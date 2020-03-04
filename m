@@ -7,121 +7,152 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EC7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDCAC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C4C42146E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C28502146E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfQeEfwj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C4C42146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LS9rXrUc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28502146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ZPU-0000Hd-BN
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:10:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39800)
+	id 1j9ZXf-000462-SL
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:18:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9ZOn-0008Fc-M0
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:09:42 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9ZWn-0003BU-GE
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9ZOm-0001Jb-A1
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:09:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30588
+ (envelope-from <jsnow@redhat.com>) id 1j9ZWm-0007x7-4U
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32981
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9ZOm-0001Hz-5y
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:09:40 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9ZWl-0007v3-T6
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583348979;
+ s=mimecast20190719; t=1583349474;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TVpPJGbZgidGFz1fY5W/CghqqC3K7ejVT7nB1yNV4NQ=;
- b=dfQeEfwjtDEMB1c7e36UYlsQl94naIfUKWBBUiSkaDjH7vttikTF6gC0nYbCzahIPIgOml
- G4RlDEOxRX2T58SB2pefv6Gk/fsJ8OnAnCVGDaYUAEXILFD91YuPBFy2qk2XASvp/ZbhCm
- X5HxRvKHtQVrz6SSZBTe836iHYMRC9s=
+ bh=cungv1hljWKE8Yxx+hRsCc5MYqudu5AadRqzQH8j8kM=;
+ b=LS9rXrUcaai5TiXMAcwZEndjVC6uOANbMQQtYFNWrJr8JxI3m2BxDex+7D83E25PoTJM0d
+ 4cs6SnAydH2L1uHFBLztBRgoHaFX2kQgBwm1DEzWhUHXCZNtRSOEdX/ZgTYKkYFZa8IXYh
+ bjcXKgykLrQRAS/wY6orGjPd6A1DhQQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-apSLEiPpNUWH0g19iqPghQ-1; Wed, 04 Mar 2020 14:09:37 -0500
-X-MC-Unique: apSLEiPpNUWH0g19iqPghQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-211-GT2bZZRVPyuCiT4hYq9nAA-1; Wed, 04 Mar 2020 14:17:50 -0500
+X-MC-Unique: GT2bZZRVPyuCiT4hYq9nAA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A160800D4E;
- Wed,  4 Mar 2020 19:09:36 +0000 (UTC)
-Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BAF219C69;
- Wed,  4 Mar 2020 19:09:35 +0000 (UTC)
-Subject: Re: [PATCH v6 17/18] docs: Add protvirt docs
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-18-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <4ec64421-da11-626c-400d-207cc7511e0f@redhat.com>
-Date: Wed, 4 Mar 2020 20:09:34 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBA0280573A;
+ Wed,  4 Mar 2020 19:17:49 +0000 (UTC)
+Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ECA1E5D9C9;
+ Wed,  4 Mar 2020 19:17:48 +0000 (UTC)
+Subject: Re: [PATCH v6 9/9] iotests: add pylintrc file
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200227000639.9644-1-jsnow@redhat.com>
+ <20200227000639.9644-10-jsnow@redhat.com> <87h7z4r3dx.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ba878308-54ba-3eee-41ec-b14c19fda8b2@redhat.com>
+Date: Wed, 4 Mar 2020 14:17:48 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304114231.23493-18-frankja@linux.ibm.com>
+In-Reply-To: <87h7z4r3dx.fsf@dusky.pond.sub.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,147 +164,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.03.20 12:42, Janosch Frank wrote:
-> Lets add some documentation for the Protected VM functionality.
+
+
+On 3/4/20 2:22 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
 >=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  docs/system/index.rst    |  1 +
->  docs/system/protvirt.rst | 57 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 58 insertions(+)
->  create mode 100644 docs/system/protvirt.rst
+>> Repeatable results. run `pylint iotests.py` and you should get a pass.
 >=20
-> diff --git a/docs/system/index.rst b/docs/system/index.rst
-> index 1a4b2c82ac..d2dc63b973 100644
-> --- a/docs/system/index.rst
-> +++ b/docs/system/index.rst
-> @@ -16,3 +16,4 @@ Contents:
-> =20
->     qemu-block-drivers
->     vfio-ap
-> +   protvirt
-> diff --git a/docs/system/protvirt.rst b/docs/system/protvirt.rst
-> new file mode 100644
-> index 0000000000..a1902cc47c
-> --- /dev/null
-> +++ b/docs/system/protvirt.rst
-> @@ -0,0 +1,57 @@
-> +Protected Virtualization on s390x
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +The memory and most of the register contents of Protected Virtual
-
-s/register contents/registers/
-
-> +Machines (PVMs) are inaccessible to the hypervisor, effectively
-
-s/inaccessible/encrypted or even inaccessible/ ?
-
-> +prohibiting VM introspection when the VM is running. At rest, PVMs are
-> +encrypted and can only be decrypted by the firmware of specific IBM Z
-> +machines.
-
-maybe "(a.k.a. the Ultravisor)"
-
-> +
-> +
-> +Prerequisites
-> +-------------
-> +
-> +To run PVMs, you need to have a machine with the Protected
-
-"a machine with the Protected Virtualization feature is required"
-
-> +Virtualization feature, which is indicated by the Ultravisor Call
-> +facility (stfle bit 158). This is a KVM only feature, therefore you
-
-", therefore, "
-
-I don't understand the "KVM only" feature part. Just say that an updated
-KVM + right HW is required and how it is to be updated.
-
-> +need a KVM which is able to support PVMs and activate the Ultravisor
-
-"a KVM version"
-
-> +initialization by setting `prot_virt=3D1` on the kernel command line.
-> +
-> +If those requirements are met, the capability `KVM_CAP_S390_PROTECTED`
-> +will indicate that KVM can support PVMs on that LPAR.
-> +
-> +
-> +QEMU Settings
-> +-------------
-> +
-> +To indicate to the VM that it can move into protected mode, the
-
-s/move/transition/ ?
-
-> +`Unpack facility` (stfle bit 161) needs to be part of the cpu model of
-> +the VM.
-
-Maybe mention the CPU feature name here.
-
-> +
-> +All I/O devices need to use the IOMMU.
-> +Passthrough (vfio) devices are currently not supported.
-> +
-> +Host huge page backings are not supported. The guest however can use
-
-"However, the guest can ..."
-
-> +huge pages as indicated by its facilities.
-> +
-> +
-> +Boot Process
-> +------------
-> +
-> +A secure guest image can be both booted from disk and using the QEMU
-
-"either be loaded from disk or supplied on the QEMU command line" ?
-
-> +command line. Booting from disk is done by the unmodified s390-ccw
-> +BIOS. I.e., the bootmap is interpreted and a number of components is
-
-"interpreted, multiple components are"
-
-> +read into memory and control is transferred to one of the components
-> +(zipl stage3), which does some fixups and then transfers control to
-> +some program residing in guest memory, which is normally the OS
-
-to many ", which". Better split that up for readability.
-
-> +kernel. The secure image has another component prepended (stage3a)
-> +which uses the new diag308 subcodes 8 and 10 to trigger the transition
-> +into secure mode.
-> +
-> +Booting from the command line requires that the file passed
-
-"from the image supplied on the QEMU command line" ?
-
-> +via -kernel has the same memory layout as would result from the disk
-> +boot. This memory layout includes the encrypted components (kernel,
-> +initrd, cmdline), the stage3a loader and metadata. In case this boot
-> +method is used, the command line options -initrd and -cmdline are
-> +ineffective.  The preparation of secure guest image is done by a
-
-s/of secure/of a PMV image/
-
-> +program (name tbd) of the s390-tools package.
+> Start your sentences with a capital letter, please.
 >=20
 
+The German complains about the capitalization, but not the sentence
+fragment.
 
-General: secure guest -> PMV
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/pylintrc | 20 ++++++++++++++++++++
+>>  1 file changed, 20 insertions(+)
+>>  create mode 100644 tests/qemu-iotests/pylintrc
+>>
+>> diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
+>> new file mode 100644
+>> index 0000000000..feed506f75
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/pylintrc
+>> @@ -0,0 +1,20 @@
+>> +[MESSAGES CONTROL]
+>> +
+>> +# Disable the message, report, category or checker with the given id(s)=
+. You
+>> +# can either give multiple identifiers separated by comma (,) or put th=
+is
+>> +# option multiple times (only on the command line, not in the configura=
+tion
+>> +# file where it should appear only once). You can also use "--disable=
+=3Dall" to
+>> +# disable everything first and then reenable specific checks. For examp=
+le, if
+>> +# you want to run only the similarities checker, you can use "--disable=
+=3Dall
+>> +# --enable=3Dsimilarities". If you want to run only the classes checker=
+, but have
+>> +# no Warning level messages displayed, use "--disable=3Dall --enable=3D=
+classes
+>> +# --disable=3DW".
+>> +disable=3Dinvalid-name,
+>> +        missing-docstring,
+>> +        line-too-long,
+>> +        too-many-lines,
+>> +        too-few-public-methods,
+>> +        too-many-arguments,
+>> +        too-many-locals,
+>> +        too-many-branches,
+>> +        too-many-public-methods,
+>> \ No newline at end of file
+>=20
+> Add the newline, please.
+>=20
+> German pejorative for the too-many- and too-few- warnings: "M=C3=BCsli".
+> Implies it's for muesli-knitters / granola-crunchers indulging their
+> orthorexia.
+>=20
 
---=20
-Thanks,
+They are useful at times as they can suggest when you are going a bit
+overboard on "organically grown" design. For cleaning an existing
+codebase, it's more of a hindrance to the immediate goal of establishing
+a baseline.
 
-David / dhildenb
+(*cough* I try to adhere to them in my own freshly written code, and
+disable per-line when I've decided to veto the suggestion. Not
+appropriate for a codebase like ours. As Max reminds me, it's just tests
+-- don't make them too clever or pretty.)
+
+Regardless. It's not appropriate here and now.
+
+> missing-docstring is not advisable for libraries.  Feels okay here.
+>=20
+
+Ideally we do start using them, but it's out of scope here. Since I did
+some cleanup, I wanted to establish the baseline of what I adhered to.
+
+*not* suggest that it's the destination state.
+
+Adding proper docstrings should be done during mypy conversion once the
+types are determined, understood, and enforced. Not before then.
+
+> line-too-long might be worth cleaning up.  How many of them do we have
+> now?
+>=20
+
+Five in iotests.py using the default length of 100. 15 if I limit to 80.
+
+If we agree that 100 is okay, I can tackle this in an amendment patch.
+If 80 is okay, I'm going to put it off as one coat of paint too many.
+
+(I will try to clean up the 100+ lines for my next version. I am
+hesitant to make a deeper cut because I have the feeling it's the type
+of series that will incur a lot of nitpicks on indent style.)
+
+--js
 
 
