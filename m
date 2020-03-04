@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0C0C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 20:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABD3C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 20:31:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3554A20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 20:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1578E2146E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 20:31:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JWCEba7n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3554A20870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c02ypg9X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1578E2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ac5-0002jz-DF
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 15:27:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55101)
+	id 1j9afc-0004uW-4t
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 15:31:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9abG-0002G9-7D
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:26:39 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9aej-0004N5-Hp
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:30:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9abF-0001a2-7f
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:26:38 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45604
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1j9aei-0003Kr-I9
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:30:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25423
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9abF-0001Zc-3u
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:26:37 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9aei-0003Jp-Da
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 15:30:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583353596;
+ s=mimecast20190719; t=1583353812;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vjKLwrrpMjtJRVofoWjKFQzlynCs5RaCPUMhoTd77rk=;
- b=JWCEba7ncIlPTWnhwIC9rn6WDf3tt18JsyekHgU6XJUECSiqU4tel9PORT71PCaihEHgiU
- vVufv8MEOEPJgwQUs2umOT/pXcGBRtxdT76LyAB/vqMLBiaQfNEVp11r7JMxHz5R9t3HUj
- shB+Wuaa//H3+WwiGjoE6kAXr8STv0k=
+ bh=f6m8sxKwa8XSL/Bc2DpTgVIXTl3wB1jLTIhVNa3BU64=;
+ b=c02ypg9X1m1oADQG2j4zUlc7dngepVWktsDwRVfF4kaXEi2DTftSHFAw/lNsKJsiS5oeLk
+ lSITWofbgxXX+qI0YrApg9ZEH7KSiDNBep/zLrzCizmzstY0MMquMjOAzz42UB7uud1vnt
+ EyZ+tZDiDb72tyBLd1H58HeQZtnAd+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-Ru2Wn7kiN3qj6KDUeo7OPA-1; Wed, 04 Mar 2020 15:26:34 -0500
-X-MC-Unique: Ru2Wn7kiN3qj6KDUeo7OPA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-42-5Sps6OGtOOeFCrCZLGNjdg-1; Wed, 04 Mar 2020 15:30:09 -0500
+X-MC-Unique: 5Sps6OGtOOeFCrCZLGNjdg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A735107ACC9;
- Wed,  4 Mar 2020 20:26:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5CB118A5508;
+ Wed,  4 Mar 2020 20:30:08 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7159E91D87;
- Wed,  4 Mar 2020 20:26:32 +0000 (UTC)
-Subject: Re: [PATCH v2 2/4] qapi: Drop conditionals for Python 2
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6DB673892;
+ Wed,  4 Mar 2020 20:30:07 +0000 (UTC)
+Subject: Re: [PATCH v2 3/4] qapi: Use super() now we have Python 3
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200304155932.20452-1-armbru@redhat.com>
- <20200304155932.20452-3-armbru@redhat.com>
+ <20200304155932.20452-4-armbru@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -138,20 +138,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <774222e2-674b-51ef-1aa6-ae7ac1da5ddb@redhat.com>
-Date: Wed, 4 Mar 2020 15:26:31 -0500
+Message-ID: <28ec8c76-c779-c279-f71a-a8751c6a081a@redhat.com>
+Date: Wed, 4 Mar 2020 15:30:07 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304155932.20452-3-armbru@redhat.com>
+In-Reply-To: <20200304155932.20452-4-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -173,16 +173,18 @@ Sender: "Qemu-devel"
 
 On 3/4/20 10:59 AM, Markus Armbruster wrote:
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  scripts/qapi/common.py         | 6 +-----
->  scripts/qapi/gen.py            | 6 +-----
->  scripts/qapi/parser.py         | 6 +-----
->  tests/qapi-schema/test-qapi.py | 6 +-----
->  4 files changed, 4 insertions(+), 20 deletions(-)
->=20
-
-Seeyanara.
+>  scripts/qapi/commands.py   |  4 +--
+>  scripts/qapi/error.py      |  4 +--
+>  scripts/qapi/events.py     |  4 +--
+>  scripts/qapi/gen.py        | 10 ++++----
+>  scripts/qapi/introspect.py |  4 +--
+>  scripts/qapi/parser.py     |  2 +-
+>  scripts/qapi/schema.py     | 51 +++++++++++++++++++-------------------
+>  scripts/qapi/types.py      |  4 +--
+>  scripts/qapi/visit.py      |  4 +--
+>  9 files changed, 43 insertions(+), 44 deletions(-)
+> 
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
