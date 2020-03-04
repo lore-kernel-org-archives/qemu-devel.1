@@ -2,102 +2,78 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62053C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B85C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:46:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B83820717
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70E4720717
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:46:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQxsiqr4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B83820717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flXUh5+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E4720717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9bqT-00005p-BQ
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 16:46:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54071)
+	id 1j9bqe-0000IN-K2
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 16:46:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9bpJ-0007Rp-0L
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:45:14 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9biv-0006Qv-OT
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9bpG-0006ml-FR
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:45:12 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48285
+ (envelope-from <jsnow@redhat.com>) id 1j9bis-0007d4-Q0
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54112
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9bpG-0006mU-An
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:45:10 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9bis-0007ck-KH
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583358310;
+ s=mimecast20190719; t=1583357914;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MdTr2TWUBGGXDKXTxZIpaPHxozp78/KkEvxBU5dHQLk=;
- b=ZQxsiqr4lx4slk+EmubaI2CnPiJUOoTS3bQhlHGjC1MKsofUQ2BtrHYB+pJ6g3aGf4EcAR
- jPAoQEfyavp7cZhSxw3TVpEHTN7N9kMZvqshARAirWPiXA4grBKTct34cmiBpc3SIHMeBs
- Aj5/FTpqAMB470mcYD9Oh/Ik2vOGTUI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-DZOegZfaM76R0gPKCU-zeQ-1; Wed, 04 Mar 2020 16:45:07 -0500
-X-MC-Unique: DZOegZfaM76R0gPKCU-zeQ-1
-Received: by mail-ed1-f70.google.com with SMTP id u1so2616055edo.14
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 13:45:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bbHyawOfKf8yHvM3+DinKWF/8RMB4VwQ4zNYO71Jwww=;
- b=Zl7HF4chBDYy1FDXJejGLknyFtipEdLB95X080dI0srmdIZdD1NW+ex+bY0tS/lruK
- 9e5WAkwiYR/02NTLezUUHFtV3W5RQh4i6GZgrey4xnEh4aroUiXFmT0HSjkzFgquILLX
- u/VL/6V8EYOf23O6/v+RryUxtE8vu2XaAzo896Sr1QZALOmTfI+0EUUt8eBQ6EeodDJh
- RTZxUW3vM0nTOISduo0yFULcK9M1J9OWJP/rhm2lQr5S7p4GFVhbue8tsIULrOGB8uEK
- ZSwjhxwQaFtRVf3/7u79rSMAkcPMgP+/F6QX9+BcF2PKDEgj3MYwErjEdgwMZExaRK/7
- wh1Q==
-X-Gm-Message-State: ANhLgQ1XPmOeZuKDihmwa0dI85YVZlbRYYyNTC380aVT9MMU36gWByKU
- tJvLpWGvqKvXINp9uSmDVgPgR5dcqOusGWoy/rbjJO3XYBQFLFqftop0F6tQhZ9bEobFkOO00Ub
- gd/Cet7bv93011uo=
-X-Received: by 2002:a05:6402:542:: with SMTP id
- i2mr4807166edx.248.1583358306199; 
- Wed, 04 Mar 2020 13:45:06 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsjLnMWU/XSGHKaTibZua0GC1D060vewJEYTScrCKU4ssFo8S2XaQi8ADkRhvyzVVkPUJ6h5Q==
-X-Received: by 2002:a05:6402:542:: with SMTP id
- i2mr4807136edx.248.1583358305802; 
- Wed, 04 Mar 2020 13:45:05 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id t24sm1695949edy.94.2020.03.04.13.45.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Mar 2020 13:45:04 -0800 (PST)
-Subject: Re: [PATCH v7 01/10] iotests: do a light delinting
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+ bh=zt7HdVkvY922Cj3kFWYOWN3sbygvHVEaks3l97rvtpc=;
+ b=flXUh5+R69i26zGPyBYXk9bAEqRCmYNviJh+Cbaw0x7uz1Ka6MZbPfcV/sNTay2Pxkh/m8
+ qRSbJoM4J2e+9iSziRq9o/n9IXAB+evUwK1yEwGi6+1XnVnjAZ+R/ZP4w7sWD+uP4/jur4
+ G3vYQhqVYLGBKEyPk7WG8MW7NfJX+rs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-h-g1ZkHYMru6fku9nMB5Vw-1; Wed, 04 Mar 2020 16:38:31 -0500
+X-MC-Unique: h-g1ZkHYMru6fku9nMB5Vw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A5F800D5A;
+ Wed,  4 Mar 2020 21:38:30 +0000 (UTC)
+Received: from probe.redhat.com (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCF5A5C1D4;
+ Wed,  4 Mar 2020 21:38:27 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 07/10] iotests: add script_initialize
+Date: Wed,  4 Mar 2020 16:38:15 -0500
+Message-Id: <20200304213818.15341-8-jsnow@redhat.com>
+In-Reply-To: <20200304213818.15341-1-jsnow@redhat.com>
 References: <20200304213818.15341-1-jsnow@redhat.com>
- <20200304213818.15341-2-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bf9bcd51-3481-259b-5d2a-ede350ceaba0@redhat.com>
-Date: Wed, 4 Mar 2020 22:45:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304213818.15341-2-jsnow@redhat.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,335 +85,753 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/4/20 10:38 PM, John Snow wrote:
-> This doesn't fix everything in here, but it does help clean up the
-> pylint report considerably.
->=20
-> This should be 100% style changes only; the intent is to make pylint
-> more useful by working on establishing a baseline for iotests that we
-> can gate against in the future. This will be important if (when?) we
-> begin adding type hints to our code base.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   tests/qemu-iotests/iotests.py | 83 ++++++++++++++++++-----------------
->   1 file changed, 43 insertions(+), 40 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index 8815052eb5..c3aa857140 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -16,11 +16,9 @@
->   # along with this program.  If not, see <http://www.gnu.org/licenses/>.
->   #
->  =20
-> -import errno
->   import os
->   import re
->   import subprocess
-> -import string
->   import unittest
->   import sys
->   import struct
-> @@ -34,7 +32,7 @@
->   sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'py=
-thon'))
->   from qemu import qtest
->  =20
-> -assert sys.version_info >=3D (3,6)
-> +assert sys.version_info >=3D (3, 6)
->  =20
->   # This will not work if arguments contain spaces but is necessary if we
->   # want to support the override options that ./check supports.
-> @@ -138,11 +136,11 @@ def qemu_img_log(*args):
->       return result
->  =20
->   def img_info_log(filename, filter_path=3DNone, imgopts=3DFalse, extra_a=
-rgs=3D[]):
-> -    args =3D [ 'info' ]
-> +    args =3D ['info']
->       if imgopts:
->           args.append('--image-opts')
->       else:
-> -        args +=3D [ '-f', imgfmt ]
-> +        args +=3D ['-f', imgfmt]
->       args +=3D extra_args
->       args.append(filename)
->  =20
-> @@ -221,7 +219,7 @@ def cmd(self, cmd):
->           # quit command is in close(), '\n' is added automatically
->           assert '\n' not in cmd
->           cmd =3D cmd.strip()
-> -        assert cmd !=3D 'q' and cmd !=3D 'quit'
-> +        assert cmd not in ('q', 'quit')
->           self._p.stdin.write(cmd + '\n')
->           self._p.stdin.flush()
->           return self._read_output()
-> @@ -243,10 +241,8 @@ def qemu_nbd_early_pipe(*args):
->           sys.stderr.write('qemu-nbd received signal %i: %s\n' %
->                            (-exitcode,
->                             ' '.join(qemu_nbd_args + ['--fork'] + list(ar=
-gs))))
-> -    if exitcode =3D=3D 0:
-> -        return exitcode, ''
-> -    else:
-> -        return exitcode, subp.communicate()[0]
-> +
-> +    return exitcode, subp.communicate()[0] if exitcode else ''
->  =20
->   def qemu_nbd_popen(*args):
->       '''Run qemu-nbd in daemon mode and return the parent's exit code'''
-> @@ -310,7 +306,7 @@ def filter_qmp(qmsg, filter_fn):
->           items =3D qmsg.items()
->  =20
->       for k, v in items:
-> -        if isinstance(v, list) or isinstance(v, dict):
-> +        if isinstance(v, (dict, list)):
->               qmsg[k] =3D filter_qmp(v, filter_fn)
->           else:
->               qmsg[k] =3D filter_fn(k, v)
-> @@ -321,7 +317,7 @@ def filter_testfiles(msg):
->       return msg.replace(prefix, 'TEST_DIR/PID-')
->  =20
->   def filter_qmp_testfiles(qmsg):
-> -    def _filter(key, value):
-> +    def _filter(_key, value):
->           if is_str(value):
->               return filter_testfiles(value)
->           return value
-> @@ -347,7 +343,7 @@ def filter_imgfmt(msg):
->       return msg.replace(imgfmt, 'IMGFMT')
->  =20
->   def filter_qmp_imgfmt(qmsg):
-> -    def _filter(key, value):
-> +    def _filter(_key, value):
->           if is_str(value):
->               return filter_imgfmt(value)
->           return value
-> @@ -358,7 +354,7 @@ def log(msg, filters=3D[], indent=3DNone):
->       If indent is provided, JSON serializable messages are pretty-printe=
-d.'''
->       for flt in filters:
->           msg =3D flt(msg)
-> -    if isinstance(msg, dict) or isinstance(msg, list):
-> +    if isinstance(msg, (dict, list)):
->           # Python < 3.4 needs to know not to add whitespace when pretty-=
-printing:
->           separators =3D (', ', ': ') if indent is None else (',', ': ')
->           # Don't sort if it's already sorted
-> @@ -369,14 +365,14 @@ def log(msg, filters=3D[], indent=3DNone):
->           print(msg)
->  =20
->   class Timeout:
-> -    def __init__(self, seconds, errmsg =3D "Timeout"):
-> +    def __init__(self, seconds, errmsg=3D"Timeout"):
->           self.seconds =3D seconds
->           self.errmsg =3D errmsg
->       def __enter__(self):
->           signal.signal(signal.SIGALRM, self.timeout)
->           signal.setitimer(signal.ITIMER_REAL, self.seconds)
->           return self
-> -    def __exit__(self, type, value, traceback):
-> +    def __exit__(self, exc_type, value, traceback):
->           signal.setitimer(signal.ITIMER_REAL, 0)
->           return False
->       def timeout(self, signum, frame):
-> @@ -385,7 +381,7 @@ def timeout(self, signum, frame):
->   def file_pattern(name):
->       return "{0}-{1}".format(os.getpid(), name)
->  =20
-> -class FilePaths(object):
-> +class FilePaths:
->       """
->       FilePaths is an auto-generated filename that cleans itself up.
->  =20
-> @@ -532,11 +528,11 @@ def pause_drive(self, drive, event=3DNone):
->               self.pause_drive(drive, "write_aio")
->               return
->           self.qmp('human-monitor-command',
-> -                    command_line=3D'qemu-io %s "break %s bp_%s"' % (driv=
-e, event, drive))
-> +                 command_line=3D'qemu-io %s "break %s bp_%s"' % (drive, =
-event, drive))
->  =20
->       def resume_drive(self, drive):
->           self.qmp('human-monitor-command',
-> -                    command_line=3D'qemu-io %s "remove_break bp_%s"' % (=
-drive, drive))
-> +                 command_line=3D'qemu-io %s "remove_break bp_%s"' % (dri=
-ve, drive))
->  =20
->       def hmp_qemu_io(self, drive, cmd):
->           '''Write to a given drive using an HMP command'''
-> @@ -547,8 +543,8 @@ def flatten_qmp_object(self, obj, output=3DNone, base=
-str=3D''):
->           if output is None:
->               output =3D dict()
->           if isinstance(obj, list):
-> -            for i in range(len(obj)):
-> -                self.flatten_qmp_object(obj[i], output, basestr + str(i)=
- + '.')
-> +            for i, atom in enumerate(obj):
-> +                self.flatten_qmp_object(atom, output, basestr + str(i) +=
- '.')
->           elif isinstance(obj, dict):
->               for key in obj:
->                   self.flatten_qmp_object(obj[key], output, basestr + key=
- + '.')
-> @@ -703,9 +699,7 @@ def get_bitmap(self, node_name, bitmap_name, recordin=
-g=3DNone, bitmaps=3DNone):
->  =20
->           for bitmap in bitmaps[node_name]:
->               if bitmap.get('name', '') =3D=3D bitmap_name:
-> -                if recording is None:
-> -                    return bitmap
-> -                elif bitmap.get('recording') =3D=3D recording:
-> +                if recording is None or bitmap.get('recording') =3D=3D r=
-ecording:
->                       return bitmap
->           return None
->  =20
-> @@ -756,12 +750,13 @@ def assert_block_path(self, root, path, expected_no=
-de, graph=3DNone):
->               assert node is not None, 'Cannot follow path %s%s' % (root,=
- path)
->  =20
->               try:
-> -                node_id =3D next(edge['child'] for edge in graph['edges'=
-] \
-> -                                             if edge['parent'] =3D=3D no=
-de['id'] and
-> -                                                edge['name'] =3D=3D chil=
-d_name)
-> +                node_id =3D next(edge['child'] for edge in graph['edges'=
-]
-> +                               if (edge['parent'] =3D=3D node['id'] and
-> +                                   edge['name'] =3D=3D child_name))
-> +
-> +                node =3D next(node for node in graph['nodes']
-> +                            if node['id'] =3D=3D node_id)
->  =20
-> -                node =3D next(node for node in graph['nodes'] \
-> -                                 if node['id'] =3D=3D node_id)
->               except StopIteration:
->                   node =3D None
->  =20
-> @@ -779,6 +774,12 @@ def assert_block_path(self, root, path, expected_nod=
-e, graph=3DNone):
->   class QMPTestCase(unittest.TestCase):
->       '''Abstract base class for QMP test cases'''
->  =20
-> +    def __init__(self, *args, **kwargs):
-> +        super().__init__(*args, **kwargs)
-> +        # Many users of this class set a VM property we rely on heavily
-> +        # in the methods below.
-> +        self.vm =3D None
-> +
->       def dictpath(self, d, path):
->           '''Traverse a path in a nested dict'''
->           for component in path.split('/'):
-> @@ -824,7 +825,7 @@ def assert_qmp(self, d, path, value):
->           else:
->               self.assertEqual(result, value,
->                                '"%s" is "%s", expected "%s"'
-> -                                 % (path, str(result), str(value)))
-> +                             % (path, str(result), str(value)))
->  =20
->       def assert_no_active_block_jobs(self):
->           result =3D self.vm.qmp('query-block-jobs')
-> @@ -834,15 +835,15 @@ def assert_has_block_node(self, node_name=3DNone, f=
-ile_name=3DNone):
->           """Issue a query-named-block-nodes and assert node_name and/or
->           file_name is present in the result"""
->           def check_equal_or_none(a, b):
-> -            return a =3D=3D None or b =3D=3D None or a =3D=3D b
-> +            return a is None or b is None or a =3D=3D b
->           assert node_name or file_name
->           result =3D self.vm.qmp('query-named-block-nodes')
->           for x in result["return"]:
->               if check_equal_or_none(x.get("node-name"), node_name) and \
->                       check_equal_or_none(x.get("file"), file_name):
->                   return
-> -        self.assertTrue(False, "Cannot find %s %s in result:\n%s" % \
-> -                (node_name, file_name, result))
-> +        self.fail("Cannot find %s %s in result:\n%s" %
-> +                  (node_name, file_name, result))
->  =20
->       def assert_json_filename_equal(self, json_filename, reference):
->           '''Asserts that the given filename is a json: filename and that=
- its
-> @@ -891,13 +892,13 @@ def wait_until_completed(self, drive=3D'drive0', ch=
-eck_offset=3DTrue, wait=3D60.0,
->                           self.assert_qmp(event, 'data/error', error)
->                       self.assert_no_active_block_jobs()
->                       return event
-> -                elif event['event'] =3D=3D 'JOB_STATUS_CHANGE':
-> +                if event['event'] =3D=3D 'JOB_STATUS_CHANGE':
+Like script_main, but doesn't require a single point of entry.
+Replace all existing initialization sections with this drop-in replacement.
 
-I don't understand the rational for this change, but the result is=20
-correct anyway, so thanks for this nice cleanup!
+This brings debug support to all existing script-style iotests.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ tests/qemu-iotests/149        |  3 +-
+ tests/qemu-iotests/194        |  4 +-
+ tests/qemu-iotests/202        |  4 +-
+ tests/qemu-iotests/203        |  4 +-
+ tests/qemu-iotests/206        |  2 +-
+ tests/qemu-iotests/207        |  6 ++-
+ tests/qemu-iotests/208        |  2 +-
+ tests/qemu-iotests/209        |  2 +-
+ tests/qemu-iotests/210        |  6 ++-
+ tests/qemu-iotests/211        |  6 ++-
+ tests/qemu-iotests/212        |  6 ++-
+ tests/qemu-iotests/213        |  6 ++-
+ tests/qemu-iotests/216        |  4 +-
+ tests/qemu-iotests/218        |  2 +-
+ tests/qemu-iotests/219        |  2 +-
+ tests/qemu-iotests/222        |  7 ++--
+ tests/qemu-iotests/224        |  4 +-
+ tests/qemu-iotests/228        |  6 ++-
+ tests/qemu-iotests/234        |  4 +-
+ tests/qemu-iotests/235        |  4 +-
+ tests/qemu-iotests/236        |  2 +-
+ tests/qemu-iotests/237        |  2 +-
+ tests/qemu-iotests/238        |  2 +
+ tests/qemu-iotests/242        |  2 +-
+ tests/qemu-iotests/246        |  2 +-
+ tests/qemu-iotests/248        |  2 +-
+ tests/qemu-iotests/254        |  2 +-
+ tests/qemu-iotests/255        |  2 +-
+ tests/qemu-iotests/256        |  2 +-
+ tests/qemu-iotests/258        |  7 ++--
+ tests/qemu-iotests/260        |  4 +-
+ tests/qemu-iotests/262        |  4 +-
+ tests/qemu-iotests/264        |  4 +-
+ tests/qemu-iotests/277        |  2 +
+ tests/qemu-iotests/280        |  8 ++--
+ tests/qemu-iotests/283        |  4 +-
+ tests/qemu-iotests/iotests.py | 73 +++++++++++++++++++++++------------
+ 37 files changed, 128 insertions(+), 80 deletions(-)
 
->                       self.assert_qmp(event, 'data/id', drive)
->  =20
->       def wait_ready(self, drive=3D'drive0'):
-> -        '''Wait until a block job BLOCK_JOB_READY event'''
-> -        f =3D {'data': {'type': 'mirror', 'device': drive } }
-> -        event =3D self.vm.event_wait(name=3D'BLOCK_JOB_READY', match=3Df=
+diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+index b4a21bf7b7..852768f80a 100755
+--- a/tests/qemu-iotests/149
++++ b/tests/qemu-iotests/149
+@@ -382,8 +382,7 @@ def test_once(config, qemu_img=3DFalse):
+=20
+=20
+ # Obviously we only work with the luks image format
+-iotests.verify_image_format(supported_fmts=3D['luks'])
+-iotests.verify_platform()
++iotests.script_initialize(supported_fmts=3D['luks'])
+=20
+ # We need sudo in order to run cryptsetup to create
+ # dm-crypt devices. This is safe to use on any
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index 9dc1bd3510..8b1f720af4 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -21,8 +21,8 @@
+=20
+ import iotests
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qed', 'raw'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2', 'qed', 'raw'],
++                          supported_platforms=3D['linux'])
+=20
+ with iotests.FilePath('source.img') as source_img_path, \
+      iotests.FilePath('dest.img') as dest_img_path, \
+diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
+index 920a8683ef..e3900a44d1 100755
+--- a/tests/qemu-iotests/202
++++ b/tests/qemu-iotests/202
+@@ -24,8 +24,8 @@
+=20
+ import iotests
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          supported_platforms=3D['linux'])
+=20
+ with iotests.FilePath('disk0.img') as disk0_img_path, \
+      iotests.FilePath('disk1.img') as disk1_img_path, \
+diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
+index 49eff5d405..4b4bd3307d 100755
+--- a/tests/qemu-iotests/203
++++ b/tests/qemu-iotests/203
+@@ -24,8 +24,8 @@
+=20
+ import iotests
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          supported_platforms=3D['linux'])
+=20
+ with iotests.FilePath('disk0.img') as disk0_img_path, \
+      iotests.FilePath('disk1.img') as disk1_img_path, \
+diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+index e2b50ae24d..f42432a838 100755
+--- a/tests/qemu-iotests/206
++++ b/tests/qemu-iotests/206
+@@ -23,7 +23,7 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ with iotests.FilePath('t.qcow2') as disk_path, \
+      iotests.FilePath('t.qcow2.base') as backing_path, \
+diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+index 3d9c1208ca..a6621410da 100755
+--- a/tests/qemu-iotests/207
++++ b/tests/qemu-iotests/207
+@@ -24,8 +24,10 @@ import iotests
+ import subprocess
+ import re
+=20
+-iotests.verify_image_format(supported_fmts=3D['raw'])
+-iotests.verify_protocol(supported=3D['ssh'])
++iotests.script_initialize(
++    supported_fmts=3D['raw'],
++    supported_protocols=3D['ssh'],
++)
+=20
+ def filter_hash(qmsg):
+     def _filter(key, value):
+diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
+index 1c3fc8c7fd..6cb642f821 100755
+--- a/tests/qemu-iotests/208
++++ b/tests/qemu-iotests/208
+@@ -22,7 +22,7 @@
+=20
+ import iotests
+=20
+-iotests.verify_image_format(supported_fmts=3D['generic'])
++iotests.script_initialize(supported_fmts=3D['generic'])
+=20
+ with iotests.FilePath('disk.img') as disk_img_path, \
+      iotests.FilePath('disk-snapshot.img') as disk_snapshot_img_path, \
+diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
+index 65c1a1e70a..8c804f4a30 100755
+--- a/tests/qemu-iotests/209
++++ b/tests/qemu-iotests/209
+@@ -22,7 +22,7 @@ import iotests
+ from iotests import qemu_img_create, qemu_io, qemu_img_verbose, qemu_nbd, =
+\
+                     file_path
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ disk =3D file_path('disk')
+ nbd_sock =3D file_path('nbd-sock', base_dir=3Diotests.sock_dir)
+diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
+index e49896e23d..7bf591f313 100755
+--- a/tests/qemu-iotests/210
++++ b/tests/qemu-iotests/210
+@@ -23,8 +23,10 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['luks'])
+-iotests.verify_protocol(supported=3D['file'])
++iotests.script_initialize(
++    supported_fmts=3D['luks'],
++    supported_protocols=3D['file'],
++)
+=20
+ with iotests.FilePath('t.luks') as disk_path, \
+      iotests.VM() as vm:
+diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
+index 163994d559..4969edb00c 100755
+--- a/tests/qemu-iotests/211
++++ b/tests/qemu-iotests/211
+@@ -23,8 +23,10 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['vdi'])
+-iotests.verify_protocol(supported=3D['file'])
++iotests.script_initialize(
++    supported_fmts=3D['vdi'],
++    supported_protocols=3D['file'],
++)
+=20
+ def blockdev_create(vm, options):
+     error =3D vm.blockdev_create(options)
+diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
+index 800f92dd84..45d08842bb 100755
+--- a/tests/qemu-iotests/212
++++ b/tests/qemu-iotests/212
+@@ -23,8 +23,10 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['parallels'])
+-iotests.verify_protocol(supported=3D['file'])
++iotests.script_initialize(
++    supported_fmts=3D['parallels'],
++    supported_protocols=3D['file'],
++)
+=20
+ with iotests.FilePath('t.parallels') as disk_path, \
+      iotests.VM() as vm:
+diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
+index 1eee45276a..cf638eb927 100755
+--- a/tests/qemu-iotests/213
++++ b/tests/qemu-iotests/213
+@@ -23,8 +23,10 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['vhdx'])
+-iotests.verify_protocol(supported=3D['file'])
++iotests.script_initialize(
++    supported_fmts=3D['vhdx'],
++    supported_protocols=3D['file'],
++)
+=20
+ with iotests.FilePath('t.vhdx') as disk_path, \
+      iotests.VM() as vm:
+diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
+index 372f042d3e..de11d85b5d 100755
+--- a/tests/qemu-iotests/216
++++ b/tests/qemu-iotests/216
+@@ -23,8 +23,8 @@ import iotests
+ from iotests import log, qemu_img, qemu_io_silent
+=20
+ # Need backing file support
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qcow', 'qed', 'vmd=
+k'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2', 'qcow', 'qed', 'vmdk'=
+],
++                          supported_platforms=3D['linux'])
+=20
+ log('')
+ log('=3D=3D=3D Copy-on-read across nodes =3D=3D=3D')
+diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
+index 1325ba9eaa..5586870456 100755
+--- a/tests/qemu-iotests/218
++++ b/tests/qemu-iotests/218
+@@ -29,7 +29,7 @@
+ import iotests
+ from iotests import log, qemu_img, qemu_io_silent
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'raw'])
++iotests.script_initialize(supported_fmts=3D['qcow2', 'raw'])
+=20
+=20
+ # Launches the VM, adds two null-co nodes (source and target), and
+diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+index b8774770c4..db272c5249 100755
+--- a/tests/qemu-iotests/219
++++ b/tests/qemu-iotests/219
+@@ -21,7 +21,7 @@
+=20
+ import iotests
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ img_size =3D 4 * 1024 * 1024
+=20
+diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
+index bf1718e179..6602f6b4ba 100755
+--- a/tests/qemu-iotests/222
++++ b/tests/qemu-iotests/222
+@@ -24,9 +24,10 @@
+ import iotests
+ from iotests import log, qemu_img, qemu_io, qemu_io_silent
+=20
+-iotests.verify_platform(['linux'])
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qcow', 'qed', 'vmd=
+k',
+-                                            'vhdx', 'raw'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2', 'qcow', 'qed', 'vmdk', 'vhdx', 'raw'],
++    supported_platforms=3D['linux'],
++)
+=20
+ patterns =3D [("0x5d", "0",         "64k"),
+             ("0xd5", "1M",        "64k"),
+diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
+index e91fb26fd8..81ca1e4898 100755
+--- a/tests/qemu-iotests/224
++++ b/tests/qemu-iotests/224
+@@ -26,8 +26,8 @@ from iotests import log, qemu_img, qemu_io_silent, filter=
+_qmp_testfiles, \
+ import json
+=20
+ # Need backing file support (for arbitrary backing formats)
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qcow', 'qed'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2', 'qcow', 'qed'],
++                          supported_platforms=3D['linux'])
+=20
+=20
+ # There are two variations of this test:
+diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
+index 64bc82ee23..da0900fb82 100755
+--- a/tests/qemu-iotests/228
++++ b/tests/qemu-iotests/228
+@@ -25,8 +25,10 @@ from iotests import log, qemu_img, filter_testfiles, fil=
+ter_imgfmt, \
+         filter_qmp_testfiles, filter_qmp_imgfmt
+=20
+ # Need backing file and change-backing-file support
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qed'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2', 'qed'],
++    supported_platforms=3D['linux'],
++)
+=20
+=20
+ def log_node_info(node):
+diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+index 324c1549fd..73c899ddae 100755
+--- a/tests/qemu-iotests/234
++++ b/tests/qemu-iotests/234
+@@ -23,8 +23,8 @@
+ import iotests
+ import os
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          supported_platforms=3D['linux'])
+=20
+ with iotests.FilePath('img') as img_path, \
+      iotests.FilePath('backing') as backing_path, \
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+index 760826128e..d1b10ac36b 100755
+--- a/tests/qemu-iotests/235
++++ b/tests/qemu-iotests/235
+@@ -27,6 +27,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '=
+..', '..', 'python'))
+=20
+ from qemu.machine import QEMUMachine
+=20
++iotests.script_initialize(supported_fmts=3D['qcow2'])
++
+ # Note:
+ # This test was added to check that mirror dead-lock was fixed (see previo=
+us
+ # commit before this test addition).
+@@ -40,8 +42,6 @@ from qemu.machine import QEMUMachine
+=20
+ size =3D 1 * 1024 * 1024 * 1024
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-
+ disk =3D file_path('disk')
+=20
+ # prepare source image
+diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
+index 8ce927a16c..6f5cee2444 100755
+--- a/tests/qemu-iotests/236
++++ b/tests/qemu-iotests/236
+@@ -22,7 +22,7 @@
+ import iotests
+ from iotests import log
+=20
+-iotests.verify_image_format(supported_fmts=3D['generic'])
++iotests.script_initialize(supported_fmts=3D['generic'])
+ size =3D 64 * 1024 * 1024
+ granularity =3D 64 * 1024
+=20
+diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+index 50ba364a3e..5b21ad3509 100755
+--- a/tests/qemu-iotests/237
++++ b/tests/qemu-iotests/237
+@@ -24,7 +24,7 @@ import math
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['vmdk'])
++iotests.script_initialize(supported_fmts=3D['vmdk'])
+=20
+ with iotests.FilePath('t.vmdk') as disk_path, \
+      iotests.FilePath('t.vmdk.1') as extent1_path, \
+diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+index d4e060228c..b8fcf15a1f 100755
+--- a/tests/qemu-iotests/238
++++ b/tests/qemu-iotests/238
+@@ -23,6 +23,8 @@ import os
+ import iotests
+ from iotests import log
+=20
++iotests.script_initialize()
++
+ virtio_scsi_device =3D iotests.get_virtio_scsi_device()
+=20
+ vm =3D iotests.VM()
+diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+index 97617876bc..64f1bd95e4 100755
+--- a/tests/qemu-iotests/242
++++ b/tests/qemu-iotests/242
+@@ -24,7 +24,7 @@ import struct
+ from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
+     file_path, img_info_log, log, filter_qemu_io
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ disk =3D file_path('disk')
+ chunk =3D 256 * 1024
+diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
+index 59a216a839..58a479cc1f 100755
+--- a/tests/qemu-iotests/246
++++ b/tests/qemu-iotests/246
+@@ -22,7 +22,7 @@
+ import iotests
+ from iotests import log
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+ size =3D 64 * 1024 * 1024 * 1024
+ gran_small =3D 32 * 1024
+ gran_large =3D 128 * 1024
+diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
+index 68c374692e..18ba03467e 100755
+--- a/tests/qemu-iotests/248
++++ b/tests/qemu-iotests/248
+@@ -21,7 +21,7 @@
+ import iotests
+ from iotests import qemu_img_create, qemu_io, file_path, filter_qmp_testfi=
+les
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ source, target =3D file_path('source', 'target')
+ size =3D 5 * 1024 * 1024
+diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
+index ee66c986db..150e58be8e 100755
+--- a/tests/qemu-iotests/254
++++ b/tests/qemu-iotests/254
+@@ -21,7 +21,7 @@
+ import iotests
+ from iotests import qemu_img_create, file_path, log
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ disk, top =3D file_path('disk', 'top')
+ size =3D 1024 * 1024
+diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+index 4a4818bafb..8f08f741da 100755
+--- a/tests/qemu-iotests/255
++++ b/tests/qemu-iotests/255
+@@ -23,7 +23,7 @@
+ import iotests
+ from iotests import imgfmt
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+=20
+ iotests.log('Finishing a commit job with background reads')
+ iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D')
+diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
+index e34074c83e..db8d6f31cf 100755
+--- a/tests/qemu-iotests/256
++++ b/tests/qemu-iotests/256
+@@ -23,7 +23,7 @@ import os
+ import iotests
+ from iotests import log
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'])
+ size =3D 64 * 1024 * 1024
+=20
+ with iotests.FilePath('img0') as img0_path, \
+diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
+index 091755a45c..a65151dda6 100755
+--- a/tests/qemu-iotests/258
++++ b/tests/qemu-iotests/258
+@@ -24,9 +24,10 @@ from iotests import log, qemu_img, qemu_io_silent, \
+         filter_qmp_testfiles, filter_qmp_imgfmt
+=20
+ # Need backing file and change-backing-file support
+-iotests.verify_image_format(supported_fmts=3D['qcow2', 'qed'])
+-iotests.verify_platform(['linux'])
+-
++iotests.script_initialize(
++    supported_fmts=3D['qcow2', 'qed'],
++    supported_platforms=3D['linux'],
++)
+=20
+ # Returns a node for blockdev-add
+ def node(node_name, path, backing=3DNone, fmt=3DNone, throttle=3DNone):
+diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
+index 30c0de380d..804a7addb9 100755
+--- a/tests/qemu-iotests/260
++++ b/tests/qemu-iotests/260
+@@ -21,7 +21,9 @@
+ import iotests
+ from iotests import qemu_img_create, file_path, log, filter_qmp_event
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2']
++)
+=20
+ base, top =3D file_path('base', 'top')
+ size =3D 64 * 1024 * 3
+diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
+index 8835dce7be..03af061f94 100755
+--- a/tests/qemu-iotests/262
++++ b/tests/qemu-iotests/262
+@@ -23,8 +23,8 @@
+ import iotests
+ import os
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          supported_platforms=3D['linux'])
+=20
+ with iotests.FilePath('img') as img_path, \
+      iotests.FilePath('mig_fifo') as fifo, \
+diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
+index 879123a343..304a7443d7 100755
+--- a/tests/qemu-iotests/264
++++ b/tests/qemu-iotests/264
+@@ -24,7 +24,9 @@ import iotests
+ from iotests import qemu_img_create, qemu_io_silent_check, file_path, \
+         qemu_nbd_popen, log
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2'],
++)
+=20
+ disk_a, disk_b, nbd_sock =3D file_path('disk_a', 'disk_b', 'nbd-sock')
+ nbd_uri =3D 'nbd+unix:///?socket=3D' + nbd_sock
+diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
+index 04aa15a3d5..d34f87021f 100755
+--- a/tests/qemu-iotests/277
++++ b/tests/qemu-iotests/277
+@@ -23,6 +23,8 @@ import subprocess
+ import iotests
+ from iotests import file_path, log
+=20
++iotests.script_initialize()
++
+=20
+ nbd_sock, conf_file =3D file_path('nbd-sock', 'nbd-fault-injector.conf')
+=20
+diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
+index 69288fdd0e..f594bb9ed2 100755
+--- a/tests/qemu-iotests/280
++++ b/tests/qemu-iotests/280
+@@ -22,9 +22,11 @@
+ import iotests
+ import os
+=20
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
+-iotests.verify_protocol(supported=3D['file'])
+-iotests.verify_platform(['linux'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2'],
++    supported_protocols=3D['file'],
++    supported_platforms=3D['linux'],
++)
+=20
+ with iotests.FilePath('base') as base_path , \
+      iotests.FilePath('top') as top_path, \
+diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
+index 55b7cff953..e17b953333 100644
+--- a/tests/qemu-iotests/283
++++ b/tests/qemu-iotests/283
+@@ -21,7 +21,9 @@
+ import iotests
+=20
+ # The test is unrelated to formats, restrict it to qcow2 to avoid extra ru=
+ns
+-iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.script_initialize(
++    supported_fmts=3D['qcow2'],
++)
+=20
+ size =3D 1024 * 1024
+=20
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 1be11f491f..1f88d2fa2a 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -28,6 +28,7 @@
+ import atexit
+ import io
+ from collections import OrderedDict
++from typing import Collection
+=20
+ # pylint: disable=3Dimport-error, wrong-import-position
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pytho=
+n'))
+@@ -1005,12 +1006,11 @@ def verify_protocol(supported=3D(), unsupported=3D(=
+)):
+     if not_sup or (imgproto in unsupported):
+         notrun('not suitable for this protocol: %s' % imgproto)
+=20
+-def verify_platform(supported=3DNone, unsupported=3DNone):
+-    if unsupported is not None:
+-        if any((sys.platform.startswith(x) for x in unsupported)):
+-            notrun('not suitable for this OS: %s' % sys.platform)
++def verify_platform(supported=3D(), unsupported=3D()):
++    if any((sys.platform.startswith(x) for x in unsupported)):
++        notrun('not suitable for this OS: %s' % sys.platform)
+=20
+-    if supported is not None:
++    if supported:
+         if not any((sys.platform.startswith(x) for x in supported)):
+             notrun('not suitable for this OS: %s' % sys.platform)
+=20
+@@ -1092,7 +1092,18 @@ def func_wrapper(*args, **kwargs):
+             return func(*args, **kwargs)
+     return func_wrapper
+=20
+-def execute_unittest(output, verbosity, debug):
++def execute_unittest(debug=3DFalse):
++    """Executes unittests within the calling module."""
++
++    verbosity =3D 2 if debug else 1
++
++    if debug:
++        output =3D sys.stdout
++    else:
++        # We need to filter out the time taken from the output so that
++        # qemu-iotest can reliably diff the results against master output.
++        output =3D io.StringIO()
++
+     runner =3D unittest.TextTestRunner(stream=3Doutput, descriptions=3DTru=
+e,
+                                      verbosity=3Dverbosity)
+     try:
+@@ -1100,6 +1111,8 @@ def execute_unittest(output, verbosity, debug):
+         # exception
+         unittest.main(testRunner=3Drunner)
+     finally:
++        # We need to filter out the time taken from the output so that
++        # qemu-iotest can reliably diff the results against master output.
+         if not debug:
+             out =3D output.getvalue()
+             out =3D re.sub(r'Ran (\d+) tests? in [\d.]+s', r'Ran \1 tests'=
+, out)
+@@ -1111,13 +1124,18 @@ def execute_unittest(output, verbosity, debug):
+=20
+             sys.stderr.write(out)
+=20
+-def execute_test(test_function=3DNone,
+-                 supported_fmts=3D(),
+-                 supported_platforms=3DNone,
+-                 supported_cache_modes=3D(), supported_aio_modes=3D(),
+-                 unsupported_fmts=3D(), supported_protocols=3D(),
+-                 unsupported_protocols=3D()):
+-    """Run either unittest or script-style tests."""
++def execute_setup_common(supported_fmts: Collection[str] =3D (),
++                         supported_platforms: Collection[str] =3D (),
++                         supported_cache_modes: Collection[str] =3D (),
++                         supported_aio_modes: Collection[str] =3D (),
++                         unsupported_fmts: Collection[str] =3D (),
++                         supported_protocols: Collection[str] =3D (),
++                         unsupported_protocols: Collection[str] =3D ()) ->=
+ bool:
++    """
++    Perform necessary setup for either script-style or unittest-style test=
+s.
++
++    :return: Bool; Whether or not debug mode has been requested via the CL=
+I.
++    """
+=20
+     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
+     # indicate that we're not being run via "check". There may be
+@@ -1127,34 +1145,39 @@ def execute_test(test_function=3DNone,
+         sys.stderr.write('Please run this test via the "check" script\n')
+         sys.exit(os.EX_USAGE)
+=20
+-    debug =3D '-d' in sys.argv
+-    verbosity =3D 1
+     verify_image_format(supported_fmts, unsupported_fmts)
+     verify_protocol(supported_protocols, unsupported_protocols)
+     verify_platform(supported=3Dsupported_platforms)
+     verify_cache_mode(supported_cache_modes)
+     verify_aio_mode(supported_aio_modes)
+=20
++    debug =3D '-d' in sys.argv
+     if debug:
+-        output =3D sys.stdout
+-        verbosity =3D 2
+         sys.argv.remove('-d')
+-    else:
+-        # We need to filter out the time taken from the output so that
+-        # qemu-iotest can reliably diff the results against master output.
+-        output =3D io.StringIO()
+-
+     logging.basicConfig(level=3D(logging.DEBUG if debug else logging.WARN)=
 )
-> +        """Wait until a BLOCK_JOB_READY event, and return the event."""
-> +        f =3D {'data': {'type': 'mirror', 'device': drive}}
-> +        return self.vm.event_wait(name=3D'BLOCK_JOB_READY', match=3Df)
->  =20
->       def wait_ready_and_cancel(self, drive=3D'drive0'):
->           self.wait_ready(drive=3Ddrive)
-> @@ -926,7 +927,7 @@ def pause_wait(self, job_id=3D'job0'):
->                   for job in result['return']:
->                       if job['device'] =3D=3D job_id:
->                           found =3D True
-> -                        if job['paused'] =3D=3D True and job['busy'] =3D=
-=3D False:
-> +                        if job['paused'] and not job['busy']:
->                               return job
->                           break
->                   assert found
-> @@ -1023,8 +1024,8 @@ def qemu_pipe(*args):
->                               universal_newlines=3DTrue)
->       exitcode =3D subp.wait()
->       if exitcode < 0:
-> -        sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode,
-> -                         ' '.join(args)))
-> +        sys.stderr.write('qemu received signal %i: %s\n' %
-> +                         (-exitcode, ' '.join(args)))
->       return subp.communicate()[0]
->  =20
->   def supported_formats(read_only=3DFalse):
-> @@ -1056,6 +1057,7 @@ def func_wrapper(test_case: QMPTestCase, *args, **k=
-wargs):
->               if usf_list:
->                   test_case.case_skip('{}: formats {} are not whitelisted=
-'.format(
->                       test_case, usf_list))
-> +                return None
->               else:
->                   return func(test_case, *args, **kwargs)
->           return func_wrapper
-> @@ -1067,6 +1069,7 @@ def skip_if_user_is_root(func):
->       def func_wrapper(*args, **kwargs):
->           if os.getuid() =3D=3D 0:
->               case_notrun('{}: cannot be run as root'.format(args[0]))
-> +            return None
->           else:
->               return func(*args, **kwargs)
->       return func_wrapper
->=20
+=20
++    return debug
++
++def execute_test(*args, test_function=3DNone, **kwargs):
++    """Run either unittest or script-style tests."""
++
++    debug =3D execute_setup_common(*args, **kwargs)
+     if not test_function:
+-        execute_unittest(output, verbosity, debug)
++        execute_unittest(debug)
+     else:
+         test_function()
+=20
++# This is called from script-style iotests without a single point of entry
++def script_initialize(*args, **kwargs):
++    """Initialize script-style tests without running any tests."""
++    execute_setup_common(*args, **kwargs)
++
++# This is called from script-style iotests with a single point of entry
+ def script_main(test_function, *args, **kwargs):
+     """Run script-style tests outside of the unittest framework"""
+-    execute_test(test_function, *args, **kwargs)
++    execute_test(*args, test_function=3Dtest_function, **kwargs)
+=20
++# This is called from unittest style iotests
+ def main(*args, **kwargs):
+     """Run tests using the unittest framework"""
+-    execute_test(None, *args, **kwargs)
++    execute_test(*args, **kwargs)
+--=20
+2.21.1
 
 
