@@ -2,68 +2,93 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A80D8C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 00:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87F2C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 00:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C84920842
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 00:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C84920842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 9177420675
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 00:52:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Od/x03Nk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9177420675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9HoZ-0000as-LQ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 19:23:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53406)
+	id 1j9IGm-0002K0-LW
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 19:52:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j9Hnq-000077-9O
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:22:24 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9IFp-0000qd-Qi
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:51:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j9Hno-0006lE-9o
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:22:22 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:13855)
+ (envelope-from <philmd@redhat.com>) id 1j9IFn-0002vW-Gv
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:51:16 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23739
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j9Hnh-0006TC-TH; Tue, 03 Mar 2020 19:22:15 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 93A547476D5;
- Wed,  4 Mar 2020 01:22:02 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 4C92D74637C; Wed,  4 Mar 2020 01:22:02 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 49A8974569F;
- Wed,  4 Mar 2020 01:22:02 +0100 (CET)
-Date: Wed, 4 Mar 2020 01:22:02 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-In-Reply-To: <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9IFn-0002tF-D7
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:51:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583283074;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fTB4PkJpoI9InVrdaWS/fwZsgOY3Q/wWHqny5EuksC0=;
+ b=Od/x03NkskpilfpgAOaZmAXm2M7zwV8VYgkeAa+gr2yW5Jspc9AdKOr5VIDQGZ79IpWZjQ
+ 8tFvIGHMHX/g3Qu1ky5lgj/vL+Qasr300qoxqX/p0OnGwes2tpE5BAEndns9JPepX+lt+s
+ VYONK8X5QG1BR94T+oAHMgnct0icEZI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-BUHE54OrOVuuNZiwFazf0w-1; Tue, 03 Mar 2020 19:51:13 -0500
+X-MC-Unique: BUHE54OrOVuuNZiwFazf0w-1
+Received: by mail-wr1-f71.google.com with SMTP id f10so158334wrv.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 16:51:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=X9KElX+HCIEUXdZrQtbAVqlZtknhV8M376bxhgxQN28=;
+ b=YO45kwB2gqxJgT2ydW3+U9DJ0CxnQ1Flyibbtc6Li+iPYExMbDAP17PsYlu/czo4qD
+ S+rvoG/9gu7jwnHLn+M6HjVQFUI1WZIJAmggXW3sUSse3g4sEmgIDxtHOiWF2YDrGIhx
+ TTcmjD9V/EdbFgfjyAqdXemHWjHXn+hsPB0C1SOi3SGhos/rpgRA1klCIBi8IG+zg0a+
+ rGTVujEeZzMEkaBIPq99TfD5ojog45+uv3AIJTdyviiTCpNbpFt8cCj/0Ena+8h9AI5C
+ t7i/YP648H4WqQT5BVMkEnw4KIlt00++3tO8s/O+U2oyd3XQ7a7w9QCnDhgYepd63pom
+ lCWA==
+X-Gm-Message-State: ANhLgQ1pikAXORCHjznA6mLWi0x4+sMzBmXvUuXf8UkpRkvFkzwm0/x1
+ uyJnmcZl5Ou0VXr9vKHT+ePR0ew4NLXI5B91SGE2sgoKWcNhKtbmRGGVUX6SDwlhBP1vnrmjIeZ
+ rxGGVtQbSPw+usFw=
+X-Received: by 2002:adf:eece:: with SMTP id a14mr692396wrp.311.1583283071786; 
+ Tue, 03 Mar 2020 16:51:11 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vs8T1V4T7T9WKL2MAEXfQH0Ex/te4IlcB+SnP7L+t6rHN58dakSCl5po9C56FTyJUhBXz27GQ==
+X-Received: by 2002:adf:eece:: with SMTP id a14mr692317wrp.311.1583283071453; 
+ Tue, 03 Mar 2020 16:51:11 -0800 (PST)
+Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id m19sm1242650wmc.34.2020.03.03.16.51.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Mar 2020 16:51:10 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] misc: Replace zero-length arrays with flexible array
+ member
+Date: Wed,  4 Mar 2020 01:51:03 +0100
+Message-Id: <20200304005105.27454-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,177 +100,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paul Durrant <paul@xen.org>, Eric Auger <eric.auger@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Kevin Wolf <kwolf@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Mar 2020, Mark Cave-Ayland wrote:
-> On 02/03/2020 21:40, BALATON Zoltan wrote:
->>> I had a quick look at the schematics linked from the page above, and they confirm
->>> that the VIA IDE interface is connected directly to IRQs 14 and 15 and not to the PCI
->>> interrupt pins.
->>
->> Where did you see that? What I got from trying to look this up in the schematics was
->> that VT8231 has two pins named IRQ14 and IRQ15 (but described as Primary and
->> Secondary Channel Interrupt Request in doc) where the interrupt lines of the two IDE
->> ports/channels are connected but how they are routed within the chip after that was
->> not clear. The chip doc says that in native mode the interrupt should be configurable
->> and use a single interrupt for both channels and in legacy mode they use the usual 14
->> and 15 but this is not what guest drivers expect so I think not how really works on
->> PegasosII. It is true however that connection to PCI interrupts aren't mentioned so
->> it always uses ISA IRQ numbers, it just depends on legacy vs. native mode which line
->> is raised. But that was never really a question for VT8231 and maybe only CMD646
->> could have such interconnection with PCI interrupts. (Proabable reason is that
->> via-ide is part of a southbridge chip where it has connections to ISA bus while
->> CMD646 is a PCI IDE controller but I could be wrong as my knowledge is limited about
->> these.)
->
-> Presumably the VIA southbridge has its own internal pair of cascaded 8259s so the IRQ
-> line from the drive is connected to IRQ14/15 as per an typical ISA PC. You can see
-> this in the "Common Hardware Reference Platform: I/O Device Reference" PDF section 4.1.
+This is a tree-wide cleanup inspired by a Linux kernel commit
+(from Gustavo A. R. Silva).
 
-Yes the VIA southbridge chip integrates all usual PC devices including 
-PICs so these may have connection internally. I haven't checked these docs 
-before but now I think another chapter in the doc you referenced and its 
-companion "Common Hardware Reference Platform: A System Architecture" may 
-explain the unusal combination of PCI like io regs with legacy interrupts 
-the Pegasos2 seems to have. In the I/O Device Reference, chapter 11 about 
-IDE says that the device must be addressed only with PCI I/O addresses 
-where io addresses are completely relocatable and that when OpenFirmware 
-passes control to the OS IDE must be configured as a PCI device. So this 
-probably means io addresses coming from PCI BARs. But the CHRP System 
-Architecture, chapter 9.2 about ISA devices says that "ISA devices 
-included in a PCI part must route their interrupt signals to the legacy 
-interrupt controller" and this is what the Pegasos2 seems to do. This may 
-be a misinterpretation of the spec because elsewhere (I've lost the exact 
-reference and have no time to find it again) it also says something about 
-native devices must be using OpenPIC but Pegasos2 does not have OpenPIC so 
-that part surely cannot apply anyway.
+--v-- description start --v--
 
->>> So on that basis the best explanation as to what is happening is the
->>> comment in the link you provided here:
->>> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/powerpc/platforms/chrp/pci.c?h=v4.14.172#n353
->>>
->>>
->>> /* Pegasos2 firmware version 20040810 configures the built-in IDE controller
->>> * in legacy mode, but sets the PCI registers to PCI native mode.
->>> * The chip can only operate in legacy mode, so force the PCI class into legacy
->>> * mode as well. The same fixup must be done to the class-code property in
->>> * the IDE node /pci@80000000/ide@C,1
->>> */
->>
->> I'm not sure that it makes much sense that the firmware configures the chip one way
->> then puts info about a different way in the device tree. There could be bugs but this
->> is not likely. Especially because I see in traces that the firmware does try to
->> configure the device in native mode. These are the first few accesses of the firmware
->> to via-ide:
->
-> But that is exactly what is happening! The comment above clearly indicates the
-> firmware incorrectly sets the IDE controller in native mode which is in exact
-> agreement with the trace you provide below. And in fact if you look at
+  The current codebase makes use of the zero-length array language
+  extension to the C90 standard, but the preferred mechanism to
+  declare variable-length types such as these ones is a flexible
+  array member [1], introduced in C99:
 
-I may be reading the comment wrong but to me that says that "firmware 
-configures IDE in _legacy_ mode" whereas the trace shows it actually 
-configures it in _native_ mode which is complying to the CHRP doc above. 
-But since it cannot comply to the "native devices using OpenPIC" part it 
-probably tries to apply the "ISA devices embedded in PCI" part and locks 
-IRQ to 14 and 15. Or it just wants to avoid sharing IRQs as much as 
-possible and the designers decided they will use IRQ14 and 15 for IDE.
+  struct foo {
+      int stuff;
+      struct boo array[];
+  };
 
-> https://www.powerdeveloper.org/platforms/pegasos/devicetree you can see the nvramrc
-> hack that was released in order to fix the device tree to boot Linux which alters the
-> class-code and sets interrupts to 14 (which I believe is invalid, but seemingly good
-> enough here).
+  By making use of the mechanism above, we will get a compiler
+  warning in case the flexible array does not occur last in the
+  structure, which will help us prevent some kind of undefined
+  behavior bugs from being unadvertenly introduced [2] to the
+  Linux codebase from now on.
 
-Isn't this the same fixup that newer Linux kernels already include? Maybe 
-this was needed before Linux properly supported Pegasos2 but later kernels 
-will do this anyway. This does not give us any new info we did not have 
-before I think maybe just easier to see all fixups in one place.
+--^-- description end --^--
 
->> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
->> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
->> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
->> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
->> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
->> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
->> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
->> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
->> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
->> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
->> pci_cfg_read via-ide 12:1 @0xc -> 0x0
->> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
->> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
->> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
->>
->> The very first write is to turn on native mode, so I think it's not about what the
->> firmware does but something about how hardware is wired on Pegasos II or the VT8231
->> chip itself that only allows legacy interrupts instead of 100% native mode for IDE.
->>
->>> Given that the DT is wrong, then we should assume that all OSs would have to
->>> compensate for this in the same way as Linux, and therefore this should be handled
->>> automatically.
->>>
->>> AFAICT this then only leaves the question: why does the firmware set
->>> PCI_INTERRUPT_LINE to 9, which is presumably why you are seeing problems running
->>> MorphOS under QEMU.
->>
->> Linux does try to handle both true native mode and half-native mode. It only uses
->> half-native mode if finds IRQ14 on Pegasos, otherwise skips Pegasos specific fixup
->> and uses true native mode setup. I don't know what MorphOS does but I think it justs
->> knows that Pegasos2 has this quirk and does not look at the device tree at all.
->>
->>> Could it be that setting prog-if to 0x8a legacy mode also resets PCI_INTERRUPT_LINE
->>> to 14? You should be able to confirm this easily on real hardware using the Forth
->>> config-* words on the IDE node and reading the prog-if byte before and after.
->>
->> I don't have direct access to real hardware and would also need to come up with some
->> Forth to verify that but given the above trace that the firmware does before we can
->> enter any Forth we would likely find @0x9 = 0x8f and @0x3c = 0x0e because after
->> booting Linux we see 0x8a and 0x0e and Linux only touches the two mode bits.
->
-> Again to summarise: this is a known bug in Pegasos2 firmware and the VIA is a
-> standard chip, so let's try and figure out exactly what is happening using a real
-> firmware and emulate that behaviour in QEMU. This should then make all guests happy,
-> regardless of architecture, without requiring the introduction of feature bits or
-> risk of introducing other incompatibilities.
+Do the similar housekeeping in the QEMU codebase (which uses
+C99 since commit 7be41675f7cb).
 
-I think I've already done that with this patch (within the limits possible 
-in QEMU). The Pegasos2 seems to always use IRQ14 and 15 even when IDE is 
-set to native mode (which the firmware does immediately, I'm using a real 
-firmware to test) and all guests are happy with this. This behaviour is 
-confirmed by excpectations of AmigaOS and MorphOS drivers and also Linux 
-comments (although those comments may get the reason wrong, they confirm 
-the behaviour). I'm not sure how real hardware implements this behaviour 
-and also not sure if it's a bug in the firmware or rather a peculiar 
-design choice for Pegasos2. But that probably does not matter for the fact 
-that it's how it works which is all we need to emulate it.
+The first patch is done with the help of a coccinelle semantic
+patch. However Coccinelle does not recognize:
 
-Also consider that QEMU via-ide is only emulating native mode of the chip 
-because we can't switch between the two modes so it's either legacy only 
-or native only because all other implemented controllers are either ISA or 
-native PCI so QEMU does not have way to deregister ISA IDE and PCI code 
-does not have way to use io BARs despite not being enabled via PCI config 
-which could be needed to use them when device is in legacy mode. 
-Previously via-ide was emulating legacy only and that worked with Linux 
-but not with anything else. I'm not planning to rewrite large parts of the 
-IDE and PCI code to allow switching back and forth which is not even 
-needed. Unless you know a better way to implement this I think the 
-proposed patch is achieving this with minimal changes. I don't see a need 
-to more exactly emulate some kind of hardware bug or peculiar design 
-choices of a board than what's needed to make clients happy and boot.
+  struct foo {
+      int stuff;
+      struct boo array[];
+  } QEMU_PACKED;
 
-Is this series good enough now to be merged or are any changes needed? I'd 
-like to not miss the deadline for the freeze and get this delayed for 
-months for not good reason because I'm not sure when will I have time to 
-work on it again.
+but does recognize:
+
+  struct QEMU_PACKED foo {
+      int stuff;
+      struct boo array[];
+  };
+
+I'm not sure why, neither it is worth refactoring all QEMU
+structures to use the attributes before the structure name,
+so I did the 2nd patch manually.
+
+Anyway this is annoying, because many structures are not handled
+by coccinelle. Maybe this needs to be reported to upstream
+coccinelle?
+
+I used spatch 1.0.8 with:
+
+  -I include --include-headers \
+  --macro-file scripts/cocci-macro-file.h \
+  --keep-comments --indent 4
 
 Regards,
-BALATON Zoltan
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  misc: Replace zero-length arrays with flexible array member
+    (automatic)
+  misc: Replace zero-length arrays with flexible array member (manual)
+
+ docs/interop/vhost-user.rst           |  4 ++--
+ block/qed.h                           |  2 +-
+ bsd-user/qemu.h                       |  2 +-
+ contrib/libvhost-user/libvhost-user.h |  2 +-
+ hw/m68k/bootinfo.h                    |  2 +-
+ hw/scsi/srp.h                         |  6 +++---
+ hw/xen/xen_pt.h                       |  2 +-
+ include/hw/acpi/acpi-defs.h           | 16 ++++++++--------
+ include/hw/arm/smmu-common.h          |  2 +-
+ include/hw/boards.h                   |  2 +-
+ include/hw/i386/intel_iommu.h         |  3 ++-
+ include/hw/s390x/event-facility.h     |  2 +-
+ include/hw/s390x/sclp.h               |  8 ++++----
+ include/hw/virtio/virtio-iommu.h      |  2 +-
+ include/sysemu/cryptodev.h            |  2 +-
+ include/tcg/tcg.h                     |  2 +-
+ pc-bios/s390-ccw/bootmap.h            |  2 +-
+ pc-bios/s390-ccw/sclp.h               |  2 +-
+ tests/qtest/libqos/ahci.h             |  2 +-
+ block/linux-aio.c                     |  2 +-
+ block/vmdk.c                          |  2 +-
+ hw/acpi/nvdimm.c                      |  6 +++---
+ hw/char/sclpconsole-lm.c              |  2 +-
+ hw/char/sclpconsole.c                 |  2 +-
+ hw/dma/soc_dma.c                      |  2 +-
+ hw/i386/x86.c                         |  2 +-
+ hw/misc/omap_l4.c                     |  2 +-
+ hw/nvram/eeprom93xx.c                 |  2 +-
+ hw/rdma/vmw/pvrdma_qp_ops.c           |  4 ++--
+ hw/s390x/virtio-ccw.c                 |  2 +-
+ hw/usb/dev-network.c                  |  2 +-
+ hw/usb/dev-smartcard-reader.c         |  4 ++--
+ hw/virtio/virtio.c                    |  4 ++--
+ net/queue.c                           |  2 +-
+ target/s390x/ioinst.c                 |  2 +-
+ 35 files changed, 54 insertions(+), 53 deletions(-)
+
+--=20
+2.21.1
+
 
