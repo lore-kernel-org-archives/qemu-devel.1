@@ -2,90 +2,126 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E823C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 16:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E78C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2841C20637
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 16:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2348D206CC
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:05:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gA5qSsP0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2841C20637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPaY+hz9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2348D206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9XBs-000095-3V
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 11:48:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34002)
+	id 1j9XSI-0005Hm-90
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:05:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1j9XBA-0007vS-7m
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 11:47:29 -0500
+ (envelope-from <david@redhat.com>) id 1j9XRV-0004qb-Sj
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1j9XB8-0004r2-Ev
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 11:47:27 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45842)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1j9XB8-0004oa-6w
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 11:47:26 -0500
-Received: by mail-wr1-x443.google.com with SMTP id v2so3222538wrp.12
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 08:47:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=yjMcTrrPUqGAVqCDBmURXzvZ/ldll76NPxiriK8Dd38=;
- b=gA5qSsP0ywWfbYjZfFa2WdFmoqSn8BNUZcWhHi7pLeIDOijzidX8MYJLymWpb3ixar
- y+i1oRxMbR9s+qMlBc7Wm6IHNbZa2o+q6m20IySvhBevqFiTORjDVpR+9pXdJvjiCjIB
- nsKAmQsoer+2ajQfw/k4q4NZgnm1P7ReQXPjJshawH39fhqOI+LtQa8JJmmNP9a1jaeg
- mVEZgNpwMcGNtKSziy5LCfwk47Ks1hx3xaF3Qh1nMLAZUmTdogCOB8IIZVuaLONWa3oJ
- kK8p5K0l19gZeNcAl3W81ax6ysRvieAuz7Iy4OtqbMLPkvijFD7TciHx4Hy8o6gIWn+j
- 1eHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yjMcTrrPUqGAVqCDBmURXzvZ/ldll76NPxiriK8Dd38=;
- b=MQZvAQ/W28pG2ETk1/2+YgGdOFeBzPm/h/jK2Q27VjTRJPAsopI6VNudNV+lCXpLyE
- dVPVTNyLtcV3K2Gl2AHPPL2S6jct3ti/qVmk9Q/EgA7P7TgobSzhEQzubLsX7DiufJlC
- NHmGklGTm9BavqzkBM3q0Q3sx7u2X9PmqbhZBBexEYPOVler9GQHklsHKRItpK2QPXs/
- hXLlsya6/djC1xdZobZ8udJtfiam6213dnZBbfrV3i5T0QNM+bLt2PfEqjG9PYCbNW/c
- VxqqWOOx5uaWxzmG2cvdRBoVeI19yffjvFym70Mnv3hiuUuki3FOXBu9k4PDBx6Esd/e
- WomA==
-X-Gm-Message-State: ANhLgQ2botNzz4WwC+6lArZTLazWRTiVgPxzdf9I7V08dHLOe2K8m542
- Hy/5hBOpeYqdSriAgSV5rJla2w==
-X-Google-Smtp-Source: ADFU+vtKdatZxuLvTqY7dAv72GwtiEZrE6pYDhM9/A9w3wfsvP1S6JGm/Da1zjGGwuLRtZd37UqQWA==
-X-Received: by 2002:a5d:4b11:: with SMTP id v17mr4730192wrq.375.1583340444352; 
- Wed, 04 Mar 2020 08:47:24 -0800 (PST)
-Received: from myrica ([2001:171b:c9a8:fbc0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id c4sm5077334wml.7.2020.03.04.08.47.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 08:47:23 -0800 (PST)
-Date: Wed, 4 Mar 2020 17:47:17 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
-Message-ID: <20200304164717.GF646000@myrica>
-References: <20200214132745.23392-1-eric.auger@redhat.com>
- <20200227111717.GG1645630@redhat.com>
- <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
- <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
- <fea625f1-b58e-6da6-8e2a-f32fc9391fc8@redhat.com>
- <CAMj5Bkgm1LKbN3E2qTTxmrGhpmdL9NWarSfX-mYCWF0yt5E9eg@mail.gmail.com>
- <88e3b669-2998-41c0-83f7-de42a72a73e7@redhat.com>
+ (envelope-from <david@redhat.com>) id 1j9XRT-0002s4-Dd
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44484
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9XRT-0002rM-2V
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583341457;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Fx0FFuMCmalp2IlVhhqABq04sIx3z1iVUqwtFrFGc0Y=;
+ b=WPaY+hz9MhxTu2bPQ+mznBF3bTShtQLndRlBnqMwHa2lnkpgzQHRqMk5duI0Drg5Eztmxb
+ LI33fPu7tgDCPQXiMY1AjsxLqELbERBDUVxv6a7s8lrEJuh58WFRBZ5WBqDha5q8ETJXrq
+ FXWLZePg0PG9x6QFfJSo23ivLU2beGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-aBKKTkEwPpScCrDWw6NYwg-1; Wed, 04 Mar 2020 12:04:16 -0500
+X-MC-Unique: aBKKTkEwPpScCrDWw6NYwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0FAB805741;
+ Wed,  4 Mar 2020 17:04:14 +0000 (UTC)
+Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D40415DDA8;
+ Wed,  4 Mar 2020 17:04:12 +0000 (UTC)
+Subject: Re: [PATCH v6 02/18] s390x: protvirt: Add diag308 subcodes 8 - 10
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-3-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <45db12aa-eccf-5a57-fee3-c963b279937c@redhat.com>
+Date: Wed, 4 Mar 2020 18:04:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88e3b669-2998-41c0-83f7-de42a72a73e7@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+In-Reply-To: <20200304114231.23493-3-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,136 +133,291 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- kenneth-lee-2012@foxmail.com, tnowicki@marvell.com,
- "Michael S. Tsirkin" <mst@redhat.com>, quintela@redhat.com,
- zhangfei.gao@foxmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- "Wangzhou \(B\)" <wangzhou1@hisilicon.com>,
- Zhangfei Gao <zhangfei.gao@gmail.com>, eric.auger.pro@gmail.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 04, 2020 at 09:41:44AM +0100, Auger Eric wrote:
-> >>> Could I ask one question?
-> >>> To support vSVA and pasid in guest, which direction you recommend,
-> >>> virtio-iommu or vSMMU (your nested paging)
-> >>>
-> >>> Do we still have any obstacles?
-> >> you can ask the question but not sure I can answer ;-)
-> >>
-> >> 1) SMMUv3 2stage implementation is blocked by Will at kernel level.
-> >>
-> >> Despite this situation I may/can respin as Marvell said they were
-> >> interested in this effort.
+On 04.03.20 12:42, Janosch Frank wrote:
+> For diag308 subcodes 8 - 10 we have a new ipib of type 5. The ipib
+> holds the address and length of the secure execution header, as well
+> as a list of guest components.
+>=20
+> Each component is a block of memory, for example kernel or initrd,
+> which needs to be decrypted by the Ultravisor in order to run a
+> protected VM. The secure execution header instructs the Ultravisor on
+> how to handle the protected VM and its components.
+>=20
+> Subcodes 8 and 9 are similiar to 5 and 6 and subcode 10 will finally
+> start the protected guest.
+>=20
+> Subcodes 8-10 are not valid in protected mode, we have to do a subcode
+> 3 and then the 8 and 10 combination for a protected reboot.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.c      | 47 ++++++++++++++++++++++++++++++++++++++++++---
+>  hw/s390x/ipl.h      | 32 ++++++++++++++++++++++++++++++
+>  target/s390x/diag.c | 26 ++++++++++++++++++++++---
+>  3 files changed, 99 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 9c1ecd423c..80c6ab233a 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -538,15 +538,55 @@ static bool is_virtio_scsi_device(IplParameterBlock=
+ *iplb)
+>      return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
+>  }
+> =20
+> +int s390_ipl_pv_check_components(IplParameterBlock *iplb)
 
-Do you know if they want vSVA as well or only nested translation?
+What about making this
 
-> >> If you are also interested in (I know you
-> >> tested it several times and I am grateful to you for that), please reply
-> >> to:
-> >> [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
-> >> (https://patchwork.kernel.org/cover/11039871/) and say you are
-> >> interested in that work so that maintainers are aware there are
-> >> potential users.
-> >>
-> >> At the moment I have not supported multiple CDs because it introduced
-> >> other dependencies.
-> >>
-> >> 2) virtio-iommu
-> >>
-> >> So only virtio-iommu dt boot on machvirt is currently supported. For non
-> >> DT, Jean respinned his kernel series
-> >> "[PATCH v2 0/3] virtio-iommu on x86 and non-devicetree platforms" as you
-> >> may know. However non DT integration still is controversial. Michael is
-> >> pushing for putting the binding info the PCI config space. Joerg
-> >> yesterday challenged this solution and said he would prefer ACPI
-> >> integration. ACPI support depends on ACPI spec update & vote anyway.
-> >>
-> >> To support PASID at virtio-iommu level you also need virtio-iommu API
-> >> extensions to be proposed and written + kernel works. So that's a long
-> >> road. I will let Jean-Philippe comment on that.
+bool s390_ipl_pv_valid(IplParameterBlock *iplb)
 
-Yeah, let's put that stuff on hold. vSVA with virtio-iommu requires about
-the same amount of work in the host kernel as vSMMU, minus the NESTED_MSI
-stuff. The device implementation would be simpler, but the guest driver is
-difficult (I'd need to extract the CD table code from the SMMU driver
-again). And obtaining better performance than vSMMU would then require
-upstreaming vhost-iommu. I do have incomplete drafts and prototypes but
-I'll put them aside until users (other than hardware validation) show up
-and actually need performance or things like unpinned stage-2.
+and return true/false?
 
-> >> I would just say that Intel is working on nested paging solution with
-> >> their emulated intel-iommu. We can help them getting that upstream and
-> >> partly benefit from this work.
-> >>
-> >>> Would you mind give some breakdown.
-> >>> Jean mentioned PASID still not supported in QEMU.
-> >> Do you mean support of multiple CDs in the emulated SMMU? That's a thing
-> >> I could implement quite easily. What is more tricky is how to test it.
-> > 
-> > Thanks Eric
-> > 
-> > Discussed with Jean before, here are some obstacles for vSVA via nested paging.
-> > Do you think they are still big issues?
-> > 
-> > Copy "
-> > * PASID support in QEMU, I don't think there is anything yet
-> > // this is not a big issue as your comments.
-> > 
-> > * Page response support in VFIO and QEMU. With Eric's series we can
-> > inject recoverable faults into the guest, but there is no channel for
-> > the guest to RESUME the stall after fixing it.
-> I guess this matches a command sent through the SMMUv3 command queue
-> (CMD_PRI_RESP) that should be trapped by QEMU and injected to the
-> physical SMMU, right?
-> 
-> I think everybody misses that injection path and that's not specific to
-> virtio-iommu. PRS is not currently addressed by in-flight Intel's kernel
-> series ([PATCH V9 00/10] Nested Shared Virtual Address (SVA) VT-d
-> support) either.
-> 
-> I think the topic is complex enough to separate the concerns and try to
-> move forward in incremental steps hence my efforts to push for simple
-> nested use case. Can't you support vSVA without PRS first (I think this
-> Intel's strategy too)
+> +{
+> +    int i;
+> +    IPLBlockPV *ipib_pv =3D &iplb->pv;
 
-Not really, for sharing guest process address spaces you need I/O page
-faults. You can test PASID alone without PRI by using auxiliary domains in
-the guest, so I'd advise to start with that, but it requires modifications
-to the device driver.
+nit: place "int i;" down here
 
-> > 
-> > * We can't use DVM in nested mode unless the VMID is shared with the
-> > CPU. For that we'll need the host SMMU driver to hook into the KVM VMID
-> > allocator, just like we do for the ASID allocator. I haven't yet
-> > investigated how to do that. It's possible to do vSVA without DVM
-> > though, by sending all TLB invalidations through the SMMU command queue.
-> > "
+> +
+> +    if (ipib_pv->num_comp =3D=3D 0) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    for (i =3D 0; i < ipib_pv->num_comp; i++) {
+> +        /* Addr must be 4k aligned */
+> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        /* Tweak prefix is monotonously increasing with each component *=
+/
 
-Hm we're already mandating DVM for host SVA, so I'd say mandate it for
-vSVA as well. We'd avoid a ton of context switches, especially for the zip
-accelerator which doesn't require ATC invalidations. The host needs to pin
-the VMID allocated by KVM and write it in the endpoint's STE.
+should that be "monotonically increasing" ?
 
+> +        if (i < ipib_pv->num_comp - 1 &&
+> +            ipib_pv->components[i].tweak_pref >
+> +            ipib_pv->components[i + 1].tweak_pref) {
+
+and I assume "=3D=3D" is valid then.
+
+> +            return -EINVAL;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>  {
+>      S390IPLState *ipl =3D get_ipl_device();
+> =20
+> -    ipl->iplb =3D *iplb;
+> -    ipl->iplb_valid =3D true;
+> +    if (iplb->pbt =3D=3D S390_IPL_TYPE_PV) {
+> +        ipl->iplb_pv =3D *iplb;
+> +        ipl->iplb_valid_pv =3D true;
+> +    } else {
+> +        ipl->iplb =3D *iplb;
+> +        ipl->iplb_valid =3D true;
+> +    }
+>      ipl->netboot =3D is_virtio_net_device(iplb);
+>  }
+> =20
+> +IplParameterBlock *s390_ipl_get_iplb_secure(void)
+
+Why suddenly the "secure" ? s390_ipl_get_iplb_pv?
+
+> +{
+> +    S390IPLState *ipl =3D get_ipl_device();
+> +
+> +    if (!ipl->iplb_valid_pv) {
+> +        return NULL;
+> +    }
+> +    return &ipl->iplb_pv;
+> +}
+> +
+>  IplParameterBlock *s390_ipl_get_iplb(void)
+>  {
+>      S390IPLState *ipl =3D get_ipl_device();
+> @@ -561,7 +601,8 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_r=
+eset reset_type)
+>  {
+>      S390IPLState *ipl =3D get_ipl_device();
+> =20
+> -    if (reset_type =3D=3D S390_RESET_EXTERNAL || reset_type =3D=3D S390_=
+RESET_REIPL) {
+> +    if (reset_type =3D=3D S390_RESET_EXTERNAL || reset_type =3D=3D S390_=
+RESET_REIPL ||
+> +        reset_type =3D=3D S390_RESET_PV) {
+
+What about a switch-case now instead?
+
+>          /* use CPU 0 for full resets */
+>          ipl->reset_cpu_index =3D 0;
+>      } else {
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index d4813105db..04be63cee1 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -15,6 +15,24 @@
+>  #include "cpu.h"
+>  #include "hw/qdev-core.h"
+> =20
+> +struct IPLBlockPVComp {
+> +    uint64_t tweak_pref;
+> +    uint64_t addr;
+> +    uint64_t size;
+> +} QEMU_PACKED;
+
+Do we need the packed here? All members are naturally aligned.
+
+> +typedef struct IPLBlockPVComp IPLBlockPVComp;
+> +
+> +struct IPLBlockPV {
+> +    uint8_t  reserved[87];
+> +    uint8_t  version;
+> +    uint32_t reserved70;
+> +    uint32_t num_comp;
+> +    uint64_t pv_header_addr;
+> +    uint64_t pv_header_len;
+> +    struct IPLBlockPVComp components[];
+> +} QEMU_PACKED;
+
+Dito.
+
+[...]
+
+>      uint64_t compat_bios_start_addr;
+>      bool enforce_bios;
+>      bool iplb_valid;
+> +    bool iplb_valid_pv;
+
+I'd name this "iplb_pv_valid" to match "iplb_pv".
+
+>      bool netboot;
+>      /* reset related properties don't have to be migrated or reset */
+>      enum s390_reset reset_type;
+> @@ -161,9 +185,11 @@ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3,=
+ "alignment of iplb wrong");
+> =20
+>  #define S390_IPL_TYPE_FCP 0x00
+>  #define S390_IPL_TYPE_CCW 0x02
+> +#define S390_IPL_TYPE_PV 0x05
+>  #define S390_IPL_TYPE_QEMU_SCSI 0xff
+> =20
+>  #define S390_IPLB_HEADER_LEN 8
+> +#define S390_IPLB_MIN_PV_LEN 148
+>  #define S390_IPLB_MIN_CCW_LEN 200
+>  #define S390_IPLB_MIN_FCP_LEN 384
+>  #define S390_IPLB_MIN_QEMU_SCSI_LEN 200
+> @@ -185,4 +211,10 @@ static inline bool iplb_valid_fcp(IplParameterBlock =
+*iplb)
+>             iplb->pbt =3D=3D S390_IPL_TYPE_FCP;
+>  }
+> =20
+> +static inline bool iplb_valid_pv(IplParameterBlock *iplb)
+> +{
+> +    return be32_to_cpu(iplb->len) >=3D S390_IPLB_MIN_PV_LEN &&
+> +           iplb->pbt =3D=3D S390_IPL_TYPE_PV;
+> +}
+> +
+>  #endif
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index b5aec06d6b..945b263f0a 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -52,6 +52,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, ui=
+nt64_t r3)
+>  #define DIAG_308_RC_OK              0x0001
+>  #define DIAG_308_RC_NO_CONF         0x0102
+>  #define DIAG_308_RC_INVALID         0x0402
+> +#define DIAG_308_RC_NO_PV_CONF      0x0902
+> =20
+>  #define DIAG308_RESET_MOD_CLR       0
+>  #define DIAG308_RESET_LOAD_NORM     1
+> @@ -59,6 +60,9 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, ui=
+nt64_t r3)
+>  #define DIAG308_LOAD_NORMAL_DUMP    4
+>  #define DIAG308_SET                 5
+>  #define DIAG308_STORE               6
+> +#define DIAG308_PV_SET              8
+> +#define DIAG308_PV_STORE            9
+> +#define DIAG308_PV_START            10
+> =20
+>  static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t =
+addr,
+>                                uintptr_t ra, bool write)
+> @@ -105,6 +109,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1,=
+ uint64_t r3, uintptr_t ra)
+>          s390_ipl_reset_request(cs, S390_RESET_REIPL);
+>          break;
+>      case DIAG308_SET:
+> +    case DIAG308_PV_SET:
+>          if (diag308_parm_check(env, r1, addr, ra, false)) {
+>              return;
+>          }
+> @@ -117,7 +122,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1,=
+ uint64_t r3, uintptr_t ra)
+> =20
+>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+> =20
+> -        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb)) {
+> +        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
+> +            !(iplb_valid_pv(iplb) && !s390_ipl_pv_check_components(iplb)=
+)) {
+
+I really think we should make this s390_ipl_pv_valid(), we're mixing
+functions that return true on success with functions that return 0 on
+success. Also, can't we simply move that check into iplb_valid_pv(iplb)
+to make this here easier to read?
+
+>              env->regs[r1 + 1] =3D DIAG_308_RC_INVALID;
+>              goto out;
+>          }
+> @@ -128,17 +134,31 @@ out:
+>          g_free(iplb);
+>          return;
+>      case DIAG308_STORE:
+> +    case DIAG308_PV_STORE:
+>          if (diag308_parm_check(env, r1, addr, ra, true)) {
+>              return;
+>          }
+> -        iplb =3D s390_ipl_get_iplb();
+> +        if (subcode =3D=3D DIAG308_PV_STORE) {
+> +            iplb =3D s390_ipl_get_iplb_secure();
+> +        } else {
+> +            iplb =3D s390_ipl_get_iplb();
+> +        }
+>          if (iplb) {
+>              cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len)=
+);
+>              env->regs[r1 + 1] =3D DIAG_308_RC_OK;
+>          } else {
+>              env->regs[r1 + 1] =3D DIAG_308_RC_NO_CONF;
+>          }
+> -        return;
+> +        break;
+> +    case DIAG308_PV_START:
+> +        iplb =3D s390_ipl_get_iplb_secure();
+> +        if (!iplb || !iplb_valid_pv(iplb)) {
+
+Why do we need another iplb_valid_pv() check? I thought we would verify
+this when setting and marking valid.
+
+> +            env->regs[r1 + 1] =3D DIAG_308_RC_NO_PV_CONF;
+> +            return;
+> +        }
+> +
+
+
+--=20
 Thanks,
-Jean
 
-> OK.
-> 
-> From the above arguments I am not sure there are technical blockers with
-> nested paging implementation. For sure there are things that are not
-> supported, because I did not address this topic yet.
-> 
-> If I were to work on this, you did not answer bout the testing feasibility.
-> 
-> Thanks
-> 
-> Eric
-> > 
-> > Thanks
-> > 
-> 
+David / dhildenb
+
 
