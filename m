@@ -2,90 +2,80 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4A3C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 14:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E206C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 14:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DD820838
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 14:36:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DACFC2166E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 14:48:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LpC3BeDD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DD820838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fNvPp2RY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DACFC2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9V8o-0000vs-JY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 09:36:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59243)
+	id 1j9VK8-0005Rg-Uj
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 09:48:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1j9V8A-0000QO-4a
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 09:36:15 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1j9VJR-0004xc-KE
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 09:47:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1j9V88-0001bb-VI
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 09:36:14 -0500
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:33095)
+ (envelope-from <bmeng.cn@gmail.com>) id 1j9VJQ-0001qs-Db
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 09:47:53 -0500
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:44726)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1j9V86-0001Zd-GP; Wed, 04 Mar 2020 09:36:10 -0500
-Received: by mail-qt1-x843.google.com with SMTP id d22so1498594qtn.0;
- Wed, 04 Mar 2020 06:36:10 -0800 (PST)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1j9VJQ-0001qU-8V; Wed, 04 Mar 2020 09:47:52 -0500
+Received: by mail-yw1-xc42.google.com with SMTP id t141so2132164ywc.11;
+ Wed, 04 Mar 2020 06:47:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=FEvtamSQPt9SnVyGPVD4R0wUTlrMsAbBDWNqMMbIciM=;
- b=LpC3BeDD9F7wUHWN2FGfnIRGrrxdjy6eO8DkYpNHlCbUgVsdxz7cf67qElH3AcA3uA
- vYC9OcaQz3E3tD/+6nke+5/9IBpTgo9oWnBQgZeSSvcSl5BsRz0vkG05gjIiiosiLwkk
- aVw+NCdvVmF99KxL+GfRRa6ChEKtp6gavrF7BMi9hOP40ct+kzDIaf5Kv8iqJVJqxhuA
- uG+iv1+Geb+XluiNU9GUf05fxCMIFFdXu8qF1H1Z0uFQPElty7kkKHoyZTeKLUIOPYl6
- uXXnMZP6tdtu6LCxVxGsFp5OoYEbWHn4Iotf51bcM5zD0ve6pk7x0UliH7Qn13gDxM72
- bnCQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UqTXvx15Lr8wC+ArYXC7z7AhIfLiJOUI7u30NjxzlTI=;
+ b=fNvPp2RYVnMM5gR9D+rqUznop0FIPUTvJeQFMQyKn0flWcKPQRmdAODpHkfqjUObqv
+ remqKUPA/QwlNOtBBVp7gejH/On9VbjjcZIrrY0r0snqz8Ru5ox4kwuf9fDVa+Lcqaav
+ rfFmIRdHpwzuvaqg39Ob/dSikBn+0IsiLbcjzgseivIoWxpTyNMAmiI4qOgrXVLq7CWt
+ zgXhXHBtMXITses4OR6576BMydf+edOh44eTuvZ3WT52SsmjITztTIzvVzpsU1cVsRUQ
+ jx/tk7RfRou1QCtZfyeDHpGm90n0U5mJ1ZXaKm9Ax1gBUaSg2AyD094IAJabjlxMSHYs
+ 2NzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FEvtamSQPt9SnVyGPVD4R0wUTlrMsAbBDWNqMMbIciM=;
- b=F7ZYg/ZNe2GlZGrELzF+CZMLxyhrT7Z2YeRY981PzI/DjpcbN3qJcPW4Nceo9TwOAv
- UDntvHMYCjYiZzR/mZVGrTdJRCjmHr6hxeBK1o1fG5TmHE65k2zklzGuOyGzJp2tb3Ja
- CLvh1E2YBwpAa5UInFCglNPXG1bBbIykPutMlCEYUXSs/USmXqAFvJElqUCOtzhF5TQ4
- EehnkqhjWkwlj9LbTTahQLAafcGNJr62xsfzhc26nHkgWh5QT4JfLyalTSJGXMEh0+5W
- QpfQGrePNWCgUeRnk3jWMd1uJkpLpZFj4kZnPB1q0pHJo3YCAkvlBs+C8sigU2y2sCRS
- Uj2Q==
-X-Gm-Message-State: ANhLgQ3jDllvdCoKSmNeBSh7g1KOMJQkh1+rS6jJluEmhl6HpMFbtQrU
- YUC4oLpC3zY0iTSiKHKjrvI=
-X-Google-Smtp-Source: ADFU+vs8E73D4EXLxDdmK4DdXtJdtecJX4IHNLJjbOtzMySfIjOCKgjtqKSTaHcfuUC+f+KFPaeXzw==
-X-Received: by 2002:ac8:e09:: with SMTP id a9mr2624956qti.84.1583332569695;
- Wed, 04 Mar 2020 06:36:09 -0800 (PST)
-Received: from ?IPv6:2804:431:c7c6:133d:fed6:da5e:2cb3:8d74?
- ([2804:431:c7c6:133d:fed6:da5e:2cb3:8d74])
- by smtp.gmail.com with ESMTPSA id a141sm14318603qkb.50.2020.03.04.06.36.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Mar 2020 06:36:09 -0800 (PST)
-Subject: Re: [PATCH v9 0/4] delete created files when
- block_crypto_co_create_opts_luks fails
-To: qemu-devel@nongnu.org
-References: <20200130213907.2830642-1-danielhb413@gmail.com>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <73a6d0d7-0348-bb84-d9b8-c7a04305385c@gmail.com>
-Date: Wed, 4 Mar 2020 11:36:04 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UqTXvx15Lr8wC+ArYXC7z7AhIfLiJOUI7u30NjxzlTI=;
+ b=avCz9gvh4mxlheWTGhXZQx5pT7i/24mVjd2Hd90VkDDF1oVmaP8MEOMs7PFqJ9fBYB
+ fl6oebdhoSho/jKBBPdpm0i1N000yFY8sesEHW8C/9DraUUIeeY1AwlblAkCbyRMlO09
+ lYQzELgS5NmlB2lBJiDXWCaG5uqLDBs9D0i6I1NzafCyP/Z3VF+Df1P7e8R+0LtxFayf
+ E1huoboLKENH0+YtzZ8pGviw2Njms8hN4EPjVF3Icmt52o6CpSh0XNi808bsg2ZULqcM
+ S6AhruRkqNDS7GiR5wwJ6wff5/hyFXeYjp8ZMXp+xlKaVBnGi60zmrl/2xSVCzaAPlYa
+ qOMA==
+X-Gm-Message-State: ANhLgQ27qMQh598wHTp7fPeG6KToiouWnRVG2K26gOBInpaJQ1om/cJd
+ FSgFETgki7gjebU/CLQRripajV4tSLOD14fROZo=
+X-Google-Smtp-Source: ADFU+vseRePhNHXlMhWgWCiw4aOCYVSm5kYvGeZARZP5WFrfw7ZVj1Dydm44ixxzKVogxR+qB/tElBV10X5GO/YqEiI=
+X-Received: by 2002:a81:4f8d:: with SMTP id d135mr3220982ywb.257.1583333271530; 
+ Wed, 04 Mar 2020 06:47:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200130213907.2830642-1-danielhb413@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <cover.1583285287.git.alistair.francis@wdc.com>
+ <e91f9fccc49a42482d964f380b2ae085de5bfab2.1583285287.git.alistair.francis@wdc.com>
+In-Reply-To: <e91f9fccc49a42482d964f380b2ae085de5bfab2.1583285287.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Wed, 4 Mar 2020 22:47:38 +0800
+Message-ID: <CAEUhbmWFPVOZ6Sxjd+VUENqyPxCe89QYKWP-nKSkH3Co-=FYbg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] riscv/sifive_u: Add a serial property to the
+ sifive_u SoC
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+X-Received-From: 2607:f8b0:4864:20::c42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,72 +87,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+Hi Alistair,
 
-On 1/30/20 6:39 PM, Daniel Henrique Barboza wrote:
-> The version 8 of this patch series got buried and it's now
-> conflicting with master. Rebase and re-sending it.
-> 
-> Also, I contemplated the idea of moving/copying the password
-> verification in qcrypto_block_luks_create() all the way back to the
-> start of block_crypto_co_create_opts_luks(), failing early before the
-> bdrv_create_file(), avoiding the problem altogether without the
-> need of a delete_file API I'm trying to push here (see patch 03
-> commit message for detailed info about the bug).
-> 
-> This idea was dropped after I saw that:
-> 
-> - We would need to store the resulting password, now being retrieved
-> early in block_crypto_co_create_opts_luks(), in a new
-> QCryptoBlockCreateOptions string to be used inside
-> qcrypto_block_luks_create() as intended. An alternative would be to
-> call qcrypto_secret_lookup_as_utf8() twice, discarding the first
-> string;
-> 
-> - There are a lot of ways to fail in qcrypto_block_luks_create()
-> other than a non-UTF8 password that would trigger the same problem.
-> A more appropiate way of doing what I intended, instead of
-> copying/hacking code around to fail before bdrv_create(), is some sort
-> of bdrv_validate() API that would encapsulate everything that is
-> related to user input validation for the security drivers. This
-> API could then be called before the file creation (maybe inside
-> bdrv_create itself) and fail early if needed. This is too overkill
-> for what I'm trying to fix here, and I'm not sure if it would be
-> a net gain compared to the delete_file API.
-> 
-> 
-> All that said, I believe that this patch series presents a sane
-> solution with the code we have ATM.
-> 
-> 
-> changes in this version:
-> - rebase with current master at 204aa60b37
-> - previous version:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01551.html
-> 
-> 
-> Daniel Henrique Barboza (4):
->    block: introducing 'bdrv_co_delete_file' interface
->    block.c: adding bdrv_co_delete_file
->    crypto.c: cleanup created file when block_crypto_co_create_opts_luks
->      fails
->    qemu-iotests: adding LUKS cleanup for non-UTF8 secret error
-> 
->   block.c                    | 26 +++++++++++++++
->   block/crypto.c             | 18 ++++++++++
->   block/file-posix.c         | 23 +++++++++++++
->   include/block/block.h      |  1 +
->   include/block/block_int.h  |  4 +++
->   tests/qemu-iotests/282     | 67 ++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/282.out | 11 +++++++
->   tests/qemu-iotests/group   |  1 +
->   8 files changed, 151 insertions(+)
->   create mode 100755 tests/qemu-iotests/282
->   create mode 100644 tests/qemu-iotests/282.out
-> 
+On Wed, Mar 4, 2020 at 9:37 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> At present the board serial number is hard-coded to 1, and passed
+> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> the serial number to generate a unique MAC address for the on-chip
+> ethernet controller. When multiple QEMU 'sifive_u' instances are
+> created and connected to the same subnet, they all have the same
+> MAC address hence it creates a unusable network.
+>
+> A new "serial" property is introduced to the sifive_u SoC to specify
+> the board serial number. When not given, the default serial number
+> 1 is used.
+>
+> Suggested-by: Bin Meng <bmeng.cn@gmail.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/riscv/sifive_u.c         | 8 +++++++-
+>  include/hw/riscv/sifive_u.h | 2 ++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 9a0145b5b4..e52f9d0bd4 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -488,7 +488,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
+>                            TYPE_SIFIVE_U_PRCI);
+>      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
+>                            TYPE_SIFIVE_U_OTP);
+> -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
+> +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", s->serial);
+>      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+>                            TYPE_CADENCE_GEM);
+>  }
+> @@ -607,10 +607,16 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>          memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+>  }
+>
+> +static Property riscv_sifive_u_soc_props[] = {
+> +    DEFINE_PROP_UINT32("serial", SiFiveUSoCState, serial, OTP_SERIAL),
+> +    DEFINE_PROP_END_OF_LIST()
+
+I am not sure how adding another level of property in the SoC could
+solve the 'make check' error.
+
+> +};
+> +
+>  static void riscv_sifive_u_soc_class_init(ObjectClass *oc, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+>
+> +    device_class_set_props(dc, riscv_sifive_u_soc_props);
+>      dc->realize = riscv_sifive_u_soc_realize;
+>      /* Reason: Uses serial_hds in realize function, thus can't be used twice */
+>      dc->user_creatable = false;
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 82667b5746..a2baa1de5f 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -42,6 +42,8 @@ typedef struct SiFiveUSoCState {
+>      SiFiveUPRCIState prci;
+>      SiFiveUOTPState otp;
+>      CadenceGEMState gem;
+> +
+> +    uint32_t serial;
+>  } SiFiveUSoCState;
+>
+>  #define TYPE_RISCV_U_MACHINE MACHINE_TYPE_NAME("sifive_u")
+> --
+
+But anyway this patch does not actually work as expected. See below:
+
+$ ./riscv64-softmmu/qemu-system-riscv64 -M sifive_u,serial=3
+-nographic -m 2G -bios opensbi_u-boot_sifive_u_64.bin
+
+OpenSBI v0.5 (Oct 31 2019 18:38:50)
+   ____                    _____ ____ _____
+  / __ \                  / ____|  _ \_   _|
+ | |  | |_ __   ___ _ __ | (___ | |_) || |
+ | |  | | '_ \ / _ \ '_ \ \___ \|  _ < | |
+ | |__| | |_) |  __/ | | |____) | |_) || |_
+  \____/| .__/ \___|_| |_|_____/|____/_____|
+        | |
+        |_|
+
+Platform Name          : SiFive Freedom U540
+Platform HART Features : RV64ACDFIMSU
+Platform Max HARTs     : 5
+Current Hart           : 1
+Firmware Base          : 0x80000000
+Firmware Size          : 96 KB
+Runtime SBI Version    : 0.2
+
+PMP0: 0x0000000080000000-0x000000008001ffff (A)
+PMP1: 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
+
+
+U-Boot 2019.10 (Oct 31 2019 - 18:38:33 +0800)
+
+CPU:   rv64imafdcsu
+Model: SiFive HiFive Unleashed A00
+DRAM:  2 GiB
+MMC:
+In:    serial@10010000
+Out:   serial@10010000
+Err:   serial@10010000
+Net:
+Warning: ethernet@10090000 MAC addresses don't match:
+Address in ROM is          52:54:00:12:34:56
+Address in environment is  70:b3:d5:92:f0:01
+eth0: ethernet@10090000
+Hit any key to stop autoboot:  0
+
+
+See this line:
+Address in environment is  70:b3:d5:92:f0:01
+
+It should be: 70:b3:d5:92:f0:03 since I specified serial number as 3.
+
+Regards,
+Bin
 
