@@ -6,91 +6,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AAFC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97913C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 878A22166E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:50:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 878A22166E
+	by mail.kernel.org (Postfix) with ESMTPS id 6D1BD20842
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:51:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1BD20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33153 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9SYA-0002YX-OM
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:50:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45181)
+	id 1j9SZA-0004Dv-LG
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:51:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45292)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j9SR2-0006Mp-7D
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:33 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SRA-0006g9-PK
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j9SR1-0007hp-2J
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31224
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SR8-0007lZ-Ik
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25752)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j9SR0-0007hb-UD
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:31 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1j9SR5-0007fS-Ej
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 024Bdo3q094048
- for <qemu-devel@nongnu.org>; Wed, 4 Mar 2020 06:43:30 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yj6nj3ca9-1
+ 024BchYT057245
+ for <qemu-devel@nongnu.org>; Wed, 4 Mar 2020 06:43:24 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yj8hbfbqp-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 06:43:30 -0500
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 06:43:24 -0500
 Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 4 Mar 2020 11:43:28 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Wed, 4 Mar 2020 11:43:22 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 4 Mar 2020 11:43:27 -0000
+ Wed, 4 Mar 2020 11:43:21 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 024BhQAp59506828
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 024BhKVM55115840
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 4 Mar 2020 11:43:26 GMT
+ Wed, 4 Mar 2020 11:43:20 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E574A42045;
- Wed,  4 Mar 2020 11:43:25 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 0A1854203F;
+ Wed,  4 Mar 2020 11:43:20 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2F29842042;
- Wed,  4 Mar 2020 11:43:25 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4710A4204C;
+ Wed,  4 Mar 2020 11:43:19 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.152.224.55])
  by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  4 Mar 2020 11:43:25 +0000 (GMT)
+ Wed,  4 Mar 2020 11:43:19 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 18/18] pc-bios: s390x: Save iplb location in lowcore
-Date: Wed,  4 Mar 2020 06:42:31 -0500
+Subject: [PATCH v6 12/18] s390x: protvirt: Move diag 308 data over SIDAD
+Date: Wed,  4 Mar 2020 06:42:25 -0500
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200304114231.23493-1-frankja@linux.ibm.com>
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20030411-4275-0000-0000-000003A844A9
+x-cbid: 20030411-0012-0000-0000-0000038D1270
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030411-4276-0000-0000-000038BD5017
-Message-Id: <20200304114231.23493-19-frankja@linux.ibm.com>
+x-cbparentid: 20030411-0013-0000-0000-000021C9CCCD
+Message-Id: <20200304114231.23493-13-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-04_01:2020-03-04,
  2020-03-04 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxlogscore=579 suspectscore=1
- impostorscore=0 priorityscore=1501 bulkscore=0 phishscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ clxscore=1015
+ priorityscore=1501 suspectscore=3 adultscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 malwarescore=0 mlxlogscore=847 spamscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003040090
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,126 +107,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The POP states that for a list directed IPL the IPLB is stored into
-memory by the machine loader and its address is stored at offset 0x14
-of the lowcore.
-
-ZIPL currently uses the address in offset 0x14 to access the IPLB and
-acquire flags about secure boot. If the IPLB address points into
-memory which has an unsupported mix of flags set, ZIPL will panic
-instead of booting the OS.
-
-As the lowcore can have quite a high entropy for a guest that did drop
-out of protected mode (i.e. rebooted) we encountered the ZIPL panic
-quite often.
+For protected guests the IPIB is written/read to/from the satellite
+block, so we need those accesses to go through
+s390_cpu_pv_mem_read/write().
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
 ---
- pc-bios/s390-ccw/jump2ipl.c  |  1 +
- pc-bios/s390-ccw/main.c      |  8 +++++++-
- pc-bios/s390-ccw/netmain.c   |  1 +
- pc-bios/s390-ccw/s390-arch.h | 10 ++++++++--
- pc-bios/s390-ccw/s390-ccw.h  |  1 +
- 5 files changed, 18 insertions(+), 3 deletions(-)
+ target/s390x/diag.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
-index da13c43cc0..4eba2510b0 100644
---- a/pc-bios/s390-ccw/jump2ipl.c
-+++ b/pc-bios/s390-ccw/jump2ipl.c
-@@ -35,6 +35,7 @@ void jump_to_IPL_code(uint64_t address)
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index a6cd1ea260..444c88ef15 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -87,6 +87,7 @@ static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
  {
-     /* store the subsystem information _after_ the bootmap was loaded */
-     write_subsystem_identification();
-+    write_iplb_location();
- 
-     /* prevent unknown IPL types in the guest */
-     if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index a21b386280..4e65b411e1 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include "libc.h"
-+#include "helper.h"
- #include "s390-arch.h"
- #include "s390-ccw.h"
- #include "cio.h"
-@@ -22,7 +23,7 @@ QemuIplParameters qipl;
- IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
- static bool have_iplb;
- static uint16_t cutype;
--LowCore const *lowcore; /* Yes, this *is* a pointer to address 0 */
-+LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
- 
- #define LOADPARM_PROMPT "PROMPT  "
- #define LOADPARM_EMPTY  "        "
-@@ -42,6 +43,11 @@ void write_subsystem_identification(void)
-     *zeroes = 0;
- }
- 
-+void write_iplb_location(void)
-+{
-+    lowcore->ptr_iplb = ptr2u32(&iplb);
-+}
+     CPUState *cs = env_cpu(env);
++    S390CPU *cpu = S390_CPU(cs);
+     uint64_t addr =  env->regs[r1];
+     uint64_t subcode = env->regs[r3];
+     IplParameterBlock *iplb;
+@@ -118,13 +119,22 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+             return;
+         }
+         iplb = g_new0(IplParameterBlock, 1);
+-        cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
++        if (!env->pv) {
++            cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
++        } else {
++            s390_cpu_pv_mem_read(cpu, 0, iplb, sizeof(iplb->len));
++        }
 +
- void panic(const char *string)
- {
-     sclp_print(string);
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index f2dcc01e27..309ffa30d9 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -40,6 +40,7 @@
- #define DEFAULT_TFTP_RETRIES 20
+         if (!iplb_valid_len(iplb)) {
+             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
+             goto out;
+         }
  
- extern char _start[];
-+void write_iplb_location(void) {}
+-        cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
++        if (!env->pv) {
++            cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
++        } else {
++            s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len));
++        }
  
- #define KERNEL_ADDR             ((void *)0L)
- #define KERNEL_MAX_SIZE         ((long)_start)
-diff --git a/pc-bios/s390-ccw/s390-arch.h b/pc-bios/s390-ccw/s390-arch.h
-index 504fc7c2f0..5f36361c02 100644
---- a/pc-bios/s390-ccw/s390-arch.h
-+++ b/pc-bios/s390-ccw/s390-arch.h
-@@ -36,7 +36,13 @@ typedef struct LowCore {
-     /* prefix area: defined by architecture */
-     PSWLegacy       ipl_psw;                  /* 0x000 */
-     uint32_t        ccw1[2];                  /* 0x008 */
--    uint32_t        ccw2[2];                  /* 0x010 */
-+    union {
-+        uint32_t        ccw2[2];                  /* 0x010 */
-+        struct {
-+            uint32_t reserved10;
-+            uint32_t ptr_iplb;
-+        };
-+    };
-     uint8_t         pad1[0x80 - 0x18];        /* 0x018 */
-     uint32_t        ext_params;               /* 0x080 */
-     uint16_t        cpu_addr;                 /* 0x084 */
-@@ -85,7 +91,7 @@ typedef struct LowCore {
-     PSW             io_new_psw;               /* 0x1f0 */
- } __attribute__((packed, aligned(8192))) LowCore;
- 
--extern LowCore const *lowcore;
-+extern LowCore *lowcore;
- 
- static inline void set_prefix(uint32_t address)
- {
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 11bce7d73c..21f27e7990 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -57,6 +57,7 @@ void consume_io_int(void);
- /* main.c */
- void panic(const char *string);
- void write_subsystem_identification(void);
-+void write_iplb_location(void);
- extern char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
- unsigned int get_loadparm_index(void);
- 
+         if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
+             !(iplb_valid_pv(iplb) && !s390_ipl_pv_check_components(iplb))) {
+@@ -136,7 +146,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+         env->regs[r1 + 1] = DIAG_308_RC_OK;
+ out:
+         g_free(iplb);
+-        return;
++        break;
+     case DIAG308_STORE:
+     case DIAG308_PV_STORE:
+         if (diag308_parm_check(env, r1, addr, ra, true)) {
+@@ -147,12 +157,18 @@ out:
+         } else {
+             iplb = s390_ipl_get_iplb();
+         }
+-        if (iplb) {
+-            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
+-            env->regs[r1 + 1] = DIAG_308_RC_OK;
+-        } else {
++        if (!iplb) {
+             env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
++            return;
+         }
++
++        if (!env->pv) {
++            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
++        } else {
++            s390_cpu_pv_mem_write(cpu, 0, iplb, be32_to_cpu(iplb->len));
++        }
++
++        env->regs[r1 + 1] = DIAG_308_RC_OK;
+         break;
+     case DIAG308_PV_START:
+         iplb = s390_ipl_get_iplb_secure();
 -- 
 2.20.1
 
