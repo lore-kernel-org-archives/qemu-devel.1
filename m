@@ -2,129 +2,82 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979DEC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 09:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8EDC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 09:13:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6227F2072D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 09:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 952F62072D
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 09:13:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHUNozQc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6227F2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/7z9pXx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 952F62072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9PzG-0000WY-Ko
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 04:06:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50643)
+	id 1j9Q5j-0001xv-RJ
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 04:13:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9Pyd-0008V5-MN
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:06:05 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j9Q4w-0001Wd-SX
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9Pyc-0005I5-Je
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:06:03 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29727
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kchamart@redhat.com>) id 1j9Q4u-0008Kl-5o
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:12:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50687
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9Pyc-0005H1-GO
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:06:02 -0500
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j9Q4u-0008JH-1d
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 04:12:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583312762;
+ s=mimecast20190719; t=1583313151;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=E1jdDI86fMMCPVz5aE0A9wniTqHWwQv/bNoJwT7SNsA=;
- b=iHUNozQcWrYESFQZFyTXbzDt7wKYtjF9yP8RX3KEZMvxYiSVuTmytBDIv8BwFr3dkzV53G
- vE1Mmg+ntRTDNPhnJ+Tq44JZbe7/IyfYei5VpCHXbpbCSuXj4ARlQ4xmrPCNc82Lqj2zdO
- iOcu2F2c/v1D3NdfF3BNd+mHmhSpGtA=
+ in-reply-to:in-reply-to:references:references;
+ bh=efR1TtkElPczAFiEeoec+SxYuf8yOLcBTIM7KbhzkD0=;
+ b=e/7z9pXx1xf/SxEMavjkcJN9j8CS0pb0EaH7gyzqsdJq4SbQnjGaLBNQ2S7bSl7DwxkdfK
+ tibEw5EwATgI3xE4N3g91t0kk4SBSOG/BpVJ/ce1Hst5nTRoBpZHOi+r2zJWezlIpBfvg/
+ v9Pf9l0I33OyYH22jtjvnO9NqDDJHV4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-UIXZEwf7N9mJv20arS8VHw-1; Wed, 04 Mar 2020 04:05:58 -0500
-X-MC-Unique: UIXZEwf7N9mJv20arS8VHw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-233-dILwnJY8Pzi0kdyfn4LAZQ-1; Wed, 04 Mar 2020 04:12:29 -0500
+X-MC-Unique: dILwnJY8Pzi0kdyfn4LAZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C8EE1005510;
- Wed,  4 Mar 2020 09:05:57 +0000 (UTC)
-Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF09660FC1;
- Wed,  4 Mar 2020 09:05:55 +0000 (UTC)
-Subject: Re: [PATCH] pc-bios: s390x: Save iplb location in lowcore
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200303155010.2519-1-frankja@linux.ibm.com>
- <49294c6a-38f6-8358-b613-72d3c3c7cf4f@redhat.com>
- <7eee8f67-d1a1-39e5-af8b-4bd6dc815005@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <ac3ee690-408c-42e0-db45-2d0b4cbc637e@redhat.com>
-Date: Wed, 4 Mar 2020 10:05:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A44C4DB68;
+ Wed,  4 Mar 2020 09:12:28 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 387B28CCE2;
+ Wed,  4 Mar 2020 09:12:28 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 632303E04CB; Wed,  4 Mar 2020 10:12:26 +0100 (CET)
+Date: Wed, 4 Mar 2020 10:12:26 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 00/33] Convert qemu-doc to rST
+Message-ID: <20200304091226.GB16082@paraplu>
+References: <20200228153619.9906-1-peter.maydell@linaro.org>
+ <CAFEAcA8vbqA_4K7dkyOrU_8HDrRo8h5eYESLgNnOzvrp0tVUpQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <7eee8f67-d1a1-39e5-af8b-4bd6dc815005@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAFEAcA8vbqA_4K7dkyOrU_8HDrRo8h5eYESLgNnOzvrp0tVUpQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,51 +89,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.03.20 09:59, Janosch Frank wrote:
-> On 3/3/20 5:13 PM, David Hildenbrand wrote:
->> On 03.03.20 16:50, Janosch Frank wrote:
->>> The POP states that for a list directed IPL the IPLB is stored into
->>> memory by the machine loader and its address is stored at offset 0x14
->>> of the lowcore.
->>>
->>> ZIPL currently uses the address in offset 0x14 to access the IPLB and
->>> acquire flags about secure boot. If the IPLB address points into
->>> memory which has an unsupported mix of flags set, ZIPL will panic
->>> instead of booting the OS.
->>>
->>> As the lowcore can have quite a high entropy for a guest that did drop
->>> out of protected mode (i.e. rebooted) we encountered the ZIPL panic
->>> quite often.
->>
->> How did this ever work? Or does this only become relevant with secure boot?
-> 
-> I'd guess that until secure boot ZIPL never touched this and with it we
-> never hit the right combination of flags to trigger a ZIPL panic.
-> 
-> This way of getting to the IPLB was used before diag308 was available,
-> i.e. way before KVM got to IBM Z. It looks like ZIPL only uses it for
-> secure boot for some reason and hence we never implemented it before.
-> 
-> I'm also in discussion with the ZIPL developers to make this more robust.
-> 
+On Tue, Mar 03, 2020 at 05:35:01PM +0000, Peter Maydell wrote:
+> On Fri, 28 Feb 2020 at 15:36, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> >
+> > Hi; this series does a complete conversion of qemu-doc from
+> > Texinfo to rST, including the hxtool-generated parts and
+> > creation of the qemu.1 manpage from rST.
+> >
+>=20
+> Advance notice: I would like to put these into a pull
+> request at the end of this week. This is your opportunity
+> to say "that would be a bad idea", "I need X more time
+> to review it", etc :-)
 
-Thanks for the clarification!
+I tried to probe some of the generated docs; I couldn't spot something
+that is glaring.  (Granted, I didn't spend a _whole_ lot of time.)
 
-[...]
+And I'm with Paolo =E2=80=94 yes, let's get this merged, and address other
+issues as follow-ups :-)
 
-> 
-> Do you want to add a patch or shall I add it to my cleanup series?
-
-Would be great if you could add a cleanup.
-
--- 
-Thanks,
-
-David / dhildenb
+--=20
+/kashyap
 
 
