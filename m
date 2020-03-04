@@ -2,70 +2,107 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54A7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8466EC3F2D7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88AEB20842
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:34:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88AEB20842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 418B820716
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:38:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SDE3AEqs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 418B820716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9cal-0001IX-PM
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 17:34:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36131)
+	id 1j9cfE-0002yJ-Ru
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 17:38:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j9cZs-0000po-UM
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:33:23 -0500
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1j9ceS-0002Wy-NW
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j9cZq-0006LW-Fs
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:33:20 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:38932)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j9cZj-00064x-Ic; Wed, 04 Mar 2020 17:33:13 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 36AA7747E00;
- Wed,  4 Mar 2020 23:33:09 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E19D4747DF7; Wed,  4 Mar 2020 23:33:08 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id DFCAA747DFF;
- Wed,  4 Mar 2020 23:33:08 +0100 (CET)
-Date: Wed, 4 Mar 2020 23:33:08 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-In-Reply-To: <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
- <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
- <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1j9ceQ-0000DB-Ak
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:04 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:56462)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1j9ceQ-0000Br-02
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:02 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024MXm3q183372;
+ Wed, 4 Mar 2020 22:37:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
+ bh=dHDaI5XU4BUsJwgISTK7xWQVTuxFTHvsEZi+fNHQN5Y=;
+ b=SDE3AEqsFj8P16i53OZMVdvTmxS/6fu//UJSQWx3PTGqj7ubW2ybLPPxcPrR+3Kz1Mll
+ gQG3XuPByiZ6Ll9YjIG/kjRiFLJTa2GTIHI9FgY4DV4n5/hELCNDN0CoSkw8xhIP8Uni
+ Sz8GV7M0zgLmscYM/9TtReubdiglwwAh15P4mUyLgBJS96Ra4F0V9KGHzbQP+KL0jdvm
+ 1R1899aNU4FMN2/afW0Zm8X4AhkA69g8Jxh9ZIJSqtpBU5Onxge4gmSUyXrufDMWHDOv
+ ARZ5sywJ/pBo+OXjV4IKnyAOPJaU/JxJY+eOVDf42iRvQcfseFBd+Wsxg1QkYay94tDo lA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2yffcusf4h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 22:37:51 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024MWYh3107682;
+ Wed, 4 Mar 2020 22:37:51 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2yg1p8nsyg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 22:37:51 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 024MbmpF029291;
+ Wed, 4 Mar 2020 22:37:48 GMT
+Received: from flaka (/174.244.65.58) by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 04 Mar 2020 14:37:47 -0800
+Date: Wed, 4 Mar 2020 14:37:43 -0800
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ stefanha@redhat.com
+Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
+Message-ID: <20200304223743.GA5151@flaka>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
+ <acc40fcd-2871-df80-d420-b9f12dfcf19c@redhat.com>
+ <20200302174745.GP1679990@redhat.com>
+ <20200302223937.GA29775@flaka>
+ <20200304110032.GA1851428@redhat.com> <20200304162533.GA314@flaka>
+ <20200304163357.GE1851428@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200304163357.GE1851428@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ malwarescore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003040143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxscore=0 bulkscore=0
+ adultscore=0 suspectscore=0 spamscore=0 malwarescore=0 impostorscore=0
+ priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003040143
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+ 024MXm3q183372
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,211 +114,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Mar 2020, Mark Cave-Ayland wrote:
-> On 04/03/2020 00:22, BALATON Zoltan wrote:
->>>>> So on that basis the best explanation as to what is happening is the
->>>>> comment in the link you provided here:
->>>>> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/powerpc/platforms/chrp/pci.c?h=v4.14.172#n353
->>>>>
->>>>> /* Pegasos2 firmware version 20040810 configures the built-in IDE controller
->>>>> * in legacy mode, but sets the PCI registers to PCI native mode.
->>>>> * The chip can only operate in legacy mode, so force the PCI class into legacy
->>>>> * mode as well. The same fixup must be done to the class-code property in
->>>>> * the IDE node /pci@80000000/ide@C,1
->>>>> */
->>>>
->>>> I'm not sure that it makes much sense that the firmware configures the chip one way
->>>> then puts info about a different way in the device tree. There could be bugs but this
->>>> is not likely. Especially because I see in traces that the firmware does try to
->>>> configure the device in native mode. These are the first few accesses of the firmware
->>>> to via-ide:
->>>
->>> But that is exactly what is happening! The comment above clearly indicates the
->>> firmware incorrectly sets the IDE controller in native mode which is in exact
->>> agreement with the trace you provide below. And in fact if you look at
->>
->> I may be reading the comment wrong but to me that says that "firmware configures IDE
->> in _legacy_ mode" whereas the trace shows it actually configures it in _native_ mode
->> which is complying to the CHRP doc above. But since it cannot comply to the "native
->> devices using OpenPIC" part it probably tries to apply the "ISA devices embedded in
->> PCI" part and locks IRQ to 14 and 15. Or it just wants to avoid sharing IRQs as much
->> as possible and the designers decided they will use IRQ14 and 15 for IDE.
->
-> Interesting. My interpretation of the comment was that the hardware can only operate
-> in legacy mode, even though the firmware configures the PCI registers to enable
-> native mode (which is why the class-code and IRQ routing are wrong).
+On Wed, Mar 04, 2020 at 04:33:57PM +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Wed, Mar 04, 2020 at 08:25:34AM -0800, Elena Ufimtseva wrote:
+> > On Wed, Mar 04, 2020 at 11:00:32AM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> > > On Mon, Mar 02, 2020 at 02:39:37PM -0800, Elena Ufimtseva wrote:
+> > > > On Mon, Mar 02, 2020 at 05:47:45PM +0000, Daniel P. Berrang=C3=A9=
+ wrote:
+> > > > > On Mon, Mar 02, 2020 at 06:36:13PM +0100, Philippe Mathieu-Daud=
+=C3=A9 wrote:
+> > > > > > typo "multi" in patch subject.
+> > > > > >
+> > > > Thank Philippe, will fix.
+> > > > =20
+> > > > > > On 2/24/20 9:55 PM, Jagannathan Raman wrote:
+> > > > > > > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > > > > > >=20
+> > > > > > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > > > > > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> > > > > > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > > > > > > ---
+> > > > > > >   v4 -> v5:
+> > > > > > >    - Added "exec" suboption to get the executable's name
+> > > > > > >    - Addressed feedback about variable names
+> > > > > > >    - Removed redundant check for spawning a process
+> > > > > > >=20
+> > > > > > >   hw/proxy/qemu-proxy.c         | 68 ++++++++++++++++++++++=
++++++++++++----------
+> > > > > > >   include/hw/proxy/qemu-proxy.h |  2 +-
+> > > > > > >   2 files changed, 54 insertions(+), 16 deletions(-)
+> > > > > > >=20
+> > > > > > > diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+> > > > > > > index 828bbd7..d792e86 100644
+> > > > > > > --- a/hw/proxy/qemu-proxy.c
+> > > > > > > +++ b/hw/proxy/qemu-proxy.c
+> > > > > > > @@ -19,19 +19,50 @@
+> > > > > > >   static void pci_proxy_dev_realize(PCIDevice *dev, Error *=
+*errp);
+> > > > > > > +static int add_argv(char *opts_str, char **argv, int argc)
+> > > > > > > +{
+> > > > > > > +    int max_args =3D 64;
+> > > > > > > +
+> > > > > > > +    if (argc < max_args - 1) {
+> > > > > > > +        argv[argc++] =3D opts_str;
+> > > > > > > +        argv[argc] =3D 0;
+> > > > > > > +    } else {
+> > > > > > > +        return 0;
+> > > > > > > +    }
+> > > > > > > +
+> > > > > > > +    return argc;
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static int make_argv(char *opts_str, char **argv, int argc=
+)
+> > > > > > > +{
+> > > > > > > +    int max_args =3D 64;
+> > > > > > > +
+> > > > > > > +    char *p2 =3D strtok(opts_str, " ");
+> > > > > > > +    while (p2 && argc < max_args - 1) {
+> > > > > > > +        argv[argc++] =3D p2;
+> > > > > > > +        p2 =3D strtok(0, " ");
+> > > > > > > +    }
+> > > > > > > +    argv[argc] =3D 0;
+> > > > > >=20
+> > > > > > Is there a GLib function to do that?
+> > > > >
+> > > >=20
+> > > > Hi Daniel
+> > > >=20
+> > > > > g_shell_parse_argv() perhaps
+> > > > >
+> > > >=20
+> > > > Thanks for the suggestion.
+> > > >=20
+> > > > >   https://developer.gnome.org/glib/stable/glib-Shell-related-Ut=
+ilities.html
+> > > > >=20
+> > > > >=20
+> > > > > Though my preference would be to avoid the need to do this at a=
+ll, by
+> > > > > not accepting a raw shell command line string in the first plac=
+e.
+> > > > >
+> > > > Can you please clarify? Did you mean that it would be better if Q=
+emu somehow
+> > > > verifies the options and then passes it to a remote process via a=
+ message?
+> > >=20
+> > > I've not been able to trace the code paths back all the way, so I c=
+an't
+> > > point to where I think needs fixing. I assuming that something, som=
+ewhere
+> > > in this patch series should starts out with a binary name and a lis=
+t of argv
+> > > as an array of char *. ie a "char **argv".  At some point this arra=
+y gets
+> > > mashed together into a single 'char *' string where all the argv ar=
+e separated
+> > > by a space. This patch now tries to parse this and turn it back int=
+o a
+> > > "char **argv" array.
+> > >=20
+> > > So my key point is that we should try hard to avoid this intermedia=
+te
+> > > shell command line string stage entirely. Always keep the argv in a=
+n array
+> > > form, and never mash them together such that they then need parsing=
+ again.
+> > >
+> > Hi Daniel
+> >=20
+> > Thank you for explanation.
+> > At this point there is no intermediate stage as we grab the arguments
+> > as a raw string from the command line option -remote:
+> >=20
+> > -remote rid=3D8,exec=3Dqemu-scsi-dev,command=3D"-drive id=3Ddrive_ima=
+ge2,,file=3D/root/remote-process-disk.img"
+> >=20
+> > So the command=3D"" string is being later parsed into the array and r=
+emote process
+> > gets spawned with the "char **argv".
+> >=20
+> > Stefan expressed his concern that its not convenient to use due to
+> > the double escaping commas, spaces, quotes and we do agree with that.
+> > We were seeking an advice on what is the better approach.
+>=20
+> I've not looked closely enough to understand the range of different
+> options we need to be able to pass to the remote QEMU ? Is it just
+> "-drive" options, or can it be absolutely any QEMU option ?
+>=20
+> If it is just -drive, then I could imagine a -remote-drive option
+> such that we end up with with a set of args
+>=20
+>    $QEMU \
+>    -remote rid=3D8,exec=3Dqemu-scsi-dev \
+>    -remote-drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-=
+disk1.img \
+>    -remote-drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-=
+disk2.img \
+>    -remote rid=3D9,exec=3Dqemu-scsi-dev \
+>    -remote-drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-=
+disk3.img \
+>    -remote-drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-=
+disk4.img
+>=20
+> And this gets turned into 2 execs:
+>=20
+>    qemu-scsi-dev \
+>    -drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-disk1.i=
+mg \
+>    -drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-disk2.i=
+mg
+>   =20
+>    qemu-scsi-dev \
+>    -drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-disk3.i=
+mg \
+>    -drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-disk4.i=
+mg
+>=20
+>=20
+> Or maybe instead of having a '-remote-drive' arg, we can make the '-dri=
+ve'
+> arg take an optional "rid" attribute to associate it with the remote pr=
+ocess
+>=20
+>    $QEMU \
+>    -remote rid=3D8,exec=3Dqemu-scsi-dev \
+>    -drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-disk1.i=
+mg \
+>    -drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-disk2.i=
+mg \
+>    -remote rid=3D9,exec=3Dqemu-scsi-dev \
+>    -drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-disk3.i=
+mg \
+>    -drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-disk4.i=
+mg
+>=20
+> When 'rid' is seen, instead of creating a local block backend, the
+> args get used for the remote process.
+>=20
+> This would have the nice user behaviour that you can take an existing
+> QEMU command line, and turn it into a multi-process command line
+> simply by adding the '-remote ...' arg, and adding 'rid=3DNN' to
+> each -drive. Nothing else about your existing command line need
+> change.
 
-I think you may give more significance to this comment than it really has. 
-I don't know who put it there but maybe was also guessing what really 
-happens and it's not really an authorative answer why it behaves like 
-that. It seems to come from this commit and not from Genesi/bPlan but 
-sounds more like a bugfix from some user:
+This does look good, especially unmodified -drive.
+And -monitor for the remote process could also be similarly added
+with only rid specified instead of plugging it into the raw string.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/arch/powerpc/platforms/chrp/pci.c?h=v3.16.82&id=556ecf9be66f4d493e19bc71a7ce84366d512b71
+Stefan did mention in the another patch that he thinks that adding
+-remote option is too invasive and suggested using -object itself
+to further separate remote process devices.
 
-I give more credibility to what MorphOS expects because the developers of 
-that were closely cooperating with the board designers:
+So to compile both replies, the command line for the remote process
+will look something like this:
 
-https://en.wikipedia.org/wiki/Bplan#Community_support
-https://en.wikipedia.org/wiki/Pegasos#Operating_system_support
 
->>> https://www.powerdeveloper.org/platforms/pegasos/devicetree you can see the nvramrc
->>> hack that was released in order to fix the device tree to boot Linux which alters the
->>> class-code and sets interrupts to 14 (which I believe is invalid, but seemingly good
->>> enough here).
->>
->> Isn't this the same fixup that newer Linux kernels already include? Maybe this was
->> needed before Linux properly supported Pegasos2 but later kernels will do this
->> anyway. This does not give us any new info we did not have before I think maybe just
->> easier to see all fixups in one place.
->>
->>>> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
->>>> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
->>>> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
->>>> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
->>>> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
->>>> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
->>>> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
->>>> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
->>>> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
->>>> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->>>> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->>>> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
->>>> pci_cfg_read via-ide 12:1 @0xc -> 0x0
->>>> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
->>>> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->>>> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
->>>> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->>>> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
->>>>
->>>> The very first write is to turn on native mode, so I think it's not about what the
->>>> firmware does but something about how hardware is wired on Pegasos II or the VT8231
->>>> chip itself that only allows legacy interrupts instead of 100% native mode for IDE.
->>>>
->>>>> Given that the DT is wrong, then we should assume that all OSs would have to
->>>>> compensate for this in the same way as Linux, and therefore this should be handled
->>>>> automatically.
->>>>>
->>>>> AFAICT this then only leaves the question: why does the firmware set
->>>>> PCI_INTERRUPT_LINE to 9, which is presumably why you are seeing problems running
->>>>> MorphOS under QEMU.
->>>>
->>>> Linux does try to handle both true native mode and half-native mode. It only uses
->>>> half-native mode if finds IRQ14 on Pegasos, otherwise skips Pegasos specific fixup
->>>> and uses true native mode setup. I don't know what MorphOS does but I think it justs
->>>> knows that Pegasos2 has this quirk and does not look at the device tree at all.
->
-> I think this is the other way around? From the code above:
->
-> 	if (viaide->irq != 14)
-> 		return;
->
-> Doesn't this suggest that chrp_pci_fixup_vt8231_ata() exits without applying the fix
-> if it finds PCI_INTERRUPT_LINE set to 9 from the firmware above?
+-object remote-device,id=3Drid0,exec=3Dqemu-scsi-dev \
+-device remote-pci-device,id=3Dscsi0,remote-device=3Drid0 \
+-device scsi-hd,drive=3Ddrive_image1,bus=3Dscsi0.0,scsi-id=3D0,remote-dev=
+ice=3Drid0 \
+-drive id=3Ddrive_image3,file=3D/root/remote-process-disk3.img,remote-dev=
+ice=3Drid0 \
+-drive id=3Ddrive_image4,file=3D/root/remote-process-disk4.img,remote-dev=
+ice=3Drid0 \
+-monitor unix:/home/qmp-sock,,server,,nowait,remote-device=3Drid0
 
-Yes but the fixup is clearing the bits saying the controller is in native 
-mode so code detecting IRQ lines later will use the legacy 14 and 15 
-because that decides based on this config value. This corresponds to 
-half-native mode, as io addresses are still from BARs not the legacy IDE 
-ports as can be seen from the dmesg output about ide addresses. If irq is 
-not set to 14, fixup function leaves config in native mode and Linux will 
-try to use the single IRQ line set by PCI_INTERRUPT_LINE (which the 
-firmware sets to 9) for both channels. This works with Linux both ways as 
-long as we emulate the same but doesn't with other OSes which always use 
-PCI BARs to access io regs but expect interrupts on 14 and 15 regardless 
-of the mode (and they leave it in native mode don't try setting to legacy) 
-so I think they just know Pegasos2 has this half-native mode and use that 
-without trying to fix up anything. From this I think we know how it works 
-on real hardware and this patch tries to emulate that which also seems to 
-work with all OSes. What else is needed?
+And in experimental version we imply that remote-pci-device is the LSI co=
+ntroller.
+For vfio-over-socket it will represent any remote PCI device.
 
-> Do you have a copy of the full DT and the firmware revision number that was used to
-> generate your Linux boot output on real hardware?
+What your thoughts on this?
 
-Firmware dumps are also linked from
+Thank you!
+Elena
 
-https://osdn.net/projects/qmiga/wiki/SubprojectPegasos2
 
-in the section about firmware and also show mode set to 0x8f by firmware 
-20040810.
-
->>> Again to summarise: this is a known bug in Pegasos2 firmware and the VIA is a
->>> standard chip, so let's try and figure out exactly what is happening using a real
->>> firmware and emulate that behaviour in QEMU. This should then make all guests happy,
->>> regardless of architecture, without requiring the introduction of feature bits or
->>> risk of introducing other incompatibilities.
->>
->> I think I've already done that with this patch (within the limits possible in QEMU).
->> The Pegasos2 seems to always use IRQ14 and 15 even when IDE is set to native mode
->> (which the firmware does immediately, I'm using a real firmware to test) and all
->> guests are happy with this. This behaviour is confirmed by excpectations of AmigaOS
->> and MorphOS drivers and also Linux comments (although those comments may get the
->> reason wrong, they confirm the behaviour). I'm not sure how real hardware implements
->> this behaviour and also not sure if it's a bug in the firmware or rather a peculiar
->> design choice for Pegasos2. But that probably does not matter for the fact that it's
->> how it works which is all we need to emulate it.
->>
->> Also consider that QEMU via-ide is only emulating native mode of the chip because we
->> can't switch between the two modes so it's either legacy only or native only because
->> all other implemented controllers are either ISA or native PCI so QEMU does not have
->> way to deregister ISA IDE and PCI code does not have way to use io BARs despite not
->> being enabled via PCI config which could be needed to use them when device is in
->> legacy mode. Previously via-ide was emulating legacy only and that worked with Linux
->> but not with anything else. I'm not planning to rewrite large parts of the IDE and
->> PCI code to allow switching back and forth which is not even needed. Unless you know
->> a better way to implement this I think the proposed patch is achieving this with
->> minimal changes. I don't see a need to more exactly emulate some kind of hardware bug
->> or peculiar design choices of a board than what's needed to make clients happy and boot.
->>
->> Is this series good enough now to be merged or are any changes needed? I'd like to
->> not miss the deadline for the freeze and get this delayed for months for not good
->> reason because I'm not sure when will I have time to work on it again.
->
-> I think there's still time to get something done before freeze, however I'm not
-> convinced that we understand the actual problem correctly (and also the use of
-> feature bits feels somewhat odd to me).
-
-There may be some time until the freeze but not sure I'll have much time 
-until maybe Easter or later so I'd rather get over this now if possible 
-than do it in the last minute. The feature bit was needed because the 
-fulong2e does not seem to have this behaviour (although Linux has a 
-different set of fixups for that board but not about IDE IRQs) so we need 
-to emulate two different behaviours: half-native mode for pegasos2 (which 
-I think is confirmed by evidence in multiple OSes even if we don't know 
-the exact reason behind it) and 100% native mode for fulong2e hence we 
-need a way to tell the device emulation which board's expectations it 
-should fulfil for which introducing a flag seemed to be the simplest 
-solution.
-
-> One more thing I don't understand: I had a glance over the logs you posted over at
-> https://osdn.net/projects/qmiga/ticket/38949 and you mention that everything works up
-> to the point where BMDMA is enabled.
->
-> From memory working with cmd646 both the BMDMA and non-BMDMA interrupts end up
-> calling into the same *_set_irq() function in the emulated controller. So what is the
-> difference between the initial state where IRQs function enough to start to load an
-> OS, and at the point where BMDMA is enabled by the OS driver and things stop working?
-> How does the IRQ routing compare?
-
-I'm not sure either why that's the case but maybe the firmware does not 
-use interrupts and MorphOS also only enables it when enabling BMDMA. 
-Before that they could just poll the PIO regs?
-
-What other OSes are we interested in running on pegasos2 than Linux, 
-MorphOS and AmigaOS? Once these are happy do we need to spend more time on 
-this until an actual problem comes up? I think there's no need to further 
-refine this relatively rarely used device model now. Unless you can 
-propose a better solution that works with these OSes, otherwise that could 
-be addressed in a later patch and the current one is good enough to enable 
-these guests for now.
-
-Regards,
-BALATON Zoltan
+Stefan,=20
+>=20
+> > Few things we discussed internally is to have the remote drive
+> > command line options passed over by messages or using QMP.
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+>=20
 
