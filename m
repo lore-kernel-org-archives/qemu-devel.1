@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3691BC3F2D8
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0118C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:51:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 066A42468B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:50:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D6E821775
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:51:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBq6QoWM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 066A42468B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTwsxNnw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D6E821775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Y9q-0007xT-5S
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:50:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49351)
+	id 1j9YBZ-0000ds-O5
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:51:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9Y8h-0006qv-8k
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:49:00 -0500
+ (envelope-from <david@redhat.com>) id 1j9YAx-0000Bu-4v
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9Y8f-0002kn-Vz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:48:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56479
+ (envelope-from <david@redhat.com>) id 1j9YAv-0005MH-Jh
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35398
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9Y8f-0002jn-Ne
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:48:57 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9YAv-0005LU-Fq
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583344137;
+ s=mimecast20190719; t=1583344276;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I6OmbtzF2fo9Ob7YMIZZmFMNPLGU4Sl9CwSOVyOSPxc=;
- b=VBq6QoWMWtgodlh3Mdesdkppez9XNgoQ42QJuP+QFUHkWcwkUHX9hfU6CeHReo+oYKqzM5
- r/ZWZHbvSsAoVdIGF6P9fFdO88+h3nydlbWLgsurQyGWw+JV1Hef2yMw3art5/5QZYqHC5
- +Q73f7rI4eUl7FLP5PMeBcqJXgrJ0fs=
+ bh=boCtawLobNhM+iemBRowaOU9Jzryw4lo9Y/rdsCLWvQ=;
+ b=QTwsxNnwDXtr+mgUEdjtcACh1MYDwGBjeZyzEocyKlYaZ85gf7W+V/rGWYqgxVXZbnF0YB
+ yieQq+ADleNrhyHX3rRzXEHZKolE6DCSuhmJ+q7pvJApaQWQSYWtvUjALzVi03bnkZzTlp
+ 7/eh6OvPRXkD4nSW4miN0aeMh4P/ol0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-kna1jEjzP3q9_WTiYEpRBg-1; Wed, 04 Mar 2020 12:48:55 -0500
-X-MC-Unique: kna1jEjzP3q9_WTiYEpRBg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-306-xRykIs4tN1-EIg2ydleUwQ-1; Wed, 04 Mar 2020 12:51:15 -0500
+X-MC-Unique: xRykIs4tN1-EIg2ydleUwQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 469FE800D4E;
- Wed,  4 Mar 2020 17:48:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD7031005510;
+ Wed,  4 Mar 2020 17:51:13 +0000 (UTC)
 Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 15AF3619DB;
- Wed,  4 Mar 2020 17:48:52 +0000 (UTC)
-Subject: Re: [PATCH v6 10/18] s390x: protvirt: SCLP interpretation
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ACADC19C58;
+ Wed,  4 Mar 2020 17:51:12 +0000 (UTC)
+Subject: Re: [PATCH v6 11/18] s390x: protvirt: Set guest IPL PSW
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-11-frankja@linux.ibm.com>
+ <20200304114231.23493-12-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,14 +108,14 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <37047b86-46e5-1180-af0e-cf25a138bf5f@redhat.com>
-Date: Wed, 4 Mar 2020 18:48:52 +0100
+Message-ID: <bc7f6f1f-e9c1-6d5e-4fe2-390d6e298a40@redhat.com>
+Date: Wed, 4 Mar 2020 18:51:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200304114231.23493-11-frankja@linux.ibm.com>
+In-Reply-To: <20200304114231.23493-12-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
@@ -139,92 +139,54 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 04.03.20 12:42, Janosch Frank wrote:
-> SCLP for a protected guest is done over the SIDAD, so we need to use
-> the s390_cpu_virt_mem_* functions to access the SIDAD instead of guest
-
-nope :)
-
-s390_cpu_pv_mem_*
-
-> memory when reading/writing SCBs.
-> 
-> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
-> since the function that injects the sclp external interrupt would
-> reject a zero sccb address.
-
-Please add that as a comment to SCLP_PV_DUMMY_ADDR.
-
+> Handling of CPU reset and setting of the IPL psw from guest storage at
+> offset 0 is done by a Ultravisor call. Let's only fetch it if
+> necessary.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/s390x/sclp.c         | 17 +++++++++++++++++
->  include/hw/s390x/sclp.h |  2 ++
->  target/s390x/kvm.c      |  5 +++++
->  3 files changed, 24 insertions(+)
+>  target/s390x/cpu.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
 > 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index af0bfbc2ec..5136f5fcbe 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -193,6 +193,23 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
->      }
->  }
->  
-> +#define SCLP_PV_DUMMY_ADDR 0x4000
-
-Should we move that to sclp_c->service_interrupt instead and document it
-properly?
-
-Or what about providing a
-
-sclp_c->service_interrupt_pv(sclp) that handles this internally?
-
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code)
-> +{
-> +    SCLPDevice *sclp = get_sclp_device();
-> +    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
-> +    SCCB work_sccb;
-> +    hwaddr sccb_len = sizeof(SCCB);
-> +
-> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
-
-I assume it's valid to always read the full SCCB length?
-
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-> +                          be16_to_cpu(work_sccb.h.length));
-> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
-> +    return 0;
-> +}
-> +
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 69b1cc5dfc..7840e784f1 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -78,16 +78,21 @@ static bool s390_cpu_has_work(CPUState *cs)
+>  static void s390_cpu_load_normal(CPUState *s)
 >  {
->      SCLPDevice *sclp = get_sclp_device();
-> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> index c54413b78c..c0a3faa37d 100644
-> --- a/include/hw/s390x/sclp.h
-> +++ b/include/hw/s390x/sclp.h
-> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
->  void sclp_service_interrupt(uint32_t sccb);
->  void raise_irq_cpu_hotplug(void);
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code);
+>      S390CPU *cpu = S390_CPU(s);
+> -    uint64_t spsw = ldq_phys(s->as, 0);
+> -
+> -    cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
+> -    /*
+> -     * Invert short psw indication, so SIE will report a specification
+> -     * exception if it was not set.
+> -     */
+> -    cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
+> -    cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
+> +    CPUS390XState *env = &cpu->env;
+> +    uint64_t spsw;
 >  
+> +    if (!env->pv) {
+> +        spsw = ldq_phys(s->as, 0);
+> +        cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
+> +        /*
+> +         * Invert short psw indication, so SIE will report a specification
+> +         * exception if it was not set.
+> +         */
+> +        cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
+> +        cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
+> +    } else {
+> +        s390_cpu_set_state(S390_CPU_STATE_LOAD, cpu);
+> +    }
+>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>  }
 >  #endif
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 43fc0c088b..a4cbdc5fc6 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1226,6 +1226,11 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
->      sccb = env->regs[ipbh0 & 0xf];
->      code = env->regs[(ipbh0 & 0xf0) >> 4];
->  
-> +    if (run->s390_sieic.icptcode == ICPT_PV_INSTR) {
+> 
 
-I still somewhat prefer checking for env->pv instead - similar to patch #9.
-
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
