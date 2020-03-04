@@ -2,158 +2,81 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9870AC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCB7C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63BE420866
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:15:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA88620870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IENwucRz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63BE420866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFfLkN2c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA88620870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9dEN-0003pN-JN
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 18:15:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44518)
+	id 1j9dFk-0004wt-UY
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 18:16:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9dDX-0002eD-V1
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:14:21 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j9dEy-0004SV-4z
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9dDW-0000xD-Dj
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:14:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30051
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9dDW-0000wT-4G
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:14:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583363656;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4aWnZ1HAllS5iW1k4OmzwPX45E5+Cdo7hRpAoi7nG7o=;
- b=IENwucRzdFz3EPlE+kRGf4lFjqdUgQ4yNekNXcJr+rVklrqUJ92Ysx+hjZjKBleaBp2v8O
- gmX/60cyCQZ+SbT+8ntG2Vg6lKbWtfICKxxq7gsbZkGO8QqAxBAkuc0K7GnbgGUYzx56bb
- 7hkUbHJOnQBKbeeL8iPCxWLwbYw+h2M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-fKxUGN9NOdq3TSwg8Y4ZzQ-1; Wed, 04 Mar 2020 18:14:12 -0500
-X-MC-Unique: fKxUGN9NOdq3TSwg8Y4ZzQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9C0D800D48;
- Wed,  4 Mar 2020 23:14:11 +0000 (UTC)
-Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D765260C80;
- Wed,  4 Mar 2020 23:14:10 +0000 (UTC)
-Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200304213818.15341-1-jsnow@redhat.com>
- <20200304213818.15341-7-jsnow@redhat.com>
- <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
-Date: Wed, 4 Mar 2020 18:14:10 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <alistair23@gmail.com>) id 1j9dEw-00022D-S7
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:15:48 -0500
+Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:37106)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j9dEv-0001zS-JJ; Wed, 04 Mar 2020 18:15:46 -0500
+Received: by mail-vs1-xe43.google.com with SMTP id h5so2379796vsc.4;
+ Wed, 04 Mar 2020 15:15:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=CQrls7h8bDwIREuaDPg8cRDb7mIUTrUYSlyjMDFweyo=;
+ b=EFfLkN2cnsVKMUiQKbbeBeasHPrp3e2Drjpf6I4p82ujRsr32etQ0+NJXBNYmWDZpO
+ Fke53iwlSAwIy/IkrBbOS1Wxch/tXIh59W3QQUEPlwOEvG0605mkbE44XLYxiVaKhJ3d
+ uJzKnoaZwfwaDo5+qORUsf74YLXOXwV2BUyd9douLHvMAM2uoxGF5rQ7vXpPTfSxjB3c
+ sG3VfONOjkALXq5mCnD3BQbMw62zC+VTPgUv6/yLfRydCAnZJSQrV65UGUBVx6yRJZGz
+ avxWTOOMlRnmrF6PGcESedcgirXvBISslH4HgHHsR6MWjrAI9nbrdydkEtJNFNlT7Pss
+ 1tsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=CQrls7h8bDwIREuaDPg8cRDb7mIUTrUYSlyjMDFweyo=;
+ b=NopffxJsM1lk7d3Yngx8I/A4fEuSHYnTC8EvDxPZsUhAwcwK6Dmyz2VMYdLWKoVUVK
+ fXupJF/O1hkMeNewU9bThMeJW7JiRMgnBu4JK+d9lxIpdG/zbr1WY0WNHJ/ZxFwpiQhB
+ vG5FOkXTEDUU5HE0I51WDbEmAp4lWbkI9ehJSO+s/QDIBrd2ywjWCepmSu/50zuca//I
+ CgGzjC5gE98A3Go/SLPpTipWe0enWmyr5qoYuES3yvf42vhgMQqrIvoOeGfpa6rtICyc
+ vHhVNM1LvQQOvnsZx871CNNd3U3agRTuBClMLTQD2zdqhjRO5KhdtkwjD/NUmDpbKvLW
+ dgpw==
+X-Gm-Message-State: ANhLgQ3hNHe+360LNafGz7fOmq1wqeObKCoVTGmhp7gQKCC13Pt2qHJp
+ sNliJrXf5zEU7zUCtk+UWnKvvA2gLMpR0Jf4zxICiA==
+X-Google-Smtp-Source: ADFU+vtorMJZRKNkJSu+5NivrR2rXkmc5vLhcN9b0PkTW2rnk2MRKK5jsW0DvQ29xR063LEudbYKHlB4IvUYGAD55wo=
+X-Received: by 2002:a67:fa43:: with SMTP id j3mr2679702vsq.70.1583363744887;
+ Wed, 04 Mar 2020 15:15:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
+ <mhng-fb3ea639-87e6-406b-a679-a568f6d7edf9@palmerdabbelt-glaptop1>
+In-Reply-To: <mhng-fb3ea639-87e6-406b-a679-a568f6d7edf9@palmerdabbelt-glaptop1>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 4 Mar 2020 15:08:04 -0800
+Message-ID: <CAKmqyKON7GaEPqfA=Hex9TMcySJsy6oVo3aAC5UGQjO2we+tjg@mail.gmail.com>
+Subject: Re: [PATCH v2] riscv: sifive_u: Add a "serial" property for board
+ serial number
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::e43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -165,53 +88,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Mar 4, 2020 at 3:00 PM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>
+> On Sun, 16 Feb 2020 05:55:17 PST (-0800), bmeng.cn@gmail.com wrote:
+> > At present the board serial number is hard-coded to 1, and passed
+> > to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> > the serial number to generate a unique MAC address for the on-chip
+> > ethernet controller. When multiple QEMU 'sifive_u' instances are
+> > created and connected to the same subnet, they all have the same
+> > MAC address hence it creates a unusable network.
+> >
+> > A new "serial" property is introduced to specify the board serial
+> > number. When not given, the default serial number 1 is used.
+> >
+> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> >
+> > ---
+> >
+> > Changes in v2:
+> > - Move setting OTP serial number property from riscv_sifive_u_soc_init()
+> >   to riscv_sifive_u_soc_realize(), to fix the 'check-qtest-riscv' error.
+> >   I am not really sure why doing so could fix the 'make check' error.
+> >   The v1 patch worked fine and nothing seems wrong.
+> >
+> >  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+> >  include/hw/riscv/sifive_u.h |  1 +
+> >  2 files changed, 21 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index 0e12b3c..ca561d3 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -34,6 +34,7 @@
+> >  #include "qemu/log.h"
+> >  #include "qemu/error-report.h"
+> >  #include "qapi/error.h"
+> > +#include "qapi/visitor.h"
+> >  #include "hw/boards.h"
+> >  #include "hw/loader.h"
+> >  #include "hw/sysbus.h"
+> > @@ -434,7 +435,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
+> >                            TYPE_SIFIVE_U_PRCI);
+> >      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
+> >                            TYPE_SIFIVE_U_OTP);
+> > -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
+> >      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+> >                            TYPE_CADENCE_GEM);
+> >  }
+> > @@ -453,6 +453,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
+> >      s->start_in_flash = value;
+> >  }
+> >
+> > +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> > +}
+> > +
+> > +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
+> > +                                void *opaque, Error **errp)
+> > +{
+> > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> > +}
+> > +
+> >  static void riscv_sifive_u_machine_instance_init(Object *obj)
+> >  {
+> >      SiFiveUState *s = RISCV_U_MACHINE(obj);
+> > @@ -464,11 +476,17 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
+> >                                      "Set on to tell QEMU's ROM to jump to " \
+> >                                      "flash. Otherwise QEMU will jump to DRAM",
+> >                                      NULL);
+> > +
+> > +    s->serial = OTP_SERIAL;
+> > +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
+> > +                        sifive_u_set_serial, NULL, &s->serial, NULL);
+> > +    object_property_set_description(obj, "serial", "Board serial number", NULL);
+> >  }
+> >
+> >  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      MachineState *ms = MACHINE(qdev_get_machine());
+> > +    SiFiveUState *us = RISCV_U_MACHINE(ms);
+> >      SiFiveUSoCState *s = RISCV_U_SOC(dev);
+> >      const struct MemmapEntry *memmap = sifive_u_memmap;
+> >      MemoryRegion *system_memory = get_system_memory();
+> > @@ -554,6 +572,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> >      object_property_set_bool(OBJECT(&s->prci), true, "realized", &err);
+> >      sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
+> >
+> > +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", us->serial);
+> >      object_property_set_bool(OBJECT(&s->otp), true, "realized", &err);
+> >      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
+> >
+> > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> > index 82667b5..7cf742e 100644
+> > --- a/include/hw/riscv/sifive_u.h
+> > +++ b/include/hw/riscv/sifive_u.h
+> > @@ -59,6 +59,7 @@ typedef struct SiFiveUState {
+> >      int fdt_size;
+> >
+> >      bool start_in_flash;
+> > +    uint32_t serial;
+> >  } SiFiveUState;
+> >
+> >  enum {
+>
+> Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+>
+> Thanks.  This is in the queue for the soft freeze.
 
+This patch isn't correct. The SoC gets the sifive_u machine state
+which is a bad idea. If the SoC is ever user on a different machine
+this will crash.
 
-On 3/4/20 4:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Do we want to indent Python like C and align argument below opening
-> parenthesis? Except when using sys.stderr.write() you seem to do it.
+I have sent a patch series that adds a machine and SoC property instead.
 
-This isn't an argument to write, it's an argument to the format string,
-so I will say "no."
+Alistair
 
-For *where* I've placed the line break, this is the correct indentation.
-emacs's python mode will settle on this indent, too.
-
-https://python.org/dev/peps/pep-0008/#indentation
-
-(If anyone quotes Guido's belittling comment in this email, I will
-become cross.)
-
-
-But there are other places to put the line break. This is also
-technically valid:
-
-sys.stderr.write('qemu-img received signal %i: %s\n'
-                 % (-exitcode, ' '.join(qemu_img_args + list(args))))
-
-And so is this:
-
-    sys.stderr.write('qemu-img received signal %i: %s\n' %
-                     (-exitcode, ' '.join(qemu_img_args + list(args))))
-
-(And so would be any other number of rewrites to use format codes,
-f-strings, or temporary variables to otherwise reduce the length of the
-line.)
-
-I will reluctantly admit that wrapping to 79 columns is useful in some
-contexts. The beauty of line continuations is something I have little
-desire to litigate, though.
-
-If there's some consensus on the true and beautiful way to do it, I will
-oblige -- but the thought of spinning more iterations until we find a
-color swatch we like is an unpleasant one.
-
---js
-
+>
 
