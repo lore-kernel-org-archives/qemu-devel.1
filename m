@@ -2,107 +2,158 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8466EC3F2D7
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 357FBC3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 418B820716
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 013C52084E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:44:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SDE3AEqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 418B820716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9+9Hg+N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 013C52084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9cfE-0002yJ-Ru
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 17:38:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36979)
+	id 1j9cky-0005PN-1p
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 17:44:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1j9ceS-0002Wy-NW
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:06 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9ckC-0004Uh-Qy
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1j9ceQ-0000DB-Ak
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:04 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56462)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1j9ceQ-0000Br-02
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:38:02 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024MXm3q183372;
- Wed, 4 Mar 2020 22:37:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2020-01-29;
- bh=dHDaI5XU4BUsJwgISTK7xWQVTuxFTHvsEZi+fNHQN5Y=;
- b=SDE3AEqsFj8P16i53OZMVdvTmxS/6fu//UJSQWx3PTGqj7ubW2ybLPPxcPrR+3Kz1Mll
- gQG3XuPByiZ6Ll9YjIG/kjRiFLJTa2GTIHI9FgY4DV4n5/hELCNDN0CoSkw8xhIP8Uni
- Sz8GV7M0zgLmscYM/9TtReubdiglwwAh15P4mUyLgBJS96Ra4F0V9KGHzbQP+KL0jdvm
- 1R1899aNU4FMN2/afW0Zm8X4AhkA69g8Jxh9ZIJSqtpBU5Onxge4gmSUyXrufDMWHDOv
- ARZ5sywJ/pBo+OXjV4IKnyAOPJaU/JxJY+eOVDf42iRvQcfseFBd+Wsxg1QkYay94tDo lA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 2yffcusf4h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 04 Mar 2020 22:37:51 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024MWYh3107682;
- Wed, 4 Mar 2020 22:37:51 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 2yg1p8nsyg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 04 Mar 2020 22:37:51 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 024MbmpF029291;
- Wed, 4 Mar 2020 22:37:48 GMT
-Received: from flaka (/174.244.65.58) by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 04 Mar 2020 14:37:47 -0800
-Date: Wed, 4 Mar 2020 14:37:43 -0800
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- stefanha@redhat.com
-Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
-Message-ID: <20200304223743.GA5151@flaka>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
- <acc40fcd-2871-df80-d420-b9f12dfcf19c@redhat.com>
- <20200302174745.GP1679990@redhat.com>
- <20200302223937.GA29775@flaka>
- <20200304110032.GA1851428@redhat.com> <20200304162533.GA314@flaka>
- <20200304163357.GE1851428@redhat.com>
+ (envelope-from <jsnow@redhat.com>) id 1j9ckB-0003lO-1V
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:43:59 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35572
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9ckA-0003kG-Ny
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:43:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583361837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=N1978hyNJHfOqV5Z6qloVL8yOVXNVfjs8YU8/xfRf8o=;
+ b=Q9+9Hg+NuW6gdX8GCVmr5NWqV5a0ip7k/OAq/HYVaKGVTgNjkDRSwfI4IUoied91R96RSq
+ snP3iEncseWSxvUz960kvAkGaJBFBKcQEoDbf81mnDPxiCaDzPn24k56il0q60PEDzG0aL
+ +lx633oURbuziRQLk3OMI1SGWzrc9vM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-81NNQ2A7NUCc7cfMcfL-Rg-1; Wed, 04 Mar 2020 17:43:56 -0500
+X-MC-Unique: 81NNQ2A7NUCc7cfMcfL-Rg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B89E100550E;
+ Wed,  4 Mar 2020 22:43:55 +0000 (UTC)
+Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F27460C80;
+ Wed,  4 Mar 2020 22:43:53 +0000 (UTC)
+Subject: Re: [PATCH v7 01/10] iotests: do a light delinting
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200304213818.15341-1-jsnow@redhat.com>
+ <20200304213818.15341-2-jsnow@redhat.com>
+ <bf9bcd51-3481-259b-5d2a-ede350ceaba0@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <f168ee28-e6a7-5374-cc56-fcbdd54a3e16@redhat.com>
+Date: Wed, 4 Mar 2020 17:43:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <bf9bcd51-3481-259b-5d2a-ede350ceaba0@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200304163357.GE1851428@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- malwarescore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 adultscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003040143
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxscore=0 bulkscore=0
- adultscore=0 suspectscore=0 spamscore=0 malwarescore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003040143
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
- 024MXm3q183372
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,249 +165,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 04, 2020 at 04:33:57PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Mar 04, 2020 at 08:25:34AM -0800, Elena Ufimtseva wrote:
-> > On Wed, Mar 04, 2020 at 11:00:32AM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> > > On Mon, Mar 02, 2020 at 02:39:37PM -0800, Elena Ufimtseva wrote:
-> > > > On Mon, Mar 02, 2020 at 05:47:45PM +0000, Daniel P. Berrang=C3=A9=
- wrote:
-> > > > > On Mon, Mar 02, 2020 at 06:36:13PM +0100, Philippe Mathieu-Daud=
-=C3=A9 wrote:
-> > > > > > typo "multi" in patch subject.
-> > > > > >
-> > > > Thank Philippe, will fix.
-> > > > =20
-> > > > > > On 2/24/20 9:55 PM, Jagannathan Raman wrote:
-> > > > > > > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > > > > >=20
-> > > > > > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > > > > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > > > > > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > > > > > > ---
-> > > > > > >   v4 -> v5:
-> > > > > > >    - Added "exec" suboption to get the executable's name
-> > > > > > >    - Addressed feedback about variable names
-> > > > > > >    - Removed redundant check for spawning a process
-> > > > > > >=20
-> > > > > > >   hw/proxy/qemu-proxy.c         | 68 ++++++++++++++++++++++=
-+++++++++++----------
-> > > > > > >   include/hw/proxy/qemu-proxy.h |  2 +-
-> > > > > > >   2 files changed, 54 insertions(+), 16 deletions(-)
-> > > > > > >=20
-> > > > > > > diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-> > > > > > > index 828bbd7..d792e86 100644
-> > > > > > > --- a/hw/proxy/qemu-proxy.c
-> > > > > > > +++ b/hw/proxy/qemu-proxy.c
-> > > > > > > @@ -19,19 +19,50 @@
-> > > > > > >   static void pci_proxy_dev_realize(PCIDevice *dev, Error *=
-*errp);
-> > > > > > > +static int add_argv(char *opts_str, char **argv, int argc)
-> > > > > > > +{
-> > > > > > > +    int max_args =3D 64;
-> > > > > > > +
-> > > > > > > +    if (argc < max_args - 1) {
-> > > > > > > +        argv[argc++] =3D opts_str;
-> > > > > > > +        argv[argc] =3D 0;
-> > > > > > > +    } else {
-> > > > > > > +        return 0;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    return argc;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int make_argv(char *opts_str, char **argv, int argc=
-)
-> > > > > > > +{
-> > > > > > > +    int max_args =3D 64;
-> > > > > > > +
-> > > > > > > +    char *p2 =3D strtok(opts_str, " ");
-> > > > > > > +    while (p2 && argc < max_args - 1) {
-> > > > > > > +        argv[argc++] =3D p2;
-> > > > > > > +        p2 =3D strtok(0, " ");
-> > > > > > > +    }
-> > > > > > > +    argv[argc] =3D 0;
-> > > > > >=20
-> > > > > > Is there a GLib function to do that?
-> > > > >
-> > > >=20
-> > > > Hi Daniel
-> > > >=20
-> > > > > g_shell_parse_argv() perhaps
-> > > > >
-> > > >=20
-> > > > Thanks for the suggestion.
-> > > >=20
-> > > > >   https://developer.gnome.org/glib/stable/glib-Shell-related-Ut=
-ilities.html
-> > > > >=20
-> > > > >=20
-> > > > > Though my preference would be to avoid the need to do this at a=
-ll, by
-> > > > > not accepting a raw shell command line string in the first plac=
-e.
-> > > > >
-> > > > Can you please clarify? Did you mean that it would be better if Q=
-emu somehow
-> > > > verifies the options and then passes it to a remote process via a=
- message?
-> > >=20
-> > > I've not been able to trace the code paths back all the way, so I c=
-an't
-> > > point to where I think needs fixing. I assuming that something, som=
-ewhere
-> > > in this patch series should starts out with a binary name and a lis=
-t of argv
-> > > as an array of char *. ie a "char **argv".  At some point this arra=
-y gets
-> > > mashed together into a single 'char *' string where all the argv ar=
-e separated
-> > > by a space. This patch now tries to parse this and turn it back int=
-o a
-> > > "char **argv" array.
-> > >=20
-> > > So my key point is that we should try hard to avoid this intermedia=
-te
-> > > shell command line string stage entirely. Always keep the argv in a=
-n array
-> > > form, and never mash them together such that they then need parsing=
- again.
-> > >
-> > Hi Daniel
-> >=20
-> > Thank you for explanation.
-> > At this point there is no intermediate stage as we grab the arguments
-> > as a raw string from the command line option -remote:
-> >=20
-> > -remote rid=3D8,exec=3Dqemu-scsi-dev,command=3D"-drive id=3Ddrive_ima=
-ge2,,file=3D/root/remote-process-disk.img"
-> >=20
-> > So the command=3D"" string is being later parsed into the array and r=
-emote process
-> > gets spawned with the "char **argv".
-> >=20
-> > Stefan expressed his concern that its not convenient to use due to
-> > the double escaping commas, spaces, quotes and we do agree with that.
-> > We were seeking an advice on what is the better approach.
->=20
-> I've not looked closely enough to understand the range of different
-> options we need to be able to pass to the remote QEMU ? Is it just
-> "-drive" options, or can it be absolutely any QEMU option ?
->=20
-> If it is just -drive, then I could imagine a -remote-drive option
-> such that we end up with with a set of args
->=20
->    $QEMU \
->    -remote rid=3D8,exec=3Dqemu-scsi-dev \
->    -remote-drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-=
-disk1.img \
->    -remote-drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-=
-disk2.img \
->    -remote rid=3D9,exec=3Dqemu-scsi-dev \
->    -remote-drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-=
-disk3.img \
->    -remote-drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-=
-disk4.img
->=20
-> And this gets turned into 2 execs:
->=20
->    qemu-scsi-dev \
->    -drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-disk1.i=
-mg \
->    -drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-disk2.i=
-mg
->   =20
->    qemu-scsi-dev \
->    -drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-disk3.i=
-mg \
->    -drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-disk4.i=
-mg
->=20
->=20
-> Or maybe instead of having a '-remote-drive' arg, we can make the '-dri=
-ve'
-> arg take an optional "rid" attribute to associate it with the remote pr=
-ocess
->=20
->    $QEMU \
->    -remote rid=3D8,exec=3Dqemu-scsi-dev \
->    -drive rid=3D8,id=3Ddrive_image1,file=3D/root/remote-process-disk1.i=
-mg \
->    -drive rid=3D8,id=3Ddrive_image2,file=3D/root/remote-process-disk2.i=
-mg \
->    -remote rid=3D9,exec=3Dqemu-scsi-dev \
->    -drive rid=3D9,id=3Ddrive_image3,file=3D/root/remote-process-disk3.i=
-mg \
->    -drive rid=3D9,id=3Ddrive_image4,file=3D/root/remote-process-disk4.i=
-mg
->=20
-> When 'rid' is seen, instead of creating a local block backend, the
-> args get used for the remote process.
->=20
-> This would have the nice user behaviour that you can take an existing
-> QEMU command line, and turn it into a multi-process command line
-> simply by adding the '-remote ...' arg, and adding 'rid=3DNN' to
-> each -drive. Nothing else about your existing command line need
-> change.
-
-This does look good, especially unmodified -drive.
-And -monitor for the remote process could also be similarly added
-with only rid specified instead of plugging it into the raw string.
-
-Stefan did mention in the another patch that he thinks that adding
--remote option is too invasive and suggested using -object itself
-to further separate remote process devices.
-
-So to compile both replies, the command line for the remote process
-will look something like this:
 
 
--object remote-device,id=3Drid0,exec=3Dqemu-scsi-dev \
--device remote-pci-device,id=3Dscsi0,remote-device=3Drid0 \
--device scsi-hd,drive=3Ddrive_image1,bus=3Dscsi0.0,scsi-id=3D0,remote-dev=
-ice=3Drid0 \
--drive id=3Ddrive_image3,file=3D/root/remote-process-disk3.img,remote-dev=
-ice=3Drid0 \
--drive id=3Ddrive_image4,file=3D/root/remote-process-disk4.img,remote-dev=
-ice=3Drid0 \
--monitor unix:/home/qmp-sock,,server,,nowait,remote-device=3Drid0
+On 3/4/20 4:45 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> I don't understand the rational for this change, but the result is
+> correct anyway, so thanks for this nice cleanup!
 
-And in experimental version we imply that remote-pci-device is the LSI co=
-ntroller.
-For vfio-over-socket it will represent any remote PCI device.
+Leftover from when 'no-else-return' was enabled.
 
-What your thoughts on this?
+It's mostly harmless.
 
-Thank you!
-Elena
-
-
-Stefan,=20
->=20
-> > Few things we discussed internally is to have the remote drive
-> > command line options passed over by messages or using QMP.
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
->=20
 
