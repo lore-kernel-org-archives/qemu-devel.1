@@ -2,97 +2,75 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35895C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C17C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0949E20842
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:08:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0949E20842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA9D20838
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 21:39:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjK9NjtL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA9D20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9bFI-0002xM-45
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 16:08:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34930)
+	id 1j9bk3-0007rU-Pm
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 16:39:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j9bES-0002EN-DS
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:07:09 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9bij-00068I-Gt
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j9bER-00030J-Bj
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:07:08 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60162
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j9bER-000304-5Z
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:07:07 -0500
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j9bEj-0003ZP-7t; Wed, 04 Mar 2020 21:07:28 +0000
-To: jasper.lowell@bt.com, balaton@eik.bme.hu
-References: <20200221065015.337915-1-jasper.lowell@bt.com>
- <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
- <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
- <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
- <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
- <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
- <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
- <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
- <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
- <alpine.BSF.2.22.395.2003011847220.28669@zero.eik.bme.hu>
- <06be591e667c6b72c78ae3a33e3092ab323fdb8b.camel@bt.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <614b7a97-84c2-1861-75d3-51921ae1e4fa@ilande.co.uk>
-Date: Wed, 4 Mar 2020 21:07:01 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <jsnow@redhat.com>) id 1j9bih-0007Uu-PX
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:25 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41067
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9bih-0007U7-Mf
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 16:38:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583357902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=l6tX2+w2ST65MKyouGiIh7RQzHBOFgPo3I2iwl8Mxmk=;
+ b=WjK9NjtL3y2dvsA6lvxMGgLhr3qmmeZahYBD6x2pALsRMmLAiROtA/2Qgztnak2pV9LV1B
+ V1d5wZWBZW+S2+huWv9jSth9DxqkgDmrnFHPMSgbFEUEyeEoB2+f7Ow//dRa1buDp2rMJO
+ 3yhgdEOPlr0n/V67WehmuWJ/Fim9PIA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-kqrZ6ACCNJWC1W3LH_GiAA-1; Wed, 04 Mar 2020 16:38:21 -0500
+X-MC-Unique: kqrZ6ACCNJWC1W3LH_GiAA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD508010E3;
+ Wed,  4 Mar 2020 21:38:20 +0000 (UTC)
+Received: from probe.redhat.com (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E0385C1D4;
+ Wed,  4 Mar 2020 21:38:18 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/10] iotests: use python logging
+Date: Wed,  4 Mar 2020 16:38:08 -0500
+Message-Id: <20200304213818.15341-1-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <06be591e667c6b72c78ae3a33e3092ab323fdb8b.camel@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] hw/ide: Remove status register read side effect
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,39 +82,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/03/2020 03:11, jasper.lowell@bt.com wrote:
+This series uses python logging to enable output conditionally on
+iotests.log(). We unify an initialization call (which also enables
+debugging output for those tests with -d) and then make the switch
+inside of iotests.
 
->> cmd646_update_irq() only seems to raise PCI interrupt, should it also
->> have 
->> an option to use INT 14 and 15 in legacy mode similar to what my
->> patch 
->> does for via-ide?
-> 
-> Looking through /qemu/hw/ide/cmd646.c it doesn't look like QEMU has
-> support for legacy mode. At the very least, it looks like we default to
-> PCI native mode:
-> 
-> static void pci_cmd646_ide_realize(PCIDevice *dev, Error **errp)
-> 	...
-> 	pci_conf[PCI_CLASS_PROG] = 0x8f;
-> 	...
-> 
-> To add support for legacy mode it would require changing
-> cmd646_update_irq() and maybe cmd646_set_irq() so that interrupts are
-> conditionally raised on IRQ14 and/or IRQ15 when the ports are in legacy
-> mode.
+It will help alleviate the need to create logged/unlogged versions
+of all the various helpers we have made.
 
-Yes, that's correct. However I'm quite confident from booting other non-Solaris OSs
-under qemu-system-sparc64 that PCI native mode is being used, particularly as it is
-possible to see the related PCI sabre IRQ routing configuration changes.
+Also, I got lost and accidentally delinted iotests while I was here.
+Sorry about that.
 
+V7:
 
-ATB,
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respecti=
+vely
 
-Mark.
+001/10:[0025] [FC] 'iotests: do a light delinting'
+002/10:[----] [--] 'iotests: don't use 'format' for drive_add'
+003/10:[----] [-C] 'iotests: ignore import warnings from pylint'
+004/10:[0008] [FC] 'iotests: replace mutable list default args'
+005/10:[0006] [FC] 'iotests: add pylintrc file'
+006/10:[down] 'iotests: limit line length to 79 chars'
+007/10:[0008] [FC] 'iotests: add script_initialize'
+008/10:[----] [--] 'iotest 258: use script_main'
+009/10:[----] [--] 'iotests: Mark verify functions as private'
+010/10:[0006] [FC] 'iotests: use python logging for iotests.log()'
+
+- All delinting patches are now entirely front-loaded.
+- Redid delinting to avoid "correcting" no-else-return statements.
+- Moved more mutable list corrections into patch 4, to make it standalone.
+- Moved pylintrc up to patch 5. Disabled no-else-return.
+- Added patch 6 to require line length checks.
+  (Some python 3.4 compatibility code is removed as a consequence.)
+- Patch 7 changes slightly as a result of patch 4 changes.
+- Added some logging explainer into patch 10.
+  (Patch changes slightly because of patch 6.)
+
+V6:
+ - It's been so long since V5, let's just look at it anew.
+ - Dropped patch 1, rebased, added more delinting.
+ - I'm not touching the supported_platforms thing.
+   Not interested in rehashing that debate.
+
+V5:
+ - Rebased again
+ - Allow Python tests to run on any platform
+
+V4:
+ - Rebased on top of kwolf/block at the behest of mreitz
+
+V3:
+ - Rebased for 4.1+; now based on main branch.
+
+V2:
+ - Added all of the other python tests I missed to use script_initialize
+ - Refactored the common setup as per Ehabkost's suggestion
+ - Added protocol arguments to common initialization,
+   but this isn't strictly required.
+
+John Snow (10):
+  iotests: do a light delinting
+  iotests: don't use 'format' for drive_add
+  iotests: ignore import warnings from pylint
+  iotests: replace mutable list default args
+  iotests: add pylintrc file
+  iotests: limit line length to 79 chars
+  iotests: add script_initialize
+  iotest 258: use script_main
+  iotests: Mark verify functions as private
+  iotests: use python logging for iotests.log()
+
+ tests/qemu-iotests/030        |   4 +-
+ tests/qemu-iotests/055        |   3 +-
+ tests/qemu-iotests/149        |   3 +-
+ tests/qemu-iotests/194        |   4 +-
+ tests/qemu-iotests/202        |   4 +-
+ tests/qemu-iotests/203        |   4 +-
+ tests/qemu-iotests/206        |   2 +-
+ tests/qemu-iotests/207        |   6 +-
+ tests/qemu-iotests/208        |   2 +-
+ tests/qemu-iotests/209        |   2 +-
+ tests/qemu-iotests/210        |   6 +-
+ tests/qemu-iotests/211        |   6 +-
+ tests/qemu-iotests/212        |   6 +-
+ tests/qemu-iotests/213        |   6 +-
+ tests/qemu-iotests/216        |   4 +-
+ tests/qemu-iotests/218        |   2 +-
+ tests/qemu-iotests/219        |   2 +-
+ tests/qemu-iotests/222        |   7 +-
+ tests/qemu-iotests/224        |   4 +-
+ tests/qemu-iotests/228        |   6 +-
+ tests/qemu-iotests/234        |   4 +-
+ tests/qemu-iotests/235        |   4 +-
+ tests/qemu-iotests/236        |   2 +-
+ tests/qemu-iotests/237        |   2 +-
+ tests/qemu-iotests/238        |   2 +
+ tests/qemu-iotests/242        |   2 +-
+ tests/qemu-iotests/245        |   1 +
+ tests/qemu-iotests/245.out    |  24 +--
+ tests/qemu-iotests/246        |   2 +-
+ tests/qemu-iotests/248        |   2 +-
+ tests/qemu-iotests/254        |   2 +-
+ tests/qemu-iotests/255        |   2 +-
+ tests/qemu-iotests/256        |   2 +-
+ tests/qemu-iotests/258        |  10 +-
+ tests/qemu-iotests/260        |   4 +-
+ tests/qemu-iotests/262        |   4 +-
+ tests/qemu-iotests/264        |   4 +-
+ tests/qemu-iotests/277        |   2 +
+ tests/qemu-iotests/280        |   8 +-
+ tests/qemu-iotests/283        |   4 +-
+ tests/qemu-iotests/iotests.py | 300 ++++++++++++++++++++--------------
+ tests/qemu-iotests/pylintrc   |  26 +++
+ 42 files changed, 300 insertions(+), 196 deletions(-)
+ create mode 100644 tests/qemu-iotests/pylintrc
+
+--=20
+2.21.1
+
 
