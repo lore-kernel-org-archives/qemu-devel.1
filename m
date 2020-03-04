@@ -2,157 +2,105 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7AFC3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E37E1C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B891F20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:28:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B85320870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:36:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNWW19wx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B891F20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Xldx+47h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B85320870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Zgf-0000hl-Sz
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:28:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43392)
+	id 1j9Zoc-0004jQ-RX
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:36:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9Zg0-0008VF-QX
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:27:29 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j9Znk-0004IV-6F
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:35:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9Zfy-0003fU-VS
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:27:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22672
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9Zfy-0003en-Qp
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:27:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583350045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BzNJ1SBJeWZNCCpdfQhFAXG5LtvQa0IHkIJd1AMFoyk=;
- b=CNWW19wxe56YSvZ1MHDGgoviUmRXz41Bx8RhKtI3yiD/gPG7mFg4UwvkZTeRHrVc2hlULS
- 4CSX4Hz9m+guI+kK5RAtvsXk7F9HxRtuVgmfh4l+wXXJh3Vb4ayLgOfB4Uk2m1zxHpiz/Z
- na5QM9S95RnnW0L8n8cqZqS9coPjYAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-l3WWnJFONNKCCOfrkXGafg-1; Wed, 04 Mar 2020 14:27:22 -0500
-X-MC-Unique: l3WWnJFONNKCCOfrkXGafg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56B00801E74;
- Wed,  4 Mar 2020 19:27:21 +0000 (UTC)
-Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A52045DA76;
- Wed,  4 Mar 2020 19:27:20 +0000 (UTC)
-Subject: Re: [PATCH 4/4] qapi: Brush off some (py)lint
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200227144531.24309-1-armbru@redhat.com>
- <20200227144531.24309-5-armbru@redhat.com>
- <6b7e0d73-6840-3a6a-9d33-0adcec0d4c84@redhat.com>
- <87y2sgpmz7.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d2ac72a0-cfc4-c258-623a-6cc0a03e0c1f@redhat.com>
-Date: Wed, 4 Mar 2020 14:27:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <jag.raman@oracle.com>) id 1j9Znh-0005Wj-Jh
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:35:27 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:42912)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1j9Znh-0005Q1-92
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:35:25 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024JWv9X010026;
+ Wed, 4 Mar 2020 19:35:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=gc41JBEo8gM0JRmLV3N52vdHf7VYQQKuX5/mLrlqips=;
+ b=Xldx+47hRMKDelHW2zhbGyXzTmSLxgNrliSntco8XdrcBYXZa1tZRG9UIzjvBTiFZEjV
+ pz0MEhFt8LHlhA02HSRtV71R5c6Q3rb46Vpsn67UEGMv2wAgrF/T3dSm2VOhxhYpQ1JY
+ 8RJDi00uZ/WaTrJECxHH5oncD528yUy7PM0YwrS5PTFHUf0RAmKI9gDcWv5LtrCw8aXI
+ 3auY+KCU+VF3X6HNpildf89kFi3IkMJuVasRA7XoklmMLtLzy6y3JiPZR/EPyPdtnHW1
+ yh3UX0FtuKJ6srU8x250zuveSsDLSBGwZWec15UxbssL2LtsojpPY+tu7YxXNJYjUJiJ Lg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2yghn3c9fc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 19:35:14 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024JQmxh117131;
+ Wed, 4 Mar 2020 19:35:13 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3020.oracle.com with ESMTP id 2yg1rs0hgd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 19:35:13 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 024JZBeM015697;
+ Wed, 4 Mar 2020 19:35:11 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 04 Mar 2020 11:35:11 -0800
+Subject: Re: [PATCH v5 16/50] multi-process: Synchronize remote memory
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <52bdcfdf44bcc4cd8a1a707b9c22f545fe0f1491.1582576372.git.jag.raman@oracle.com>
+ <20200304115323.GD4104@work-vm>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <d8e11ec7-cae9-a7e9-76d4-6df09e6f836e@oracle.com>
+Date: Wed, 4 Mar 2020 14:35:08 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <87y2sgpmz7.fsf@dusky.pond.sub.org>
+In-Reply-To: <20200304115323.GD4104@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ mlxlogscore=999
+ suspectscore=2 malwarescore=0 adultscore=0 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003040128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ phishscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 clxscore=1015 suspectscore=2
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003040128
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
+ 024JWv9X010026
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,112 +112,498 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: crosa@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- mdroth@linux.vnet.ibm.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/4/20 3:01 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
->=20
->> On 2/27/20 9:45 AM, Markus Armbruster wrote:
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 3/4/2020 6:53 AM, Dr. David Alan Gilbert wrote:
+> * Jagannathan Raman (jag.raman@oracle.com) wrote:
+>> Add memory-listener object which is used to keep the view of the RAM
+>> in sync between QEMU and remote process.
+>> A MemoryListener is registered for system-memory AddressSpace. The
+>> listener sends SYNC_SYSMEM message to the remote process when memory
+>> listener commits the changes to memory, the remote process receives
+>> the message and processes it in the handler for SYNC_SYSMEM message.
 >>
->> I wrote some pylint cleanup for iotests recently, too. Are you targeting
->> a subset of pylint errors to clean here?
+>> TODO: No need to create object for remote memory listener.
 >>
->> (Do any files pass 100%?)
->=20
-> Surely you're joking, Mr. Snow!
->=20
-> I'm chipping away at pylint's gripes.  I ran it with the following
-> messages disabled:
->=20
->     bad-whitespace,
->     fixme,
->     invalid-name,
->     missing-docstring,
->     too-few-public-methods,
->     too-many-arguments,
->     too-many-branches,
->     too-many-instance-attributes,
->     too-many-lines,
->     too-many-locals,
->     too-many-statements,
->     unused-argument,
->     unused-wildcard-import,
->=20
-> These are not all obviously useless.  They're just not what I want to
-> focus on right now.
->=20
-
-Yes, understood - so my approach is disable what I don't intend to fix,
-commit the pylintrc to prevent backslide, and move on.
-
-I think we have a difference in what a pylintrc means to us (the goal
-vs. the current status.)
-
-I didn't mean "100% without caveats", just "100% in some subset of checks".
-
-(I assume the answer is still no.)
-
-> Remaining:
->=20
-> 1 x C0330: Wrong continued indentation (remove 19 spaces).
->=20
->     Accident, will fix in v2.
->=20
-> 8 x R0201: Method could be a function (no-self-use)
->=20
->     Yes, but the override in a sub-class does use self.
->=20
-> 2 x W0212: Access to a protected member _body of a client class (protecte=
-d-access)
->=20
->     Needs cleanup, but not now.
->=20
-> 6 x W0401: Wildcard import qapi.common (wildcard-import)
->=20
->     Not sure I care.  I'd prefer not to have more wildcard imports,
->     though.
->=20
-> 2 x W0603: Using the global statement (global-statement)
->=20
->     Cleanup is non-trivial.  Not now.
->=20
-> I also ran pycodestyle-3:
->=20
-> 1 x E127 continuation line over-indented for visual indent
->=20
->     Same as pylint's C0330, will fix in v2.
->=20
-> 3 x E261 at least two spaces before inline comment
->=20
->     I blame Emacs.  Left for another day.
->=20
-> 8 x E501 line too long
->=20
->     Left for another day.
->=20
-> 1 x E713 test for membership should be 'not in'
->=20
->     I missed that one, will fix in v2.
->=20
->> Consider checking in a pylintrc file that lets others run the same
->> subset of pylint tests as you are doing so that we can prevent future
->> regressions.
->=20
-> Working towards it, slowly.
->=20
->> Take a peek at [PATCH v6 0/9] iotests: use python logging=E2=80=8B
+>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+>> ---
+>>   Makefile.target                |   3 +
+>>   hw/proxy/memory-sync.c         | 212 +++++++++++++++++++++++++++++++=
+++++++++++
+>>   hw/proxy/qemu-proxy.c          |   5 +
+>>   include/hw/proxy/memory-sync.h |  37 +++++++
+>>   include/hw/proxy/qemu-proxy.h  |   5 +
+>>   remote/remote-main.c           |  11 +++
+>>   6 files changed, 273 insertions(+)
+>>   create mode 100644 hw/proxy/memory-sync.c
+>>   create mode 100644 include/hw/proxy/memory-sync.h
 >>
->> Thanks for this series. I had a very similar series sitting waiting to
->> go out, but this goes further in a few places.
+>> diff --git a/Makefile.target b/Makefile.target
+>> index cfd36c1..271d883 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -127,6 +127,9 @@ obj-$(CONFIG_TCG) +=3D fpu/softfloat.o
+>>   obj-y +=3D target/$(TARGET_BASE_ARCH)/
+>>   obj-y +=3D disas.o
+>>   obj-$(call notempty,$(TARGET_XML_FILES)) +=3D gdbstub-xml.o
+>> +ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
+>> +obj-$(CONFIG_MPQEMU) +=3D hw/proxy/memory-sync.o
+>> +endif
+>>   LIBS :=3D $(libs_cpu) $(LIBS)
+>>  =20
+>>   obj-$(CONFIG_PLUGIN) +=3D plugins/
+>> diff --git a/hw/proxy/memory-sync.c b/hw/proxy/memory-sync.c
+>> new file mode 100644
+>> index 0000000..3edbb19
+>> --- /dev/null
+>> +++ b/hw/proxy/memory-sync.c
+>> @@ -0,0 +1,212 @@
+>> +/*
+>> + * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + */
+>> +
+>> +#include <sys/types.h>
+>> +#include <stdio.h>
+>> +#include <string.h>
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/compiler.h"
+>> +#include "qemu/int128.h"
+>> +#include "qemu/range.h"
+>> +#include "exec/memory.h"
+>> +#include "exec/cpu-common.h"
+>> +#include "cpu.h"
+>> +#include "exec/ram_addr.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "io/mpqemu-link.h"
+>> +#include "hw/proxy/memory-sync.h"
+>> +
+>> +static const TypeInfo remote_mem_sync_type_info =3D {
+>> +    .name          =3D TYPE_MEMORY_LISTENER,
+>> +    .parent        =3D TYPE_OBJECT,
+>> +    .instance_size =3D sizeof(RemoteMemSync),
+>> +};
+>> +
+>> +static void remote_mem_sync_register_types(void)
+>> +{
+>> +    type_register_static(&remote_mem_sync_type_info);
+>> +}
+>> +
+>> +type_init(remote_mem_sync_register_types)
+>> +
+>> +static void proxy_ml_begin(MemoryListener *listener)
+>> +{
+>> +    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, lis=
+tener);
+>> +    int mrs;
+>> +
+>> +    for (mrs =3D 0; mrs < sync->n_mr_sections; mrs++) {
+>> +        memory_region_unref(sync->mr_sections[mrs].mr);
+>> +    }
+>> +
+>> +    g_free(sync->mr_sections);
+>> +    sync->mr_sections =3D NULL;
+>> +    sync->n_mr_sections =3D 0;
+>> +}
+>> +
+>> +static int get_fd_from_hostaddr(uint64_t host, ram_addr_t *offset)
+>> +{
+>> +    MemoryRegion *mr;
+>> +    ram_addr_t off;
+>> +
+>> +    mr =3D memory_region_from_host((void *)(uintptr_t)host, &off);
 >=20
-> Thanks!
->=20
+> Do you need to just check we found an 'mr' ?
 
+OK, we'll add this check.
+
+>=20
+>> +    if (offset) {
+>> +        *offset =3D off;
+>> +    }
+>> +
+>> +    return memory_region_get_fd(mr);
+>> +}
+>> +
+>> +static bool proxy_mrs_can_merge(uint64_t host, uint64_t prev_host, si=
+ze_t size)
+>> +{
+>> +    bool merge;
+>> +    int fd1, fd2;
+>> +
+>> +    fd1 =3D get_fd_from_hostaddr(host, NULL);
+>> +
+>> +    fd2 =3D get_fd_from_hostaddr(prev_host, NULL);
+>> +
+>> +    merge =3D (fd1 =3D=3D fd2);
+>> +
+>> +    merge &=3D ((prev_host + size) =3D=3D host);
+>=20
+> It's interesting; I think the vhost code checks that the two mr's are
+> the same where you are checking for the same underlying fd - but I thin=
+k
+> that's OK.
+> (I wonder if we need to check offset's within the fd's match up when
+> they're merged - since you added that offset feature in an earlier
+> patch?
+> That would also need checking in vhost_region_add_section)
+
+If the fds are the same, and the subsequent check ((prev_host + size) =3D=
+=3D
+host) passes, then I believe the offsets would match as well.
+
+>=20
+>> +    return merge;
+>> +}
+>> +
+>> +static void proxy_ml_region_addnop(MemoryListener *listener,
+>> +                                   MemoryRegionSection *section)
+>> +{
+>> +    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, lis=
+tener);
+>> +    bool need_add =3D true;
+>> +    uint64_t mrs_size, mrs_gpa, mrs_page;
+>> +    uintptr_t mrs_host;
+>> +    RAMBlock *mrs_rb;
+>> +    MemoryRegionSection *prev_sec;
+>> +
+>> +    if (!(memory_region_is_ram(section->mr) &&
+>> +          !memory_region_is_rom(section->mr))) {
+>> +        return;
+>> +    }
+>> +
+>> +    mrs_rb =3D section->mr->ram_block;
+>> +    mrs_page =3D (uint64_t)qemu_ram_pagesize(mrs_rb);
+>> +    mrs_size =3D int128_get64(section->size);
+>> +    mrs_gpa =3D section->offset_within_address_space;
+>> +    mrs_host =3D (uintptr_t)memory_region_get_ram_ptr(section->mr) +
+>> +               section->offset_within_region;
+>> +
+>> +    if (get_fd_from_hostaddr(mrs_host, NULL) <=3D 0) {
+>> +        return;
+>> +    }
+>> +
+>> +    mrs_host =3D mrs_host & ~(mrs_page - 1);
+>> +    mrs_gpa =3D mrs_gpa & ~(mrs_page - 1);
+>> +    mrs_size =3D ROUND_UP(mrs_size, mrs_page);
+>=20
+> OK, just note the more complex code in vhost_region_add_section for pag=
+e
+> aligning regions that are needed for postcopy; I think that would be th=
+e
+> same if you wanted to do postcopy with remote processes.
+
+Since mmap requires the addresses to be aligned with a page boundry, we
+added these checks. We are essentially doing the same with alignage as
+compared with vhost user. So we should be compliant with postcopy I
+believe.
+
+>=20
+>> +    if (sync->n_mr_sections) {
+>> +        prev_sec =3D sync->mr_sections + (sync->n_mr_sections - 1);
+>> +        uint64_t prev_gpa_start =3D prev_sec->offset_within_address_s=
+pace;
+>> +        uint64_t prev_size =3D int128_get64(prev_sec->size);
+>> +        uint64_t prev_gpa_end   =3D range_get_last(prev_gpa_start, pr=
+ev_size);
+>> +        uint64_t prev_host_start =3D
+>> +            (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
+>> +            prev_sec->offset_within_region;
+>> +        uint64_t prev_host_end =3D range_get_last(prev_host_start, pr=
+ev_size);
+>> +
+>> +        if (mrs_gpa <=3D (prev_gpa_end + 1)) {
+>> +            if (mrs_gpa < prev_gpa_start) {
+>> +                assert(0);
+>> +            }
+>=20
+> g_assert(mrs_gpa < prev_gpa_start);
+
+Thank you, we'll update the above check with the version you proposed.
+
+>=20
+>=20
+>> +            if ((section->mr =3D=3D prev_sec->mr) &&
+>> +                proxy_mrs_can_merge(mrs_host, prev_host_start,
+>> +                                    (mrs_gpa - prev_gpa_start))) {
+>> +                uint64_t max_end =3D MAX(prev_host_end, mrs_host + mr=
+s_size);
+>> +                need_add =3D false;
+>> +                prev_sec->offset_within_address_space =3D
+>> +                    MIN(prev_gpa_start, mrs_gpa);
+>> +                prev_sec->offset_within_region =3D
+>> +                    MIN(prev_host_start, mrs_host) -
+>> +                    (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr=
+);
+>> +                prev_sec->size =3D int128_make64(max_end - MIN(prev_h=
+ost_start,
+>> +                                                             mrs_host=
+));
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    if (need_add) {
+>> +        ++sync->n_mr_sections;
+>> +        sync->mr_sections =3D g_renew(MemoryRegionSection, sync->mr_s=
+ections,
+>> +                                    sync->n_mr_sections);
+>> +        sync->mr_sections[sync->n_mr_sections - 1] =3D *section;
+>> +        sync->mr_sections[sync->n_mr_sections - 1].fv =3D NULL;
+>> +        memory_region_ref(section->mr);
+>> +    }
+>=20
+> I'd add some tracing in this function; it's a nightmare to debug when i=
+t
+> does something unexpected.
+
+Thank you, we'll add the tracing.
+
+>=20
+>> +}
+>> +
+>> +static void proxy_ml_commit(MemoryListener *listener)
+>> +{
+>> +    RemoteMemSync *sync =3D container_of(listener, RemoteMemSync, lis=
+tener);
+>> +    MPQemuMsg msg;
+>> +    MemoryRegionSection section;
+>> +    ram_addr_t offset;
+>> +    uintptr_t host_addr;
+>> +    int region;
+>> +
+>> +    memset(&msg, 0, sizeof(MPQemuMsg));
+>> +
+>> +    msg.cmd =3D SYNC_SYSMEM;
+>> +    msg.bytestream =3D 0;
+>> +    msg.num_fds =3D sync->n_mr_sections;
+>> +    msg.size =3D sizeof(msg.data1);
+>> +    assert(msg.num_fds <=3D REMOTE_MAX_FDS);
+>> +
+>> +    for (region =3D 0; region < sync->n_mr_sections; region++) {
+>> +        section =3D sync->mr_sections[region];
+>> +        msg.data1.sync_sysmem.gpas[region] =3D
+>> +            section.offset_within_address_space;
+>> +        msg.data1.sync_sysmem.sizes[region] =3D int128_get64(section.=
+size);
+>> +        host_addr =3D (uintptr_t)memory_region_get_ram_ptr(section.mr=
+) +
+>> +                    section.offset_within_region;
+>> +        msg.fds[region] =3D get_fd_from_hostaddr(host_addr, &offset);
+>=20
+> Since you already have section.mr you cna use memory_region_get_fd.
+
+OK.
+
+Thank you!
+--
+Jag
+
+>=20
+>> +        msg.data1.sync_sysmem.offsets[region] =3D offset;
+>> +    }
+>> +    mpqemu_msg_send(&msg, sync->mpqemu_link->com);
+>> +}
+>> +
+>> +void deconfigure_memory_sync(RemoteMemSync *sync)
+>> +{
+>> +    memory_listener_unregister(&sync->listener);
+>> +}
+>> +
+>> +/*
+>> + * TODO: Memory Sync need not be instantianted once per every proxy d=
+evice.
+>> + *       All remote devices are going to get the exact same updates a=
+t the
+>> + *       same time. It therefore makes sense to have a broadcast mode=
+l.
+>> + *
+>> + *       Broadcast model would involve running the MemorySync object =
+in a
+>> + *       thread. MemorySync would contain a list of mpqemu-link objec=
+ts
+>> + *       that need notification. proxy_ml_commit() could send the sam=
+e
+>> + *       message to all the links at the same time.
+>> + */
+>> +void configure_memory_sync(RemoteMemSync *sync, MPQemuLinkState *mpqe=
+mu_link)
+>> +{
+>> +    sync->n_mr_sections =3D 0;
+>> +    sync->mr_sections =3D NULL;
+>> +
+>> +    sync->mpqemu_link =3D mpqemu_link;
+>> +
+>> +    sync->listener.begin =3D proxy_ml_begin;
+>> +    sync->listener.commit =3D proxy_ml_commit;
+>> +    sync->listener.region_add =3D proxy_ml_region_addnop;
+>> +    sync->listener.region_nop =3D proxy_ml_region_addnop;
+>> +    sync->listener.priority =3D 10;
+>> +
+>> +    memory_listener_register(&sync->listener, &address_space_memory);
+>> +}
+>> diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+>> index b17d9bb..d3a9d38 100644
+>> --- a/hw/proxy/qemu-proxy.c
+>> +++ b/hw/proxy/qemu-proxy.c
+>> @@ -16,6 +16,8 @@
+>>   #include "qapi/qmp/qjson.h"
+>>   #include "qapi/qmp/qstring.h"
+>>   #include "hw/proxy/qemu-proxy.h"
+>> +#include "hw/proxy/memory-sync.h"
+>> +#include "qom/object.h"
+>>  =20
+>>   static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+>>  =20
+>> @@ -243,6 +245,8 @@ static void init_proxy(PCIDevice *dev, char *comma=
+nd, char *exec_name,
+>>  =20
+>>       mpqemu_init_channel(pdev->mpqemu_link, &pdev->mpqemu_link->com,
+>>                           pdev->socket);
+>> +
+>> +    configure_memory_sync(pdev->sync, pdev->mpqemu_link);
+>>   }
+>>  =20
+>>   static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+>> @@ -261,6 +265,7 @@ static void pci_proxy_dev_realize(PCIDevice *devic=
+e, Error **errp)
+>>       dev->set_proxy_sock =3D set_proxy_sock;
+>>       dev->get_proxy_sock =3D get_proxy_sock;
+>>       dev->init_proxy =3D init_proxy;
+>> +    dev->sync =3D REMOTE_MEM_SYNC(object_new(TYPE_MEMORY_LISTENER));
+>>   }
+>>  =20
+>>   static void send_bar_access_msg(PCIProxyDev *dev, MemoryRegion *mr,
+>> diff --git a/include/hw/proxy/memory-sync.h b/include/hw/proxy/memory-=
+sync.h
+>> new file mode 100644
+>> index 0000000..d8329c9
+>> --- /dev/null
+>> +++ b/include/hw/proxy/memory-sync.h
+>> @@ -0,0 +1,37 @@
+>> +/*
+>> + * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ later.
+>> + * See the COPYING file in the top-level directory.
+>> + *
+>> + */
+>> +
+>> +#ifndef MEMORY_SYNC_H
+>> +#define MEMORY_SYNC_H
+>> +
+>> +#include <sys/types.h>
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qom/object.h"
+>> +#include "exec/memory.h"
+>> +#include "io/mpqemu-link.h"
+>> +
+>> +#define TYPE_MEMORY_LISTENER "memory-listener"
+>> +#define REMOTE_MEM_SYNC(obj) \
+>> +            OBJECT_CHECK(RemoteMemSync, (obj), TYPE_MEMORY_LISTENER)
+>> +
+>> +typedef struct RemoteMemSync {
+>> +    Object obj;
+>> +
+>> +    MemoryListener listener;
+>> +
+>> +    int n_mr_sections;
+>> +    MemoryRegionSection *mr_sections;
+>> +
+>> +    MPQemuLinkState *mpqemu_link;
+>> +} RemoteMemSync;
+>> +
+>> +void configure_memory_sync(RemoteMemSync *sync, MPQemuLinkState *mpqe=
+mu_link);
+>> +void deconfigure_memory_sync(RemoteMemSync *sync);
+>> +
+>> +#endif
+>> diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-pro=
+xy.h
+>> index 44e370e..c93ffe3 100644
+>> --- a/include/hw/proxy/qemu-proxy.h
+>> +++ b/include/hw/proxy/qemu-proxy.h
+>> @@ -10,6 +10,7 @@
+>>   #define QEMU_PROXY_H
+>>  =20
+>>   #include "io/mpqemu-link.h"
+>> +#include "hw/proxy/memory-sync.h"
+>>  =20
+>>   #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
+>>  =20
+>> @@ -37,8 +38,12 @@ extern const MemoryRegionOps proxy_default_ops;
+>>   struct PCIProxyDev {
+>>       PCIDevice parent_dev;
+>>  =20
+>> +    int n_mr_sections;
+>> +    MemoryRegionSection *mr_sections;
+>> +
+>>       MPQemuLinkState *mpqemu_link;
+>>  =20
+>> +    RemoteMemSync *sync;
+>>       pid_t remote_pid;
+>>       int socket;
+>>  =20
+>> diff --git a/remote/remote-main.c b/remote/remote-main.c
+>> index acd8daf..9512a3b 100644
+>> --- a/remote/remote-main.c
+>> +++ b/remote/remote-main.c
+>> @@ -34,6 +34,7 @@
+>>   #include "block/block.h"
+>>   #include "exec/ramlist.h"
+>>   #include "exec/memattrs.h"
+>> +#include "exec/address-spaces.h"
+>>  =20
+>>   static MPQemuLinkState *mpqemu_link;
+>>   PCIDevice *remote_pci_dev;
+>> @@ -161,6 +162,16 @@ static void process_msg(GIOCondition cond, MPQemu=
+Channel *chan)
+>>               goto finalize_loop;
+>>           }
+>>           break;
+>> +    case SYNC_SYSMEM:
+>> +        /*
+>> +         * TODO: ensure no active DMA is happening when
+>> +         * sysmem is being updated
+>=20
+> In practice this turns out to be hard!
+>=20
+> Dave
+>=20
+>> +         */
+>> +        remote_sysmem_reconfig(msg, &err);
+>> +        if (err) {
+>> +            goto finalize_loop;
+>> +        }
+>> +        break;
+>>       default:
+>>           error_setg(&err, "Unknown command");
+>>           goto finalize_loop;
+>> --=20
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
 
