@@ -2,85 +2,88 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C202C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC51FC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:35:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28529207FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B013C207FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:35:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X1KPbVbM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28529207FD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qkka7/kL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B013C207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tS8-0008L7-8k
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:34:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59023)
+	id 1j9tSp-00017c-LO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:35:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOs-0003Ay-Qf
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:08 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP2-0003PB-ID
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOq-00024H-UI
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:06 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42570)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP0-0002CY-ID
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:15 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37752)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tOq-00021Y-NQ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:04 -0500
-Received: by mail-wr1-x432.google.com with SMTP id v11so5843427wrm.9
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:04 -0800 (PST)
+ id 1j9tP0-0002Bc-Bu
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:14 -0500
+Received: by mail-wr1-x442.google.com with SMTP id 6so2374682wre.4
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=bTh3B649XDI9W5fyM9S/2slByoAutwJyvkUDWGWUEPc=;
- b=X1KPbVbM8vfQuNPCGbuybyX3c169RSeF09YuQlMwQY7f95RG3iTfbFpDGpmb7DiiGu
- ipP2nWdurz1JuoVUmcBd4ZxKN0ydBaGKH62cCwe0dTFtEBTrYSNT7JGn7J+6J2/kVred
- pgtroKsmTn78xcMb4wTn61zcqFXFI8PW1ebzg7mKEV7NWhhflhN1OOmIYPzCD3bzIuJv
- q7Gc0HpxhZsR6T07pgOKnuYVy4UEk2b1sKFZ5lNDBTjpMKi2yAEuH30g7Gq9AoQUSTXP
- KMWH+G43OlsRWc3pvphBi1x1DAtixUbt3lNFI0CJDx119zwAz8SDzeyaN3+DRrFL4dJj
- T0zg==
+ bh=srKZx6+JQVSktw34hlVpZslhqf3wdIxhXrsJ7DiNWzA=;
+ b=qkka7/kLUm1EEp7zTZwq1HX5481ZQrz3D67GJgd1XpGMU0nnSIUDhHPCGD1//Et5Zc
+ fdjpJiJM8bicRywBBkXbpe8l1Cg0TCUMES2oh3BcenRzGpEtFHhpmoETShqxxH7HVwwY
+ D36AnmtI9X83ixxjV6EX+WOfpeI+NlAnCw98GLoq3rHg1kkqjckFRHXqyAyeuGz5zIpo
+ UbdgCbfVcTsV6S+8ar/FljH3wPWNifA6C/SNagYcfImNZ45O2gwcqan96AS4p3wxGbM5
+ 2GPqvF+cJjgYKl9cuMPcWTy3g4sAg+VTKjArdHYDJN6rF5Y0xGMvxABwR+oi73d2bL2A
+ uL4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bTh3B649XDI9W5fyM9S/2slByoAutwJyvkUDWGWUEPc=;
- b=gMEwhQDq03snsEhzyhWdY9sO2nWtny3rTLxVIgWPgk0Szzx3asHLCC04md45cSOqI9
- 1xu2SEgjgRomIrBNtYPjc/RLIMM5oqEch6K0ie8CUQvUXCa13o9/9of37VF+Hm2HaswR
- jyGDWqia3AQm/dLiJRRKVFqGEjetPuCqZMqd84ri/XA3hGrB2mybWBtptWdJgdIXP84U
- NFDhW0FiyIczO1qS6+9t5DQWOCE2Jybd7+5cHHsiqcwLRVcRM/IUhHZxnt/1WIEJxejp
- OLKYt7HPiuMSX55uB8eD46ZFomTX4NimyBqp3UFvB6+ajN5I4My42jATdVKgxLr4J4Iq
- 0OGg==
-X-Gm-Message-State: ANhLgQ2C+KgcNEmEd4rpT8mEOHs0kML9I5JJphqauvtC9+zt/JN4nG75
- 0+xXG9nZLEysxWmaDK9gNAWV6neJteoY3w==
-X-Google-Smtp-Source: ADFU+vvTo5sxwtPcBOi1rSCQ5FVCYB/z0NGou1UAaV3TYJqFvsw4GqC5w0DMtlRT5/2DbZbQlnKoMA==
-X-Received: by 2002:adf:a419:: with SMTP id d25mr11661780wra.210.1583425862644; 
- Thu, 05 Mar 2020 08:31:02 -0800 (PST)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=srKZx6+JQVSktw34hlVpZslhqf3wdIxhXrsJ7DiNWzA=;
+ b=GQKNi2GC8AV22AK0j8OzXN+UjOGz/srqXOGHSojNCp09shfvM/HILZWbo+DWft/9lZ
+ Nv4z6zp1cdP2RVk858s03JUz7lIf8HVJL+0Hoba6YQ+cJ5+J12ARLMjI1Ur8ZQIKWura
+ za+PpdOffmw5tH1LwS3/eeFHC3n5AXxg8S9kQtIRHugN8FHqK71mDIRZR25jFtlZr38e
+ MZUN2PkSbdVFxbfH14bWvX+vROdPxvbXpE6DCKx/+puTutL3ZzVGpdaFuuRFIxatQxID
+ emjo6Zo1Iv6TP1OKXZALX2DEie/BENof9rszoxIOifdIMPFf5G3ttYvze6G1vPu/cwOC
+ djKQ==
+X-Gm-Message-State: ANhLgQ3K79mMMc2yOqmwjZem2HRxp3FnGqidG1YvC8Q+3NN52LJq1prp
+ quIGR4dVCM7Bi+ryYEOTeACgwHg3NXeUFw==
+X-Google-Smtp-Source: ADFU+vstNPmWYtrPXoFBGj4ivzZE+cIIyKEo/uvnBpUUef2U8DJYBNtxe004leh6hbV0l4vhagNL6w==
+X-Received: by 2002:adf:a419:: with SMTP id d25mr11662565wra.210.1583425872994; 
+ Thu, 05 Mar 2020 08:31:12 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.01
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.11
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:01 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:11 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/37] target-arm queue
-Date: Thu,  5 Mar 2020 16:30:23 +0000
-Message-Id: <20200305163100.22912-1-peter.maydell@linaro.org>
+Subject: [PULL 09/37] hw/arm/z2: Simplify since the machines are little-endian
+ only
+Date: Thu,  5 Mar 2020 16:30:32 +0000
+Message-Id: <20200305163100.22912-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
+References: <20200305163100.22912-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,109 +99,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nothing much exciting here, but it's 37 patches worth...
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-thanks
--- PMM
+We only build the little-endian softmmu configurations. Checking
+for big endian is pointless, remove the unused code.
 
-The following changes since commit e64a62df378a746c0b257105959613c9f8122e59:
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/z2.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-040320-1' into staging (2020-03-05 12:13:51 +0000)
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 4bb237f22d2..a0f40959904 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -300,7 +300,6 @@ static void z2_init(MachineState *machine)
+     uint32_t sector_len = 0x10000;
+     PXA2xxState *mpu;
+     DriveInfo *dinfo;
+-    int be;
+     void *z2_lcd;
+     I2CBus *bus;
+     DeviceState *wm;
+@@ -308,15 +307,10 @@ static void z2_init(MachineState *machine)
+     /* Setup CPU & memory */
+     mpu = pxa270_init(address_space_mem, z2_binfo.ram_size, machine->cpu_type);
+ 
+-#ifdef TARGET_WORDS_BIGENDIAN
+-    be = 1;
+-#else
+-    be = 0;
+-#endif
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     if (!pflash_cfi01_register(Z2_FLASH_BASE, "z2.flash0", Z2_FLASH_SIZE,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                               sector_len, 4, 0, 0, 0, 0, be)) {
++                               sector_len, 4, 0, 0, 0, 0, 0)) {
+         error_report("Error registering flash memory");
+         exit(1);
+     }
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200305
-
-for you to fetch changes up to 597d61a3b1f94c53a3aaa77671697c0c5f797dbf:
-
-  target/arm: Clean address for DC ZVA (2020-03-05 16:09:21 +0000)
-
-----------------------------------------------------------------
- * versal: Implement ADMA
- * Implement (trivially) ARMv8.2-TTCNP
- * hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
- * Remove unnecessary endianness-handling on some boards
- * Avoid minor memory leaks from timer_new in some devices
- * Honour more of the HCR_EL2 trap bits
- * Complain rather than ignoring bad command line options for cubieboard
- * Honour TBI for DC ZVA and exception return
-
-----------------------------------------------------------------
-Edgar E. Iglesias (2):
-      hw/arm: versal: Add support for the LPD ADMAs
-      hw/arm: versal: Generate xlnx-versal-virt zdma FDT nodes
-
-Eric Auger (1):
-      hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
-
-Niek Linnenbank (4):
-      hw/arm/cubieboard: use ARM Cortex-A8 as the default CPU in machine definition
-      hw/arm/cubieboard: restrict allowed CPU type to ARM Cortex-A8
-      hw/arm/cubieboard: restrict allowed RAM size to 512MiB and 1GiB
-      hw/arm/cubieboard: report error when using unsupported -bios argument
-
-Pan Nengyuan (4):
-      hw/arm/pxa2xx: move timer_new from init() into realize() to avoid memleaks
-      hw/arm/spitz: move timer_new from init() into realize() to avoid memleaks
-      hw/arm/strongarm: move timer_new from init() into realize() to avoid memleaks
-      hw/timer/cadence_ttc: move timer_new from init() into realize() to avoid memleaks
-
-Peter Maydell (1):
-      target/arm: Implement (trivially) ARMv8.2-TTCNP
-
-Philippe Mathieu-Daudé (6):
-      hw/arm/smmu-common: Simplify smmu_find_smmu_pcibus() logic
-      hw/arm/gumstix: Simplify since the machines are little-endian only
-      hw/arm/mainstone: Simplify since the machines are little-endian only
-      hw/arm/omap_sx1: Simplify since the machines are little-endian only
-      hw/arm/z2: Simplify since the machines are little-endian only
-      hw/arm/musicpal: Simplify since the machines are little-endian only
-
-Richard Henderson (19):
-      target/arm: Improve masking of HCR/HCR2 RES0 bits
-      target/arm: Add HCR_EL2 bit definitions from ARMv8.6
-      target/arm: Disable has_el2 and has_el3 for user-only
-      target/arm: Remove EL2 and EL3 setup from user-only
-      target/arm: Improve masking in arm_hcr_el2_eff
-      target/arm: Honor the HCR_EL2.{TVM,TRVM} bits
-      target/arm: Honor the HCR_EL2.TSW bit
-      target/arm: Honor the HCR_EL2.TACR bit
-      target/arm: Honor the HCR_EL2.TPCP bit
-      target/arm: Honor the HCR_EL2.TPU bit
-      target/arm: Honor the HCR_EL2.TTLB bit
-      tests/tcg/aarch64: Add newline in pauth-1 printf
-      target/arm: Replicate TBI/TBID bits for single range regimes
-      target/arm: Optimize cpu_mmu_index
-      target/arm: Introduce core_to_aa64_mmu_idx
-      target/arm: Apply TBI to ESR_ELx in helper_exception_return
-      target/arm: Move helper_dc_zva to helper-a64.c
-      target/arm: Use DEF_HELPER_FLAGS for helper_dc_zva
-      target/arm: Clean address for DC ZVA
-
- include/hw/arm/xlnx-versal.h |   6 +
- target/arm/cpu.h             |  30 ++--
- target/arm/helper-a64.h      |   1 +
- target/arm/helper.h          |   1 -
- target/arm/internals.h       |   6 +
- hw/arm/cubieboard.c          |  29 +++-
- hw/arm/gumstix.c             |  16 +-
- hw/arm/mainstone.c           |   8 +-
- hw/arm/musicpal.c            |  10 --
- hw/arm/omap_sx1.c            |  11 +-
- hw/arm/pxa2xx.c              |  17 +-
- hw/arm/smmu-common.c         |  20 +--
- hw/arm/spitz.c               |   8 +-
- hw/arm/strongarm.c           |  18 ++-
- hw/arm/xlnx-versal-virt.c    |  28 ++++
- hw/arm/xlnx-versal.c         |  24 +++
- hw/arm/z2.c                  |   8 +-
- hw/timer/cadence_ttc.c       |  18 ++-
- target/arm/cpu.c             |  13 +-
- target/arm/cpu64.c           |   2 +
- target/arm/helper-a64.c      | 114 ++++++++++++-
- target/arm/helper.c          | 373 ++++++++++++++++++++++++++++++-------------
- target/arm/op_helper.c       |  93 -----------
- target/arm/translate-a64.c   |   4 +-
- tests/tcg/aarch64/pauth-1.c  |   2 +-
- 25 files changed, 551 insertions(+), 309 deletions(-)
 
