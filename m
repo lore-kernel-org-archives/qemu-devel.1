@@ -2,84 +2,80 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D877C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FDDC3F2D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37EE320637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82A24207FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:07:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgkXtxHu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37EE320637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irCNS+KM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A24207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9twp-0004EQ-4K
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:06:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37235)
+	id 1j9tyL-0006ul-On
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:07:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34847)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j9tvX-00022P-FQ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:04:54 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j9tjz-00061L-9g
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:52:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j9tvT-0000Nh-Tj
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:04:50 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28265
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1j9tjx-0007rk-Mx
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:52:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37135
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9tvT-0000Ld-EE
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:04:47 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j9tjx-0007rM-Jg
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:52:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583427886;
+ s=mimecast20190719; t=1583427173;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PZM4emyGl1edtc8y6Xx9aw9kJAunPTokTt8KV3IRhOk=;
- b=FgkXtxHuN8ORKhl7JQrTyDjT6kHCX29y1fpXzFns3ZvEb9JjJVw+oSywx0OFq0Q2iax9mU
- ftoL6zXDHlePJEgjsyhDeF5ACN/ZeYGZVIexoJyB18Sh6GneUHUl8ktl56tTP6YJfQGDjR
- 9s7Z7BNkNUpoSYIGbcLsQyi1wbeNEik=
+ bh=4LMRGprLEsCZy4PwdwIVcrQ3I9IHMnRZNWW14H7RFNo=;
+ b=irCNS+KM3m3M1M9dQe9UmB/mG32p4c0Ojjq4yVEzu5GfNIAg90LsLc5tu2uaCJbrqV8Qp0
+ BHIQGzCsEIoXjRURzDaoyeYqm1YAEUEp6WTmYXZC5+jkW99IcV9GEG70bWtXbn91RklhhU
+ oR0AlqT5cfXGyTZbvtQx4rFfky/r0k4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-ogtwWgPjMYW6xaH0GXhOBQ-1; Thu, 05 Mar 2020 12:04:42 -0500
-X-MC-Unique: ogtwWgPjMYW6xaH0GXhOBQ-1
+ us-mta-149-RRmddL4yOuS62svk_WGsrw-1; Thu, 05 Mar 2020 11:52:51 -0500
+X-MC-Unique: RRmddL4yOuS62svk_WGsrw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CD23B07B0;
- Thu,  5 Mar 2020 17:04:40 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D21327BD8;
- Thu,  5 Mar 2020 17:04:25 +0000 (UTC)
-Date: Thu, 5 Mar 2020 17:04:22 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jag Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v5 41/50] multi-process/mig: Enable VMSD save in the
- Proxy object
-Message-ID: <20200305170422.GN3130@work-vm>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <f056d73bb7f749171626cb8abc5a317b0ec17845.1582576372.git.jag.raman@oracle.com>
- <20200305123155.GH3130@work-vm>
- <566485f3-bc78-991a-5ff7-b0f99977d0e8@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5207310CE783;
+ Thu,  5 Mar 2020 16:52:50 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EAC32271BA;
+ Thu,  5 Mar 2020 16:52:47 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Subject: [PATCH v5 10/10] test: tpm-tis: Add Sysbus TPM-TIS device test
+Date: Thu,  5 Mar 2020 17:51:49 +0100
+Message-Id: <20200305165149.618-11-eric.auger@redhat.com>
+In-Reply-To: <20200305165149.618-1-eric.auger@redhat.com>
+References: <20200305165149.618-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <566485f3-bc78-991a-5ff7-b0f99977d0e8@oracle.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,328 +87,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
- stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jag Raman (jag.raman@oracle.com) wrote:
->=20
->=20
-> On 3/5/2020 7:31 AM, Dr. David Alan Gilbert wrote:
-> > * Jagannathan Raman (jag.raman@oracle.com) wrote:
-> > > Collect the VMSD from remote process on the source and save
-> > > it to the channel leading to the destination
-> > >=20
-> > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > > ---
-> > >   v4 -> v5:
-> > >    - Using qemu_file_shutdown() instead of qemu_thread_cancel(). Remo=
-ved patch
-> > >      which introduced qemu_thread_cancel()
-> > >=20
-> > >   hw/proxy/qemu-proxy.c         | 135 +++++++++++++++++++++++++++++++=
-+++++++++++
-> > >   include/hw/proxy/qemu-proxy.h |   2 +
-> > >   include/io/mpqemu-link.h      |   1 +
-> > >   3 files changed, 138 insertions(+)
-> > >=20
-> > > diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-> > > index b1b9282..19f0dbb 100644
-> > > --- a/hw/proxy/qemu-proxy.c
-> > > +++ b/hw/proxy/qemu-proxy.c
-> > > @@ -23,6 +23,14 @@
-> > >   #include "util/event_notifier-posix.c"
-> > >   #include "hw/boards.h"
-> > >   #include "include/qemu/log.h"
-> > > +#include "io/channel.h"
-> > > +#include "migration/qemu-file-types.h"
-> > > +#include "qapi/error.h"
-> > > +#include "io/channel-util.h"
-> > > +#include "migration/qemu-file-channel.h"
-> > > +#include "migration/qemu-file.h"
-> > > +#include "migration/migration.h"
-> > > +#include "migration/vmstate.h"
-> > >   QEMUTimer *hb_timer;
-> > >   static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
-> > > @@ -35,6 +43,9 @@ static void broadcast_init(void);
-> > >   static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t=
- *val, int l,
-> > >                             unsigned int op);
-> > > +#define PAGE_SIZE qemu_real_host_page_size
-> > > +uint8_t *mig_data;
-> > > +
-> > >   static void childsig_handler(int sig, siginfo_t *siginfo, void *ctx=
-)
-> > >   {
-> > >       /* TODO: Add proper handler. */
-> > > @@ -460,6 +471,129 @@ static void pci_proxy_dev_inst_init(Object *obj=
-)
-> > >       dev->mem_init =3D false;
-> > >   }
-> > > +typedef struct {
-> > > +    QEMUFile *rem;
-> > > +    PCIProxyDev *dev;
-> > > +} proxy_mig_data;
-> > > +
-> > > +static void *proxy_mig_out(void *opaque)
-> > > +{
-> > > +    proxy_mig_data *data =3D opaque;
-> > > +    PCIProxyDev *dev =3D data->dev;
-> > > +    uint8_t byte;
-> > > +    uint64_t data_size =3D PAGE_SIZE;
-> > > +
-> > > +    mig_data =3D g_malloc(data_size);
-> > > +
-> > > +    while (true) {
-> > > +        byte =3D qemu_get_byte(data->rem);
-> > > +
-> > > +        if (qemu_file_get_error(data->rem)) {
-> > > +            break;
-> > > +        }
-> > > +
-> > > +        mig_data[dev->migsize++] =3D byte;
-> > > +        if (dev->migsize =3D=3D data_size) {
-> > > +            data_size +=3D PAGE_SIZE;
-> > > +            mig_data =3D g_realloc(mig_data, data_size);
-> > > +        }
-> > > +    }
-> > > +
-> > > +    return NULL;
-> > > +}
-> > > +
-> > > +static int proxy_pre_save(void *opaque)
-> > > +{
-> > > +    PCIProxyDev *pdev =3D opaque;
-> > > +    proxy_mig_data *mig_data;
-> > > +    QEMUFile *f_remote;
-> > > +    MPQemuMsg msg =3D {0};
-> > > +    QemuThread thread;
-> > > +    Error *err =3D NULL;
-> > > +    QIOChannel *ioc;
-> > > +    uint64_t size;
-> > > +    int fd[2];
-> > > +
-> > > +    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
-> > > +        return -1;
-> > > +    }
-> > > +
-> > > +    ioc =3D qio_channel_new_fd(fd[0], &err);
-> > > +    if (err) {
-> > > +        error_report_err(err);
-> > > +        return -1;
-> > > +    }
-> > > +
-> > > +    qio_channel_set_name(QIO_CHANNEL(ioc), "PCIProxyDevice-mig");
-> > > +
-> > > +    f_remote =3D qemu_fopen_channel_input(ioc);
-> > > +
-> > > +    pdev->migsize =3D 0;
-> > > +
-> > > +    mig_data =3D g_malloc0(sizeof(proxy_mig_data));
-> > > +    mig_data->rem =3D f_remote;
-> >=20
-> > This feels way too complicated.   Since we know f_remote is always just
-> > a simple fd we're getting we don't need to use qio or qemu_file here;
-> > just use the fd - nice and simple.
-> >=20
-> > Then the code to read it can just use read(2) with a sensible size chun=
-k
-> > rather than reading a byte at a time.
->=20
-> Hi Dave,
->=20
-> Upon closer inspection, we found that the migration code on the remote
-> (which uses QEMUFile) could sometimes set an error on the channel using
-> qemu_file_set_error(). We needed to use qemu_file_get_error() to catch
-> these errors and abort migration. So we had to stick with QEMUFile at
-> the receiving end as well.
+The tests themselves are the same as the ISA device ones.
+Only the main() changes as the "tpm-tis-device" device gets
+instantiated. Also the base address of the device is not
+0xFED40000 anymore but matches the base address of the
+ARM virt platform bus.
 
-I realise you need to use a QEMUFile on the part that connects to the
-Savevm code/vmstate code - but that doesn't mean you need it on the side
-that just connects between your pipe and the qemu.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ tests/qtest/tpm-tis-device-swtpm-test.c | 76 +++++++++++++++++++++
+ tests/qtest/tpm-tis-device-test.c       | 87 +++++++++++++++++++++++++
+ tests/qtest/Makefile.include            |  5 ++
+ 3 files changed, 168 insertions(+)
+ create mode 100644 tests/qtest/tpm-tis-device-swtpm-test.c
+ create mode 100644 tests/qtest/tpm-tis-device-test.c
 
-> >=20
-> > > +    mig_data->dev =3D pdev;
-> > > +
-> > > +    qemu_thread_create(&thread, "Proxy MIG_OUT", proxy_mig_out, mig_=
-data,
-> > > +                       QEMU_THREAD_DETACHED);
-> >=20
-> > I'm just checking why a thread is necessary; is this because you need t=
-o
-> > be able to start reading before you block waiting for the remote to tel=
-l
-> > you the size - worrying that if you don't start reading then the remote
-> > might block waiting for us?
->=20
-> Yes, Dave. That is correct.
->=20
-> >=20
-> > > +    msg.cmd =3D START_MIG_OUT;
-> > > +    msg.bytestream =3D 0;
-> > > +    msg.num_fds =3D 2;
-> > > +    msg.fds[0] =3D fd[1];
-> > > +    msg.fds[1] =3D GET_REMOTE_WAIT;
-> > > +
-> > > +    mpqemu_msg_send(&msg, pdev->mpqemu_link->com);
-> > > +    size =3D wait_for_remote(msg.fds[1]);
-> > > +    PUT_REMOTE_WAIT(msg.fds[1]);
-> > > +
-> > > +    assert(size !=3D ULLONG_MAX);
-> > > +
-> > > +    /*
-> > > +     * migsize is being update by a separate thread. Using volatile =
-to
-> > > +     * instruct the compiler to fetch the value of this variable fro=
-m
-> > > +     * memory during every read
-> > > +     */
-> > > +    while (*((volatile uint64_t *)&pdev->migsize) < size) {
-> > > +    }
-> >=20
-> > Hmm.  I suggest the following:
-> >=20
-> >    a) You create a shared 'size' variable;  and initialize it to
-> >      UINT64_MAX.
-> >    b) The thread uses atomic_read(shared_size) to read that value.
-> >    c) When you receive the size from the remote you do
-> >       atomic_set(&shared_size, size);
-> >    d) The thread does:
-> >       while (received_size < atomic_read(&shared_size))
-> >=20
-> >       so the thread will quit either on EOF or it hitting the size.
-> >=20
-> >    e) We pthread_join here to wait for the thread
-> >    f) We then check a received size to make sure it matches what we
-> > expect.
-> >=20
-> > That removes the tight loop.
->=20
-> Sure, will do.
->=20
-> >=20
-> > > +    qemu_file_shutdown(f_remote);
-> > > +
-> > > +    qemu_fclose(f_remote);
-> > > +    close(fd[1]);
-> > > +
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +static int proxy_post_save(void *opaque)
-> > > +{
-> > > +    MigrationState *ms =3D migrate_get_current();
-> > > +    PCIProxyDev *pdev =3D opaque;
-> > > +    uint64_t pos =3D 0;
-> > > +
-> > > +    while (pos < pdev->migsize) {
-> > > +        qemu_put_byte(ms->to_dst_file, mig_data[pos]);
-> > > +        pos++;
-> > > +    }
-> > > +
-> > > +    qemu_fflush(ms->to_dst_file);
-> > > +
-> > > +    return 0;
-> >=20
-> > I don't think you need that.
-> >=20
-> > > +}
-> > > +
-> > > +const VMStateDescription vmstate_pci_proxy_device =3D {
-> > > +    .name =3D "PCIProxyDevice",
-> > > +    .version_id =3D 2,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .pre_save =3D proxy_pre_save,
-> > > +    .post_save =3D proxy_post_save,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_PCI_DEVICE(parent_dev, PCIProxyDev),
-> > > +        VMSTATE_UINT64(migsize, PCIProxyDev),
-> >=20
-> > I think instead you should use a VMSTATE_VBUFFER here to save
-> > the mig_data.
-> > What we should do is the post_save should g_free the buffer.
-> > (mig_data should be a field in proxy).
->=20
-> We noticed that VMSTATE_BUFFER requires that the buffer be part of a
-> "struct" and that the buffer is an array. Since the buffer we're using
-> is neither an array nor part of a "struct", we decided to go with
-> writing the buffer directly to the migration stream in proxy_post_save()
-> instead of using VMSTATE_BUFFER.
->=20
-> I think we should nevertheless g_free this buffer in post_save like you
-> pointed out.
-
-Note I'm suggesting using VMSTATE_VBUFFER, not VMSTATE_BUFFER;
-VBUFFER is expecting a unsigned char *; it does expect that to be in
-your structure, so I'd expect your proxy to have a mig_data and uint32_t
-mig_len fields.
-
-Dave
-
-> Thank you!
-> --
-> Jag
->=20
-> >=20
-> > Dave
-> >=20
-> >=20
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    }
-> > > +};
-> > > +
-> > >   static void pci_proxy_dev_class_init(ObjectClass *klass, void *data=
-)
-> > >   {
-> > >       PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-> > > @@ -471,6 +605,7 @@ static void pci_proxy_dev_class_init(ObjectClass =
-*klass, void *data)
-> > >       k->config_write =3D pci_proxy_write_config;
-> > >       dc->reset =3D proxy_device_reset;
-> > > +    dc->vmsd =3D &vmstate_pci_proxy_device;
-> > >   }
-> > >   static const TypeInfo pci_proxy_dev_type_info =3D {
-> > > diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-pr=
-oxy.h
-> > > index 5de8129..537c227 100644
-> > > --- a/include/hw/proxy/qemu-proxy.h
-> > > +++ b/include/hw/proxy/qemu-proxy.h
-> > > @@ -75,6 +75,8 @@ struct PCIProxyDev {
-> > >                           bool need_spawn, Error **errp);
-> > >       ProxyMemoryRegion region[PCI_NUM_REGIONS];
-> > > +
-> > > +    uint64_t migsize;
-> > >   };
-> > >   typedef struct PCIProxyDevClass {
-> > > diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-> > > index d2234ca..b42c003 100644
-> > > --- a/include/io/mpqemu-link.h
-> > > +++ b/include/io/mpqemu-link.h
-> > > @@ -63,6 +63,7 @@ typedef enum {
-> > >       PROXY_PING,
-> > >       MMIO_RETURN,
-> > >       DEVICE_RESET,
-> > > +    START_MIG_OUT,
-> > >       MAX,
-> > >   } mpqemu_cmd_t;
-> > > --=20
-> > > 1.8.3.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/tests/qtest/tpm-tis-device-swtpm-test.c b/tests/qtest/tpm-tis-=
+device-swtpm-test.c
+new file mode 100644
+index 0000000000..7b20035142
+--- /dev/null
++++ b/tests/qtest/tpm-tis-device-swtpm-test.c
+@@ -0,0 +1,76 @@
++/*
++ * QTest testcase for Sysbus TPM TIS talking to external swtpm and swtpm
++ * migration
++ *
++ * Copyright (c) 2018 IBM Corporation
++ *  with parts borrowed from migration-test.c that is:
++ *     Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include <glib/gstdio.h>
++
++#include "libqtest.h"
++#include "qemu/module.h"
++#include "tpm-tests.h"
++#include "hw/acpi/tpm.h"
++
++uint64_t tpm_tis_base_addr =3D 0xc000000;
++#define MACHINE_OPTIONS "-machine virt,gic-version=3Dmax -accel tcg"
++
++typedef struct TestState {
++    char *src_tpm_path;
++    char *dst_tpm_path;
++    char *uri;
++} TestState;
++
++static void tpm_tis_swtpm_test(const void *data)
++{
++    const TestState *ts =3D data;
++
++    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_tis_transfer,
++                        "tpm-tis-device", MACHINE_OPTIONS);
++}
++
++static void tpm_tis_swtpm_migration_test(const void *data)
++{
++    const TestState *ts =3D data;
++
++    tpm_test_swtpm_migration_test(ts->src_tpm_path, ts->dst_tpm_path, ts->=
+uri,
++                                  tpm_util_tis_transfer, "tpm-tis-device",
++                                  MACHINE_OPTIONS);
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++    TestState ts =3D { 0 };
++
++    ts.src_tpm_path =3D g_dir_make_tmp("qemu-tpm-tis-device-swtpm-test.XXX=
+XXX",
++                                     NULL);
++    ts.dst_tpm_path =3D g_dir_make_tmp("qemu-tpm-tis-device-swtpm-test.XXX=
+XXX",
++                                     NULL);
++    ts.uri =3D g_strdup_printf("unix:%s/migsocket", ts.src_tpm_path);
++
++    module_call_init(MODULE_INIT_QOM);
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/tpm/tis-swtpm/test", &ts, tpm_tis_swtpm_test);
++    qtest_add_data_func("/tpm/tis-swtpm-migration/test", &ts,
++                        tpm_tis_swtpm_migration_test);
++    ret =3D g_test_run();
++
++    g_rmdir(ts.dst_tpm_path);
++    g_free(ts.dst_tpm_path);
++    g_rmdir(ts.src_tpm_path);
++    g_free(ts.src_tpm_path);
++    g_free(ts.uri);
++
++    return ret;
++}
+diff --git a/tests/qtest/tpm-tis-device-test.c b/tests/qtest/tpm-tis-device=
+-test.c
+new file mode 100644
+index 0000000000..63ed36440f
+--- /dev/null
++++ b/tests/qtest/tpm-tis-device-test.c
+@@ -0,0 +1,87 @@
++/*
++ * QTest testcase for SYSBUS TPM TIS
++ *
++ * Copyright (c) 2018 Red Hat, Inc.
++ * Copyright (c) 2018 IBM Corporation
++ *
++ * Authors:
++ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include <glib/gstdio.h>
++
++#include "io/channel-socket.h"
++#include "libqtest-single.h"
++#include "qemu/module.h"
++#include "tpm-emu.h"
++#include "tpm-util.h"
++#include "tpm-tis-util.h"
++
++/*
++ * As the Sysbus tpm-tis-device is instantiated on the ARM virt
++ * platform bus and it is the only sysbus device dynamically
++ * instantiated, it gets plugged at its base address
++ */
++uint64_t tpm_tis_base_addr =3D 0xc000000;
++
++int main(int argc, char **argv)
++{
++    char *tmp_path =3D g_dir_make_tmp("qemu-tpm-tis-device-test.XXXXXX", N=
+ULL);
++    GThread *thread;
++    TestState test;
++    char *args;
++    int ret;
++
++    module_call_init(MODULE_INIT_QOM);
++    g_test_init(&argc, &argv, NULL);
++
++    test.addr =3D g_new0(SocketAddress, 1);
++    test.addr->type =3D SOCKET_ADDRESS_TYPE_UNIX;
++    test.addr->u.q_unix.path =3D g_build_filename(tmp_path, "sock", NULL);
++    g_mutex_init(&test.data_mutex);
++    g_cond_init(&test.data_cond);
++    test.data_cond_signal =3D false;
++
++    thread =3D g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
++    tpm_emu_test_wait_cond(&test);
++
++    args =3D g_strdup_printf(
++        "-machine virt,gic-version=3Dmax -accel tcg "
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-tis-device,tpmdev=3Ddev",
++        test.addr->u.q_unix.path);
++    qtest_start(args);
++
++    qtest_add_data_func("/tpm-tis/test_check_localities", &test,
++                        tpm_tis_test_check_localities);
++
++    qtest_add_data_func("/tpm-tis/test_check_access_reg", &test,
++                        tpm_tis_test_check_access_reg);
++
++    qtest_add_data_func("/tpm-tis/test_check_access_reg_seize", &test,
++                        tpm_tis_test_check_access_reg_seize);
++
++    qtest_add_data_func("/tpm-tis/test_check_access_reg_release", &test,
++                        tpm_tis_test_check_access_reg_release);
++
++    qtest_add_data_func("/tpm-tis/test_check_transmit", &test,
++                        tpm_tis_test_check_transmit);
++
++    ret =3D g_test_run();
++
++    qtest_end();
++
++    g_thread_join(thread);
++    g_unlink(test.addr->u.q_unix.path);
++    qapi_free_SocketAddress(test.addr);
++    g_rmdir(tmp_path);
++    g_free(tmp_path);
++    g_free(args);
++    return ret;
++}
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index 44aac68b25..383b0ab217 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -130,6 +130,8 @@ check-qtest-arm-y +=3D hexloader-test
+ check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D pflash-cfi02-test
+=20
+ check-qtest-aarch64-y +=3D arm-cpu-features
++check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) +=3D tpm-tis-device-test
++check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) +=3D tpm-tis-device-swtpm-tes=
+t
+ check-qtest-aarch64-y +=3D numa-test
+ check-qtest-aarch64-y +=3D boot-serial-test
+ check-qtest-aarch64-y +=3D migration-test
+@@ -302,7 +304,10 @@ tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/t=
+pm-crb-swtpm-test.o tests/
+ tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/=
+tpm-emu.o $(test-io-obj-y)
+ tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o =
+tests/qtest/tpm-emu.o \
+ =09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
++tests/qtest/tpm-tis-device-swtpm-test$(EXESUF): tests/qtest/tpm-tis-device=
+-swtpm-test.o tests/qtest/tpm-emu.o \
++=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+ tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/=
+tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
++tests/qtest/tpm-tis-device-test$(EXESUF): tests/qtest/tpm-tis-device-test.=
+o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+=20
+ # QTest rules
+=20
+--=20
+2.20.1
 
 
