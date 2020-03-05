@@ -2,68 +2,69 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F46C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D612BC3F2CE
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCA1020866
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A044C20866
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kk7NuXoV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA1020866
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eX2qfdqU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A044C20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9eWq-000196-SP
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:38:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34432)
+	id 1j9eXM-0001zx-PI
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:38:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9eVw-0008Kb-4B
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:25 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9eWG-0000TE-LB
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9eVu-00015t-GJ
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40253)
+ (envelope-from <jsnow@redhat.com>) id 1j9eWF-0001ou-LD
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36119
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9eVu-000136-CE
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:22 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9eWF-0001oD-Hz
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583368641;
+ s=mimecast20190719; t=1583368663;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=nD+OmfcSCsKdImRCgX0hC12kDkEb9r+c4gCCAaOpOSg=;
- b=Kk7NuXoV+URXsybPJ4CYDUSMtqULwrdKEboTsHiWPSxvuTxH2+1xuBzHhPs4PLrmTWAxKZ
- okIOGUFg2UABHgmwb+NT46gf/HWqm8vDIRk//kuvIdjokCF/sWRCvvWoUVc0BO/oyz5Rsa
- j9MnAPZIPYWc0/YmOjoaQYET0v3k9jg=
+ bh=nnDap56KxMb+y/ocxflqGm7aqIkBs/MznNpvS4SOrGs=;
+ b=eX2qfdqUl9D4ERKTsIyyOdMaLKlYrOY9s6jZ5T/vPoLwy78K6aMSDtrhO5yPcXGZ8Cnih4
+ kqB2aGORqf9lkagWW4MhFp4f86u64pnQAdYn112GgBebMViz46q1ZjSwS1xV/cXR80poGV
+ /2yfuV4Q3GDzWURU79m7m4aeJBMuRsg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-GLrhnu4HOtSFp2aoBb-oTw-1; Wed, 04 Mar 2020 19:37:17 -0500
-X-MC-Unique: GLrhnu4HOtSFp2aoBb-oTw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-466-mvugJWbaOp27ifkfg7T7TQ-1; Wed, 04 Mar 2020 19:37:41 -0500
+X-MC-Unique: mvugJWbaOp27ifkfg7T7TQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D445C1034B38;
- Thu,  5 Mar 2020 00:37:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3920B19057AD;
+ Thu,  5 Mar 2020 00:37:38 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D9AA5C1D4;
- Thu,  5 Mar 2020 00:36:40 +0000 (UTC)
-Subject: Re: [PATCH v3 11/20] hw/ide/internal: Remove unused DMARestartFunc
- typedef
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 447E948;
+ Thu,  5 Mar 2020 00:37:20 +0000 (UTC)
+Subject: Re: [PATCH v3 12/20] hw/ide: Let the DMAIntFunc prototype use a
+ boolean 'is_write' argument
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-12-philmd@redhat.com>
+ <20200220130548.29974-13-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,15 +140,15 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <88be6686-e966-7faa-757e-40eae101088e@redhat.com>
-Date: Wed, 4 Mar 2020 19:36:38 -0500
+Message-ID: <42bee269-a32b-8c11-cb2f-779f6f936dd6@redhat.com>
+Date: Wed, 4 Mar 2020 19:37:19 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200220130548.29974-12-philmd@redhat.com>
+In-Reply-To: <20200220130548.29974-13-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -190,27 +191,18 @@ Sender: "Qemu-devel"
 
 
 On 2/20/20 8:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The IDE DMA restart callback has been removed in commit fe09c7c9f0.
+> The 'is_write' argument is either 0 or 1.
+> Convert it to a boolean type.
 >=20
-> Fixes: fe09c7c9f0
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  include/hw/ide/internal.h | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-> index 52ec197da0..ce766ac485 100644
-> --- a/include/hw/ide/internal.h
-> +++ b/include/hw/ide/internal.h
-> @@ -326,7 +326,6 @@ typedef int DMAIntFunc(IDEDMA *, int);
->  typedef int32_t DMAInt32Func(IDEDMA *, int32_t len);
->  typedef void DMAu32Func(IDEDMA *, uint32_t);
->  typedef void DMAStopFunc(IDEDMA *, bool);
-> -typedef void DMARestartFunc(void *, int, RunState);
-> =20
->  struct unreported_events {
->      bool eject_request;
->=20
+>  include/hw/ide/internal.h | 2 +-
+>  hw/dma/rc4030.c           | 6 +++---
+>  hw/ide/ahci.c             | 2 +-
+>  hw/ide/core.c             | 2 +-
+>  hw/ide/macio.c            | 2 +-
+>  hw/ide/pci.c              | 2 +-
+>  6 files changed, 8 insertions(+), 8 deletions(-)
 
 Acked-by: John Snow <jsnow@redhat.com>
 
