@@ -2,62 +2,96 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1CFC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8745DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CA9208C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:14:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CA9208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 517A1208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:19:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4e+ZeUg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517A1208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9oST-00023U-B8
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 06:14:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53246)
+	id 1j9oXD-00048D-FA
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 06:19:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alexandru.elisei@arm.com>) id 1j9oOr-00010J-Mw
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:10:47 -0500
+ (envelope-from <mst@redhat.com>) id 1j9oWY-0003XI-GO
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:18:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alexandru.elisei@arm.com>) id 1j9oOq-0000lz-4w
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:10:45 -0500
-Received: from foss.arm.com ([217.140.110.172]:55246)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <alexandru.elisei@arm.com>)
- id 1j9oOl-0000j3-RZ; Thu, 05 Mar 2020 06:10:40 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33FA831B;
- Thu,  5 Mar 2020 03:10:38 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C02B33F6C4;
- Thu,  5 Mar 2020 03:10:36 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 8/9] arm: gic: Provide per-IRQ helper
- functions
-To: Andrew Jones <drjones@redhat.com>, Eric Auger <eric.auger@redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-9-eric.auger@redhat.com>
- <20200305095529.hkdyhghkofquat75@kamzik.brq.redhat.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <80417be0-b897-2e09-ad56-05ae6b6a5fd6@arm.com>
-Date: Thu, 5 Mar 2020 11:10:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <mst@redhat.com>) id 1j9oWW-0000zq-RL
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:18:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52314
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j9oWW-0000yu-JZ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:18:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583407119;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xrVtzktr0qiOU8ITwSEN0ihc/kYonAkgE5cdM+DSZys=;
+ b=A4e+ZeUgCQCiAp4VIy3DPwwjsC5eRXeeMACFZZUfL3bMWKjSCjdwQR496Ar7iyRtfHg/k/
+ WMzSH8y0Bxfp/sqgs1w3cXxacARjV+yZxFwvG7ZmI4Vh7E6w3X0iew9iZCZcGk7+44nMRa
+ hvximOBae+VEdAxHFoT6UnBCLoNs/T8=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-JuADljUGNQuzlqslGqaiEA-1; Thu, 05 Mar 2020 06:18:38 -0500
+X-MC-Unique: JuADljUGNQuzlqslGqaiEA-1
+Received: by mail-qk1-f199.google.com with SMTP id q123so3567944qkb.1
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 03:18:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=kLQGRxKT3nC1QBPHTb+Z4AYfSERnI81tpjagDVFshsw=;
+ b=UO3EXlLre9HIbiMXDl/+e662bhqMPRJ+FUIBup8We8OyNO7sC1fQTTnL6L5kzcbyJu
+ NXCUDuB7ZrtzLbqGc2lBMvqgAnptVHAmKYW+KKucM0BYLMy29Oetn/EBG3FOKs3NmKxq
+ 2TDl0IK4PJn3BzlojULIoZ3v/BMsG7uaQXBOv3FLKDTAomeDZBar358Pcc/pKIwKA3Yk
+ 5iB9GwoVA8/nbVy5U/VIeH3l0SgjmBOujyKHqhW0D2No9GTZuvM5zTZZr2jwQMs8/0V+
+ m5DoRQB43K70OBuKPXo59WaZBHFHqDcczN01/DFfuCFiSbR6BSROQiY0LNSaI/FvMGK8
+ T1Gw==
+X-Gm-Message-State: ANhLgQ2ZjbJaR5X6RZYlvvZgs9zLjTOSy9jRWHtj5xCVLQNP7xeWY7aL
+ SXV0SkV7+fLqZ3l8oNuIMEK3myDPOpSxi7hR3vN1Uuvk9RbzRqNGJWiqUF0pmEbcNLN6K7KY1ZW
+ bmoAVrG+HuteDhKo=
+X-Received: by 2002:a37:b304:: with SMTP id c4mr7630518qkf.348.1583407117830; 
+ Thu, 05 Mar 2020 03:18:37 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vvi89OFp9a1bai4JatJvF/e2yckl006J6IaXUvmNHMnL2IjmZPTdRCi47N2iNcXyBf2+hK5hw==
+X-Received: by 2002:a37:b304:: with SMTP id c4mr7630490qkf.348.1583407117532; 
+ Thu, 05 Mar 2020 03:18:37 -0800 (PST)
+Received: from redhat.com (bzq-79-180-48-224.red.bezeqint.net. [79.180.48.224])
+ by smtp.gmail.com with ESMTPSA id 69sm535439qki.131.2020.03.05.03.18.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 03:18:36 -0800 (PST)
+Date: Thu, 5 Mar 2020 06:18:30 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v4] hw/i386/intel_iommu: Simplify
+ vtd_find_as_from_bus_num() logic
+Message-ID: <20200305061809-mutt-send-email-mst@kernel.org>
+References: <20200305102702.31512-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305095529.hkdyhghkofquat75@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+In-Reply-To: <20200305102702.31512-1-philmd@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.140.110.172
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,215 +103,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
- andrew.murray@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Liu Yi L <yi.l.liu@intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Thu, Mar 05, 2020 at 11:27:02AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> The vtd_find_as_from_bus_num() function was introduced (in commit
+> dbaabb25f) in a code format that could return an incorrect pointer,
+> which was later fixed by commit a2e1cd41ccf.
+> We could have avoided this by writing the if() statement differently.
+> Do it now, in case this function is re-used. The code is easier to
+> review (harder to miss bugs).
+>=20
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-I'm going to reiterate the comments I posted on this exact same patch sent by
-Andre [1], and add a few new ones.
 
-[1] https://www.spinics.net/lists/arm-kernel/msg767690.html
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-On 3/5/20 9:55 AM, Andrew Jones wrote:
-> On Thu, Jan 30, 2020 at 12:25:09PM +0100, Eric Auger wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
->>
->> A common theme when accessing per-IRQ parameters in the GIC distributor
->> is to set fields of a certain bit width in a range of MMIO registers.
->> Examples are the enabled status (one bit per IRQ), the level/edge
->> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
->>
->> Add a generic helper function which is able to mask and set the
->> respective number of bits, given the IRQ number and the MMIO offset.
->> Provide wrappers using this function to easily allow configuring an IRQ.
->>
->> For now assume that private IRQ numbers always refer to the current CPU.
->> In a GICv2 accessing the "other" private IRQs is not easily doable (the
->> registers are banked per CPU on the same MMIO address), so we impose the
->> same limitation on GICv3, even though those registers are not banked
->> there anymore.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Missing Eric's s-b.
->
->> ---
->>
->> initialize reg
->> ---
->>  lib/arm/asm/gic-v3.h |  2 +
->>  lib/arm/asm/gic.h    |  9 +++++
->>  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 101 insertions(+)
->>
->> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
->> index 347be2f..4a445a5 100644
->> --- a/lib/arm/asm/gic-v3.h
->> +++ b/lib/arm/asm/gic-v3.h
->> @@ -23,6 +23,8 @@
->>  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
->>  #define GICD_CTLR_ENABLE_G1		(1U << 0)
->>  
->> +#define GICD_IROUTER			0x6000
->> +
->>  /* Re-Distributor registers, offsets from RD_base */
->>  #define GICR_TYPER			0x0008
->>  
->> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
->> index 1fc10a0..21cdb58 100644
->> --- a/lib/arm/asm/gic.h
->> +++ b/lib/arm/asm/gic.h
->> @@ -15,6 +15,7 @@
->>  #define GICD_IIDR			0x0008
->>  #define GICD_IGROUPR			0x0080
->>  #define GICD_ISENABLER			0x0100
->> +#define GICD_ICENABLER			0x0180
->>  #define GICD_ISPENDR			0x0200
->>  #define GICD_ICPENDR			0x0280
->>  #define GICD_ISACTIVER			0x0300
->> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
->>  extern void gic_ipi_send_single(int irq, int cpu);
->>  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
->>  
->> +void gic_set_irq_bit(int irq, int offset);
->> +void gic_enable_irq(int irq);
->> +void gic_disable_irq(int irq);
->> +void gic_set_irq_priority(int irq, u8 prio);
->> +void gic_set_irq_target(int irq, int cpu);
->> +void gic_set_irq_group(int irq, int group);
->> +int gic_get_irq_group(int irq);
->> +
->>  #endif /* !__ASSEMBLY__ */
->>  #endif /* _ASMARM_GIC_H_ */
->> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
->> index 9430116..aa9cb86 100644
->> --- a/lib/arm/gic.c
->> +++ b/lib/arm/gic.c
->> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->>  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
->>  	gic_common_ops->ipi_send_mask(irq, dest);
->>  }
->> +
->> +enum gic_bit_access {
->> +	ACCESS_READ,
->> +	ACCESS_SET,
->> +	ACCESS_RMW
->> +};
->> +
->> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
->> +			      enum gic_bit_access access)
->> +{
->> +	void *base;
->> +	int split = 32 / bits;
->> +	int shift = (irq % split) * bits;
->> +	u32 reg = 0, mask = ((1U << bits) - 1) << shift;
->> +
->> +	switch (gic_version()) {
->> +	case 2:
->> +		base = gicv2_dist_base();
->> +		break;
->> +	case 3:
->> +		if (irq < 32)
->> +			base = gicv3_sgi_base();
->> +		else
->> +			base = gicv3_dist_base();
->> +		break;
->> +	default:
->> +		return 0;
->> +	}
->> +	base += offset + (irq / split) * 4;
->> +
->> +	switch (access) {
->> +	case ACCESS_READ:
->> +		return (readl(base) & mask) >> shift;
->> +	case ACCESS_SET:
->> +		reg = 0;
->> +		break;
->> +	case ACCESS_RMW:
->> +		reg = readl(base) & ~mask;
->> +		break;
->> +	}
->> +
->> +	writel(reg | ((u32)value << shift), base);
->> +
->> +	return 0;
->> +}
+I'll queues this.
 
-This function looks a bit out of place:
-- the function name has a verb in the past tense ('masked'), which makes me think
-it should return a bool, but the function actually performs an access to a GIC
-register.
-- the return value is an u8, but it returns an u32 on a read, because readl
-returns an u32.
-- the semantics of the function and the return value change based on the access
-parameter; worse yet, the return value on a write is completely ignored by the
-callers and the value parameter is ignored on reads.
+> ---
+> Since v1: Re-worded commit description, patch sent without -w.
+> Since v2: patch send without diff
+> Since v3: Fix typo in description and comment (Eric Auger)
+>=20
+> This patch is easier to review with 'git-diff -w' (--ignore-all-space)
+> ---
+>  hw/i386/intel_iommu.c | 34 ++++++++++++++++++----------------
+>  1 file changed, 18 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 6258c58ac9..204b6841ec 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -987,24 +987,26 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, =
+uint32_t level)
+>  static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_=
+num)
+>  {
+>      VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
+> -    if (!vtd_bus) {
+> -        /*
+> -         * Iterate over the registered buses to find the one which
+> -         * currently hold this bus number, and update the bus_num
+> -         * lookup table:
+> -         */
+> -        GHashTableIter iter;
+> +    GHashTableIter iter;
+> =20
+> -        g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> -        while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
+> -            if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> -                s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> -                return vtd_bus;
+> -            }
+> -        }
+> -        vtd_bus =3D NULL;
+> +    if (vtd_bus) {
+> +        return vtd_bus;
+>      }
+> -    return vtd_bus;
+> +
+> +    /*
+> +     * Iterate over the registered buses to find the one which
+> +     * currently holds this bus number and update the bus_num
+> +     * lookup table.
+> +     */
+> +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> +    while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
+> +        if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> +            s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> +            return vtd_bus;
+> +        }
+> +    }
+> +
+> +    return NULL;
+>  }
+> =20
+>  /* Given the @iova, get relevant @slptep. @slpte_level will be the last =
+level
+> --=20
+> 2.21.1
 
-And a few new niggles:
-- the accessor functions are hard to read: git_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET). What the 1's represent is not obvious without reading the gic_masked_irq_bits functions.
-- Andrew introduced a function to check the IRQ state at the GIC level [2]. The function is clear and nice to read because it has no indirection. How about we follow this pattern for all the accessors below and we remove the calls to gic_masked_irq_bits entirely? 
-
-[2] https://www.spinics.net/lists/kvm/msg207073.html
-
-Thanks,
-Alex
-
->> +
->> +void gic_set_irq_bit(int irq, int offset)
->> +{
->> +	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
->> +}
->> +
->> +void gic_enable_irq(int irq)
->> +{
->> +	gic_set_irq_bit(irq, GICD_ISENABLER);
->> +}
->> +
->> +void gic_disable_irq(int irq)
->> +{
->> +	gic_set_irq_bit(irq, GICD_ICENABLER);
->> +}
->> +
->> +void gic_set_irq_priority(int irq, u8 prio)
->> +{
->> +	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
->> +}
->> +
->> +void gic_set_irq_target(int irq, int cpu)
->> +{
->> +	if (irq < 32)
->> +		return;
->> +
->> +	if (gic_version() == 2) {
->> +		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
->> +				    ACCESS_RMW);
->> +
->> +		return;
->> +	}
->> +
->> +	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
->> +}
->> +
->> +void gic_set_irq_group(int irq, int group)
->> +{
->> +	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
->> +}
->> +
->> +int gic_get_irq_group(int irq)
->> +{
->> +	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
->> +}
->> -- 
->> 2.20.1
->>
->>
-> Looks good to me.
->
-> Thanks,
-> drew
->
 
