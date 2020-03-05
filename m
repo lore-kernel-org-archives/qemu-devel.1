@@ -2,80 +2,98 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3149C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E58C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69F0420732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9088020732
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLVvAOBD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F0420732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhskNOBO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9088020732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rhf-0000vJ-IO
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:42:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36023)
+	id 1j9ri0-0001kN-LO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:42:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9rYO-0001Bm-Qx
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:50 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j9rg3-0006V9-Mp
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9rYN-0003tl-CS
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:48 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26600
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1j9rg2-000329-Gp
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22460
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9rYN-0003tZ-7v
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:47 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j9rg2-00031W-CZ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583418766;
+ s=mimecast20190719; t=1583419242;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rsKZZfmGf4FTjYAGcSvxDcDvtjCsMTO9zMXFazmq4nI=;
- b=dLVvAOBD/nZ8ykR99frX8Vw9gBV8ZOlHZ1GdqOi7A3nakhPvwoqQLP/BTzjTMV965rHVWo
- MLluD4Oj12Ftoc2+IfrU81XcilGNtCDym7z1jRXzI4Ah2j6p+61QIkJ5w/N7aDbNRczL2r
- jwcEoUuk+R7gb8dR5Ekbk5CkZQbi6+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-SFyd3lYwP0K6PPThgbjaBQ-1; Thu, 05 Mar 2020 09:32:45 -0500
-X-MC-Unique: SFyd3lYwP0K6PPThgbjaBQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC82E13E6;
- Thu,  5 Mar 2020 14:32:43 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A3A4390538;
- Thu,  5 Mar 2020 14:32:30 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/15] util: oslib: Resizeable anonymous allocations under
- POSIX
-Date: Thu,  5 Mar 2020 15:29:43 +0100
-Message-Id: <20200305142945.216465-14-david@redhat.com>
-In-Reply-To: <20200305142945.216465-1-david@redhat.com>
-References: <20200305142945.216465-1-david@redhat.com>
+ bh=Hn0YIGyfHl+O6XUJ5nHyG1yent3/MBPqFXxf/LfpEkk=;
+ b=bhskNOBOEaqAdErTSeZyC+UhYI2tMRWr1p9ItYSfSWT2p7KdGjKsAK7CvdLmSL5JQPx8v4
+ nJvnPe4RAYpVABUdx01CFD/2cQMgSnyXY3Un/+ahcQxlLaw/yZJ6ZkRegeomoi9qhsIAW1
+ /PdIWUf81RACacqa3gdhguYY56682h4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-sHMUgyyrNRWePgwlgQ9HdA-1; Thu, 05 Mar 2020 09:40:40 -0500
+X-MC-Unique: sHMUgyyrNRWePgwlgQ9HdA-1
+Received: by mail-wr1-f71.google.com with SMTP id m13so2396002wrw.3
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 06:40:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5nTfBo1AjozwuH2fY56tBvVbThFhIHlIG6d3trpW31I=;
+ b=g0dyzqIYwsYYx5kXpUSQeHhJwGZCmy+ftyMWy3KlImnwXPOryuEFrKbsKKhm2UkGmL
+ ZII++WkantPCNXGrMdWSh0xlXcL/H4faZoN6M/eRXnqLDP5yl+jz3HTrSicYxNaXGSDj
+ YZZH/GCeGA35ZAOXUBNHEZs/k6Q5paHZMT4HBSF+CPUnBPnP+w0Tn8lxVVosKRttUL8u
+ VKpeZzacDIKkLRlHVZzJecO60MhpkmC/88nzI/Tq1aBGVdKmn9GypwfcASoFF8hnTFhJ
+ 4IdHXAJULDZ169Gy/G8vEY/IMW7CCoQIuPcdz0v8uQCtd7t34Y/yiwHy3LBjQ+JieJ6H
+ ufIQ==
+X-Gm-Message-State: ANhLgQ20/wxP3RwjF5T5nRcL2jcAguhTFZ6pSSZqy6D1PD99LUExPop1
+ OIDRsVPneNM1srGEca7pHgN1km8dFABAC3gGGA+vkfA4BFUAIE2eK9o10nvmz+8LxlI0vwJICOv
+ eGYZhih+FE4A3A6o=
+X-Received: by 2002:a5d:68ce:: with SMTP id p14mr10402482wrw.315.1583419238940; 
+ Thu, 05 Mar 2020 06:40:38 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtaj5cQYnkiErgB3yw7XSWXYWEMSi5KEHtnZpwZVTrTqVK5AYSfHvTi9cL8UBUCyIAAXxASgw==
+X-Received: by 2002:a5d:68ce:: with SMTP id p14mr10402467wrw.315.1583419238677; 
+ Thu, 05 Mar 2020 06:40:38 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993?
+ ([2001:b07:6468:f312:9def:34a0:b68d:9993])
+ by smtp.gmail.com with ESMTPSA id v16sm27460899wrp.84.2020.03.05.06.40.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Mar 2020 06:40:38 -0800 (PST)
+Subject: Re: [PATCH v3 0/7] hw/scsi/spapr_vscsi: Fix time bomb buffer overflow
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200305121253.19078-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eac8c380-eb0d-b075-f70b-bd339ce5fc6e@redhat.com>
+Date: Thu, 5 Mar 2020 15:40:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200305121253.19078-1-philmd@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,168 +105,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce qemu_anon_ram_alloc_resizeable() and qemu_anon_ram_resize().
-Implement them under POSIX and make them return NULL under WIN32.
+On 05/03/20 13:12, Philippe Mathieu-Daud=C3=A9 wrote:
+> This series fixes a possible buffer overflow.
+>=20
+> Simples patches first (dissociate the buffer holding DMA
+> requests with pointer to SRP Information Unit packets) to
+> clean the issue in the penultimate patch.
+>=20
+> v3:
+> - Fixed typo reported by Greg Kurz
+> - Addressed Paolo Bonzini review comments as an extra patch
+> - Added another patch converting a fprintf() call while here
+>=20
+> v2:
+> - Addressed David Gibson review comments
+>=20
+> Supersedes: <20200305083135.8270-1-philmd@redhat.com>
+>=20
+> Philippe Mathieu-Daud=C3=A9 (7):
+>   hw/scsi/viosrp: Add missing 'hw/scsi/srp.h' include
+>   hw/scsi/spapr_vscsi: Use SRP_MAX_IU_LEN instead of sizeof flexible
+>     array
+>   hw/scsi/spapr_vscsi: Simplify a bit
+>   hw/scsi/spapr_vscsi: Introduce req_iu() helper
+>   hw/scsi/spapr_vscsi: Do not mix SRP IU size with DMA buffer size
+>   hw/scsi/spapr_vscsi: Prevent buffer overflow
+>   hw/scsi/spapr_vscsi: Convert debug fprintf() to trace event
+>=20
+>  hw/scsi/viosrp.h      |  3 +-
+>  hw/scsi/spapr_vscsi.c | 72 +++++++++++++++++++++++++------------------
+>  hw/scsi/trace-events  |  1 +
+>  3 files changed, 45 insertions(+), 31 deletions(-)
+>=20
 
-Under POSIX, we make use of resizeable mmaps. An implementation under
-WIN32 is theoretically possible AFAIK and can be added later.
-
-In qemu_anon_ram_free(), rename the size parameter to max_size, to make
-it clearer that we have to use the maximum size when freeing resizeable
-anonymous allocations.
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Stefan Weil <sw@weilnetz.de>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- include/qemu/osdep.h |  6 +++++-
- util/oslib-posix.c   | 37 ++++++++++++++++++++++++++++++++++---
- util/oslib-win32.c   | 14 ++++++++++++++
- util/trace-events    |  4 +++-
- 4 files changed, 56 insertions(+), 5 deletions(-)
-
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 9bd3dcfd13..a1ea9e043d 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -311,8 +311,12 @@ int qemu_daemon(int nochdir, int noclose);
- void *qemu_try_memalign(size_t alignment, size_t size);
- void *qemu_memalign(size_t alignment, size_t size);
- void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
-+void *qemu_anon_ram_alloc_resizeable(size_t size, size_t max_size,
-+                                     uint64_t *align, bool shared);
-+bool qemu_anon_ram_resize(void *ptr, size_t old_size, size_t new_size,
-+                          bool shared);
- void qemu_vfree(void *ptr);
--void qemu_anon_ram_free(void *ptr, size_t size);
-+void qemu_anon_ram_free(void *ptr, size_t max_size);
-=20
- #define QEMU_MADV_INVALID -1
-=20
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 897e8f3ba6..34b1ce74b7 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -223,16 +223,47 @@ void *qemu_anon_ram_alloc(size_t size, uint64_t *alig=
-nment, bool shared)
-     return ptr;
- }
-=20
-+void *qemu_anon_ram_alloc_resizeable(size_t size, size_t max_size,
-+                                     uint64_t *alignment, bool shared)
-+{
-+    size_t align =3D QEMU_VMALLOC_ALIGN;
-+    void *ptr =3D qemu_ram_mmap_resizeable(-1, size, max_size, align, shar=
-ed,
-+                                         false);
-+
-+    if (ptr =3D=3D MAP_FAILED) {
-+        return NULL;
-+    }
-+
-+    if (alignment) {
-+        *alignment =3D align;
-+    }
-+
-+    trace_qemu_anon_ram_alloc_resizeable(size, max_size, ptr);
-+    return ptr;
-+}
-+
-+bool qemu_anon_ram_resize(void *ptr, size_t old_size, size_t new_size,
-+                          bool shared)
-+{
-+    bool resized =3D qemu_ram_mmap_resize(ptr, -1, old_size, new_size, sha=
-red,
-+                                        false);
-+
-+    if (resized) {
-+        trace_qemu_anon_ram_resize(old_size, new_size, ptr);
-+    }
-+    return resized;
-+}
-+
- void qemu_vfree(void *ptr)
- {
-     trace_qemu_vfree(ptr);
-     free(ptr);
- }
-=20
--void qemu_anon_ram_free(void *ptr, size_t size)
-+void qemu_anon_ram_free(void *ptr, size_t max_size)
- {
--    trace_qemu_anon_ram_free(ptr, size);
--    qemu_ram_munmap(-1, ptr, size);
-+    trace_qemu_anon_ram_free(ptr, max_size);
-+    qemu_ram_munmap(-1, ptr, max_size);
- }
-=20
- void qemu_set_block(int fd)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index e9b14ab178..c034fdfe01 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -90,6 +90,20 @@ void *qemu_anon_ram_alloc(size_t size, uint64_t *align, =
-bool shared)
-     return ptr;
- }
-=20
-+void *qemu_anon_ram_alloc_resizeable(size_t size, size_t max_size,
-+                                     uint64_t *align, bool shared)
-+{
-+    /* resizeable ram not implemented yet */
-+    return NULL;
-+}
-+
-+bool qemu_anon_ram_resize(void *ptr, size_t old_size, size_t new_size,
-+                          bool shared)
-+{
-+    /* resizeable ram not implemented yet */
-+    return false;
-+}
-+
- void qemu_vfree(void *ptr)
- {
-     trace_qemu_vfree(ptr);
-diff --git a/util/trace-events b/util/trace-events
-index a4d39eca5e..24a6f1a1e1 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -46,8 +46,10 @@ qemu_co_mutex_unlock_return(void *mutex, void *self) "mu=
-tex %p self %p"
- # oslib-posix.c
- qemu_memalign(size_t alignment, size_t size, void *ptr) "alignment %zu siz=
-e %zu ptr %p"
- qemu_anon_ram_alloc(size_t size, void *ptr) "size %zu ptr %p"
-+qemu_anon_ram_alloc_resizeable(size_t size, size_t max_size, void *ptr) "s=
-ize %zu max_size %zu ptr %p"
-+qemu_anon_ram_resize(size_t old_size, size_t new_size, void *ptr) "old_siz=
-e %zu new_size %zu ptr %p"
- qemu_vfree(void *ptr) "ptr %p"
--qemu_anon_ram_free(void *ptr, size_t size) "ptr %p size %zu"
-+qemu_anon_ram_free(void *ptr, size_t max_size) "ptr %p max_size %zu"
-=20
- # hbitmap.c
- hbitmap_iter_skip_words(const void *hb, void *hbi, uint64_t pos, unsigned =
-long cur) "hb %p hbi %p pos %"PRId64" cur 0x%lx"
---=20
-2.24.1
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
