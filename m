@@ -2,76 +2,145 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C7CC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64106C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:43:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C23B2073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:38:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHz4UCYQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C23B2073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9E3A2073D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:43:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E3A2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9mxH-0008Tw-OE
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:38:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
+	id 1j9n1y-0002xq-TS
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:43:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1j9mwZ-000851-4X
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:37:28 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j9n1A-0002Ur-SE
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1j9mwX-0005QQ-R4
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:37:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44982
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j9mwX-0005Q3-NL
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:37:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583401045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=H+FCFIRFbznBQRS5RiI1oKiCG0Ih5s+Wl3PBFLEoSi4=;
- b=bHz4UCYQBHab0u8WzqM3FiEb7wfFVPuea91IkYZu9eqfbQcCaqLu7w2k2MdkPBtwt3ENxW
- X7XsAVXyOdtr0uPKv8sSnixxsBjINVAGnQHuFkR/W+Hlc5hg1U+/wLXk379lULfDLGZyS7
- +NCmVDhjV0hRJgvRtWF+DIYR51Awfds=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-EoOYzJSpNP6oNmtkXi4aGQ-1; Thu, 05 Mar 2020 04:37:23 -0500
-X-MC-Unique: EoOYzJSpNP6oNmtkXi4aGQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF678800D6C;
- Thu,  5 Mar 2020 09:37:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-110.brq.redhat.com
- [10.40.204.110])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 84A6D90795;
- Thu,  5 Mar 2020 09:37:15 +0000 (UTC)
-Date: Thu, 5 Mar 2020 10:37:12 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 6/9] arm: pmu: Test chained counter
-Message-ID: <20200305093712.moxksc534hprwu5o@kamzik.brq.redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-7-eric.auger@redhat.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1j9n19-0001UW-Sm
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:12 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33636
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1j9n19-0001U9-Ne
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0259ZVq7066060
+ for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 04:42:10 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yjx04sy8c-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:42:10 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 5 Mar 2020 09:42:09 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 5 Mar 2020 09:42:05 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0259g4HZ39780362
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 5 Mar 2020 09:42:04 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BA5DA42041;
+ Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 899774203F;
+ Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
+Received: from dyn-9-152-224-184.boeblingen.de.ibm.com (unknown
+ [9.152.224.184])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
+Subject: Re: [PATCH v6 13/18] s390x: protvirt: Disable address checks for PV
+ guest IO emulation
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-14-frankja@linux.ibm.com>
+ <36715573-98c2-311c-03a8-300e6b4915a3@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 5 Mar 2020 10:42:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200130112510.15154-7-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <36715573-98c2-311c-03a8-300e6b4915a3@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5"
+X-TM-AS-GCONF: 00
+x-cbid: 20030509-0020-0000-0000-000003B0B1AD
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030509-0021-0000-0000-00002208EC64
+Message-Id: <c4476e36-6738-0140-ba72-92d384b1cffc@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-05_02:2020-03-04,
+ 2020-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0
+ clxscore=1015 suspectscore=3 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003050060
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,208 +152,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
- andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 30, 2020 at 12:25:07PM +0100, Eric Auger wrote:
-> Add 2 tests exercising chained counters. The first one uses
-> CPU_CYCLES and the second one uses SW_INCR.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/pmu.c         | 128 ++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg |  12 +++++
->  2 files changed, 140 insertions(+)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 1b0101f..538fbeb 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -113,6 +113,8 @@ static void test_event_introspection(void) {}
->  static void test_event_counter_config(void) {}
->  static void test_basic_event_count(void) {}
->  static void test_mem_access(void) {}
-> +static void test_chained_counters(void) {}
-> +static void test_chained_sw_incr(void) {}
->  
->  #elif defined(__aarch64__)
->  #define ID_AA64DFR0_PERFMON_SHIFT 8
-> @@ -458,6 +460,126 @@ static void test_mem_access(void)
->  			read_sysreg(pmovsclr_el0));
->  }
->  
-> +static void test_chained_counters(void)
-> +{
-> +	uint32_t events[] = { 0x11 /* CPU_CYCLES */, 0x1E /* CHAIN */};
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +		return;
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +	/* enable counters #0 and #1 */
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	/* preset counter #0 at 0xFFFFFFF0 */
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +
-> +	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> +
-> +	report(read_regn(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
-> +	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
-> +
-> +	/* test 64b overflow */
-> +
-> +	pmu_reset();
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	write_regn(pmevcntr, 1, 0x1);
-> +	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> +	report(read_regn(pmevcntr, 1) == 2, "CHAIN counter #1 incremented");
-> +	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
-> +
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	write_regn(pmevcntr, 1, 0xFFFFFFFF);
-> +
-> +	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> +	report(!read_regn(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> +	report(read_sysreg(pmovsclr_el0) == 0x2,
-> +		"check no overflow is recorded");
-> +}
-> +
-> +static void test_chained_sw_incr(void)
-> +{
-> +	uint32_t events[] = { 0x0 /* SW_INCR */, 0x0 /* SW_INCR */};
-> +	int i;
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +		return;
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +	/* enable counters #0 and #1 */
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +
-> +	/* preset counter #0 at 0xFFFFFFF0 */
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +
-> +	for (i = 0; i < 100; i++)
-> +		write_sysreg(0x1, pmswinc_el0);
-> +
-> +	report_info("SW_INCR counter #0 has value %ld", read_regn(pmevcntr, 0));
-> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
-> +		"PWSYNC does not increment if PMCR.E is unset");
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +
-> +	for (i = 0; i < 100; i++)
-> +		write_sysreg(0x3, pmswinc_el0);
-> +
-> +	report(read_regn(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> +	report(read_regn(pmevcntr, 1)  == 100,
-> +		"counter #0 after + 100 SW_INCR");
-> +	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-> +		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
-> +	report(read_sysreg(pmovsclr_el0) == 0x1,
-> +		"overflow reg after 100 SW_INCR");
-> +
-> +	/* 64b SW_INCR */
-> +	pmu_reset();
-> +
-> +	events[1] = 0x1E /* CHAIN */;
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +	for (i = 0; i < 100; i++)
-> +		write_sysreg(0x3, pmswinc_el0);
-> +
-> +	report(!read_sysreg(pmovsclr_el0) && (read_regn(pmevcntr, 1) == 1),
-> +		"overflow reg after 100 SW_INCR/CHAIN");
-> +	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> +		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
-> +
-> +	/* 64b SW_INCR and overflow on CHAIN counter*/
-> +	pmu_reset();
-> +
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	write_regn(pmevcntr, 1, 0xFFFFFFFF);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +	for (i = 0; i < 100; i++)
-> +		write_sysreg(0x3, pmswinc_el0);
-> +
-> +	report((read_sysreg(pmovsclr_el0) == 0x2) &&
-> +		(read_regn(pmevcntr, 1) == 0) &&
-> +		(read_regn(pmevcntr, 0) == 84),
-> +		"overflow reg after 100 SW_INCR/CHAIN");
-> +	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> +		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
-> +}
-> +
->  #endif
->  
->  /*
-> @@ -657,6 +779,12 @@ int main(int argc, char *argv[])
->  	} else if (strcmp(argv[1], "mem-access") == 0) {
->  		report_prefix_push(argv[1]);
->  		test_mem_access();
-> +	} else if (strcmp(argv[1], "chained-counters") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_chained_counters();
-> +	} else if (strcmp(argv[1], "chained-sw-incr") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_chained_sw_incr();
->  	} else {
->  		report_abort("Unknown sub-test '%s'", argv[1]);
->  	}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 7a59403..1bd4319 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -90,6 +90,18 @@ groups = pmu
->  arch = arm64
->  extra_params = -append 'mem-access'
->  
-> +[pmu-chained-counters]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'chained-counters'
-> +
-> +[pmu-chained-sw-incr]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'chained-sw-incr'
-> +
->  # Test PMU support (TCG) with -icount IPC=1
->  #[pmu-tcg-icount-1]
->  #file = pmu.flat
-> -- 
-> 2.20.1
-> 
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5
+Content-Type: multipart/mixed; boundary="nMvIQgLrb7lceEdyDjtquWm1w4q87yir2"
 
-Same comments as previous patch
+--nMvIQgLrb7lceEdyDjtquWm1w4q87yir2
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-drew
+On 3/4/20 6:55 PM, David Hildenbrand wrote:
+> On 04.03.20 12:42, Janosch Frank wrote:
+>> IO instruction data is routed through SIDAD for protected guests, so
+>> adresses do not need to be checked, as this is kernel memory.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  target/s390x/ioinst.c | 26 +++++++++++++++++++-------
+>>  1 file changed, 19 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+>> index c437a1d8c6..e4102430aa 100644
+>> --- a/target/s390x/ioinst.c
+>> +++ b/target/s390x/ioinst.c
+>> @@ -17,6 +17,16 @@
+>>  #include "trace.h"
+>>  #include "hw/s390x/s390-pci-bus.h"
+>> =20
+>> +static uint64_t get_address_from_regs(CPUS390XState *env, uint32_t ip=
+b,
+>> +                                      uint8_t *ar)
+>> +{
+>=20
+> Please add a comment here why this is done. (e.g., make all address
+> checks - like alignment checks - in the caller succeed, and we don't
+> need the address).
+
+     * Addresses for protected guests are all offsets into the
+
+
+     * satellite block which holds the IO control structures. Those
+
+
+     * control structures are always aligned and accessible, so we can
+
+
+     * return 0 here which will pass the following address checks.
+
+?
+
+>=20
+>> +    if (env->pv) {
+>> +        *ar =3D 0;
+>> +        return 0;
+>> +    }
+>> +    return decode_basedisp_s(env, ipb, ar);
+>> +}
+>> +
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
+>=20
+
+
+
+--nMvIQgLrb7lceEdyDjtquWm1w4q87yir2--
+
+--29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5gyWwACgkQ41TmuOI4
+ufiwAw//Thp743N70geXvRXDqhhlsGIWCd9t9yVFr1jk51/bVjpIWidbnEgwiwih
+MeyyUiXzKyrYdlkDOFfG5HjJXkHmhXp3dbrwfEDiA+6pY0ikLVurg8ekifB36frz
+IMk+Z6Qzd231w8yLBLmliRMlZ+CNDoaWONELWXElFAiDlS15pKGrmvvogxZwMM6G
+r7t3WaXbRaUpuvpt72nI0kF/2Ez8tUiiZAlcdn4XO+2E/UgA0CoWCJrGBtSBwX6M
+R9m26zmSbxjwioQ9vh1zqTdRxBvbiK9PX0DwUqT1xxigGa/n7HSSdbyLt0H5wYbj
+riNo7BbIqJCKpyIXh1dDQC8dCTLiZPlLsBqJfh6un+3wYOLzHHiWfl3kFR3zyxJf
+xkjbN6Y7u5n6nOSAtAPqZXcUfL5TFDAe85wmYiSZIp4QA2olbgx3OahLKHjI9sUG
+UQIU3vkrcK0Dyqn9NHYV1fyHBBDoOqkByzgXStV3Z9kQOCIALt4uabbFRDZ2GyTe
+kw3O3WrxMeDgevacfzhQEyrUZjn/Yhk+wuZe0SkFVyHqA5NP7biNi1YotYBKJVU0
+mPgb+Y5SD1tUsY8FKGWFgMgNZGORWmyXWsq/bcTEWgcu4h1jHzfipzeayYThuadK
+jDMCsBkFDbeHhHuadSciPNW0R0310M/hbQC2SKLbd1puACu8UU8=
+=+KKj
+-----END PGP SIGNATURE-----
+
+--29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5--
 
 
