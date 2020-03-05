@@ -2,82 +2,82 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B34C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E4EC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B3C20732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:26:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E07820732
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:27:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="mclYmM0T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B3C20732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKAWu0BK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E07820732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rSR-0000Ob-TJ
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:26:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34319)
+	id 1j9rT5-0001nc-BF
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:27:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lekiravi@yandex-team.ru>) id 1j9rRO-00061o-08
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:25:35 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j9rPw-0003RJ-Rp
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:24:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lekiravi@yandex-team.ru>) id 1j9rRM-00060f-Qc
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:25:33 -0500
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:41258)
+ (envelope-from <kwolf@redhat.com>) id 1j9rPw-0004Z2-0B
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:24:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27256
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lekiravi@yandex-team.ru>)
- id 1j9rR9-0005lY-D9; Thu, 05 Mar 2020 09:25:20 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 9AE9B2E154F;
- Thu,  5 Mar 2020 17:25:14 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- z5MNPQhVm2-PBO06DpE; Thu, 05 Mar 2020 17:25:14 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1583418314; bh=YyF2qBT8dm3IZGrfiOfUkAj9l9sxVno25dxtEJYNu9s=;
- h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
- b=mclYmM0T5/GYKQWvd06n/AP7uK3ujTwm+rq5ZfUyy7ssRi+6foz4CwBc506ZleAaA
- 9Mwe4pQ12xO/Xuiv70sxX/Uu3NNlloZG8VC92BGPknHEYN0TOcYDPSe2h0nM7IOLDJ
- kVh2HZoqnwxdVfYWPpOr9CBpKmZFQB/G+EvpMuZA=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000161690
-X-Yandex-Avir: 1
-Received: from mxbackcorp1g.mail.yandex.net (localhost [::1])
- by mxbackcorp1g.mail.yandex.net with LMTP id iUMswpJpt2-EsudiJzi
- for <lekiravi@yandex-team.ru>; Thu, 05 Mar 2020 17:25:01 +0300
-Received: by vla1-bfecef18a7a0.qloud-c.yandex.net with HTTP;
- Thu, 05 Mar 2020 17:25:01 +0300
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Markus Armbruster <armbru@redhat.com>
-In-Reply-To: <274ce4fc-f7ef-791c-7c25-c99b694c1e78@redhat.com>
-References: <20200304130656.16859-1-lekiravi@yandex-team.ru>
- <20200304130656.16859-2-lekiravi@yandex-team.ru>
- <274ce4fc-f7ef-791c-7c25-c99b694c1e78@redhat.com>
-Subject: Re: [PATCH v2 1/4] qapi: net: Add query-netdevs command
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j9rPv-0004XD-SE
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:24:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583418242;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fycpKbmYa2MQQ2I7T+8TZlDL2cOuDrd4KBMm76xA6i0=;
+ b=aKAWu0BKD6IGkfppItfQNi7j+f24ZoJz2D32u4WyIplNNTVplV2mCJ0eEV07/zn0HBFxL1
+ nAgpo9NHifa/XCpo+F318sMBG6gj3KzTks6N1YT0IjmrjALkOVRs/jt1KmGYPyO6aPby4+
+ +WOFagMl9iHZrcxYmoMjkSfXN+SPOMw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-4FGCqqzINVW_kSiew_vgrA-1; Thu, 05 Mar 2020 09:23:58 -0500
+X-MC-Unique: 4FGCqqzINVW_kSiew_vgrA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCD318048F5;
+ Thu,  5 Mar 2020 14:23:57 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BA3B5C54A;
+ Thu,  5 Mar 2020 14:23:53 +0000 (UTC)
+Date: Thu, 5 Mar 2020 15:23:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Florian Florensa <fflorensa@online.net>
+Subject: Re: [PATCH v3 0/1] block/rbd: Add support for ceph namespaces
+Message-ID: <20200305142352.GB5363@linux.fritz.box>
+References: <20200110111513.321728-1-fflorensa@online.net>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Thu, 05 Mar 2020 17:25:11 +0300
-Message-Id: <1039831583412539@myt4-457577cc370d.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200110111513.321728-1-fflorensa@online.net>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 95.108.205.193
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,104 +86,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Sven Schnelle <svens@stackframe.org>, Rob Herring <robh@kernel.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
- Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>, Jiri Pirko <jiri@resnulli.us>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair@alistair23.me>,
- Beniamino Galvani <b.galvani@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>,
- Michael Walle <michael@walle.cc>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: dillaman@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ mreitz@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 10.01.2020 um 12:15 hat Florian Florensa geschrieben:
+> Fixed the white space issue, no changes other than that.
+>=20
+> Florian Florensa (1):
+>   block/rbd: Add support for ceph namespaces
 
+Thanks, applied to the block branch.
 
-04.03.2020, 18:57, "Laurent Vivier" <lvivier@redhat.com>:
-> On 04/03/2020 14:06, Alexey Kirillov wrote:
->> =C2=A0Add a qmp command that provides information about currently atta=
-ched
->> =C2=A0network devices and their configuration.
->>
->> =C2=A0Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
->> =C2=A0---
->> =C2=A0=C2=A0include/net/net.h | 1 +
->> =C2=A0=C2=A0net/hub.c | 8 +++
->> =C2=A0=C2=A0net/l2tpv3.c | 19 +++++++
->> =C2=A0=C2=A0net/net.c | 91 +++++++++++++++++++++++++++++++++
->> =C2=A0=C2=A0net/netmap.c | 13 +++++
->> =C2=A0=C2=A0net/slirp.c | 126 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->> =C2=A0=C2=A0net/socket.c | 71 ++++++++++++++++++++++++++
->> =C2=A0=C2=A0net/tap-win32.c | 9 ++++
->> =C2=A0=C2=A0net/tap.c | 103 +++++++++++++++++++++++++++++++++++--
->> =C2=A0=C2=A0net/vde.c | 26 ++++++++++
->> =C2=A0=C2=A0net/vhost-user.c | 18 +++++--
->> =C2=A0=C2=A0qapi/net.json | 89 ++++++++++++++++++++++++++++++++
->> =C2=A0=C2=A012 files changed, 566 insertions(+), 8 deletions(-)
->
-> ...
->> =C2=A0diff --git a/net/net.c b/net/net.c
->> =C2=A0index 9e93c3f8a1..01e0548295 100644
->> =C2=A0--- a/net/net.c
->> =C2=A0+++ b/net/net.c
->> =C2=A0@@ -54,6 +54,7 @@
->> =C2=A0=C2=A0#include "sysemu/sysemu.h"
->> =C2=A0=C2=A0#include "net/filter.h"
->> =C2=A0=C2=A0#include "qapi/string-output-visitor.h"
->> =C2=A0+#include "qapi/clone-visitor.h"
->>
->> =C2=A0=C2=A0/* Net bridge is currently not supported for W32. */
->> =C2=A0=C2=A0#if !defined(_WIN32)
->> =C2=A0@@ -128,6 +129,12 @@ char *qemu_mac_strdup_printf(const uint8_t =
-*macaddr)
->>
->> =C2=A0=C2=A0void qemu_format_nic_info_str(NetClientState *nc, uint8_t =
-macaddr[6])
->> =C2=A0=C2=A0{
->> =C2=A0+ g_assert(nc->stored_config);
->> =C2=A0+
->> =C2=A0+ g_free(nc->stored_config->u.nic.macaddr);
->> =C2=A0+ nc->stored_config->u.nic.macaddr =3D g_strdup_printf(MAC_FMT,
->> =C2=A0+ MAC_ARG(macaddr));
->> =C2=A0+
->
-> Why do you use this rather than the qemu_mac_strdup_printf() function
-> defined above?
->
-> qemu_mac_strdup_printf():
-> =C2=A0=C2=A0890ee6abb385 ("net: add MAC address string printer")
->
-> MAC_FMT/MAC_ARG:
-> =C2=A0=C2=A06d1d4939a647 ("net: Add macros for MAC address tracing")
->
-> MAC_FMT/MAC_ARG seems to be reserved for tracing.
->
-> Thanks,
-> Laurent
-
-Somehow, I managed not to notice this feature.
-Thank you for pointing this out, I will definitely fix this place.
-
---=C2=A0
-Alexey Kirillov
-Yandex.Cloud
+Kevin
 
 
