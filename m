@@ -2,92 +2,97 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C70C3F2D7
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FAA3C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:06:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9498620842
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB0472084E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:06:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bH2l9nJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9498620842
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WrPgRn7u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB0472084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9exc-0006Co-Pj
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 20:06:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39428)
+	id 1j9ey1-0006sE-2n
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 20:06:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9ewa-00046c-MW
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:04:57 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9ewn-0004Lq-B4
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9ewZ-0005GR-Di
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:04:56 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45372
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j9ewm-0005Vf-DX
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:05:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56337
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9ewZ-0005Fl-7s
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:04:55 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9ewm-0005VM-9y
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:05:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583370294;
+ s=mimecast20190719; t=1583370308;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ASuvXJzSwaay1xbKHLSIhs2mAWSbDz0oulJY6D76muw=;
- b=bH2l9nJfpl00DmiLWPfsJqhct0Atj8EK+RcQUpIBkXLDOXlCcXURERLEnkctques+b//JX
- SxS36bD1HpkE4y6raPSkHM0P/o+8+OXGMQPSa/sYigvNkV94/Pc24L7LGMFAYj7Y1W0Lo5
- lC8UhdAThy4trA0yzKms+EgaSjpE6os=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-N6PMxI_5MKSNpZcuE_jKFQ-1; Wed, 04 Mar 2020 20:04:50 -0500
-X-MC-Unique: N6PMxI_5MKSNpZcuE_jKFQ-1
-Received: by mail-wr1-f70.google.com with SMTP id n12so1610822wrp.19
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 17:04:50 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9Pobed26pNltZm/I9CiNxzmUNaY+9kG51Kk6vz3G8IU=;
+ b=WrPgRn7uIZnoaVorPNiZXX4Am3uOwT5nUdzrseNAQszgP7qt/BueZbL47iRtyTE4bfSecl
+ iaSQZ2GQJzqg8V9Lp5WnYaaKEhxwTo3t0Kq7/L9kShmwXwdEOV4YFgCCV5G+w9lj1C71az
+ AeaKMi0oga7wb/SSDEMVryipz5JBDuQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-lut5XvbfNH2cZBwFwl13dg-1; Wed, 04 Mar 2020 20:05:06 -0500
+X-MC-Unique: lut5XvbfNH2cZBwFwl13dg-1
+Received: by mail-wr1-f72.google.com with SMTP id l15so1106800wrr.21
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 17:05:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=fm9u3HbkueAjiabsbTX9B1kjiGGd9Wj6z2DYzKRIZKE=;
- b=ebzeTqKDo3Lgy4l/J3MJwy/++d0NAxtQjNPqd/jPngcNxWfC41V5BZnABHgdEOkQq6
- tVgM/BUgx6GJ8bEbQ9YCjQ4UJEPFEQ0V/ubjmVPbRN0NEbseELTosAfA8xLSiJX5Vfg6
- x56c5v+QtxNmOFKrqQD6iss6OZQJXkKkjs8vDO1HG0N6gJGlCDTJBcYpTCtVoqzM9h88
- gzb3bjRLtpvhURK3HPeqWSa1JBc0dCWlhiALaLi+ANG4TSkO7Zu6CSZbUklcGQZrXXez
- SFwvOGzOQDUGbaeJr8ORLAKmRe4+StJI1bu8Q9mwZKPIOkPPrP66g/xOHDUBoCYxWOcf
- Jc0A==
-X-Gm-Message-State: ANhLgQ1Msrsq9ayqtMA0GUDHnBEGfKDdg1BYTH4ovQ02lITxUjlmcgPg
- 8mIJJvBAqOOT17F3LJnDj+MYrkhAYMqXJ55+fkoqX+fNpvGX1/86ONdAHqBjhFSltJYJ2vFGHgJ
- 39rvmbDj4ZFNcS8U=
-X-Received: by 2002:a1c:a515:: with SMTP id o21mr6098366wme.124.1583370289253; 
- Wed, 04 Mar 2020 17:04:49 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtFHPd6DevqhvKtgWk19aGA+th8kpFNpqu6vlf2jO/7T3jFqDrpCT0SrzLlWlKVkwxjehcq4A==
-X-Received: by 2002:a1c:a515:: with SMTP id o21mr6098337wme.124.1583370288963; 
- Wed, 04 Mar 2020 17:04:48 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=jMnU2Ro3TeTUnU2ZUl/yMOyKuppxic5kPK7lhjxznVI=;
+ b=Q5200ylrolOhfnxAR7Ys/9dmuHgVa2GrG+3CnxPuIFG8SKxqt2m5S7QRPwKTrpWhEY
+ sSYvAWujY5a+61RVhYIbJaGpMujQKgEYED1HZZyEZeSb9a+hfZmJWqnQUGOiDIJgpgUM
+ EVj/QRRf+nMnXfbv7kqNLw4j+vU/sG0oMXX+M1FngBAdmk+nxovVj9xG4CkWO5pLuwiA
+ M8NN/l48CPS1FYIKAadH60NfInbyPIoKPkc6n0vSvgL10zNCHLrc80zbTQmXQo14RW73
+ 3b5jnJsC3Ydebu/DFoi/dTRNRJluKli7BXScts9dwqMgabmsOjUfgjtrjEfojFZ3Dxbe
+ /eSw==
+X-Gm-Message-State: ANhLgQ3eQF43c4dZLvXl1zNUqLnZwIW71tqq4q0YRaWEUBLGUJIUvaL3
+ URzHzQKLM7l0lR4UaWSmvDO/uX1JHpjXMCaDXfd7Z31/ushC1ec0KQ9obeuqhxB+fGE8CWPH8Yw
+ WrTCJjQwEMtOEBT8=
+X-Received: by 2002:a1c:488b:: with SMTP id v133mr5910586wma.159.1583370304860; 
+ Wed, 04 Mar 2020 17:05:04 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsACmAuVe5lYfeAoDO8kBmBnjPUB2CXcZOhSjuKqXRx0ACmPOcBDdZJM9Oi+/8DUXp8ycY47Q==
+X-Received: by 2002:a1c:488b:: with SMTP id v133mr5910560wma.159.1583370304662; 
+ Wed, 04 Mar 2020 17:05:04 -0800 (PST)
 Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id o5sm7228822wmb.8.2020.03.04.17.04.47
+ by smtp.gmail.com with ESMTPSA id g7sm39625648wrm.72.2020.03.04.17.05.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 17:04:48 -0800 (PST)
+ Wed, 04 Mar 2020 17:05:04 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] hw/net,virtfs-proxy-helper: Reduce .data footprint
-Date: Thu,  5 Mar 2020 02:04:43 +0100
-Message-Id: <20200305010446.17029-1-philmd@redhat.com>
+Subject: [PATCH 3/3] virtfs-proxy-helper: Make the helper_opts[] array const
+Date: Thu,  5 Mar 2020 02:04:46 +0100
+Message-Id: <20200305010446.17029-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200305010446.17029-1-philmd@redhat.com>
+References: <20200305010446.17029-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,25 +113,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-More memory footprint reduction, similar to:
-https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00984.html
+Reduce a bit the memory footprint by making the helper_opts[]
+array const.
 
-The elf-dissector tool [1] [2] helped to notice the big array.
-
-[1] https://phabricator.kde.org/source/elf-dissector/
-[2] https://www.volkerkrause.eu/2019/06/22/elf-dissector-aarch64-support.ht=
-ml
-
-Philippe Mathieu-Daud=C3=A9 (3):
-  hw/net/e1000: Add readops/writeops typedefs
-  hw/net/e1000: Move macreg[] arrays to .rodata to save 1MiB of .data
-  virtfs-proxy-helper: Make the helper_opts[] array const
-
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
  fsdev/virtfs-proxy-helper.c | 2 +-
- hw/net/e1000.c              | 6 ++++--
- hw/net/e1000e_core.c        | 6 ++++--
- 3 files changed, 9 insertions(+), 5 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+index aa1ab2590d..de061a8a0e 100644
+--- a/fsdev/virtfs-proxy-helper.c
++++ b/fsdev/virtfs-proxy-helper.c
+@@ -43,7 +43,7 @@
+ #define BTRFS_SUPER_MAGIC 0x9123683E
+ #endif
+=20
+-static struct option helper_opts[] =3D {
++static const struct option helper_opts[] =3D {
+     {"fd", required_argument, NULL, 'f'},
+     {"path", required_argument, NULL, 'p'},
+     {"nodaemon", no_argument, NULL, 'n'},
 --=20
 2.21.1
 
