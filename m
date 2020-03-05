@@ -8,76 +8,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2549BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAB2C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D22A02073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3AB22073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hE7fwriT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D22A02073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NONVj+Nm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AB22073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9zlf-0000iz-2p
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 18:19:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42975)
+	id 1j9zmO-0001Yo-Uz
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 18:19:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j9zkf-00009h-LK
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:04 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j9zlF-0000aG-F4
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j9zkd-0002DW-6T
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:01 -0500
-Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:41363)
+ (envelope-from <alistair23@gmail.com>) id 1j9zlE-0002ld-Aw
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:37 -0500
+Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:35302)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j9zkb-0002Af-Jb; Thu, 05 Mar 2020 18:17:59 -0500
-Received: by mail-ua1-x941.google.com with SMTP id d19so40654uak.8;
- Thu, 05 Mar 2020 15:17:57 -0800 (PST)
+ id 1j9zlD-0002kW-Qn; Thu, 05 Mar 2020 18:18:35 -0500
+Received: by mail-vs1-xe44.google.com with SMTP id u26so379131vsg.2;
+ Thu, 05 Mar 2020 15:18:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=funjGOLXnLTCLLz6+ezXE6saKhCd9zFIxVk+VMUMsd0=;
- b=hE7fwriTX0O4qGtiZb9oItQEXjLP7YSrDnF5tkkKLQ95HHUVReIPXyfNaw85FAx72v
- +uygvbKOoBYyk9pUaFRwNWEPABjJmMcv+tu/PNedT6NmoVqz+VVItO/EZin869aNG8gx
- GcEI7qG5tT5xEIv0jzPM5zAQ98s7ikmJYInCxRbjAsZJgdWrHbAvinjAoenndy8QSmf+
- 88tV2XIKOB+StRuPOfrufmGIHa1z+t0kxPLz/8QXX5N7lA6C5Qi5Q371YHAbVj0bUhO7
- H74P79fGA3OARCWhligVgehdY2jTMtNUOh2VY96Ir0KDwm2PrmgnacBzkz+E1rv/pFuw
- Vn3w==
+ bh=8G8DYzV4+k5eDdvlRAgIYoVYwz7I40ZoA9ZyhuMHNt0=;
+ b=NONVj+NmsZBgXIsULysZoWvneAWUpVGagTFX7aDH759+CcPtugtTWe6Ej/EC806PPW
+ CW0OlaN0zVXvUfNkrYR/GdiQ7DjkFH0qwl76qUM0G4kZLpvVTdgeN7YnNtt1CpN9rFK7
+ Le5QNjkFq/CFeeMEygPLLAuQT5lJyDUA5YnTLyLJPUOlWQfYfNPjCT1vA9CH2FVLriiX
+ jftMCWcnKg5Rz1wwn+b2BRfIH1R5BCqOQt6uFcrrm0w45YLrBtOm0hU1holOQ5Syyohs
+ N0JIb8GkRSB7map0GKDWDaUjI9RQ9IMu4TsmV/syBrbujt/5T/RIAwUQdw2XcwBAXNPh
+ exLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=funjGOLXnLTCLLz6+ezXE6saKhCd9zFIxVk+VMUMsd0=;
- b=epmcv+6Tav5d1Mm+aKiu8iPYnp2Nk64y82l1Yf2FnitNoE10OKjoeG6pGORMkv7DwH
- 0cDORtfafnk/nMMvNLFmL+yE7h5fyKP5f4vZsWZNJf+sFKm7hfF6+oR27jon24ub0LsI
- UJjtbNfVWX42JJwmGlShpho0uBiuKuaW0WmX1Q8mhEWUDvFeN0wspMCrwAxXrfTJml4n
- w0gS+IrBxAJhefTI9fXJTsBSLpy7YNaS+HW6mueIOuAajLlb6cGn6rmHNSEl03P6x9IE
- mA978gaKmXriq7bMZGTxULmMOc0JnvxFmehJwgG4TTRGFFMYCjQrLuUYOQue0sXzLTDi
- scog==
-X-Gm-Message-State: ANhLgQ2GyOz+zZUDP4d6zBP0uoUBfPtPjZbG8dl2FJ2w5Zi26kxGMYLH
- j4nlnBwwjxUyWOl+ik+UiiadCIkgGGxed9sybTc=
-X-Google-Smtp-Source: ADFU+vtwx8OPvUfhLHHokRUhmdNvmxbgriaof5LpQlOCDb6rw0fBUC4NIBlVrIUeowRC5tf1C8zG07GBY3FpUZTxXpE=
-X-Received: by 2002:ab0:143:: with SMTP id 61mr150265uak.85.1583450276917;
- Thu, 05 Mar 2020 15:17:56 -0800 (PST)
+ bh=8G8DYzV4+k5eDdvlRAgIYoVYwz7I40ZoA9ZyhuMHNt0=;
+ b=pN3NxR3PSU1/gg1qiFKSsNNKQd3sVFOOl9zX+nUxCCnxQFcZGIIvG0fZP/SW1ucDFe
+ SMUj1vqZHxLC94F+4jb0LndF3MoW7T0YQ07DFusKc/Z3Gh5L0pBuN1r7k5J2Adgr0lmx
+ 9lcwvePz4MBIE5NsjR1SfC/LkcVYpYtgRe+BAOaK4521GkanWC6A3GDeqZLa2n5VIyUq
+ gFXh6E95ud3GMNz+IUQZmbj++F+bE0YAgGYKzRui0tSmScA6Cy/PqvSJ5g0EELGWwfzB
+ KupF4nvqpm/ItSGMpvrEj2epwYSqexmGjwIB2Ds1vH/imIlmgaM7rA4Q6aP0qqt17E5K
+ M30Q==
+X-Gm-Message-State: ANhLgQ0aAI5JtDc9l965xDWJyMJ3801lJMfpVdYwHXtBG09MnllOxYtp
+ Y/NeyHxktJpvb/SODqCFZHl7qiX6jvC2FBOonag=
+X-Google-Smtp-Source: ADFU+vs4ziIyRL2LBoaIObKiQDaAYezXZhwa7vIGLSxBVKyqcTAfQTzPuZoPLzxMC1FIRp9ZV7ReEGq8ZAtyARIHW+8=
+X-Received: by 2002:a05:6102:3c2:: with SMTP id
+ n2mr517363vsq.172.1583450314758; 
+ Thu, 05 Mar 2020 15:18:34 -0800 (PST)
 MIME-Version: 1.0
 References: <20200305175651.4563-1-philmd@redhat.com>
- <20200305175651.4563-6-philmd@redhat.com>
-In-Reply-To: <20200305175651.4563-6-philmd@redhat.com>
+ <20200305175651.4563-7-philmd@redhat.com>
+In-Reply-To: <20200305175651.4563-7-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 5 Mar 2020 15:10:14 -0800
-Message-ID: <CAKmqyKN2k=dUA7RjzPsMsBJ10rNywqfYjUN9R0=QSVdac_h7JA@mail.gmail.com>
-Subject: Re: [PATCH 5/6] hw/net: Make NetCanReceive() return a boolean
+Date: Thu, 5 Mar 2020 15:10:52 -0800
+Message-ID: <CAKmqyKN0f_Tx1x06i3X4Pp1s8EVV8-cvLex-U-nTUCFz=8bZTA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] hw/net/can: Make CanBusClientInfo::can_receive()
+ return a boolean
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::941
+X-Received-From: 2607:f8b0:4864:20::e44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,12 +107,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 5, 2020 at 9:57 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Thu, Mar 5, 2020 at 9:59 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
 >
-> The NetCanReceive handler return whether the device can or
-> can not receive new packets. Make it obvious by returning
-> a boolean type.
+> The CanBusClientInfo::can_receive handler return whether the
+> device can or can not receive new frames. Make it obvious by
+> returning a boolean type.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -119,551 +121,88 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/net/i82596.h         |  2 +-
->  include/net/net.h       |  2 +-
->  hw/net/allwinner_emac.c |  2 +-
->  hw/net/cadence_gem.c    |  8 ++++----
->  hw/net/dp8393x.c        |  8 +++-----
->  hw/net/e1000.c          |  2 +-
->  hw/net/e1000e.c         |  2 +-
->  hw/net/ftgmac100.c      |  6 +++---
->  hw/net/i82596.c         | 10 +++++-----
->  hw/net/imx_fec.c        |  2 +-
->  hw/net/opencores_eth.c  |  5 ++---
->  hw/net/rtl8139.c        |  8 ++++----
->  hw/net/smc91c111.c      |  2 +-
->  hw/net/spapr_llan.c     |  4 ++--
->  hw/net/sungem.c         |  6 +++---
->  hw/net/sunhme.c         |  4 ++--
->  hw/net/virtio-net.c     | 10 +++++-----
->  hw/net/xilinx_ethlite.c |  2 +-
->  net/filter-buffer.c     |  2 +-
->  net/hub.c               |  6 +++---
->  20 files changed, 45 insertions(+), 48 deletions(-)
+>  hw/net/can/can_sja1000.h | 2 +-
+>  include/net/can_emu.h    | 2 +-
+>  hw/net/can/can_sja1000.c | 8 ++++----
+>  net/can/can_socketcan.c  | 4 ++--
+>  4 files changed, 8 insertions(+), 8 deletions(-)
 >
-> diff --git a/hw/net/i82596.h b/hw/net/i82596.h
-> index 1238ac11f8..f0bbe810eb 100644
-> --- a/hw/net/i82596.h
-> +++ b/hw/net/i82596.h
-> @@ -48,7 +48,7 @@ void i82596_ioport_writel(void *opaque, uint32_t addr, =
-uint32_t val);
->  uint32_t i82596_ioport_readl(void *opaque, uint32_t addr);
->  uint32_t i82596_bcr_readw(I82596State *s, uint32_t rap);
->  ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t si=
-ze_);
-> -int i82596_can_receive(NetClientState *nc);
-> +bool i82596_can_receive(NetClientState *nc);
->  void i82596_set_link_status(NetClientState *nc);
->  void i82596_common_init(DeviceState *dev, I82596State *s, NetClientInfo =
-*info);
->  extern const VMStateDescription vmstate_i82596;
-> diff --git a/include/net/net.h b/include/net/net.h
-> index e175ba9677..d191ee777e 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -42,7 +42,7 @@ typedef struct NICConf {
->  /* Net clients */
+> diff --git a/hw/net/can/can_sja1000.h b/hw/net/can/can_sja1000.h
+> index 220a622087..7ca9cd681e 100644
+> --- a/hw/net/can/can_sja1000.h
+> +++ b/hw/net/can/can_sja1000.h
+> @@ -137,7 +137,7 @@ void can_sja_disconnect(CanSJA1000State *s);
 >
->  typedef void (NetPoll)(NetClientState *, bool enable);
-> -typedef int (NetCanReceive)(NetClientState *);
-> +typedef bool (NetCanReceive)(NetClientState *);
->  typedef ssize_t (NetReceive)(NetClientState *, const uint8_t *, size_t);
->  typedef ssize_t (NetReceiveIOV)(NetClientState *, const struct iovec *, =
-int);
->  typedef void (NetCleanup) (NetClientState *);
-> diff --git a/hw/net/allwinner_emac.c b/hw/net/allwinner_emac.c
-> index e9bbff8710..ddddf35c45 100644
-> --- a/hw/net/allwinner_emac.c
-> +++ b/hw/net/allwinner_emac.c
-> @@ -178,13 +178,13 @@ static uint32_t fifo8_pop_word(Fifo8 *fifo)
->      return ret;
+>  int can_sja_init(CanSJA1000State *s, qemu_irq irq);
+>
+> -int can_sja_can_receive(CanBusClientState *client);
+> +bool can_sja_can_receive(CanBusClientState *client);
+>
+>  ssize_t can_sja_receive(CanBusClientState *client,
+>                          const qemu_can_frame *frames, size_t frames_cnt)=
+;
+> diff --git a/include/net/can_emu.h b/include/net/can_emu.h
+> index d4fc51b57d..fce9770928 100644
+> --- a/include/net/can_emu.h
+> +++ b/include/net/can_emu.h
+> @@ -83,7 +83,7 @@ typedef struct CanBusClientState CanBusClientState;
+>  typedef struct CanBusState CanBusState;
+>
+>  typedef struct CanBusClientInfo {
+> -    int (*can_receive)(CanBusClientState *);
+> +    bool (*can_receive)(CanBusClientState *);
+>      ssize_t (*receive)(CanBusClientState *,
+>          const struct qemu_can_frame *frames, size_t frames_cnt);
+>  } CanBusClientInfo;
+> diff --git a/hw/net/can/can_sja1000.c b/hw/net/can/can_sja1000.c
+> index 39c78faf9b..ea915a023a 100644
+> --- a/hw/net/can/can_sja1000.c
+> +++ b/hw/net/can/can_sja1000.c
+> @@ -733,21 +733,21 @@ uint64_t can_sja_mem_read(CanSJA1000State *s, hwadd=
+r addr, unsigned size)
+>      return temp;
 >  }
 >
-> -static int aw_emac_can_receive(NetClientState *nc)
-> +static bool aw_emac_can_receive(NetClientState *nc)
+> -int can_sja_can_receive(CanBusClientState *client)
+> +bool can_sja_can_receive(CanBusClientState *client)
 >  {
->      AwEmacState *s =3D qemu_get_nic_opaque(nc);
+>      CanSJA1000State *s =3D container_of(client, CanSJA1000State, bus_cli=
+ent);
 >
->      /*
->       * To avoid packet drops, allow reception only when there is space
->       * for a full frame: 1522 + 8 (rx headers) + 2 (padding).
->       */
->      return (s->ctl & EMAC_CTL_RX_EN) && (fifo8_num_free(&s->rx_fifo) >=
-=3D 1532);
+>      if (s->clock & 0x80) { /* PeliCAN Mode */
+>          if (s->mode & 0x01) { /* reset mode. */
+> -            return 0;
+> +            return false;
+>          }
+>      } else { /* BasicCAN mode */
+>          if (s->control & 0x01) {
+> -            return 0;
+> +            return false;
+>          }
+>      }
+>
+> -    return 1; /* always return 1, when operation mode */
+> +    return true; /* always return true, when operation mode */
 >  }
-> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> index 6340c1eaf8..51ec5a072d 100644
-> --- a/hw/net/cadence_gem.c
-> +++ b/hw/net/cadence_gem.c
-> @@ -505,44 +505,44 @@ static void phy_update_link(CadenceGEMState *s)
+>
+>  ssize_t can_sja_receive(CanBusClientState *client, const qemu_can_frame =
+*frames,
+> diff --git a/net/can/can_socketcan.c b/net/can/can_socketcan.c
+> index 29bfacd4f8..807f31fcde 100644
+> --- a/net/can/can_socketcan.c
+> +++ b/net/can/can_socketcan.c
+> @@ -110,9 +110,9 @@ static void can_host_socketcan_read(void *opaque)
 >      }
 >  }
 >
-> -static int gem_can_receive(NetClientState *nc)
-> +static bool gem_can_receive(NetClientState *nc)
+> -static int can_host_socketcan_can_receive(CanBusClientState *client)
+> +static bool can_host_socketcan_can_receive(CanBusClientState *client)
 >  {
->      CadenceGEMState *s;
->      int i;
->
->      s =3D qemu_get_nic_opaque(nc);
->
->      /* Do nothing if receive is not enabled. */
->      if (!(s->regs[GEM_NWCTRL] & GEM_NWCTRL_RXENA)) {
->          if (s->can_rx_state !=3D 1) {
->              s->can_rx_state =3D 1;
->              DB_PRINT("can't receive - no enable\n");
->          }
-> -        return 0;
-> +        return false;
->      }
->
->      for (i =3D 0; i < s->num_priority_queues; i++) {
->          if (rx_desc_get_ownership(s->rx_desc[i]) !=3D 1) {
->              break;
->          }
->      };
->
->      if (i =3D=3D s->num_priority_queues) {
->          if (s->can_rx_state !=3D 2) {
->              s->can_rx_state =3D 2;
->              DB_PRINT("can't receive - all the buffer descriptors are bus=
-y\n");
->          }
-> -        return 0;
-> +        return false;
->      }
->
->      if (s->can_rx_state !=3D 0) {
->          s->can_rx_state =3D 0;
->          DB_PRINT("can receive\n");
->      }
 > -    return 1;
 > +    return true;
 >  }
 >
->  /*
->   * gem_update_int_status:
->   * Raise or lower interrupt based on current status.
->   */
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index 8a3504d962..900ba5ca65 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -414,7 +414,7 @@ static void dp8393x_do_stop_timer(dp8393xState *s)
->      dp8393x_update_wt_regs(s);
->  }
->
-> -static int dp8393x_can_receive(NetClientState *nc);
-> +static bool dp8393x_can_receive(NetClientState *nc);
->
->  static void dp8393x_do_receiver_enable(dp8393xState *s)
->  {
-> @@ -718,13 +718,11 @@ static void dp8393x_watchdog(void *opaque)
->      dp8393x_update_irq(s);
->  }
->
-> -static int dp8393x_can_receive(NetClientState *nc)
-> +static bool dp8393x_can_receive(NetClientState *nc)
->  {
->      dp8393xState *s =3D qemu_get_nic_opaque(nc);
->
-> -    if (!(s->regs[SONIC_CR] & SONIC_CR_RXEN))
-> -        return 0;
-> -    return 1;
-> +    return !!(s->regs[SONIC_CR] & SONIC_CR_RXEN);
->  }
->
->  static int dp8393x_receive_filter(dp8393xState *s, const uint8_t * buf,
-> diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-> index 0b833d5a15..6b89df8f0a 100644
-> --- a/hw/net/e1000.c
-> +++ b/hw/net/e1000.c
-> @@ -845,7 +845,7 @@ static bool e1000_has_rxbufs(E1000State *s, size_t to=
-tal_size)
->      return total_size <=3D bufs * s->rxbuf_size;
->  }
->
-> -static int
-> +static bool
->  e1000_can_receive(NetClientState *nc)
->  {
->      E1000State *s =3D qemu_get_nic_opaque(nc);
-> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> index a91dbdca3c..f49fa1c7b1 100644
-> --- a/hw/net/e1000e.c
-> +++ b/hw/net/e1000e.c
-> @@ -199,7 +199,7 @@ static const MemoryRegionOps io_ops =3D {
->      },
->  };
->
-> -static int
-> +static bool
->  e1000e_nc_can_receive(NetClientState *nc)
->  {
->      E1000EState *s =3D qemu_get_nic_opaque(nc);
-> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 2f92b65d4e..041ed21017 100644
-> --- a/hw/net/ftgmac100.c
-> +++ b/hw/net/ftgmac100.c
-> @@ -562,24 +562,24 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint=
-32_t tx_ring,
->      ftgmac100_update_irq(s);
->  }
->
-> -static int ftgmac100_can_receive(NetClientState *nc)
-> +static bool ftgmac100_can_receive(NetClientState *nc)
->  {
->      FTGMAC100State *s =3D FTGMAC100(qemu_get_nic_opaque(nc));
->      FTGMAC100Desc bd;
->
->      if ((s->maccr & (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN=
-))
->           !=3D (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN)) {
-> -        return 0;
-> +        return false;
->      }
->
->      if (ftgmac100_read_bd(&bd, s->rx_descriptor)) {
-> -        return 0;
-> +        return false;
->      }
->      return !(bd.des0 & FTGMAC100_RXDES0_RXPKT_RDY);
->  }
->
->  /*
->   * This is purely informative. The HW can poll the RW (and RX) ring
->   * buffers for available descriptors but we don't need to trigger a
->   * timer for that in qemu.
->   */
-> diff --git a/hw/net/i82596.c b/hw/net/i82596.c
-> index fe9f2390a9..e5547fa3c2 100644
-> --- a/hw/net/i82596.c
-> +++ b/hw/net/i82596.c
-> @@ -474,23 +474,23 @@ void i82596_h_reset(void *opaque)
->      i82596_s_reset(s);
->  }
->
-> -int i82596_can_receive(NetClientState *nc)
-> +bool i82596_can_receive(NetClientState *nc)
->  {
->      I82596State *s =3D qemu_get_nic_opaque(nc);
->
->      if (s->rx_status =3D=3D RX_SUSPENDED) {
-> -        return 0;
-> +        return false;
->      }
->
->      if (!s->lnkst) {
-> -        return 0;
-> +        return false;
->      }
->
->      if (USE_TIMER && !timer_pending(s->flush_queue_timer)) {
-> -        return 1;
-> +        return true;
->      }
->
-> -    return 1;
-> +    return true;
->  }
->
->  #define MIN_BUF_SIZE 60
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index 6a124a154a..5dec813d6d 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -1047,11 +1047,11 @@ static void imx_eth_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->      imx_eth_update(s);
->  }
->
-> -static int imx_eth_can_receive(NetClientState *nc)
-> +static bool imx_eth_can_receive(NetClientState *nc)
->  {
->      IMXFECState *s =3D IMX_FEC(qemu_get_nic_opaque(nc));
->
->      FEC_PRINTF("\n");
->
->      return !!s->regs[ENET_RDAR];
->  }
-> diff --git a/hw/net/opencores_eth.c b/hw/net/opencores_eth.c
-> index 6b338c2f29..2ba0dc8c2f 100644
-> --- a/hw/net/opencores_eth.c
-> +++ b/hw/net/opencores_eth.c
-> @@ -349,12 +349,11 @@ static void open_eth_reset(void *opaque)
->      open_eth_set_link_status(qemu_get_queue(s->nic));
->  }
->
-> -static int open_eth_can_receive(NetClientState *nc)
-> +static bool open_eth_can_receive(NetClientState *nc)
->  {
->      OpenEthState *s =3D qemu_get_nic_opaque(nc);
->
-> -    return GET_REGBIT(s, MODER, RXEN) &&
-> -        (s->regs[TX_BD_NUM] < 0x80);
-> +    return GET_REGBIT(s, MODER, RXEN) && (s->regs[TX_BD_NUM] < 0x80);
->  }
->
->  static ssize_t open_eth_receive(NetClientState *nc,
-> diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-> index be9a0af629..70aca7ec26 100644
-> --- a/hw/net/rtl8139.c
-> +++ b/hw/net/rtl8139.c
-> @@ -793,26 +793,26 @@ static bool rtl8139_cp_rx_valid(RTL8139State *s)
->      return !(s->RxRingAddrLO =3D=3D 0 && s->RxRingAddrHI =3D=3D 0);
->  }
->
-> -static int rtl8139_can_receive(NetClientState *nc)
-> +static bool rtl8139_can_receive(NetClientState *nc)
->  {
->      RTL8139State *s =3D qemu_get_nic_opaque(nc);
->      int avail;
->
->      /* Receive (drop) packets if card is disabled.  */
->      if (!s->clock_enabled) {
-> -        return 1;
-> +        return true;
->      }
->      if (!rtl8139_receiver_enabled(s)) {
-> -        return 1;
-> +        return true;
->      }
->
->      if (rtl8139_cp_receiver_enabled(s) && rtl8139_cp_rx_valid(s)) {
->          /* ??? Flow control not implemented in c+ mode.
->             This is a hack to work around slirp deficiencies anyway.  */
-> -        return 1;
-> +        return true;
->      }
->
->      avail =3D MOD2(s->RxBufferSize + s->RxBufPtr - s->RxBufAddr,
->                   s->RxBufferSize);
->      return avail =3D=3D 0 || avail >=3D 1514 || (s->IntrMask & RxOverflo=
-w);
->  }
-> diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-> index 02be60c955..b3240b9335 100644
-> --- a/hw/net/smc91c111.c
-> +++ b/hw/net/smc91c111.c
-> @@ -667,9 +667,9 @@ static void smc91c111_writefn(void *opaque, hwaddr ad=
-dr,
->      }
->  }
->
-> -static int smc91c111_can_receive_nc(NetClientState *nc)
-> +static bool smc91c111_can_receive_nc(NetClientState *nc)
->  {
->      smc91c111_state *s =3D qemu_get_nic_opaque(nc);
->
->      return smc91c111_can_receive(s);
->  }
-> diff --git a/hw/net/spapr_llan.c b/hw/net/spapr_llan.c
-> index 80f5a1dd37..a2377025a7 100644
-> --- a/hw/net/spapr_llan.c
-> +++ b/hw/net/spapr_llan.c
-> @@ -110,17 +110,17 @@ typedef struct SpaprVioVlan {
->      RxBufPool *rx_pool[RX_MAX_POOLS];  /* Receive buffer descriptor pool=
-s */
->  } SpaprVioVlan;
->
-> -static int spapr_vlan_can_receive(NetClientState *nc)
-> +static bool spapr_vlan_can_receive(NetClientState *nc)
->  {
->      SpaprVioVlan *dev =3D qemu_get_nic_opaque(nc);
->
-> -    return (dev->isopen && dev->rx_bufs > 0);
-> +    return dev->isopen && dev->rx_bufs > 0;
->  }
->
->  /**
->   * The last 8 bytes of the receive buffer list page (that has been
->   * supplied by the guest with the H_REGISTER_LOGICAL_LAN call) contain
->   * a counter for frames that have been dropped because there was no
->   * suitable receive buffer available. This function is used to increase
->   * this counter by one.
->   */
-> diff --git a/hw/net/sungem.c b/hw/net/sungem.c
-> index 89da51f7f6..b01197d952 100644
-> --- a/hw/net/sungem.c
-> +++ b/hw/net/sungem.c
-> @@ -433,31 +433,31 @@ static bool sungem_rx_full(SunGEMState *s, uint32_t=
- kick, uint32_t done)
->      return kick =3D=3D ((done + 1) & s->rx_mask);
->  }
->
-> -static int sungem_can_receive(NetClientState *nc)
-> +static bool sungem_can_receive(NetClientState *nc)
->  {
->      SunGEMState *s =3D qemu_get_nic_opaque(nc);
->      uint32_t kick, done, rxdma_cfg, rxmac_cfg;
->      bool full;
->
->      rxmac_cfg =3D s->macregs[MAC_RXCFG >> 2];
->      rxdma_cfg =3D s->rxdmaregs[RXDMA_CFG >> 2];
->
->      /* If MAC disabled, can't receive */
->      if ((rxmac_cfg & MAC_RXCFG_ENAB) =3D=3D 0) {
->          trace_sungem_rx_mac_disabled();
-> -        return 0;
-> +        return false;
->      }
->      if ((rxdma_cfg & RXDMA_CFG_ENABLE) =3D=3D 0) {
->          trace_sungem_rx_txdma_disabled();
-> -        return 0;
-> +        return false;
->      }
->
->      /* Check RX availability */
->      kick =3D s->rxdmaregs[RXDMA_KICK >> 2];
->      done =3D s->rxdmaregs[RXDMA_DONE >> 2];
->      full =3D sungem_rx_full(s, kick, done);
->
->      trace_sungem_rx_check(!full, kick, done);
->
->      return !full;
->  }
-> diff --git a/hw/net/sunhme.c b/hw/net/sunhme.c
-> index 8863601f6c..9c38583180 100644
-> --- a/hw/net/sunhme.c
-> +++ b/hw/net/sunhme.c
-> @@ -657,11 +657,11 @@ static void sunhme_transmit(SunHMEState *s)
->      sunhme_update_irq(s);
->  }
->
-> -static int sunhme_can_receive(NetClientState *nc)
-> +static bool sunhme_can_receive(NetClientState *nc)
->  {
->      SunHMEState *s =3D qemu_get_nic_opaque(nc);
->
-> -    return s->macregs[HME_MACI_RXCFG >> 2] & HME_MAC_RXCFG_ENABLE;
-> +    return !!(s->macregs[HME_MACI_RXCFG >> 2] & HME_MAC_RXCFG_ENABLE);
->  }
->
->  static void sunhme_link_status_changed(NetClientState *nc)
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 3627bb1717..a46e3b37a7 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -1234,26 +1234,26 @@ static void virtio_net_handle_rx(VirtIODevice *vd=
-ev, VirtQueue *vq)
->      qemu_flush_queued_packets(qemu_get_subqueue(n->nic, queue_index));
->  }
->
-> -static int virtio_net_can_receive(NetClientState *nc)
-> +static bool virtio_net_can_receive(NetClientState *nc)
->  {
->      VirtIONet *n =3D qemu_get_nic_opaque(nc);
->      VirtIODevice *vdev =3D VIRTIO_DEVICE(n);
->      VirtIONetQueue *q =3D virtio_net_get_subqueue(nc);
->
->      if (!vdev->vm_running) {
-> -        return 0;
-> +        return false;
->      }
->
->      if (nc->queue_index >=3D n->curr_queues) {
-> -        return 0;
-> +        return false;
->      }
->
->      if (!virtio_queue_ready(q->rx_vq) ||
->          !(vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-> -        return 0;
-> +        return false;
->      }
->
-> -    return 1;
-> +    return true;
->  }
->
->  static int virtio_net_has_buffers(VirtIONetQueue *q, int bufsize)
-> diff --git a/hw/net/xilinx_ethlite.c b/hw/net/xilinx_ethlite.c
-> index cf07e698b3..71d16fef3d 100644
-> --- a/hw/net/xilinx_ethlite.c
-> +++ b/hw/net/xilinx_ethlite.c
-> @@ -175,10 +175,10 @@ static const MemoryRegionOps eth_ops =3D {
->      }
->  };
->
-> -static int eth_can_rx(NetClientState *nc)
-> +static bool eth_can_rx(NetClientState *nc)
->  {
->      struct xlx_ethlite *s =3D qemu_get_nic_opaque(nc);
->      unsigned int rxbase =3D s->rxbuf * (0x800 / 4);
->
->      return !(s->regs[rxbase + R_RX_CTRL0] & CTRL_S);
->  }
-> diff --git a/net/filter-buffer.c b/net/filter-buffer.c
-> index 88da78f821..12e0254287 100644
-> --- a/net/filter-buffer.c
-> +++ b/net/filter-buffer.c
-> @@ -59,28 +59,28 @@ static void filter_buffer_release_timer(void *opaque)
->  /* filter APIs */
->  static ssize_t filter_buffer_receive_iov(NetFilterState *nf,
->                                           NetClientState *sender,
->                                           unsigned flags,
->                                           const struct iovec *iov,
->                                           int iovcnt,
->                                           NetPacketSent *sent_cb)
->  {
->      FilterBufferState *s =3D FILTER_BUFFER(nf);
->
->      /*
->       * We return size when buffer a packet, the sender will take it as
->       * a already sent packet, so sent_cb should not be called later.
->       *
->       * FIXME: Even if the guest can't receive packets for some reasons,
->       * the filter can still accept packets until its internal queue is f=
-ull.
->       * For example:
->       *   For some reason, receiver could not receive more packets
-> -     * (.can_receive() returns zero). Without a filter, at most one pack=
-et
-> +     * (.can_receive() returns false). Without a filter, at most one pac=
-ket
->       * will be queued in incoming queue and sender's poll will be disabl=
-ed
->       * unit its sent_cb() was called. With a filter, it will keep receiv=
-ing
->       * the packets without caring about the receiver. This is suboptimal=
-.
->       * May need more thoughts (e.g keeping sent_cb).
->       */
->      qemu_net_queue_append_iov(s->incoming_queue, sender, flags,
->                                iov, iovcnt, NULL);
->      return iov_size(iov, iovcnt);
->  }
-> diff --git a/net/hub.c b/net/hub.c
-> index 5795a678ed..e7de173171 100644
-> --- a/net/hub.c
-> +++ b/net/hub.c
-> @@ -90,23 +90,23 @@ static NetHub *net_hub_new(int id)
->      return hub;
->  }
->
-> -static int net_hub_port_can_receive(NetClientState *nc)
-> +static bool net_hub_port_can_receive(NetClientState *nc)
->  {
->      NetHubPort *port;
->      NetHubPort *src_port =3D DO_UPCAST(NetHubPort, nc, nc);
->      NetHub *hub =3D src_port->hub;
->
->      QLIST_FOREACH(port, &hub->ports, next) {
->          if (port =3D=3D src_port) {
->              continue;
->          }
->
->          if (qemu_can_send_packet(&port->nc)) {
-> -            return 1;
-> +            return true;
->          }
->      }
->
-> -    return 0;
-> +    return false;
->  }
->
->  static ssize_t net_hub_port_receive(NetClientState *nc,
+>  static ssize_t can_host_socketcan_receive(CanBusClientState *client,
 > --
 > 2.21.1
 >
