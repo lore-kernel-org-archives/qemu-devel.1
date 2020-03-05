@@ -2,78 +2,110 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B32C7C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6191EC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DD5420732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:35:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvwrFpjn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD5420732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A64B20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:36:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A64B20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rbR-0006na-L1
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:35:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35794)
+	id 1j9rc3-0007mq-Bj
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:36:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9rXy-0000Sd-7N
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:23 -0500
+ (envelope-from <sw@weilnetz.de>) id 1j9rXZ-00088O-Vp
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9rXw-0003Oq-NU
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34147
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <sw@weilnetz.de>) id 1j9rXY-00034H-My
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:31:57 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:40990
+ helo=v2201612906741603.powersrv.de)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9rXw-0003O9-Hj
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:32:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583418740;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MVaLnjXvJg6zL4YkvtGMVqzRgwjU5unEthNhKZGounY=;
- b=ZvwrFpjnrezPkQnlYmpPpwccCx7/V20I0jy2DyYgSA9N5Ws38WJPSRNmQk+OvsPK7tHY/t
- AzuIar20LngzjiJE/TjPJVRsZLkHPMSXK7WrRiSLLcVuyRfkLp+8NS9qWKccGnQt+oZQ0j
- bQUZPEdJpbZLNW3rkNhzGlklhSSutmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-xdx8g9ajNhOd9JEkwZUm-w-1; Thu, 05 Mar 2020 09:32:18 -0500
-X-MC-Unique: xdx8g9ajNhOd9JEkwZUm-w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1j9rXY-00032Z-CJ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:31:56 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id C53F7DBC09A;
+ Thu,  5 Mar 2020 15:31:53 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id 1-WNsZavjXVC; Thu,  5 Mar 2020 15:31:52 +0100 (CET)
+Received: from mobile-148-146.wlan.uni-mannheim.de
+ (mobile-148-146.wlan.uni-mannheim.de [134.155.148.146])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DB9013EA;
- Thu,  5 Mar 2020 14:32:17 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 086BF90538;
- Thu,  5 Mar 2020 14:32:14 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/15] util/mmap-alloc: Implement resizeable mmaps
-Date: Thu,  5 Mar 2020 15:29:41 +0100
-Message-Id: <20200305142945.216465-12-david@redhat.com>
-In-Reply-To: <20200305142945.216465-1-david@redhat.com>
-References: <20200305142945.216465-1-david@redhat.com>
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 30A20DBC099;
+ Thu,  5 Mar 2020 15:31:52 +0100 (CET)
+Subject: Re: [PULL 1/2] Arithmetic error in EDID generation fixed
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200302091836.29012-1-kraxel@redhat.com>
+ <20200302091836.29012-2-kraxel@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ mQINBFXCNBcBEACUbHx9FWsS1ATrhLGAS+Nc6bFQHPR3CpUQ4v++RiMg25bF6Ov1RsYEcovI
+ 0DXGh6Ma+l6dRlvUXV8tMvNwqghDUr5KY7LN6tgcFKjBbXdv9VlKiWiMLKBrARcFKxx1sfLp
+ 1P8RiaUdKsgy2Hq4T1PPy9ENTL1/FBG6P/Rw0rO9zOB+yNHcRJ5diDnERbi3x7qoaPUra2Ig
+ lmQk/uxXKC0aNIhpNLNiQ+YpwTUN9q3eG6B9/3CG8RGtFzH9vDPlLvtUX+01a2gCifTi3iH3
+ 8EEK8ACXIRs2dszlxMneKTvflXfvyCM1O+59wGcICQxltxLLhHSCJjOQyWdR2JUtn//XjVWM
+ mf6bBT7Imx3DhhfFRlA+/Lw9Zah66DJrZgiV0LqoN/2f031TzD3FCBiGQEMC072MvSQ1DdJN
+ OiRE1iWO0teLOxaFSbvJS9ij8CFSQQTnSVZs0YXGBal+1kMeaKo9sO4tkaAR2190IlMNanig
+ CTJfeFqxzZkoki378grSHdGUTGKfwNPflTOA6Pw6xuUcxW55LB3lBsPqb0289P8o9dTR7582
+ e6XTkpzqe/z/fYmfI9YXIjGY8WBMRbsuQA30JLq1/n/zwxAOr2P9y4nqTMMgFOtQS8w4G46K
+ UMY/5IspZp2VnPwvazUo2zpYiUSLo1hFHx2jrePYNu2KLROXpwARAQABtBxTdGVmYW4gV2Vp
+ bCA8c3dAd2VpbG5ldHouZGU+iQI6BBMBCAAkAhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheA
+ BQJV04LlAhkBAAoJEOCMIdVndFCtP5QP/1U8yWZzHeHufRFxtMsK1PERiLuKyGRH2oE5NWVc
+ 5QQHZZ2ypXu53o2ZbZxmdy8+4lXiPWWwYVqto3V7bPaMTvQhIT0I3c3ZEZsvwyEEE6QdRs52
+ haZwX+TzNMQ5mOePdM2m4WqO0oU7YHU2WFf54MBmAGtj3FAQEAlZAaMiJs2aApw/4t35ICL1
+ Sb0FY8d8lKBbIFOAaFfrlQTC3y8eMTk1QxOVtdXpRrOl6OE0alWn97NRqeZlBm0P+BEvdgTP
+ Qt+9rxbe4ulgKME2LkbDhLqf0m2+xMXb7T4LiHbQYnnWKGZyogpFaw3PuRVd9m8uxx1F8b4U
+ jNzI9x2Ez5LDv8NHpSY0LGwvVmkgELYbcbyiftbuw81gJuM7k4IW5GR85kTH6y/Sq6JNaI4p
+ 909IK8X4eeoCkAqEVmDOo1D5DytgxIV/PErrin82OIDXLENzOWfPPtUTO+H7qUe80NS2HLPG
+ IveYSjuYKBB6n2JhPkUD7xxMEdh5Ukqi1WIBSV4Tuk3/ubHajP5bqg4QP3Wo1AyICX09A1QQ
+ DajtMkyxXhYxr826EGcRD2WUUprGNYwaks4YiPuvOAJxSYprKWT6UDHzE3S8u4uZZm9H8cyg
+ Fa3pysJwTmbmrBAP1lMolwXHky60dPnKPmFyArGC0utAH7QELXzBybnE/vSNttNT1D+HuQIN
+ BFXcnj0BEAC32cCu2MWeqZEcvShjkoKsXk42mHrGbeuh/viVn8JOQbTO706GZtazoww2weAz
+ uVEYhwqi7u9RATz9MReHf7R5F0KIRhc/2NhNNeixT/7L+E5jffH1LD+0IQdeLPoz6unvg7U/
+ 7OpdKWbHzPM3Lfd0N1dRP5sXULpjtYQKEgiOU58sc4F5rM10KoPFEMz8Ip4j9RbH/CbTPUM0
+ S4PxytRciB3Fjd0ECbVsErTjX7cZc/yBgs3ip7BPVWgbflhrc+utML/MwC6ZqCOIXf/U0ICY
+ fp5I7PDbUSWgMFHvorWegMYJ9EzZ2nTvytL8E75C2U3j5RZAuQH5ysfGpdaTS76CRrYDtkEc
+ ViTL+hRUgrX9qvqzCdNEePbQZr6u6TNx3FBEnaTAZ5GuosfUk7ynvam2+zAzLNU+GTywTZL2
+ WU+tvOePp9z1/mbLnH2LkWHgy3bPu77AFJ1yTbBXl5OEQ/PtTOJeC1urvgeNru26hDFSFyk4
+ gFcqXxswu2PGU7tWYffXZXN+IFipCS718eDcT8eL66ifZ8lqJ8Vu5WJmp9mr1spP9RYbT7Rw
+ pzZ3iiz7e7AZyOtpSMIVJeYZTbtiqJbyN4zukhrTdCgCFYgf0CkA5UGpYXp2sXPr+gVxKX2p
+ tj/gid4n95vR7KMeWV6DJ0YS4hKGtdhkuJCpJfjKP/e8TwARAQABiQIfBBgBCAAJBQJV3J49
+ AhsMAAoJEOCMIdVndFCtYRoQAJOu3RZTEvUBPoFqsnd849VmOKKg77cs+HD3xyLtp95JwQrz
+ hwa/4ouDFrC86jt1vARfpVx5C8nQtNnWhg+5h5kyOIbtB1/27CCTdXAd/hL2k3GyrJXEc+i0
+ 31E9bCqgf2KGY7+aXu4LeAfRIWJT9FGVzdz1f+77pJuRIRRmtSs8VAond2l+OcDdEI9Mjd9M
+ qvyPJwDkDkDvsNptrcv4xeNzvX+2foxkJmYru6dJ+leritsasiAxacUowGB5E41RZEUg6bmV
+ F4SMseIAEKWLy3hPGvYBOzADhq2YLgnM/wn9Y9Z7bEMy+w5e75saBbkFI7TncxDPUnIl/UTE
+ KU1ORi5WWbvXYkUTtfNzZyD0/v3oojcIoZvK1OlpOtXHdlqOodjXF9nLe8eiVHyl8ZnzFxhe
+ EW2QPvX8FLKqmSs9W9saQtk6bhv9LNYIYINjH3EEH/+bbmV+ln4O7a73Wm8L3tnpC3LmdGn2
+ Rm8B6J2ZK6ci1TRDiMpCUWefpnIuE+TibC5VJR5zx0Yh11rxxBFob8mWktRmLZyeEoCcZoBo
+ sbJxD80QxWO03zPpkcJ7d4BrVsQ/BJkBtEe4Jn4iqHqA/OcrzwuEZSv+/MdgoqfblBZhDusm
+ LYfVy7wFDeVClG6eQIiK2EnmDChLRkVIQzbkV0iG+NJVVJHLGK7/OsO47+zq
+Message-ID: <0255817c-5cff-f206-297b-620463c241db@weilnetz.de>
+Date: Thu, 5 Mar 2020 15:31:50 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200302091836.29012-2-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 37.120.169.71
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,173 +117,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
- David Hildenbrand <david@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Greg Kurz <groug@kaod.org>, Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Anton V. Boyarshinov" <boyarsh@altlinux.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement resizeable mmaps. For now, the actual resizing is not wired up.
-Introduce qemu_ram_mmap_resizeable() and qemu_ram_mmap_resize(). Make
-qemu_ram_mmap() a wrapper of qemu_ram_mmap_resizeable().
+Am 02.03.20 um 10:18 schrieb Gerd Hoffmann:
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
-Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- include/qemu/mmap-alloc.h | 21 +++++++++++--------
- util/mmap-alloc.c         | 43 ++++++++++++++++++++++++++++-----------
- 2 files changed, 44 insertions(+), 20 deletions(-)
+> From: "Anton V. Boyarshinov" <boyarsh@altlinux.org>
+>
+> To calculate screen size in centimeters we should calculate:
+> pixels/dpi*2.54
+> but not
+> pixels*dpi/2540
+>
+> Using wrong formula we actually get 65 DPI and very small fonts.
+>
+> Signed-off-by: Anton V. Boyarshinov <boyarsh@altlinux.org>
+> Message-id: 20200226122054.366b9cda@table.localdomain
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/edid-generate.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/display/edid-generate.c b/hw/display/edid-generate.c
+> index 75c945a94813..e58472fde501 100644
+> --- a/hw/display/edid-generate.c
+> +++ b/hw/display/edid-generate.c
+> @@ -360,8 +360,8 @@ void qemu_edid_generate(uint8_t *edid, size_t size,
+>      edid[20] = 0xa5;
+>  
+>      /* screen size: undefined */
+> -    edid[21] = info->prefx * info->dpi / 2540;
+> -    edid[22] = info->prefy * info->dpi / 2540;
+> +    edid[21] = info->prefx * 254 / 100 / info->dpi;
+> +    edid[22] = info->prefy * 254 / 100 / info->dpi;
 
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index e786266b92..ca8f7edf70 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -7,11 +7,13 @@ size_t qemu_fd_getpagesize(int fd);
- size_t qemu_mempath_getpagesize(const char *mem_path);
-=20
- /**
-- * qemu_ram_mmap: mmap the specified file or device.
-+ * qemu_ram_mmap_resizeable: reserve a memory region of @max_size to mmap =
-the
-+ *                           specified file or device and mmap @size of it=
-.
-  *
-  * Parameters:
-  *  @fd: the file or the device to mmap
-  *  @size: the number of bytes to be mmaped
-+ *  @max_size: the number of bytes to be reserved
-  *  @align: if not zero, specify the alignment of the starting mapping add=
-ress;
-  *          otherwise, the alignment in use will be determined by QEMU.
-  *  @shared: map has RAM_SHARED flag.
-@@ -21,12 +23,15 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
-  *  On success, return a pointer to the mapped area.
-  *  On failure, return MAP_FAILED.
-  */
--void *qemu_ram_mmap(int fd,
--                    size_t size,
--                    size_t align,
--                    bool shared,
--                    bool is_pmem);
--
--void qemu_ram_munmap(int fd, void *ptr, size_t size);
-+void *qemu_ram_mmap_resizeable(int fd, size_t size, size_t max_size,
-+                              size_t align, bool shared, bool is_pmem);
-+bool qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t new_s=
-ize,
-+                          bool shared, bool is_pmem);
-+static inline void *qemu_ram_mmap(int fd, size_t size, size_t align,
-+                                  bool shared, bool is_pmem)
-+{
-+    return qemu_ram_mmap_resizeable(fd, size, size, align, shared, is_pmem=
-);
-+}
-+void qemu_ram_munmap(int fd, void *ptr, size_t max_size);
-=20
- #endif
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 2767caa33b..7ed85f16d3 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -174,11 +174,8 @@ static inline size_t mmap_guard_pagesize(int fd)
- #endif
- }
-=20
--void *qemu_ram_mmap(int fd,
--                    size_t size,
--                    size_t align,
--                    bool shared,
--                    bool is_pmem)
-+void *qemu_ram_mmap_resizeable(int fd, size_t size, size_t max_size,
-+                               size_t align, bool shared, bool is_pmem)
- {
-     const size_t guard_pagesize =3D mmap_guard_pagesize(fd);
-     const size_t pagesize =3D qemu_fd_getpagesize(fd);
-@@ -186,12 +183,14 @@ void *qemu_ram_mmap(int fd,
-     void *ptr, *guardptr;
-=20
-     g_assert(QEMU_IS_ALIGNED(size, pagesize));
-+    g_assert(QEMU_IS_ALIGNED(max_size, pagesize));
-=20
-     /*
-      * Note: this always allocates at least one extra page of virtual addr=
-ess
--     * space, even if size is already aligned.
-+     * space, even if the size is already aligned. We will reserve an area=
- of
-+     * at least max_size, but only activate the requested part of it.
-      */
--    total =3D size + align;
-+    total =3D max_size + align;
-=20
-     guardptr =3D mmap_reserve(NULL, total, fd);
-     if (guardptr =3D=3D MAP_FAILED) {
-@@ -219,21 +218,41 @@ void *qemu_ram_mmap(int fd,
-      * a guard page guarding against potential buffer overflows.
-      */
-     total -=3D offset;
--    if (total > size + guard_pagesize) {
--        munmap(ptr + size + guard_pagesize, total - size - guard_pagesize)=
-;
-+    if (total > max_size + guard_pagesize) {
-+        munmap(ptr + max_size + guard_pagesize,
-+               total - max_size - guard_pagesize);
-     }
-=20
-     return ptr;
- }
-=20
--void qemu_ram_munmap(int fd, void *ptr, size_t size)
-+bool qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t new_s=
-ize,
-+                          bool shared, bool is_pmem)
- {
-     const size_t pagesize =3D qemu_fd_getpagesize(fd);
-=20
--    g_assert(QEMU_IS_ALIGNED(size, pagesize));
-+    g_assert(QEMU_IS_ALIGNED(old_size, pagesize));
-+    g_assert(QEMU_IS_ALIGNED(new_size, pagesize));
-+
-+    if (old_size < new_size) {
-+        /* activate the missing piece in the reserved area */
-+        ptr =3D mmap_activate(ptr + old_size, new_size - old_size, fd, old=
-_size,
-+                            shared, is_pmem);
-+    } else if (old_size > new_size) {
-+        /* discard this piece, marking it reserved */
-+        ptr =3D mmap_reserve(ptr + new_size, old_size - new_size, fd);
-+    }
-+    return ptr !=3D MAP_FAILED;
-+}
-+
-+void qemu_ram_munmap(int fd, void *ptr, size_t max_size)
-+{
-+    const size_t pagesize =3D qemu_fd_getpagesize(fd);
-+
-+    g_assert(QEMU_IS_ALIGNED(max_size, pagesize));
-=20
-     if (ptr) {
-         /* Unmap both the RAM block and the guard page */
--        munmap(ptr, size + mmap_guard_pagesize(fd));
-+        munmap(ptr, max_size + mmap_guard_pagesize(fd));
-     }
- }
---=20
-2.24.1
+
+Gerd, the required rounding (see my previous e-mail) for both values is
+still missing.
+
+Cheers,
+
+Stefan
+
 
 
