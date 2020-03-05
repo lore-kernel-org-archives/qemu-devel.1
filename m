@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C6DC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA182C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC19207FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7956020637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c16OyJIc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC19207FD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WAZdIyJt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7956020637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tTm-0002zx-Kb
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:36:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
+	id 1j9tUA-0003iZ-F4
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:36:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tP6-0003S3-HH
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:22 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tOt-0003Cr-Io
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tP5-0002HS-B9
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:20 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38951)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tOs-00025F-EL
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:07 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39600)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tP5-0002GO-52
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:19 -0500
-Received: by mail-wm1-x329.google.com with SMTP id j1so6421149wmi.4
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:19 -0800 (PST)
+ id 1j9tOs-00024k-7q
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:06 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y17so7802534wrn.6
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=3GK41nG/OoUPXZ9s0SYYzwW0XMBSCvTJmH8pW+e8Jw8=;
- b=c16OyJIc/hZ0Zou0sp0AnJXZWpb2lpshAHN5j0ff/dGNAh7x9PJC6vvpszBC4Q/9d2
- hFC4FP1zlEEN/Q3mkoipJwxFB/WeR+9Vkzu75STlsZse4FiDy2K1bfBScE19o4pptpjC
- 0/YxYrSjAEPMXxTfZbpVoj6vjedrV01soOaFw5FZ5FoBLolvKDooFt5Xm07RmZiXpMPd
- eEIZIggUum6U7xpuXX4AvkltfThWp3sLVRjG/ModDI7XYXX3j3yTyYLRAIyp5k1KewkQ
- u/iylW8ADsRsGam5sy0CwsBoh5x2em47vApEA1OYHcl8v5BqOR2MxKZhOBHpfk3Cmvtv
- HieA==
+ bh=yEiymKhkPROqYzNJ51XYaQjzjgzEBScugFbYELCXiTs=;
+ b=WAZdIyJtpvTzEe2dl4d/NyQM5LyI8aBJcyzH3QLfvySD0Nlz7CTEFomvWpACmrlAKc
+ ezylUjdtp6oM1+6+wBa51tPRB20ilUyqBWZt8LsFnz1hYXgM7oHtAZKcLyXKZ0j/WCep
+ xUMiObVoG1F7VYAGypc4e+gCwR8RRendsxTbm24eYNfho9BplXCDiQh7o6hOOqertbC+
+ Xo55/CkYya5ymlmjEIMnRwADbrKl5+AC9xoMerRDRALvSedICUc/aBnMQvTg37nfgmWZ
+ PQs0xZIabR4ajaxu7x5nPCc9eZxjo1KnLQz8KR9g3lViRybyWx2lKIg55ZFlTuW0Svpx
+ n7KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3GK41nG/OoUPXZ9s0SYYzwW0XMBSCvTJmH8pW+e8Jw8=;
- b=khwg7fefMJUj4GDqBDHKTeYnkspjWKqQn7bre+jdzgn+N8pERTuKp1EtJ7nQ55HPi4
- 8OQANdaumJ8Ig4PVRzrtGAHwMTGzD9Vf50xdtQPzKOUpvfjKFDpFCbdi+rsGSdqQNWEp
- aaO3IaMPLkYDax6WownWBW7MWEZ3kYeA+tUPpqP+xMl1jj1n6KBykm3wEdErQn7yZLuV
- VnH3BgSJgXg5848Al0DhZV7A606Wi9sqAwa32u1wWLPwEXNA0WrmXfv9dqvmYu3ETUCr
- 3kGBfHUqHsaS1PwY4zP/qFzfdrjNBhhNCSJ/NUBTzM5p/cBOATK5t68ZuFLDWv5O0O3G
- lwRA==
-X-Gm-Message-State: ANhLgQ15wNunNj0CnjGKCvlyDuVwkyCm+b3mOHN8Nb6uaWQQj0TiGHdJ
- TyYdIVqMl9GOOnHdACHyDFqRHaxmlQmRVg==
-X-Google-Smtp-Source: ADFU+vu1xYX3jmOugfIzZdbMNUJW/m3L0ZEpHE3+CnwLVnGTEcPsEpJaEVbPe1t5UC34S6Spte1apg==
-X-Received: by 2002:a1c:9a45:: with SMTP id c66mr6239189wme.115.1583425877865; 
- Thu, 05 Mar 2020 08:31:17 -0800 (PST)
+ bh=yEiymKhkPROqYzNJ51XYaQjzjgzEBScugFbYELCXiTs=;
+ b=RwRWLFUjoH4obSVMBhpCN3J/AadEsT3rlyxH8wQ6UI/+FjvNZd9xuZ2G9RAlN2L6KX
+ F+lbHlB30BhoiPIgaVtIv7FXzVj7JHY/UA5tegN9hVbajV15NzQ/wl3Cv0uZsO6s6EFN
+ 0VSZJfxvKGcY8FMy7CcQs4XiXDF/eXBrBAYCrnVlNzt2WQIjF5AwF9dI5G1Tb4xQRQSY
+ NvC33qx2uYDlSCheQ/2/sh9mDxtEoYUz3wXnFMDW+tPozgdwBR9oZPVWk01Bx6Ql9mNT
+ DHQuIFH8uHeYlwXySZn++TIRXV9b3VS+IhS2l/cfYY3g0CWXhwSh0KbJK/t7/zrYnK1Q
+ CJYQ==
+X-Gm-Message-State: ANhLgQ0NQXvpEnbfDkLbvShr3OqqtWIUdTaKyXDkI2APSgvOfqINbgzU
+ k/XhGtcT16pZbzCj65XVRwTd+j+cntnEdA==
+X-Google-Smtp-Source: ADFU+vtA0kPCR5Orj3C6WQw9qTciGUtirEnCMl0eWew44VVFLEroUEpemEPgEXySrn2mUyESbvuByw==
+X-Received: by 2002:a5d:5043:: with SMTP id h3mr5963574wrt.274.1583425864900; 
+ Thu, 05 Mar 2020 08:31:04 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.16
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:17 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:04 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/37] hw/timer/cadence_ttc: move timer_new from init() into
- realize() to avoid memleaks
-Date: Thu,  5 Mar 2020 16:30:37 +0000
-Message-Id: <20200305163100.22912-15-peter.maydell@linaro.org>
+Subject: [PULL 02/37] hw/arm: versal: Generate xlnx-versal-virt zdma FDT nodes
+Date: Thu,  5 Mar 2020 16:30:25 +0000
+Message-Id: <20200305163100.22912-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
 References: <20200305163100.22912-1-peter.maydell@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,62 +97,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-There are some memleaks when we call 'device_list_properties'. This patch move timer_new from init into realize to fix it.
+Generate xlnx-versal-virt zdma FDT nodes.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200227025055.14341-7-pannengyuan@huawei.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/timer/cadence_ttc.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ hw/arm/xlnx-versal-virt.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
-index 5e3128c1e37..b0ba6b2bbae 100644
---- a/hw/timer/cadence_ttc.c
-+++ b/hw/timer/cadence_ttc.c
-@@ -412,18 +412,23 @@ static void cadence_timer_init(uint32_t freq, CadenceTimerState *s)
- static void cadence_ttc_init(Object *obj)
- {
-     CadenceTTCState *s = CADENCE_TTC(obj);
--    int i;
--
--    for (i = 0; i < 3; ++i) {
--        cadence_timer_init(133000000, &s->timer[i]);
--        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->timer[i].irq);
--    }
- 
-     memory_region_init_io(&s->iomem, obj, &cadence_ttc_ops, s,
-                           "timer", 0x1000);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index e7f4ca8bf95..878a2751400 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -229,6 +229,33 @@ static void fdt_add_gem_nodes(VersalVirt *s)
+     }
  }
  
-+static void cadence_ttc_realize(DeviceState *dev, Error **errp)
++static void fdt_add_zdma_nodes(VersalVirt *s)
 +{
-+    CadenceTTCState *s = CADENCE_TTC(dev);
++    const char clocknames[] = "clk_main\0clk_apb";
++    const char compat[] = "xlnx,zynqmp-dma-1.0";
 +    int i;
 +
-+    for (i = 0; i < 3; ++i) {
-+        cadence_timer_init(133000000, &s->timer[i]);
-+        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->timer[i].irq);
++    for (i = XLNX_VERSAL_NR_ADMAS - 1; i >= 0; i--) {
++        uint64_t addr = MM_ADMA_CH0 + MM_ADMA_CH0_SIZE * i;
++        char *name = g_strdup_printf("/dma@%" PRIx64, addr);
++
++        qemu_fdt_add_subnode(s->fdt, name);
++
++        qemu_fdt_setprop_cell(s->fdt, name, "xlnx,bus-width", 64);
++        qemu_fdt_setprop_cells(s->fdt, name, "clocks",
++                               s->phandle.clk_25Mhz, s->phandle.clk_25Mhz);
++        qemu_fdt_setprop(s->fdt, name, "clock-names",
++                         clocknames, sizeof(clocknames));
++        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
++                               GIC_FDT_IRQ_TYPE_SPI, VERSAL_ADMA_IRQ_0 + i,
++                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
++                                     2, addr, 2, 0x1000);
++        qemu_fdt_setprop(s->fdt, name, "compatible", compat, sizeof(compat));
++        g_free(name);
 +    }
 +}
 +
- static int cadence_timer_pre_save(void *opaque)
+ static void fdt_nop_memory_nodes(void *fdt, Error **errp)
  {
-     cadence_timer_sync((CadenceTimerState *)opaque);
-@@ -479,6 +484,7 @@ static void cadence_ttc_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->vmsd = &vmstate_cadence_ttc;
-+    dc->realize = cadence_ttc_realize;
- }
- 
- static const TypeInfo cadence_ttc_info = {
+     Error *err = NULL;
+@@ -427,6 +454,7 @@ static void versal_virt_init(MachineState *machine)
+     fdt_add_uart_nodes(s);
+     fdt_add_gic_nodes(s);
+     fdt_add_timer_nodes(s);
++    fdt_add_zdma_nodes(s);
+     fdt_add_cpu_nodes(s, psci_conduit);
+     fdt_add_clk_node(s, "/clk125", 125000000, s->phandle.clk_125Mhz);
+     fdt_add_clk_node(s, "/clk25", 25000000, s->phandle.clk_25Mhz);
 -- 
 2.20.1
 
