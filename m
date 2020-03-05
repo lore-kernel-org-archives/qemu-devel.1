@@ -2,136 +2,114 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2651C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7094BC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D80B2084E
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:47:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A3342084E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bt.com header.i=@bt.com header.b="auPqbB7b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D80B2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nonterra01.onmicrosoft.com header.i=@nonterra01.onmicrosoft.com header.b="pGsePj9i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A3342084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nonterra.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9eg8-0004tB-Mq
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:47:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36316)
+	id 1j9eh7-0005lv-Fh
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:48:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasper.lowell@bt.com>) id 1j9efP-0004PO-J4
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:12 -0500
+ (envelope-from <tobias.koch@nonterra.com>) id 1j9egS-0005KR-SL
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:48:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasper.lowell@bt.com>) id 1j9efO-000092-9G
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:11 -0500
-Received: from smtpe1.intersmtp.com ([213.121.35.73]:59208)
+ (envelope-from <tobias.koch@nonterra.com>) id 1j9egR-0002KN-Nd
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:48:16 -0500
+Received: from mail-eopbgr150081.outbound.protection.outlook.com
+ ([40.107.15.81]:9394 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasper.lowell@bt.com>)
- id 1j9efN-0008T7-MD
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:10 -0500
-Received: from tpw09926dag08f.domain1.systemhost.net (10.9.202.39) by
- BWP09926078.bt.com (10.36.82.109) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 5 Mar
- 2020 00:47:06 +0000
-Received: from tpw09926dag04f.domain1.systemhost.net (10.9.202.23) by
- tpw09926dag08f.domain1.systemhost.net (10.9.202.39) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 5 Mar 2020 00:47:05 +0000
-Received: from bwp09926077.bt.com (10.36.82.108) by
- tpw09926dag04f.domain1.systemhost.net (10.9.202.23) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4 via Frontend Transport; Thu, 5 Mar 2020 00:47:05
- +0000
-Received: from GBR01-CWL-obe.outbound.protection.outlook.com (104.47.20.51) by
- smtpe1.intersmtp.com (10.36.82.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id
- 15.1.1713.5; Thu, 5 Mar 2020 00:47:05 +0000
+ (Exim 4.71) (envelope-from <tobias.koch@nonterra.com>)
+ id 1j9egR-0002Ie-Dr
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:48:15 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ckubQT346+N/rKBP4NOmySzFX/BYQtjU4Ov3fV28benbDBddzqON6gADQ09bH/27MCHGH3nRvu80zT5NuCC2gHZ8JEcMgDo6ttXpUlWn3uKvL8ylHqETDmIvjZyp5bUcvjOjiLEJfpNqYek0vCPDArPqZ7Md//TJqjWevpeGfcsZvYP2fgMPZD4JZcdIJ8lR9MkY7s3NYyOHyHHEnxgiV3sNBNlXqohQoowAQp/fucdi6xIm8GHfIpxb2OE9bOGaF+CJ/4MMXfbxFpnYtwM7CzVPDqohX4iYtzotc2z4+Jom5vpMZOhz1/cDNsdwNdq6SeBbcwVc8qkBhixpQjArfQ==
+ b=KSY3EJJY3bDIIWLyyrDUaPviYDLEk3iQ3+YpyvWnUlPIaKgPRcc4wIOegJgxMKQrCdtHLHjgXtFMwjHcfz4YlD+zJkQLylz1wgk/BUvrWBoHSQWxBp426RlMmaPuxLhHyyHCE6ibcUc3GGoDbNscTnqE+W9ha2W08lusJHSy8dv8j46ra/ST2LHFbTJNwtFTVY5M3r293JWcGutFkBC9bO/8ijqOV32vAQlN761jUsnzr4OsW0qCjnRXmPgWSCIjvqffs/M/nzE39mUyRtnKuBeGvu7Tuok0bhxbJtIxL5RVIzwWlYm4Bz8JycwGS3LFz2AaCTjccmtdAZMeZ8S8dQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cc7XoJ9IW5N9SdVcw/5/q/+nrUKp5cbF29i+hiYr6Qc=;
- b=KidEJL6JUfotdLV1YwqRXnyDvKiqhnD9rzecEPFymlXMg1GfQMoIi/y5xYFmTTJNjeXEbnfZ3NAfyncG8uHad25sZL11bNUQ71h/9yOQ1POfuazpgEO3orNTKqvXRh2G18cXi5hrJSSwpdCcFYlcY0GrYFHgL0CLBZ1rzJxmJgRhMMkopOTPHe0qMNeVgOl8DveoOlxAR2oERdDIKgHpeMMEn1SkgTxsmZPLDxPaurBpzq9COMtoj2dq6HkWgUQSCHNsFOgukuDJslVtNDFSLhiGDrZA3yqabyGTpBIUcozq8pALQtsWgXNhV7oSsmFMivVUoa7XcX3ztnMp/N4xNw==
+ bh=LaCFAUA2g4iVk31YglLfVViQc3HAtGn2jkjtbZ36Cho=;
+ b=gNZXWZBH2QNqbdJs3ETQmGVUomk7AD8Lx7vxHUVf1lnMQSJLFNBrXc72ZsqTKMI5Gr4EKJChWtPoo/OaooXWmf0QpUWafUCwQAhWKWSg/eQTlzgTT3I8s2FE4oFUSBzWdtplLmo6KqM+wAeNtQEn47QdPSaswH0Hte73e3uRH6qtD+8ukE2Q24aKoCuy8M1pRAG86w7uaCr1jMevzJnFP2kuJNkTlyEQ1VqBcMOoZ7DiFsl1q1Q1m5RiVOW9AjhafSY0Gz+mWlV9Ny/spqoEh5GOU4QUE+BgK5TEugG2FRrPKm54dJVv188OvW0SGwt8zs7UfhzGAhl1dGItKLC1cQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bt.com; dmarc=pass action=none header.from=bt.com; dkim=pass
- header.d=bt.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bt.com; s=selector1;
+ smtp.mailfrom=nonterra.com; dmarc=pass action=none header.from=nonterra.com;
+ dkim=pass header.d=nonterra.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=nonterra01.onmicrosoft.com; s=selector2-nonterra01-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cc7XoJ9IW5N9SdVcw/5/q/+nrUKp5cbF29i+hiYr6Qc=;
- b=auPqbB7b57S4T2zvOwUWJu6IuTdXUIdCq7Ul6hWW9DbCR3v+8KPVKpEq8desG0HpEDyE71ZjNKgj87pR2+a65jNiMi19CUvGFpG2L7VKrlSz5OO8Xe3gY6n9FsA9ZftuaSLfnP5WC+WXPQ+6m5XedwxsqGzsjBCkHdSkXEIcYu0=
-Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM (20.176.154.209) by
- LO2P123MB2174.GBRP123.PROD.OUTLOOK.COM (20.176.158.16) with Microsoft SMTP
+ bh=LaCFAUA2g4iVk31YglLfVViQc3HAtGn2jkjtbZ36Cho=;
+ b=pGsePj9iO3y1kpJlwSMXD1CalaDwLpJ360glQY8YK5z8EqA+uU8wzzF23/F4Ao6rUsvMbvF6HdlyWak3ZJn1CqXWTgBWGbYbtjBBgQ4CiH3m0c0bfBeHGchigTDNv+GNeAFCsiOfWCuV5yG1hLnWZUkYWVBDInJFsJhkF+629CM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=tobias.koch@nonterra.com; 
+Received: from AM0PR08MB4273.eurprd08.prod.outlook.com (20.179.35.80) by
+ AM0PR08MB4161.eurprd08.prod.outlook.com (20.178.203.93) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.18; Thu, 5 Mar 2020 00:47:05 +0000
-Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
- ([fe80::312f:184d:74b1:28c5]) by LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
- ([fe80::312f:184d:74b1:28c5%4]) with mapi id 15.20.2793.013; Thu, 5 Mar 2020
- 00:47:05 +0000
-From: <jasper.lowell@bt.com>
-To: <balaton@eik.bme.hu>, <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH] hw/ide: Remove status register read side effect
-Thread-Topic: [PATCH] hw/ide: Remove status register read side effect
-Thread-Index: AQHV6IMztk0nS91QXUSAhbuFxp1TiagnnJkAgAADjoCAAAXGgIAAvUiAgACESgCAAmZZAIAAvBaAgADuooCABx1uAIADvlaAgAEsV4CAAD2JgA==
-Date: Thu, 5 Mar 2020 00:47:05 +0000
-Message-ID: <a3eda55a557ea121f7859c3457e64fa92d85de55.camel@bt.com>
-References: <20200221065015.337915-1-jasper.lowell@bt.com>
- <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
- <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
- <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
- <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
- <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
- <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
- <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
- <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
- <alpine.BSF.2.22.395.2003011847220.28669@zero.eik.bme.hu>
- <06be591e667c6b72c78ae3a33e3092ab323fdb8b.camel@bt.com>
- <614b7a97-84c2-1861-75d3-51921ae1e4fa@ilande.co.uk>
-In-Reply-To: <614b7a97-84c2-1861-75d3-51921ae1e4fa@ilande.co.uk>
-Accept-Language: en-US
+ 15.20.2750.21; Thu, 5 Mar 2020 00:48:12 +0000
+Received: from AM0PR08MB4273.eurprd08.prod.outlook.com
+ ([fe80::7163:372d:fd4c:812a]) by AM0PR08MB4273.eurprd08.prod.outlook.com
+ ([fe80::7163:372d:fd4c:812a%5]) with mapi id 15.20.2772.019; Thu, 5 Mar 2020
+ 00:48:12 +0000
+To: qemu-devel@nongnu.org
+From: Tobias Koch <tobias.koch@nonterra.com>
+Subject: [PATCH] linux-user: do prlimit selectively
+Message-ID: <6d93d213-894b-8fc7-a008-62084c5c1a01@nonterra.com>
+Date: Thu, 5 Mar 2020 03:48:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jasper.lowell@bt.com; 
-x-originating-ip: [61.68.11.94]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2050a92d-aef6-4d98-3ccf-08d7c09eb9db
-x-ms-traffictypediagnostic: LO2P123MB2174:
-x-microsoft-antispam-prvs: <LO2P123MB21745F429853CA757CEAAEFE83E20@LO2P123MB2174.GBRP123.PROD.OUTLOOK.COM>
-x-antispam-2: 1
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 03333C607F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(4636009)(376002)(366004)(136003)(396003)(39860400002)(346002)(199004)(189003)(2906002)(76116006)(66946007)(6486002)(2616005)(91956017)(36756003)(53546011)(186003)(6506007)(81166006)(478600001)(6512007)(4326008)(316002)(86362001)(8936002)(5660300002)(71200400001)(81156014)(66446008)(26005)(64756008)(54906003)(110136005)(8676002)(66476007)(66556008);
- DIR:OUT; SFP:1101; SCL:1; SRVR:LO2P123MB2174;
- H:LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: bt.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: K+8ysIYQLIVnQPNKPOP4SmQr5rln8GREqfDZyz9C3Cpy+5G2iswViU6qKPVJB/kLf4gh5fA7rhwiyHgCT6Ne1WVRy0Hq07PnraPVigHuSrLIG/Fyr5rAvgryMfCiMX5FJLqECxr5RytfHbiOve+NSduPDDJ1ufggZOG+eEXbWfFGQFWd2zoPd5VmTaoyKES2obPzbBEh6UN98nHzUXTqC2qbM7Gbvqfgk5BVkvMPmF8S0VEZVfTBe3GftNWU/KXiKxZjBdw3uAT7e+OaEnrCLYHRsakXZxrrmNpUMiRSVCO47ZvmoxKoPoYd/j8TRUzNbD57a+J64fbIxQicsCW5TlcsiNbXOFO5c3L1KzKJ+K/3W5TbcA1RDFjhICzj86wAeKse6yogWNc7msAEoFCov37rYyOxzuf+XCAPArgaIMKufBmcPa4fm3L6gq/Ug/VV
-x-ms-exchange-antispam-messagedata: UpOVI1nEt5WjaackMV2MKRLEOH1v/dHXJ+bbMgG3rHhzsCU6fkjV/olIq8zMbJHD2fVnw8m2McVOlAbNibVatJGOJL1vMJ6BhIufJ47uazMEkmxFdkR5nhHtiT7n1BprQ5BwlNL7l6F694IKtF0eNA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ECC77D8F0E547846930A84C9B7856E6A@GBRP123.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+X-ClientProxiedBy: FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::20) To AM0PR08MB4273.eurprd08.prod.outlook.com
+ (2603:10a6:208:144::16)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2050a92d-aef6-4d98-3ccf-08d7c09eb9db
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2020 00:47:05.0813 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7f35688-9c00-4d5e-ba41-29f146377ab0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: R0pDjCxItIw8AZ2iLwmxH4e/9roeTee2srHWdD2Q3HxXE6IBKYb3NZh5XUHyRWQIHhh3lb5U3+MPlXHBUZPWLg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P123MB2174
-X-OriginatorOrg: bt.com
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.73
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.132.123.168] (88.128.88.112) by
+ FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.19 via Frontend Transport; Thu, 5 Mar 2020 00:48:10 +0000
+X-Originating-IP: [88.128.88.112]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b08832f8-0dd1-4e7a-4d92-08d7c09ee106
+X-MS-TrafficTypeDiagnostic: AM0PR08MB4161:
+X-Microsoft-Antispam-PRVS: <AM0PR08MB41617898A8A03E7271C64E1689E20@AM0PR08MB4161.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:269;
+X-Forefront-PRVS: 03333C607F
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(136003)(366004)(39830400003)(396003)(376002)(346002)(189003)(199004)(2906002)(5660300002)(4326008)(6916009)(44832011)(2616005)(316002)(956004)(52116002)(86362001)(31696002)(16576012)(36756003)(31686004)(6486002)(508600001)(8936002)(16526019)(186003)(81156014)(26005)(81166006)(66556008)(66476007)(8676002)(66946007);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:AM0PR08MB4161;
+ H:AM0PR08MB4273.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: nonterra.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SmuUfXME2nrZFzRmu6x0CopS2MmJqy2SjtZicvjUDs+OJj2XS4DUG6/QE2UITHp9ono3M/YfEB824OCXqNLZq8v8p4dvWTtr1WhU42yzcxWIV5Q27GaEghOtqr9CkGk+lrrD1WllzjaNbEH/my/4dbFcmweNOmNJ8sQXbYGDtrXlocrGJrpcjiQJOulPtAc/4h6eJXCxqWF7vLAAWv0zB5gqNlc9quaKeq2cHRIbqVEk4/q+iTy1Uw5uBcJ0v+T2ZSktKpCwH5w9lrQBNLjCL9AKDvkASrU1P1pPwoSLbpHI2K1m1HsuCGC/hTpIuypvG9lJdrHyA7UfCa+tWU+6JDAeGyN/bFnf7AyklAHXpnV7Ew1akL1p1T31qTybYhswccX2SeXdqiAWQjM3Tha2xlKr+1kYCLhHFwH211i3HkEU241509LgfCTWKz2DC51v
+X-MS-Exchange-AntiSpam-MessageData: yamu27w7CYjnzrh14hGez0Z39L6AQG4FnkPTNOC75zX+aIO4m37xGszR/UwooIWE53drdjKKSwDGpSb2eQms0xE9j6Zr24W2QQdH4TeH0FOx58CPeO0S43YCqKgDKtb73JH9Xkb+cUtfR5PNSqYhAQ==
+X-OriginatorOrg: nonterra.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b08832f8-0dd1-4e7a-4d92-08d7c09ee106
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2020 00:48:11.5643 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 76ec9478-ab84-4eac-917c-c1a3242376a3
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IdGvE57t8psHR2Mp8JjpbqS1nvpCnKl5RIwEqLJ9PqJhW4Vjam+6Xy2hRXN3sq5gL/+Z88yE34phbD2SYUsShD6mK2JeYnscYwgxdjjCacw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4161
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.15.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,39 +121,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBZZXMsIHRoYXQncyBjb3JyZWN0LiBIb3dldmVyIEknbSBxdWl0ZSBjb25maWRlbnQgZnJvbSBi
-b290aW5nIG90aGVyDQo+IG5vbi1Tb2xhcmlzIE9Tcw0KPiB1bmRlciBxZW11LXN5c3RlbS1zcGFy
-YzY0IHRoYXQgUENJIG5hdGl2ZSBtb2RlIGlzIGJlaW5nIHVzZWQsDQo+IHBhcnRpY3VsYXJseSBh
-cyBpdCBpcw0KPiBwb3NzaWJsZSB0byBzZWUgdGhlIHJlbGF0ZWQgUENJIHNhYnJlIElSUSByb3V0
-aW5nIGNvbmZpZ3VyYXRpb24NCj4gY2hhbmdlcy4NCg0KQ29uc2lkZXJpbmcgdGhhdCBTb2xhcmlz
-IDEwIGlzIGFjY2Vzc2luZyBDRlIgYW5kIEFSVFRJTTIzIEkgZG9uJ3QgdGhpbmsNCnRoZXJlIGlz
-IGFueSBkb3VidCB0aGF0IGl0IGlzIHVzaW5nIHRoZSBjaGlwIGluIFBDSSBuYXRpdmUgbW9kZS4g
-SQ0KZG9uJ3QgdGhpbmsgU29sYXJpcyAxMCBldmVuIGhhcyBzdXBwb3J0IGZvciBsZWdhY3kgbW9k
-ZS4NCg0KVGhhbmtzLA0KSmFzcGVyIExvd2VsbC4NCg0KT24gV2VkLCAyMDIwLTAzLTA0IGF0IDIx
-OjA3ICswMDAwLCBNYXJrIENhdmUtQXlsYW5kIHdyb3RlOg0KPiBPbiAwNC8wMy8yMDIwIDAzOjEx
-LCBqYXNwZXIubG93ZWxsQGJ0LmNvbSB3cm90ZToNCj4gDQo+ID4gPiBjbWQ2NDZfdXBkYXRlX2ly
-cSgpIG9ubHkgc2VlbXMgdG8gcmFpc2UgUENJIGludGVycnVwdCwgc2hvdWxkIGl0DQo+ID4gPiBh
-bHNvDQo+ID4gPiBoYXZlIA0KPiA+ID4gYW4gb3B0aW9uIHRvIHVzZSBJTlQgMTQgYW5kIDE1IGlu
-IGxlZ2FjeSBtb2RlIHNpbWlsYXIgdG8gd2hhdCBteQ0KPiA+ID4gcGF0Y2ggDQo+ID4gPiBkb2Vz
-IGZvciB2aWEtaWRlPw0KPiA+IA0KPiA+IExvb2tpbmcgdGhyb3VnaCAvcWVtdS9ody9pZGUvY21k
-NjQ2LmMgaXQgZG9lc24ndCBsb29rIGxpa2UgUUVNVSBoYXMNCj4gPiBzdXBwb3J0IGZvciBsZWdh
-Y3kgbW9kZS4gQXQgdGhlIHZlcnkgbGVhc3QsIGl0IGxvb2tzIGxpa2Ugd2UNCj4gPiBkZWZhdWx0
-IHRvDQo+ID4gUENJIG5hdGl2ZSBtb2RlOg0KPiA+IA0KPiA+IHN0YXRpYyB2b2lkIHBjaV9jbWQ2
-NDZfaWRlX3JlYWxpemUoUENJRGV2aWNlICpkZXYsIEVycm9yICoqZXJycCkNCj4gPiAJLi4uDQo+
-ID4gCXBjaV9jb25mW1BDSV9DTEFTU19QUk9HXSA9IDB4OGY7DQo+ID4gCS4uLg0KPiA+IA0KPiA+
-IFRvIGFkZCBzdXBwb3J0IGZvciBsZWdhY3kgbW9kZSBpdCB3b3VsZCByZXF1aXJlIGNoYW5naW5n
-DQo+ID4gY21kNjQ2X3VwZGF0ZV9pcnEoKSBhbmQgbWF5YmUgY21kNjQ2X3NldF9pcnEoKSBzbyB0
-aGF0IGludGVycnVwdHMNCj4gPiBhcmUNCj4gPiBjb25kaXRpb25hbGx5IHJhaXNlZCBvbiBJUlEx
-NCBhbmQvb3IgSVJRMTUgd2hlbiB0aGUgcG9ydHMgYXJlIGluDQo+ID4gbGVnYWN5DQo+ID4gbW9k
-ZS4NCj4gDQo+IFllcywgdGhhdCdzIGNvcnJlY3QuIEhvd2V2ZXIgSSdtIHF1aXRlIGNvbmZpZGVu
-dCBmcm9tIGJvb3Rpbmcgb3RoZXINCj4gbm9uLVNvbGFyaXMgT1NzDQo+IHVuZGVyIHFlbXUtc3lz
-dGVtLXNwYXJjNjQgdGhhdCBQQ0kgbmF0aXZlIG1vZGUgaXMgYmVpbmcgdXNlZCwNCj4gcGFydGlj
-dWxhcmx5IGFzIGl0IGlzDQo+IHBvc3NpYmxlIHRvIHNlZSB0aGUgcmVsYXRlZCBQQ0kgc2FicmUg
-SVJRIHJvdXRpbmcgY29uZmlndXJhdGlvbg0KPiBjaGFuZ2VzLg0KPiANCj4gDQo+IEFUQiwNCj4g
-DQo+IE1hcmsuDQo=
+Analogous to what commit 5dfa88f7 did for setrlimit, this commit
+selectively ignores limits for memory-related resources in prlimit64
+calls. This is to prevent too restrictive limits from causing QEMU
+itself to malfunction.
+
+Signed-off-by: Tobias Koch <tobias.koch@nonterra.com>
+---
+=C2=A0linux-user/syscall.c | 16 ++++++++++------
+=C2=A01 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 8d27d10807..8554c77a38 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11872,13 +11872,17 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct host_rlimit64 rnew,=
+ rold, *rnewp =3D 0;
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int resource =3D target_to=
+_host_resource(arg2);
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (arg3) {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!lo=
+ck_user_struct(VERIFY_READ, target_rnew, arg3, 1)) {
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 return -TARGET_EFAULT;
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (res=
+ource !=3D RLIMIT_AS &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 resource !=3D RLIMIT_DATA &&
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 resource !=3D RLIMIT_STACK) {
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 if (!lock_user_struct(VERIFY_READ, target_rnew, arg3, 1)=
+) {
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -TARGET_EFAULT;
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 }
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 rnew.rlim_cur =3D tswap64(target_rnew->rlim_cur);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 rnew.rlim_max =3D tswap64(target_rnew->rlim_max);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 unlock_user_struct(target_rnew, arg3, 0);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 rnewp =3D &rnew;
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rnew.rl=
+im_cur =3D tswap64(target_rnew->rlim_cur);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rnew.rl=
+im_max =3D tswap64(target_rnew->rlim_max);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unlock_=
+user_struct(target_rnew, arg3, 0);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rnewp =
+=3D &rnew;
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+=C2=A0
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D get_errno(sys_prli=
+mit64(arg1, resource, rnewp, arg4 ?
+&rold : 0));
+--=20
+2.20.1
+
 
