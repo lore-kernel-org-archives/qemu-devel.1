@@ -2,81 +2,83 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C615C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5856C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:29:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8AC22073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:18:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F579208CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:29:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BafEGaTA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8AC22073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UkpyreFh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F579208CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9sGo-0003LP-0C
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:18:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44930)
+	id 1j9sQq-0000O7-M0
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:29:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9sGA-0002uC-4j
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:18:02 -0500
+ (envelope-from <quintela@redhat.com>) id 1j9sPw-0008H2-3D
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9sG9-0007Rx-4y
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:18:01 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42849)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9sG8-0007RR-Vi
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:18:01 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 66so6000283otd.9
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 07:18:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k1xwR2KPPUogPphk5Q0+rS6jTuTHREOmc67Cr4a5Y04=;
- b=BafEGaTAw4klHGT3mXgsGL0UlVfU0YfhqBWZ8XskcG5uAlv99rJ1GAr67jkPPhKq/X
- bIdwkpnHx/j/ikEkQ/gLlI8BCQ7du3/UjhHyFD6BIVxUJ38A2REIpgIvlrfv81NZUxlF
- 6gMGOUM4zi6eTRT5+BHAlav7x4wJ0wrxdzJxtBJFQB/BzpwzNk12Ja7Ov7LYGKVsFItD
- 8LrgLNAB/VmJL+7VMWKSFNptvQR4byf2gYE/YLev74VHW4saAHvYPrlOBSzxylNCioot
- 6xo/tK1ZxT3ewPn60ucQaDMKpeD1kSsETPJ957uF4/oZSG4sr/6N0E8jvCG4wQT7lvv2
- ZINQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k1xwR2KPPUogPphk5Q0+rS6jTuTHREOmc67Cr4a5Y04=;
- b=PavmWj0yKwMYij2vr276nk1GPvNkMqIzrWcWvRmEqEvb7pUYPjf14+Ye+KZ7X+l1sw
- QnO5/fM9ZKRmy7xh2vigIbdmpzlVwHw7Gs8+fNBR/pQB8EPTDlTrzPSSGCieHRuSiUfl
- SVopMfOrISB5V2kljA+aLYBfL5Tu815RPrrj5IASDOT3kDszWwC1VzOo1UOcl0X8M8bT
- OkbjaYUhJv/48Hj69HHUS2nRNJta29QsOcfyrAEycv+3R3WUK+cCGk9Uk+sewGlOggY7
- 1GnaIjd5w7s+D3KENirwDfuSiUHHpNSqZtGPAnVF8VRypk+EuiKIg1z/ACDDCMP7F0t4
- Htjw==
-X-Gm-Message-State: ANhLgQ06xYR8lsgDrroKnp8UHeRCYQJvNrAzB+nzTwBC00iJ5dXy2ury
- saefHXfy+EaHqomvRS4R0bf5YXGupkVV3C9JQ5ASiA==
-X-Google-Smtp-Source: ADFU+vt5460GTevFdiL99vC59vMlo5KkwFEhOULo7vuagmuE+VRswmbnj6oBnx6tZl36B/w2Gi+B+EhZ/m26d1EVfA4=
-X-Received: by 2002:a05:6830:30ac:: with SMTP id
- g12mr5753521ots.221.1583421479874; 
- Thu, 05 Mar 2020 07:17:59 -0800 (PST)
+ (envelope-from <quintela@redhat.com>) id 1j9sPu-00013u-HB
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:28:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26389
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j9sPu-00012i-CX
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:28:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583422085;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3ltEaftIAwBsKDFG9iTR7+L/C2sXjivId4aEz/aWFWo=;
+ b=UkpyreFh+Gc9cb0/OfOTUbuE4DY6tgd3pnb+UFih1rIhG4In7YbnR3OPWpkwMwSMZt8OFG
+ zeITjNJZeZT0ZAiBvGp6B/gQdLD4oZXhJM+qyN3KXh47lm0tbzOw8kXgmIurnNO6WY7+1F
+ gJcLi4KTYuIsh/ibBdzdGjpdTFLH6BU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-rbJF5UUaMNm4p_D3IJ2_wA-1; Thu, 05 Mar 2020 10:28:04 -0500
+X-MC-Unique: rbJF5UUaMNm4p_D3IJ2_wA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C01B3800D50;
+ Thu,  5 Mar 2020 15:28:02 +0000 (UTC)
+Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 406C860BE0;
+ Thu,  5 Mar 2020 15:28:02 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH] configure: Improve zstd test
+In-Reply-To: <87imji6eio.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+ message of "Thu, 05 Mar 2020 14:51:43 +0000")
+References: <20200305103427.157658-1-quintela@redhat.com>
+ <87imji6eio.fsf@linaro.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 05 Mar 2020 16:27:57 +0100
+Message-ID: <87h7z2g6te.fsf@secure.laptop>
 MIME-Version: 1.0
-References: <20200304131214.179000-1-stefanb@linux.vnet.ibm.com>
- <CAFEAcA9dW7MqCXYN6TvWiW_95BcC9K839Z=-an7hRYHvUvUJAg@mail.gmail.com>
- <32857917-279b-3f63-6c14-cb6908b93da8@redhat.com>
-In-Reply-To: <32857917-279b-3f63-6c14-cb6908b93da8@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Mar 2020 15:17:48 +0000
-Message-ID: <CAFEAcA-WCx1a+Ynd7BoVoSR-GuSnvmCp4DLX=pU97+-LwivS6w@mail.gmail.com>
-Subject: Re: [PULL v1 00/10] Merge TPM 2020/03/04
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,29 +90,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 at 15:11, Auger Eric <eric.auger@redhat.com> wrote:
+Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Juan Quintela <quintela@redhat.com> writes:
 >
-> Hi Peter, Stefan
+>> There were one error on the test (missing an s for --exists).
+>> But we really need a recent zstd (0.8.1).
+>> That version was released in 2016, so it is newer that some of our travi=
+s
+>> images.  Just check for the version that we need.
+>>
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> Reported-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  configure | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 7b373bc0bb..1bf48df1ef 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2464,7 +2464,8 @@ fi
+>>  # zstd check
+>> =20
+>>  if test "$zstd" !=3D "no" ; then
+>> -    if $pkg_config --exist libzstd ; then
+>> +    libzstd_minver=3D"0.8.1"
+>> +    if $pkg_config --atleast-version=3D$libzstd_minver libzstd ; then
+>>          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
+>>          zstd_libs=3D"$($pkg_config --libs libzstd)"
+>>          LIBS=3D"$zstd_libs $LIBS"
 >
-> On 3/5/20 3:50 PM, Peter Maydell wrote:
-> I think it is an issue in
-> [PATCH v4 06/10] hw/arm/virt: vTPM support
+> Hmm still breaks with:
 >
->     TYPE_BINDING(TYPE_TPM_TIS_SYSBUS, add_tpm_tis_fdt_node),
-> is within the CONFIG_LINUX and should be outside.
->
-> I am going to send a fix right now but I don't have any environment
-> ready to test it against make check.
+>    make docker-test-build@ubuntu J=3D9 V=3D1
 
-It fails also on the BSD VM setups in tests/vm, which
-you can probably use to test locally.
+Thanks.
 
-thanks
--- PMM
+> With:
+>
+>   FY_SOURCE=3D2 -g   -c -o monitor/qmp.o /tmp/qemu-test/src/monitor/qmp.c
+>   /tmp/qemu-test/src/migration/multifd-zstd.c: In function 'zstd_send_pre=
+pare':
+>   /tmp/qemu-test/src/migration/multifd-zstd.c:125:9: error: unknown type =
+name 'ZSTD_EndDirective'; did you mean 'ZSTD_DDict'?
+>            ZSTD_EndDirective flush =3D ZSTD_e_continue;
+>            ^~~~~~~~~~~~~~~~~
+
+Greate, more things were introduced later.
+As it would be too easy, the zstd repository is not lineal, you need to
+checkout the tag you want to see when something has been introduced.
+
+Will try to get this fixed.
+
+Sorry for the inconveniences.
+
+
+>   Version: 1.3.8+dfsg-3
+>   Depends: libzstd1 (=3D 1.3.8+dfsg-3)
+>   Description: fast lossless compression algorithm -- development files
+
+I don't undertsand now.
+
+ZSTD_EndDirective was included in 1.3.0.
+
+I can just change that for 1.3.9, but I don't know why is that there.
+Could you do a grep ZSTD_EndDirective /usr/lib/zstd.h?
+
+Or if there is some documentation that shows how to use that docker
+images.
+
+Later, Juan.
+
 
