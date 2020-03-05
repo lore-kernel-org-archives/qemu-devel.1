@@ -2,149 +2,75 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00668C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F4CC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C940220732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C940220732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A2DC420732
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:31:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LM/L241S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2DC420732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rV6-0004op-2Z
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:29:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34382)
+	id 1j9rWw-0006nc-N4
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:31:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1j9rRX-0006Yk-B1
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:25:44 -0500
+ (envelope-from <david@redhat.com>) id 1j9rW2-0006AS-6L
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:30:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1j9rRV-00069i-Tn
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:25:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7722
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1j9rRV-00069R-Oj
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:25:41 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 025EKFCM110137
- for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 09:25:41 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yj6nkkhnq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:25:40 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 5 Mar 2020 14:25:20 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Mar 2020 14:25:16 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 025EPFtN37290036
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Mar 2020 14:25:15 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1770442052;
- Thu,  5 Mar 2020 14:25:15 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C665C4204C;
- Thu,  5 Mar 2020 14:25:14 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Mar 2020 14:25:14 +0000 (GMT)
-Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
-To: Halil Pasic <pasic@linux.ibm.com>
-References: <20200224150213.21253-1-pasic@linux.ibm.com>
- <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
- <20200225125641.72e8cc86.pasic@linux.ibm.com>
- <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
- <c019ecc6-900e-8653-a603-de8d03017e95@de.ibm.com>
- <20200305151119.6cd63e96.pasic@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Thu, 5 Mar 2020 15:25:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <david@redhat.com>) id 1j9rVz-0001bC-UQ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:30:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60796
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9rVz-0001aN-PX
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:30:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583418619;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=+yb+HU79wQ5wpyAGtb6fdjgiUkzdh/6ve5pXenuwDxc=;
+ b=LM/L241SSZUbsyfSgTRrE9OpU6Wz91cFRsmLZlVHfqx7ZunFJzjuIK5Q0UsuITecU8k0qf
+ INF0wtGSoHAHkTd1dkM/cKVOGOTubn2ZDFycF4yxpc2XTKooe+PsboM0uUZ/Gn3KlcGEz1
+ aXluXUcs84h0NO5j6U2fnH7aVRSCuEw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-XzsmhgBLPYqK0djINuIsEg-1; Thu, 05 Mar 2020 09:30:15 -0500
+X-MC-Unique: XzsmhgBLPYqK0djINuIsEg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77E74107ACCD;
+ Thu,  5 Mar 2020 14:30:13 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D108991D91;
+ Thu,  5 Mar 2020 14:29:47 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 00/15] Ram blocks with resizeable anonymous allocations
+ under POSIX
+Date: Thu,  5 Mar 2020 15:29:30 +0100
+Message-Id: <20200305142945.216465-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305151119.6cd63e96.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 20030514-0016-0000-0000-000002ED7BB7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030514-0017-0000-0000-00003350CFBC
-Message-Id: <98038ac5-c2dd-7536-2399-459fea7dc6ce@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-05_04:2020-03-05,
- 2020-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
- impostorscore=0 priorityscore=1501 bulkscore=0 phishscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003050093
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 025EKFCM110137
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,115 +82,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Marc Hartmayer <mhartmay@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Alex Williamson <alex.williamson@redhat.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This series is based on [1]:
+    "[PATCH v3 00/13] migrate/ram: Fix resizing RAM blocks while migrating"
 
+We already allow resizable ram blocks for anonymous memory, however, they
+are not actually resized. All memory is mmaped() R/W, including the memory
+exceeding the used_length, up to the max_length.
 
-On 05.03.20 15:11, Halil Pasic wrote:
-> On Thu, 5 Mar 2020 13:44:31 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->=20
->>
->>
->> On 25.02.20 15:35, Viktor Mihajlovski wrote:
->>>
->>>
->>> On 2/25/20 12:56 PM, Halil Pasic wrote:
->>>> On Tue, 25 Feb 2020 10:39:40 +0100
->>>> David Hildenbrand <david@redhat.com> wrote:
->>>>
->>>>> On 24.02.20 16:02, Halil Pasic wrote:
->>>>>> We expose loadparm as a r/w machine property, but if loadparm is s=
-et by
->>>>>> the guest via DIAG 308, we don't update the property. Having a
->>>>>> disconnect between the guest view and the QEMU property is not nic=
-e in
->>>>>> itself, but things get even worse for SCSI, where under certain
->>>>>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
->>>>>> expected" for details) we call s390_gen_initial_iplb() on resets
->>>>>> effectively overwriting the guest/user supplied loadparm with the =
-stale
->>>>>> value.
->>>>>>
->>>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->>>>>> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the mac=
-hine"
->>>>>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->>>>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
->>>>>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->>>>>> ---
->>>>>> =C2=A0 hw/s390x/ipl.c | 21 +++++++++++++++++++++
->>>>>> =C2=A0 1 file changed, 21 insertions(+)
->>>>>>
->>>>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>> [...]
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0 /* Sync loadparm */
->>>>>> +=C2=A0=C2=A0=C2=A0 if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char ascii_loadparm[8]=
-;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *ebcdic_loadpa=
-rm =3D iplb->loadparm;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i;
->>>>>> +
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 8 &&=
- ebcdic_loadparm[i]; i++) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- ascii_loadparm[i] =3D ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ascii_loadparm[i] =3D =
-0;
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_st=
-r(mo, ascii_loadparm, "loadparm", NULL);
->>>>>> +=C2=A0=C2=A0=C2=A0 } else {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_st=
-r(mo, "", "loadparm", NULL);
->>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>
->>>>> &error_abort instead of NULL, we certainly want to know if this wou=
-ld
->>>>> ever surprisingly fail.
->>>>
->>>> IMHO this is a typical assert() situation where one would like to ha=
-ve
->>>> a fast and obvious failure when testing, but not in production.
->>>>
->>>> AFAIU the guest can trigger this code at any time, and crashing the
->>>> whole (production) system seems a bit heavy handed to me. The setter
->>>> should only fail if something is buggy.
->>>>
->>>> But if the majority says &error_abort I can certainly do. Other opin=
-ions?
->>>>
->>> We might consider to return 0x0402 (invalid parameter) from the diag3=
-08 "set", which is less drastic and would allow the OS to do whatever it =
-finds appropriate to deal with the failure. Not that Linux would care abo=
-ut that today :-).
->>
->> I think it is not an error. It is perfectly fine for a guest to not se=
-t DIAG308_FLAGS_LP_VALID if the guest does not want to set it. The LOADPA=
-RM is supposed to be ignored then.
->>
->=20
-> I believe David's concern was not the else branch, but the last
-> parameter of object_property_set_str(), which tells us what to do if th=
-e
-> validation/normalization done by the setter of the loadparm qemu
-> property fails the set operation.
+When resizing, effectively only the boundary is moved. Implement actually
+resizable anonymous allocations and make use of them in resizable ram
+blocks when possible. Memory exceeding the used_length will be
+inaccessible. Especially ram block notifiers require care.
 
-Ah I see. I still think that the guest could provoke the an error by putt=
-ing
-invalid characters in the loadparm field. So error_abort seems wrong.
-And in fact for that case, the 0x0402 proposal from Viktor seems like the
-right thing to do.
+Having actually resizable anonymous allocations (via mmap-hackery) allows
+to reserve a big region in virtual address space and grow the
+accessible/usable part on demand. Even if "/proc/sys/vm/overcommit_memory"
+is set to "never" under Linux, huge reservations will succeed. If there is
+not enough memory when resizing (to populate parts of the reserved region),
+trying to resize will fail. Only the actually used size is reserved in the
+OS.
+
+Especially, memory notifiers already handle resizing by first removing
+the old region, and then re-adding the resized region. prealloc is
+currently not possible with resizable ram blocks. mlock() should continue
+to work as is. Resizing is currently rare and must only happen on the
+start of an incoming migration, or during resets. No code path (except
+HAX and SEV ram block notifiers) should access memory outside of the usable
+range - and if we ever find one, that one has to be fixed (I did not
+identify any).
+
+E.g., virtio-mem [2] wants to reserve big resizable memory regions and
+grow the usable part on demand. I think this change is worth sending out
+individually. I did excessive tests of this with virtio-mem (which makes
+it very easy to trigger resizes), including precopy and postcopy migration.
+
+Accompanied by a bunch of minor fixes and cleanups.
+
+v3 -> v4:
+- Added RBs
+- "util/mmap-alloc: Factor out activating of memory to mmap_activate()"
+-- use "activate" instead of "populate"
+- "util: vfio-helpers: Implement ram_block_resized()"
+-- Also store max_size in mappings and assert against i
+-- Better comment why atomic resizes are not possible
+- "exec: Ram blocks with resizeable anonymous allocations under POSIX"
+-- Assert that RAM_RESIZEABLE_ALLOC is not set before allocating
+
+v2 -> v3:
+- Rebased on current master/[1].
+- "util: vfio-helpers: Factor out and fix processing of existing ram
+   blocks"
+-- moved to [1]
+- "util: vfio-helpers: Remove Error parameter from qemu_vfio_undo_mapping()=
+"
+-- Better parch description
+- "util/mmap-alloc: Factor out calculation of pagesize to mmap_pagesize()"
+-- is now "util/mmap-alloc: Factor out calculation of the pagesize for the
+   guard page"
+-- Decided to keep special handling for the guard page for now
+-- Dropped rb's
+- "util/mmap-alloc: Prepare for resizeable mmaps"
+-- No asserts sizes against the real page size
+- "numa: Teach ram block notifiers about resizable ram blocks"
+-- Split. One part is in [1], the other is now in "numa: Introduce
+   ram_block_notifiers_support_resize()"
+- "exec: Ram blocks with resizeable anonymous allocations under POSIX"
+-- Call qemu_ram_apply_settings() only populated parts. Call it on
+   freshly populated parts when growing.
+- Minor changes
+
+v1 -> v2:
+- Add "util: vfio-helpers: Fix qemu_vfio_close()"
+- Add "util: vfio-helpers: Remove Error parameter from
+       qemu_vfio_undo_mapping()"
+- Add "util: vfio-helpers: Factor out removal from
+       qemu_vfio_undo_mapping()"
+- "util/mmap-alloc: ..."
+ -- Minor changes due to review feedback (e.g., assert alignment, return
+    bool when resizing)
+- "util: vfio-helpers: Implement ram_block_resized()"
+ -- Reserve max_size in the IOVA address space.
+ -- On resize, undo old mapping and do new mapping. We can later implement
+    a new ioctl to resize the mapping directly.
+- "numa: Teach ram block notifiers about resizable ram blocks"
+ -- Pass size/max_size to ram block notifiers, which makes things easier an
+    cleaner
+- "exec: Ram blocks with resizable anonymous allocations under POSIX"
+ -- Adapt to new ram block notifiers
+ -- Shrink after notifying. Always trigger ram block notifiers on resizes
+ -- Add a safety net that all ram block notifiers registered at runtime
+    support resizes.
+
+[1] https://lkml.kernel.org/r/20200226155304.60219-1-david@redhat.com
+[2] https://lore.kernel.org/kvm/20191212171137.13872-1-david@redhat.com/
+
+David Hildenbrand (15):
+  util: vfio-helpers: Fix qemu_vfio_close()
+  util: vfio-helpers: Remove Error parameter from
+    qemu_vfio_undo_mapping()
+  util: vfio-helpers: Factor out removal from qemu_vfio_undo_mapping()
+  exec: Factor out setting ram settings (madvise ...) into
+    qemu_ram_apply_settings()
+  exec: Reuse qemu_ram_apply_settings() in qemu_ram_remap()
+  exec: Drop "shared" parameter from ram_block_add()
+  util/mmap-alloc: Factor out calculation of the pagesize for the guard
+    page
+  util/mmap-alloc: Factor out reserving of a memory region to
+    mmap_reserve()
+  util/mmap-alloc: Factor out activating of memory to mmap_activate()
+  util/mmap-alloc: Prepare for resizeable mmaps
+  util/mmap-alloc: Implement resizeable mmaps
+  util: vfio-helpers: Implement ram_block_resized()
+  util: oslib: Resizeable anonymous allocations under POSIX
+  numa: Introduce ram_block_notifiers_support_resize()
+  exec: Ram blocks with resizeable anonymous allocations under POSIX
+
+ exec.c                    | 100 ++++++++++++++++++-----
+ hw/core/numa.c            |  19 +++++
+ include/exec/cpu-common.h |   2 +
+ include/exec/memory.h     |   8 ++
+ include/exec/ramlist.h    |   1 +
+ include/qemu/mmap-alloc.h |  21 +++--
+ include/qemu/osdep.h      |   6 +-
+ util/mmap-alloc.c         | 168 ++++++++++++++++++++++++--------------
+ util/oslib-posix.c        |  37 ++++++++-
+ util/oslib-win32.c        |  14 ++++
+ util/trace-events         |  11 ++-
+ util/vfio-helpers.c       | 145 ++++++++++++++++++++++++--------
+ 12 files changed, 404 insertions(+), 128 deletions(-)
+
+--=20
+2.24.1
 
 
