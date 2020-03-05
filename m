@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A598C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C5AC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:38:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3059B20637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:37:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F98A20637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:38:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iakjqyEh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3059B20637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V5g94zAR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F98A20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tVF-0006aO-9s
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:37:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59349)
+	id 1j9tVk-0007TI-5x
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:38:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tPG-0003fa-5I
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:31 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tOv-0003Gx-42
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tPE-0002ZB-NN
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:30 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45950)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tOt-00026N-S2
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:09 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39801)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tPE-0002Xi-GG
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:28 -0500
-Received: by mail-wr1-x442.google.com with SMTP id v2so7780483wrp.12
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:28 -0800 (PST)
+ id 1j9tOt-00025Y-LF
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:07 -0500
+Received: by mail-wr1-x436.google.com with SMTP id y17so7802676wrn.6
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cBpCaClb9/Cygo6mKyCev/5pUMwMYtTJNviojF+pUgs=;
- b=iakjqyEhuffLB3W6UrYStftfKEseihDk7eqC6Us48xyi8i7GHCAbrFIRM7ZjSz2oHW
- LpIdkMCbuhXgr6RDvXy7Q+4dxALrEYV2AHcv+MTfnigQ/QFhGaMMJoxejXAGHxof8/QH
- wIBtlTXqCBhPVD+e2CtFl2f58NIhpbMZRUDpvNJ5OpIE8TOsrz0X8B/zJZlQPWq8v1m7
- 60OJSH5gIEMbAumNe8lAtnTaukYRxBlVep/9bNgKLQ/s929IJ23L1TN65zHkPWKAOpaE
- ZaoE5o2+Tpzai6pKZszdJDLfM1ZtUJNyEOn1QU44hZfPFHIBUq2g76gSNfTZRmBkEmp1
- 9Sug==
+ bh=1ef+BYDS8rTe5i0BI9ywJQpdyAoxyoAQZCX8XvfU9aI=;
+ b=V5g94zARXCWjtrHWfE9gIuQpbY1ZKvJcCm4ihRaOFXNd6Cxd2Zv+6gQPa38Bq7Oehs
+ BnTQAX/Pi7vyekCZyIuVpoVldvn+iaWr23ZDoEXQVk0YtVMTl3c3YnNN5cP8nyWNWunL
+ 1s1gMo4zMaVVfbwDRvgBcXnmnnTIqOrmVvJQW4kp8+uETQB9xdn3iqlYM6W+A2StHaYT
+ TrL2OkaXue6rbTa4TErZ/00/8kFVgaixhsMK30c96GgNg5gQ3B5AgEI+SDNir/QcDqNG
+ w3J0xXIs+x1iAsHs+e0KjJyrkrmb5xlQUarWDyw6gBvt67hEyIoTqkj9Kb1BH/5YzGRM
+ 1evw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cBpCaClb9/Cygo6mKyCev/5pUMwMYtTJNviojF+pUgs=;
- b=FRbztYOKhZsWCH4RQ0C/T49rR5gvDazp6JXamttZaJbmqjdPLobo9Ogalghqsw1YU8
- kMvpVytkVVAj10WTcKAr/ddQ4e8ZCLkOfhQsEa3GX7P3DFQThoXvYQnLU03D5Hwps1sb
- FCEVHYwkB/YEL1gz9uWF3xIOgyrMtOlzs6Drz6xJHB5pyOyS6MXOscZfzTJCsHu8D4X0
- 0JIy2WFUjMkOfntkBGTaHfXOXp9UyvFyxkvMhc++ptKfloJgvbmLMU8S8D53I8gXtfkk
- BdHIxEWWbz5rWmAj8dj3OTLWdvnQOIqgYG0ru7g3jvMvHvxpYkzZJsJ4ZO16KQHdWKaA
- wFqQ==
-X-Gm-Message-State: ANhLgQ0DQ2mnGO4tRaSRwpB75TNg44eDz9bWuj531UkQX63btfG6wtU9
- a90rc/K8GfcPGFXnnkW8O+mCO+yH2naHPg==
-X-Google-Smtp-Source: ADFU+vv4jXOd0B5kPknWeGGDGR6RttbXBDFksxaMh5J0vV6FczDlxh4F7LN/4HHbLXSCMZPanV1Eyw==
-X-Received: by 2002:adf:ec50:: with SMTP id w16mr11312961wrn.9.1583425886968; 
- Thu, 05 Mar 2020 08:31:26 -0800 (PST)
+ bh=1ef+BYDS8rTe5i0BI9ywJQpdyAoxyoAQZCX8XvfU9aI=;
+ b=avTuGDnYFvxvXnhK2rNBf8+oQf3zuPXrBylS9N49RiqJl+11QgBWimRJg4FiiE0ru/
+ hmpUm1Rf6rGyie+elFVCnfHytH1cSHMSWCIs8avIZo22p7m2a+hqaMnDjmAgcwrol8Cx
+ TyMd3lf4Fz6O7uE28Wy4ShbyTjE7t8C1V3ZnXrgyqAZF2LAJgfo8MBuW9g7DalLWxkUQ
+ 31REvxNUpAnx7fThZwBJTuDpwh8Zr9fYm8Ahm9GJ0GQeAEjftfGQj/fSYpZd6EzLDNTs
+ /9zXzUW2A2whlexLAi8PsEkXmYmWJK3N/K5Hke5Ww3bQPWBGUa3wHn77oJpHNWa6+72l
+ 0+ow==
+X-Gm-Message-State: ANhLgQ2klPo8TpGdM6NbBP6fnGgNPwsc399eqPLOH26YiwV1uogx6GSV
+ VPcKyBqnobIwF7ziI7paCys5+eXFL44Qmg==
+X-Google-Smtp-Source: ADFU+vsLGq40XEGFIxc6tct9GkXAyKJ7azS8wlp649g8+b8+oGYtDg3pQ/y1mcssALeN0uQpq2HE+Q==
+X-Received: by 2002:adf:b345:: with SMTP id k5mr11656251wrd.55.1583425866143; 
+ Thu, 05 Mar 2020 08:31:06 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.26
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.04
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:26 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:05 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/37] target/arm: Honor the HCR_EL2.TPCP bit
-Date: Thu,  5 Mar 2020 16:30:46 +0000
-Message-Id: <20200305163100.22912-24-peter.maydell@linaro.org>
+Subject: [PULL 03/37] target/arm: Implement (trivially) ARMv8.2-TTCNP
+Date: Thu,  5 Mar 2020 16:30:26 +0000
+Message-Id: <20200305163100.22912-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
 References: <20200305163100.22912-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,118 +97,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The ARMv8.2-TTCNP extension allows an implementation to optimize by
+sharing TLB entries between multiple cores, provided that software
+declares that it's ready to deal with this by setting a CnP bit in
+the TTBRn_ELx.  It is mandatory from ARMv8.2 onward.
 
-This bit traps EL1 access to cache maintenance insns that operate
-to the point of coherency or persistence.
+For QEMU's TLB implementation, sharing TLB entries between different
+cores would not really benefit us and would be a lot of work to
+implement.  So we implement this extension in the "trivial" manner:
+we allow the guest to set and read back the CnP bit, but don't change
+our behaviour (this is an architecturally valid implementation
+choice).
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200229012811.24129-10-richard.henderson@linaro.org
+The only code path which looks at the TTBRn_ELx values for the
+long-descriptor format where the CnP bit is defined is already doing
+enough masking to not get confused when the CnP bit at the bottom of
+the register is set, so we can simply add a comment noting why we're
+relying on that mask.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200225193822.18874-1-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 39 +++++++++++++++++++++++++++++++--------
- 1 file changed, 31 insertions(+), 8 deletions(-)
+ target/arm/cpu.c    | 1 +
+ target/arm/cpu64.c  | 2 ++
+ target/arm/helper.c | 4 ++++
+ 3 files changed, 7 insertions(+)
 
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index e6016e33cec..de00a45e903 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2702,6 +2702,7 @@ static void arm_max_initfn(Object *obj)
+             t = cpu->isar.id_mmfr4;
+             t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
+             t = FIELD_DP32(t, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
++            t = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* TTCNP */
+             cpu->isar.id_mmfr4 = t;
+         }
+ #endif
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index b842e2b664a..62d36f9e8d3 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -677,6 +677,7 @@ static void aarch64_max_initfn(Object *obj)
+ 
+         t = cpu->isar.id_aa64mmfr2;
+         t = FIELD_DP64(t, ID_AA64MMFR2, UAO, 1);
++        t = FIELD_DP64(t, ID_AA64MMFR2, CNP, 1); /* TTCNP */
+         cpu->isar.id_aa64mmfr2 = t;
+ 
+         /* Replicate the same data to the 32-bit id registers.  */
+@@ -704,6 +705,7 @@ static void aarch64_max_initfn(Object *obj)
+         u = cpu->isar.id_mmfr4;
+         u = FIELD_DP32(u, ID_MMFR4, HPDS, 1); /* AA32HPD */
+         u = FIELD_DP32(u, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
++        u = FIELD_DP32(t, ID_MMFR4, CNP, 1); /* TTCNP */
+         cpu->isar.id_mmfr4 = u;
+ 
+         u = cpu->isar.id_aa64dfr0;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index e362d420eb4..e6eaec8ad31 100644
+index 6be9ffa09ef..4eaf7333c7b 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -4314,6 +4314,28 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
-     return CP_ACCESS_OK;
- }
+@@ -10591,6 +10591,10 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
  
-+static CPAccessResult aa64_cacheop_poc_access(CPUARMState *env,
-+                                              const ARMCPRegInfo *ri,
-+                                              bool isread)
-+{
-+    /* Cache invalidate/clean to Point of Coherency or Persistence...  */
-+    switch (arm_current_el(env)) {
-+    case 0:
-+        /* ... EL0 must UNDEF unless SCTLR_EL1.UCI is set.  */
-+        if (!(arm_sctlr(env, 0) & SCTLR_UCI)) {
-+            return CP_ACCESS_TRAP;
-+        }
-+        /* fall through */
-+    case 1:
-+        /* ... EL1 must trap to EL2 if HCR_EL2.TPCP is set.  */
-+        if (arm_hcr_el2_eff(env) & HCR_TPCP) {
-+            return CP_ACCESS_TRAP_EL2;
-+        }
-+        break;
-+    }
-+    return CP_ACCESS_OK;
-+}
-+
- /* See: D4.7.2 TLB maintenance requirements and the TLB maintenance instructions
-  * Page D4-1736 (DDI0487A.b)
-  */
-@@ -4721,14 +4743,15 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-       .accessfn = aa64_cacheop_access },
-     { .name = "DC_IVAC", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 1,
--      .access = PL1_W, .type = ARM_CP_NOP },
-+      .access = PL1_W, .accessfn = aa64_cacheop_poc_access,
-+      .type = ARM_CP_NOP },
-     { .name = "DC_ISW", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 2,
-       .access = PL1_W, .accessfn = access_tsw, .type = ARM_CP_NOP },
-     { .name = "DC_CVAC", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 1,
-       .access = PL0_W, .type = ARM_CP_NOP,
--      .accessfn = aa64_cacheop_access },
-+      .accessfn = aa64_cacheop_poc_access },
-     { .name = "DC_CSW", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 2,
-       .access = PL1_W, .accessfn = access_tsw, .type = ARM_CP_NOP },
-@@ -4739,7 +4762,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-     { .name = "DC_CIVAC", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 1,
-       .access = PL0_W, .type = ARM_CP_NOP,
--      .accessfn = aa64_cacheop_access },
-+      .accessfn = aa64_cacheop_poc_access },
-     { .name = "DC_CISW", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 2,
-       .access = PL1_W, .accessfn = access_tsw, .type = ARM_CP_NOP },
-@@ -4921,17 +4944,17 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
-     { .name = "BPIMVA", .cp = 15, .opc1 = 0, .crn = 7, .crm = 5, .opc2 = 7,
-       .type = ARM_CP_NOP, .access = PL1_W },
-     { .name = "DCIMVAC", .cp = 15, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 1,
--      .type = ARM_CP_NOP, .access = PL1_W },
-+      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = aa64_cacheop_poc_access },
-     { .name = "DCISW", .cp = 15, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 2,
-       .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
-     { .name = "DCCMVAC", .cp = 15, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 1,
--      .type = ARM_CP_NOP, .access = PL1_W },
-+      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = aa64_cacheop_poc_access },
-     { .name = "DCCSW", .cp = 15, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 2,
-       .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
-     { .name = "DCCMVAU", .cp = 15, .opc1 = 0, .crn = 7, .crm = 11, .opc2 = 1,
-       .type = ARM_CP_NOP, .access = PL1_W },
-     { .name = "DCCIMVAC", .cp = 15, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 1,
--      .type = ARM_CP_NOP, .access = PL1_W },
-+      .type = ARM_CP_NOP, .access = PL1_W, .accessfn = aa64_cacheop_poc_access },
-     { .name = "DCCISW", .cp = 15, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 2,
-       .type = ARM_CP_NOP, .access = PL1_W, .accessfn = access_tsw },
-     /* MMU Domain access control / MPU write buffer control */
-@@ -6750,7 +6773,7 @@ static const ARMCPRegInfo dcpop_reg[] = {
-     { .name = "DC_CVAP", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 1,
-       .access = PL0_W, .type = ARM_CP_NO_RAW | ARM_CP_SUPPRESS_TB_END,
--      .accessfn = aa64_cacheop_access, .writefn = dccvap_writefn },
-+      .accessfn = aa64_cacheop_poc_access, .writefn = dccvap_writefn },
-     REGINFO_SENTINEL
- };
+     /* Now we can extract the actual base address from the TTBR */
+     descaddr = extract64(ttbr, 0, 48);
++    /*
++     * We rely on this masking to clear the RES0 bits at the bottom of the TTBR
++     * and also to mask out CnP (bit 0) which could validly be non-zero.
++     */
+     descaddr &= ~indexmask;
  
-@@ -6758,7 +6781,7 @@ static const ARMCPRegInfo dcpodp_reg[] = {
-     { .name = "DC_CVADP", .state = ARM_CP_STATE_AA64,
-       .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 1,
-       .access = PL0_W, .type = ARM_CP_NO_RAW | ARM_CP_SUPPRESS_TB_END,
--      .accessfn = aa64_cacheop_access, .writefn = dccvap_writefn },
-+      .accessfn = aa64_cacheop_poc_access, .writefn = dccvap_writefn },
-     REGINFO_SENTINEL
- };
- #endif /*CONFIG_USER_ONLY*/
+     /* The address field in the descriptor goes up to bit 39 for ARMv7
 -- 
 2.20.1
 
