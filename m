@@ -2,87 +2,79 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F03BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA02C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CF312072D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:21:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA9412072D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UR3Y0P0P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF312072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfSYVqqm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA9412072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9uC6-0004Ad-Di
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:21:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39895)
+	id 1j9uCG-0004TU-Tp
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:22:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j9u9w-0000mR-DI
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:19:46 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j9tzB-0000V5-AX
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j9u9t-0002C8-To
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:19:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56377
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1j9tz9-0003ND-Sx
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:08:37 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58424
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9u9t-0002BN-Nq
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:19:41 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j9tz9-0003MZ-No
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:08:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583428781;
+ s=mimecast20190719; t=1583428115;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hTJFqVA0lABDlwKUj390+GQUd6YzHgnGqXSwcitn4Ng=;
- b=UR3Y0P0PHaxO7QGSu+fUyWL1lcO9is7Na5IhwC2F2+waEykW35AWn15TUr2QkKdLv56wqk
- lBgOa61By00n79/H5ywLsNtfq9tGjNfLUtZ4dRxmXtU3kEXI8sR5v8JWmM1TSEC2XW9ZnU
- N/ReoMgHAmfB4AXEM4Qg14T5+b5olAg=
+ bh=ZSd10YyDelIgpQ6PH9ngXWKEeTT2D1gh++ZXGYXUwgk=;
+ b=PfSYVqqmnhsqtCpzAULQHlE15jG5CvU8ASP/pdinLX3oQzHQCSKyFeJtbfcaTCw2rZIt34
+ vfzINU+v0S0E832M5RbHN3PdtsK9O/djPZJJ38G1RJF3t00RadPvELPlCLKWEeVOw6iYja
+ 6Iat8bzw0KCkMm5EriOcD4tP4ue1wKY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-Fl_dFMqvNy66D5n2Qgo5AQ-1; Thu, 05 Mar 2020 12:19:36 -0500
-X-MC-Unique: Fl_dFMqvNy66D5n2Qgo5AQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-81-LuA6_eZCNmS9X8sajAILxA-1; Thu, 05 Mar 2020 12:08:34 -0500
+X-MC-Unique: LuA6_eZCNmS9X8sajAILxA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86724107ACC9;
- Thu,  5 Mar 2020 17:19:34 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DB4F8B75C;
- Thu,  5 Mar 2020 17:19:21 +0000 (UTC)
-Date: Thu, 5 Mar 2020 17:19:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Subject: Re: [PATCH v5 40/50] multi-process/mig: build migration module in
- the remote process
-Message-ID: <20200305171919.GO3130@work-vm>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <96a495711764282ff90504cec6734eff563ceb4d.1582576372.git.jag.raman@oracle.com>
- <20200304155859.GG4104@work-vm>
- <240f3182-80bb-f808-f93a-a41634eaff54@oracle.com>
- <20200304195201.GM4104@work-vm>
- <ce7ed38a-f17b-3a94-3a26-91abed632d17@oracle.com>
- <20200305101059.GC3130@work-vm> <20200305170746.GB26883@flaka>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7391107ACC4;
+ Thu,  5 Mar 2020 17:08:32 +0000 (UTC)
+Received: from localhost (ovpn-117-104.ams2.redhat.com [10.36.117.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AF9E90796;
+ Thu,  5 Mar 2020 17:08:32 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 6/7] aio-posix: support userspace polling of fd monitoring
+Date: Thu,  5 Mar 2020 17:08:05 +0000
+Message-Id: <20200305170806.1313245-7-stefanha@redhat.com>
+In-Reply-To: <20200305170806.1313245-1-stefanha@redhat.com>
+References: <20200305170806.1313245-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305170746.GB26883@flaka>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,426 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- Jag Raman <jag.raman@oracle.com>, quintela@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
- stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Elena Ufimtseva (elena.ufimtseva@oracle.com) wrote:
-> On Thu, Mar 05, 2020 at 10:10:59AM +0000, Dr. David Alan Gilbert wrote:
-> > * Jag Raman (jag.raman@oracle.com) wrote:
-> > >=20
-> > >=20
-> > > On 3/4/2020 2:52 PM, Dr. David Alan Gilbert wrote:
-> > > > * Jag Raman (jag.raman@oracle.com) wrote:
-> > > > >=20
-> > > > >=20
-> > > > > On 3/4/2020 10:58 AM, Dr. David Alan Gilbert wrote:
-> > > > > > * Jagannathan Raman (jag.raman@oracle.com) wrote:
-> > > > > > > Add Makefile support to enable migration in remote process
-> > > > > > >=20
-> > > > > > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > > > > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > > > > > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > > > > > > ---
-> > > > > > >    Makefile.objs           |  4 +++-
-> > > > > > >    Makefile.target         |  1 +
-> > > > > > >    migration/Makefile.objs | 13 ++++++++++++-
-> > > > > > >    net/Makefile.objs       |  2 ++
-> > > > > > >    softmmu/vl.c            |  2 --
-> > > > > > >    stubs/migration.c       | 49 +++++++++++++++++++++++++++++=
-++++++++++++++++++++
-> > > > > > >    stubs/net-stub.c        | 21 +++++++++++++++++++++
-> > > > > > >    stubs/qapi-misc.c       |  2 ++
-> > > > > > >    stubs/replay.c          |  8 ++++++++
-> > > > > > >    stubs/vl-stub.c         | 24 ++++++++++++++++++++++++
-> > > > > > >    vl-parse.c              |  3 +++
-> > > > > > >    11 files changed, 125 insertions(+), 4 deletions(-)
-> > > > > > >=20
-> > > > > > > diff --git a/Makefile.objs b/Makefile.objs
-> > > > > > > index 4b5db09..65009da 100644
-> > > > > > > --- a/Makefile.objs
-> > > > > > > +++ b/Makefile.objs
-> > > > > > > @@ -74,6 +74,8 @@ common-obj-y +=3D qdev-monitor.o device-hot=
-plug.o
-> > > > > > >    common-obj-$(CONFIG_WIN32) +=3D os-win32.o
-> > > > > > >    common-obj-$(CONFIG_POSIX) +=3D os-posix.o
-> > > > > > > +remote-pci-obj-$(CONFIG_POSIX) +=3D os-posix.o
-> > > > > > > +
-> > > > > > >    common-obj-$(CONFIG_LINUX) +=3D fsdev/
-> > > > > > >    common-obj-y +=3D accel/
-> > > > > > > @@ -104,11 +106,11 @@ common-obj-y +=3D vl-parse.o
-> > > > > > >    ##########################################################=
-#############
-> > > > > > >    # qapi
-> > > > > > > -
-> > > > > > >    common-obj-y +=3D qapi/
-> > > > > > >    endif # CONFIG_SOFTMMU
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D net/
-> > > > > > >    remote-pci-obj-$(CONFIG_MPQEMU) +=3D qapi/
-> > > > > > >    remote-pci-obj-$(CONFIG_MPQEMU) +=3D blockdev-nbd.o
-> > > > > > >    remote-pci-obj-$(CONFIG_MPQEMU) +=3D job-qmp.o
-> > > > > > > diff --git a/Makefile.target b/Makefile.target
-> > > > > > > index 4ead5c3..4012ae5 100644
-> > > > > > > --- a/Makefile.target
-> > > > > > > +++ b/Makefile.target
-> > > > > > > @@ -240,6 +240,7 @@ all-remote-pci-obj-y +=3D exec.o
-> > > > > > >    all-remote-pci-obj-y +=3D exec-vary.o
-> > > > > > >    all-remote-pci-obj-y +=3D ioport.o
-> > > > > > >    all-remote-pci-obj-y +=3D cpus.o
-> > > > > > > +all-remote-pci-obj-y +=3D migration/ram.o
-> > > > > > >    endif
-> > > > > > >    remote-pci-obj-y :=3D
-> > > > > > > diff --git a/migration/Makefile.objs b/migration/Makefile.obj=
-s
-> > > > > > > index e7cdc76..21f9d8d 100644
-> > > > > > > --- a/migration/Makefile.objs
-> > > > > > > +++ b/migration/Makefile.objs
-> > > > > > > @@ -15,4 +15,15 @@ common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) =
-+=3D block.o
-> > > > > > >    rdma.o-libs :=3D $(RDMA_LIBS)
-> > > > > > > -remote-pci-obj-$(CONFIG_MPQEMU) +=3D qemu-file.o vmstate.o q=
-json.o vmstate-types.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D migration.o socket.o fd=
-.o exec.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D tls.o channel.o savevm.=
-o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D colo.o colo-failover.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D vmstate.o vmstate-types=
-.o page_cache.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D qemu-file.o global_stat=
-e.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D qemu-file-channel.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D xbzrle.o postcopy-ram.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D qjson.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D block-dirty-bitmap.o
-> > > > > > > +remote-pci-obj-$(CONFIG_RDMA) +=3D rdma.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D block.o
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D multifd.o
-> > > > > >=20
-> > > > > > Hmm, are you really going to want all this lot in your remote p=
-rocess?
-> > > > > > Assuming it's just devices, I can understand the first line or =
-two, but
-> > > > > > it seems odd to have all of this.
-> > > > >=20
-> > > > > Yeah, we ended up needing to compile these in to enable migration=
-. We
-> > > > > are only using "fd" to enable migration. Although we don't use tl=
-s,
-> > > > > xbzrle, rdma, multifd, etc... for example, the migration code doe=
-s
-> > > > > support these protocols and, therefore, we had to compile them in=
-.
-> > > >=20
-> > > > But are you even running a migration stream from the remote process=
-?
-> > > > Aren't you just doing vmstate migration of devices; i.e. do you nee=
-d
-> > > > anything relating to incremental RAM migration (e.g. xbzrle, rdma,
-> > > > postcopy).
-> > >=20
-> > > We are running a migration stream from the remote process. We are onl=
-y
-> > > doing the vmstate migration of devices, and not anything incremental
-> > > related to RAM.
-> > >=20
-> > > We are using QEMU's existing migration infrastructure (vmstate_save /
-> > > qemu_loadvm_section_start_full) to move the vmstate. Based on my limi=
-ted
-> > > experience with the migration code, I get that it comes as a suite.
-> > > Without some refactoring, we would need to build all of the files wit=
-hin
-> > > the migration folder.
-> > >=20
-> > > The vmstate functions communicate over QEMUFile, which would be using
-> > > fd, tcp, rdma, etc... at the backend. These functions also need other
-> > > functions defined in migration.c, which require the building of xbzrl=
-e,
-> > > postcopy, etc...
-> >=20
-> > OK, I bet we can refactor some of that to be modular fairly easily; som=
-e
-> > is harder than others.  For example there are different QEMUFile
-> > subclasses for RDMA, so you should be able to have just the top level
-> > QEMUFile and the implementations you need.
-> > Similarly the vmstate code shouldn't depend on the ram code;  we can
-> > look at splitting it up some how.
-> >
->=20
-> Hi Dave
->=20
-> We did initially tried to split some of the vmstate code, and it was a lo=
-t of code to add to
-> already big patchset. So we could do this split later on as a separate se=
-ries.
-> Would that be an option or you would rather see it in this set?
-
-I'd say see if there are any easy things you can split; if there are
-then lets take those as part of this series.
-
-Dave
-
-> Thank you!
->=20
-> Elena=20
-> > Dave
-> >=20
-> > > Thank you!
-> > > --
-> > > Jag
-> > >=20
-> > > >=20
-> > > > Dave
-> > > >=20
-> > > > > Thank you!
-> > > > > --
-> > > > > Jag
-> > > > >=20
-> > > > > >=20
-> > > > > > Dave
-> > > > > >=20
-> > > > > > > diff --git a/net/Makefile.objs b/net/Makefile.objs
-> > > > > > > index c5d076d..a8ad986 100644
-> > > > > > > --- a/net/Makefile.objs
-> > > > > > > +++ b/net/Makefile.objs
-> > > > > > > @@ -30,3 +30,5 @@ common-obj-$(CONFIG_WIN32) +=3D tap-win32.o
-> > > > > > >    vde.o-libs =3D $(VDE_LIBS)
-> > > > > > >    common-obj-$(CONFIG_CAN_BUS) +=3D can/
-> > > > > > > +
-> > > > > > > +remote-pci-obj-$(CONFIG_MPQEMU) +=3D announce.o
-> > > > > > > diff --git a/softmmu/vl.c b/softmmu/vl.c
-> > > > > > > index 4a4f52c..42d5682 100644
-> > > > > > > --- a/softmmu/vl.c
-> > > > > > > +++ b/softmmu/vl.c
-> > > > > > > @@ -128,7 +128,6 @@ const char* keyboard_layout =3D NULL;
-> > > > > > >    ram_addr_t ram_size;
-> > > > > > >    const char *mem_path =3D NULL;
-> > > > > > >    int mem_prealloc =3D 0; /* force preallocation of physical=
- target memory */
-> > > > > > > -bool enable_mlock =3D false;
-> > > > > > >    bool enable_cpu_pm =3D false;
-> > > > > > >    int nb_nics;
-> > > > > > >    NICInfo nd_table[MAX_NICS];
-> > > > > > > @@ -168,7 +167,6 @@ const char *prom_envs[MAX_PROM_ENVS];
-> > > > > > >    int boot_menu;
-> > > > > > >    bool boot_strict;
-> > > > > > >    uint8_t *boot_splash_filedata;
-> > > > > > > -int only_migratable; /* turn it off unless user states other=
-wise */
-> > > > > > >    bool wakeup_suspend_enabled;
-> > > > > > >    int icount_align_option;
-> > > > > > > diff --git a/stubs/migration.c b/stubs/migration.c
-> > > > > > > index 28ccf80..dbd12db 100644
-> > > > > > > --- a/stubs/migration.c
-> > > > > > > +++ b/stubs/migration.c
-> > > > > > > @@ -6,6 +6,35 @@
-> > > > > > >    #include "qapi/qapi-types-migration.h"
-> > > > > > >    #include "qapi/qapi-commands-migration.h"
-> > > > > > >    #include "qapi/qapi-types-net.h"
-> > > > > > > +#include "net/filter.h"
-> > > > > > > +#include "net/colo-compare.h"
-> > > > > > > +
-> > > > > > > +#pragma weak qmp_query_migrate_capabilities
-> > > > > > > +#pragma weak qmp_query_migrate_parameters
-> > > > > > > +#pragma weak migrate_announce_params
-> > > > > > > +#pragma weak qmp_query_migrate
-> > > > > > > +#pragma weak qmp_migrate_set_capabilities
-> > > > > > > +#pragma weak qmp_migrate_set_parameters
-> > > > > > > +#pragma weak qmp_migrate_incoming
-> > > > > > > +#pragma weak qmp_migrate_recover
-> > > > > > > +#pragma weak qmp_migrate_pause
-> > > > > > > +#pragma weak qmp_migrate
-> > > > > > > +#pragma weak qmp_migrate_cancel
-> > > > > > > +#pragma weak qmp_migrate_continue
-> > > > > > > +#pragma weak qmp_migrate_set_cache_size
-> > > > > > > +#pragma weak qmp_query_migrate_cache_size
-> > > > > > > +#pragma weak qmp_migrate_set_speed
-> > > > > > > +#pragma weak qmp_migrate_set_downtime
-> > > > > > > +#pragma weak qmp_migrate_start_postcopy
-> > > > > > > +#pragma weak migration_global_dump
-> > > > > > > +#pragma weak save_snapshot
-> > > > > > > +#pragma weak qmp_xen_save_devices_state
-> > > > > > > +#pragma weak load_snapshot
-> > > > > > > +#pragma weak qmp_xen_set_replication
-> > > > > > > +#pragma weak qmp_query_xen_replication_status
-> > > > > > > +#pragma weak qmp_xen_colo_do_checkpoint
-> > > > > > > +#pragma weak qmp_query_colo_status
-> > > > > > > +#pragma weak qmp_x_colo_lost_heartbeat
-> > > > > > >    MigrationInfo *qmp_query_migrate(Error **errp)
-> > > > > > >    {
-> > > > > > > @@ -160,3 +189,23 @@ AnnounceParameters *migrate_announce_par=
-ams(void)
-> > > > > > >        return NULL;
-> > > > > > >    }
-> > > > > > > +
-> > > > > > > +void colo_notify_filters_event(int event, Error **errp)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void colo_notify_compares_event(void *opaque, int event, Err=
-or **errp)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void colo_compare_register_notifier(Notifier *notify)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void colo_compare_unregister_notifier(Notifier *notify)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > diff --git a/stubs/net-stub.c b/stubs/net-stub.c
-> > > > > > > index 962827e..ddfd1e4 100644
-> > > > > > > --- a/stubs/net-stub.c
-> > > > > > > +++ b/stubs/net-stub.c
-> > > > > > > @@ -5,6 +5,8 @@
-> > > > > > >    #include "qapi/qapi-commands-net.h"
-> > > > > > >    #include "qapi/qapi-commands-rocker.h"
-> > > > > > > +#pragma weak qmp_announce_self
-> > > > > > > +
-> > > > > > >    int qemu_find_net_clients_except(const char *id, NetClient=
-State **ncs,
-> > > > > > >                                     NetClientDriver type, int=
- max)
-> > > > > > >    {
-> > > > > > > @@ -98,3 +100,22 @@ void netdev_add(QemuOpts *opts, Error **e=
-rrp)
-> > > > > > >    {
-> > > > > > >        qemu_debug_assert(0);
-> > > > > > >    }
-> > > > > > > +
-> > > > > > > +NetClientState *qemu_get_queue(NICState *nic)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +
-> > > > > > > +    return NULL;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +ssize_t qemu_send_packet_raw(NetClientState *nc, const uint8=
-_t *buf, int size)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +
-> > > > > > > +    return 0;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void qemu_foreach_nic(qemu_nic_foreach func, void *opaque)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > diff --git a/stubs/qapi-misc.c b/stubs/qapi-misc.c
-> > > > > > > index 3eeedd9..824eac1 100644
-> > > > > > > --- a/stubs/qapi-misc.c
-> > > > > > > +++ b/stubs/qapi-misc.c
-> > > > > > > @@ -5,6 +5,8 @@
-> > > > > > >    #include "./qapi/qapi-types-dump.h"
-> > > > > > >    #include "qapi/qapi-commands-dump.h"
-> > > > > > > +#pragma weak qmp_xen_load_devices_state
-> > > > > > > +
-> > > > > > >    void qmp_dump_guest_memory(bool paging, const char *file,
-> > > > > > >                               bool has_detach, bool detach,
-> > > > > > >                               bool has_begin, int64_t begin, =
-bool has_length,
-> > > > > > > diff --git a/stubs/replay.c b/stubs/replay.c
-> > > > > > > index 9b53c0c..6fc7850 100644
-> > > > > > > --- a/stubs/replay.c
-> > > > > > > +++ b/stubs/replay.c
-> > > > > > > @@ -1,4 +1,5 @@
-> > > > > > >    #include "qemu/osdep.h"
-> > > > > > > +#include "qemu-common.h"
-> > > > > > >    #include "sysemu/replay.h"
-> > > > > > >    ReplayMode replay_mode;
-> > > > > > > @@ -106,3 +107,10 @@ void replay_account_executed_instruction=
-s(void)
-> > > > > > >    void replay_add_blocker(Error *reason)
-> > > > > > >    {
-> > > > > > >    }
-> > > > > > > +
-> > > > > > > +bool replay_can_snapshot(void)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +
-> > > > > > > +    return false;
-> > > > > > > +}
-> > > > > > > diff --git a/stubs/vl-stub.c b/stubs/vl-stub.c
-> > > > > > > index 606f078..5f308c1 100644
-> > > > > > > --- a/stubs/vl-stub.c
-> > > > > > > +++ b/stubs/vl-stub.c
-> > > > > > > @@ -14,6 +14,8 @@
-> > > > > > >    #include "disas/disas.h"
-> > > > > > >    #include "audio/audio.h"
-> > > > > > > +#pragma weak qemu_add_exit_notifier
-> > > > > > > +
-> > > > > > >    bool tcg_allowed;
-> > > > > > >    bool xen_allowed;
-> > > > > > >    bool boot_strict;
-> > > > > > > @@ -169,3 +171,25 @@ int wav_start_capture(AudioState *state,=
- CaptureState *s, const char *path,
-> > > > > > >        return -1;
-> > > > > > >    }
-> > > > > > > +
-> > > > > > > +void qemu_system_killed(int signal, pid_t pid)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void qemu_system_reset(ShutdownCause reason)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +bool runstate_store(char *str, size_t size)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +
-> > > > > > > +    return false;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +void qemu_add_exit_notifier(Notifier *notify)
-> > > > > > > +{
-> > > > > > > +    qemu_debug_assert(0);
-> > > > > > > +}
-> > > > > > > diff --git a/vl-parse.c b/vl-parse.c
-> > > > > > > index 1f6a3f0..423f4a0 100644
-> > > > > > > --- a/vl-parse.c
-> > > > > > > +++ b/vl-parse.c
-> > > > > > > @@ -27,6 +27,9 @@
-> > > > > > >    #include "vl.h"
-> > > > > > > +int only_migratable; /* turn it off unless user states other=
-wise */
-> > > > > > > +bool enable_mlock;
-> > > > > > > +
-> > > > > > >    /*********************************************************=
-**/
-> > > > > > >    /* QEMU Block devices */
-> > > > > > > --=20
-> > > > > > > 1.8.3.1
-> > > > > > >=20
-> > > > > > --
-> > > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > > > >=20
-> > > > >=20
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > > >=20
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+VW5saWtlIHBwb2xsKDIpIGFuZCBlcG9sbCg3KSwgTGludXggaW9fdXJpbmcgY29tcGxldGlvbnMg
+Y2FuIGJlIHBvbGxlZApmcm9tIHVzZXJzcGFjZS4gIFByZXZpb3VzbHkgdXNlcnNwYWNlIHBvbGxp
+bmcgd2FzIG9ubHkgYWxsb3dlZCB3aGVuIGFsbApBaW9IYW5kbGVyJ3MgaGFkIGFuIC0+aW9fcG9s
+bCgpIGNhbGxiYWNrLiAgVGhpcyBwcmV2ZW50ZWQgc3RhcnZhdGlvbiBvZgpmZHMgYnkgdXNlcnNw
+YWNlIHBvbGxhYmxlIGhhbmRsZXJzLgoKQWRkIHRoZSBGRE1vbk9wcy0+bmVlZF93YWl0KCkgY2Fs
+bGJhY2sgdGhhdCBlbmFibGVzIHVzZXJzcGFjZSBwb2xsaW5nCmV2ZW4gd2hlbiBzb21lIEFpb0hh
+bmRsZXJzIGxhY2sgLT5pb19wb2xsKCkuCgpGb3IgZXhhbXBsZSwgaXQncyBub3cgcG9zc2libGUg
+dG8gZG8gdXNlcnNwYWNlIHBvbGxpbmcgd2hlbiBhIFRDUC9JUApzb2NrZXQgaXMgbW9uaXRvcmVk
+IHRoYW5rcyB0byBMaW51eCBpb191cmluZy4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6
+aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiBpbmNsdWRlL2Jsb2NrL2Fpby5oICAgfCAxOSAr
+KysrKysrKysrKysrKysrKysrCiB1dGlsL2Fpby1wb3NpeC5jICAgICAgfCAxMSArKysrKysrKy0t
+LQogdXRpbC9mZG1vbi1lcG9sbC5jICAgIHwgIDEgKwogdXRpbC9mZG1vbi1pb191cmluZy5jIHwg
+IDYgKysrKysrCiB1dGlsL2ZkbW9uLXBvbGwuYyAgICAgfCAgMSArCiA1IGZpbGVzIGNoYW5nZWQs
+IDM1IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9i
+bG9jay9haW8uaCBiL2luY2x1ZGUvYmxvY2svYWlvLmgKaW5kZXggODNmYzliODQ0ZC4uZjA3ZWJi
+NzZiOCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9ibG9jay9haW8uaAorKysgYi9pbmNsdWRlL2Jsb2Nr
+L2Fpby5oCkBAIC01NSw2ICs1NSw5IEBAIHN0cnVjdCBUaHJlYWRQb29sOwogc3RydWN0IExpbnV4
+QWlvU3RhdGU7CiBzdHJ1Y3QgTHVyaW5nU3RhdGU7CiAKKy8qIElzIHBvbGxpbmcgZGlzYWJsZWQ/
+ICovCitib29sIGFpb19wb2xsX2Rpc2FibGVkKEFpb0NvbnRleHQgKmN0eCk7CisKIC8qIENhbGxi
+YWNrcyBmb3IgZmlsZSBkZXNjcmlwdG9yIG1vbml0b3JpbmcgaW1wbGVtZW50YXRpb25zICovCiB0
+eXBlZGVmIHN0cnVjdCB7CiAgICAgLyoKQEAgLTg0LDYgKzg3LDIyIEBAIHR5cGVkZWYgc3RydWN0
+IHsKICAgICAgKiBSZXR1cm5zOiBudW1iZXIgb2YgcmVhZHkgZmlsZSBkZXNjcmlwdG9ycy4KICAg
+ICAgKi8KICAgICBpbnQgKCp3YWl0KShBaW9Db250ZXh0ICpjdHgsIEFpb0hhbmRsZXJMaXN0ICpy
+ZWFkeV9saXN0LCBpbnQ2NF90IHRpbWVvdXQpOworCisgICAgLyoKKyAgICAgKiBuZWVkX3dhaXQ6
+CisgICAgICogQGN0eDogdGhlIEFpb0NvbnRleHQKKyAgICAgKgorICAgICAqIFRlbGwgYWlvX3Bv
+bGwoKSB3aGVuIHRvIHN0b3AgdXNlcnNwYWNlIHBvbGxpbmcgZWFybHkgYmVjYXVzZSAtPndhaXQo
+KQorICAgICAqIGhhcyBmZHMgcmVhZHkuCisgICAgICoKKyAgICAgKiBGaWxlIGRlc2NyaXB0b3Ig
+bW9uaXRvcmluZyBpbXBsZW1lbnRhdGlvbnMgdGhhdCBjYW5ub3QgcG9sbCBmZCByZWFkaW5lc3MK
+KyAgICAgKiBmcm9tIHVzZXJzcGFjZSBzaG91bGQgdXNlIGFpb19wb2xsX2Rpc2FibGVkKCkgaGVy
+ZS4gIFRoaXMgZW5zdXJlcyB0aGF0CisgICAgICogZmlsZSBkZXNjcmlwdG9ycyBhcmUgbm90IHN0
+YXJ2ZWQgYnkgaGFuZGxlcnMgdGhhdCBmcmVxdWVudGx5IG1ha2UKKyAgICAgKiBwcm9ncmVzcyB2
+aWEgdXNlcnNwYWNlIHBvbGxpbmcuCisgICAgICoKKyAgICAgKiBSZXR1cm5zOiB0cnVlIGlmIC0+
+d2FpdCgpIHNob3VsZCBiZSBjYWxsZWQsIGZhbHNlIG90aGVyd2lzZS4KKyAgICAgKi8KKyAgICBi
+b29sICgqbmVlZF93YWl0KShBaW9Db250ZXh0ICpjdHgpOwogfSBGRE1vbk9wczsKIAogLyoKZGlm
+ZiAtLWdpdCBhL3V0aWwvYWlvLXBvc2l4LmMgYi91dGlsL2Fpby1wb3NpeC5jCmluZGV4IGEyNGEz
+M2MxNWEuLmVkZTA0YTRiYzIgMTAwNjQ0Ci0tLSBhL3V0aWwvYWlvLXBvc2l4LmMKKysrIGIvdXRp
+bC9haW8tcG9zaXguYwpAQCAtMjIsNiArMjIsMTEgQEAKICNpbmNsdWRlICJ0cmFjZS5oIgogI2lu
+Y2x1ZGUgImFpby1wb3NpeC5oIgogCitib29sIGFpb19wb2xsX2Rpc2FibGVkKEFpb0NvbnRleHQg
+KmN0eCkKK3sKKyAgICByZXR1cm4gYXRvbWljX3JlYWQoJmN0eC0+cG9sbF9kaXNhYmxlX2NudCk7
+Cit9CisKIHZvaWQgYWlvX2FkZF9yZWFkeV9oYW5kbGVyKEFpb0hhbmRsZXJMaXN0ICpyZWFkeV9s
+aXN0LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgQWlvSGFuZGxlciAqbm9kZSwKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGludCByZXZlbnRzKQpAQCAtNDIzLDcgKzQyOCw3IEBAIHN0
+YXRpYyBib29sIHJ1bl9wb2xsX2hhbmRsZXJzKEFpb0NvbnRleHQgKmN0eCwgaW50NjRfdCBtYXhf
+bnMsIGludDY0X3QgKnRpbWVvdXQpCiAgICAgICAgIGVsYXBzZWRfdGltZSA9IHFlbXVfY2xvY2tf
+Z2V0X25zKFFFTVVfQ0xPQ0tfUkVBTFRJTUUpIC0gc3RhcnRfdGltZTsKICAgICAgICAgbWF4X25z
+ID0gcWVtdV9zb29uZXN0X3RpbWVvdXQoKnRpbWVvdXQsIG1heF9ucyk7CiAgICAgICAgIGFzc2Vy
+dCghKG1heF9ucyAmJiBwcm9ncmVzcykpOwotICAgIH0gd2hpbGUgKGVsYXBzZWRfdGltZSA8IG1h
+eF9ucyAmJiAhYXRvbWljX3JlYWQoJmN0eC0+cG9sbF9kaXNhYmxlX2NudCkpOworICAgIH0gd2hp
+bGUgKGVsYXBzZWRfdGltZSA8IG1heF9ucyAmJiAhY3R4LT5mZG1vbl9vcHMtPm5lZWRfd2FpdChj
+dHgpKTsKIAogICAgIC8qIElmIHRpbWUgaGFzIHBhc3NlZCB3aXRoIG5vIHN1Y2Nlc3NmdWwgcG9s
+bGluZywgYWRqdXN0ICp0aW1lb3V0IHRvCiAgICAgICoga2VlcCB0aGUgc2FtZSBlbmRpbmcgdGlt
+ZS4KQEAgLTQ1MSw3ICs0NTYsNyBAQCBzdGF0aWMgYm9vbCB0cnlfcG9sbF9tb2RlKEFpb0NvbnRl
+eHQgKmN0eCwgaW50NjRfdCAqdGltZW91dCkKIHsKICAgICBpbnQ2NF90IG1heF9ucyA9IHFlbXVf
+c29vbmVzdF90aW1lb3V0KCp0aW1lb3V0LCBjdHgtPnBvbGxfbnMpOwogCi0gICAgaWYgKG1heF9u
+cyAmJiAhYXRvbWljX3JlYWQoJmN0eC0+cG9sbF9kaXNhYmxlX2NudCkpIHsKKyAgICBpZiAobWF4
+X25zICYmICFjdHgtPmZkbW9uX29wcy0+bmVlZF93YWl0KGN0eCkpIHsKICAgICAgICAgcG9sbF9z
+ZXRfc3RhcnRlZChjdHgsIHRydWUpOwogCiAgICAgICAgIGlmIChydW5fcG9sbF9oYW5kbGVycyhj
+dHgsIG1heF9ucywgdGltZW91dCkpIHsKQEAgLTUwMSw3ICs1MDYsNyBAQCBib29sIGFpb19wb2xs
+KEFpb0NvbnRleHQgKmN0eCwgYm9vbCBibG9ja2luZykKICAgICAvKiBJZiBwb2xsaW5nIGlzIGFs
+bG93ZWQsIG5vbi1ibG9ja2luZyBhaW9fcG9sbCBkb2VzIG5vdCBuZWVkIHRoZQogICAgICAqIHN5
+c3RlbSBjYWxsLS0tYSBzaW5nbGUgcm91bmQgb2YgcnVuX3BvbGxfaGFuZGxlcnNfb25jZSBzdWZm
+aWNlcy4KICAgICAgKi8KLSAgICBpZiAodGltZW91dCB8fCBhdG9taWNfcmVhZCgmY3R4LT5wb2xs
+X2Rpc2FibGVfY250KSkgeworICAgIGlmICh0aW1lb3V0IHx8IGN0eC0+ZmRtb25fb3BzLT5uZWVk
+X3dhaXQoY3R4KSkgewogICAgICAgICByZXQgPSBjdHgtPmZkbW9uX29wcy0+d2FpdChjdHgsICZy
+ZWFkeV9saXN0LCB0aW1lb3V0KTsKICAgICB9CiAKZGlmZiAtLWdpdCBhL3V0aWwvZmRtb24tZXBv
+bGwuYyBiL3V0aWwvZmRtb24tZXBvbGwuYwppbmRleCBkNTZiNjk0NjhiLi5mY2Q5ODlkNDdkIDEw
+MDY0NAotLS0gYS91dGlsL2ZkbW9uLWVwb2xsLmMKKysrIGIvdXRpbC9mZG1vbi1lcG9sbC5jCkBA
+IC0xMDAsNiArMTAwLDcgQEAgb3V0Ogogc3RhdGljIGNvbnN0IEZETW9uT3BzIGZkbW9uX2Vwb2xs
+X29wcyA9IHsKICAgICAudXBkYXRlID0gZmRtb25fZXBvbGxfdXBkYXRlLAogICAgIC53YWl0ID0g
+ZmRtb25fZXBvbGxfd2FpdCwKKyAgICAubmVlZF93YWl0ID0gYWlvX3BvbGxfZGlzYWJsZWQsCiB9
+OwogCiBzdGF0aWMgYm9vbCBmZG1vbl9lcG9sbF90cnlfZW5hYmxlKEFpb0NvbnRleHQgKmN0eCkK
+ZGlmZiAtLWdpdCBhL3V0aWwvZmRtb24taW9fdXJpbmcuYyBiL3V0aWwvZmRtb24taW9fdXJpbmcu
+YwppbmRleCBmYjk5YjRiNjFlLi44OTNiNzliNjIyIDEwMDY0NAotLS0gYS91dGlsL2ZkbW9uLWlv
+X3VyaW5nLmMKKysrIGIvdXRpbC9mZG1vbi1pb191cmluZy5jCkBAIC0yODgsOSArMjg4LDE1IEBA
+IHN0YXRpYyBpbnQgZmRtb25faW9fdXJpbmdfd2FpdChBaW9Db250ZXh0ICpjdHgsIEFpb0hhbmRs
+ZXJMaXN0ICpyZWFkeV9saXN0LAogICAgIHJldHVybiBwcm9jZXNzX2NxX3JpbmcoY3R4LCByZWFk
+eV9saXN0KTsKIH0KIAorc3RhdGljIGJvb2wgZmRtb25faW9fdXJpbmdfbmVlZF93YWl0KEFpb0Nv
+bnRleHQgKmN0eCkKK3sKKyAgICByZXR1cm4gaW9fdXJpbmdfY3FfcmVhZHkoJmN0eC0+ZmRtb25f
+aW9fdXJpbmcpOworfQorCiBzdGF0aWMgY29uc3QgRkRNb25PcHMgZmRtb25faW9fdXJpbmdfb3Bz
+ID0gewogICAgIC51cGRhdGUgPSBmZG1vbl9pb191cmluZ191cGRhdGUsCiAgICAgLndhaXQgPSBm
+ZG1vbl9pb191cmluZ193YWl0LAorICAgIC5uZWVkX3dhaXQgPSBmZG1vbl9pb191cmluZ19uZWVk
+X3dhaXQsCiB9OwogCiBib29sIGZkbW9uX2lvX3VyaW5nX3NldHVwKEFpb0NvbnRleHQgKmN0eCkK
+ZGlmZiAtLWdpdCBhL3V0aWwvZmRtb24tcG9sbC5jIGIvdXRpbC9mZG1vbi1wb2xsLmMKaW5kZXgg
+MjgxMTRhMGYzOS4uNDg4MDY3YjY3OSAxMDA2NDQKLS0tIGEvdXRpbC9mZG1vbi1wb2xsLmMKKysr
+IGIvdXRpbC9mZG1vbi1wb2xsLmMKQEAgLTEwMyw0ICsxMDMsNSBAQCBzdGF0aWMgdm9pZCBmZG1v
+bl9wb2xsX3VwZGF0ZShBaW9Db250ZXh0ICpjdHgsCiBjb25zdCBGRE1vbk9wcyBmZG1vbl9wb2xs
+X29wcyA9IHsKICAgICAudXBkYXRlID0gZmRtb25fcG9sbF91cGRhdGUsCiAgICAgLndhaXQgPSBm
+ZG1vbl9wb2xsX3dhaXQsCisgICAgLm5lZWRfd2FpdCA9IGFpb19wb2xsX2Rpc2FibGVkLAogfTsK
+LS0gCjIuMjQuMQoK
 
 
