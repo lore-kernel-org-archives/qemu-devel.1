@@ -2,130 +2,115 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932F8C3F2D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7240CC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 612E82146E
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELJYqB8v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 612E82146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B27220848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:07:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B27220848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9nLu-0004KJ-FO
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:03:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38660)
+	id 1j9nPZ-0005js-Fl
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:07:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9nJd-0002dG-K7
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:22 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j9nOm-0005Dv-GL
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:06:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9nJc-0002rv-H7
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48780
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9nJc-0002m9-22
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583402473;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=RmWBPzQDr2e4/bU5NPOQYXttUJbEaOHeO+qjLA8EfWo=;
- b=ELJYqB8vM2eD6duvsaarvZ//LqcV9Nhj/VsVwYKjNeNymdCEvINjLDzfRf4/VO2tZL+yd1
- pWjI6YbQ+pGtjXhxCbHPn69Nvfsok8kUGABQscDuDAW8qeRrjZMPeWfSo7lpSF6E41V404
- 4DSFLHLFZFGuppwLmOkAwo+IRlBzQ0s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-1-yU2K6INTeiRoW_XgL2qw-1; Thu, 05 Mar 2020 05:01:09 -0500
-X-MC-Unique: 1-yU2K6INTeiRoW_XgL2qw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 688FC800D53;
- Thu,  5 Mar 2020 10:01:08 +0000 (UTC)
-Received: from [10.10.120.166] (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 704E58AC30;
- Thu,  5 Mar 2020 10:01:05 +0000 (UTC)
-Subject: Re: [PATCH v6 14/18] s390x: protvirt: Move IO control structures over
- SIDA
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-15-frankja@linux.ibm.com>
- <6f9c004c-cff7-cc41-fb96-4f6f32e692e2@redhat.com>
- <8993b7ae-cd16-a9d1-e168-eff752bd5cc9@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
- AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
- 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
- zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
- Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
- jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
- II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
- Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
- RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
- ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
- Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
- ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
- 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
- GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
- GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
- H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
- 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
- ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
- GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
- CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
- njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
- FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
-Organization: Red Hat GmbH
-Message-ID: <b420b112-7b53-f92f-1a1c-a883d607570b@redhat.com>
-Date: Thu, 5 Mar 2020 11:01:03 +0100
+ (envelope-from <laurent@vivier.eu>) id 1j9nOl-0004LF-En
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:06:36 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:33767)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j9nOl-0004Ge-69; Thu, 05 Mar 2020 05:06:35 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M6UuX-1jGg5k2yXx-006v89; Thu, 05 Mar 2020 11:06:29 +0100
+Subject: Re: [PATCH 1/6] hw/audio/fmopl: Fix a typo twice
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200304221807.25212-1-philmd@redhat.com>
+ <20200304221807.25212-2-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <cb226473-f7be-02cb-62c8-94c71adbb164@vivier.eu>
+Date: Thu, 5 Mar 2020 11:06:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <8993b7ae-cd16-a9d1-e168-eff752bd5cc9@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200304221807.25212-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:SVrP9RUn+z4TOSjzBerozJ+li+7WFZ0ms2M15GY6Q+h0OTvjC/r
+ dZV4lZAy1G3c5ffBaKvsWatKwuNAwuYF9Be+NV0w8FSS2fpKTfXVCoKW5XBeK484ARrNioE
+ QU2jP+Q/PreEdrnoeG4Yc9nApCpzYyVZ0b7mU3LxRY4WhNbuo8UWNP3d9DxWffTxd/VZ01o
+ OUxR3uBUBFTkipua+dqOw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HPvNT8uZMb0=:3MBZWvNpqUGHUaD7N98PUC
+ WaxA5U+mj7idkAmFmgmdclHmocvw46wmFmzadoCgihxw7xaZ364W+ecvsU59tVUOGasvwQCcx
+ 5C2mAOp9OxKRYXZObl99OU5t1hzKbpCT/5pUriKsd5Ej+FtyjLf/psuM976Xvek1otG0N51Oa
+ LOyznSKL70LjHkfMwiowwHI0ivTVy5nx23eGUf7gnQaiWCXXKY92G0MPR1I1lAkbUJX7hRpe4
+ UEdRYRqI6M4IbKtjRYTrUQmV0B8hvlVR5aFKEo5tYs00GAwmafnDJKucDYRkItJ+OyCqkBpPW
+ 5R8vXFly5kVuIhH+GCnwhiaSHmgJBwopGrvylf93BQmVAl5iUuFAPCWvCL9z179uDUBbguRGN
+ W/6aCBa3+B2IeLza06h6vCEcO05m2S9jWR+fMbe6WbkvbI9HMqCNHoByxSJUbAg2QQpqP5uYd
+ D/02FGRKJrLjSWHM4LKnJog1bZceR8/ltNftH5blktoKAXeGVbsIp7x6fpB8+FkatDruwAx7O
+ 8U3JNr6TwCESBV1Xw7zhW/8WhiIkb0eeK3nrCnYnIvDP7+ag4tUeoVK1Bif6eWyRJ6nfVRLkP
+ lnibUBUxjVExQ+OGOvjegETcnp1AE6bjCFlDdoIbI3fySV7CQ+Zz//yX40iHSt8D+4trSfHH3
+ ENNRLXX5gUiCagXor1dpGqluaJiWABAm3iz8V9VNQXBEg+e1NMmt2yN4rvvcNhkNZF31QzXhq
+ pDiasV2G5Xt4YXsiCY9AMMCtUUH5bAe6guv5bzEghe8Xy0emH3Xribom00OESsHDwBZe8jORi
+ avwyR8HFTbGnYJBRr3oZ1FagQT60JKanJXud042TQ4EoRBHZj/8p0mOZTv0IhEhsOWvn5j9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,39 +122,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.03.20 10:55, Janosch Frank wrote:
-> On 3/4/20 7:56 PM, David Hildenbrand wrote:
->> On 04.03.20 12:42, Janosch Frank wrote:
->>> For protected guests, we need to put the IO emulation results into the
->>> SIDA, so SIE will write them into the guest at the next entry.
->>>
->>
->> [...]
->>
->>>  
->>>      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
->>> +        if (env->pv) {
->>> +            return;
->>> +        }
->>
->> Can you elaborate why we don't have to do anything here? I can
->> understand why we don't/cannot probe for writes. But what about the
->> PGM_OPERAND?
+Le 04/03/2020 à 23:18, Philippe Mathieu-Daudé a écrit :
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/audio/fmopl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> CSSID and the schid one check are done by the Ultravisor/SIE
+> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+> index 9f50a89b4a..173a7521f2 100644
+> --- a/hw/audio/fmopl.c
+> +++ b/hw/audio/fmopl.c
+> @@ -1066,7 +1066,7 @@ static void OPLResetChip(FM_OPL *OPL)
+>  	}
+>  }
+>  
+> -/* ----------  Create one of vietual YM3812 ----------       */
+> +/* ----------  Create one of virtual YM3812 ----------       */
+>  /* 'rate'  is sampling rate and 'bufsiz' is the size of the  */
+>  FM_OPL *OPLCreate(int clock, int rate)
+>  {
+> @@ -1115,7 +1115,7 @@ FM_OPL *OPLCreate(int clock, int rate)
+>  	return OPL;
+>  }
+>  
+> -/* ----------  Destroy one of vietual YM3812 ----------       */
+> +/* ----------  Destroy one of virtual YM3812 ----------       */
+>  void OPLDestroy(FM_OPL *OPL)
+>  {
+>  #ifdef OPL_OUTPUT_LOG
 > 
 
-So can we even reach this path?
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
