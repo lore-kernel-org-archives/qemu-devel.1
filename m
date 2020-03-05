@@ -2,79 +2,92 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9317C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8D9C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 961A62072D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:51:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BACE52072D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oGyTGG2K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 961A62072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AlX+yJ5w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BACE52072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9uen-0004Ow-RX
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:51:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45957)
+	id 1j9ulF-0000Us-JL
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:58:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9ue4-0003id-A5
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:50:53 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9uk0-00075j-9D
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9ue2-0003Dx-PJ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:50:51 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41557)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9ue2-0003CR-Is
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:50:50 -0500
-Received: by mail-ot1-x342.google.com with SMTP id v19so6571837ote.8
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:50:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=z8t4BhMCBxgcnMll80FT1fnNti2is6qK+HTLFJSab+E=;
- b=oGyTGG2KEiAxjA1x9SYprMdxKBkcKyYtB7TTrYcLTRV5Xm5gSGmq5MTKrKXj0BOXzt
- Pk880j74tx0wxav8aR7lMvRcG9c17YQxaHsy6bJOdgJ0pwGtICsbMxhDV1lpIxTqif33
- s1q8dutFlgeQPW8AUDazNuiF/mD+5X00Q6bBz8pM/gTYVZCIHe3GI2hu7zql3PkhTvpp
- hdNrb5cqTrS0TDR7xjBzhXK+scJUfVXa2kGeV+GIDKz5oXEjrN3e2zhi9SvJNz6dKqZ0
- AQOxrh6Qxh36gymzB+Bagx1yL49VaT/gJiiKlKvh8q+pwYS4AHtbgIJSlaDq+aJrknGH
- QcLw==
+ (envelope-from <philmd@redhat.com>) id 1j9ujy-0002dV-Np
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:56:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32744
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9ujy-0002cw-Ko
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:56:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583431017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=LVNdqsgidxTOl/zf7lJCTVEB/6AAxpggw+CjoQVwh+A=;
+ b=AlX+yJ5wJPi4rQ62i1w9mSCgz/0F6Lt3P5tM+aA9iRmLty7Luagt9BY02tMwTZEgqQJB95
+ HVFvEEsLgYz04iDneoF4qggc8ufXofNlXKuVYQOrCMCSP1xWJAAp+Vw03JZbTFhb4wXwwe
+ 6wVxAlp/5HHgWCeGVROhHARf/gVOkJ8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-AnrEFfCxPFyMpqaqBC6rxA-1; Thu, 05 Mar 2020 12:56:54 -0500
+X-MC-Unique: AnrEFfCxPFyMpqaqBC6rxA-1
+Received: by mail-wm1-f70.google.com with SMTP id c5so2373161wmd.8
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:56:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=z8t4BhMCBxgcnMll80FT1fnNti2is6qK+HTLFJSab+E=;
- b=Z/ja2mAWNSo3f01K79eUk5kd+sD9XHUf/9neky4g7qbj1jl8hTO+yMAak/IB8Pgb3J
- nlvHj07tBRZew2rq/do7Q/Sv/4ez057IxuXi19vtyWDEpcNGjhrqwYBWpvSZWtkCJorc
- syfxquyaZuC9Vb1lNIgLvuR8e+AUbprNB0rs+dvt8V0RykOEP9kn1gHeSmgIsDSfewzW
- 0pMk6Qx+765y4+i8yf4bzfuzdL6TLw1Z+pxozAdcAhaKKNsz5noMp+xfTgdNGYAWwQIx
- IX3QXGVrqBtg4G5UdhG/H45jDHi5j7n/RF/A1m6ou9h/X54A/oTtBBaNPn0D7L0/SbXF
- 1D6g==
-X-Gm-Message-State: ANhLgQ09je9EimsMiWgxm+Ebn8dE8NbAyLV9Vx4qmrkG4u/idM4UZIc7
- ze6KYSEiMRKsr/5dsNUY0u+YeS/ZMlJcGH16xNkeGl5xsRo=
-X-Google-Smtp-Source: ADFU+vtPLGy1ndYWlB/AitEOp89d2XZOG/nlVMtyDeKVissXYLNNyfhxr09c/8xJL9vaR3tld/hOntFa9ZVZlfm1V3k=
-X-Received: by 2002:a9d:6f88:: with SMTP id h8mr7688114otq.91.1583430649078;
- Thu, 05 Mar 2020 09:50:49 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rXrFsYCbNITMAKKDyeFnLcrzD4LbTWQbaw3IfuF40i0=;
+ b=JRGFpYjEPzOGYc8Uw4Tw38FWMk4vXL27fwMATEYhLc7mtYFQPip3YQpfAW/whPo2/q
+ GMOpTdW+PYJJ1/Z4v5ngmBPD0h+GPtLGbf5nNRzl6h6Tsv6y5/JRgGnEg7n8vPuEbFQw
+ z5pWCaPM3WfhO1qbWcAe9UwvR+SU4utNH0BVb67vOe1rPRru68noNi7ymtB7HW3kBDHK
+ OVNpcT+VoDOj28coh6wVppCGySnFmQlkaUSZyY4tOki3J3Ov9kAGzNv5OzKo72LRwegs
+ Mszqa62pr4It5mjBPquymMiFTzQ8Ckb7JuqfMiKyvdNO1kc/JFw/3huMm78pu9Af2StO
+ SwEg==
+X-Gm-Message-State: ANhLgQ2JyR5Zx4rN3kaK8ZLDpXBOUZLfkuBGRA5Zqr9SG/L+wCyJ5+VQ
+ YpyO0RG7qcoZgZs8u4Y9tflEMqRsJmE+CVpcqXGnYXLTx7aFquBBafQtcQXVy0AonqI+yibVmbR
+ fC47R1XHiyM5MulA=
+X-Received: by 2002:a5d:4389:: with SMTP id i9mr144697wrq.90.1583431013360;
+ Thu, 05 Mar 2020 09:56:53 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vt06duxsLwo2jqPu8jYkYTApkgH0gZ9gFiO4tBdqbt55DylznDtVWxEPf5n5A0t+srolVEC0A==
+X-Received: by 2002:a5d:4389:: with SMTP id i9mr144664wrq.90.1583431013103;
+ Thu, 05 Mar 2020 09:56:53 -0800 (PST)
+Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id q1sm3608381wrx.19.2020.03.05.09.56.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 09:56:52 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/6] hw/net: Make Net/CanBus can_receive() handlers return a
+ boolean
+Date: Thu,  5 Mar 2020 18:56:44 +0100
+Message-Id: <20200305175651.4563-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200305163100.22912-1-peter.maydell@linaro.org>
-In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Mar 2020 17:50:37 +0000
-Message-ID: <CAFEAcA_kvR_Lq3GcvCgNnoEDwf9SfiK8+GbJs9oYjfgo8Y9fQg@mail.gmail.com>
-Subject: Re: [PULL 00/37] target-arm queue
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ Joel Stanley <joel@jms.id.au>, Beniamino Galvani <b.galvani@gmail.com>,
+ Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> Nothing much exciting here, but it's 37 patches worth...
->
-> thanks
-> -- PMM
->
-> The following changes since commit e64a62df378a746c0b257105959613c9f8122e59:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-040320-1' into staging (2020-03-05 12:13:51 +0000)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200305
->
-> for you to fetch changes up to 597d61a3b1f94c53a3aaa77671697c0c5f797dbf:
->
->   target/arm: Clean address for DC ZVA (2020-03-05 16:09:21 +0000)
->
-> ----------------------------------------------------------------
->  * versal: Implement ADMA
->  * Implement (trivially) ARMv8.2-TTCNP
->  * hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
->  * Remove unnecessary endianness-handling on some boards
->  * Avoid minor memory leaks from timer_new in some devices
->  * Honour more of the HCR_EL2 trap bits
->  * Complain rather than ignoring bad command line options for cubieboard
->  * Honour TBI for DC ZVA and exception return
->
+The Net/CanBus can_receive() handlers return whether
+the network device can or can not receive new data.
+Make it obvious by returning a boolean type
 
+Philippe Mathieu-Daud=C3=A9 (6):
+  hw/net/e1000e_core: Let e1000e_can_receive() return a boolean
+  hw/net/smc91c111: Let smc91c111_can_receive() return a boolean
+  hw/net/rtl8139: Simplify if/else statement
+  hw/net/rtl8139: Update coding style to make checkpatch.pl happy
+  hw/net: Make NetCanReceive() return a boolean
+  hw/net/can: Make CanBusClientInfo::can_receive() return a boolean
 
-Applied, thanks.
+ hw/net/can/can_sja1000.h |  2 +-
+ hw/net/e1000e_core.h     |  2 +-
+ hw/net/i82596.h          |  2 +-
+ include/net/can_emu.h    |  2 +-
+ include/net/net.h        |  2 +-
+ hw/net/allwinner_emac.c  |  2 +-
+ hw/net/cadence_gem.c     |  8 ++++----
+ hw/net/can/can_sja1000.c |  8 ++++----
+ hw/net/dp8393x.c         |  8 +++-----
+ hw/net/e1000.c           |  2 +-
+ hw/net/e1000e.c          |  2 +-
+ hw/net/e1000e_core.c     |  2 +-
+ hw/net/ftgmac100.c       |  6 +++---
+ hw/net/i82596.c          | 10 +++++-----
+ hw/net/imx_fec.c         |  2 +-
+ hw/net/opencores_eth.c   |  5 ++---
+ hw/net/rtl8139.c         | 22 ++++++++++++----------
+ hw/net/smc91c111.c       | 10 +++++-----
+ hw/net/spapr_llan.c      |  4 ++--
+ hw/net/sungem.c          |  6 +++---
+ hw/net/sunhme.c          |  4 ++--
+ hw/net/virtio-net.c      | 10 +++++-----
+ hw/net/xilinx_ethlite.c  |  2 +-
+ net/can/can_socketcan.c  |  4 ++--
+ net/filter-buffer.c      |  2 +-
+ net/hub.c                |  6 +++---
+ 26 files changed, 67 insertions(+), 68 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+--=20
+2.21.1
 
--- PMM
 
