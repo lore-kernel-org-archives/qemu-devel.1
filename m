@@ -2,98 +2,86 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E58C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3108C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9088020732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF45E20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:43:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhskNOBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9088020732
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZwiKLlAg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF45E20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ri0-0001kN-LO
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:42:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37753)
+	id 1j9rjA-0003jH-TN
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:43:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j9rg3-0006V9-Mp
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:44 -0500
+ (envelope-from <eblake@redhat.com>) id 1j9raA-0005Ct-AH
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j9rg2-000329-Gp
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22460
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1j9ra8-0005l2-1t
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:34:38 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53009
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j9rg2-00031W-CZ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:40:42 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j9ra7-0005ko-V9
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:34:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583419242;
+ s=mimecast20190719; t=1583418875;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hn0YIGyfHl+O6XUJ5nHyG1yent3/MBPqFXxf/LfpEkk=;
- b=bhskNOBOEaqAdErTSeZyC+UhYI2tMRWr1p9ItYSfSWT2p7KdGjKsAK7CvdLmSL5JQPx8v4
- nJvnPe4RAYpVABUdx01CFD/2cQMgSnyXY3Un/+ahcQxlLaw/yZJ6ZkRegeomoi9qhsIAW1
- /PdIWUf81RACacqa3gdhguYY56682h4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-sHMUgyyrNRWePgwlgQ9HdA-1; Thu, 05 Mar 2020 09:40:40 -0500
-X-MC-Unique: sHMUgyyrNRWePgwlgQ9HdA-1
-Received: by mail-wr1-f71.google.com with SMTP id m13so2396002wrw.3
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 06:40:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5nTfBo1AjozwuH2fY56tBvVbThFhIHlIG6d3trpW31I=;
- b=g0dyzqIYwsYYx5kXpUSQeHhJwGZCmy+ftyMWy3KlImnwXPOryuEFrKbsKKhm2UkGmL
- ZII++WkantPCNXGrMdWSh0xlXcL/H4faZoN6M/eRXnqLDP5yl+jz3HTrSicYxNaXGSDj
- YZZH/GCeGA35ZAOXUBNHEZs/k6Q5paHZMT4HBSF+CPUnBPnP+w0Tn8lxVVosKRttUL8u
- VKpeZzacDIKkLRlHVZzJecO60MhpkmC/88nzI/Tq1aBGVdKmn9GypwfcASoFF8hnTFhJ
- 4IdHXAJULDZ169Gy/G8vEY/IMW7CCoQIuPcdz0v8uQCtd7t34Y/yiwHy3LBjQ+JieJ6H
- ufIQ==
-X-Gm-Message-State: ANhLgQ20/wxP3RwjF5T5nRcL2jcAguhTFZ6pSSZqy6D1PD99LUExPop1
- OIDRsVPneNM1srGEca7pHgN1km8dFABAC3gGGA+vkfA4BFUAIE2eK9o10nvmz+8LxlI0vwJICOv
- eGYZhih+FE4A3A6o=
-X-Received: by 2002:a5d:68ce:: with SMTP id p14mr10402482wrw.315.1583419238940; 
- Thu, 05 Mar 2020 06:40:38 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtaj5cQYnkiErgB3yw7XSWXYWEMSi5KEHtnZpwZVTrTqVK5AYSfHvTi9cL8UBUCyIAAXxASgw==
-X-Received: by 2002:a5d:68ce:: with SMTP id p14mr10402467wrw.315.1583419238677; 
- Thu, 05 Mar 2020 06:40:38 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993?
- ([2001:b07:6468:f312:9def:34a0:b68d:9993])
- by smtp.gmail.com with ESMTPSA id v16sm27460899wrp.84.2020.03.05.06.40.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Mar 2020 06:40:38 -0800 (PST)
-Subject: Re: [PATCH v3 0/7] hw/scsi/spapr_vscsi: Fix time bomb buffer overflow
+ bh=krX3gDbpIAPOR6Dt66bZ4ORH7zF5XP/GGnCiX9UoZtI=;
+ b=ZwiKLlAgDu62iHbCBVV5/TTcTX4PBI+6pHzA6sfqbVe7IfjeS2hsz/zrn5V2j1cGvB0y3M
+ ZL2XKBCZ2CkcYgs0yZP3L9eSf3KsRYiCxNOx16qcjr1M1C38uy2SFkbIcJZO/C8H8JWxQu
+ Jh33JfrBvrVVeCk0x/vfygqHSoCU4p0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-RHk3sziXMoqANvyLxvZjhw-1; Thu, 05 Mar 2020 09:34:32 -0500
+X-MC-Unique: RHk3sziXMoqANvyLxvZjhw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE174189F760;
+ Thu,  5 Mar 2020 14:34:30 +0000 (UTC)
+Received: from [10.3.117.177] (ovpn-117-177.phx2.redhat.com [10.3.117.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A712272D3;
+ Thu,  5 Mar 2020 14:34:26 +0000 (UTC)
+Subject: Re: [PATCH v2 0/9] hw, ui, virtfs-proxy-helper: Reduce QEMU
+ .data/.rodata/.bss footprint
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200305121253.19078-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eac8c380-eb0d-b075-f70b-bd339ce5fc6e@redhat.com>
-Date: Thu, 5 Mar 2020 15:40:36 +0100
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200305124525.14555-1-philmd@redhat.com>
+ <20200305134229.GB2112347@redhat.com>
+ <a7c0746f-75dc-99ed-62df-26f26cf23ec0@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <daf7eac5-1796-06f0-1e95-ee86d50d629f@redhat.com>
+Date: Thu, 5 Mar 2020 08:34:25 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200305121253.19078-1-philmd@redhat.com>
+In-Reply-To: <a7c0746f-75dc-99ed-62df-26f26cf23ec0@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,45 +93,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/03/20 13:12, Philippe Mathieu-Daud=C3=A9 wrote:
-> This series fixes a possible buffer overflow.
+On 3/5/20 7:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/5/20 2:42 PM, Daniel P. Berrang=C3=A9 wrote:
+>> On Thu, Mar 05, 2020 at 01:45:16PM +0100, Philippe Mathieu-Daud=C3=A9 wr=
+ote:
+>>> Since v1:
+>>> - merged 2 series
+>>> - reworked hw/usb/quirks
+>>> - added R-b/A-b tags
+>>>
+>>> This series reduce the footprint of the QEMU binary:
+>>> .bss: 106KiB (moved to .heap)
+>>
+>> Did this actually have an impact on the binary size, or just on the
+>> size the elf-dissector reports ?=C2=A0 I'm not very familiar with ELF,
+>> but Wikipedia's description of BSS makes me question it...
+>>
+>> =C2=A0=C2=A0 "Typically only the length of the bss section, but no data,
+>> =C2=A0=C2=A0=C2=A0 is stored in the object file. The program loader allo=
+cates
+>> =C2=A0=C2=A0=C2=A0 memory for the bss section when it loads the program.=
+ On
+>> =C2=A0=C2=A0=C2=A0 some platforms, some or all of the bss section is ini=
+tialized
+>> =C2=A0=C2=A0=C2=A0 to zeroes. Unix-like systems and Windows initialize t=
+he bss
+>> =C2=A0=C2=A0=C2=A0 section to zero"
+>>
+>> This suggests .bss has no on-disk overhead, only runtime overhead,
+>> which is presumably going to be the same with heap allocations.
 >=20
-> Simples patches first (dissociate the buffer holding DMA
-> requests with pointer to SRP Information Unit packets) to
-> clean the issue in the penultimate patch.
->=20
-> v3:
-> - Fixed typo reported by Greg Kurz
-> - Addressed Paolo Bonzini review comments as an extra patch
-> - Added another patch converting a fprintf() call while here
->=20
-> v2:
-> - Addressed David Gibson review comments
->=20
-> Supersedes: <20200305083135.8270-1-philmd@redhat.com>
->=20
-> Philippe Mathieu-Daud=C3=A9 (7):
->   hw/scsi/viosrp: Add missing 'hw/scsi/srp.h' include
->   hw/scsi/spapr_vscsi: Use SRP_MAX_IU_LEN instead of sizeof flexible
->     array
->   hw/scsi/spapr_vscsi: Simplify a bit
->   hw/scsi/spapr_vscsi: Introduce req_iu() helper
->   hw/scsi/spapr_vscsi: Do not mix SRP IU size with DMA buffer size
->   hw/scsi/spapr_vscsi: Prevent buffer overflow
->   hw/scsi/spapr_vscsi: Convert debug fprintf() to trace event
->=20
->  hw/scsi/viosrp.h      |  3 +-
->  hw/scsi/spapr_vscsi.c | 72 +++++++++++++++++++++++++------------------
->  hw/scsi/trace-events  |  1 +
->  3 files changed, 45 insertions(+), 31 deletions(-)
->=20
+> IIUC when stored in the .bss, the buffer are always allocated in memory,=
+=20
+> even if not used. By moving them to the .heap, we only allocate them=20
+> when using either the adlib audio device or curses.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Virtual memory is cheap on 64-bit platforms.  Just because the address=20
+range is reserved does not actually change the amount of memory in use=20
+by the machine, if the application does not touch those virtual=20
+addresses.  But you do have a potential point on a 32-bit platform,=20
+where a heap allocation only when needed may avoid address space=20
+exhaustion for other cases.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
