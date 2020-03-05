@@ -2,80 +2,69 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E8BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EC4C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 13:04:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21EB72072D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:59:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="ihViNg0u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21EB72072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 494602073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 13:04:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 494602073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9q5h-0001bd-Bk
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:59:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44950)
+	id 1j9qAi-0003tR-GO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 08:04:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1j9q4n-00013S-UV
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:58:11 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j9q9y-0003UZ-1l
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 08:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1j9q4m-0004md-T5
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:58:09 -0500
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:41263)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1j9q4m-0004m9-4N
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:58:08 -0500
-Received: by mail-yw1-xc44.google.com with SMTP id p124so1579766ywc.8
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:58:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JtT0OF0dleUvPZlgLiPL71NANb5N5V/jdC6WvztdW3I=;
- b=ihViNg0unQ6Ca0ch1X/ELic/Wuhj2EI5I+dmU0gr24I4uDcCat6icaBxiZZnsEPOxC
- emmDxMzs1y9V2KLE3Rt4LeoTsK24o4anrEd7WGyprQSIT31bGVCoVgsfQP2QeQ6575OR
- 0SD8AtxqiNga8XZwSWaut33Pe1JWgxGeuTIcfJGGW4KC4pdSRF63NK7ee3YfIvseqaLL
- d17hy5re7sRIJAb31f58EcPwEfA322KG/WXRVNCzHXXNaKBZUB0QfjNB0TaIXidJ6S9x
- 34L926R9G+kMYwdMcdrvZi03naAsZMUwEUSTFrGYXy3B1nmr0UhkHJchSAkpb+NzQSxG
- EpdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JtT0OF0dleUvPZlgLiPL71NANb5N5V/jdC6WvztdW3I=;
- b=MlZ0CevYDLDZLxEdl0fWYUaTbevYJsHajR+0XfoqOdY0N2hHHLXKG7n4mirvpneKL5
- vdMXBQJ4SHVUyz3ds45fH7m4AfqVx9VA/EuISFS9xmcqqd0trCp8n3oEDxLhHtdAJzcN
- kQAyHMGWprWM8g/GQ7rk8MB9nAqZBtpdSjiE0zU6e/ocXNcMOMrIMJAwv/2T7wth/mM3
- wh7LLjj/Dggt33+pjUSg10mZgN3Z+DgRgGus9dPj70YiOAzE49ZVQsxB2LecAbbqMwWs
- xGSRbbOa44M4vdIacZOI2C8BO7KpI6fYQL1pb4AgHA/ET9kruD7L//RWhtK4gZWphdN+
- U7ug==
-X-Gm-Message-State: ANhLgQ1e2YUjSl+LHuj+xTfQ0mmCIVA98lx4Vue7YcGcM1WQNstwLhVp
- G+GbZsh5HiOWyNh5zyyOTeJfOyLG2ja0mehXcRnEjgD0S+Q=
-X-Google-Smtp-Source: ADFU+vt3/HBqEErLELhJ5JKh7JpbGmyqjq4LhVH9pD2C8t7ytn+ji16eVCQ3CXeBQ0jYPcw2jIZw/bemuCCCdRij+S0=
-X-Received: by 2002:a25:ca46:: with SMTP id a67mr7643424ybg.447.1583413086619; 
- Thu, 05 Mar 2020 04:58:06 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1j9q9w-0001R0-HA
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 08:03:29 -0500
+Resent-Date: Thu, 05 Mar 2020 08:03:29 -0500
+Resent-Message-Id: <E1j9q9w-0001R0-HA@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21133)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j9q9w-0001PB-9W
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 08:03:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1583413402; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=B7I/3bGHC4vTq0o3mn9oso/bI/YLAQ1XAtv9Y1si5rIKH+Jzpv+Kp2qpFkyvXben1GgQn4kBfB+M7xSrJOk19zia5k3bfHQCjJX+cDU3cWhHlpER0iapDRQPpIY9K/JewCYSUfKY79Hfng5yLNxjb1UkfVtkGEo1MvR26+8tb6o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583413402;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=kN/85VylakSufhtLKja2nBw1pHx8iAqS5v9D32P+Mn4=; 
+ b=Dsc6332Tgx/xHbmLnM8FQx+st5i79CXEjxjRfZJNU2Ory1ijaQGQA1EC0vbNfW1hjaPkDNL6uytk9ZBp9mKoPC9i67sn1Wd1tPfCVhPspsrxeH4o7lLU9+d3WndezWcFnH2l1y+o3eMUnbVlzNh1qVVSKSRNlpU+4kUQWXHiZSg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583413380863874.457097050395;
+ Thu, 5 Mar 2020 05:03:00 -0800 (PST)
+In-Reply-To: <20200305124346.22053-1-armbru@redhat.com>
+Subject: Re: [PULL 0/4] QAPI patches for 2020-03-05
+Message-ID: <158341337989.357.2329411854045200644@39012742ff91>
 MIME-Version: 1.0
-References: <20200226174809.9675-1-yuri.benditovich@daynix.com>
-In-Reply-To: <20200226174809.9675-1-yuri.benditovich@daynix.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Thu, 5 Mar 2020 14:57:55 +0200
-Message-ID: <CAOEp5Oeup=6syqmEnpWsR_c8xKP4QSeFyG+Wqp1rd=caaiwDKA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] reference implementation of RSS
-To: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Thu, 5 Mar 2020 05:03:00 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,36 +76,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping
-
-On Wed, Feb 26, 2020 at 7:48 PM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> Support for VIRTIO_NET_F_RSS feature in QEMU for reference
-> purpose. Implements Toeplitz hash calculation for incoming
-> packets according to configuration provided by driver.
->
-> This series requires previously submitted and accepted
-> patch to be applied:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg06448.html
->
-> Yuri Benditovich (3):
->   virtio-net: introduce RSS RX steering feature
->   virtio-net: implement RSS configuration command
->   virtio-net: implement RX RSS processing
->
->  hw/net/trace-events                         |   3 +
->  hw/net/virtio-net.c                         | 234 +++++++++++++++++++-VIRTIO_NET_F_RSS
->  include/hw/virtio/virtio-net.h              |  12 +
->  include/standard-headers/linux/virtio_net.h |  37 +++-
->  4 files changed, 273 insertions(+), 13 deletions(-)
->
-> --
-> 2.17.1
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwNTEyNDM0Ni4yMjA1
+My0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN1Ym1vZHVsZSAnZHRjJyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycK
+Q2xvbmluZyBpbnRvICdkdGMnLi4uCnJlbW90ZTogQ291bnRpbmcgb2JqZWN0czogNTM5NCwgZG9u
+ZS4gICAgICAgIAplcnJvcjogUlBDIGZhaWxlZDsgcmVzdWx0PTE4LCBIVFRQIGNvZGUgPSAyMDAK
+ZmF0YWw6IFRoZSByZW1vdGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmZhdGFsOiBwcm90b2Nv
+bCBlcnJvcjogYmFkIHBhY2sgaGVhZGVyCkNsb25lIG9mICdodHRwczovL2dpdC5xZW11Lm9yZy9n
+aXQvZHRjLmdpdCcgaW50byBzdWJtb2R1bGUgcGF0aCAnZHRjJyBmYWlsZWQKZmFpbGVkIHRvIHVw
+ZGF0ZSBzdWJtb2R1bGUgZHRjClN1Ym1vZHVsZSAnZHRjJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
+Z2l0L2R0Yy5naXQpIHVucmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwptYWtlWzFdOiAqKiogWy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1qYjN3X3V0ay9zcmMvZG9ja2VyLXNyYy4yMDIwLTAz
+LTA1LTA3LjU1LjIwLjIzMDc3XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtamIzd191dGsvc3JjJwptYWtlOiAqKiogW2RvY2tl
+ci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDdtNDAuNzM3cwp1c2Vy
+ICAgIDBtMi40NjBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDMwNTEyNDM0Ni4yMjA1My0xLWFybWJydUByZWRoYXQuY29tL3Rlc3Rp
+bmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
