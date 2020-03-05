@@ -2,115 +2,91 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7240CC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565F7C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B27220848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:07:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B27220848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 207A020848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:10:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XsGwA9Ng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207A020848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9nPZ-0005js-Fl
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:07:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39639)
+	id 1j9nSM-00079Q-8b
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:10:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j9nOm-0005Dv-GL
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:06:37 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j9nRX-0006ON-OU
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j9nOl-0004LF-En
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:06:36 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:33767)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j9nOl-0004Ge-69; Thu, 05 Mar 2020 05:06:35 -0500
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M6UuX-1jGg5k2yXx-006v89; Thu, 05 Mar 2020 11:06:29 +0100
-Subject: Re: [PATCH 1/6] hw/audio/fmopl: Fix a typo twice
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200304221807.25212-1-philmd@redhat.com>
- <20200304221807.25212-2-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <cb226473-f7be-02cb-62c8-94c71adbb164@vivier.eu>
-Date: Thu, 5 Mar 2020 11:06:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <alex.bennee@linaro.org>) id 1j9nRV-0002Qu-7H
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:09:26 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46001)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j9nRU-0002Qf-VA
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:09:25 -0500
+Received: by mail-wr1-x442.google.com with SMTP id v2so6215914wrp.12
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 02:09:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=j77nLhOwoWG/siSHqClrE51PrP47M+Q7dbHrF2aVhSw=;
+ b=XsGwA9NgMU6/DNQ3JL6uFssdB4eUNF5WqWNX08fsVYSaWq//F51LrgPvVQgj6D2QtF
+ Kf5T34VA+kuVMddZBbKHkqF5r2S9+uPCZ+eDJ20MxCteoa54kMmJjvnCG/cyAosEtOJ2
+ Ns77+tVP6Gmw9KwioFckkIPAxcz1uRevbAZ0mzkl+dg25QsUKPyhy3iRNgJj7+kx9GU5
+ tmGQGVutrDVumVuG4YkMJeTLLHYqRnFuPi6DDSl2b8oVCWXwfbPtNKnRCUniCdV4lNtN
+ OrMP4yv7QQ78qm1SU0yombmCcLEQjN2XzeU/08CHf3YUGOPjFoI83E91VIONmJbR2ID5
+ tIyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=j77nLhOwoWG/siSHqClrE51PrP47M+Q7dbHrF2aVhSw=;
+ b=F6Q8fFYaEBV3oY8Lz78/haIGScSvfvc369hmHGckiv2i2dU9usyieWVxS4WPMzB2hI
+ DsbN5IDXIG9czbRhlHCNJjpcUEaSttCAz4dqfj5gCOg1HvXCHEAPCNhTsVggoM5u1sfb
+ MlsMRUEReXQ1Bj7vfQmE+E8Wl4pXequh/Bv1ft2zNNaB/ertDuwd0XSA6SMRU5JM2dFA
+ LB9lmsbH1a6VsHB9elIP+RytHktGZ5xrVnlDdaw1jttEI52u2xRq7t2eRYlIR2GaPlH9
+ v8nrA/HDtfDfdLvNWs+iA+RXfOZHiuyuQzrnMcM3cI33nNwLOsmiUIHl/3hCg+FPwgYN
+ 5U+Q==
+X-Gm-Message-State: ANhLgQ3b53F+GBRM+KrSCaqmoJACApVwgifNncYZBwVm6Kg4rFnd/mOS
+ EEgMA6lMJwOtJEunBKWRJP4YHTqAFuk=
+X-Google-Smtp-Source: ADFU+vti0xdiS73ZZ4mdetOBwuA+gDhYqfEatIxldvBklpcZv/xQWC5lskNtKKSg36fg2/nxTIKFWw==
+X-Received: by 2002:adf:fa05:: with SMTP id m5mr9464790wrr.352.1583402962867; 
+ Thu, 05 Mar 2020 02:09:22 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p17sm41027959wre.89.2020.03.05.02.09.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 02:09:21 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id EAD831FF87;
+ Thu,  5 Mar 2020 10:09:20 +0000 (GMT)
+References: <20200302181907.32110-1-alex.bennee@linaro.org>
+ <20200302181907.32110-8-alex.bennee@linaro.org>
+ <874kv68lg9.fsf@linaro.org> <87v9njf87n.fsf@secure.laptop>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: quintela@redhat.com
+Subject: Re: [PATCH  v1 07/10] configure: fix check for libzstd
+In-reply-to: <87v9njf87n.fsf@secure.laptop>
+Date: Thu, 05 Mar 2020 10:09:20 +0000
+Message-ID: <87o8tb5d0v.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200304221807.25212-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SVrP9RUn+z4TOSjzBerozJ+li+7WFZ0ms2M15GY6Q+h0OTvjC/r
- dZV4lZAy1G3c5ffBaKvsWatKwuNAwuYF9Be+NV0w8FSS2fpKTfXVCoKW5XBeK484ARrNioE
- QU2jP+Q/PreEdrnoeG4Yc9nApCpzYyVZ0b7mU3LxRY4WhNbuo8UWNP3d9DxWffTxd/VZ01o
- OUxR3uBUBFTkipua+dqOw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:HPvNT8uZMb0=:3MBZWvNpqUGHUaD7N98PUC
- WaxA5U+mj7idkAmFmgmdclHmocvw46wmFmzadoCgihxw7xaZ364W+ecvsU59tVUOGasvwQCcx
- 5C2mAOp9OxKRYXZObl99OU5t1hzKbpCT/5pUriKsd5Ej+FtyjLf/psuM976Xvek1otG0N51Oa
- LOyznSKL70LjHkfMwiowwHI0ivTVy5nx23eGUf7gnQaiWCXXKY92G0MPR1I1lAkbUJX7hRpe4
- UEdRYRqI6M4IbKtjRYTrUQmV0B8hvlVR5aFKEo5tYs00GAwmafnDJKucDYRkItJ+OyCqkBpPW
- 5R8vXFly5kVuIhH+GCnwhiaSHmgJBwopGrvylf93BQmVAl5iUuFAPCWvCL9z179uDUBbguRGN
- W/6aCBa3+B2IeLza06h6vCEcO05m2S9jWR+fMbe6WbkvbI9HMqCNHoByxSJUbAg2QQpqP5uYd
- D/02FGRKJrLjSWHM4LKnJog1bZceR8/ltNftH5blktoKAXeGVbsIp7x6fpB8+FkatDruwAx7O
- 8U3JNr6TwCESBV1Xw7zhW/8WhiIkb0eeK3nrCnYnIvDP7+ag4tUeoVK1Bif6eWyRJ6nfVRLkP
- lnibUBUxjVExQ+OGOvjegETcnp1AE6bjCFlDdoIbI3fySV7CQ+Zz//yX40iHSt8D+4trSfHH3
- ENNRLXX5gUiCagXor1dpGqluaJiWABAm3iz8V9VNQXBEg+e1NMmt2yN4rvvcNhkNZF31QzXhq
- pDiasV2G5Xt4YXsiCY9AMMCtUUH5bAe6guv5bzEghe8Xy0emH3Xribom00OESsHDwBZe8jORi
- avwyR8HFTbGnYJBRr3oZ1FagQT60JKanJXud042TQ4EoRBHZj/8p0mOZTv0IhEhsOWvn5j9
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,41 +98,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 04/03/2020 à 23:18, Philippe Mathieu-Daudé a écrit :
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/audio/fmopl.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-> index 9f50a89b4a..173a7521f2 100644
-> --- a/hw/audio/fmopl.c
-> +++ b/hw/audio/fmopl.c
-> @@ -1066,7 +1066,7 @@ static void OPLResetChip(FM_OPL *OPL)
->  	}
->  }
->  
-> -/* ----------  Create one of vietual YM3812 ----------       */
-> +/* ----------  Create one of virtual YM3812 ----------       */
->  /* 'rate'  is sampling rate and 'bufsiz' is the size of the  */
->  FM_OPL *OPLCreate(int clock, int rate)
->  {
-> @@ -1115,7 +1115,7 @@ FM_OPL *OPLCreate(int clock, int rate)
->  	return OPL;
->  }
->  
-> -/* ----------  Destroy one of vietual YM3812 ----------       */
-> +/* ----------  Destroy one of virtual YM3812 ----------       */
->  void OPLDestroy(FM_OPL *OPL)
->  {
->  #ifdef OPL_OUTPUT_LOG
-> 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Juan Quintela <quintela@redhat.com> writes:
+
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>
+>>> Fixes: 3a67848134d0
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>  configure | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 7b373bc0bb8..caa65f58831 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -2464,7 +2464,7 @@ fi
+>>>  # zstd check
+>>>=20=20
+>>>  if test "$zstd" !=3D "no" ; then
+>>> -    if $pkg_config --exist libzstd ; then
+>>> +    if $pkg_config --exists libzstd ; then
+>
+> Hi
+>
+> several things:
+>
+> a- I found why I didn't get the error.  Fedora pkg-config is really
+> "smart":
+>
+> b- I have tried (with this patch), the following configurations:
+>    * --enable-zstd
+>    * --disable-zstd
+>    with both libzstd-devel installed and not installed. Everything
+>    worked as expected.
+>    (BTW, I tested that before submmiting the patch in the first place, I
+>    thought that I had done all testing needed for such a check).
+>
+> Can you told me what architecture/distro/os are you using.
+
+It broke on the CI setup - it could be another issue with the ageing
+Travis images (Ubuntu 16.04).
+
+>> Dropping this patch as it breaks the build even more!
+>>
+>>   CC      migration/block.o
+>>
+>> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:24:5: error: un=
+known type name =E2=80=98ZSTD_CStream=E2=80=99
+>>
+>>      ZSTD_CStream *zcs;
+>>
+>>      ^
+>
+> This is really weird.  if you arrive here, that means:
+> - you have zstd devel installed (whatever is that called for your
+>   os/distro/whatever).
+
+Well it detected it:
+
+  zstd support      yes
+
+>
+> - pkg-config has found zstd devel packages and configured them (that
+>   file depends on CONFiG_ZSTD beoing defined)
+>
+> - gcc has found <zstd.h> (i.e. it don't give one error about that
+>   include file not found).
+>
+> And zstd don't have ZSTD_CStream defined?  What is going on here?
+> Can you post/show what is on your zstd.h file?
+> What zstd library version do you have?
+>
+> I thought that zstd was a new library, and that we didn't need to check
+> for versions.  It appears that I was wrong.  And no, the include file
+> don't show what features are new/old.
+
+Obviously not that new but has changed since it first got introduced.
+
+--=20
+Alex Benn=C3=A9e
 
