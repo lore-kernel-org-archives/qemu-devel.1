@@ -2,162 +2,73 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB4BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8997EC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51098208C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:26:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+xz1yGU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51098208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61A5A208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A5A208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9vCn-0001wh-Fc
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:26:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
+	id 1j9vD4-0002GK-Ik
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:27:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9vBy-0001B9-It
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:56 -0500
+ (envelope-from <bounces@canonical.com>) id 1j9vCA-0001JN-VO
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9vBw-0006F0-M3
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:54 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34560
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9vBw-0006EM-If
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583432751;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Bzd0CxFe1i9bKiLXbe06FC3UnijR6HFoIvxvfmKyC0A=;
- b=c+xz1yGUeTOrANknbwBdoaf0f/4SzX3zrn/OmheI+nNNejpHFojtm/aAvbjM77E8bFvucL
- NBU8XiLCMoQxnZLW/OaLY/EBX3XCvt7Fby/iR164sja8lq4gGrcOu7Inp+T0ae2/EKRXWe
- Nptf6tEHQ6FVAyyW1Kl6DLf7Mk37PeI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-DzuKs0ZRNaOmM3Ty5H3A0g-1; Thu, 05 Mar 2020 13:25:48 -0500
-X-MC-Unique: DzuKs0ZRNaOmM3Ty5H3A0g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2A9A13EA;
- Thu,  5 Mar 2020 18:25:46 +0000 (UTC)
-Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 60CE08F34E;
- Thu,  5 Mar 2020 18:25:44 +0000 (UTC)
-Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200304213818.15341-1-jsnow@redhat.com>
- <20200304213818.15341-7-jsnow@redhat.com>
- <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
- <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
- <20200305115548.GA5363@linux.fritz.box>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <d9500e3c-48d4-8ab2-51c7-9a914dd8ec49@redhat.com>
-Date: Thu, 5 Mar 2020 13:25:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bounces@canonical.com>) id 1j9vC9-0006NS-Ba
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j9vC9-0006Mw-6C
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:05 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j9vC6-0001gS-57
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 18:26:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D090F2EAE0A
+ for <qemu-devel@nongnu.org>; Thu,  5 Mar 2020 18:00:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200305115548.GA5363@linux.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Mar 2020 17:17:36 -0000
+From: tstrike <1813165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
+ tstrike34 vkuznets
+X-Launchpad-Bug-Reporter: Thomas (himbeere)
+X-Launchpad-Bug-Modifier: tstrike (tstrike34)
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <158342865638.12437.2872061254656621768.malone@wampee.canonical.com>
+Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 940718c5170285e3192da5c2ea57532cfcbe7c8a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -166,139 +77,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hey folks, I am having the same problem.
 
+I recognize there was a patch a year ago (almost exactly one year ago)
+and I wonder it was included in later updates.
 
-On 3/5/20 6:55 AM, Kevin Wolf wrote:
-> Am 05.03.2020 um 00:14 hat John Snow geschrieben:
->>
->>
->> On 3/4/20 4:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->=20
-> Adding back the context:
->=20
->> -        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitco=
-de, ' '.join(qemu_img_args + list(args))))
->> +        sys.stderr.write('qemu-img received signal %i: %s\n' % (
->> +            -exitcode, ' '.join(qemu_img_args + list(args))))
->=20
->>> Do we want to indent Python like C and align argument below opening
->>> parenthesis? Except when using sys.stderr.write() you seem to do it.
->>
->> This isn't an argument to write, it's an argument to the format string,
->> so I will say "no."
->=20
-> The argument to write() is an expression. This expression contains the %
-> operator with both of its operands. It's still fully within the
-> parentheses of write(), so I think Philippe's question is valid.
->=20
->> For *where* I've placed the line break, this is the correct indentation.
->> emacs's python mode will settle on this indent, too.
->>
->> https://python.org/dev/peps/pep-0008/#indentation
->=20
-> The PEP-8 examples are not nested, so it's not completely clear. I
-> wonder if hanging indents wouldn't actually mean the following because
-> if you line wrap an argument list (which contains the whole %
-> expression), you're supposed to have nothing else on the line of the
-> opening parenthesis:
->=20
->     sys.stderr.write(
->         'qemu-img received signal %i: %s\n'
->         % (-exitcode, ' '.join(qemu_img_args + list(args))))
->=20
+That said, Ubuntu has upgraded. Recently I upgrade my machine. Here are
+some key stats.
 
-This is fine too.
+DistroRelease: Ubuntu 20.04
+Uname: Linux 5.4.0-14-generic x86_64
+UpgradeStatus: Upgraded to focal on 2020-02-12 (22 days ago)
+ProcVersionSignature: Ubuntu 5.4.0-14.17-generic 5.4.18
+RelatedPackageVersions:
+ kvmtool                               N/A
+ gir1.2-libvirt-glib-1.0               2.0.0-2
+ gir1.2-libvirt-sandbox-1.0            N/A
+ libnss-libvirt                        N/A
+ libvirt-bin                           N/A
+ libvirt-clients                       6.0.0-0ubuntu4
+ libvirt-daemon                        6.0.0-0ubuntu4
+ libvirt-daemon-driver-lxc             N/A
+ libvirt-daemon-driver-qemu            6.0.0-0ubuntu4
+ libvirt-daemon-driver-storage-gluster N/A
+ libvirt-daemon-driver-storage-rbd     6.0.0-0ubuntu4
+ libvirt-daemon-driver-storage-zfs     N/A
+ libvirt-daemon-driver-vbox            N/A
+ libvirt-daemon-driver-xen             N/A
+ libvirt-daemon-system                 6.0.0-0ubuntu4
+ libvirt-daemon-system-systemd         6.0.0-0ubuntu4
+ libvirt-daemon-system-sysv            N/A
+ libvirt-dbus                          N/A
+ libvirt-dev                           6.0.0-0ubuntu4
+ libvirt-doc                           N/A
+ libvirt-glib-1.0-0                    2.0.0-2
+ libvirt-glib-1.0-dev                  N/A
+ libvirt-ocaml                         N/A
+ libvirt-ocaml-dev                     N/A
+ libvirt-sandbox-1.0-5                 N/A
+ libvirt-sandbox-1.0-dev               N/A
+ libvirt-sanlock                       N/A
+ libvirt-wireshark                     N/A
+ libvirt0                              6.0.0-0ubuntu4
+ libvirtodbc0                          N/A
+ libvirtualpg-dev                      N/A
+ libvirtualpg0                         N/A
+ libvirtuoso5.5-cil                    N/A
+ nbdkit-plugin-libvirt                 N/A
+ nova-compute-libvirt                  N/A
+ php-libvirt-php                       N/A
+ python3-libvirt                       6.0.0-0ubuntu3
+ ruby-fog-libvirt                      0.6.0-1
+ ruby-libvirt                          0.7.1-1
+ uvtool-libvirt                        N/A
+ vagrant-libvirt                       0.0.45-2
+ virt-manager                          1:2.2.1-3ubuntu1
+ qemu                                  1:4.2-3ubuntu1
+ qemu-block-extra                      1:4.2-3ubuntu1
+ qemu-efi                              N/A
+ qemu-efi-aarch64                      N/A
+ qemu-efi-arm                          N/A
+ qemu-guest-agent                      N/A
+ qemu-kvm                              1:4.2-3ubuntu1
+ qemu-slof                             N/A
+ qemu-system                           N/A
+ qemu-system-arm                       N/A
+ qemu-system-common                    1:4.2-3ubuntu1
+ qemu-system-data                      1:4.2-3ubuntu1
+ qemu-system-gui                       1:4.2-3ubuntu1
+ qemu-system-mips                      N/A
+ qemu-system-misc                      N/A
+ qemu-system-ppc                       N/A
+ qemu-system-s390x                     N/A
+ qemu-system-sparc                     N/A
+ qemu-system-x86                       1:4.2-3ubuntu1
+ qemu-system-x86-microvm               N/A
+ qemu-system-x86-xen                   N/A
+ qemu-user                             N/A
+ qemu-user-binfmt                      N/A
+ qemu-user-static                      N/A
+ qemu-utils                            1:4.2-3ubuntu1
+ qemubuilder                           N/A
 
-> But anyway, I think the question is more whether we want to use hanging
-> indents at all (or at least if we want to use it even in cases where the
-> opening parenthesis isn't already at like 70 characters) when we're
-> avoiding it in our C coding style.
->=20
-> There's no technical answer to this, it's a question of our preferences.
->=20
+-- =
 
-Maybe it is ambiguous. Long lines are just ugly everywhere.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
 
->> (If anyone quotes Guido's belittling comment in this email, I will
->> become cross.)
->>
->>
->> But there are other places to put the line break. This is also
->> technically valid:
->>
->> sys.stderr.write('qemu-img received signal %i: %s\n'
->>                  % (-exitcode, ' '.join(qemu_img_args + list(args))))
->>
->> And so is this:
->>
->>     sys.stderr.write('qemu-img received signal %i: %s\n' %
->>                      (-exitcode, ' '.join(qemu_img_args + list(args))))
->=20
-> PEP-8 suggests the former, but allows both styles:
->=20
-> https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-a=
-fter-a-binary-operator
->=20
+Title:
+  KVM internal error. Suberror: 1 emulation failure
 
-So in summary:
+Status in QEMU:
+  New
 
-- Avoid nested hanging indents from format operators
-- Use a line break before the % format operator.
-- OPTIONALLY(?), use a hanging indent for the entire format string to
-reduce nesting depth.
+Bug description:
+  Hello Devs.
 
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
 
-e.g., either this form:
-(using a line break before the binary operator and nesting to the
-argument level)
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
 
-write('hello %s'
-      % (world,))
+  Someone has an idea whats going wrong here?
 
+  thanks and cheers
+  t.
 
-or optionally this form if it buys you a little more room:
-(using a hanging indent of 4 spaces and nesting arguments at that level)
-
-write(
-    'hello %s'
-    % ('world',))
-
-
-but not ever this form:
-(Using a hanging indent of 4 spaces from the opening paren of the format
-operand)
-
-write('hello %s' % (
-    'world',))
-
-
-
-yea/nea?
-
-(Kevin, Philippe, Markus, Max)
-
->> (And so would be any other number of rewrites to use format codes,
->> f-strings, or temporary variables to otherwise reduce the length of the
->> line.)
->>
->> I will reluctantly admit that wrapping to 79 columns is useful in some
->> contexts. The beauty of line continuations is something I have little
->> desire to litigate, though.
->>
->> If there's some consensus on the true and beautiful way to do it, I will
->> oblige -- but the thought of spinning more iterations until we find a
->> color swatch we like is an unpleasant one.
->=20
-> I'll accept any colour for the bikeshed, as long as it's green. ;-)
->=20
-> Kevin
->=20
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
 
