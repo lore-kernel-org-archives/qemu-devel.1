@@ -2,85 +2,82 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D69C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4CAC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:09:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33DCB20848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:04:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB00E208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:09:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIl+IyPA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33DCB20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQASgSvg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB00E208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50869 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9s2j-000267-8Z
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:04:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42192)
+	id 1j9s7T-0004js-UV
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:09:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43225)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1j9s0F-00015N-Er
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:36 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j9s6h-0003o1-If
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:08:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1j9s0D-0001dQ-2T
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37303
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1j9s0C-0001d3-Uf
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583420492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=o4x3+2HVduoV5LvQcyZhKCpkD5Jw62Jja240veAukng=;
- b=bIl+IyPADo+1TD4S0ACa9uuwEcFhkVOgc9z9RilTM7voy9eaf6GuRGlvWKCeuBwOXKsprL
- cpShlxx4V3ajybOs7V2W1JRe4FX1PclUCBz7ASakN/kduziD1UgurpU6VsWA+UoXdAlCxH
- 0vnAa8GCs2uBbEGmgsTwII6x7oH0OHo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-cwJR9mMMOQeJFo6A0mI-_w-1; Thu, 05 Mar 2020 10:01:30 -0500
-X-MC-Unique: cwJR9mMMOQeJFo6A0mI-_w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAE5A800D4E
- for <qemu-devel@nongnu.org>; Thu,  5 Mar 2020 15:01:29 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-216.ams2.redhat.com
- [10.36.117.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A2CD59CA3;
- Thu,  5 Mar 2020 15:01:25 +0000 (UTC)
-Subject: Re: [PULL 1/1] qxl: introduce hardware revision 5
-To: Yuri Benditovich <ybendito@redhat.com>
-References: <20200213090627.2181-1-kraxel@redhat.com>
- <20200213090627.2181-2-kraxel@redhat.com>
- <bb1f9cbb-7f98-e955-c55d-abc36e788902@redhat.com>
- <1472901155.11933269.1583395037984.JavaMail.zimbra@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e69ea9ab-9fc1-ca12-c7ab-50e094c1c782@redhat.com>
-Date: Thu, 5 Mar 2020 16:01:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j9s6g-0006iA-BO
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:08:15 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38778)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1j9s6g-0006gZ-1s
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:08:14 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t11so7448875wrw.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 07:08:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=aoQxwI8Pz+ypsaosJmUL+2ag+z5LuvEcVdunPahoJD4=;
+ b=OQASgSvg3zphGp1eDKD3ohbGyaBeYvawZDjuUErv3lx9idBlCUqpztteT9G0GUyFJR
+ sVYQNEit3y9h/ZWQrLHsA2qCdSi4VVioSlmjCfv/fMd3CzB5qbLTHjY0yI0BgcRB4QfA
+ aQqYwXXNce3KIgmUPyI7gMtGHEN2JDaC2Xhm7PZXX0bKdRhpJwea/LuVGI/EO7Iq5EU6
+ +92tM4xl+58tVK5CXNl51fQVZhhd0A1wB4pcXqqgB8C7AZh6gyzXk9f7NWsEYG6OQ5Ql
+ QG6m539F4p61vitbHYIPTOGS2JU1a1RBrlGwR88OaS/GaUkzBARdtmcVfVBdtASEszcw
+ 070w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=aoQxwI8Pz+ypsaosJmUL+2ag+z5LuvEcVdunPahoJD4=;
+ b=bXssMRePExe5uV3btQFe6OkyjTSJkQRRw1dLLk2wH85n/PVGQoa94qkpvCzUfyIkgA
+ kK4X2mVN8JaN36QqqP9a8fWZD1MSz16Ajl/pDBnEr8mtkzy8uojG3bQKWkyYlpz2/OOY
+ AaALzVnpQDUwfSYE4dP+A6BlMdob0Pspo8qnKOZteYFqTanQKlGSSiC83A5DZoj3DJan
+ WRKLOFMx7bW+lHDbUpCorva95I6B68pdoUA7nMekqdztm8gU268NpdS4DzX8GYJcdSIF
+ 5OJZDyOAwg2uGhv1uKS0+cpq+1UEqhjilYiYhhpQq5/fiNdtL3JJ6Q4DgHb/UzW+69z+
+ pDcA==
+X-Gm-Message-State: ANhLgQ0iIfZMhhDsyjxzhd3W4/5Gv1pFdNs0N1TQuHe214w78fo0iDkB
+ SMj1DavMz6OdrCxo2qic5Lin4I2v8G2nqfT+qJ4=
+X-Google-Smtp-Source: ADFU+vsxxTFgzf08yV1qNo3VW66SElrQOQESAKHL63JyY/QsonJJY1tKP2XSS4nHzI8oDKLSEOYdsm23fxgoIyTjZVc=
+X-Received: by 2002:a5d:62c9:: with SMTP id o9mr10974896wrv.2.1583420892716;
+ Thu, 05 Mar 2020 07:08:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1472901155.11933269.1583395037984.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a74ueudt.fsf@dusky.pond.sub.org>
+In-Reply-To: <87a74ueudt.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 5 Mar 2020 16:08:00 +0100
+Message-ID: <CAJ+F1C+GY6d8Jr+NjSMuXpX+QiMsFQ9qd-rEJyp+oF9Ld6Z1wQ@mail.gmail.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,76 +89,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/05/20 08:57, Yuri Benditovich wrote:
-> ----- Original Message -----
+Hi
+
+On Thu, Mar 5, 2020 at 3:46 PM Markus Armbruster <armbru@redhat.com> wrote:
 >
->> From: "Laszlo Ersek" <lersek@redhat.com>
->> To: "Gerd Hoffmann" <kraxel@redhat.com>
->> Cc: qemu-devel@nongnu.org, "Eduardo Habkost" <ehabkost@redhat.com>,
->> "Yuri Benditovich" <ybendito@redhat.com>, "Yan Vugenfirer"
->> <yvugenfi@redhat.com>
->> Sent: Thursday, March 5, 2020 1:28:23 AM
->> Subject: Re: [PULL 1/1] qxl: introduce hardware revision 5
+> I tried to observe the main loop keeps running while the screendump does
+> its work.
 >
->> this patch -- commit ed71c09ffd6f -- disables ACPI S3 in the Windows
->> 10 guest for me, using OVMF and QXL.
+> The main loop appears to lack trace points.  Alright, if there's no
+> hammer handy, I'll use a rock:
 >
->> The "Sleep" menu entry disappears from the power button icon/menu at
->> the login screen, and "psshutdown -d -t 3" (from the pstools package)
->> also stops working (it reports that the computer does not support
->> S3).
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 5549f4b619..b6561a65d7 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -1661,6 +1661,7 @@ void qemu_main_loop(void)
+>  #ifdef CONFIG_PROFILER
+>          ti =3D profile_getclock();
+>  #endif
+> +        printf("*** main loop\n");
+>          main_loop_wait(false);
+>  #ifdef CONFIG_PROFILER
+>          dev_time +=3D profile_getclock() - ti;
 >
->> At the parent commit (e18e5501d8ac), S3 suspend/resume works.
+>
+> First experiment: does the main loop continue to run when writing out
+> the screendump blocks / would block?
+>
+> Observe qmp_screendump() opens the file without O_EXCL.  Great, that
+> lets me block output by making it open a FIFO.
+>
+> Terminal#1:
+>
+>     $ mkfifo s
+>
+> Terminal#2:
+>
+>     $ upstream-qemu -S -display none -chardev socket,id=3Dqmp,path=3Dtest=
+-qmp,server=3Don,wait=3Doff -mon mode=3Dcontrol,chardev=3Dqmp
+>     *** main loop
+>     *** main loop
+>     *** main loop
+>
+> Keeps printing at a steady pace.
+>
+> Terminal#3:
+>
+>     $ socat "READLINE,history=3D$HOME/.qmp_history,prompt=3DQMP>" UNIX-CO=
+NNECT:$HOME/work/images/test-qmp
+>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 2, "major": 4}, "=
+package": "v4.2.0-2069-g5e5ae6b644-dirty"}, "capabilities": ["oob"]}}
+>     QMP>{"execute": "qmp_capabilities"}
+>     {"return": {}}
+>     QMP>{"execute": "screendump", "arguments": {"filename": "s"}}
+>
+> The printing in terminal#2 stops.  This is expected; qemu_open() calls
+> open(), which blocks, because the FIFO has no reader.
+>
+> Terminal#1:
+>
+>     $ exec 4<s
+>
+> Now the FIFO has a reader.  Terminal#2 remains quiet.
+>
+> We now hang in ppm_save().  Abridged stack backtrace:
+>
+>     #0  0x00007ffff519d0f5 in writev () at /lib64/libc.so.6
+>     #1  0x0000555555e15f61 in qio_channel_file_writev
+>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, fds=3D0x0,=
+ nfds=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel-file.c:12=
+3
+>     #2  0x0000555555e133d3 in qio_channel_writev_full
+>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, fds=3D0x0,=
+ nfds=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel.c:86
+>     #3  0x0000555555e137a2 in qio_channel_writev
+>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, errp=3D0x7=
+fffe9d81d10)
+>         at /work/armbru/qemu/io/channel.c:207
+>     #4  0x0000555555e13696 in qio_channel_writev_all
+>         (ioc=3D0x5555567bf5f0, iov=3D0x7fffe9d81bd0, niov=3D1, errp=3D0x7=
+fffe9d81d10)
+>         at /work/armbru/qemu/io/channel.c:171
+>     #5  0x0000555555e139b1 in qio_channel_write_all
+>         (ioc=3D0x5555567bf5f0, buf=3D0x555556b05200 "", buflen=3D1920, er=
+rp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel.c:257
+>     #6  0x0000555555cd74ff in ppm_save
+>         (fd=3D22, image=3D0x5555568ffdd0, errp=3D0x7fffe9d81d10)
+>         at /work/armbru/qemu/ui/console.c:336
+>     #7  0x0000555555cd77e6 in qmp_screendump
+>         (filename=3D0x555556ea0900 "s", has_device=3Dfalse, device=3D0x0,=
+ has_head=3Dfalse, head=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/ui=
+/console.c:401
+>
+> A brief inspection of qio_channel_file_writev() and
+> qio_channel_writev_all() suggests this might work if you make the output
+> file descriptor non-blocking.
+
+Right, the goal was rather originally to fix rhbz#1230527. We got
+coroutine IO by accident, and I was too optimistic about default
+behaviour change ;) I will update the patch.
+
+>
+>     $ head -c 1 <&4 | hexdump -C
+>     00000000  50                                                |P|
+>     00000001
+>
+> Still quiet.
+>
+>     $ cat <&4 >/dev/null
+>
+> The printing resumes.
+>
+>     $ exec 4<&-
+>
+>
+> Second experiment: does the main loop continue to run while we wait for
+> graphic_hw_update_done()?
+>
+> Left as an exercise for the patch submitter ;)
+>
 >
 
-[...]
+With your main loop printf, one printf in graphic_hw_update() and one
+in graphic_hw_update_done() ? (rather part of testing commit
+4d6316218bf7bf3b8c7c7165b072cc314511a7a7, soon 4y old!)
 
->> OVMF is built at current edk2 master: e63d54db9526.
->
->> In the Windows 10 guest, the installed driver has the following
->> properties (per Device Manager):
->
->> - driver date: 7/28/2015
->> - driver version: 22.33.46.473
-
-> This is not what I would expect from any qxl driver for Win10
-> What is the name of display adapter?
-
-"Red Hat QXL controller"
-
-> The driver provider is 'Red Hat'?
-
-In the "Red Hat QXL controller Properties" dialog:
-
-- on the General tab, Manufacturer is "Red Hat, Inc."
-
-- on the Driver tab, both the "Driver Provider" and the "Digital Signer"
-  fields are "Red Hat, Inc."
-
-This driver comes from "qxlwddm-0.1-12" (buildID=449635), in Brew.
-
-In retrospect it looks like this driver was meant for Windows 8 only,
-but it happened to install under, and work OK for, Windows 10 too.
-
-> Does your guest run with secure boot?
-
-Yes, it does. (Double-checked it with "confirm-SecureBootUEFI" in
-PowerShell.)
-
-> I do not see such an effect with 'Sleep' with latest qemu master +
-> OVMF + qxl + Win10, the sleep button does not disappear.
-
-I'm happy to try other driver versions. Hopefully Windows 10 will
-actually see them as upgrading the currently installed driver. (Or
-should I uninstall first?)
-
-Thanks!
-Laszlo
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
