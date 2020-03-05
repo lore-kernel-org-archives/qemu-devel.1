@@ -2,97 +2,86 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05269C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D833BC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C24092073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:41:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C24092073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5DD42073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:43:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJJv/g16"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5DD42073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9wNa-0004XQ-10
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:41:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36015)
+	id 1j9wOa-0006WW-Pf
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:43:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKj-0007Ov-Vc
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:03 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j9wMo-0002kV-6d
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKi-0005FC-97
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13618
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1j9wKi-0005Du-3s
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:00 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 025JL3sT098165; Thu, 5 Mar 2020 14:38:58 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yhr4kncyv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Mar 2020 14:38:58 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 025JPUrd109231;
- Thu, 5 Mar 2020 14:38:58 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yhr4kncyg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Mar 2020 14:38:58 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 025JaIiN013487;
- Thu, 5 Mar 2020 19:38:57 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 2yffk8182q-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Mar 2020 19:38:57 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 025JcucC54198696
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Mar 2020 19:38:56 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 91DCE124053;
- Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 78D94124058;
- Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/10] tpm: Use TPMState as a common struct
-Date: Thu,  5 Mar 2020 14:38:47 -0500
-Message-Id: <20200305193855.278878-3-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200305193855.278878-1-stefanb@linux.vnet.ibm.com>
-References: <20200305193855.278878-1-stefanb@linux.vnet.ibm.com>
+ (envelope-from <eric.auger@redhat.com>) id 1j9wMl-0006NE-GI
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:41:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43819
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j9wMl-0006Mg-CX
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:41:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583437266;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XTwc7utWzKzyAhBWCE6+Bn/zt36VL3m2kIIGjJFea4w=;
+ b=NJJv/g16fuj+di17SEHg8b5aJgj95mAf9kbxpSUS69G1YtwZwo9q35SM6L7O1dLYtLVgGA
+ oMkF7XpTh1uUqhPziDukoRnfWESMoiAyaSswLHs7CBLua0AITuzI7MfUqhPJ/1BN8cdD3p
+ QnCnlQY1m5YqGlUuZDtrV3Dwm+Q+Esk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-p2KwtOX8PpWqemKazDTNyg-1; Thu, 05 Mar 2020 14:41:04 -0500
+X-MC-Unique: p2KwtOX8PpWqemKazDTNyg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80EA98010F2;
+ Thu,  5 Mar 2020 19:41:01 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F9938FBE0;
+ Thu,  5 Mar 2020 19:40:56 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 06/14] arm/arm64: gicv3: Set the LPI
+ config and pending tables
+To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-7-eric.auger@redhat.com>
+ <5e188428-11c9-aad4-3d5e-fca89cc41b7f@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <11ff332b-6634-7d9a-c12e-921e8dc592e9@redhat.com>
+Date: Thu, 5 Mar 2020 20:40:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-05_06:2020-03-05,
- 2020-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015
- mlxscore=0 phishscore=0 mlxlogscore=999 suspectscore=1 lowpriorityscore=0
- impostorscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003050114
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <5e188428-11c9-aad4-3d5e-fca89cc41b7f@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,319 +93,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, peter.maydell@linaro.org,
- Stefan Berger <stefanb@linux.ibm.com>, eric.auger@redhat.com
+Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
+ thuth@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+Hi Zenghui,
 
-As we plan to introduce a SysBus TPM TIS device, let's
-make the TPMState a common struct usable by both the
-ISADevice and the SysBusDevice. TPMStateISA embeds the
-struct and inherits from the ISADevice.
+On 2/7/20 3:12 AM, Zenghui Yu wrote:
+> Hi Eric,
+>=20
+> On 2020/1/28 18:34, Eric Auger wrote:
+>> Allocate the LPI configuration and per re-distributor pending table.
+>> Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
+>> by default in the config table.
+>>
+>> Also introduce a helper routine that allows to set the pending table
+>> bit for a given LPI.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - Move the helpers in lib/arm/gic-v3.c and prefix them with "gicv3_"
+>> =C2=A0=C2=A0 and add _lpi prefix too
+>>
+>> v1 -> v2:
+>> - remove memory attributes
+>> ---
+>> =C2=A0 lib/arm/asm/gic-v3.h | 16 +++++++++++
+>> =C2=A0 lib/arm/gic-v3.c=C2=A0=C2=A0=C2=A0=C2=A0 | 64 +++++++++++++++++=
++++++++++++++++++++++++++++
+>> =C2=A0 2 files changed, 80 insertions(+)
+>>
+>> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+>> index ffb2e26..ec2a6f0 100644
+>> --- a/lib/arm/asm/gic-v3.h
+>> +++ b/lib/arm/asm/gic-v3.h
+>> @@ -48,6 +48,16 @@
+>> =C2=A0 #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (MPIDR_AFFINITY_LEVEL(cluster_id, level=
+) <<
+>> ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+>> =C2=A0 +#define GICR_PROPBASER_IDBITS_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 (0x1f)
+>=20
+> This is not being used.=C2=A0 You can use it when calculating prop_val
+> or just drop it.
+yep dropped it.
+>=20
+>> +
+>> +#define GICR_PENDBASER_PTZ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT_ULL(62)
+>> +
+>> +#define LPI_PROP_GROUP1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1 =
+<< 1)
+>> +#define LPI_PROP_ENABLED=C2=A0=C2=A0=C2=A0 (1 << 0)
+>> +#define LPI_PROP_DEFAULT_PRIO=C2=A0=C2=A0 0xa0
+>> +#define LPI_PROP_DEFAULT=C2=A0=C2=A0=C2=A0 (LPI_PROP_DEFAULT_PRIO | L=
+PI_PROP_GROUP1 | \
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 LPI_PROP_ENABLED)
+>> +
+>> =C2=A0 #include <asm/arch_gicv3.h>
+>> =C2=A0 =C2=A0 #ifndef __ASSEMBLY__
+>> @@ -64,6 +74,8 @@ struct gicv3_data {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *dist_base;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *redist_bases[GICV3_NR_REDISTS];
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *redist_base[NR_CPUS];
+>> +=C2=A0=C2=A0=C2=A0 void *lpi_prop;
+>> +=C2=A0=C2=A0=C2=A0 void *lpi_pend[NR_CPUS];
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int irq_nr;
+>> =C2=A0 };
+>> =C2=A0 extern struct gicv3_data gicv3_data;
+>> @@ -80,6 +92,10 @@ extern void gicv3_write_eoir(u32 irqstat);
+>> =C2=A0 extern void gicv3_ipi_send_single(int irq, int cpu);
+>> =C2=A0 extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)=
+;
+>> =C2=A0 extern void gicv3_set_redist_base(size_t stride);
+>> +extern void gicv3_lpi_set_config(int n, u8 val);
+>> +extern u8 gicv3_lpi_get_config(int n);
+>> +extern void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool se=
+t);
+>> +extern void gicv3_lpi_alloc_tables(void);
+>> =C2=A0 =C2=A0 static inline void gicv3_do_wait_for_rwp(void *base)
+>> =C2=A0 {
+>> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+>> index feecb5e..c33f883 100644
+>> --- a/lib/arm/gic-v3.c
+>> +++ b/lib/arm/gic-v3.c
+>> @@ -5,6 +5,7 @@
+>> =C2=A0=C2=A0 */
+>> =C2=A0 #include <asm/gic.h>
+>> =C2=A0 #include <asm/io.h>
+>> +#include <alloc_page.h>
+>> =C2=A0 =C2=A0 void gicv3_set_redist_base(size_t stride)
+>> =C2=A0 {
+>> @@ -147,3 +148,66 @@ void gicv3_ipi_send_single(int irq, int cpu)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpumask_set_cpu(cpu, &dest);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_ipi_send_mask(irq, &dest);
+>> =C2=A0 }
+>> +
+>> +#if defined(__aarch64__)
+>> +/* alloc_lpi_tables: Allocate LPI config and pending tables */
+>> +void gicv3_lpi_alloc_tables(void)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 unsigned long n =3D SZ_64K >> PAGE_SHIFT;
+>> +=C2=A0=C2=A0=C2=A0 unsigned long order =3D fls(n);
+>> +=C2=A0=C2=A0=C2=A0 u64 prop_val;
+>> +=C2=A0=C2=A0=C2=A0 int cpu;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 gicv3_data.lpi_prop =3D (void *)virt_to_phys(alloc=
+_pages(order));
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* ID bits =3D 13, ie. up to 14b LPI INTID */
+>> +=C2=A0=C2=A0=C2=A0 prop_val =3D (u64)gicv3_data.lpi_prop | 13;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Allocate pending tables for each redistrib=
+utor
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * and set PROPBASER and PENDBASER
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0 for_each_present_cpu(cpu) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64 pend_val;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *ptr;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ptr =3D gicv3_data.redist_=
+base[cpu];
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writeq(prop_val, ptr + GIC=
+R_PROPBASER);
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 gicv3_data.lpi_pend[cpu] =3D=
+ (void
+>> *)virt_to_phys(alloc_pages(order));
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pend_val =3D (u64)gicv3_da=
+ta.lpi_pend[cpu];
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writeq(pend_val, ptr + GIC=
+R_PENDBASER);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +}
+>> +
+>> +void gicv3_lpi_set_config(int n, u8 value)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 81=
+92));
+>=20
+> But this is actually the *physical* address, shouldn't it be
+> converted by phys_to_virt() before reading/writing something?
+> Like what you've done for the 'lpi_pend[rdist]' before writing
+> pending bit.=C2=A0 Or I'm missing some points here?
+Agreed! Thanks
 
-The prototype of functions bound to be used by both
-the ISA and SysBus devices is changed to take TPMState
-handle.
-
-A bunch of structs also are renamed to be specialized
-for the ISA device. Besides those transformations, no
-functional change is expected.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Message-id: 20200305165149.618-3-eric.auger@redhat.com
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- hw/tpm/tpm_tis.c | 146 +++++++++++++++++++++++++++++------------------
- 1 file changed, 91 insertions(+), 55 deletions(-)
-
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index c609737272..fc6d7ca579 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -65,7 +65,6 @@ typedef struct TPMLocality {
- } TPMLocality;
- 
- typedef struct TPMState {
--    ISADevice busdev;
-     MemoryRegion mmio;
- 
-     unsigned char buffer[TPM_TIS_BUFFER_MAX];
-@@ -91,7 +90,15 @@ typedef struct TPMState {
-     TPMPPI ppi;
- } TPMState;
- 
--#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
-+typedef struct TPMStateISA {
-+    /*< private >*/
-+    ISADevice parent_obj;
-+
-+    /*< public >*/
-+    TPMState state; /* not a QOM object */
-+} TPMStateISA;
-+
-+#define TPM_TIS_ISA(obj) OBJECT_CHECK(TPMStateISA, (obj), TYPE_TPM_TIS_ISA)
- 
- #define DEBUG_TIS 0
- 
-@@ -281,9 +288,8 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t locty, uint8_t newlocty)
- /*
-  * Callback from the TPM to indicate that the response was received.
-  */
--static void tpm_tis_request_completed(TPMIf *ti, int ret)
-+static void tpm_tis_request_completed(TPMState *s, int ret)
- {
--    TPMState *s = TPM(ti);
-     uint8_t locty = s->cmd.locty;
-     uint8_t l;
- 
-@@ -338,7 +344,7 @@ static uint32_t tpm_tis_data_read(TPMState *s, uint8_t locty)
- }
- 
- #ifdef DEBUG_TIS
--static void tpm_tis_dump_state(void *opaque, hwaddr addr)
-+static void tpm_tis_dump_state(TPMState *s, hwaddr addr)
- {
-     static const unsigned regs[] = {
-         TPM_TIS_REG_ACCESS,
-@@ -353,7 +359,6 @@ static void tpm_tis_dump_state(void *opaque, hwaddr addr)
-     int idx;
-     uint8_t locty = tpm_tis_locality_from_addr(addr);
-     hwaddr base = addr & ~0xfff;
--    TPMState *s = opaque;
- 
-     printf("tpm_tis: active locality      : %d\n"
-            "tpm_tis: state of locality %d : %d\n"
-@@ -363,7 +368,7 @@ static void tpm_tis_dump_state(void *opaque, hwaddr addr)
- 
-     for (idx = 0; regs[idx] != 0xfff; idx++) {
-         printf("tpm_tis: 0x%04x : 0x%08x\n", regs[idx],
--               (int)tpm_tis_mmio_read(opaque, base + regs[idx], 4));
-+               (int)tpm_tis_mmio_read(s, base + regs[idx], 4));
-     }
- 
-     printf("tpm_tis: r/w offset    : %d\n"
-@@ -488,7 +493,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr addr,
-         break;
- #ifdef DEBUG_TIS
-     case TPM_TIS_REG_DEBUG:
--        tpm_tis_dump_state(opaque, addr);
-+        tpm_tis_dump_state(s, addr);
-         break;
- #endif
-     }
-@@ -835,10 +840,8 @@ static const MemoryRegionOps tpm_tis_memory_ops = {
- /*
-  * Get the TPMVersion of the backend device being used
-  */
--static enum TPMVersion tpm_tis_get_tpm_version(TPMIf *ti)
-+static enum TPMVersion tpm_tis_get_tpm_version(TPMState *s)
- {
--    TPMState *s = TPM(ti);
--
-     if (tpm_backend_had_startup_error(s->be_driver)) {
-         return TPM_VERSION_UNSPEC;
-     }
-@@ -850,9 +853,8 @@ static enum TPMVersion tpm_tis_get_tpm_version(TPMIf *ti)
-  * This function is called when the machine starts, resets or due to
-  * S3 resume.
-  */
--static void tpm_tis_reset(DeviceState *dev)
-+static void tpm_tis_reset(TPMState *s)
- {
--    TPMState *s = TPM(dev);
-     int c;
- 
-     s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
-@@ -896,15 +898,14 @@ static void tpm_tis_reset(DeviceState *dev)
- 
- /* persistent state handling */
- 
--static int tpm_tis_pre_save(void *opaque)
-+static int tpm_tis_pre_save(TPMState *s)
- {
--    TPMState *s = opaque;
-     uint8_t locty = s->active_locty;
- 
-     trace_tpm_tis_pre_save(locty, s->rw_offset);
- 
-     if (DEBUG_TIS) {
--        tpm_tis_dump_state(opaque, 0);
-+        tpm_tis_dump_state(s, 0);
-     }
- 
-     /*
-@@ -929,34 +930,78 @@ static const VMStateDescription vmstate_locty = {
-     }
- };
- 
--static const VMStateDescription vmstate_tpm_tis = {
-+/* ISA */
-+
-+static int tpm_tis_pre_save_isa(void *opaque)
-+{
-+    TPMStateISA *isadev = opaque;
-+
-+    return tpm_tis_pre_save(&isadev->state);
-+}
-+
-+static const VMStateDescription vmstate_tpm_tis_isa = {
-     .name = "tpm-tis",
-     .version_id = 0,
--    .pre_save  = tpm_tis_pre_save,
-+    .pre_save  = tpm_tis_pre_save_isa,
-     .fields = (VMStateField[]) {
--        VMSTATE_BUFFER(buffer, TPMState),
--        VMSTATE_UINT16(rw_offset, TPMState),
--        VMSTATE_UINT8(active_locty, TPMState),
--        VMSTATE_UINT8(aborting_locty, TPMState),
--        VMSTATE_UINT8(next_locty, TPMState),
-+        VMSTATE_BUFFER(state.buffer, TPMStateISA),
-+        VMSTATE_UINT16(state.rw_offset, TPMStateISA),
-+        VMSTATE_UINT8(state.active_locty, TPMStateISA),
-+        VMSTATE_UINT8(state.aborting_locty, TPMStateISA),
-+        VMSTATE_UINT8(state.next_locty, TPMStateISA),
- 
--        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 0,
-+        VMSTATE_STRUCT_ARRAY(state.loc, TPMStateISA, TPM_TIS_NUM_LOCALITIES, 0,
-                              vmstate_locty, TPMLocality),
- 
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
--static Property tpm_tis_properties[] = {
--    DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
--    DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
--    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
-+static void tpm_tis_isa_request_completed(TPMIf *ti, int ret)
-+{
-+    TPMStateISA *isadev = TPM_TIS_ISA(ti);
-+    TPMState *s = &isadev->state;
-+
-+    tpm_tis_request_completed(s, ret);
-+}
-+
-+static enum TPMVersion tpm_tis_isa_get_tpm_version(TPMIf *ti)
-+{
-+    TPMStateISA *isadev = TPM_TIS_ISA(ti);
-+    TPMState *s = &isadev->state;
-+
-+    return tpm_tis_get_tpm_version(s);
-+}
-+
-+static void tpm_tis_isa_reset(DeviceState *dev)
-+{
-+    TPMStateISA *isadev = TPM_TIS_ISA(dev);
-+    TPMState *s = &isadev->state;
-+
-+    return tpm_tis_reset(s);
-+}
-+
-+static Property tpm_tis_isa_properties[] = {
-+    DEFINE_PROP_UINT32("irq", TPMStateISA, state.irq_num, TPM_TIS_IRQ),
-+    DEFINE_PROP_TPMBE("tpmdev", TPMStateISA, state.be_driver),
-+    DEFINE_PROP_BOOL("ppi", TPMStateISA, state.ppi_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void tpm_tis_realizefn(DeviceState *dev, Error **errp)
-+static void tpm_tis_isa_initfn(Object *obj)
- {
--    TPMState *s = TPM(dev);
-+    TPMStateISA *isadev = TPM_TIS_ISA(obj);
-+    TPMState *s = &isadev->state;
-+
-+    memory_region_init_io(&s->mmio, obj, &tpm_tis_memory_ops,
-+                          s, "tpm-tis-mmio",
-+                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
-+}
-+
-+static void tpm_tis_isa_realizefn(DeviceState *dev, Error **errp)
-+{
-+    TPMStateISA *isadev = TPM_TIS_ISA(dev);
-+    TPMState *s = &isadev->state;
- 
-     if (!tpm_find()) {
-         error_setg(errp, "at most one TPM device is permitted");
-@@ -973,55 +1018,46 @@ static void tpm_tis_realizefn(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    isa_init_irq(&s->busdev, &s->irq, s->irq_num);
-+    isa_init_irq(ISA_DEVICE(dev), &s->irq, s->irq_num);
- 
-     memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
-                                 TPM_TIS_ADDR_BASE, &s->mmio);
- 
-     if (s->ppi_enabled) {
-         tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
--                     TPM_PPI_ADDR_BASE, OBJECT(s));
-+                     TPM_PPI_ADDR_BASE, OBJECT(dev));
-     }
- }
- 
--static void tpm_tis_initfn(Object *obj)
--{
--    TPMState *s = TPM(obj);
--
--    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_tis_memory_ops,
--                          s, "tpm-tis-mmio",
--                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
--}
--
--static void tpm_tis_class_init(ObjectClass *klass, void *data)
-+static void tpm_tis_isa_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     TPMIfClass *tc = TPM_IF_CLASS(klass);
- 
--    dc->realize = tpm_tis_realizefn;
--    device_class_set_props(dc, tpm_tis_properties);
--    dc->reset = tpm_tis_reset;
--    dc->vmsd  = &vmstate_tpm_tis;
-+    device_class_set_props(dc, tpm_tis_isa_properties);
-+    dc->vmsd  = &vmstate_tpm_tis_isa;
-     tc->model = TPM_MODEL_TPM_TIS;
--    tc->get_version = tpm_tis_get_tpm_version;
--    tc->request_completed = tpm_tis_request_completed;
-+    dc->realize = tpm_tis_isa_realizefn;
-+    dc->reset = tpm_tis_isa_reset;
-+    tc->request_completed = tpm_tis_isa_request_completed;
-+    tc->get_version = tpm_tis_isa_get_tpm_version;
- }
- 
--static const TypeInfo tpm_tis_info = {
-+static const TypeInfo tpm_tis_isa_info = {
-     .name = TYPE_TPM_TIS_ISA,
-     .parent = TYPE_ISA_DEVICE,
--    .instance_size = sizeof(TPMState),
--    .instance_init = tpm_tis_initfn,
--    .class_init  = tpm_tis_class_init,
-+    .instance_size = sizeof(TPMStateISA),
-+    .instance_init = tpm_tis_isa_initfn,
-+    .class_init  = tpm_tis_isa_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_TPM_IF },
-         { }
-     }
- };
- 
--static void tpm_tis_register(void)
-+static void tpm_tis_isa_register(void)
- {
--    type_register_static(&tpm_tis_info);
-+    type_register_static(&tpm_tis_isa_info);
- }
- 
--type_init(tpm_tis_register)
-+type_init(tpm_tis_isa_register)
--- 
-2.24.1
+Eric
+>=20
+>> +
+>> +=C2=A0=C2=A0=C2=A0 *entry =3D value;
+>> +}
+>> +
+>> +u8 gicv3_lpi_get_config(int n)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 81=
+92));
+>=20
+> The same as above.
+>=20
+>=20
+> Thanks,
+> Zenghui
+>=20
+>> +
+>> +=C2=A0=C2=A0=C2=A0 return *entry;
+>> +}
+>> +
+>> +void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 u8 *ptr =3D phys_to_virt((phys_addr_t)gicv3_data.l=
+pi_pend[rdist]);
+>> +=C2=A0=C2=A0=C2=A0 u8 mask =3D 1 << (n % 8), byte;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 ptr +=3D (n / 8);
+>> +=C2=A0=C2=A0=C2=A0 byte =3D *ptr;
+>> +=C2=A0=C2=A0=C2=A0 if (set)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 byte |=3D=C2=A0 mask;
+>> +=C2=A0=C2=A0=C2=A0 else
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 byte &=3D ~mask;
+>> +=C2=A0=C2=A0=C2=A0 *ptr =3D byte;
+>> +}
+>> +#endif /* __aarch64__ */
+>>
+>=20
 
 
