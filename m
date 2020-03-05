@@ -2,70 +2,70 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28122C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 932F8C3F2D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DED45208CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:02:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 612E82146E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 10:03:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBSln9zo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DED45208CD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELJYqB8v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 612E82146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9nKT-0002wT-0x
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:02:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38538)
+	id 1j9nLu-0004KJ-FO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 05:03:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9nJ8-00028T-1G
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:00:50 -0500
+ (envelope-from <david@redhat.com>) id 1j9nJd-0002dG-K7
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9nJ6-0001qY-V4
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:00:45 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36960
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j9nJc-0002rv-H7
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48780
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9nJ6-0001pZ-PW
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:00:44 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9nJc-0002m9-22
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 05:01:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583402443;
+ s=mimecast20190719; t=1583402473;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1WRJCuXEMkDeAvJ1pwo8VSD7bNcITBdDkaaIJDZg3NM=;
- b=eBSln9zojC3+ICiDIkR7MooOm+s79btffxgeTZz4Y3aQhfN4cBmKwGxE0vqwszUlw9Y2J+
- 6Ds6TKgPI14yIEk9tJJZVb2tI1j/cR73sWY++Oz7A0lmPO70DwoNjyT2NPtTg+iPK56p0/
- PMJacXBCz9uBb+gbB/Ttrgb1ybajG78=
+ bh=RmWBPzQDr2e4/bU5NPOQYXttUJbEaOHeO+qjLA8EfWo=;
+ b=ELJYqB8vM2eD6duvsaarvZ//LqcV9Nhj/VsVwYKjNeNymdCEvINjLDzfRf4/VO2tZL+yd1
+ pWjI6YbQ+pGtjXhxCbHPn69Nvfsok8kUGABQscDuDAW8qeRrjZMPeWfSo7lpSF6E41V404
+ 4DSFLHLFZFGuppwLmOkAwo+IRlBzQ0s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-TFsOEkyGMauX1JPeZ1cG_Q-1; Thu, 05 Mar 2020 05:00:42 -0500
-X-MC-Unique: TFsOEkyGMauX1JPeZ1cG_Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-425-1-yU2K6INTeiRoW_XgL2qw-1; Thu, 05 Mar 2020 05:01:09 -0500
+X-MC-Unique: 1-yU2K6INTeiRoW_XgL2qw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45D7B800D5B;
- Thu,  5 Mar 2020 10:00:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 688FC800D53;
+ Thu,  5 Mar 2020 10:01:08 +0000 (UTC)
 Received: from [10.10.120.166] (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57B44100194E;
- Thu,  5 Mar 2020 10:00:38 +0000 (UTC)
-Subject: Re: [PATCH v6 13/18] s390x: protvirt: Disable address checks for PV
- guest IO emulation
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 704E58AC30;
+ Thu,  5 Mar 2020 10:01:05 +0000 (UTC)
+Subject: Re: [PATCH v6 14/18] s390x: protvirt: Move IO control structures over
+ SIDA
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-14-frankja@linux.ibm.com>
- <36715573-98c2-311c-03a8-300e6b4915a3@redhat.com>
- <c4476e36-6738-0140-ba72-92d384b1cffc@linux.ibm.com>
+ <20200304114231.23493-15-frankja@linux.ibm.com>
+ <6f9c004c-cff7-cc41-fb96-4f6f32e692e2@redhat.com>
+ <8993b7ae-cd16-a9d1-e168-eff752bd5cc9@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -111,20 +111,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <b86a987f-528b-250d-ae56-a3fbc3c4aaa8@redhat.com>
-Date: Thu, 5 Mar 2020 11:00:36 +0100
+Message-ID: <b420b112-7b53-f92f-1a1c-a883d607570b@redhat.com>
+Date: Thu, 5 Mar 2020 11:01:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <c4476e36-6738-0140-ba72-92d384b1cffc@linux.ibm.com>
+In-Reply-To: <8993b7ae-cd16-a9d1-e168-eff752bd5cc9@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,52 +142,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.03.20 10:42, Janosch Frank wrote:
-> On 3/4/20 6:55 PM, David Hildenbrand wrote:
+On 05.03.20 10:55, Janosch Frank wrote:
+> On 3/4/20 7:56 PM, David Hildenbrand wrote:
 >> On 04.03.20 12:42, Janosch Frank wrote:
->>> IO instruction data is routed through SIDAD for protected guests, so
->>> adresses do not need to be checked, as this is kernel memory.
+>>> For protected guests, we need to put the IO emulation results into the
+>>> SIDA, so SIE will write them into the guest at the next entry.
 >>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  target/s390x/ioinst.c | 26 +++++++++++++++++++-------
->>>  1 file changed, 19 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
->>> index c437a1d8c6..e4102430aa 100644
->>> --- a/target/s390x/ioinst.c
->>> +++ b/target/s390x/ioinst.c
->>> @@ -17,6 +17,16 @@
->>>  #include "trace.h"
->>>  #include "hw/s390x/s390-pci-bus.h"
->>>  
->>> +static uint64_t get_address_from_regs(CPUS390XState *env, uint32_t ipb,
->>> +                                      uint8_t *ar)
->>> +{
 >>
->> Please add a comment here why this is done. (e.g., make all address
->> checks - like alignment checks - in the caller succeed, and we don't
->> need the address).
+>> [...]
+>>
+>>>  
+>>>      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid)) {
+>>> +        if (env->pv) {
+>>> +            return;
+>>> +        }
+>>
+>> Can you elaborate why we don't have to do anything here? I can
+>> understand why we don't/cannot probe for writes. But what about the
+>> PGM_OPERAND?
 > 
->      * Addresses for protected guests are all offsets into the
+> CSSID and the schid one check are done by the Ultravisor/SIE
 > 
-> 
->      * satellite block which holds the IO control structures. Those
 
-maybe mention SIDA as well
-
-> 
-> 
->      * control structures are always aligned and accessible, so we can
-> 
-> 
->      * return 0 here which will pass the following address checks.
-> 
-> ?
-
-
-Sounds good!
+So can we even reach this path?
 
 
 -- 
