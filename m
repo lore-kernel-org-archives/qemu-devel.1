@@ -4,97 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB446C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C7AC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FA82073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:43:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FA82073B
+	by mail.kernel.org (Postfix) with ESMTPS id 6B05E2073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:44:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B05E2073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9wP9-0007JN-04
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:43:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36057)
+	id 1j9wQR-0000uF-8N
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:44:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKl-0007P9-7X
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:04 -0500
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKl-0007PL-N9
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKj-0005HA-CB
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1j9wKk-0005Iu-2U
  for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6902)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4708
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1j9wKj-0005GJ-4T
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:01 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 025JK2VT114507; Thu, 5 Mar 2020 14:38:59 -0500
+ id 1j9wKj-0005Dz-TD
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:39:02 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 025JJYOt007699; Thu, 5 Mar 2020 14:38:58 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yk4jp6qp2-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yjx05eb18-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Mar 2020 14:38:59 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 025JVqCS033802;
- Thu, 5 Mar 2020 14:38:59 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yk4jp6qmn-1
+ Thu, 05 Mar 2020 14:38:58 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 025JJvpS008648;
+ Thu, 5 Mar 2020 14:38:58 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yjx05eb0w-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 05 Mar 2020 14:38:59 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 025Jb8kQ020882;
+ Thu, 05 Mar 2020 14:38:58 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 025JZEcT014773;
  Thu, 5 Mar 2020 19:38:57 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03wdc.us.ibm.com with ESMTP id 2yffk7dqur-1
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma02dal.us.ibm.com with ESMTP id 2yffk7h4kd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Thu, 05 Mar 2020 19:38:57 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
  [9.57.199.107])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 025JcvPG48365934
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 025JcufP42664358
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Thu, 5 Mar 2020 19:38:57 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7179B124053;
- Thu,  5 Mar 2020 19:38:57 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D1E7312405C;
+ Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 626FA124055;
- Thu,  5 Mar 2020 19:38:57 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CBA09124055;
+ Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu,  5 Mar 2020 19:38:57 +0000 (GMT)
+ Thu,  5 Mar 2020 19:38:56 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 10/10] test: tpm-tis: Add Sysbus TPM-TIS device test
-Date: Thu,  5 Mar 2020 14:38:55 -0500
-Message-Id: <20200305193855.278878-11-stefanb@linux.vnet.ibm.com>
+Subject: [PULL v2 05/10] tpm: Add the SysBus TPM TIS device
+Date: Thu,  5 Mar 2020 14:38:50 -0500
+Message-Id: <20200305193855.278878-6-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200305193855.278878-1-stefanb@linux.vnet.ibm.com>
 References: <20200305193855.278878-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-05_06:2020-03-05,
  2020-03-05 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=999
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 mlxscore=0
- impostorscore=0 clxscore=1015 spamscore=0 suspectscore=3 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ adultscore=0 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0
+ clxscore=1015 suspectscore=1 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003050114
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 025JK2VT114507
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,249 +104,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.ibm.com>,
- eric.auger@redhat.com
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, peter.maydell@linaro.org,
+ Stefan Berger <stefanb@linux.ibm.com>, eric.auger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Eric Auger <eric.auger@redhat.com>
 
-The tests themselves are the same as the ISA device ones.
-Only the main() changes as the "tpm-tis-device" device gets
-instantiated. Also the base address of the device is not
-0xFED40000 anymore but matches the base address of the
-ARM virt platform bus.
+Introduce the tpm-tis-device which is a sysbus device
+and is bound to be used on ARM.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Message-id: 20200305165149.618-11-eric.auger@redhat.com
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Message-id: 20200305165149.618-6-eric.auger@redhat.com
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- tests/qtest/Makefile.include            |  5 ++
- tests/qtest/tpm-tis-device-swtpm-test.c | 76 +++++++++++++++++++++
- tests/qtest/tpm-tis-device-test.c       | 87 +++++++++++++++++++++++++
- 3 files changed, 168 insertions(+)
- create mode 100644 tests/qtest/tpm-tis-device-swtpm-test.c
- create mode 100644 tests/qtest/tpm-tis-device-test.c
+ hw/tpm/Kconfig          |   5 ++
+ hw/tpm/Makefile.objs    |   1 +
+ hw/tpm/tpm_tis_sysbus.c | 159 ++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/tpm.h    |   1 +
+ 4 files changed, 166 insertions(+)
+ create mode 100644 hw/tpm/tpm_tis_sysbus.c
 
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index 44aac68b25..383b0ab217 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -130,6 +130,8 @@ check-qtest-arm-y +=3D hexloader-test
- check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D pflash-cfi02-test
-=20
- check-qtest-aarch64-y +=3D arm-cpu-features
-+check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) +=3D tpm-tis-device-test
-+check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) +=3D tpm-tis-device-swtpm-t=
-est
- check-qtest-aarch64-y +=3D numa-test
- check-qtest-aarch64-y +=3D boot-serial-test
- check-qtest-aarch64-y +=3D migration-test
-@@ -302,7 +304,10 @@ tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest=
-/tpm-crb-swtpm-test.o tests/
- tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtes=
-t/tpm-emu.o $(test-io-obj-y)
- tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.=
-o tests/qtest/tpm-emu.o \
- 	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
-+tests/qtest/tpm-tis-device-swtpm-test$(EXESUF): tests/qtest/tpm-tis-devi=
-ce-swtpm-test.o tests/qtest/tpm-emu.o \
-+	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
- tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtes=
-t/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
-+tests/qtest/tpm-tis-device-test$(EXESUF): tests/qtest/tpm-tis-device-tes=
-t.o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
-=20
- # QTest rules
-=20
-diff --git a/tests/qtest/tpm-tis-device-swtpm-test.c b/tests/qtest/tpm-ti=
-s-device-swtpm-test.c
+diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
+index 686f8206bb..4794e7fe28 100644
+--- a/hw/tpm/Kconfig
++++ b/hw/tpm/Kconfig
+@@ -7,6 +7,11 @@ config TPM_TIS_ISA
+     depends on TPM && ISA_BUS
+     select TPM_TIS
+ 
++config TPM_TIS_SYSBUS
++    bool
++    depends on TPM
++    select TPM_TIS
++
+ config TPM_TIS
+     bool
+     depends on TPM
+diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
+index 3ef2036cca..f1ec4beb95 100644
+--- a/hw/tpm/Makefile.objs
++++ b/hw/tpm/Makefile.objs
+@@ -1,6 +1,7 @@
+ common-obj-$(CONFIG_TPM) += tpm_util.o
+ obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) += tpm_ppi.o
+ common-obj-$(CONFIG_TPM_TIS_ISA) += tpm_tis_isa.o
++common-obj-$(CONFIG_TPM_TIS_SYSBUS) += tpm_tis_sysbus.o
+ common-obj-$(CONFIG_TPM_TIS) += tpm_tis_common.o
+ common-obj-$(CONFIG_TPM_CRB) += tpm_crb.o
+ common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
+diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
 new file mode 100644
-index 0000000000..7b20035142
+index 0000000000..18c02aed67
 --- /dev/null
-+++ b/tests/qtest/tpm-tis-device-swtpm-test.c
-@@ -0,0 +1,76 @@
++++ b/hw/tpm/tpm_tis_sysbus.c
+@@ -0,0 +1,159 @@
 +/*
-+ * QTest testcase for Sysbus TPM TIS talking to external swtpm and swtpm
-+ * migration
++ * tpm_tis_sysbus.c - QEMU's TPM TIS SYSBUS Device
 + *
-+ * Copyright (c) 2018 IBM Corporation
-+ *  with parts borrowed from migration-test.c that is:
-+ *     Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
++ * Copyright (C) 2006,2010-2013 IBM Corporation
 + *
 + * Authors:
-+ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *  Stefan Berger <stefanb@us.ibm.com>
++ *  David Safford <safford@us.ibm.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
++ * Xen 4 support: Andrease Niederl <andreas.niederl@iaik.tugraz.at>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
++ *
++ * Implementation of the TIS interface according to specs found at
++ * http://www.trustedcomputinggroup.org. This implementation currently
++ * supports version 1.3, 21 March 2013
++ * In the developers menu choose the PC Client section then find the TIS
++ * specification.
++ *
++ * TPM TIS for TPM 2 implementation following TCG PC Client Platform
++ * TPM Profile (PTP) Specification, Familiy 2.0, Revision 00.43
 + */
 +
 +#include "qemu/osdep.h"
-+#include <glib/gstdio.h>
++#include "hw/qdev-properties.h"
++#include "migration/vmstate.h"
++#include "tpm_util.h"
++#include "hw/sysbus.h"
++#include "tpm_tis.h"
 +
-+#include "libqtest.h"
-+#include "qemu/module.h"
-+#include "tpm-tests.h"
-+#include "hw/acpi/tpm.h"
++typedef struct TPMStateSysBus {
++    /*< private >*/
++    SysBusDevice parent_obj;
 +
-+uint64_t tpm_tis_base_addr =3D 0xc000000;
-+#define MACHINE_OPTIONS "-machine virt,gic-version=3Dmax -accel tcg"
++    /*< public >*/
++    TPMState state; /* not a QOM object */
++} TPMStateSysBus;
 +
-+typedef struct TestState {
-+    char *src_tpm_path;
-+    char *dst_tpm_path;
-+    char *uri;
-+} TestState;
++#define TPM_TIS_SYSBUS(obj) OBJECT_CHECK(TPMStateSysBus, (obj), TYPE_TPM_TIS_SYSBUS)
 +
-+static void tpm_tis_swtpm_test(const void *data)
++static int tpm_tis_pre_save_sysbus(void *opaque)
 +{
-+    const TestState *ts =3D data;
++    TPMStateSysBus *sbdev = opaque;
 +
-+    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_tis_transfer,
-+                        "tpm-tis-device", MACHINE_OPTIONS);
++    return tpm_tis_pre_save(&sbdev->state);
 +}
 +
-+static void tpm_tis_swtpm_migration_test(const void *data)
-+{
-+    const TestState *ts =3D data;
++static const VMStateDescription vmstate_tpm_tis_sysbus = {
++    .name = "tpm-tis",
++    .version_id = 0,
++    .pre_save  = tpm_tis_pre_save_sysbus,
++    .fields = (VMStateField[]) {
++        VMSTATE_BUFFER(state.buffer, TPMStateSysBus),
++        VMSTATE_UINT16(state.rw_offset, TPMStateSysBus),
++        VMSTATE_UINT8(state.active_locty, TPMStateSysBus),
++        VMSTATE_UINT8(state.aborting_locty, TPMStateSysBus),
++        VMSTATE_UINT8(state.next_locty, TPMStateSysBus),
 +
-+    tpm_test_swtpm_migration_test(ts->src_tpm_path, ts->dst_tpm_path, ts=
-->uri,
-+                                  tpm_util_tis_transfer, "tpm-tis-device=
-",
-+                                  MACHINE_OPTIONS);
++        VMSTATE_STRUCT_ARRAY(state.loc, TPMStateSysBus, TPM_TIS_NUM_LOCALITIES,
++                             0, vmstate_locty, TPMLocality),
++
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void tpm_tis_sysbus_request_completed(TPMIf *ti, int ret)
++{
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
++    TPMState *s = &sbdev->state;
++
++    tpm_tis_request_completed(s, ret);
 +}
 +
-+int main(int argc, char **argv)
++static enum TPMVersion tpm_tis_sysbus_get_tpm_version(TPMIf *ti)
 +{
-+    int ret;
-+    TestState ts =3D { 0 };
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
++    TPMState *s = &sbdev->state;
 +
-+    ts.src_tpm_path =3D g_dir_make_tmp("qemu-tpm-tis-device-swtpm-test.X=
-XXXXX",
-+                                     NULL);
-+    ts.dst_tpm_path =3D g_dir_make_tmp("qemu-tpm-tis-device-swtpm-test.X=
-XXXXX",
-+                                     NULL);
-+    ts.uri =3D g_strdup_printf("unix:%s/migsocket", ts.src_tpm_path);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_data_func("/tpm/tis-swtpm/test", &ts, tpm_tis_swtpm_test);
-+    qtest_add_data_func("/tpm/tis-swtpm-migration/test", &ts,
-+                        tpm_tis_swtpm_migration_test);
-+    ret =3D g_test_run();
-+
-+    g_rmdir(ts.dst_tpm_path);
-+    g_free(ts.dst_tpm_path);
-+    g_rmdir(ts.src_tpm_path);
-+    g_free(ts.src_tpm_path);
-+    g_free(ts.uri);
-+
-+    return ret;
++    return tpm_tis_get_tpm_version(s);
 +}
-diff --git a/tests/qtest/tpm-tis-device-test.c b/tests/qtest/tpm-tis-devi=
-ce-test.c
-new file mode 100644
-index 0000000000..63ed36440f
---- /dev/null
-+++ b/tests/qtest/tpm-tis-device-test.c
-@@ -0,0 +1,87 @@
-+/*
-+ * QTest testcase for SYSBUS TPM TIS
-+ *
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ * Copyright (c) 2018 IBM Corporation
-+ *
-+ * Authors:
-+ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
 +
-+#include "qemu/osdep.h"
-+#include <glib/gstdio.h>
-+
-+#include "io/channel-socket.h"
-+#include "libqtest-single.h"
-+#include "qemu/module.h"
-+#include "tpm-emu.h"
-+#include "tpm-util.h"
-+#include "tpm-tis-util.h"
-+
-+/*
-+ * As the Sysbus tpm-tis-device is instantiated on the ARM virt
-+ * platform bus and it is the only sysbus device dynamically
-+ * instantiated, it gets plugged at its base address
-+ */
-+uint64_t tpm_tis_base_addr =3D 0xc000000;
-+
-+int main(int argc, char **argv)
++static void tpm_tis_sysbus_reset(DeviceState *dev)
 +{
-+    char *tmp_path =3D g_dir_make_tmp("qemu-tpm-tis-device-test.XXXXXX",=
- NULL);
-+    GThread *thread;
-+    TestState test;
-+    char *args;
-+    int ret;
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
++    TPMState *s = &sbdev->state;
 +
-+    module_call_init(MODULE_INIT_QOM);
-+    g_test_init(&argc, &argv, NULL);
-+
-+    test.addr =3D g_new0(SocketAddress, 1);
-+    test.addr->type =3D SOCKET_ADDRESS_TYPE_UNIX;
-+    test.addr->u.q_unix.path =3D g_build_filename(tmp_path, "sock", NULL=
-);
-+    g_mutex_init(&test.data_mutex);
-+    g_cond_init(&test.data_cond);
-+    test.data_cond_signal =3D false;
-+
-+    thread =3D g_thread_new(NULL, tpm_emu_ctrl_thread, &test);
-+    tpm_emu_test_wait_cond(&test);
-+
-+    args =3D g_strdup_printf(
-+        "-machine virt,gic-version=3Dmax -accel tcg "
-+        "-chardev socket,id=3Dchr,path=3D%s "
-+        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
-+        "-device tpm-tis-device,tpmdev=3Ddev",
-+        test.addr->u.q_unix.path);
-+    qtest_start(args);
-+
-+    qtest_add_data_func("/tpm-tis/test_check_localities", &test,
-+                        tpm_tis_test_check_localities);
-+
-+    qtest_add_data_func("/tpm-tis/test_check_access_reg", &test,
-+                        tpm_tis_test_check_access_reg);
-+
-+    qtest_add_data_func("/tpm-tis/test_check_access_reg_seize", &test,
-+                        tpm_tis_test_check_access_reg_seize);
-+
-+    qtest_add_data_func("/tpm-tis/test_check_access_reg_release", &test,
-+                        tpm_tis_test_check_access_reg_release);
-+
-+    qtest_add_data_func("/tpm-tis/test_check_transmit", &test,
-+                        tpm_tis_test_check_transmit);
-+
-+    ret =3D g_test_run();
-+
-+    qtest_end();
-+
-+    g_thread_join(thread);
-+    g_unlink(test.addr->u.q_unix.path);
-+    qapi_free_SocketAddress(test.addr);
-+    g_rmdir(tmp_path);
-+    g_free(tmp_path);
-+    g_free(args);
-+    return ret;
++    return tpm_tis_reset(s);
 +}
---=20
++
++static Property tpm_tis_sysbus_properties[] = {
++    DEFINE_PROP_UINT32("irq", TPMStateSysBus, state.irq_num, TPM_TIS_IRQ),
++    DEFINE_PROP_TPMBE("tpmdev", TPMStateSysBus, state.be_driver),
++    DEFINE_PROP_BOOL("ppi", TPMStateSysBus, state.ppi_enabled, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void tpm_tis_sysbus_initfn(Object *obj)
++{
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(obj);
++    TPMState *s = &sbdev->state;
++
++    memory_region_init_io(&s->mmio, obj, &tpm_tis_memory_ops,
++                          s, "tpm-tis-mmio",
++                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
++
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
++}
++
++static void tpm_tis_sysbus_realizefn(DeviceState *dev, Error **errp)
++{
++    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
++    TPMState *s = &sbdev->state;
++
++    if (!tpm_find()) {
++        error_setg(errp, "at most one TPM device is permitted");
++        return;
++    }
++
++    if (!s->be_driver) {
++        error_setg(errp, "'tpmdev' property is required");
++        return;
++    }
++}
++
++static void tpm_tis_sysbus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    TPMIfClass *tc = TPM_IF_CLASS(klass);
++
++    device_class_set_props(dc, tpm_tis_sysbus_properties);
++    dc->vmsd  = &vmstate_tpm_tis_sysbus;
++    tc->model = TPM_MODEL_TPM_TIS;
++    dc->realize = tpm_tis_sysbus_realizefn;
++    dc->user_creatable = true;
++    dc->reset = tpm_tis_sysbus_reset;
++    tc->request_completed = tpm_tis_sysbus_request_completed;
++    tc->get_version = tpm_tis_sysbus_get_tpm_version;
++}
++
++static const TypeInfo tpm_tis_sysbus_info = {
++    .name = TYPE_TPM_TIS_SYSBUS,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(TPMStateSysBus),
++    .instance_init = tpm_tis_sysbus_initfn,
++    .class_init  = tpm_tis_sysbus_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_TPM_IF },
++        { }
++    }
++};
++
++static void tpm_tis_sysbus_register(void)
++{
++    type_register_static(&tpm_tis_sysbus_info);
++}
++
++type_init(tpm_tis_sysbus_register)
+diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+index 1691b92c28..f37851b1aa 100644
+--- a/include/sysemu/tpm.h
++++ b/include/sysemu/tpm.h
+@@ -44,6 +44,7 @@ typedef struct TPMIfClass {
+ } TPMIfClass;
+ 
+ #define TYPE_TPM_TIS_ISA            "tpm-tis"
++#define TYPE_TPM_TIS_SYSBUS         "tpm-tis-device"
+ #define TYPE_TPM_CRB                "tpm-crb"
+ #define TYPE_TPM_SPAPR              "tpm-spapr"
+ 
+-- 
 2.24.1
 
 
