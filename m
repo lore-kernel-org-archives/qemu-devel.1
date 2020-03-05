@@ -2,78 +2,82 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25816C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2334C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:00:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4C3D20848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC37720848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:00:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7aPVKgG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C3D20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXT3W1/X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC37720848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9p7v-0001Gu-4d
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 06:57:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60362)
+	id 1j9pAX-0003Py-Us
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:00:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j9p6c-00009L-8C
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:59 -0500
+ (envelope-from <kraxel@redhat.com>) id 1j9p9n-0002e8-Ka
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:59:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j9p6a-0006Mv-Du
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35276
+ (envelope-from <kraxel@redhat.com>) id 1j9p9m-00019n-Lp
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:59:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57409
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j9p6a-0006M3-6Y
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:56 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1j9p9m-000188-Hj
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:59:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583409355;
+ s=mimecast20190719; t=1583409553;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZBFMeX1tUR9btSwjA919NghtH5NO4/XuDwxTCy6JDgc=;
- b=K7aPVKgGtqg3Njv7q5qyX2djRBu3faWyz1ObxUKpZOeQn/RJobHtaE3S5/xjeAmPYtC5tx
- CsnLIPQwxV7rjCKM2A42NxH3kpMRQbQYix1TWOjpxK7lYEOHYBEkltZIKBJYVXDMUF27oh
- FLTkjsbSfElN1nkWVxzy8LwQ7LBBXQU=
+ bh=DMBX7jwvEhYERR2oFqWerlGCA/xirpAAmT2ofGoiN5M=;
+ b=XXT3W1/XJ4e/pqPWzoLcK76pwpdaN/esLx/IX2+gm9w6O4pmxh0iSOajtyChy4AKfv6wr0
+ celOZKzjHCEFVK+kbaNcGG2ZypnFU1q1/G8yQK7AdHAjA1MIrCJ9I3MvRraKt08p36g7EH
+ VTlDvQR2/dQKtRAuH6YiQb38lZapOtU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-EQ8gPoxNMmOmjVkIDG9ksQ-1; Thu, 05 Mar 2020 06:55:52 -0500
-X-MC-Unique: EQ8gPoxNMmOmjVkIDG9ksQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-290-GfbOGbD9OkW4nFvGc6OPjA-1; Thu, 05 Mar 2020 06:59:12 -0500
+X-MC-Unique: GfbOGbD9OkW4nFvGc6OPjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E7681922960;
- Thu,  5 Mar 2020 11:55:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-210.ams2.redhat.com [10.36.117.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0010F8B75C;
- Thu,  5 Mar 2020 11:55:49 +0000 (UTC)
-Date: Thu, 5 Mar 2020 12:55:48 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
-Message-ID: <20200305115548.GA5363@linux.fritz.box>
-References: <20200304213818.15341-1-jsnow@redhat.com>
- <20200304213818.15341-7-jsnow@redhat.com>
- <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
- <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28EB6DB23;
+ Thu,  5 Mar 2020 11:59:11 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-150.ams2.redhat.com
+ [10.36.116.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DEAC510027A3;
+ Thu,  5 Mar 2020 11:59:10 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 21A8717449; Thu,  5 Mar 2020 12:59:10 +0100 (CET)
+Date: Thu, 5 Mar 2020 12:59:10 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 3/6] hw/usb/quirks: Use smaller types to reduce .rodata
+ by 10KiB
+Message-ID: <20200305115910.zhmaw3xqgoz4fan2@sirius.home.kraxel.org>
+References: <20200304221807.25212-1-philmd@redhat.com>
+ <20200304221807.25212-4-philmd@redhat.com>
+ <20200305080237.j2a7waokxominirn@sirius.home.kraxel.org>
+ <a5b6cddf-5887-be27-db76-2e515daa2c11@redhat.com>
+ <CAP+75-XBbTPHbQJWxn5nEYsz4hdGXSTLTqKRRR-sx-APbPN2Sg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <CAP+75-XBbTPHbQJWxn5nEYsz4hdGXSTLTqKRRR-sx-APbPN2Sg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -89,91 +93,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.03.2020 um 00:14 hat John Snow geschrieben:
+> > And went this less intrusive way.
+> >
+> > I'll respin with s/-1/UINT8_MAX/.
 >=20
->=20
-> On 3/4/20 4:58 PM, Philippe Mathieu-Daud=E9 wrote:
+> Problem, now this entry is ignored (interface_class=3D=3D-1):
 
-Adding back the context:
+Yep, "-1" is used as "not used" or "end-of-list" indicator, and it is
+outside the valid range to avoid that kind of clashes.  You need some
+other way to express that if you want go with smaller types which don't
+allow values outside the valid range any more.  Add a "flags" field for
+that maybe?
 
-> -        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcod=
-e, ' '.join(qemu_img_args + list(args))))
-> +        sys.stderr.write('qemu-img received signal %i: %s\n' % (
-> +            -exitcode, ' '.join(qemu_img_args + list(args))))
-
-> > Do we want to indent Python like C and align argument below opening
-> > parenthesis? Except when using sys.stderr.write() you seem to do it.
->=20
-> This isn't an argument to write, it's an argument to the format string,
-> so I will say "no."
-
-The argument to write() is an expression. This expression contains the %
-operator with both of its operands. It's still fully within the
-parentheses of write(), so I think Philippe's question is valid.
-
-> For *where* I've placed the line break, this is the correct indentation.
-> emacs's python mode will settle on this indent, too.
->=20
-> https://python.org/dev/peps/pep-0008/#indentation
-
-The PEP-8 examples are not nested, so it's not completely clear. I
-wonder if hanging indents wouldn't actually mean the following because
-if you line wrap an argument list (which contains the whole %
-expression), you're supposed to have nothing else on the line of the
-opening parenthesis:
-
-    sys.stderr.write(
-        'qemu-img received signal %i: %s\n'
-        % (-exitcode, ' '.join(qemu_img_args + list(args))))
-
-But anyway, I think the question is more whether we want to use hanging
-indents at all (or at least if we want to use it even in cases where the
-opening parenthesis isn't already at like 70 characters) when we're
-avoiding it in our C coding style.
-
-There's no technical answer to this, it's a question of our preferences.
-
-> (If anyone quotes Guido's belittling comment in this email, I will
-> become cross.)
->=20
->=20
-> But there are other places to put the line break. This is also
-> technically valid:
->=20
-> sys.stderr.write('qemu-img received signal %i: %s\n'
->                  % (-exitcode, ' '.join(qemu_img_args + list(args))))
->=20
-> And so is this:
->=20
->     sys.stderr.write('qemu-img received signal %i: %s\n' %
->                      (-exitcode, ' '.join(qemu_img_args + list(args))))
-
-PEP-8 suggests the former, but allows both styles:
-
-https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-aft=
-er-a-binary-operator
-
-> (And so would be any other number of rewrites to use format codes,
-> f-strings, or temporary variables to otherwise reduce the length of the
-> line.)
->=20
-> I will reluctantly admit that wrapping to 79 columns is useful in some
-> contexts. The beauty of line continuations is something I have little
-> desire to litigate, though.
->=20
-> If there's some consensus on the true and beautiful way to do it, I will
-> oblige -- but the thought of spinning more iterations until we find a
-> color swatch we like is an unpleasant one.
-
-I'll accept any colour for the bikeshed, as long as it's green. ;-)
-
-Kevin
+cheers,
+  Gerd
 
 
