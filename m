@@ -3,80 +3,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFEEC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257D6C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CE9A205C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:11:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5AB020658
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:14:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nvol41tn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE9A205C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i7dVnrbn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5AB020658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9pLE-00053P-Bi
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:11:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35126)
+	id 1j9pOg-0007or-E9
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:14:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9pKN-0003un-SZ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:10:12 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9pN6-0005j5-N7
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:13:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9pKM-00066a-Fs
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:10:11 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49687
+ (envelope-from <philmd@redhat.com>) id 1j9pN5-0000Gv-Ix
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:13:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20997
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9pKM-00064N-BE
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:10:10 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9pN5-0000Gn-Fr
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:12:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583410209;
+ s=mimecast20190719; t=1583410378;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ai78hO+qH+uqyZg9Mamcj6w2vQyadmSV06iIgWeclWE=;
- b=Nvol41tn3TIGgUA77CXWAFNksbrjVw9HL68rYmjhJCvhR9eR6WncTDRJ09RISaiF+fOalv
- Nwv19ghSEKpkpWxyCPu4qNjvysUabynvWSteIfEf9zuTeq2B+xMOARYr5e1fwkEgQ3+Gd9
- CIL5TLkMaKhKIyAuaMLvZ4wnY+xsX/4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-bQvArdOKMw-vBsORZ1ow0Q-1; Thu, 05 Mar 2020 07:10:05 -0500
-X-MC-Unique: bQvArdOKMw-vBsORZ1ow0Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D03A4100550E;
- Thu,  5 Mar 2020 12:10:03 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0CBE5DA7B;
- Thu,  5 Mar 2020 12:10:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 10ABA11386A6; Thu,  5 Mar 2020 13:10:00 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v5 4/5] qcow2: add zstd cluster compression
-References: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
- <20200304133538.9159-5-dplotnikov@virtuozzo.com>
- <e95bf0d3-7caf-91a1-b8cd-615d6d1a9d9d@virtuozzo.com>
-Date: Thu, 05 Mar 2020 13:10:00 +0100
-In-Reply-To: <e95bf0d3-7caf-91a1-b8cd-615d6d1a9d9d@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 5 Mar 2020 12:56:40 +0300")
-Message-ID: <87eeu7f1ev.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=+56ePGmcoq5HykhcZAo7kepR5r52+6ZEFhWUGu2Ti+0=;
+ b=i7dVnrbn5HSOBmNFKOK1VddBPHlpsc9feKBw8XYlprWUSneKgYfs6qt3tR4CCFNFGCP2Bp
+ zX61NmKanGZCHo8GeCRPUvuaDQBI8OPrKEIhTaoelH6y4iBSqdLJhaSIWk3QibgZTsz0n4
+ hD9c+gMqlggN2McVXlbB83w3hzp7icU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-msrKl2yHNbGajcQISJ-Lsw-1; Thu, 05 Mar 2020 07:12:57 -0500
+X-MC-Unique: msrKl2yHNbGajcQISJ-Lsw-1
+Received: by mail-wm1-f70.google.com with SMTP id b23so2009529wmj.3
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:12:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=b+3jo3N8d74YrpwOeB7pNboZd0jkS+c2ioGwyFUoFzI=;
+ b=lIBhxv5kKmSywDfNjRIhmcZtaGfwN6vLDr7WI2Po04PSzDIWgnJSe3NctZg2krY85Y
+ ZRrUpn1FRwns3+9Sf4O1uK5bpp+O2jR5TtC8QJP/f0h+xzBT3w2NN6PW2J+uLk4gMP3V
+ SqsnNBSVDYjNgcxvQ4wKLYvT1ZG5lGLOgbDwHX2ae/ECUjeSKVkhg9eUOyfnKyifhzV1
+ US9bWScXWsbskzbPbRCv6Opyl2Y2mwIGZVlkiq5nlRxzLFljG84GXSMLVsHnVND7p7WX
+ oMIQ7h2qB5Syu1yH5mn1RqJJXAA++zPOGcqoHoFuRJGua6dLSjpnDLbqV8t9OTMX/aOa
+ +NNA==
+X-Gm-Message-State: ANhLgQ2OGdvsJDrySyHun2oCxr0AgSrgT5Gga3uXDW8zeNTsjoCvUP/K
+ +UBBUDRxA+3tcWd/jaSlLZzmo3dbFKYkMch+fv6hYhKyBr7U3GY1gas0xfrC8egewsH6vjSMEXJ
+ JiK9jyTi8QcLf6W8=
+X-Received: by 2002:a7b:c391:: with SMTP id s17mr9426458wmj.116.1583410376032; 
+ Thu, 05 Mar 2020 04:12:56 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtOg2OYMFkXseO6aX/PFLVwFGALH7wLn6zIGjdxv5vPJMXDH9J7kVGhSVFjNXx+wk1qI/E5kA==
+X-Received: by 2002:a7b:c391:: with SMTP id s17mr9426436wmj.116.1583410375830; 
+ Thu, 05 Mar 2020 04:12:55 -0800 (PST)
+Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id a26sm9260336wmm.18.2020.03.05.04.12.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 04:12:55 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/7] hw/scsi/spapr_vscsi: Fix time bomb buffer overflow
+Date: Thu,  5 Mar 2020 13:12:46 +0100
+Message-Id: <20200305121253.19078-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -92,69 +99,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+This series fixes a possible buffer overflow.
 
-> 04.03.2020 16:35, Denis Plotnikov wrote:
->> zstd significantly reduces cluster compression time.
->> It provides better compression performance maintaining
->> the same level of the compression ratio in comparison with
->> zlib, which, at the moment, is the only compression
->> method available.
->>
->> The performance test results:
->> Test compresses and decompresses qemu qcow2 image with just
->> installed rhel-7.6 guest.
->> Image cluster size: 64K. Image on disk size: 2.2G
->>
->> The test was conducted with brd disk to reduce the influence
->> of disk subsystem to the test results.
->> The results is given in seconds.
->>
->> compress cmd:
->>    time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|zstd]
->>                    src.img [zlib|zstd]_compressed.img
->> decompress cmd
->>    time ./qemu-img convert -O qcow2
->>                    [zlib|zstd]_compressed.img uncompressed.img
->>
->>             compression               decompression
->>           zlib       zstd           zlib         zstd
->> ------------------------------------------------------------
->> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
->> user     65.0       15.8            5.3          2.5
->> sys       3.3        0.2            2.0          2.0
->>
->> Both ZLIB and ZSTD gave the same compression ratio: 1.57
->> compressed image size in both cases: 1.4G
->>
->> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
->> QAPI part:
->> Acked-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> Looks a bit like I've reviewed only QAPI part, when actually my r-b is fo=
-r full patch...
->
-> May be
->
-> Acked-by: Markus Armbruster <armbru@redhat.com>
->           [QAPI part]
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Simples patches first (dissociate the buffer holding DMA
+requests with pointer to SRP Information Unit packets) to
+clean the issue in the penultimate patch.
 
-No objection.
+v3:
+- Fixed typo reported by Greg Kurz
+- Addressed Paolo Bonzini review comments as an extra patch
+- Added another patch converting a fprintf() call while here
 
-We habitually use
+v2:
+- Addressed David Gibson review comments
 
-  Acked-by: Markus Armbruster <armbru@redhat.com>
-  Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Supersedes: <20200305083135.8270-1-philmd@redhat.com>
 
-I'm okay with that, too.
+Philippe Mathieu-Daud=C3=A9 (7):
+  hw/scsi/viosrp: Add missing 'hw/scsi/srp.h' include
+  hw/scsi/spapr_vscsi: Use SRP_MAX_IU_LEN instead of sizeof flexible
+    array
+  hw/scsi/spapr_vscsi: Simplify a bit
+  hw/scsi/spapr_vscsi: Introduce req_iu() helper
+  hw/scsi/spapr_vscsi: Do not mix SRP IU size with DMA buffer size
+  hw/scsi/spapr_vscsi: Prevent buffer overflow
+  hw/scsi/spapr_vscsi: Convert debug fprintf() to trace event
+
+ hw/scsi/viosrp.h      |  3 +-
+ hw/scsi/spapr_vscsi.c | 72 +++++++++++++++++++++++++------------------
+ hw/scsi/trace-events  |  1 +
+ 3 files changed, 45 insertions(+), 31 deletions(-)
+
+--=20
+2.21.1
 
 
