@@ -7,81 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F4AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52ACC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A8B2072D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B42C920870
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 17:58:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivv4vi0v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A8B2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QrUl+qX7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B42C920870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ulM-0000if-0i
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:58:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47032)
+	id 1j9ulc-000160-OP
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 12:58:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9uk4-00079x-NK
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9uk7-0007Gf-UG
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9uk3-0002hI-Is
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51440
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j9uk6-0002kL-Un
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26938
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9uk3-0002gs-Ft
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:03 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9uk6-0002jQ-QD
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 12:57:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583431023;
+ s=mimecast20190719; t=1583431026;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CS6YPb3Ihef4vMzBH/zBkjylrRdhrNd8BsGM+mGSMes=;
- b=ivv4vi0vf4qc93h8r5KEyIZAYl/Hwf5siqawO9MkegtvvzMAvBBAnnIpdKk1jrZGqrALY6
- uFFpgoHrcWYl8+srvuL8Ojyv5lXBeEMCnzFXRPJSfI5L52sOCINxpfhP2HLoLMPAosc3GL
- wZx3+1erwt9pDHmGvrLYzcLJvOlGFzk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-LpT-CZ8dNiCx6aLBtvX6gA-1; Thu, 05 Mar 2020 12:56:59 -0500
-X-MC-Unique: LpT-CZ8dNiCx6aLBtvX6gA-1
-Received: by mail-wm1-f69.google.com with SMTP id t2so1876387wmj.2
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:56:59 -0800 (PST)
+ bh=Tw4AXOFUsVnWWH/+MEC8+/Jzhzp7Eu5EQAdmUFQrX44=;
+ b=QrUl+qX7YjvvjTEi0ddyZwljl9VY6VpIEHCeM4702cd9LzZw9uCHaKO1IIPy7RR/ZWFLfh
+ gLpFoONjMFjZe1ureK37acscKKSFjD8JIEGYepbIAo0Rit0skoXxDCXSo0iwi/ZUAmy71H
+ mzpUACiBlj9QMnZqnvJLpM4pL64atQc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-jk2EZzg5NaaLkL2LTD_Xgw-1; Thu, 05 Mar 2020 12:57:05 -0500
+X-MC-Unique: jk2EZzg5NaaLkL2LTD_Xgw-1
+Received: by mail-wr1-f70.google.com with SMTP id q18so2601808wrw.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:57:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=6JrFb878lHzGwYsPjMk4F0hM2hVACJ2Pnf75ZdCaRHg=;
- b=aGe5zXssWmspgjWRWemrPBIqnQXFgmnVn8oiY+UkkREAkjEZvxRUs5cVFh5ATN/Nap
- clXfbERcFK/sSyU/OmwRfKLB5RmACofa0jRflTVzzhrBjJz6RLcb4aCiY6bMXDaPBMpD
- dRb/E+KJrMTw/AtS7EY3TEnHlbOOfdMFdPesET6C1Vh12ajEvC37uErXb0g5SQ4DoWNk
- 5zXv4+LQDcR7zse6wCbMngBXv1E3PGakKu1GGH2lNDKfI/C9oKGKXVJktsh1IcKWEHXM
- 5T0st/pP5fc51MX+/2EXd00kT9IbT1/E+qFGUzD+vTx4ELdjljLjyTbOnb+QKVmBjW5b
- tzyA==
-X-Gm-Message-State: ANhLgQ1toor/zS7nEPjUKuDlGq8dWi9AcJtccxYU0pH5jEDCtJeoEyTd
- dSRBdPEdse2HyWtQm7jgFpC3USqD3YcQQH5oJuJ1oaufjuRTTd4LwZxdeVOZvgJTH350tHF+a3w
- lRB4p5+wHI+a5GTc=
-X-Received: by 2002:a5d:4885:: with SMTP id g5mr97807wrq.93.1583431018457;
- Thu, 05 Mar 2020 09:56:58 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vskaAkFKgbEQH+pNIGFb8Sr3L1S1HvDcf8VKDBvX02lrY1dc2utRLDl7z40uKKyLXE/PBLOtw==
-X-Received: by 2002:a5d:4885:: with SMTP id g5mr97785wrq.93.1583431018221;
- Thu, 05 Mar 2020 09:56:58 -0800 (PST)
+ bh=+MbtoWKkcqHCz+vfqyTzTQ/PF32JMBmzxf8ccd5VY20=;
+ b=uFsv2zuh2IZZqnzW/AyOGxmJ+zeHyi6pi0goP3LTBsrVwjpGkemm3rZSYt/QFh0NDa
+ SSnzWGA3bMcD5hv5J6wZEnAEnTYrBpkrJ0khN8YqQZe4tZrbcZvE5Inqzyvle04y+BV6
+ eMabmsV4JM6Q2ECsskJTOvNRxcM36qpw8jnZOmYdtZT61DsGNewv6BzPnyG5NDj3Mxyd
+ le3Co4kDQPP4Kan5nAUKv/W8p1ZNXNIaR1A0DmB6E8NLYNeok9RT6IfVfA55zOgpFFJL
+ WXNYSpVfyYFLC/tGxwjJ/ofWkTxeslmKnnFIhd77VjIV0o0RMx0szI8lTFNyWRxgADlN
+ paOg==
+X-Gm-Message-State: ANhLgQ1/LNmeNDA0TZCZgE32OwyN41ktfsSKjNbBk2CySdTxeIjwnjoh
+ EZU2GdbgMrTM9Y65RFPLQOrX6lnyaZT8toJU3ON+DmSvFGFNJkf/tJe84lBn+6u/3snQjq/OnYt
+ NXge9wufFWhpm0do=
+X-Received: by 2002:a05:6000:108:: with SMTP id
+ o8mr120891wrx.312.1583431023632; 
+ Thu, 05 Mar 2020 09:57:03 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vuWmokTTXWO/3o9W34TZ6DMM4KH3ciqzOZWMvRg7PGY3DDIVccA2xbcBAAbGbz94dLSvuoqxg==
+X-Received: by 2002:a05:6000:108:: with SMTP id
+ o8mr120874wrx.312.1583431023428; 
+ Thu, 05 Mar 2020 09:57:03 -0800 (PST)
 Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id f3sm15240718wrs.26.2020.03.05.09.56.56
+ by smtp.gmail.com with ESMTPSA id d203sm9699558wmd.37.2020.03.05.09.57.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 09:56:57 -0800 (PST)
+ Thu, 05 Mar 2020 09:57:02 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/6] hw/net/e1000e_core: Let e1000e_can_receive() return a
+Subject: [PATCH 2/6] hw/net/smc91c111: Let smc91c111_can_receive() return a
  boolean
-Date: Thu,  5 Mar 2020 18:56:45 +0100
-Message-Id: <20200305175651.4563-2-philmd@redhat.com>
+Date: Thu,  5 Mar 2020 18:56:46 +0100
+Message-Id: <20200305175651.4563-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200305175651.4563-1-philmd@redhat.com>
 References: <20200305175651.4563-1-philmd@redhat.com>
@@ -92,7 +94,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,40 +123,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The e1000e_can_receive() function simply returns a boolean value.
+The smc91c111_can_receive() function simply returns a boolean value.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/net/e1000e_core.h | 2 +-
- hw/net/e1000e_core.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/net/smc91c111.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
-index 49abb136dd..aee32f7e48 100644
---- a/hw/net/e1000e_core.h
-+++ b/hw/net/e1000e_core.h
-@@ -143,7 +143,7 @@ e1000e_core_set_link_status(E1000ECore *core);
- void
- e1000e_core_pci_uninit(E1000ECore *core);
-=20
--int
-+bool
- e1000e_can_receive(E1000ECore *core);
-=20
- ssize_t
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 94ea34dca5..e0bafe975b 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -967,7 +967,7 @@ e1000e_start_recv(E1000ECore *core)
-     }
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index e9eb6f6c05..02be60c955 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -130,16 +130,16 @@ static void smc91c111_update(smc91c111_state *s)
+     qemu_set_irq(s->irq, level);
  }
 =20
--int
-+bool
- e1000e_can_receive(E1000ECore *core)
+-static int smc91c111_can_receive(smc91c111_state *s)
++static bool smc91c111_can_receive(smc91c111_state *s)
  {
-     int i;
+     if ((s->rcr & RCR_RXEN) =3D=3D 0 || (s->rcr & RCR_SOFT_RST)) {
+-        return 1;
++        return true;
+     }
+     if (s->allocated =3D=3D (1 << NUM_PACKETS) - 1 ||
+         s->rx_fifo_len =3D=3D NUM_PACKETS) {
+-        return 0;
++        return false;
+     }
+-    return 1;
++    return true;
+ }
+=20
+ static inline void smc91c111_flush_queued_packets(smc91c111_state *s)
 --=20
 2.21.1
 
