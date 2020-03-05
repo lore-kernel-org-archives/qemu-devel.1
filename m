@@ -2,65 +2,90 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0A5C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E25EC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:58:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 465DA20717
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27AE62072D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:58:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ZtYsakHM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 465DA20717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WrsfFiIO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27AE62072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9sqj-0008Bg-Fo
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:55:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52907)
+	id 1j9ssq-0000uY-CO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:58:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1j9spz-0007NL-FS
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:55:04 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j9ss4-0000JA-Nj
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1j9spy-0002ok-Ij
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:55:03 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:35423)
+ (envelope-from <richard.henderson@linaro.org>) id 1j9ss3-0006H1-I6
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:57:12 -0500
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:45721)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1j9spu-0002MF-PO; Thu, 05 Mar 2020 10:55:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=fbnXSEOGynS8dpVNygZ0GLcvtjAM0rndlL9xZWhyUyY=; 
- b=ZtYsakHMoCtPRyXR74iBLxH3MHkfKKfOtMgzxeX3pq5nTsvs/pVA8FqXrj2fVELdMUm3VcEq7JP8GYIVucZnyxA/joGwPBx1X6qztz3g/81Bp/jITrEH0xozbk2/Bh9svfYGfY8lLRrnS3a7ZHDp93pZ/2aj3BDa9CIMLO99Gyfpj56onPtjwBzydzEteL5/YJEjAzOU38I28ixmbroU4GVA88yuiUVbeKNrdCx4J0mkcJnhOETbJiHVIJs7PjfaS47oYMet0q0At6IrBQ1CUF1sdVPTkzXyQh2kSSHwTxS8j1VYh/yFRJBV71TlWdXDIYegdm7P41yRldFYtfVFoQ==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1j9spb-0005gj-SJ; Thu, 05 Mar 2020 16:54:39 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1j9spb-0008Lu-HV; Thu, 05 Mar 2020 16:54:39 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Subject: Re: [PATCH 2/2] block: bdrv_reopen() with backing file in different
- AioContext
-In-Reply-To: <20200227181804.15299-3-kwolf@redhat.com>
-References: <20200227181804.15299-1-kwolf@redhat.com>
- <20200227181804.15299-3-kwolf@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 05 Mar 2020 16:54:39 +0100
-Message-ID: <w51h7z27q68.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j9ss3-0006CL-AE
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:57:11 -0500
+Received: by mail-pg1-x52d.google.com with SMTP id m15so2944537pgv.12
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 07:57:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Aj1j9q1kdsqVBtMkYyKH6uLYz+CzIcrft2h4WyHB374=;
+ b=WrsfFiIOoOSxyg7SwnEQQFTzLIRNB7y7s0CCodvj4PemhQ4u3eWG5WUOGPAD0n7+2I
+ 9CtcUizxuCyvKa7H6MNtb3mgP93I5n+Y0EyMSNCRNYKjTllYAbMPTfgmI4fCIJVDcJ9D
+ hKAHE0XX9wNsUz9BGQL9j6ET0Mj2gPfuHqcniOHXBoTGOX3SWCeTMm8D68YYs93MdNzp
+ 7LktxyUofFyo3an3rTpuPESn+2+l1yWCuhrVlUanlIa9u1ZJ2Bf1KgrjTCXtDf3yec3y
+ 0IxlygAOdD5ggkU5PvCy1UdOArPdGD3AtfjR5EQijzCk7NkYenmfWMMPJaPT4EmPff3J
+ fmYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Aj1j9q1kdsqVBtMkYyKH6uLYz+CzIcrft2h4WyHB374=;
+ b=SaE/sb05I5zNQmYm1jlc2sC86gSeycUoo/vne0kiKvKVLexRNL0SZlnhDycXJa6n0C
+ M7CWSV+O+pd5fx7+8m2dNxDQPOP9Ecn2OXPZCPgqLOWjFzIpaDgMABliLzmmqK9S+oUC
+ aeiCJSFLdY20bL2lvpwYwiETWk2hfxJlY11pAndmXMln9Atknjv+X05mtjuPoPclWMIF
+ pdyWyj/2qOfuRXL3QyPI5fy6B+uvY6rmXFUHP6hx86GLcsougckicPhuYD3AABpM4wIN
+ amlMmdFWE6+yUlC1UU/mPeKTpPw+bQt/6tv6AfdEH3Qd8WFnYkIPWKJOyUYmX5MoQOMc
+ Krow==
+X-Gm-Message-State: ANhLgQ1FGbYvEwyIN/kJc22GVJSxMepYjF8rXb20ncm1uNmPyzUF3FjK
+ KKG7wfhKpUZc6b0UlfkjYdSDDQ==
+X-Google-Smtp-Source: ADFU+vuRvfy6kRhtrNmfuqsxLcngbxNmBEHoWCwSUzXmYtYz2HPQ11w2v/QHz1W3MUS0JvChnMgBlg==
+X-Received: by 2002:a62:3603:: with SMTP id d3mr8574284pfa.37.1583423828401;
+ Thu, 05 Mar 2020 07:57:08 -0800 (PST)
+Received: from [10.0.3.1] ([156.19.247.250])
+ by smtp.gmail.com with ESMTPSA id w195sm30122629pfd.65.2020.03.05.07.57.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Mar 2020 07:57:07 -0800 (PST)
+Subject: Re: [PATCH v2 8/9] target/arm: Check addresses for disabled regimes
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200302175829.2183-1-richard.henderson@linaro.org>
+ <20200302175829.2183-9-richard.henderson@linaro.org>
+ <CAFEAcA8vEHctFuYfaziQs1QobbrHJgMioATwF7QkWL-e=gLxJw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d74accc4-7671-2d91-8acb-206487f0a915@linaro.org>
+Date: Thu, 5 Mar 2020 07:57:05 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+In-Reply-To: <CAFEAcA8vEHctFuYfaziQs1QobbrHJgMioATwF7QkWL-e=gLxJw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::52d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,34 +97,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu 27 Feb 2020 07:18:04 PM CET, Kevin Wolf wrote:
->      /*
-> -     * TODO: before removing the x- prefix from x-blockdev-reopen we
-> -     * should move the new backing file into the right AioContext
-> -     * instead of returning an error.
-> +     * Check AioContext compatibility so that the bdrv_set_backing_hd() call in
-> +     * bdrv_reopen_commit() won't fail.
->       */
-> -    if (new_backing_bs) {
-> -        if (bdrv_get_aio_context(new_backing_bs) != bdrv_get_aio_context(bs)) {
-> -            error_setg(errp, "Cannot use a new backing file "
-> -                       "with a different AioContext");
-> -            return -EINVAL;
-> -        }
-> +    if (!bdrv_reopen_can_attach(bs->backing, bs, new_backing_bs, errp)) {
-> +        return -EINVAL;
->      }
+On 3/5/20 6:21 AM, Peter Maydell wrote:
+>>      if (regime_translation_disabled(env, mmu_idx)) {
+>> -        /* MMU disabled. */
+>> +        /*
+>> +         * MMU disabled.  S1 addresses are still checked for bounds.
+>> +         * C.f. AArch64.TranslateAddressS1Off.
+>> +         */
+>> +        if (is_a64(env) && mmu_idx != ARMMMUIdx_Stage2) {
+> 
+> This looks weird -- why do we care about whether the current
+> EL is aarch64, rather than looking at the controlling EL
+> for the translation regime ?
 
-What happens here now if 'new_backing_bs' is NULL ?
+You're right, it should be the aa64-ness of the regime_el.
+Thanks,
 
-It seems that you would be calling bdrv_can_set_aio_context(NULL, ...),
-and it looks like that would crash.
 
-Berto
+r~
 
