@@ -6,51 +6,51 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1092CC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F33C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:40:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA8BF208CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:40:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8BF208CD
+	by mail.kernel.org (Postfix) with ESMTPS id 844A6208CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:40:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 844A6208CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9kAv-00059o-2r
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 01:40:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60636)
+	id 1j9kBD-0005cB-OY
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 01:40:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j9kA8-0003lO-Gk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:17 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1j9kAG-0003w0-1V
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j9kA5-0006S9-KH
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:16 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3260 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1j9kAE-0006be-VA
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:23 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3261 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j9kA5-0006Q6-8m; Thu, 05 Mar 2020 01:39:13 -0500
+ id 1j9kAE-0006Zo-Jx; Thu, 05 Mar 2020 01:39:22 -0500
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 6AE6E71227B591FEA178;
- Thu,  5 Mar 2020 14:39:10 +0800 (CST)
+ by Forcepoint Email with ESMTP id 80FCB12617C58EFDA6F7;
+ Thu,  5 Mar 2020 14:39:20 +0800 (CST)
 Received: from localhost.huawei.com (10.175.104.216) by
  DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 14:39:03 +0800
+ 14.3.439.0; Thu, 5 Mar 2020 14:39:10 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v4 1/3] s390x: fix memleaks in cpu_finalize
-Date: Thu, 5 Mar 2020 14:54:20 +0800
-Message-ID: <20200305065422.12707-2-pannengyuan@huawei.com>
+Subject: [PATCH v4 3/3] hw/misc/mos6522: move timer_new from init() into
+ realize() to avoid memleaks
+Date: Thu, 5 Mar 2020 14:54:22 +0800
+Message-ID: <20200305065422.12707-4-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200305065422.12707-1-pannengyuan@huawei.com>
 References: <20200305065422.12707-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 X-Originating-IP: [10.175.104.216]
 X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 45.249.212.191
@@ -66,158 +66,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-s390x@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+ Pan Nengyuan <pannengyuan@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent
+ Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org, euler.robot@huawei.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch fix memleaks when we call tests/qtest/cpu-plug-test on s390x. =
-The leak stack is as follow:
-
-Direct leak of 48 byte(s) in 1 object(s) allocated from:
-    #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0xef97=
-0)
-    #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
-    #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/include/qe=
-mu/timer.h:530
-    #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qemu/ti=
-mer.h:551
-    #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include/qemu=
-/timer.h:569
-    #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/target/s3=
-90x/cpu.c:285
-    #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qemu/qom=
-/object.c:372
-    #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-new/qe=
-mu/qom/object.c:516
-    #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu/qom/=
-object.c:684
-    #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s390x/s3=
-90-virtio-ccw.c:64
-    #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core/mach=
-ine-hmp-cmds.c:57
-    #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/monit=
-or/hmp.c:1082
-    #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-new/qem=
-u/monitor/misc.c:142
+There are some memleaks when we call 'device_list_properties'. This patch move timer_new from init into realize to fix it.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
 ---
 v2->v1:
-- Similarly to other cleanups, move timer_new into realize(Suggested by P=
-hilippe Mathieu-Daud=C3=A9)
+- no changes in this patch.
 v3->v2:
-- Aslo do the timer_free in unrealize, it seems balanced.
+- remove null check in reset, and add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
 v4->v3:
-- Aslo do timer_free on the error path in realize() and fix some coding s=
-tyle.
-- Use device_class_set_parent_unrealize to declare unrealize.
+- split patch into two, this patch fix the memleaks.
 ---
- target/s390x/cpu-qom.h |  1 +
- target/s390x/cpu.c     | 41 +++++++++++++++++++++++++++++++++++++----
- 2 files changed, 38 insertions(+), 4 deletions(-)
+ hw/misc/mos6522.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index dbe5346ec9..af9ffed0d8 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -61,6 +61,7 @@ typedef struct S390CPUClass {
-     const char *desc;
-=20
-     DeviceRealize parent_realize;
-+    DeviceUnrealize parent_unrealize;
-     void (*parent_reset)(CPUState *cpu);
-     void (*load_normal)(CPUState *cpu);
-     void (*reset)(CPUState *cpu, cpu_reset_type type);
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index cf84d307c6..80b987ff1b 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -182,6 +182,12 @@ static void s390_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
- #if !defined(CONFIG_USER_ONLY)
-     MachineState *ms =3D MACHINE(qdev_get_machine());
-     unsigned int max_cpus =3D ms->smp.max_cpus;
-+
-+    cpu->env.tod_timer =3D
-+        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
-+    cpu->env.cpu_timer =3D
-+        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
-+
-     if (cpu->env.core_id >=3D max_cpus) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-                    ", maximum core-id: %d", cpu->env.core_id,
-@@ -224,9 +230,38 @@ static void s390_cpu_realizefn(DeviceState *dev, Err=
-or **errp)
-=20
-     scc->parent_realize(dev, &err);
- out:
-+    if (cpu->env.tod_timer) {
-+        timer_del(cpu->env.tod_timer);
-+    }
-+    if (cpu->env.cpu_timer) {
-+        timer_del(cpu->env.cpu_timer);
-+    }
-+    timer_free(cpu->env.tod_timer);
-+    timer_free(cpu->env.cpu_timer);
-     error_propagate(errp, err);
- }
-=20
-+static void s390_cpu_unrealizefn(DeviceState *dev, Error **errp)
-+{
-+    S390CPUClass *scc =3D S390_CPU_GET_CLASS(dev);
-+    Error *err =3D NULL;
-+
-+#if !defined(CONFIG_USER_ONLY)
-+    S390CPU *cpu =3D S390_CPU(dev);
-+
-+    timer_del(cpu->env.tod_timer);
-+    timer_del(cpu->env.cpu_timer);
-+    timer_free(cpu->env.tod_timer);
-+    timer_free(cpu->env.cpu_timer);
-+#endif
-+
-+    scc->parent_unrealize(dev, &err);
-+    if (err !=3D NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index 19e154b870..c1cd154a84 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -485,6 +485,11 @@ static void mos6522_init(Object *obj)
+     for (i = 0; i < ARRAY_SIZE(s->timers); i++) {
+         s->timers[i].index = i;
+     }
 +}
 +
- static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
- {
-     GuestPanicInformation *panic_info;
-@@ -279,10 +314,6 @@ static void s390_cpu_initfn(Object *obj)
-                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL, N=
-ULL);
-     s390_cpu_model_register_props(obj);
- #if !defined(CONFIG_USER_ONLY)
--    cpu->env.tod_timer =3D
--        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
--    cpu->env.cpu_timer =3D
--        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
-     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
- #endif
- }
-@@ -453,6 +484,8 @@ static void s390_cpu_class_init(ObjectClass *oc, void=
- *data)
-=20
-     device_class_set_parent_realize(dc, s390_cpu_realizefn,
-                                     &scc->parent_realize);
-+    device_class_set_parent_unrealize(dc, s390_cpu_unrealizefn,
-+                                      &scc->parent_unrealize);
-     device_class_set_props(dc, s390x_cpu_properties);
-     dc->user_creatable =3D true;
-=20
---=20
++static void mos6522_realize(DeviceState *dev, Error **errp)
++{
++    MOS6522State *s = MOS6522(dev);
+ 
+     s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer1, s);
+     s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer2, s);
+@@ -502,6 +507,7 @@ static void mos6522_class_init(ObjectClass *oc, void *data)
+ 
+     dc->reset = mos6522_reset;
+     dc->vmsd = &vmstate_mos6522;
++    dc->realize = mos6522_realize;
+     device_class_set_props(dc, mos6522_properties);
+     mdc->parent_reset = dc->reset;
+     mdc->set_sr_int = mos6522_set_sr_int;
+-- 
 2.18.2
 
 
