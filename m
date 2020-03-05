@@ -7,98 +7,97 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C74C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 08:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BA4C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:01:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF2D42073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 08:59:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F35B2073D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:01:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yrpb3A/P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2D42073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NswhO6+A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F35B2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9mLR-0005Tt-Ua
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 03:59:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54422)
+	id 1j9mNW-0006qT-HF
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:01:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54628)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9mKm-0004xi-DI
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:58:25 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9mMF-0005zX-Ns
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9mKl-0004GW-2s
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:58:24 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37077
+ (envelope-from <philmd@redhat.com>) id 1j9mME-0005I1-DK
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:59:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48606
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9mKk-0004FU-V5
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:58:23 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9mME-0005HP-A1
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 03:59:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583398701;
+ s=mimecast20190719; t=1583398794;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=b7pCAjGpUN2kZiyEX6tW2SrxhWS/wkFOVl8MErvim7Q=;
- b=Yrpb3A/PLgWqRcTOa/lJFTCV5fxe1ZjUJMd4XsW30dkYs1r395Pa54Du0NwSvhDeizMfMw
- 5wD4YiiJ4vaLe2AUU4euQdZ05F/0lqe3iHsgpWKaYiMy+Hi1AA0Qt87wq5AXGpZOGgb9p5
- uWzqxUsmcaRxj9UQD5dOPEWBrMW+edo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-uAq87fy1OpK9ILJEVtd1Kw-1; Thu, 05 Mar 2020 03:58:20 -0500
-X-MC-Unique: uAq87fy1OpK9ILJEVtd1Kw-1
-Received: by mail-ed1-f71.google.com with SMTP id l8so3884855edq.1
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 00:58:19 -0800 (PST)
+ bh=Nf3IzAsfWpRltOKV69pNDXqv9U6O1CXT0dJjE821guM=;
+ b=NswhO6+ACf0iGEoM5MsJha/12QONsPogNMvP/aygYc89GqDLQ86uMra2XLn04f94QM6QBO
+ wSQkeyTDaGBcqmpxArqXlmjpZGMS46VPPZWqy2obVFtkklhfJLfVCcUeE4+KwFxPvENC8W
+ 684j1KxDbw6Wp5Gj3RUKU3CbIB25IYQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-d6KZh1FKMaS1ZbRx_j1UZQ-1; Thu, 05 Mar 2020 03:59:50 -0500
+X-MC-Unique: d6KZh1FKMaS1ZbRx_j1UZQ-1
+Received: by mail-ed1-f70.google.com with SMTP id f13so3815312edy.21
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 00:59:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=F7409IbmZrm8EY/bbX1VJwzGwZL/Lzq4sVk7B26+AqI=;
- b=jXu0g8mGF6sOHxWuqp7CAthOfjh0HFgpVdwOdEy65W/kWzj9JPF/XgNWyqJsEO9+w7
- 20pGu1vdjvp4GFlDtc+jHTGzrN2jukXr27i7Zh5suSKgqPo5YupG5VxDFWFNZhnadUzi
- Bg6ImNXHDVcO0ydM5pD2MHpbkCZ65jeFSVEjNlL+dR8FyRvgPciKztr7TpES3zHREVoU
- WE6x8xSqKmECQvUexO0Q1D7SHXCfcy+7f6IpyFEkJ6Xgi1Fn4i0kmkKbL1neFIfyaois
- q9JohNdEKI/WgZunpET0e2GeGxC6GCKXvJL4+WjJXfGv1O4chenJrW6WxkBqDg/andU8
- BYZQ==
-X-Gm-Message-State: ANhLgQ1DCxY9WMHF0mk3Txjc/vb4y2I3044Pyx6+TJUHN/26oM18ygac
- dXglUPsa8HMmiSrf3zfSx3m7czI/vRN8+Y8vXodU8vITqq8nU4MzoUCA0DC5Q03e5WMGxzH/5rH
- UfDeliKU05aIUDg8=
-X-Received: by 2002:a17:906:23e2:: with SMTP id
- j2mr6322166ejg.257.1583398698673; 
- Thu, 05 Mar 2020 00:58:18 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvpKZEzRvmew9XnwJX6odn4sxN+QSS5wJ+COPORKfVgNOeNr6hnE5Ve3QiJL7s24NChc+fv+g==
-X-Received: by 2002:a17:906:23e2:: with SMTP id
- j2mr6322130ejg.257.1583398698372; 
- Thu, 05 Mar 2020 00:58:18 -0800 (PST)
+ bh=RzzfNNrAnfTG7m5PXfkWNiMAOxASmMaeWOk50HkuWwo=;
+ b=boZF3auIDb8Gk7cqPcL3e/gVIhknE+G1rQ2cpnLAX5xStHng+zj7wxQVr5iGbaeAMo
+ iHgzUI2RKTGtd8McQYXIyZMKrIGpzlpnENhx9j+Zpn2vBWd5ukWachiqWWJNFtBDTwp+
+ fNw0NZ1Rv3FX8DrYnxXinFu7K50SUKGgFwKVeAAJyNXKnOdRkXqxDyKAIYHLzeN79VpI
+ a2oLWlyEQpj//1aAjkYqWYN/iV5ruE88z1yGtBZih+7To9AKua2N2ne402JaWwlNTXeE
+ 1v4sr3rk1Tlc9cgh210jIU0+74l4BLTnCZHgbCp0mUQfuxgqg9YvzA0/RQ2ieydIF8E2
+ TeFQ==
+X-Gm-Message-State: ANhLgQ2/5IFR6ISy7N8Mh7RZfyRZwFFrfN1VcsmD4VWz4maeOJ+OnjQu
+ H+u3fDCcx5i/gI7quhQOtK7MjxJg4v8b/XJCZ17USKTM1l2FuNATlkvdgb0UvgoZFus9xD7kwiX
+ xnCfpzCXBnBctKKM=
+X-Received: by 2002:aa7:d704:: with SMTP id t4mr6957001edq.46.1583398789165;
+ Thu, 05 Mar 2020 00:59:49 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtGT4SHi7j5arFOZz8U72uVIdKE8e1ytfk0klEo0pZX8TSV3YFLVwId8inGVdwzJ1RVRV6o9w==
+X-Received: by 2002:aa7:d704:: with SMTP id t4mr6956967edq.46.1583398788900;
+ Thu, 05 Mar 2020 00:59:48 -0800 (PST)
 Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id o17sm14272edz.83.2020.03.05.00.58.16
+ by smtp.gmail.com with ESMTPSA id i14sm339169edk.16.2020.03.05.00.59.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Mar 2020 00:58:17 -0800 (PST)
-Subject: Re: [PATCH v7 01/17] ppc: Remove stub support for 32-bit hypervisor
- mode
+ Thu, 05 Mar 2020 00:59:48 -0800 (PST)
+Subject: Re: [PATCH v7 04/17] target/ppc: Introduce ppc_hash64_use_vrma()
+ helper
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
  clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-2-david@gibson.dropbear.id.au>
+ <20200303034351.333043-5-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <80ff6c03-68ed-be51-22b9-208ce3a52332@redhat.com>
-Date: Thu, 5 Mar 2020 09:58:16 +0100
+Message-ID: <9ad055c0-aaeb-8645-ec2b-7f9956c5bf1a@redhat.com>
+Date: Thu, 5 Mar 2020 09:59:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200303034351.333043-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20200303034351.333043-5-david@gibson.dropbear.id.au>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,134 +121,141 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/3/20 4:43 AM, David Gibson wrote:
-> a4f30719a8cd, way back in 2007 noted that "PowerPC hypervisor mode is not
-> fundamentally available only for PowerPC 64" and added a 32-bit version
-> of the MSR[HV] bit.
+> When running guests under a hypervisor, the hypervisor obviously needs to
+> be protected from guest accesses even if those are in what the guest
+> considers real mode (translation off).  The POWER hardware provides two
+> ways of doing that: The old way has guest real mode accesses simply offse=
+t
+> and bounds checked into host addresses.  It works, but requires that a
+> significant chunk of the guest's memory - the RMA - be physically
+> contiguous in the host, which is pretty inconvenient.  The new way, known
+> as VRMA, has guest real mode accesses translated in roughly the normal wa=
+y
+> but with some special parameters.
 >=20
-> But nothing was ever really done with that; there is no meaningful suppor=
-t
-> for 32-bit hypervisor mode 13 years later.  Let's stop pretending and jus=
-t
-> remove the stubs.
+> In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes, b=
+ut
+> in POWER9 only VRMA mode is supported and LPCR[VPM0] no longer exists.  W=
+e
+> handle that difference in behaviour in ppc_hash64_set_isi().. but not in
+> other places that we blindly check LPCR[VPM0].
+>=20
+> Correct those instances with a new helper to tell if we should be in VRMA
+> mode.
 >=20
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 > Reviewed-by: Greg Kurz <groug@kaod.org>
 > ---
->   target/ppc/cpu.h                | 21 +++++++--------------
->   target/ppc/translate_init.inc.c |  6 +++---
->   2 files changed, 10 insertions(+), 17 deletions(-)
+>   target/ppc/mmu-hash64.c | 43 ++++++++++++++++++++---------------------
+>   1 file changed, 21 insertions(+), 22 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index b283042515..8077fdb068 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -24,8 +24,6 @@
->   #include "exec/cpu-defs.h"
->   #include "cpu-qom.h"
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 392f90e0ae..e372c42add 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -668,6 +668,21 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU=
+ *cpu,
+>       return 0;
+>   }
 >  =20
-> -/* #define PPC_EMULATE_32BITS_HYPV */
-> -
->   #define TCG_GUEST_DEFAULT_MO 0
+> +static bool ppc_hash64_use_vrma(CPUPPCState *env)
+> +{
+> +    switch (env->mmu_model) {
+> +    case POWERPC_MMU_3_00:
+> +        /*
+> +         * ISAv3.0 (POWER9) always uses VRMA, the VPM0 field and RMOR
+> +         * register no longer exist
+> +         */
+> +        return true;
+> +
+> +    default:
+> +        return !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+> +    }
+> +}
+> +
+>   static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
+>   {
+>       CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
+> @@ -676,15 +691,7 @@ static void ppc_hash64_set_isi(CPUState *cs, uint64_=
+t error_code)
+>       if (msr_ir) {
+>           vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
+>       } else {
+> -        switch (env->mmu_model) {
+> -        case POWERPC_MMU_3_00:
+> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
+perv */
+> -            vpm =3D true;
+> -            break;
+> -        default:
+> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+> -            break;
+> -        }
+> +        vpm =3D ppc_hash64_use_vrma(env);
+>       }
+>       if (vpm && !msr_hv) {
+>           cs->exception_index =3D POWERPC_EXCP_HISI;
+> @@ -702,15 +709,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
+t dar, uint64_t dsisr)
+>       if (msr_dr) {
+>           vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
+>       } else {
+> -        switch (env->mmu_model) {
+> -        case POWERPC_MMU_3_00:
+> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
+perv */
+> -            vpm =3D true;
+> -            break;
+> -        default:
+> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+> -            break;
+> -        }
+> +        vpm =3D ppc_hash64_use_vrma(env);
+>       }
+>       if (vpm && !msr_hv) {
+>           cs->exception_index =3D POWERPC_EXCP_HDSI;
+> @@ -799,7 +798,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+>               if (!(eaddr >> 63)) {
+>                   raddr |=3D env->spr[SPR_HRMOR];
+>               }
+> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +        } else if (ppc_hash64_use_vrma(env)) {
+>               /* Emulated VRMA mode */
+>               slb =3D &env->vrma_slb;
+>               if (!slb->sps) {
+> @@ -967,7 +966,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
+, target_ulong addr)
+>           } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
+>               /* In HV mode, add HRMOR if top EA bit is clear */
+>               return raddr | env->spr[SPR_HRMOR];
+> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +        } else if (ppc_hash64_use_vrma(env)) {
+>               /* Emulated VRMA mode */
+>               slb =3D &env->vrma_slb;
+>               if (!slb->sps) {
+> @@ -1056,8 +1055,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>       slb->sps =3D NULL;
 >  =20
->   #define TARGET_PAGE_BITS_64K 16
-> @@ -300,13 +298,12 @@ typedef struct ppc_v3_pate_t {
->   #define MSR_SF   63 /* Sixty-four-bit mode                            h=
-flags */
->   #define MSR_TAG  62 /* Tag-active mode (POWERx ?)                      =
-      */
->   #define MSR_ISF  61 /* Sixty-four-bit interrupt mode on 630            =
-      */
-> -#define MSR_SHV  60 /* hypervisor state                               hf=
-lags */
-> +#define MSR_HV   60 /* hypervisor state                               hf=
-lags */
->   #define MSR_TS0  34 /* Transactional state, 2 bits (Book3s)            =
-      */
->   #define MSR_TS1  33
->   #define MSR_TM   32 /* Transactional Memory Available (Book3s)         =
-      */
->   #define MSR_CM   31 /* Computation mode for BookE                     h=
-flags */
->   #define MSR_ICM  30 /* Interrupt computation mode for BookE            =
-      */
-> -#define MSR_THV  29 /* hypervisor state for 32 bits PowerPC           hf=
-lags */
->   #define MSR_GS   28 /* guest state for BookE                           =
-      */
->   #define MSR_UCLE 26 /* User-mode cache lock enable for BookE           =
-      */
->   #define MSR_VR   25 /* altivec available                            x h=
-flags */
-> @@ -401,10 +398,13 @@ typedef struct ppc_v3_pate_t {
+>       /* Is VRMA enabled ? */
+> -    lpcr =3D env->spr[SPR_LPCR];
+> -    if (!(lpcr & LPCR_VPM0)) {
+> +    if (!ppc_hash64_use_vrma(env)) {
+>           return;
+>       }
 >  =20
->   #define msr_sf   ((env->msr >> MSR_SF)   & 1)
->   #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
-> -#define msr_shv  ((env->msr >> MSR_SHV)  & 1)
-> +#if defined(TARGET_PPC64)
-> +#define msr_hv   ((env->msr >> MSR_HV)   & 1)
-> +#else
-> +#define msr_hv   (0)
-> +#endif
->   #define msr_cm   ((env->msr >> MSR_CM)   & 1)
->   #define msr_icm  ((env->msr >> MSR_ICM)  & 1)
-> -#define msr_thv  ((env->msr >> MSR_THV)  & 1)
->   #define msr_gs   ((env->msr >> MSR_GS)   & 1)
->   #define msr_ucle ((env->msr >> MSR_UCLE) & 1)
->   #define msr_vr   ((env->msr >> MSR_VR)   & 1)
-> @@ -449,16 +449,9 @@ typedef struct ppc_v3_pate_t {
->  =20
->   /* Hypervisor bit is more specific */
->   #if defined(TARGET_PPC64)
-> -#define MSR_HVB (1ULL << MSR_SHV)
-> -#define msr_hv  msr_shv
-> -#else
-> -#if defined(PPC_EMULATE_32BITS_HYPV)
-> -#define MSR_HVB (1ULL << MSR_THV)
-> -#define msr_hv  msr_thv
-> +#define MSR_HVB (1ULL << MSR_HV)
->   #else
->   #define MSR_HVB (0ULL)
-> -#define msr_hv  (0)
-> -#endif
->   #endif
->  =20
->   /* DSISR */
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index 2f7125c51f..df3401cf06 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -8764,7 +8764,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
->                           PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
->                           PPC2_TM | PPC2_PM_ISA206;
->       pcc->msr_mask =3D (1ull << MSR_SF) |
-> -                    (1ull << MSR_SHV) |
-> +                    (1ull << MSR_HV) |
->                       (1ull << MSR_TM) |
->                       (1ull << MSR_VR) |
->                       (1ull << MSR_VSX) |
-> @@ -8976,7 +8976,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                           PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
->                           PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
->       pcc->msr_mask =3D (1ull << MSR_SF) |
-> -                    (1ull << MSR_SHV) |
-> +                    (1ull << MSR_HV) |
->                       (1ull << MSR_TM) |
->                       (1ull << MSR_VR) |
->                       (1ull << MSR_VSX) |
-> @@ -9186,7 +9186,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
-)
->                           PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
->                           PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
->       pcc->msr_mask =3D (1ull << MSR_SF) |
-> -                    (1ull << MSR_SHV) |
-> +                    (1ull << MSR_HV) |
->                       (1ull << MSR_TM) |
->                       (1ull << MSR_VR) |
->                       (1ull << MSR_VSX) |
+> @@ -1065,6 +1063,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>        * Make one up. Mostly ignore the ESID which will not be needed
+>        * for translation
+>        */
+> +    lpcr =3D env->spr[SPR_LPCR];
+>       vsid =3D SLB_VSID_VRMA;
+>       vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
+>       vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
 >=20
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
