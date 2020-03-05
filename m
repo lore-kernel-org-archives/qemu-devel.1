@@ -2,102 +2,129 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371AFC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E50C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 092BB20709
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:12:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 092BB20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56AAA207FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:16:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z57ix15B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56AAA207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rF8-0001qg-8B
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:12:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59717)
+	id 1j9rIj-0003sZ-Fx
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:16:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1j9rEA-00015x-7K
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:11:55 -0500
+ (envelope-from <david@redhat.com>) id 1j9rHy-0003NZ-1O
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1j9rE8-00009w-V4
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:11:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50890)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1j9rE8-0007ul-MJ
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:11:52 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 025E9nP5141306
- for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 09:11:28 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yhryewaj9-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 09:11:27 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Thu, 5 Mar 2020 14:11:24 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Mar 2020 14:11:22 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 025EBLNd45613084
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Mar 2020 14:11:21 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 616BBA4051;
- Thu,  5 Mar 2020 14:11:21 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0BE3DA4053;
- Thu,  5 Mar 2020 14:11:21 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.114])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Mar 2020 14:11:20 +0000 (GMT)
-Date: Thu, 5 Mar 2020 15:11:19 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
-In-Reply-To: <c019ecc6-900e-8653-a603-de8d03017e95@de.ibm.com>
-References: <20200224150213.21253-1-pasic@linux.ibm.com>
- <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
- <20200225125641.72e8cc86.pasic@linux.ibm.com>
- <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
- <c019ecc6-900e-8653-a603-de8d03017e95@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <david@redhat.com>) id 1j9rHw-0004eu-5T
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:15:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39627
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9rHw-0004ce-0Z
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:15:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583417747;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=x4iJSWBlCVIIK7RiGDjb6rEuseGYJLdJvcZHWGSk6bE=;
+ b=Z57ix15BDVEsv9J3GKF12T8sf9Sj6xtI/dSJMZLswD2FAOHwXKMhCIXO5J8UQJZHOqwKRw
+ 7i3+79xM4+vhLHV0H18PMzog/B7jmUMZ/xNU2Z1vaoSoxxqjTWkNykJBKb9z0m+TJezw37
+ LZiMp/jRgWo93LG6QQl7Wr8TcT62MAQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-EFakGmEqMr22KXKS0daa5w-1; Thu, 05 Mar 2020 09:15:45 -0500
+X-MC-Unique: EFakGmEqMr22KXKS0daa5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B994801A03;
+ Thu,  5 Mar 2020 14:15:44 +0000 (UTC)
+Received: from [10.10.120.166] (ovpn-120-166.rdu2.redhat.com [10.10.120.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0324F60C18;
+ Thu,  5 Mar 2020 14:15:40 +0000 (UTC)
+Subject: Re: [PATCH v6 03/18] s390x: protvirt: Support unpack facility
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-4-frankja@linux.ibm.com>
+ <2a93ff2e-4955-67c4-e7af-766a49fc8b32@redhat.com>
+ <8fcf6bcf-137c-b488-64b3-4c0bce48b909@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <8018f651-8800-3c9f-0764-188472a41dae@redhat.com>
+Date: Thu, 5 Mar 2020 15:15:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-x-cbid: 20030514-0028-0000-0000-000003E12E9A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030514-0029-0000-0000-000024A6639E
-Message-Id: <20200305151119.6cd63e96.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-05_04:2020-03-05,
- 2020-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 malwarescore=0
- bulkscore=0 phishscore=0 impostorscore=0 spamscore=0 adultscore=0
- clxscore=1015 mlxlogscore=999 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003050092
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 025E9nP5141306
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <8fcf6bcf-137c-b488-64b3-4c0bce48b909@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,123 +136,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
- Marc Hartmayer <mhartmay@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 13:44:31 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>>  
+>>> +static void s390_machine_unprotect(S390CcwMachineState *ms)
+>>> +{
+>>> +    CPUState *t;
+>>> +
+>>> +    if (!ms->pv)
+>>> +        return;
+>>
+>> How can this ever happen? g_assert(ms->pv) ?
+> 
+> Currently not, that's only used in the follow up patches with the ballon
+> and migration blocker
 
->=20
->=20
-> On 25.02.20 15:35, Viktor Mihajlovski wrote:
-> >=20
-> >=20
-> > On 2/25/20 12:56 PM, Halil Pasic wrote:
-> >> On Tue, 25 Feb 2020 10:39:40 +0100
-> >> David Hildenbrand <david@redhat.com> wrote:
-> >>
-> >>> On 24.02.20 16:02, Halil Pasic wrote:
-> >>>> We expose loadparm as a r/w machine property, but if loadparm is s=
-et by
-> >>>> the guest via DIAG 308, we don't update the property. Having a
-> >>>> disconnect between the guest view and the QEMU property is not nic=
-e in
-> >>>> itself, but things get even worse for SCSI, where under certain
-> >>>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-> >>>> expected" for details) we call s390_gen_initial_iplb() on resets
-> >>>> effectively overwriting the guest/user supplied loadparm with the =
-stale
-> >>>> value.
-> >>>>
-> >>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >>>> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the mac=
-hine"
-> >>>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> >>>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-> >>>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >>>> ---
-> >>>> =C2=A0 hw/s390x/ipl.c | 21 +++++++++++++++++++++
-> >>>> =C2=A0 1 file changed, 21 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > [...]
-> >>>> +
-> >>>> +=C2=A0=C2=A0=C2=A0 /* Sync loadparm */
-> >>>> +=C2=A0=C2=A0=C2=A0 if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char ascii_loadparm[8]=
-;
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *ebcdic_loadpa=
-rm =3D iplb->loadparm;
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i;
-> >>>> +
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 8 &&=
- ebcdic_loadparm[i]; i++) {
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- ascii_loadparm[i] =3D ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ascii_loadparm[i] =3D =
-0;
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_st=
-r(mo, ascii_loadparm, "loadparm", NULL);
-> >>>> +=C2=A0=C2=A0=C2=A0 } else {
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_st=
-r(mo, "", "loadparm", NULL);
-> >>>> +=C2=A0=C2=A0=C2=A0 }
-> >>>
-> >>> &error_abort instead of NULL, we certainly want to know if this wou=
-ld
-> >>> ever surprisingly fail.
-> >>
-> >> IMHO this is a typical assert() situation where one would like to ha=
-ve
-> >> a fast and obvious failure when testing, but not in production.
-> >>
-> >> AFAIU the guest can trigger this code at any time, and crashing the
-> >> whole (production) system seems a bit heavy handed to me. The setter
-> >> should only fail if something is buggy.
-> >>
-> >> But if the majority says &error_abort I can certainly do. Other opin=
-ions?
-> >>
-> > We might consider to return 0x0402 (invalid parameter) from the diag3=
-08 "set", which is less drastic and would allow the OS to do whatever it =
-finds appropriate to deal with the failure. Not that Linux would care abo=
-ut that today :-).
->=20
-> I think it is not an error. It is perfectly fine for a guest to not set=
- DIAG308_FLAGS_LP_VALID if the guest does not want to set it. The LOADPAR=
-M is supposed to be ignored then.
->=20
+Even then, why should we unprotect when not protected. That looks wrong
+to me and has to be fixed in the other patches,
 
-I believe David's concern was not the else branch, but the last
-parameter of object_property_set_str(), which tells us what to do if the
-validation/normalization done by the setter of the loadparm qemu
-property fails the set operation.
+> 
+>>
+>> Also, i don't see this function getting called from anywhere else except
+>> when s390_machine_protect() fails. That looks wrong. This has to be
+>> called when going out of PV mode.
+> 
+> Yes, but that's in the diag308 1-4 patch.
 
-> So we have two options:
-> a. leave the patch as-is. This means that we replace the loadparm with =
-an empty string
-> b. remove the else. THis means that we leave the global loadparm unchan=
-ged if the guest does not specify one (but it specifies a new IPLB).
->=20
-> I will double check what LPAR does.
->=20
+The way patches were split up is somewhat sub-optimal for review.
 
-Thanks! BTW my reading of the architecture and understanding how we
-expose it via qemu interfaces makes me to lean towards option a). In my
-understanding we represent invalid loadparm with an empty string in the
-context of the qemu property. That is we don't expose the garbage-value.
+[...]
 
-Regards,
-Halil
+>>> +        break;
+>>> +    case S390_RESET_PV: /* Subcode 10 */
+>>> +        subsystem_reset();
+>>> +        s390_crypto_reset();
+>>> +
+>>> +        CPU_FOREACH(t) {
+>>> +            if (t == cs) {
+>>> +                continue;
+>>> +            }
+>>> +            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+>>> +        }
+>>> +        run_on_cpu(cs, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+>>> +
+>>> +        if (s390_machine_protect(ms)) {
+>>> +            s390_machine_inject_pv_error(cs);
+>>
+>> Ah, so it's not an actual exception. BUT: All other guest cpus were
+>> reset, can the guest deal with that?
+> 
+> Well, all other CPUs should be stopped for diag308, no?
+> Also it's done by the bootloader and not a OS which just stops its cpus
+> and goes into protected mode.
+> 
+>>
+>> (run_on_cpu(cs, s390_do_cpu_reset, RUN_ON_CPU_NULL) should go after the
+>> s390_machine_protect() I assume - the change you had in the other patch)
+> 
+> That's not a good idea, I want to reset before we automatically call the
+> UV routines on a reset.
 
+But how can s390_machine_inject_pv_error(cs) be any effective if you
+already reset the CPU?
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
