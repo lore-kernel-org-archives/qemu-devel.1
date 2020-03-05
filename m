@@ -7,83 +7,81 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B1C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661E3C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A03BB20637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:40:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3372020637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TDN84NoG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A03BB20637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EQIwyenB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3372020637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tYN-0002zV-MT
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:40:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59116)
+	id 1j9tZP-0004uR-Bd
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:41:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOy-0003LM-UW
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:14 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tPQ-0003sg-1C
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOx-0002A9-P6
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:12 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:44605)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tPO-0002qp-Qd
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:39 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:55819)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tOx-00028f-Iq
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:11 -0500
-Received: by mail-wr1-x435.google.com with SMTP id n7so7765761wrt.11
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:11 -0800 (PST)
+ id 1j9tPO-0002qH-KB
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:38 -0500
+Received: by mail-wm1-x333.google.com with SMTP id 6so7072340wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=YI5GZ4epbK0QXokUOGTMGNexzluV/B8yk7q3BWioDGk=;
- b=TDN84NoGjXC5t+d7D7nIbb/WVInpK3kzG2As3XQFHfX2zdODHdGqAylKOMDChZLKQn
- RRPfQLoQr4Xg2hs+4s+K8CUOKFYQLnrx/tNjHn08cGCcVNvqRormitE4pLVxIbGBLoy0
- VmIKgm3leaCEXtsCSiIXfPGUEHLkCGShmuVgbE7q+Fb7wB4L7p/F2ImmCc4+wqkySpic
- F2zcRguAiaQfK8ZnfkHkBbeI5RtcNNyfxlITAkvEmkNoYPKHR9GPSwWEUxXG2n4T8itD
- wn0yykaUHZxoUztlXIvxxF/jEAyh1n/ysDarS8EnTdaU3HILNnZBR7RVtEe5jfelIArS
- KLrg==
+ bh=YYHIjy33GB3VuD4wC7Jf/ToNqj5l8tdIAcVXeQg/vp4=;
+ b=EQIwyenBpY9WuM17efhrXAvdjsYUrASNdDg4ZvaHSauPIzmg20IpoGnoSPf5op8PFG
+ z2J5nDEXOOo2lzxdRjcAcafIyBzCDOHRTNz3BLTmvlnPIC2j7XOLETMn2q+NL7C8Pdvs
+ OWsmFt0y2CC7fMAQJFlhPYRdpwRcbBC8jn4dPSmd3sdU4DnIzKsV/U7oKPapF2iqaw4g
+ KovCTAUgSM2NgzBrkgtAIXlATR+SOGn9Cgmm9hrYLyFYcmrCYljAeNVITEykvHrDegEb
+ MDSNXsXmKEUl8+1E0hTE4WHtbN8qQ7w5rRdE6F8wKrS7uS4NCuSoNcBiezSlxhsAdD9a
+ aj0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YI5GZ4epbK0QXokUOGTMGNexzluV/B8yk7q3BWioDGk=;
- b=KHdpeUZ5HnicfM84EZ7xzyz9ygsz18VYY6hoz+QOnCXi/KxEeQT0q797mmY113MIAn
- uBLKc/87GsMTzvY0j7O1a8LRrmne+Jut+X6zIcgZtmpGTnhDbABfwvN1O2ktZ8wjAmUb
- O1/bzifmYVFMZOZgKbFOf82QNvRt5fzgq0aLSw5yc5AvbIF4knfJvYPv8Sd53snoWgWw
- AGlAyse37zscKwYzW0c57NwVyBinEMzNIQPV44pqHRk2O6n5u6nLcuuidvwiH1MQmhpx
- Nb3YS1om+G5PG3cemNJq7JuA5+IkhYGEBFS/TWR/G7Pqo3k8LmPTPivXMaGIlwBAokVv
- 6RnA==
-X-Gm-Message-State: ANhLgQ3+1w58gMPpOltygIMi4mo8cyj0dWa4fI0WX2klpTeyu5J1uYoh
- Tl4t9gWFvkRvSxLvtUccEoPGR5ktriUwfQ==
-X-Google-Smtp-Source: ADFU+vvhnX+BE0WlaEjCIuy5F9tJJ7k9yC1EPocA+gPNUWyy6X3Iqaq+qT47qdHjrx8pI100VQR4fQ==
-X-Received: by 2002:adf:dd4d:: with SMTP id u13mr10989189wrm.70.1583425870318; 
- Thu, 05 Mar 2020 08:31:10 -0800 (PST)
+ bh=YYHIjy33GB3VuD4wC7Jf/ToNqj5l8tdIAcVXeQg/vp4=;
+ b=Xi08d7tZtOlYa5ZdgNN3RLD5j4ytCPtD0wUP80uJr9frztA04CVJWu/3YjWYOjiaKl
+ +3LzEGgnJ7AzkjpgUCMY2GZOtjfBJv/VnRYFJX3nQtKR+p038GhfRqy2Weo+sByrCiP3
+ 1DNKAvxOxT09ZUD4wlf4mjZgtZoPbYNW9v5H9V2xnJUQRN3aNJ5sba5qUjQ7r7pUZMQI
+ OwkL+/Lia8qTz9mqaBqgxUrNozNprcuTgr9D82+lixMcfi/p27QzzeCkOSg3HoIulhwV
+ oN+by4TcFPopQVLlkgsyKQsbxMo9jhSxASxZimKV5WtkbaTLo8FJ0iOO0SHyCiqnoDkj
+ Ch2w==
+X-Gm-Message-State: ANhLgQ0M3linEk70o0374sS3ykxF+66dUUCane383KJCN5yTLhAryeus
+ mpbu6ZUvcGPFKySUmGGNqkOcLYl/OcQjMA==
+X-Google-Smtp-Source: ADFU+vtZWFhOBwxv/tcea7r1GfUyba79bHPU9j5ldaKnzFaOSFMjh/R7YnSya/kn554R3cJSV6lQAQ==
+X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr10928624wmk.83.1583425897244; 
+ Thu, 05 Mar 2020 08:31:37 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.09
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.36
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:09 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:36 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/37] hw/arm/mainstone: Simplify since the machines are
- little-endian only
-Date: Thu,  5 Mar 2020 16:30:30 +0000
-Message-Id: <20200305163100.22912-8-peter.maydell@linaro.org>
+Subject: [PULL 32/37] target/arm: Optimize cpu_mmu_index
+Date: Thu,  5 Mar 2020 16:30:55 +0000
+Message-Id: <20200305163100.22912-33-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
 References: <20200305163100.22912-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,51 +97,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We only build the little-endian softmmu configurations. Checking
-for big endian is pointless, remove the unused code.
+We now cache the core mmu_idx in env->hflags.  Rather than recompute
+from scratch, extract the field.  All of the uses of cpu_mmu_index
+within target/arm are within helpers, and env->hflags is always stable
+within a translation block from whence helpers are called.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200302175829.2183-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/mainstone.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ target/arm/cpu.h    | 23 +++++++++++++----------
+ target/arm/helper.c |  5 -----
+ 2 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index 6e64dfab506..10420170866 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -119,7 +119,6 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
-     DeviceState *mst_irq;
-     DriveInfo *dinfo;
-     int i;
--    int be;
-     MemoryRegion *rom = g_new(MemoryRegion, 1);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0ae07a72e43..4ffd991b6fc 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2943,16 +2943,6 @@ typedef enum ARMMMUIdxBit {
  
-     /* Setup CPU & memory */
-@@ -130,11 +129,6 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
-     memory_region_set_readonly(rom, true);
-     memory_region_add_subregion(address_space_mem, 0, rom);
+ #define MMU_USER_IDX 0
  
--#ifdef TARGET_WORDS_BIGENDIAN
--    be = 1;
--#else
--    be = 0;
--#endif
-     /* There are two 32MiB flash devices on the board */
-     for (i = 0; i < 2; i ++) {
-         dinfo = drive_get(IF_PFLASH, 0, i);
-@@ -142,7 +136,7 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
-                                    i ? "mainstone.flash1" : "mainstone.flash0",
-                                    MAINSTONE_FLASH,
-                                    dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
--                                   sector_len, 4, 0, 0, 0, 0, be)) {
-+                                   sector_len, 4, 0, 0, 0, 0, 0)) {
-             error_report("Error registering flash memory");
-             exit(1);
-         }
+-/**
+- * cpu_mmu_index:
+- * @env: The cpu environment
+- * @ifetch: True for code access, false for data access.
+- *
+- * Return the core mmu index for the current translation regime.
+- * This function is used by generic TCG code paths.
+- */
+-int cpu_mmu_index(CPUARMState *env, bool ifetch);
+-
+ /* Indexes used when registering address spaces with cpu_address_space_init */
+ typedef enum ARMASIdx {
+     ARMASIdx_NS = 0,
+@@ -3232,6 +3222,19 @@ FIELD(TBFLAG_A64, BTYPE, 10, 2)         /* Not cached. */
+ FIELD(TBFLAG_A64, TBID, 12, 2)
+ FIELD(TBFLAG_A64, UNPRIV, 14, 1)
+ 
++/**
++ * cpu_mmu_index:
++ * @env: The cpu environment
++ * @ifetch: True for code access, false for data access.
++ *
++ * Return the core mmu index for the current translation regime.
++ * This function is used by generic TCG code paths.
++ */
++static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
++{
++    return FIELD_EX32(env->hflags, TBFLAG_ANY, MMUIDX);
++}
++
+ static inline bool bswap_code(bool sctlr_b)
+ {
+ #ifdef CONFIG_USER_ONLY
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f7ba34bbf6d..f91e5d5345f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -12274,11 +12274,6 @@ ARMMMUIdx arm_mmu_idx(CPUARMState *env)
+     return arm_mmu_idx_el(env, arm_current_el(env));
+ }
+ 
+-int cpu_mmu_index(CPUARMState *env, bool ifetch)
+-{
+-    return arm_to_core_mmu_idx(arm_mmu_idx(env));
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env)
+ {
 -- 
 2.20.1
 
