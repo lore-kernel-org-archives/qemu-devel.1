@@ -2,89 +2,85 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A9FC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D69C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:04:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4139A20732
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 14:52:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33DCB20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 15:04:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JKpC+uuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4139A20732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIl+IyPA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33DCB20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9rrY-000369-EB
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 09:52:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
+	id 1j9s2j-000267-8Z
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 10:04:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j9rqn-0002FR-9x
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:51:50 -0500
+ (envelope-from <lersek@redhat.com>) id 1j9s0F-00015N-Er
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j9rqm-0007M2-0g
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:51:49 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33458)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j9rql-0007K7-Q1
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 09:51:47 -0500
-Received: by mail-wr1-x444.google.com with SMTP id x7so7393766wrr.0
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 06:51:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=AV9DKZeo5XSlqfQw6OOTSdxsG7ZkNypj7VbKwVF7WlQ=;
- b=JKpC+uuDYOGdZ2QCnk3pS9RGzl96baZ/9HH+LveIzjwk2uG0GowsfaZVskbeOGCuCa
- 8g51UdpmgvG2rMvQo2LzUxcBoGr3VmXw7Swgr1ShPS7WM1umA03XR02T4E8zJIBwhAFe
- k88zwwoQmw+glShc1p1MRgLhMjYucAc9yiWIb173/xsMrIHne5Y8+MLFT/V/qzH1Y8wG
- 5vOIvKZdCYIEzmAs8TLlwmAkuh9tHAW3bU3za+wY+qzQh8rRTFVB0PrboQimODk68pj7
- jajl5NNgcyH6+RNP9FYWbGcr4Km5+nJY490Fd8BeF9VtdLAT8BvWk9MzfYmhOWljtAQU
- jBFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=AV9DKZeo5XSlqfQw6OOTSdxsG7ZkNypj7VbKwVF7WlQ=;
- b=ZoI5lN42dPbz0CdMo3XXwi1FP0E8q1oSMNUGQjaxtNCtRyyaIwtmx75atAogtegBLP
- CpeEPX9hu3dK3hRWoSpli9JzqTxUg+BgOpdf8IfQRuSqDbTlD4RT9BMw/S7H40CerAht
- MzFShFx3B3AzIPcKI0Cw1d66VbsXRcZIC/wQ6fW435AcilMjYWsoQwPL90+0xaBCx8z6
- dkxF9g2eT9rNAqaFhZ2u0pv1icdGHzQ83oYjWuVIZ4ieZxMhJ6rLSpqNLzivAMB+qq4+
- pJtmxyr2/89ID+U82UCZ3DWYEIg9/TosKpo9dVDxHFLwEV0vCQmiUzEj+v7/sXfasav8
- IWkg==
-X-Gm-Message-State: ANhLgQ3aDkDrG2SUvwUqJlcTcdlpYLp2whWvbbHEwkB/bLZMvIZGeJDn
- nuS8dBTE8xy0WRWJ/pZplLKqWQ==
-X-Google-Smtp-Source: ADFU+vs4gER01xiqr0PXQuia5/QLQ/d5QIEZ2w8vDTM2kZf21sV+FG80kwtAKk4gpShXSZHaqUSrmw==
-X-Received: by 2002:adf:fa43:: with SMTP id y3mr10423901wrr.404.1583419905864; 
- Thu, 05 Mar 2020 06:51:45 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o26sm9083457wmc.33.2020.03.05.06.51.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 06:51:44 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D4C801FF87;
- Thu,  5 Mar 2020 14:51:43 +0000 (GMT)
-References: <20200305103427.157658-1-quintela@redhat.com>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH] configure: Improve zstd test
-In-reply-to: <20200305103427.157658-1-quintela@redhat.com>
-Date: Thu, 05 Mar 2020 14:51:43 +0000
-Message-ID: <87imji6eio.fsf@linaro.org>
+ (envelope-from <lersek@redhat.com>) id 1j9s0D-0001dQ-2T
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37303
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1j9s0C-0001d3-Uf
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 10:01:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583420492;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=o4x3+2HVduoV5LvQcyZhKCpkD5Jw62Jja240veAukng=;
+ b=bIl+IyPADo+1TD4S0ACa9uuwEcFhkVOgc9z9RilTM7voy9eaf6GuRGlvWKCeuBwOXKsprL
+ cpShlxx4V3ajybOs7V2W1JRe4FX1PclUCBz7ASakN/kduziD1UgurpU6VsWA+UoXdAlCxH
+ 0vnAa8GCs2uBbEGmgsTwII6x7oH0OHo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-cwJR9mMMOQeJFo6A0mI-_w-1; Thu, 05 Mar 2020 10:01:30 -0500
+X-MC-Unique: cwJR9mMMOQeJFo6A0mI-_w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAE5A800D4E
+ for <qemu-devel@nongnu.org>; Thu,  5 Mar 2020 15:01:29 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-216.ams2.redhat.com
+ [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2CD59CA3;
+ Thu,  5 Mar 2020 15:01:25 +0000 (UTC)
+Subject: Re: [PULL 1/1] qxl: introduce hardware revision 5
+To: Yuri Benditovich <ybendito@redhat.com>
+References: <20200213090627.2181-1-kraxel@redhat.com>
+ <20200213090627.2181-2-kraxel@redhat.com>
+ <bb1f9cbb-7f98-e955-c55d-abc36e788902@redhat.com>
+ <1472901155.11933269.1583395037984.JavaMail.zimbra@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <e69ea9ab-9fc1-ca12-c7ab-50e094c1c782@redhat.com>
+Date: Thu, 5 Mar 2020 16:01:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
+In-Reply-To: <1472901155.11933269.1583395037984.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,122 +92,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yvugenfi@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Juan Quintela <quintela@redhat.com> writes:
-
-> There were one error on the test (missing an s for --exists).
-> But we really need a recent zstd (0.8.1).
-> That version was released in 2016, so it is newer that some of our travis
-> images.  Just check for the version that we need.
+On 03/05/20 08:57, Yuri Benditovich wrote:
+> ----- Original Message -----
 >
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reported-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  configure | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>> From: "Laszlo Ersek" <lersek@redhat.com>
+>> To: "Gerd Hoffmann" <kraxel@redhat.com>
+>> Cc: qemu-devel@nongnu.org, "Eduardo Habkost" <ehabkost@redhat.com>,
+>> "Yuri Benditovich" <ybendito@redhat.com>, "Yan Vugenfirer"
+>> <yvugenfi@redhat.com>
+>> Sent: Thursday, March 5, 2020 1:28:23 AM
+>> Subject: Re: [PULL 1/1] qxl: introduce hardware revision 5
 >
-> diff --git a/configure b/configure
-> index 7b373bc0bb..1bf48df1ef 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2464,7 +2464,8 @@ fi
->  # zstd check
->=20=20
->  if test "$zstd" !=3D "no" ; then
-> -    if $pkg_config --exist libzstd ; then
-> +    libzstd_minver=3D"0.8.1"
-> +    if $pkg_config --atleast-version=3D$libzstd_minver libzstd ; then
->          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
->          zstd_libs=3D"$($pkg_config --libs libzstd)"
->          LIBS=3D"$zstd_libs $LIBS"
+>> this patch -- commit ed71c09ffd6f -- disables ACPI S3 in the Windows
+>> 10 guest for me, using OVMF and QXL.
+>
+>> The "Sleep" menu entry disappears from the power button icon/menu at
+>> the login screen, and "psshutdown -d -t 3" (from the pstools package)
+>> also stops working (it reports that the computer does not support
+>> S3).
+>
+>> At the parent commit (e18e5501d8ac), S3 suspend/resume works.
+>
 
-Hmm still breaks with:
+[...]
 
-   make docker-test-build@ubuntu J=3D9 V=3D1
+>> OVMF is built at current edk2 master: e63d54db9526.
+>
+>> In the Windows 10 guest, the installed driver has the following
+>> properties (per Device Manager):
+>
+>> - driver date: 7/28/2015
+>> - driver version: 22.33.46.473
 
-With:
+> This is not what I would expect from any qxl driver for Win10
+> What is the name of display adapter?
 
-  FY_SOURCE=3D2 -g   -c -o monitor/qmp.o /tmp/qemu-test/src/monitor/qmp.c
-  /tmp/qemu-test/src/migration/multifd-zstd.c: In function 'zstd_send_prepa=
-re':
-  /tmp/qemu-test/src/migration/multifd-zstd.c:125:9: error: unknown type na=
-me 'ZSTD_EndDirective'; did you mean 'ZSTD_DDict'?
-           ZSTD_EndDirective flush =3D ZSTD_e_continue;
-           ^~~~~~~~~~~~~~~~~
-           ZSTD_DDict
-  /tmp/qemu-test/src/migration/multifd-zstd.c:125:35: error: 'ZSTD_e_contin=
-ue' undeclared (first use in this function); did you mean 'g_timer_continue=
-'?
-           ZSTD_EndDirective flush =3D ZSTD_e_continue;
-                                     ^~~~~~~~~~~~~~~
-                                     g_timer_continue
-  /tmp/qemu-test/src/migration/multifd-zstd.c:125:35: note: each undeclared=
- identifier is reported only once for each function it appears in
-  /tmp/qemu-test/src/migration/multifd-zstd.c:128:21: error: 'ZSTD_e_flush'=
- undeclared (first use in this function); did you mean 'ZSTD_DCtx_s'?
-               flush =3D ZSTD_e_flush;
-                       ^~~~~~~~~~~~
-                       ZSTD_DCtx_s
-  /tmp/qemu-test/src/migration/multifd-zstd.c:143:19: error: implicit decla=
-ration of function 'ZSTD_compressStream2'; did you mean 'ZSTD_compressStrea=
-m'? [-Werror=3Dimplicit-fun
-  ction-declaration]
-               ret =3D ZSTD_compressStream2(z->zcs, &z->out, &z->in, flush);
-                     ^~~~~~~~~~~~~~~~~~~~
-                     ZSTD_compressStream
-  /tmp/qemu-test/src/migration/multifd-zstd.c:143:19: error: nested extern =
-declaration of 'ZSTD_compressStream2' [-Werror=3Dnested-externs]
-  cc1: all warnings being treated as errors
-  make: *** [/tmp/qemu-test/src/rules.mak:69: migration/multifd-zstd.o] Err=
-or 1
-  make: *** Waiting for unfinished jobs....
-  rm tests/qemu-iotests/socket_scm_helper.o
+"Red Hat QXL controller"
 
-Running manually you get:
+> The driver provider is 'Red Hat'?
 
-  14:48:20 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 1 + docker run=
- --rm -it qemu:ubuntu pkg-config --exists libzstd
-  14:48:24 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + echo $status
-  0
-  14:48:28 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + docker run -=
--rm -it qemu:ubuntu pkg-config --atleast-version=3D"0.8.1" libzstd
-  14:48:52 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + echo $status
-  0
-  14:49:33 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + docker run -=
--rm -it qemu:ubuntu pkg-config --cflags libzstd
+In the "Red Hat QXL controller Properties" dialog:
 
-  14:49:45 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + docker run -=
--rm -it qemu:ubuntu pkg-config --libs libzstd
-  -lzstd
-  14:51:14 [alex@zen:~/l/q/b/all] review/misc-bits|=E2=80=A6 + docker run -=
--rm -it qemu:ubuntu dpkg --status libzstd-dev
-  Package: libzstd-dev
-  Status: install ok installed
-  Priority: optional
-  Section: libdevel
-  Installed-Size: 985
-  Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-  Architecture: amd64
-  Multi-Arch: same
-  Source: libzstd
-  Version: 1.3.8+dfsg-3
-  Depends: libzstd1 (=3D 1.3.8+dfsg-3)
-  Description: fast lossless compression algorithm -- development files
-   Zstd, short for Zstandard, is a fast lossless compression algorithm, tar=
-geting
-   real-time compression scenarios at zlib-level compression ratio.
-   .
-   This package contains the headers and static library.
-  Original-Maintainer: Debian Med Packaging Team <debian-med-packaging@list=
-s.alioth.debian.org>
-  Homepage: https://github.com/facebook/zstd
+- on the General tab, Manufacturer is "Red Hat, Inc."
 
+- on the Driver tab, both the "Driver Provider" and the "Digital Signer"
+  fields are "Red Hat, Inc."
 
---=20
-Alex Benn=C3=A9e
+This driver comes from "qxlwddm-0.1-12" (buildID=449635), in Brew.
+
+In retrospect it looks like this driver was meant for Windows 8 only,
+but it happened to install under, and work OK for, Windows 10 too.
+
+> Does your guest run with secure boot?
+
+Yes, it does. (Double-checked it with "confirm-SecureBootUEFI" in
+PowerShell.)
+
+> I do not see such an effect with 'Sleep' with latest qemu master +
+> OVMF + qxl + Win10, the sleep button does not disappear.
+
+I'm happy to try other driver versions. Hopefully Windows 10 will
+actually see them as upgrading the currently installed driver. (Or
+should I uninstall first?)
+
+Thanks!
+Laszlo
+
 
