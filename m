@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F20AC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC2DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBC8A20848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83D3A20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4bFPt15"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC8A20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpjgaBvN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D3A20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9pwD-0004Pb-3a
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:49:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41763)
+	id 1j9pxN-0007DN-Le
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:50:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9pt7-0007NN-Kv
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:46:06 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9psz-00073M-1j
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9pt6-0001bi-Dk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:46:05 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38156
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j9psx-0001Wi-Op
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:56 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34958
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9pt6-0001b6-9H
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:46:04 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9psx-0001WY-KY
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583412363;
+ s=mimecast20190719; t=1583412355;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BfL2wrp1xmfb4e/iaQpRjnEbNuM8Iy0Ua18MeCip/nA=;
- b=Z4bFPt15GH4RT06GeGeyeyZwS16pPZMLQG0Zkq5EDkaJPVUdji6oIr3q7BEA6hz8BtNn+y
- rw50v75zc/zOATP5Oa1u7orIYFFCbb1Imh/KLIo1WAundc4duwssRIDz094J3LXWbk1e8c
- uJLOpT3JIqCmcklBGRvGJr4fCx57Obc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-H9dQGy4OPBGMq5WN70j7lg-1; Thu, 05 Mar 2020 07:46:02 -0500
-X-MC-Unique: H9dQGy4OPBGMq5WN70j7lg-1
-Received: by mail-wr1-f69.google.com with SMTP id p11so2255787wrn.10
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:46:02 -0800 (PST)
+ bh=JfaE+0axlKWiznACDUVr5NFMk2fsnhKxXDiz+PMDV4Y=;
+ b=KpjgaBvN/geU6cdjF4P4+omH8MwS0MNBgj6JKGdzemTQEaTtSnJfeBHhzm/l4DU7Ok+Pkd
+ lZbDj/V29baTT2/otwXt25KEASd6hqS+Gv/2VHtM/glfx6ZkJk3YGYNrWrFvb3AjC55EY3
+ ah6xLMAvdRH/3E5ovs3PyY6+KOjIKnc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-_0KXLWMnN2qr69nfToXtVQ-1; Thu, 05 Mar 2020 07:45:51 -0500
+X-MC-Unique: _0KXLWMnN2qr69nfToXtVQ-1
+Received: by mail-wr1-f70.google.com with SMTP id s10so494158wrr.21
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:45:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cOfgZg45p005Cf8aNVaFJuLhPI+JdhyWRao0wzg6LoM=;
- b=kFoFRPYahhvk91z/Bz46XBTIDPHJ97T0ms3Q1CcdvftdlndharpeCq0y1XflRSpTMw
- Xe2NqAHxSp+UAQI5qQI1RhytsAb2U/+QyrkR1xKWRVzgJcNdtbaCAMB4ru/8S241IgdC
- K4CL7D8HYnoZk2TGc42ttUbr3R2/O4NnjUE3MsuHFS50fjf7W/9S5nZ2d+JxfaCAQiEO
- y0M30dHr1ir68HmjH68pjZxATP5uyLK679mRZ9CGEGF6+ycOqym6v/kY+VDRWRGCk3vy
- O1WKw7rlIWj+4TzTcWa/V1MwyYIYMs69P2tQ0HZOGOMgn8cC6Lz7eTWtfx3eskqPomOL
- MEDA==
-X-Gm-Message-State: ANhLgQ0yBSyhYcsWZXphUVAHXEcQ0WfAl60PkUyxtWNWXdsr+lgEYOLr
- zQzCOTs6NiR/OevF6Vyt5EmakV2aPQajq+kAXaFy5qLNVWk+eT5oYDwdywt+NFFUEP0tU+nKp35
- AnCAhuv1MyIJjkoY=
-X-Received: by 2002:a7b:ce99:: with SMTP id q25mr9353857wmj.34.1583412360850; 
- Thu, 05 Mar 2020 04:46:00 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtYQ3Fcji41liGZ4F/ZeQyFAYO+TfPXs7EPSdszQCv1mrO1EYqxHjHgHw9ceMByt1uuFupuDw==
-X-Received: by 2002:a7b:ce99:: with SMTP id q25mr9353820wmj.34.1583412360562; 
- Thu, 05 Mar 2020 04:46:00 -0800 (PST)
+ bh=42bbadqUAgxtcc+IIT/30qYCAcYJc9y0Vsbx4Pz3gIU=;
+ b=Ecxn/RpEdytcNdeunmcLEY0BT/uZRhnzE8+7jgGtf7qtBslLcOe70To2TkDkQCP2Wf
+ RZdqO2PBcKejleVBoYRxoVak93jMgeHCza+iAC0zdNjF+ud/vtEpsoLmHGWQUB8qA+6l
+ Wy1Fzzzy5wU1wbwAiOUc3lCsl16ALg4ADvx4Rj47o+9ugx122RLe7DwWElKdb+BrXbMI
+ Q6BFZpUqIJGvcrORdiLLWniv1RyFai2gtPtPnGIBsbFYrBn5evgU0izeX4WpEN4CLexo
+ ohWVstE/hsvaXYD9J0YrJR9XI+wDcB2u0VejH4kx3i2HJdPFa09UMZrCHnXwvfioe1bU
+ qViA==
+X-Gm-Message-State: ANhLgQ3+5qdlm+L2MKh39rzkhDLWEN87T1L1344Ju6DcIB0yTJCBRnn4
+ MUokVZxH//k+wmD0LX6zwlcz8JaTnIPSGFNaE12zXy9YpUWdRu/edFmb78EKnt61vZKQgL3JWek
+ 63NDsK55kx3it6VE=
+X-Received: by 2002:a1c:e146:: with SMTP id y67mr9108383wmg.81.1583412350052; 
+ Thu, 05 Mar 2020 04:45:50 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vthWhcpjJ0QtztZkI8eKhbEYA0N0BtUoJ9LPdGVIeSPURfmP7IqY9VKyto/DkMvQ6hUEDzqPA==
+X-Received: by 2002:a1c:e146:: with SMTP id y67mr9108368wmg.81.1583412349872; 
+ Thu, 05 Mar 2020 04:45:49 -0800 (PST)
 Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id z12sm17054451wrs.43.2020.03.05.04.45.59
+ by smtp.gmail.com with ESMTPSA id j14sm44924328wrn.32.2020.03.05.04.45.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 04:46:00 -0800 (PST)
+ Thu, 05 Mar 2020 04:45:49 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-trivial@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 6/9] hw/usb/quirks: Use smaller types to reduce .rodata by
- 10KiB
-Date: Thu,  5 Mar 2020 13:45:22 +0100
-Message-Id: <20200305124525.14555-7-philmd@redhat.com>
+Subject: [PATCH v2 4/9] hw/net/e1000: Add readops/writeops typedefs
+Date: Thu,  5 Mar 2020 13:45:20 +0100
+Message-Id: <20200305124525.14555-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200305124525.14555-1-philmd@redhat.com>
 References: <20200305124525.14555-1-philmd@redhat.com>
@@ -93,7 +92,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,97 +115,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The USB descriptor sizes are specified as 16-bit for idVendor /
-idProduct, and 8-bit for bInterfaceClass / bInterfaceSubClass /
-bInterfaceProtocol. Doing so we reduce the usbredir_raw_serial_ids[]
-and usbredir_ftdi_serial_ids[] arrays from 16KiB to 6KiB (size
-reported on x86_64 host, building with --extra-cflags=3D-Os).
+Express the macreg[] arrays using typedefs.
+No logical changes introduced here.
 
+Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Add bitfield values and use unsigned types (Gerd)
----
- hw/usb/quirks.h | 22 +++++++++++++---------
- hw/usb/quirks.c |  4 ++--
- 2 files changed, 15 insertions(+), 11 deletions(-)
+ hw/net/e1000.c       | 6 ++++--
+ hw/net/e1000e_core.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/hw/usb/quirks.h b/hw/usb/quirks.h
-index 89480befd7..50ef2f9c2e 100644
---- a/hw/usb/quirks.h
-+++ b/hw/usb/quirks.h
-@@ -21,19 +21,23 @@
- #include "quirks-pl2303-ids.h"
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 0b833d5a15..972d9b5083 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -1150,7 +1150,8 @@ set_ims(E1000State *s, int index, uint32_t val)
+ }
 =20
- struct usb_device_id {
--    int vendor_id;
--    int product_id;
--    int interface_class;
--    int interface_subclass;
--    int interface_protocol;
-+    uint16_t vendor_id;
-+    uint16_t product_id;
-+    uint8_t interface_class;
-+    uint8_t interface_subclass;
-+    uint8_t interface_protocol;
-+    uint8_t interface_protocol_used:1,
-+            terminating_entry:1,
-+            reserved:6;
- };
+ #define getreg(x)    [x] =3D mac_readreg
+-static uint32_t (*macreg_readops[])(E1000State *, int) =3D {
++typedef uint32_t (*readops)(E1000State *, int);
++static readops macreg_readops[] =3D {
+     getreg(PBA),      getreg(RCTL),     getreg(TDH),      getreg(TXDCTL),
+     getreg(WUFC),     getreg(TDT),      getreg(CTRL),     getreg(LEDCTL),
+     getreg(MANC),     getreg(MDIC),     getreg(SWSM),     getreg(STATUS),
+@@ -1205,7 +1206,8 @@ static uint32_t (*macreg_readops[])(E1000State *, int=
+) =3D {
+ enum { NREADOPS =3D ARRAY_SIZE(macreg_readops) };
 =20
- #define USB_DEVICE(vendor, product) \
--    .vendor_id =3D vendor, .product_id =3D product, .interface_class =3D -=
-1,
-+    .vendor_id =3D vendor, .product_id =3D product, .interface_protocol_us=
-ed =3D 0,
+ #define putreg(x)    [x] =3D mac_writereg
+-static void (*macreg_writeops[])(E1000State *, int, uint32_t) =3D {
++typedef void (*writeops)(E1000State *, int, uint32_t);
++static writeops macreg_writeops[] =3D {
+     putreg(PBA),      putreg(EERD),     putreg(SWSM),     putreg(WUFC),
+     putreg(TDBAL),    putreg(TDBAH),    putreg(TXDCTL),   putreg(RDBAH),
+     putreg(RDBAL),    putreg(LEDCTL),   putreg(VET),      putreg(FCRUC),
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index 94ea34dca5..38bdb90114 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2855,7 +2855,8 @@ e1000e_set_gcr(E1000ECore *core, int index, uint32_t =
+val)
+ }
 =20
- #define USB_DEVICE_AND_INTERFACE_INFO(vend, prod, iclass, isubclass, iprot=
-o) \
-     .vendor_id =3D vend, .product_id =3D prod, .interface_class =3D iclass=
-, \
--    .interface_subclass =3D isubclass, .interface_protocol =3D iproto
-+    .interface_subclass =3D isubclass, .interface_protocol =3D iproto, \
-+    .interface_protocol_used =3D 1
+ #define e1000e_getreg(x)    [x] =3D e1000e_mac_readreg
+-static uint32_t (*e1000e_macreg_readops[])(E1000ECore *, int) =3D {
++typedef uint32_t (*readops)(E1000ECore *, int);
++static readops e1000e_macreg_readops[] =3D {
+     e1000e_getreg(PBA),
+     e1000e_getreg(WUFC),
+     e1000e_getreg(MANC),
+@@ -3061,7 +3062,8 @@ static uint32_t (*e1000e_macreg_readops[])(E1000ECore=
+ *, int) =3D {
+ enum { E1000E_NREADOPS =3D ARRAY_SIZE(e1000e_macreg_readops) };
 =20
- static const struct usb_device_id usbredir_raw_serial_ids[] =3D {
-     /*
-@@ -206,7 +210,7 @@ static const struct usb_device_id usbredir_raw_serial_i=
-ds[] =3D {
-     { USB_DEVICE(ADLINK_VENDOR_ID, ADLINK_ND6530_PRODUCT_ID) },
-     { USB_DEVICE(SMART_VENDOR_ID, SMART_PRODUCT_ID) },
-=20
--    { USB_DEVICE(-1, -1) } /* Terminating Entry */
-+    { .terminating_entry =3D 1 } /* Terminating Entry */
- };
-=20
- static const struct usb_device_id usbredir_ftdi_serial_ids[] =3D {
-@@ -906,7 +910,7 @@ static const struct usb_device_id usbredir_ftdi_serial_=
-ids[] =3D {
-     { USB_DEVICE(FTDI_VID, FTDI_DISTORTEC_JTAG_LOCK_PICK_PID) },
-     { USB_DEVICE(FTDI_VID, FTDI_LUMEL_PD12_PID) },
-=20
--    { USB_DEVICE(-1, -1) } /* Terminating Entry */
-+    { .terminating_entry =3D 1 } /* Terminating Entry */
- };
-=20
- #undef USB_DEVICE
-diff --git a/hw/usb/quirks.c b/hw/usb/quirks.c
-index 38a9c5634a..23ea7a23ea 100644
---- a/hw/usb/quirks.c
-+++ b/hw/usb/quirks.c
-@@ -22,10 +22,10 @@ static bool usb_id_match(const struct usb_device_id *id=
-s,
-                          uint8_t interface_protocol) {
-     int i;
-=20
--    for (i =3D 0; ids[i].vendor_id !=3D -1; i++) {
-+    for (i =3D 0; ids[i].terminating_entry =3D=3D 0; i++) {
-         if (ids[i].vendor_id  =3D=3D vendor_id &&
-             ids[i].product_id =3D=3D product_id &&
--            (ids[i].interface_class =3D=3D -1 ||
-+            (ids[i].interface_protocol_used =3D=3D 0 ||
-              (ids[i].interface_class =3D=3D interface_class &&
-               ids[i].interface_subclass =3D=3D interface_subclass &&
-               ids[i].interface_protocol =3D=3D interface_protocol))) {
+ #define e1000e_putreg(x)    [x] =3D e1000e_mac_writereg
+-static void (*e1000e_macreg_writeops[])(E1000ECore *, int, uint32_t) =3D {
++typedef void (*writeops)(E1000ECore *, int, uint32_t);
++static writeops e1000e_macreg_writeops[] =3D {
+     e1000e_putreg(PBA),
+     e1000e_putreg(SWSM),
+     e1000e_putreg(WUFC),
 --=20
 2.21.1
 
