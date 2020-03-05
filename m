@@ -2,101 +2,144 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1FDC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9DEC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6679D20870
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:21:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQK8vPDU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6679D20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAC1E20870
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC1E20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9mhU-0004Id-LF
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:21:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57684)
+	id 1j9mjR-0005Q7-0Q
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:23:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58888)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9md0-0007BH-Vz
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:17:18 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j9mih-0004wh-PJ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:23:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9mcz-0006E0-8q
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:17:14 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30244
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9mcz-0006Dn-5j
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:17:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583399832;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S8dBFiAueIRgg+I3eciWAuVQYiIdrgGLq7Vh5RN5zHI=;
- b=AQK8vPDUm8x0Ss3M3z2nJlWZt5T1PF2On9ESZswOxL+1FPiV1cjbgCtCeGEAsh5185FqrF
- VCdIYdG/GfWUg2RbMUnb+B3hmdn5GJLWjnqQh+ns3MUYatqf+Lcmmtn3anDnwY72CIRKE/
- iluM9RNMTj94ixT67ioRs35Whf3SrIY=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-J_DA_aN8Oj6mWY8Xtej6BQ-1; Thu, 05 Mar 2020 04:17:08 -0500
-X-MC-Unique: J_DA_aN8Oj6mWY8Xtej6BQ-1
-Received: by mail-ed1-f72.google.com with SMTP id y23so3901567edt.2
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 01:17:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1GeNh3pDeMWkP307y0ZOfzMWWNA5A4ck1U/lHK/oiMQ=;
- b=BMzGSpG57JrVtytud2KrPOi1LuqPlGU6/hUbmmFewnu7OLK5/MPGGFJ9/wx2oDTEPf
- Ez7W1ir/ww7KnvfWGfvsD+A/0QbIMpw0fIwgc+XqZLr2kMnva268nToXS9QNOImQby8W
- vLjNkdq4+rlizgRD11ed9kQcinkjWuA8+rKqo+UixEwJZBS7ESElXSy+a8Xqe6eZqpIA
- iVdvbIfNkX5KD8rVVZ53U2I5hOLf/Ii6iBzpGFl26BRAaozktKaGsOIKG8DTVepjRIoE
- FKxYhld5SNgQqOdwZEZ9zg0fPH/TRO72i8l4Zbhtjr5lE0kU4SOWjZXG2cbHm8r2svvJ
- Es4w==
-X-Gm-Message-State: ANhLgQ3av5n+DQH0QmmQ5gBxftJ8NNuQJb0S8EoojILAPfMf2NwBMwwr
- KvyVTA1/4L41WjfBkqnGg4Oe0h2Nm20tR0+1vqOyE3oy9Qp2xTt2wiAq5UXNlj43bUwtMtd9y+c
- CLtk8YgtGvjN/eig=
-X-Received: by 2002:a50:fb02:: with SMTP id d2mr7229309edq.270.1583399826926; 
- Thu, 05 Mar 2020 01:17:06 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vub67LLGU4X08P1iTU19NZMbUc2hyhBo72YJn58wyVtQme/rolifdizy0pMhY2s5W/XoFedBg==
-X-Received: by 2002:a50:fb02:: with SMTP id d2mr7229281edq.270.1583399826687; 
- Thu, 05 Mar 2020 01:17:06 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id o17sm20683edz.83.2020.03.05.01.17.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 05 Mar 2020 01:17:05 -0800 (PST)
-Subject: Re: [PATCH v7 11/17] target/ppc: Don't store VRMA SLBE persistently
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-12-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <efb1558c-15ab-70f8-0963-357c45da2682@redhat.com>
-Date: Thu, 5 Mar 2020 10:17:03 +0100
+ (envelope-from <frankja@linux.ibm.com>) id 1j9mig-0002Wf-F8
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:23:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18734
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1j9mig-0002WL-91
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:23:06 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0259KVYf102727
+ for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 04:23:05 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yj6nk9220-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:23:05 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 5 Mar 2020 09:23:03 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 5 Mar 2020 09:23:01 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0259N1xl50331734
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 5 Mar 2020 09:23:01 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F343242041;
+ Thu,  5 Mar 2020 09:23:00 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C37744203F;
+ Thu,  5 Mar 2020 09:23:00 +0000 (GMT)
+Received: from dyn-9-152-224-184.boeblingen.de.ibm.com (unknown
+ [9.152.224.184])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  5 Mar 2020 09:23:00 +0000 (GMT)
+Subject: Re: [PATCH v6 08/18] s390x: Add SIDA memory ops
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-9-frankja@linux.ibm.com>
+ <0cfa4651-dc80-05de-94ce-78cccf7cd903@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 5 Mar 2020 10:23:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200303034351.333043-12-david@gibson.dropbear.id.au>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <0cfa4651-dc80-05de-94ce-78cccf7cd903@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="e6h5eEXZ1LHep1auWx5GtixycjK5EsNtz"
+X-TM-AS-GCONF: 00
+x-cbid: 20030509-4275-0000-0000-000003A891C6
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030509-4276-0000-0000-000038BDA12B
+Message-Id: <949848d6-4145-106d-ece8-6bbcf7fe9e7d@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-05_02:2020-03-04,
+ 2020-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxlogscore=999 suspectscore=3
+ impostorscore=0 priorityscore=1501 bulkscore=0 phishscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003050059
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,263 +151,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Igor Mammedov <imammedo@redhat.com>, paulus@samba.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--e6h5eEXZ1LHep1auWx5GtixycjK5EsNtz
+Content-Type: multipart/mixed; boundary="dZJmC133M7nZemRb2gjHczZxQlXGwlEJI"
 
-On 3/3/20 4:43 AM, David Gibson wrote:
-> Currently, we construct the SLBE used for VRMA translations when the LPCR
-> is written (which controls some bits in the SLBE), then use it later for
-> translations.
+--dZJmC133M7nZemRb2gjHczZxQlXGwlEJI
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 3/4/20 6:39 PM, David Hildenbrand wrote:
+> On 04.03.20 12:42, Janosch Frank wrote:
+>> Protected guests save the instruction control blocks in the SIDA
+>> instead of QEMU/KVM directly accessing the guest's memory.
+>>
+>> Let's introduce new functions to access the SIDA.
 >=20
-> This is a bit complex and confusing - simplify it by simply constructing
-> the SLBE directly from the LPCR when we need it.
+> "The new memops are available with KVM_CAP_S390_PROTECTED, so let's
+> check for that."
+
+Ack
+
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->   target/ppc/cpu.h        |  3 --
->   target/ppc/mmu-hash64.c | 92 ++++++++++++++++-------------------------
->   2 files changed, 35 insertions(+), 60 deletions(-)
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  linux-headers/linux/kvm.h |  2 ++
+>>  target/s390x/cpu.h        |  7 ++++++-
+>>  target/s390x/kvm.c        | 25 +++++++++++++++++++++++++
+>>  target/s390x/kvm_s390x.h  |  2 ++
+>>  target/s390x/mmu_helper.c | 14 ++++++++++++++
+>>  5 files changed, 49 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> index e36f761194..c30344ab00 100644
+>> --- a/linux-headers/linux/kvm.h
+>> +++ b/linux-headers/linux/kvm.h
+>> @@ -483,6 +483,8 @@ struct kvm_s390_mem_op {
+>>  /* types for kvm_s390_mem_op->op */
+>>  #define KVM_S390_MEMOP_LOGICAL_READ	0
+>>  #define KVM_S390_MEMOP_LOGICAL_WRITE	1
+>> +#define KVM_S390_MEMOP_SIDA_READ	2
+>> +#define KVM_S390_MEMOP_SIDA_WRITE	3
+>>  /* flags for kvm_s390_mem_op->flags */
+>>  #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
+>>  #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index f9871b1233..5a55fb02bd 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1044,9 +1044,6 @@ struct CPUPPCState {
->       uint32_t flags;
->       uint64_t insns_flags;
->       uint64_t insns_flags2;
-> -#if defined(TARGET_PPC64)
-> -    ppc_slb_t vrma_slb;
-> -#endif
+> This should go into the header sync.
 
-I find it confusing to move this member to the stack, when other slb=20
-stay on the CPUState context on the heap.
+Ack
 
-Consider amending the following (I can also send a patch later if you=20
-prefer):
-
--- >8 --
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 5a55fb02bd..ade71c3592 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -988,6 +988,7 @@ struct CPUPPCState {
-      /* MMU context, only relevant for full system emulation */
-  #if defined(TARGET_PPC64)
-      ppc_slb_t slb[MAX_SLB_ENTRIES]; /* PowerPC 64 SLB area */
-+    ppc_slb_t vrma_slbe;
-  #endif
-      target_ulong sr[32];   /* segment registers */
-      uint32_t nb_BATs;      /* number of BATs */
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 34f6009b1e..abbdd531c6 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -818,7 +818,6 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu,=20
-vaddr eaddr,
-  {
-      CPUState *cs =3D CPU(cpu);
-      CPUPPCState *env =3D &cpu->env;
--    ppc_slb_t vrma_slbe;
-      ppc_slb_t *slb;
-      unsigned apshift;
-      hwaddr ptex;
-@@ -857,7 +856,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu,=20
-vaddr eaddr,
-              }
-          } else if (ppc_hash64_use_vrma(env)) {
-              /* Emulated VRMA mode */
--            slb =3D &vrma_slbe;
-+            slb =3D &env->vrma_slbe;
-              if (build_vrma_slbe(cpu, slb) !=3D 0) {
-                  /* Invalid VRMA setup, machine check */
-                  cs->exception_index =3D POWERPC_EXCP_MCHECK;
-@@ -1006,7 +1005,6 @@ skip_slb_search:
-  hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
-  {
-      CPUPPCState *env =3D &cpu->env;
--    ppc_slb_t vrma_slbe;
-      ppc_slb_t *slb;
-      hwaddr ptex, raddr;
-      ppc_hash_pte64_t pte;
-@@ -1028,7 +1026,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU=20
-*cpu, target_ulong addr)
-              return raddr | env->spr[SPR_HRMOR];
-          } else if (ppc_hash64_use_vrma(env)) {
-              /* Emulated VRMA mode */
--            slb =3D &vrma_slbe;
-+            slb =3D &env->vrma_slbe;
-              if (build_vrma_slbe(cpu, slb) !=3D 0) {
-                  return -1;
-              }
----
-
-With the hunk amended I dare to give:
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
->  =20
->       int error_code;
->       uint32_t pending_interrupts;
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 4fd7b7ee74..34f6009b1e 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -784,11 +784,41 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
->       return rma_sizes[rmls];
->   }
->  =20
-> +static int build_vrma_slbe(PowerPCCPU *cpu, ppc_slb_t *slb)
-> +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +    target_ulong lpcr =3D env->spr[SPR_LPCR];
-> +    uint32_t vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-> +    target_ulong vsid =3D SLB_VSID_VRMA | ((vrmasd << 4) & SLB_VSID_LLP_=
-MASK);
-> +    int i;
-> +
-> +    for (i =3D 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-> +        const PPCHash64SegmentPageSizes *sps =3D &cpu->hash64_opts->sps[=
-i];
-> +
-> +        if (!sps->page_shift) {
-> +            break;
-> +        }
-> +
-> +        if ((vsid & SLB_VSID_LLP_MASK) =3D=3D sps->slb_enc) {
-> +            slb->esid =3D SLB_ESID_V;
-> +            slb->vsid =3D vsid;
-> +            slb->sps =3D sps;
-> +            return 0;
-> +        }
-> +    }
-> +
-> +    error_report("Bad page size encoding in LPCR[VRMASD]; LPCR=3D0x"
-> +                 TARGET_FMT_lx"\n", lpcr);
-> +
-> +    return -1;
-> +}
-> +
->   int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
->                                   int rwx, int mmu_idx)
->   {
->       CPUState *cs =3D CPU(cpu);
->       CPUPPCState *env =3D &cpu->env;
-> +    ppc_slb_t vrma_slbe;
->       ppc_slb_t *slb;
->       unsigned apshift;
->       hwaddr ptex;
-> @@ -827,8 +857,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
->               }
->           } else if (ppc_hash64_use_vrma(env)) {
->               /* Emulated VRMA mode */
-> -            slb =3D &env->vrma_slb;
-> -            if (!slb->sps) {
-> +            slb =3D &vrma_slbe;
-> +            if (build_vrma_slbe(cpu, slb) !=3D 0) {
->                   /* Invalid VRMA setup, machine check */
->                   cs->exception_index =3D POWERPC_EXCP_MCHECK;
->                   env->error_code =3D 0;
-> @@ -976,6 +1006,7 @@ skip_slb_search:
->   hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong add=
-r)
->   {
->       CPUPPCState *env =3D &cpu->env;
-> +    ppc_slb_t vrma_slbe;
->       ppc_slb_t *slb;
->       hwaddr ptex, raddr;
->       ppc_hash_pte64_t pte;
-> @@ -997,8 +1028,8 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cp=
-u, target_ulong addr)
->               return raddr | env->spr[SPR_HRMOR];
->           } else if (ppc_hash64_use_vrma(env)) {
->               /* Emulated VRMA mode */
-> -            slb =3D &env->vrma_slb;
-> -            if (!slb->sps) {
-> +            slb =3D &vrma_slbe;
-> +            if (build_vrma_slbe(cpu, slb) !=3D 0) {
->                   return -1;
->               }
->           } else {
-> @@ -1037,65 +1068,12 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, t=
-arget_ulong ptex,
->       cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_=
-FLUSH;
->   }
->  =20
-> -static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-> -{
-> -    CPUPPCState *env =3D &cpu->env;
-> -    const PPCHash64SegmentPageSizes *sps =3D NULL;
-> -    target_ulong esid, vsid, lpcr;
-> -    ppc_slb_t *slb =3D &env->vrma_slb;
-> -    uint32_t vrmasd;
-> -    int i;
-> -
-> -    /* First clear it */
-> -    slb->esid =3D slb->vsid =3D 0;
-> -    slb->sps =3D NULL;
-> -
-> -    /* Is VRMA enabled ? */
-> -    if (!ppc_hash64_use_vrma(env)) {
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * Make one up. Mostly ignore the ESID which will not be needed
-> -     * for translation
-> -     */
-> -    lpcr =3D env->spr[SPR_LPCR];
-> -    vsid =3D SLB_VSID_VRMA;
-> -    vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-> -    vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
-> -    esid =3D SLB_ESID_V;
-> -
-> -    for (i =3D 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-> -        const PPCHash64SegmentPageSizes *sps1 =3D &cpu->hash64_opts->sps=
-[i];
-> -
-> -        if (!sps1->page_shift) {
-> -            break;
-> -        }
-> -
-> -        if ((vsid & SLB_VSID_LLP_MASK) =3D=3D sps1->slb_enc) {
-> -            sps =3D sps1;
-> -            break;
-> -        }
-> -    }
-> -
-> -    if (!sps) {
-> -        error_report("Bad page size encoding esid 0x"TARGET_FMT_lx
-> -                     " vsid 0x"TARGET_FMT_lx, esid, vsid);
-> -        return;
-> -    }
-> -
-> -    slb->vsid =3D vsid;
-> -    slb->esid =3D esid;
-> -    slb->sps =3D sps;
-> -}
-> -
->   void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
->   {
->       PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->       CPUPPCState *env =3D &cpu->env;
->  =20
->       env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
-> -    ppc_hash64_update_vrma(cpu);
->   }
->  =20
->   void helper_store_lpcr(CPUPPCState *env, target_ulong val)
 >=20
+> [...]
+>=20
+>> index 7e4d9d267c..2578c838f8 100644
+>> --- a/target/s390x/cpu.h
+>> +++ b/target/s390x/cpu.h
+>> @@ -824,7 +824,12 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr ladd=
+r, uint8_t ar, void *hostbuf,
+>>  #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
+>>          s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
+>>  void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra);
+>> -
+>> +int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset,  void *host=
+buf,
+>=20
+> double space after "offset,"
+
+Ack
+
+>=20
+> [...]
+>=20
+>> =20
+>> +int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset, void *hostb=
+uf,
+>> +                       int len, bool is_write)
+>> +{
+>> +    int ret;
+>> +
+>> +    if (kvm_enabled()) {
+>> +        ret =3D kvm_s390_mem_op_pv(cpu, offset, hostbuf, len, is_writ=
+e);
+>> +    } else {
+>> +        /* Protected Virtualization is a KVM/Hardware only feature */=
+
+>> +        g_assert_not_reached();
+>> +    }
+>> +    return ret;
+>> +}
+>=20
+>=20
+> I suspect nobody will ever check the return value, correct?
+>=20
+> With the things changed
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+
+Thanks!
+
+>=20
+
+
+
+--dZJmC133M7nZemRb2gjHczZxQlXGwlEJI--
+
+--e6h5eEXZ1LHep1auWx5GtixycjK5EsNtz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5gxPQACgkQ41TmuOI4
+ufi/Nw//Wb+dOElT4L5NdOdw4zUS8SOPtyptqRK2o88aCtbQGorMCea9A6cVM2T4
+Ytq4KSZghLIpl3cA3exK1kg1iKxHPVCpKtqBv2fBrXOn6lUGG5s0SsAN1oLhd+en
+SVl4Yl9GdJ5+5M7AZNf8BywWvCpIU/+FymKSCCM+9DFAFOpq8hYfZTEgwXuKWzfI
+F6pjJJN226qPSrHkyVgg2PReNUyalDsermmHKgz7jnHGW4S84eZ5yCIt/6SY/r2E
+myxhJGzLuVSd8Zxr7CFZQ1x0jiJQa+g2VefTa3i1chQcO8Pp5x3vyoK5BfI4Vkzv
+qu2QGLf2d+iEPvsvXpojGzGNlgap/oV9VqOw0QRNTjSZDY6qH6VTMmR800w9OrGn
+QauqtkR9insb3d0IW566kw8qk5bdu5TUbsCZ+npud+H0RSJdmVRdwFbl/BIfQDKC
+NBMOm27OEbRaZDM3MucQMRxFHFi6tdkn1N67zhO9U4/F1UiP71MGeRUIpAmlSXIb
+6tCtcRI0uWJDrpYcEOVLZGiEOcnQ3C1q9GjW3F+dLNWH0ubHbI9lMF73i54qCMfa
+g3Sf0AwupveDP6CXyWQpAJdIdK30KUQnOJFOMWGstMm7G1JJ/GtxvRhbBeWP2eSV
+FTdEkwKPqDOztqLA2jdaALw+vhgZ0e7ZLaTeSUiCafq1K3RdRyM=
+=cUbY
+-----END PGP SIGNATURE-----
+
+--e6h5eEXZ1LHep1auWx5GtixycjK5EsNtz--
 
 
