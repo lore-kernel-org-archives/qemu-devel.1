@@ -2,156 +2,136 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D612BC3F2CE
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2651C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:47:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A044C20866
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:38:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D80B2084E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:47:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eX2qfdqU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A044C20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=bt.com header.i=@bt.com header.b="auPqbB7b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D80B2084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9eXM-0001zx-PI
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:38:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34551)
+	id 1j9eg8-0004tB-Mq
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:47:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9eWG-0000TE-LB
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:45 -0500
+ (envelope-from <jasper.lowell@bt.com>) id 1j9efP-0004PO-J4
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9eWF-0001ou-LD
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36119
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9eWF-0001oD-Hz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:37:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583368663;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=nnDap56KxMb+y/ocxflqGm7aqIkBs/MznNpvS4SOrGs=;
- b=eX2qfdqUl9D4ERKTsIyyOdMaLKlYrOY9s6jZ5T/vPoLwy78K6aMSDtrhO5yPcXGZ8Cnih4
- kqB2aGORqf9lkagWW4MhFp4f86u64pnQAdYn112GgBebMViz46q1ZjSwS1xV/cXR80poGV
- /2yfuV4Q3GDzWURU79m7m4aeJBMuRsg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-mvugJWbaOp27ifkfg7T7TQ-1; Wed, 04 Mar 2020 19:37:41 -0500
-X-MC-Unique: mvugJWbaOp27ifkfg7T7TQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3920B19057AD;
- Thu,  5 Mar 2020 00:37:38 +0000 (UTC)
-Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 447E948;
- Thu,  5 Mar 2020 00:37:20 +0000 (UTC)
-Subject: Re: [PATCH v3 12/20] hw/ide: Let the DMAIntFunc prototype use a
- boolean 'is_write' argument
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-13-philmd@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <42bee269-a32b-8c11-cb2f-779f6f936dd6@redhat.com>
-Date: Wed, 4 Mar 2020 19:37:19 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200220130548.29974-13-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <jasper.lowell@bt.com>) id 1j9efO-000092-9G
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:11 -0500
+Received: from smtpe1.intersmtp.com ([213.121.35.73]:59208)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasper.lowell@bt.com>)
+ id 1j9efN-0008T7-MD
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:47:10 -0500
+Received: from tpw09926dag08f.domain1.systemhost.net (10.9.202.39) by
+ BWP09926078.bt.com (10.36.82.109) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 5 Mar
+ 2020 00:47:06 +0000
+Received: from tpw09926dag04f.domain1.systemhost.net (10.9.202.23) by
+ tpw09926dag08f.domain1.systemhost.net (10.9.202.39) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Thu, 5 Mar 2020 00:47:05 +0000
+Received: from bwp09926077.bt.com (10.36.82.108) by
+ tpw09926dag04f.domain1.systemhost.net (10.9.202.23) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4 via Frontend Transport; Thu, 5 Mar 2020 00:47:05
+ +0000
+Received: from GBR01-CWL-obe.outbound.protection.outlook.com (104.47.20.51) by
+ smtpe1.intersmtp.com (10.36.82.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id
+ 15.1.1713.5; Thu, 5 Mar 2020 00:47:05 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ckubQT346+N/rKBP4NOmySzFX/BYQtjU4Ov3fV28benbDBddzqON6gADQ09bH/27MCHGH3nRvu80zT5NuCC2gHZ8JEcMgDo6ttXpUlWn3uKvL8ylHqETDmIvjZyp5bUcvjOjiLEJfpNqYek0vCPDArPqZ7Md//TJqjWevpeGfcsZvYP2fgMPZD4JZcdIJ8lR9MkY7s3NYyOHyHHEnxgiV3sNBNlXqohQoowAQp/fucdi6xIm8GHfIpxb2OE9bOGaF+CJ/4MMXfbxFpnYtwM7CzVPDqohX4iYtzotc2z4+Jom5vpMZOhz1/cDNsdwNdq6SeBbcwVc8qkBhixpQjArfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cc7XoJ9IW5N9SdVcw/5/q/+nrUKp5cbF29i+hiYr6Qc=;
+ b=KidEJL6JUfotdLV1YwqRXnyDvKiqhnD9rzecEPFymlXMg1GfQMoIi/y5xYFmTTJNjeXEbnfZ3NAfyncG8uHad25sZL11bNUQ71h/9yOQ1POfuazpgEO3orNTKqvXRh2G18cXi5hrJSSwpdCcFYlcY0GrYFHgL0CLBZ1rzJxmJgRhMMkopOTPHe0qMNeVgOl8DveoOlxAR2oERdDIKgHpeMMEn1SkgTxsmZPLDxPaurBpzq9COMtoj2dq6HkWgUQSCHNsFOgukuDJslVtNDFSLhiGDrZA3yqabyGTpBIUcozq8pALQtsWgXNhV7oSsmFMivVUoa7XcX3ztnMp/N4xNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bt.com; dmarc=pass action=none header.from=bt.com; dkim=pass
+ header.d=bt.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bt.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cc7XoJ9IW5N9SdVcw/5/q/+nrUKp5cbF29i+hiYr6Qc=;
+ b=auPqbB7b57S4T2zvOwUWJu6IuTdXUIdCq7Ul6hWW9DbCR3v+8KPVKpEq8desG0HpEDyE71ZjNKgj87pR2+a65jNiMi19CUvGFpG2L7VKrlSz5OO8Xe3gY6n9FsA9ZftuaSLfnP5WC+WXPQ+6m5XedwxsqGzsjBCkHdSkXEIcYu0=
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM (20.176.154.209) by
+ LO2P123MB2174.GBRP123.PROD.OUTLOOK.COM (20.176.158.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.18; Thu, 5 Mar 2020 00:47:05 +0000
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5]) by LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5%4]) with mapi id 15.20.2793.013; Thu, 5 Mar 2020
+ 00:47:05 +0000
+From: <jasper.lowell@bt.com>
+To: <balaton@eik.bme.hu>, <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+Thread-Topic: [PATCH] hw/ide: Remove status register read side effect
+Thread-Index: AQHV6IMztk0nS91QXUSAhbuFxp1TiagnnJkAgAADjoCAAAXGgIAAvUiAgACESgCAAmZZAIAAvBaAgADuooCABx1uAIADvlaAgAEsV4CAAD2JgA==
+Date: Thu, 5 Mar 2020 00:47:05 +0000
+Message-ID: <a3eda55a557ea121f7859c3457e64fa92d85de55.camel@bt.com>
+References: <20200221065015.337915-1-jasper.lowell@bt.com>
+ <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+ <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
+ <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
+ <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
+ <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
+ <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
+ <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
+ <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
+ <alpine.BSF.2.22.395.2003011847220.28669@zero.eik.bme.hu>
+ <06be591e667c6b72c78ae3a33e3092ab323fdb8b.camel@bt.com>
+ <614b7a97-84c2-1861-75d3-51921ae1e4fa@ilande.co.uk>
+In-Reply-To: <614b7a97-84c2-1861-75d3-51921ae1e4fa@ilande.co.uk>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jasper.lowell@bt.com; 
+x-originating-ip: [61.68.11.94]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2050a92d-aef6-4d98-3ccf-08d7c09eb9db
+x-ms-traffictypediagnostic: LO2P123MB2174:
+x-microsoft-antispam-prvs: <LO2P123MB21745F429853CA757CEAAEFE83E20@LO2P123MB2174.GBRP123.PROD.OUTLOOK.COM>
+x-antispam-2: 1
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 03333C607F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(366004)(136003)(396003)(39860400002)(346002)(199004)(189003)(2906002)(76116006)(66946007)(6486002)(2616005)(91956017)(36756003)(53546011)(186003)(6506007)(81166006)(478600001)(6512007)(4326008)(316002)(86362001)(8936002)(5660300002)(71200400001)(81156014)(66446008)(26005)(64756008)(54906003)(110136005)(8676002)(66476007)(66556008);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:LO2P123MB2174;
+ H:LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: bt.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: K+8ysIYQLIVnQPNKPOP4SmQr5rln8GREqfDZyz9C3Cpy+5G2iswViU6qKPVJB/kLf4gh5fA7rhwiyHgCT6Ne1WVRy0Hq07PnraPVigHuSrLIG/Fyr5rAvgryMfCiMX5FJLqECxr5RytfHbiOve+NSduPDDJ1ufggZOG+eEXbWfFGQFWd2zoPd5VmTaoyKES2obPzbBEh6UN98nHzUXTqC2qbM7Gbvqfgk5BVkvMPmF8S0VEZVfTBe3GftNWU/KXiKxZjBdw3uAT7e+OaEnrCLYHRsakXZxrrmNpUMiRSVCO47ZvmoxKoPoYd/j8TRUzNbD57a+J64fbIxQicsCW5TlcsiNbXOFO5c3L1KzKJ+K/3W5TbcA1RDFjhICzj86wAeKse6yogWNc7msAEoFCov37rYyOxzuf+XCAPArgaIMKufBmcPa4fm3L6gq/Ug/VV
+x-ms-exchange-antispam-messagedata: UpOVI1nEt5WjaackMV2MKRLEOH1v/dHXJ+bbMgG3rHhzsCU6fkjV/olIq8zMbJHD2fVnw8m2McVOlAbNibVatJGOJL1vMJ6BhIufJ47uazMEkmxFdkR5nhHtiT7n1BprQ5BwlNL7l6F694IKtF0eNA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ECC77D8F0E547846930A84C9B7856E6A@GBRP123.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2050a92d-aef6-4d98-3ccf-08d7c09eb9db
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2020 00:47:05.0813 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7f35688-9c00-4d5e-ba41-29f146377ab0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R0pDjCxItIw8AZ2iLwmxH4e/9roeTee2srHWdD2Q3HxXE6IBKYb3NZh5XUHyRWQIHhh3lb5U3+MPlXHBUZPWLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P123MB2174
+X-OriginatorOrg: bt.com
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,47 +143,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>, Paul Durrant <paul@xen.org>,
- Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2/20/20 8:05 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The 'is_write' argument is either 0 or 1.
-> Convert it to a boolean type.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/hw/ide/internal.h | 2 +-
->  hw/dma/rc4030.c           | 6 +++---
->  hw/ide/ahci.c             | 2 +-
->  hw/ide/core.c             | 2 +-
->  hw/ide/macio.c            | 2 +-
->  hw/ide/pci.c              | 2 +-
->  6 files changed, 8 insertions(+), 8 deletions(-)
-
-Acked-by: John Snow <jsnow@redhat.com>
-
+PiBZZXMsIHRoYXQncyBjb3JyZWN0LiBIb3dldmVyIEknbSBxdWl0ZSBjb25maWRlbnQgZnJvbSBi
+b290aW5nIG90aGVyDQo+IG5vbi1Tb2xhcmlzIE9Tcw0KPiB1bmRlciBxZW11LXN5c3RlbS1zcGFy
+YzY0IHRoYXQgUENJIG5hdGl2ZSBtb2RlIGlzIGJlaW5nIHVzZWQsDQo+IHBhcnRpY3VsYXJseSBh
+cyBpdCBpcw0KPiBwb3NzaWJsZSB0byBzZWUgdGhlIHJlbGF0ZWQgUENJIHNhYnJlIElSUSByb3V0
+aW5nIGNvbmZpZ3VyYXRpb24NCj4gY2hhbmdlcy4NCg0KQ29uc2lkZXJpbmcgdGhhdCBTb2xhcmlz
+IDEwIGlzIGFjY2Vzc2luZyBDRlIgYW5kIEFSVFRJTTIzIEkgZG9uJ3QgdGhpbmsNCnRoZXJlIGlz
+IGFueSBkb3VidCB0aGF0IGl0IGlzIHVzaW5nIHRoZSBjaGlwIGluIFBDSSBuYXRpdmUgbW9kZS4g
+SQ0KZG9uJ3QgdGhpbmsgU29sYXJpcyAxMCBldmVuIGhhcyBzdXBwb3J0IGZvciBsZWdhY3kgbW9k
+ZS4NCg0KVGhhbmtzLA0KSmFzcGVyIExvd2VsbC4NCg0KT24gV2VkLCAyMDIwLTAzLTA0IGF0IDIx
+OjA3ICswMDAwLCBNYXJrIENhdmUtQXlsYW5kIHdyb3RlOg0KPiBPbiAwNC8wMy8yMDIwIDAzOjEx
+LCBqYXNwZXIubG93ZWxsQGJ0LmNvbSB3cm90ZToNCj4gDQo+ID4gPiBjbWQ2NDZfdXBkYXRlX2ly
+cSgpIG9ubHkgc2VlbXMgdG8gcmFpc2UgUENJIGludGVycnVwdCwgc2hvdWxkIGl0DQo+ID4gPiBh
+bHNvDQo+ID4gPiBoYXZlIA0KPiA+ID4gYW4gb3B0aW9uIHRvIHVzZSBJTlQgMTQgYW5kIDE1IGlu
+IGxlZ2FjeSBtb2RlIHNpbWlsYXIgdG8gd2hhdCBteQ0KPiA+ID4gcGF0Y2ggDQo+ID4gPiBkb2Vz
+IGZvciB2aWEtaWRlPw0KPiA+IA0KPiA+IExvb2tpbmcgdGhyb3VnaCAvcWVtdS9ody9pZGUvY21k
+NjQ2LmMgaXQgZG9lc24ndCBsb29rIGxpa2UgUUVNVSBoYXMNCj4gPiBzdXBwb3J0IGZvciBsZWdh
+Y3kgbW9kZS4gQXQgdGhlIHZlcnkgbGVhc3QsIGl0IGxvb2tzIGxpa2Ugd2UNCj4gPiBkZWZhdWx0
+IHRvDQo+ID4gUENJIG5hdGl2ZSBtb2RlOg0KPiA+IA0KPiA+IHN0YXRpYyB2b2lkIHBjaV9jbWQ2
+NDZfaWRlX3JlYWxpemUoUENJRGV2aWNlICpkZXYsIEVycm9yICoqZXJycCkNCj4gPiAJLi4uDQo+
+ID4gCXBjaV9jb25mW1BDSV9DTEFTU19QUk9HXSA9IDB4OGY7DQo+ID4gCS4uLg0KPiA+IA0KPiA+
+IFRvIGFkZCBzdXBwb3J0IGZvciBsZWdhY3kgbW9kZSBpdCB3b3VsZCByZXF1aXJlIGNoYW5naW5n
+DQo+ID4gY21kNjQ2X3VwZGF0ZV9pcnEoKSBhbmQgbWF5YmUgY21kNjQ2X3NldF9pcnEoKSBzbyB0
+aGF0IGludGVycnVwdHMNCj4gPiBhcmUNCj4gPiBjb25kaXRpb25hbGx5IHJhaXNlZCBvbiBJUlEx
+NCBhbmQvb3IgSVJRMTUgd2hlbiB0aGUgcG9ydHMgYXJlIGluDQo+ID4gbGVnYWN5DQo+ID4gbW9k
+ZS4NCj4gDQo+IFllcywgdGhhdCdzIGNvcnJlY3QuIEhvd2V2ZXIgSSdtIHF1aXRlIGNvbmZpZGVu
+dCBmcm9tIGJvb3Rpbmcgb3RoZXINCj4gbm9uLVNvbGFyaXMgT1NzDQo+IHVuZGVyIHFlbXUtc3lz
+dGVtLXNwYXJjNjQgdGhhdCBQQ0kgbmF0aXZlIG1vZGUgaXMgYmVpbmcgdXNlZCwNCj4gcGFydGlj
+dWxhcmx5IGFzIGl0IGlzDQo+IHBvc3NpYmxlIHRvIHNlZSB0aGUgcmVsYXRlZCBQQ0kgc2FicmUg
+SVJRIHJvdXRpbmcgY29uZmlndXJhdGlvbg0KPiBjaGFuZ2VzLg0KPiANCj4gDQo+IEFUQiwNCj4g
+DQo+IE1hcmsuDQo=
 
