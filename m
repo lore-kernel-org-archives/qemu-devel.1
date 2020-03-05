@@ -2,83 +2,115 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA76C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 20:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70993C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 20:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5308F2072D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 20:47:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWrzNahJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5308F2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 475A1208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 20:53:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475A1208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9xPR-0007aE-Hd
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 15:47:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46757)
+	id 1j9xVA-0003K4-HB
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 15:53:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j9xOW-0006mH-TC
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 15:47:02 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j9xU6-00026y-Ou
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 15:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j9xOV-0000kU-8L
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 15:47:00 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22888
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j9xOU-0000iy-Uf
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 15:46:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583441218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FjfrmKKHOo3R+HpDVWc7rakk7Fd0fB3Tr8N2RxlD1tQ=;
- b=jWrzNahJ5FFLTsCeYUYPPLemPjXBqcciiFkmjXJdxLP3DLhqRcm2sJcnxzYX6Ar6sdIzSx
- aQgMu7STuZiepjcZ7qI/rwkz8ureNyPMhce0QA40DuOAZHI4a6Bj3sqL4XFK3wpKnaZnuu
- sy1wsTKME1d50/RoK0daMISkIYzOI2g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-tdYhLZFNNLOe-DqcP_Gw3Q-1; Thu, 05 Mar 2020 15:46:54 -0500
-X-MC-Unique: tdYhLZFNNLOe-DqcP_Gw3Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 149C418C8C02;
- Thu,  5 Mar 2020 20:46:53 +0000 (UTC)
-Received: from [10.3.117.177] (ovpn-117-177.phx2.redhat.com [10.3.117.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F07795D9C9;
- Thu,  5 Mar 2020 20:46:49 +0000 (UTC)
-Subject: Re: [PATCH] audio: Add sndio backend
-To: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
-References: <20200304145003.GB15649@humpty.home.comstyle.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <bfddf01e-ef79-5eb6-eec1-ee81a175882f@redhat.com>
-Date: Thu, 5 Mar 2020 14:46:49 -0600
+ (envelope-from <laurent@vivier.eu>) id 1j9xU3-0003GU-6m
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 15:52:45 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:54161)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j9xU2-0003G3-TX; Thu, 05 Mar 2020 15:52:43 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MEmAV-1j81Xy074d-00GFfj; Thu, 05 Mar 2020 21:52:37 +0100
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org, aleksandar.m.mail@gmail.com
+References: <cover.1583437651.git.alistair.francis@wdc.com>
+ <72e025129270d09c899a48435908d52894587160.1583437651.git.alistair.francis@wdc.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH v5 1/3] linux-user: Protect more syscalls
+Message-ID: <9a7a1445-aad2-c3be-76eb-858ebd473c3d@vivier.eu>
+Date: Thu, 5 Mar 2020 21:52:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304145003.GB15649@humpty.home.comstyle.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <72e025129270d09c899a48435908d52894587160.1583437651.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:xSWnLePoOW6Tyi5/1xmEft/+Sk/QmHd/oRe+kKsRcX7GEgE8HAu
+ 7LjLZPWJ2NQHFs3V7tZAfZgAEoiNlZ7KxeT4kMXj1gSNigZ4yCxc4PxhUS5zmJ5EazWQsce
+ V/QWnZykAjVFoq7FzDDiZ+6852VbZDKivk/KYqYSoZQuAkPmW1HUHvdAoI7dFx1IPh2uRON
+ wNCWJmpDF82rucmI65Fdg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BMbQD2NTv0U=:FbFUOf/UGawMHymy+HEdsG
+ Ob5Mjdf8oPgZBcJ+3qxqI1TTftTklVw5fLzOo1bWz5Xl6pm3sTjKnSfxnN+vTEOj4W8rOg7bI
+ 9Rc6oqJreNlGnxNq9r/dr2g1gMPW4F6gOkH2mOJ5wLHnKrgg5bBNznMFpGMzj6Gn/YtmKUJAd
+ FWQUhoKx+0Rg3WafcdBbzfk43OckYvzId8bq72XmhJuHEcxfXWVUPLkArKyOuMVU4ph1gg5Jn
+ 7cg3ghNvRyBcH/exdkP5Yn0gYtd9GmiMSZ+yhU+H8gRq+8DFyyBHsT8pGmWzLsRu2XctWI0GN
+ KOpdhTOVVVuOSXzOS1Kfdyx6vfcnlA4SXh7LFldXcOG2jWhcF4yamYsW4317mgWwJcWt8rhLA
+ 9AFSHeDVA19XJtxOF2q8K5j7zFJiLIAebs+SaKv5+bo8ygnmyPpsoZFyt5A1lWu3czmMKSCLw
+ Z78cyDEK83UBaP28jAYT2eNkNLeCN5ltd3UsgBOZOGPitZ8r7uqeg4ciTmrkfIN3Rw0lLq1Sm
+ cyTgiFh8GsonfgPtp9ngsYNq21C+nEHIGiBhDbK0kNZefTSrTU1UfdWHj6WZ3OmC1OYpSdCrt
+ ++7GGu7SkG79kllRbACP1E7YwyPvct50HlJ80Lx72DDdKz0NgRU/bj5BBN7MsIRP7ZduYLo7M
+ ZRmbc4A7iUA2EoGSSqx8SYoGLhhsWgAZQIx6K4ysfLldWik5iidV1O0GoYM01fQACCOr5HZ/r
+ S5OEgjoEkkn2FZ/sf224y+y60CVFreXxk+UlznSCEnZwyqQoD26ikl7SLuJtG9eBeGQQARYlG
+ WR+dMjjZTTT0C/m7wL6qEpSBI7v6X4y90dGeJuFSUCIYgNFPdYimElIXI9SiQgC1qX657VE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,99 +122,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: alistair23@gmail.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/4/20 8:50 AM, Brad Smith wrote:
-> Add a sndio backend.
-> 
-> sndio is the native API used by OpenBSD, although it has been ported to
-> other *BSD's and Linux (packages for Ubuntu, Debian, Void, Arch, etc.).
-> 
-> The C code is from Alexandre Ratchov <alex@caoua.org> and the rest of
-> the bits are from me.
-> 
-> 
-> Signed-off-by: Alexandre Ratchov <alex@caoua.org>
-> Signed-off-by: Brad Smith <brad@comstyle.com>
-> 
-> diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+Le 05/03/2020 à 20:48, Alistair Francis a écrit :
+> New y2038 safe 32-bit architectures (like RISC-V) don't support old
+> syscalls with a 32-bit time_t. The kernel defines new *_time64 versions
+> of these syscalls. Add some more #ifdefs to syscall.c in linux-user to
+> allow us to compile without these old syscalls.
 
-Your patch lacks the usual --- separator and diffstat that 'git 
-format-patch' (and therefore 'git send-email') uses.  This makes it 
-harder to see at a glance the approximate impact of your patch, and 
-whether it touches a file I'm interested in.
+You should split this patch it two parts:
+- one to add the needed "#ifdef"
+- one to manage the futex_time64 case
 
-> +++ b/qapi/audio.json
-> @@ -248,6 +248,28 @@
->       '*out':    'AudiodevPaPerDirectionOptions',
->       '*server': 'str' } }
->   
-> +##
-> +# @AudiodevSndioOptions:
-> +#
-> +# Options of the sndio audio backend.
-> +#
-> +# @in: options of the capture stream
-> +#
-> +# @out: options of the playback stream
-> +#
-> +# @dev: the name of the sndio device to use (default 'default')
-> +#
-> +# @latency: play buffer size (in microseconds)
-> +#
-> +# Since: 4.0
+For the futex_time64 you need the same work as in PATCH 2: use
+target_to_host_timespec64() with TARGET_NR_futex_time64.
 
-You've missed 4.0 by a long shot; the next release is 5.0.
+It's a little bit hacky to alias __NR_sys_futex to __NR_futex_time64,
+and works only if timespec defined on the system is the 64bit version.
 
-> +##
-> +{ 'struct': 'AudiodevSndioOptions',
-> +  'data': {
-> +    '*in':        'AudiodevPerDirectionOptions',
-> +    '*out':       'AudiodevPerDirectionOptions',
-> +    '*dev':       'str',
-> +    '*latency':   'uint32'} }
-> +
->   ##
->   # @AudiodevWavOptions:
->   #
-> @@ -287,7 +309,7 @@
->   ##
->   { 'enum': 'AudiodevDriver',
->     'data': [ 'none', 'alsa', 'coreaudio', 'dsound', 'oss', 'pa', 'sdl',
-> -            'spice', 'wav' ] }
-> +            'sndio', 'spice', 'wav' ] }
+A better way to do that would be to define both, __NR_sys_futex and
+__NR_sys_futex_time64 (according to the availability of their defines),
+and then to call safe_futex_time64() and if it fails because of -ENOSYS
+to try safe_futex() (we need to use __kernel_timespec and
+__kernel_old_timespec accordingly).
 
-It's also customary to document enum options, something like:
-
-# @sndio (since 5.0)
-
-Furthermore, since:
-
-
-> +++ b/qemu-options.hx
-> @@ -566,6 +566,9 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
->   #ifdef CONFIG_AUDIO_SDL
->       "-audiodev sdl,id=id[,prop[=value][,...]]\n"
->   #endif
-> +#ifdef CONFIG_AUDIO_SNDIO
-> +    "-audiodev sndio,id=id[,prop[=value][,...]]\n"
-> +#endif
-
-the option is only useful based on configure-time decisions, it seems 
-like the new enum element should be:
-
-{ 'name': 'sndio', 'if': 'defined(CONFIG_AUDIO_SNDIO)' }
-
-to make it introspectible whether support is compiled in to a given 
-binary.  True, there are existing enum members that should do likewise, 
-so maybe it's worth a cleanup patch first.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Thanks,
+Laurent
 
