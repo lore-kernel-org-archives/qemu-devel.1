@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D481C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C6DC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B00E207FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DC19207FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c5yfdy9H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B00E207FD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c16OyJIc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC19207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52483 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tTH-0001oH-7p
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:35:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59066)
+	id 1j9tTm-0002zx-Kb
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:36:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOv-0003H2-Q6
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:11 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP6-0003S3-HH
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tOu-00026p-PW
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:09 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:55805)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP5-0002HS-B9
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:20 -0500
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:38951)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tOu-00026R-IY
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:08 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id 6so7070285wmi.5
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:08 -0800 (PST)
+ id 1j9tP5-0002GO-52
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:19 -0500
+Received: by mail-wm1-x329.google.com with SMTP id j1so6421149wmi.4
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=/PZhJSySPN1YW4Bj6r0qdRVaYj511W7grsZV1hLEBIE=;
- b=c5yfdy9Hwb5AtnhhTgkuSKk5+05krDu8XaXyJsB644JLCen1dFEiIk5npuby30/Ft0
- yNRYme8vZ3G+ggfvRSj9VFJoo5xQtPtnL/dDl/0indxnsowMjr9vzABKt7GDUtFtPvko
- ljMe/ffLWbzlvLHjEiLNZCfFfRTJz7K1BuUOQ2luhjpivOQH8okzllpXr664usxfFdPA
- GaPS8uZ3etgJIJOX+EosqN1AJzNQ7/r4XuYuz6aJltwNuOxnAryXu/L2k+tvEsKtE/b9
- wL82NM4Xrof4FZ5rClkTHdqG7wyPuILJs+LNkpB6+1ARCnf81AE34ChH2meOd0TcCNEE
- XwNA==
+ bh=3GK41nG/OoUPXZ9s0SYYzwW0XMBSCvTJmH8pW+e8Jw8=;
+ b=c16OyJIc/hZ0Zou0sp0AnJXZWpb2lpshAHN5j0ff/dGNAh7x9PJC6vvpszBC4Q/9d2
+ hFC4FP1zlEEN/Q3mkoipJwxFB/WeR+9Vkzu75STlsZse4FiDy2K1bfBScE19o4pptpjC
+ 0/YxYrSjAEPMXxTfZbpVoj6vjedrV01soOaFw5FZ5FoBLolvKDooFt5Xm07RmZiXpMPd
+ eEIZIggUum6U7xpuXX4AvkltfThWp3sLVRjG/ModDI7XYXX3j3yTyYLRAIyp5k1KewkQ
+ u/iylW8ADsRsGam5sy0CwsBoh5x2em47vApEA1OYHcl8v5BqOR2MxKZhOBHpfk3Cmvtv
+ HieA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/PZhJSySPN1YW4Bj6r0qdRVaYj511W7grsZV1hLEBIE=;
- b=qx03airdiVNjNLI9fWvHLdsvd/be11QUDqcRh5pr507PnFgjPijIGkrSKWIUD0tTGk
- hx+t2sS0wpVboL66OYYYgM+lnV6MTFK/LTgp8LZM90WLNI9AFsNzYgt6aszNK9fO6feY
- ucdUjCwVWQ+y+srcppzDnA7X+nbS1GM9YO2X4s2XkKsD0x7MFY5UBRIPCgymb+85K4fi
- +XDlee8V6isjb9gQGfiUpWgLpbmHeYcmy/e4jEmQX2Wy8k4fdPIhhxHATcC1r5DkC/K5
- NZw0N3z0eInEXehCCc0dH4sq66ujHorSJ4XqX2rj4O6tqmsCB5L4n7MhUzLmPHYPPWp0
- YYrg==
-X-Gm-Message-State: ANhLgQ2+JicYfwk+hEWZia4f1tsSv72wrNzvmKo3MgchsBCEjCRIT4bz
- MNDVm8Zb1jIQuQEP8UbDeP08h0wUWA1iVw==
-X-Google-Smtp-Source: ADFU+vtotPycQnCrxMRb/qRFZU2vpMWrL0MbSBVTw7CPEwu+tScAxptxdXVFX1Vt6yaUvFzm0eulHQ==
-X-Received: by 2002:a7b:c2a2:: with SMTP id c2mr10157468wmk.19.1583425867159; 
- Thu, 05 Mar 2020 08:31:07 -0800 (PST)
+ bh=3GK41nG/OoUPXZ9s0SYYzwW0XMBSCvTJmH8pW+e8Jw8=;
+ b=khwg7fefMJUj4GDqBDHKTeYnkspjWKqQn7bre+jdzgn+N8pERTuKp1EtJ7nQ55HPi4
+ 8OQANdaumJ8Ig4PVRzrtGAHwMTGzD9Vf50xdtQPzKOUpvfjKFDpFCbdi+rsGSdqQNWEp
+ aaO3IaMPLkYDax6WownWBW7MWEZ3kYeA+tUPpqP+xMl1jj1n6KBykm3wEdErQn7yZLuV
+ VnH3BgSJgXg5848Al0DhZV7A606Wi9sqAwa32u1wWLPwEXNA0WrmXfv9dqvmYu3ETUCr
+ 3kGBfHUqHsaS1PwY4zP/qFzfdrjNBhhNCSJ/NUBTzM5p/cBOATK5t68ZuFLDWv5O0O3G
+ lwRA==
+X-Gm-Message-State: ANhLgQ15wNunNj0CnjGKCvlyDuVwkyCm+b3mOHN8Nb6uaWQQj0TiGHdJ
+ TyYdIVqMl9GOOnHdACHyDFqRHaxmlQmRVg==
+X-Google-Smtp-Source: ADFU+vu1xYX3jmOugfIzZdbMNUJW/m3L0ZEpHE3+CnwLVnGTEcPsEpJaEVbPe1t5UC34S6Spte1apg==
+X-Received: by 2002:a1c:9a45:: with SMTP id c66mr6239189wme.115.1583425877865; 
+ Thu, 05 Mar 2020 08:31:17 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.06
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.16
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:06 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:17 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/37] hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
-Date: Thu,  5 Mar 2020 16:30:27 +0000
-Message-Id: <20200305163100.22912-5-peter.maydell@linaro.org>
+Subject: [PULL 14/37] hw/timer/cadence_ttc: move timer_new from init() into
+ realize() to avoid memleaks
+Date: Thu,  5 Mar 2020 16:30:37 +0000
+Message-Id: <20200305163100.22912-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
 References: <20200305163100.22912-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+X-Received-From: 2a00:1450:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,36 +98,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Make sure a null SMMUPciBus is returned in case we were
-not able to identify a pci bus matching the @bus_num.
+There are some memleaks when we call 'device_list_properties'. This patch move timer_new from init into realize to fix it.
 
-This matches the fix done on intel iommu in commit:
-a2e1cd41ccfe796529abfd1b6aeb1dd4393762a2
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20200226172628.17449-1-eric.auger@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20200227025055.14341-7-pannengyuan@huawei.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmu-common.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/timer/cadence_ttc.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 0f2573f0045..67d7b2d0fd9 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -301,6 +301,7 @@ SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num)
-                 return smmu_pci_bus;
-             }
-         }
-+        smmu_pci_bus = NULL;
-     }
-     return smmu_pci_bus;
+diff --git a/hw/timer/cadence_ttc.c b/hw/timer/cadence_ttc.c
+index 5e3128c1e37..b0ba6b2bbae 100644
+--- a/hw/timer/cadence_ttc.c
++++ b/hw/timer/cadence_ttc.c
+@@ -412,18 +412,23 @@ static void cadence_timer_init(uint32_t freq, CadenceTimerState *s)
+ static void cadence_ttc_init(Object *obj)
+ {
+     CadenceTTCState *s = CADENCE_TTC(obj);
+-    int i;
+-
+-    for (i = 0; i < 3; ++i) {
+-        cadence_timer_init(133000000, &s->timer[i]);
+-        sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->timer[i].irq);
+-    }
+ 
+     memory_region_init_io(&s->iomem, obj, &cadence_ttc_ops, s,
+                           "timer", 0x1000);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
  }
+ 
++static void cadence_ttc_realize(DeviceState *dev, Error **errp)
++{
++    CadenceTTCState *s = CADENCE_TTC(dev);
++    int i;
++
++    for (i = 0; i < 3; ++i) {
++        cadence_timer_init(133000000, &s->timer[i]);
++        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->timer[i].irq);
++    }
++}
++
+ static int cadence_timer_pre_save(void *opaque)
+ {
+     cadence_timer_sync((CadenceTimerState *)opaque);
+@@ -479,6 +484,7 @@ static void cadence_ttc_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->vmsd = &vmstate_cadence_ttc;
++    dc->realize = cadence_ttc_realize;
+ }
+ 
+ static const TypeInfo cadence_ttc_info = {
 -- 
 2.20.1
 
