@@ -2,69 +2,82 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00745C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25816C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D58020848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D58020848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E4C3D20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 11:57:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7aPVKgG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C3D20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9p7c-0000tx-8q
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 06:57:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60311)
+	id 1j9p7v-0001Gu-4d
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 06:57:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j9p6O-0008M7-3n
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:45 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j9p6c-00009L-8C
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j9p6M-0006Af-LC
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:43 -0500
-Resent-Date: Thu, 05 Mar 2020 06:55:43 -0500
-Resent-Message-Id: <E1j9p6M-0006Af-LC@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21173)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j9p6L-000677-Lm; Thu, 05 Mar 2020 06:55:42 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1583409318; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=XyzW4gh8vBt5k8iZAdsZ990DvLef4jWlK5u056NsXE4hqCX2iHkjZwxvIhmUrNqZtwQqS04rAC0GJfAWkW3dvgJiAWhh+XNRvJuIGwlNyQaBRPx8KbmjExNckmdi9PyvYyWKNnE8RfbqvyDKOjLt8uIZdGJ+pgbwSVNU0JoWbgA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583409318;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=OqxZg/6nJG+xmoBE5njyrN9NQCUqIlrDCXZpa7fXJrs=; 
- b=O+p4ub6tGcXepaEp7NTE7RToVCbrqVdj7N3Fv6YNz8E2yXf4HOIcrOrSmQM7jLofHVLsA1021UMJdpCUK64Mj4KsTyL4cVxvwy1WvB9xuWdFbejF/WUTGSmdebqmr7QuKgq29+aRLlu5ENGqWnbiy/FCW6BQVJb4cZyQ5gautx0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583409316626629.7816668153877;
- Thu, 5 Mar 2020 03:55:16 -0800 (PST)
-In-Reply-To: <20200305105325.31264-1-kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH v2] hw/net/imx_fec: write TGSR and TCSR3 in
- imx_enet_write()
-Message-ID: <158340931491.357.2497052944687105374@39012742ff91>
+ (envelope-from <kwolf@redhat.com>) id 1j9p6a-0006Mv-Du
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35276
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j9p6a-0006M3-6Y
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 06:55:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583409355;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZBFMeX1tUR9btSwjA919NghtH5NO4/XuDwxTCy6JDgc=;
+ b=K7aPVKgGtqg3Njv7q5qyX2djRBu3faWyz1ObxUKpZOeQn/RJobHtaE3S5/xjeAmPYtC5tx
+ CsnLIPQwxV7rjCKM2A42NxH3kpMRQbQYix1TWOjpxK7lYEOHYBEkltZIKBJYVXDMUF27oh
+ FLTkjsbSfElN1nkWVxzy8LwQ7LBBXQU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-EQ8gPoxNMmOmjVkIDG9ksQ-1; Thu, 05 Mar 2020 06:55:52 -0500
+X-MC-Unique: EQ8gPoxNMmOmjVkIDG9ksQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E7681922960;
+ Thu,  5 Mar 2020 11:55:51 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0010F8B75C;
+ Thu,  5 Mar 2020 11:55:49 +0000 (UTC)
+Date: Thu, 5 Mar 2020 12:55:48 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
+Message-ID: <20200305115548.GA5363@linux.fritz.box>
+References: <20200304213818.15341-1-jsnow@redhat.com>
+ <20200304213818.15341-7-jsnow@redhat.com>
+ <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
+ <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kuhn.chenqun@huawei.com
-Date: Thu, 5 Mar 2020 03:55:16 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,39 +89,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- qemu-trivial@nongnu.org, jasowang@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.chubb@nicta.com.au, euler.robot@huawei.com,
- kuhn.chenqun@huawei.com
+Cc: qemu-block@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwNTEwNTMyNS4zMTI2
-NC0xLWt1aG4uY2hlbnF1bkBodWF3ZWkuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
-aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9j
-a2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN1Ym1vZHVs
-ZSAnZHRjJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICdkdGMnLi4uCnJlbW90ZTogQ291bnRpbmcgb2JqZWN0
-czogNTM5NCwgZG9uZS4gICAgICAgIAplcnJvcjogUlBDIGZhaWxlZDsgcmVzdWx0PTE4LCBIVFRQ
-IGNvZGUgPSAyMDAKZmF0YWw6IFRoZSByZW1vdGUgZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmZh
-dGFsOiBwcm90b2NvbCBlcnJvcjogYmFkIHBhY2sgaGVhZGVyCkNsb25lIG9mICdodHRwczovL2dp
-dC5xZW11Lm9yZy9naXQvZHRjLmdpdCcgaW50byBzdWJtb2R1bGUgcGF0aCAnZHRjJyBmYWlsZWQK
-ZmFpbGVkIHRvIHVwZGF0ZSBzdWJtb2R1bGUgZHRjClN1Ym1vZHVsZSAnZHRjJyAoaHR0cHM6Ly9n
-aXQucWVtdS5vcmcvZ2l0L2R0Yy5naXQpIHVucmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwptYWtl
-WzFdOiAqKiogWy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC11MHdqbDZ4bS9zcmMvZG9ja2Vy
-LXNyYy4yMDIwLTAzLTA1LTA2LjUxLjEzLjE1NTU4XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcg
-ZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdTB3amw2eG0vc3JjJwptYWtl
-OiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNG0y
-Ljc0OXMKdXNlciAgICAwbTIuMzU2cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMDUxMDUzMjUuMzEyNjQtMS1rdWhuLmNoZW5xdW5A
-aHVhd2VpLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+Am 05.03.2020 um 00:14 hat John Snow geschrieben:
+>=20
+>=20
+> On 3/4/20 4:58 PM, Philippe Mathieu-Daud=E9 wrote:
+
+Adding back the context:
+
+> -        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcod=
+e, ' '.join(qemu_img_args + list(args))))
+> +        sys.stderr.write('qemu-img received signal %i: %s\n' % (
+> +            -exitcode, ' '.join(qemu_img_args + list(args))))
+
+> > Do we want to indent Python like C and align argument below opening
+> > parenthesis? Except when using sys.stderr.write() you seem to do it.
+>=20
+> This isn't an argument to write, it's an argument to the format string,
+> so I will say "no."
+
+The argument to write() is an expression. This expression contains the %
+operator with both of its operands. It's still fully within the
+parentheses of write(), so I think Philippe's question is valid.
+
+> For *where* I've placed the line break, this is the correct indentation.
+> emacs's python mode will settle on this indent, too.
+>=20
+> https://python.org/dev/peps/pep-0008/#indentation
+
+The PEP-8 examples are not nested, so it's not completely clear. I
+wonder if hanging indents wouldn't actually mean the following because
+if you line wrap an argument list (which contains the whole %
+expression), you're supposed to have nothing else on the line of the
+opening parenthesis:
+
+    sys.stderr.write(
+        'qemu-img received signal %i: %s\n'
+        % (-exitcode, ' '.join(qemu_img_args + list(args))))
+
+But anyway, I think the question is more whether we want to use hanging
+indents at all (or at least if we want to use it even in cases where the
+opening parenthesis isn't already at like 70 characters) when we're
+avoiding it in our C coding style.
+
+There's no technical answer to this, it's a question of our preferences.
+
+> (If anyone quotes Guido's belittling comment in this email, I will
+> become cross.)
+>=20
+>=20
+> But there are other places to put the line break. This is also
+> technically valid:
+>=20
+> sys.stderr.write('qemu-img received signal %i: %s\n'
+>                  % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>=20
+> And so is this:
+>=20
+>     sys.stderr.write('qemu-img received signal %i: %s\n' %
+>                      (-exitcode, ' '.join(qemu_img_args + list(args))))
+
+PEP-8 suggests the former, but allows both styles:
+
+https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-aft=
+er-a-binary-operator
+
+> (And so would be any other number of rewrites to use format codes,
+> f-strings, or temporary variables to otherwise reduce the length of the
+> line.)
+>=20
+> I will reluctantly admit that wrapping to 79 columns is useful in some
+> contexts. The beauty of line continuations is something I have little
+> desire to litigate, though.
+>=20
+> If there's some consensus on the true and beautiful way to do it, I will
+> oblige -- but the thought of spinning more iterations until we find a
+> color swatch we like is an unpleasant one.
+
+I'll accept any colour for the bikeshed, as long as it's green. ;-)
+
+Kevin
+
 
