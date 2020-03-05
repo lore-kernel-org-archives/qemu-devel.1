@@ -2,77 +2,83 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA906C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB072C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:45:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A50A52073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E7F02073D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:45:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfBaYjf+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A50A52073D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjxVj36A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F02073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9n36-0003vr-Sw
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:44:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34533)
+	id 1j9n4I-0004wP-L1
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:45:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1j9n1b-0002lk-NL
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:41 -0500
+ (envelope-from <quintela@redhat.com>) id 1j9n2E-0003KS-Mv
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:43:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1j9n1V-0001eT-Gk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40402
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1j9n2C-0001yN-CV
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:43:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24624
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j9n1V-0001dx-99
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:33 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j9n2C-0001xg-7V
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:43:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583401352;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1583401395;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n1kdqKhx6UhMgyhPLaJhoFI/Fp/q6dK0IxmM+CL0QIk=;
- b=bfBaYjf+kGyEDsCaN9d2X8MKAwL39A+aNaEmZVWM2tKpAqsKVVF+7hjmG+0rJAbUHrVpKD
- sWYbwoeUHD9u5Gu077lpxCynG8G2BlMB+ytKa2TSlGslBa1TNuQgz9Pwp2/nM/AmtIAC4P
- 4dmYyB52KGhr32UI/330ryAKiEFqmDw=
+ bh=8g3UsaeiFnCvWREfxvBiuoxpdpsMsgsiWZsp/zK1x4M=;
+ b=SjxVj36Ac3I2upxxTvhA2rCReBAZb9WrSLJrXnMUTRSrI1E43+a2mS7B19cmOkQ3fbJDMq
+ k1bpzckZetH65XI9cjKIXlESP6CNfjB7sIj/D19O5lduDWINLDPkFIFyrVGRyEqfXjDj0D
+ CUbH3hlfz762RTmXIxhjjD2bEZeFAw0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-hdP1kQbQNGulrKXCfwRM5A-1; Thu, 05 Mar 2020 04:42:28 -0500
-X-MC-Unique: hdP1kQbQNGulrKXCfwRM5A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-320-wJ7qjlGoPNmZ2h8XYfy8TQ-1; Thu, 05 Mar 2020 04:43:13 -0500
+X-MC-Unique: wJ7qjlGoPNmZ2h8XYfy8TQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D62DC801E70;
- Thu,  5 Mar 2020 09:42:26 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-110.brq.redhat.com
- [10.40.204.110])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADC219E9C;
- Thu,  5 Mar 2020 09:42:20 +0000 (UTC)
-Date: Thu, 5 Mar 2020 10:42:17 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
-Message-ID: <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-6-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D68CA18C43C0;
+ Thu,  5 Mar 2020 09:43:12 +0000 (UTC)
+Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 106A85D9C9;
+ Thu,  5 Mar 2020 09:43:12 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH  v1 07/10] configure: fix check for libzstd
+In-Reply-To: <874kv68lg9.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
+ message of "Mon, 02 Mar 2020 22:02:14 +0000")
+References: <20200302181907.32110-1-alex.bennee@linaro.org>
+ <20200302181907.32110-8-alex.bennee@linaro.org>
+ <874kv68lg9.fsf@linaro.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 05 Mar 2020 10:43:08 +0100
+Message-ID: <87v9njf87n.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200130112510.15154-6-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,388 +90,485 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
- andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
- eric.auger.pro@gmail.com
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
-> Adds the following tests:
-> - event-counter-config: test event counter configuration
-> - basic-event-count:
->   - programs counters #0 and #1 to count 2 required events
->   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
->   to a value close enough to the 32b
->   overflow limit so that we check the overflow bit is set
->   after the execution of the asm loop.
-> - mem-access: counts MEM_ACCESS event on counters #0 and #1
->   with and without 32-bit overflow.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v1 -> v2:
-> - fix PMCNTENSET_EL0 and PMCNTENCLR_EL0 op0
-> - print PMEVTYPER SH
-> - properly clobber used regs and add "cc"
-> - simplify mem_access_loop
-> ---
->  arm/pmu.c         | 269 ++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg |  18 ++++
->  2 files changed, 287 insertions(+)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 4a26a76..1b0101f 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -18,9 +18,15 @@
->  #include "asm/barrier.h"
->  #include "asm/sysreg.h"
->  #include "asm/processor.h"
-> +#include <bitops.h>
-> +#include <asm/gic.h>
->  
->  #define PMU_PMCR_E         (1 << 0)
-> +#define PMU_PMCR_P         (1 << 1)
->  #define PMU_PMCR_C         (1 << 2)
-> +#define PMU_PMCR_D         (1 << 3)
-> +#define PMU_PMCR_X         (1 << 4)
-> +#define PMU_PMCR_DP        (1 << 5)
->  #define PMU_PMCR_LC        (1 << 6)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
-> @@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  
->  /* event counter tests only implemented for aarch64 */
->  static void test_event_introspection(void) {}
-> +static void test_event_counter_config(void) {}
-> +static void test_basic_event_count(void) {}
-> +static void test_mem_access(void) {}
->  
->  #elif defined(__aarch64__)
->  #define ID_AA64DFR0_PERFMON_SHIFT 8
-> @@ -145,6 +154,33 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  }
->  
->  #define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
-> +#define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
-> +#define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
-> +
-> +#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
-> +#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
-> +
-> +#define regn_el0(__reg, __n) __reg ## __n  ## _el0
-> +#define write_regn(__reg, __n, __val) \
-> +	write_sysreg((__val), __reg ## __n ## _el0)
-> +
-> +#define read_regn(__reg, __n) \
-> +	read_sysreg(__reg ## __n ## _el0)
-> +
-> +#define print_pmevtyper(__s, __n) do { \
-> +	uint32_t val; \
-> +	val = read_regn(pmevtyper, __n);\
-> +	report_info("%s pmevtyper%d=0x%x, eventcount=0x%x (p=%ld, u=%ld nsk=%ld, nsu=%ld, nsh=%ld m=%ld, mt=%ld, sh=%ld)", \
-> +			(__s), (__n), val, val & 0xFFFF,	\
-> +			(BIT_MASK(31) & val) >> 31,		\
-> +			(BIT_MASK(30) & val) >> 30,		\
-> +			(BIT_MASK(29) & val) >> 29,		\
-> +			(BIT_MASK(28) & val) >> 28,		\
-> +			(BIT_MASK(27) & val) >> 27,		\
-> +			(BIT_MASK(26) & val) >> 26,		\
-> +			(BIT_MASK(25) & val) >> 25);		\
-> +			(BIT_MASK(24) & val) >> 24);		\
-> +	} while (0)
->  
->  static bool is_event_supported(uint32_t n, bool warn)
->  {
-> @@ -198,6 +234,230 @@ static void test_event_introspection(void)
->  	report(required_events, "Check required events are implemented");
->  }
->  
-> +/*
-> + * Extra instructions inserted by the compiler would be difficult to compensate
-> + * for, so hand assemble everything between, and including, the PMCR accesses
-> + * to start and stop counting. isb instructions are inserted to make sure
-> + * pmccntr read after this function returns the exact instructions executed
-> + * in the controlled block. Loads @loop times the data at @address into x9.
-> + */
-> +static void mem_access_loop(void *addr, int loop, uint32_t pmcr)
-> +{
-> +asm volatile(
-> +	"       msr     pmcr_el0, %[pmcr]\n"
-> +	"       isb\n"
-> +	"       mov     x10, %[loop]\n"
-> +	"1:     sub     x10, x10, #1\n"
-> +	"       ldr x9, [%[addr]]\n"
-> +	"       cmp     x10, #0x0\n"
-> +	"       b.gt    1b\n"
-> +	"       msr     pmcr_el0, xzr\n"
-> +	"       isb\n"
-> +	:
-> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
-> +	: "x9", "x10", "cc");
-> +}
-> +
-> +static void pmu_reset(void)
-> +{
-> +	/* reset all counters, counting disabled at PMCR level*/
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +	/* Disable all counters */
-> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-> +	/* clear overflow reg */
-> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-> +	/* disable overflow interrupts on all counters */
-> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-> +	isb();
+Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>
+>> Fixes: 3a67848134d0
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  configure | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 7b373bc0bb8..caa65f58831 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2464,7 +2464,7 @@ fi
+>>  # zstd check
+>> =20
+>>  if test "$zstd" !=3D "no" ; then
+>> -    if $pkg_config --exist libzstd ; then
+>> +    if $pkg_config --exists libzstd ; then
 
-Is there a test we can do here to ensure the PMU was succesfully reset and
-assert if not? Reset is a critical part of each test prep, so we should be
-sure it has been done.
+Hi
 
-> +}
-> +
-> +static void test_event_counter_config(void)
-> +{
-> +	int i;
-> +
-> +	if (!pmu.nb_implemented_counters) {
-> +		report_skip("No event counter, skip ...");
-> +		return;
-> +	}
-> +
-> +	pmu_reset();
-> +
-> +	/*
-> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
-> +	 * select counter 0
-> +	 */
-> +	write_sysreg(1, PMSELR_EL0);
-> +	/* program this counter to count unsupported event */
-> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
-> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
-> +	report((read_regn(pmevtyper, 1) & 0xFFF) == 0xEA,
-> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
-> +	report((read_regn(pmevcntr, 1) == 0xdeadbeef),
-> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
-> +
-> +	/* try to configure an unsupported event within the range [0x0, 0x3F] */
-> +	for (i = 0; i <= 0x3F; i++) {
-> +		if (!is_event_supported(i, false))
-> +			break;
-> +	}
-> +	if (i > 0x3F) {
-> +		report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
-> +		return;
-> +	}
-> +
-> +	/* select counter 0 */
-> +	write_sysreg(0, PMSELR_EL0);
-> +	/* program this counter to count unsupported event */
-> +	write_sysreg(i, PMXEVCNTR_EL0);
-> +	/* read the counter value */
-> +	read_sysreg(PMXEVCNTR_EL0);
-> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
-> +		"read of a counter programmed with unsupported event");
-> +
-> +}
-> +
-> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
-> +{
-> +	int i;
-> +
-> +	if (pmu.nb_implemented_counters < nb_events) {
-> +		report_skip("Skip test as number of counters is too small (%d)",
-> +			    pmu.nb_implemented_counters);
-> +		return false;
-> +	}
-> +
-> +	for (i = 0; i < nb_events; i++) {
-> +		if (!is_event_supported(events[i], false)) {
-> +			report_skip("Skip test as event %d is not supported",
-> +				    events[i]);
-> +			return false;
-> +		}
-> +	}
-> +	return true;
-> +}
-> +
-> +static void test_basic_event_count(void)
-> +{
-> +	uint32_t implemented_counter_mask, non_implemented_counter_mask;
-> +	uint32_t counter_mask;
-> +	uint32_t events[] = {
-> +		0x11,	/* CPU_CYCLES */
-> +		0x8,	/* INST_RETIRED */
-> +	};
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +		return;
-> +
-> +	implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
-> +	non_implemented_counter_mask = ~(BIT(31) | implemented_counter_mask);
-> +	counter_mask = implemented_counter_mask | non_implemented_counter_mask;
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +
-> +	/* disable all counters */
-> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-> +	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
-> +		"pmcntenclr: disable all counters");
-> +
-> +	/*
-> +	 * clear cycle and all event counters and allow counter enablement
-> +	 * through PMCNTENSET. LC is RES1.
-> +	 */
-> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +	isb();
-> +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-> +
-> +	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
-> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
-> +		"counter #0 preset to 0xFFFFFFF0");
-> +	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
-> +
-> +	/*
-> +	 * Enable all implemented counters and also attempt to enable
-> +	 * not supported counters. Counting still is disabled by !PMCR.E
-> +	 */
-> +	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
-> +
-> +	/* check only those implemented are enabled */
-> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
-> +		(read_sysreg_s(PMCNTENSET_EL0) == implemented_counter_mask),
-> +		"pmcntenset: enabled implemented_counters");
-> +
-> +	/* Disable all counters but counters #0 and #1 */
-> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
-> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
-> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
-> +		"pmcntenset: just enabled #0 and #1");
-> +
-> +	/* clear overflow register */
-> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-> +	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
-> +
-> +	/* disable overflow interrupts on all counters*/
-> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-> +	report(!read_sysreg(pmintenclr_el1),
-> +		"pmintenclr_el1=0, all interrupts disabled");
-> +
-> +	/* enable overflow interrupts on all event counters */
-> +	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
-> +		     pmintenset_el1);
-> +	report(read_sysreg(pmintenset_el1) == implemented_counter_mask,
-> +		"overflow interrupts enabled on all implemented counters");
-> +
-> +	/* Set PMCR.E, execute asm code and unset PMCR.E */
-> +	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
-> +
-> +	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
-> +		    read_regn(pmevcntr, 0));
-> +	report_info("counter #1 is 0x%lx (INST_RETIRED)",
-> +		    read_regn(pmevcntr, 1));
-> +
-> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> +	report(read_sysreg(pmovsclr_el0) & 0x1,
-> +		"check overflow happened on #0 only");
-> +}
-> +
-> +static void test_mem_access(void)
-> +{
-> +	void *addr = malloc(PAGE_SIZE);
-> +	uint32_t events[] = {
-> +		0x13,   /* MEM_ACCESS */
-> +		0x13,   /* MEM_ACCESS */
-> +	};
-> +
-> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +		return;
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	isb();
-> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
-> +	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
-> +	/* We may measure more than 20 mem access depending on the core */
-> +	report((read_regn(pmevcntr, 0) == read_regn(pmevcntr, 1)) &&
-> +	       (read_regn(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
-> +	       "Ran 20 mem accesses");
-> +
-> +	pmu_reset();
-> +
-> +	write_regn(pmevcntr, 0, 0xFFFFFFFA);
-> +	write_regn(pmevcntr, 1, 0xFFFFFFF0);
-> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> +	isb();
-> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +	report(read_sysreg(pmovsclr_el0) == 0x3,
-> +	       "Ran 20 mem accesses with expected overflows on both counters");
-> +	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-> +			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
-> +			read_sysreg(pmovsclr_el0));
-> +}
-> +
->  #endif
->  
->  /*
-> @@ -388,6 +648,15 @@ int main(int argc, char *argv[])
->  	} else if (strcmp(argv[1], "event-introspection") == 0) {
->  		report_prefix_push(argv[1]);
->  		test_event_introspection();
-> +	} else if (strcmp(argv[1], "event-counter-config") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_event_counter_config();
-> +	} else if (strcmp(argv[1], "basic-event-count") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_basic_event_count();
-> +	} else if (strcmp(argv[1], "mem-access") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_mem_access();
->  	} else {
->  		report_abort("Unknown sub-test '%s'", argv[1]);
->  	}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 4433ef3..7a59403 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -72,6 +72,24 @@ groups = pmu
->  arch = arm64
->  extra_params = -append 'event-introspection'
->  
-> +[pmu-event-counter-config]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'event-counter-config'
-> +
-> +[pmu-basic-event-count]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'basic-event-count'
-> +
-> +[pmu-mem-access]
-> +file = pmu.flat
-> +groups = pmu
-> +arch = arm64
-> +extra_params = -append 'mem-access'
-> +
->  # Test PMU support (TCG) with -icount IPC=1
->  #[pmu-tcg-icount-1]
->  #file = pmu.flat
-> -- 
-> 2.20.1
-> 
-> 
+several things:
+
+a- I found why I didn't get the error.  Fedora pkg-config is really
+"smart":
+
+b- I have tried (with this patch), the following configurations:
+   * --enable-zstd
+   * --disable-zstd
+   with both libzstd-devel installed and not installed. Everything
+   worked as expected.
+   (BTW, I tested that before submmiting the patch in the first place, I
+   thought that I had done all testing needed for such a check).
+
+Can you told me what architecture/distro/os are you using.
+
+
+> Dropping this patch as it breaks the build even more!
+>
+>   CC      migration/block.o
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:24:5: error: unk=
+nown type name =E2=80=98ZSTD_CStream=E2=80=99
+>
+>      ZSTD_CStream *zcs;
+>
+>      ^
+
+This is really weird.  if you arrive here, that means:
+- you have zstd devel installed (whatever is that called for your
+  os/distro/whatever).
+
+- pkg-config has found zstd devel packages and configured them (that
+  file depends on CONFiG_ZSTD beoing defined)
+
+- gcc has found <zstd.h> (i.e. it don't give one error about that
+  include file not found).
+
+And zstd don't have ZSTD_CStream defined?  What is going on here?
+Can you post/show what is on your zstd.h file?
+What zstd library version do you have?
+
+I thought that zstd was a new library, and that we didn't need to check
+for versions.  It appears that I was wrong.  And no, the include file
+don't show what features are new/old.
+
+Sorry for the inconveniences.
+
+Later, Juan.
+
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:26:5: error: unk=
+nown type name =E2=80=98ZSTD_DStream=E2=80=99
+>
+>      ZSTD_DStream *zds;
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:28:5: error: unk=
+nown type name =E2=80=98ZSTD_inBuffer=E2=80=99
+>
+>      ZSTD_inBuffer in;
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:29:5: error: unk=
+nown type name =E2=80=98ZSTD_outBuffer=E2=80=99
+>
+>      ZSTD_outBuffer out;
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c: In function =E2=
+=80=98zstd_send_setup=E2=80=99:
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:55:14: error: im=
+plicit declaration of function =E2=80=98ZSTD_createCStream=E2=80=99 [-Werro=
+r=3Dimplicit-function-declaration]
+>
+>      z->zcs =3D ZSTD_createCStream();
+>
+>               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:55:5: error: nes=
+ted extern declaration of =E2=80=98ZSTD_createCStream=E2=80=99 [-Werror=3Dn=
+ested-externs]
+>
+>      z->zcs =3D ZSTD_createCStream();
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:55:12: error: as=
+signment makes pointer from integer without a cast [-Werror=3Dint-conversio=
+n]
+>
+>      z->zcs =3D ZSTD_createCStream();
+>
+>             ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:62:11: error: im=
+plicit declaration of function =E2=80=98ZSTD_initCStream=E2=80=99 [-Werror=
+=3Dimplicit-function-declaration]
+>
+>      res =3D ZSTD_initCStream(z->zcs, migrate_multifd_zstd_level());
+>
+>            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:62:5: error: nes=
+ted extern declaration of =E2=80=98ZSTD_initCStream=E2=80=99 [-Werror=3Dnes=
+ted-externs]
+>
+>      res =3D ZSTD_initCStream(z->zcs, migrate_multifd_zstd_level());
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:64:9: error: imp=
+licit declaration of function =E2=80=98ZSTD_freeCStream=E2=80=99 [-Werror=
+=3Dimplicit-function-declaration]
+>
+>          ZSTD_freeCStream(z->zcs);
+>
+>          ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:64:9: error: nes=
+ted extern declaration of =E2=80=98ZSTD_freeCStream=E2=80=99 [-Werror=3Dnes=
+ted-externs]
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c: In function =E2=
+=80=98zstd_send_prepare=E2=80=99:
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:120:11: error: r=
+equest for member =E2=80=98dst=E2=80=99 in something not a structure or uni=
+on
+>
+>      z->out.dst =3D z->zbuff;
+>
+>            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:121:11: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>      z->out.size =3D z->zbuff_len;
+>
+>            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:122:11: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>      z->out.pos =3D 0;
+>
+>            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:125:9: error: un=
+known type name =E2=80=98ZSTD_EndDirective=E2=80=99
+>
+>          ZSTD_EndDirective flush =3D ZSTD_e_continue;
+>
+>          ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:125:35: error: =
+=E2=80=98ZSTD_e_continue=E2=80=99 undeclared (first use in this function)
+>
+>          ZSTD_EndDirective flush =3D ZSTD_e_continue;
+>
+>                                    ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:125:35: note: ea=
+ch undeclared identifier is reported only once for each function it appears=
+ in
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:128:21: error: =
+=E2=80=98ZSTD_e_flush=E2=80=99 undeclared (first use in this function)
+>
+>              flush =3D ZSTD_e_flush;
+>
+>                      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:130:14: error: r=
+equest for member =E2=80=98src=E2=80=99 in something not a structure or uni=
+on
+>
+>          z->in.src =3D iov[i].iov_base;
+>
+>               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:131:14: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>          z->in.size =3D iov[i].iov_len;
+>
+>               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:132:14: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          z->in.pos =3D 0;
+>
+>               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:143:19: error: i=
+mplicit declaration of function =E2=80=98ZSTD_compressStream2=E2=80=99 [-We=
+rror=3Dimplicit-function-declaration]
+>
+>              ret =3D ZSTD_compressStream2(z->zcs, &z->out, &z->in, flush)=
+;
+>
+>                    ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:143:13: error: n=
+ested extern declaration of =E2=80=98ZSTD_compressStream2=E2=80=99 [-Werror=
+=3Dnested-externs]
+>
+>              ret =3D ZSTD_compressStream2(z->zcs, &z->out, &z->in, flush)=
+;
+>
+>              ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:144:35: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>          } while (ret > 0 && (z->in.size - z->in.pos > 0)
+>
+>                                    ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:144:48: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          } while (ret > 0 && (z->in.size - z->in.pos > 0)
+>
+>                                                 ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:145:36: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>                           && (z->out.size - z->out.pos > 0));
+>
+>                                     ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:145:50: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>                           && (z->out.size - z->out.pos > 0));
+>
+>                                                   ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:146:30: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>          if (ret > 0 && (z->in.size - z->in.pos > 0)) {
+>
+>                               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:146:43: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          if (ret > 0 && (z->in.size - z->in.pos > 0)) {
+>
+>                                            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:157:33: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>      p->next_packet_size =3D z->out.pos;
+>
+>                                  ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c: In function =E2=
+=80=98zstd_recv_setup=E2=80=99:
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:199:14: error: i=
+mplicit declaration of function =E2=80=98ZSTD_createDStream=E2=80=99 [-Werr=
+or=3Dimplicit-function-declaration]
+>
+>      z->zds =3D ZSTD_createDStream();
+>
+>               ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:199:5: error: ne=
+sted extern declaration of =E2=80=98ZSTD_createDStream=E2=80=99 [-Werror=3D=
+nested-externs]
+>
+>      z->zds =3D ZSTD_createDStream();
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:199:12: error: a=
+ssignment makes pointer from integer without a cast [-Werror=3Dint-conversi=
+on]
+>
+>      z->zds =3D ZSTD_createDStream();
+>
+>             ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:206:11: error: i=
+mplicit declaration of function =E2=80=98ZSTD_initDStream=E2=80=99 [-Werror=
+=3Dimplicit-function-declaration]
+>
+>      ret =3D ZSTD_initDStream(z->zds);
+>
+>            ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:206:5: error: ne=
+sted extern declaration of =E2=80=98ZSTD_initDStream=E2=80=99 [-Werror=3Dne=
+sted-externs]
+>
+>      ret =3D ZSTD_initDStream(z->zds);
+>
+>      ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:208:9: error: im=
+plicit declaration of function =E2=80=98ZSTD_freeDStream=E2=80=99 [-Werror=
+=3Dimplicit-function-declaration]
+>
+>          ZSTD_freeDStream(z->zds);
+>
+>          ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:208:9: error: ne=
+sted extern declaration of =E2=80=98ZSTD_freeDStream=E2=80=99 [-Werror=3Dne=
+sted-externs]
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c: In function =E2=
+=80=98zstd_recv_pages=E2=80=99:
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:281:10: error: r=
+equest for member =E2=80=98src=E2=80=99 in something not a structure or uni=
+on
+>
+>      z->in.src =3D z->zbuff;
+>
+>           ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:282:10: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>      z->in.size =3D in_size;
+>
+>           ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:283:10: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>      z->in.pos =3D 0;
+>
+>           ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:288:15: error: r=
+equest for member =E2=80=98dst=E2=80=99 in something not a structure or uni=
+on
+>
+>          z->out.dst =3D iov->iov_base;
+>
+>                ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:289:15: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>          z->out.size =3D iov->iov_len;
+>
+>                ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:290:15: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          z->out.pos =3D 0;
+>
+>                ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:301:19: error: i=
+mplicit declaration of function =E2=80=98ZSTD_decompressStream=E2=80=99 [-W=
+error=3Dimplicit-function-declaration]
+>
+>              ret =3D ZSTD_decompressStream(z->zds, &z->out, &z->in);
+>
+>                    ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:301:13: error: n=
+ested extern declaration of =E2=80=98ZSTD_decompressStream=E2=80=99 [-Werro=
+r=3Dnested-externs]
+>
+>              ret =3D ZSTD_decompressStream(z->zds, &z->out, &z->in);
+>
+>              ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:302:35: error: r=
+equest for member =E2=80=98size=E2=80=99 in something not a structure or un=
+ion
+>
+>          } while (ret > 0 && (z->in.size - z->in.pos > 0)
+>
+>                                    ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:302:48: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          } while (ret > 0 && (z->in.size - z->in.pos > 0)
+>
+>                                                 ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:303:36: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>                           && (z->out.pos < iov->iov_len));
+>
+>                                     ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:304:31: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          if (ret > 0 && (z->out.pos < iov->iov_len)) {
+>
+>                                ^
+>
+> /home/travis/build/stsquad/qemu/migration/multifd-zstd.c:314:27: error: r=
+equest for member =E2=80=98pos=E2=80=99 in something not a structure or uni=
+on
+>
+>          out_size +=3D z->out.pos;
+>
+>                            ^
+>
+> cc1: all warnings being treated as errors
+>
+> /home/travis/build/stsquad/qemu/rules.mak:69: recipe for target 'migratio=
+n/multifd-zstd.o' failed
+>
+> make: *** [migration/multifd-zstd.o] Error 1
+>
+> make: *** Waiting for unfinished jobs....
+>
+> rm tests/qemu-iotests/socket_scm_helper.o
+>
+>>          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
+>>          zstd_libs=3D"$($pkg_config --libs libzstd)"
+>>          LIBS=3D"$zstd_libs $LIBS"
 
 
