@@ -2,145 +2,77 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64106C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA906C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9E3A2073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:43:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E3A2073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A50A52073D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:44:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfBaYjf+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A50A52073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9n1y-0002xq-TS
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:43:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34470)
+	id 1j9n36-0003vr-Sw
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:44:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j9n1A-0002Ur-SE
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:13 -0500
+ (envelope-from <drjones@redhat.com>) id 1j9n1b-0002lk-NL
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j9n19-0001UW-Sm
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33636
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j9n19-0001U9-Ne
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:11 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0259ZVq7066060
- for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 04:42:10 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yjx04sy8c-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:42:10 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 5 Mar 2020 09:42:09 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Mar 2020 09:42:05 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0259g4HZ39780362
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Mar 2020 09:42:04 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BA5DA42041;
- Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 899774203F;
- Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
-Received: from dyn-9-152-224-184.boeblingen.de.ibm.com (unknown
- [9.152.224.184])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Mar 2020 09:42:04 +0000 (GMT)
-Subject: Re: [PATCH v6 13/18] s390x: protvirt: Disable address checks for PV
- guest IO emulation
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-14-frankja@linux.ibm.com>
- <36715573-98c2-311c-03a8-300e6b4915a3@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 5 Mar 2020 10:42:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <drjones@redhat.com>) id 1j9n1V-0001eT-Gk
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j9n1V-0001dx-99
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:42:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583401352;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=n1kdqKhx6UhMgyhPLaJhoFI/Fp/q6dK0IxmM+CL0QIk=;
+ b=bfBaYjf+kGyEDsCaN9d2X8MKAwL39A+aNaEmZVWM2tKpAqsKVVF+7hjmG+0rJAbUHrVpKD
+ sWYbwoeUHD9u5Gu077lpxCynG8G2BlMB+ytKa2TSlGslBa1TNuQgz9Pwp2/nM/AmtIAC4P
+ 4dmYyB52KGhr32UI/330ryAKiEFqmDw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-hdP1kQbQNGulrKXCfwRM5A-1; Thu, 05 Mar 2020 04:42:28 -0500
+X-MC-Unique: hdP1kQbQNGulrKXCfwRM5A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D62DC801E70;
+ Thu,  5 Mar 2020 09:42:26 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-110.brq.redhat.com
+ [10.40.204.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ADC219E9C;
+ Thu,  5 Mar 2020 09:42:20 +0000 (UTC)
+Date: Thu, 5 Mar 2020 10:42:17 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
+Message-ID: <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-6-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <36715573-98c2-311c-03a8-300e6b4915a3@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5"
-X-TM-AS-GCONF: 00
-x-cbid: 20030509-0020-0000-0000-000003B0B1AD
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030509-0021-0000-0000-00002208EC64
-Message-Id: <c4476e36-6738-0140-ba72-92d384b1cffc@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-05_02:2020-03-04,
- 2020-03-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 impostorscore=0
- mlxscore=0 lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0
- clxscore=1015 suspectscore=3 mlxlogscore=999 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003050060
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200130112510.15154-6-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,100 +84,388 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5
-Content-Type: multipart/mixed; boundary="nMvIQgLrb7lceEdyDjtquWm1w4q87yir2"
+On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
+> Adds the following tests:
+> - event-counter-config: test event counter configuration
+> - basic-event-count:
+>   - programs counters #0 and #1 to count 2 required events
+>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
+>   to a value close enough to the 32b
+>   overflow limit so that we check the overflow bit is set
+>   after the execution of the asm loop.
+> - mem-access: counts MEM_ACCESS event on counters #0 and #1
+>   with and without 32-bit overflow.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - fix PMCNTENSET_EL0 and PMCNTENCLR_EL0 op0
+> - print PMEVTYPER SH
+> - properly clobber used regs and add "cc"
+> - simplify mem_access_loop
+> ---
+>  arm/pmu.c         | 269 ++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  18 ++++
+>  2 files changed, 287 insertions(+)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 4a26a76..1b0101f 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -18,9 +18,15 @@
+>  #include "asm/barrier.h"
+>  #include "asm/sysreg.h"
+>  #include "asm/processor.h"
+> +#include <bitops.h>
+> +#include <asm/gic.h>
+>  
+>  #define PMU_PMCR_E         (1 << 0)
+> +#define PMU_PMCR_P         (1 << 1)
+>  #define PMU_PMCR_C         (1 << 2)
+> +#define PMU_PMCR_D         (1 << 3)
+> +#define PMU_PMCR_X         (1 << 4)
+> +#define PMU_PMCR_DP        (1 << 5)
+>  #define PMU_PMCR_LC        (1 << 6)
+>  #define PMU_PMCR_N_SHIFT   11
+>  #define PMU_PMCR_N_MASK    0x1f
+> @@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  
+>  /* event counter tests only implemented for aarch64 */
+>  static void test_event_introspection(void) {}
+> +static void test_event_counter_config(void) {}
+> +static void test_basic_event_count(void) {}
+> +static void test_mem_access(void) {}
+>  
+>  #elif defined(__aarch64__)
+>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+> @@ -145,6 +154,33 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  }
+>  
+>  #define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
+> +#define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
+> +#define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+> +
+> +#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
+> +#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
+> +
+> +#define regn_el0(__reg, __n) __reg ## __n  ## _el0
+> +#define write_regn(__reg, __n, __val) \
+> +	write_sysreg((__val), __reg ## __n ## _el0)
+> +
+> +#define read_regn(__reg, __n) \
+> +	read_sysreg(__reg ## __n ## _el0)
+> +
+> +#define print_pmevtyper(__s, __n) do { \
+> +	uint32_t val; \
+> +	val = read_regn(pmevtyper, __n);\
+> +	report_info("%s pmevtyper%d=0x%x, eventcount=0x%x (p=%ld, u=%ld nsk=%ld, nsu=%ld, nsh=%ld m=%ld, mt=%ld, sh=%ld)", \
+> +			(__s), (__n), val, val & 0xFFFF,	\
+> +			(BIT_MASK(31) & val) >> 31,		\
+> +			(BIT_MASK(30) & val) >> 30,		\
+> +			(BIT_MASK(29) & val) >> 29,		\
+> +			(BIT_MASK(28) & val) >> 28,		\
+> +			(BIT_MASK(27) & val) >> 27,		\
+> +			(BIT_MASK(26) & val) >> 26,		\
+> +			(BIT_MASK(25) & val) >> 25);		\
+> +			(BIT_MASK(24) & val) >> 24);		\
+> +	} while (0)
+>  
+>  static bool is_event_supported(uint32_t n, bool warn)
+>  {
+> @@ -198,6 +234,230 @@ static void test_event_introspection(void)
+>  	report(required_events, "Check required events are implemented");
+>  }
+>  
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting. isb instructions are inserted to make sure
+> + * pmccntr read after this function returns the exact instructions executed
+> + * in the controlled block. Loads @loop times the data at @address into x9.
+> + */
+> +static void mem_access_loop(void *addr, int loop, uint32_t pmcr)
+> +{
+> +asm volatile(
+> +	"       msr     pmcr_el0, %[pmcr]\n"
+> +	"       isb\n"
+> +	"       mov     x10, %[loop]\n"
+> +	"1:     sub     x10, x10, #1\n"
+> +	"       ldr x9, [%[addr]]\n"
+> +	"       cmp     x10, #0x0\n"
+> +	"       b.gt    1b\n"
+> +	"       msr     pmcr_el0, xzr\n"
+> +	"       isb\n"
+> +	:
+> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
+> +	: "x9", "x10", "cc");
+> +}
+> +
+> +static void pmu_reset(void)
+> +{
+> +	/* reset all counters, counting disabled at PMCR level*/
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> +	/* Disable all counters */
+> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+> +	/* clear overflow reg */
+> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+> +	/* disable overflow interrupts on all counters */
+> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+> +	isb();
 
---nMvIQgLrb7lceEdyDjtquWm1w4q87yir2
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Is there a test we can do here to ensure the PMU was succesfully reset and
+assert if not? Reset is a critical part of each test prep, so we should be
+sure it has been done.
 
-On 3/4/20 6:55 PM, David Hildenbrand wrote:
-> On 04.03.20 12:42, Janosch Frank wrote:
->> IO instruction data is routed through SIDAD for protected guests, so
->> adresses do not need to be checked, as this is kernel memory.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  target/s390x/ioinst.c | 26 +++++++++++++++++++-------
->>  1 file changed, 19 insertions(+), 7 deletions(-)
->>
->> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
->> index c437a1d8c6..e4102430aa 100644
->> --- a/target/s390x/ioinst.c
->> +++ b/target/s390x/ioinst.c
->> @@ -17,6 +17,16 @@
->>  #include "trace.h"
->>  #include "hw/s390x/s390-pci-bus.h"
->> =20
->> +static uint64_t get_address_from_regs(CPUS390XState *env, uint32_t ip=
-b,
->> +                                      uint8_t *ar)
->> +{
->=20
-> Please add a comment here why this is done. (e.g., make all address
-> checks - like alignment checks - in the caller succeed, and we don't
-> need the address).
-
-     * Addresses for protected guests are all offsets into the
-
-
-     * satellite block which holds the IO control structures. Those
-
-
-     * control structures are always aligned and accessible, so we can
-
-
-     * return 0 here which will pass the following address checks.
-
-?
-
->=20
->> +    if (env->pv) {
->> +        *ar =3D 0;
->> +        return 0;
->> +    }
->> +    return decode_basedisp_s(env, ipb, ar);
->> +}
->> +
->=20
-> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
->=20
-
-
-
---nMvIQgLrb7lceEdyDjtquWm1w4q87yir2--
-
---29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5gyWwACgkQ41TmuOI4
-ufiwAw//Thp743N70geXvRXDqhhlsGIWCd9t9yVFr1jk51/bVjpIWidbnEgwiwih
-MeyyUiXzKyrYdlkDOFfG5HjJXkHmhXp3dbrwfEDiA+6pY0ikLVurg8ekifB36frz
-IMk+Z6Qzd231w8yLBLmliRMlZ+CNDoaWONELWXElFAiDlS15pKGrmvvogxZwMM6G
-r7t3WaXbRaUpuvpt72nI0kF/2Ez8tUiiZAlcdn4XO+2E/UgA0CoWCJrGBtSBwX6M
-R9m26zmSbxjwioQ9vh1zqTdRxBvbiK9PX0DwUqT1xxigGa/n7HSSdbyLt0H5wYbj
-riNo7BbIqJCKpyIXh1dDQC8dCTLiZPlLsBqJfh6un+3wYOLzHHiWfl3kFR3zyxJf
-xkjbN6Y7u5n6nOSAtAPqZXcUfL5TFDAe85wmYiSZIp4QA2olbgx3OahLKHjI9sUG
-UQIU3vkrcK0Dyqn9NHYV1fyHBBDoOqkByzgXStV3Z9kQOCIALt4uabbFRDZ2GyTe
-kw3O3WrxMeDgevacfzhQEyrUZjn/Yhk+wuZe0SkFVyHqA5NP7biNi1YotYBKJVU0
-mPgb+Y5SD1tUsY8FKGWFgMgNZGORWmyXWsq/bcTEWgcu4h1jHzfipzeayYThuadK
-jDMCsBkFDbeHhHuadSciPNW0R0310M/hbQC2SKLbd1puACu8UU8=
-=+KKj
------END PGP SIGNATURE-----
-
---29eNqqUGvm7KZA7vLYG8XwykQLqEUYzM5--
+> +}
+> +
+> +static void test_event_counter_config(void)
+> +{
+> +	int i;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +
+> +	pmu_reset();
+> +
+> +	/*
+> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
+> +	 * select counter 0
+> +	 */
+> +	write_sysreg(1, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
+> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
+> +	report((read_regn(pmevtyper, 1) & 0xFFF) == 0xEA,
+> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
+> +	report((read_regn(pmevcntr, 1) == 0xdeadbeef),
+> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
+> +
+> +	/* try to configure an unsupported event within the range [0x0, 0x3F] */
+> +	for (i = 0; i <= 0x3F; i++) {
+> +		if (!is_event_supported(i, false))
+> +			break;
+> +	}
+> +	if (i > 0x3F) {
+> +		report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
+> +		return;
+> +	}
+> +
+> +	/* select counter 0 */
+> +	write_sysreg(0, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+> +	write_sysreg(i, PMXEVCNTR_EL0);
+> +	/* read the counter value */
+> +	read_sysreg(PMXEVCNTR_EL0);
+> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
+> +		"read of a counter programmed with unsupported event");
+> +
+> +}
+> +
+> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
+> +{
+> +	int i;
+> +
+> +	if (pmu.nb_implemented_counters < nb_events) {
+> +		report_skip("Skip test as number of counters is too small (%d)",
+> +			    pmu.nb_implemented_counters);
+> +		return false;
+> +	}
+> +
+> +	for (i = 0; i < nb_events; i++) {
+> +		if (!is_event_supported(events[i], false)) {
+> +			report_skip("Skip test as event %d is not supported",
+> +				    events[i]);
+> +			return false;
+> +		}
+> +	}
+> +	return true;
+> +}
+> +
+> +static void test_basic_event_count(void)
+> +{
+> +	uint32_t implemented_counter_mask, non_implemented_counter_mask;
+> +	uint32_t counter_mask;
+> +	uint32_t events[] = {
+> +		0x11,	/* CPU_CYCLES */
+> +		0x8,	/* INST_RETIRED */
+> +	};
+> +
+> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> +		return;
+> +
+> +	implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
+> +	non_implemented_counter_mask = ~(BIT(31) | implemented_counter_mask);
+> +	counter_mask = implemented_counter_mask | non_implemented_counter_mask;
+> +
+> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> +
+> +	/* disable all counters */
+> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
+> +	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0),
+> +		"pmcntenclr: disable all counters");
+> +
+> +	/*
+> +	 * clear cycle and all event counters and allow counter enablement
+> +	 * through PMCNTENSET. LC is RES1.
+> +	 */
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> +	isb();
+> +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
+> +
+> +	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
+> +	write_regn(pmevcntr, 0, 0xFFFFFFF0);
+> +	report(read_regn(pmevcntr, 0) == 0xFFFFFFF0,
+> +		"counter #0 preset to 0xFFFFFFF0");
+> +	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
+> +
+> +	/*
+> +	 * Enable all implemented counters and also attempt to enable
+> +	 * not supported counters. Counting still is disabled by !PMCR.E
+> +	 */
+> +	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
+> +
+> +	/* check only those implemented are enabled */
+> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+> +		(read_sysreg_s(PMCNTENSET_EL0) == implemented_counter_mask),
+> +		"pmcntenset: enabled implemented_counters");
+> +
+> +	/* Disable all counters but counters #0 and #1 */
+> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
+> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
+> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
+> +		"pmcntenset: just enabled #0 and #1");
+> +
+> +	/* clear overflow register */
+> +	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
+> +	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
+> +
+> +	/* disable overflow interrupts on all counters*/
+> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
+> +	report(!read_sysreg(pmintenclr_el1),
+> +		"pmintenclr_el1=0, all interrupts disabled");
+> +
+> +	/* enable overflow interrupts on all event counters */
+> +	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
+> +		     pmintenset_el1);
+> +	report(read_sysreg(pmintenset_el1) == implemented_counter_mask,
+> +		"overflow interrupts enabled on all implemented counters");
+> +
+> +	/* Set PMCR.E, execute asm code and unset PMCR.E */
+> +	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
+> +
+> +	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
+> +		    read_regn(pmevcntr, 0));
+> +	report_info("counter #1 is 0x%lx (INST_RETIRED)",
+> +		    read_regn(pmevcntr, 1));
+> +
+> +	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> +	report(read_sysreg(pmovsclr_el0) & 0x1,
+> +		"check overflow happened on #0 only");
+> +}
+> +
+> +static void test_mem_access(void)
+> +{
+> +	void *addr = malloc(PAGE_SIZE);
+> +	uint32_t events[] = {
+> +		0x13,   /* MEM_ACCESS */
+> +		0x13,   /* MEM_ACCESS */
+> +	};
+> +
+> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> +		return;
+> +
+> +	pmu_reset();
+> +
+> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+> +	isb();
+> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
+> +	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
+> +	/* We may measure more than 20 mem access depending on the core */
+> +	report((read_regn(pmevcntr, 0) == read_regn(pmevcntr, 1)) &&
+> +	       (read_regn(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
+> +	       "Ran 20 mem accesses");
+> +
+> +	pmu_reset();
+> +
+> +	write_regn(pmevcntr, 0, 0xFFFFFFFA);
+> +	write_regn(pmevcntr, 1, 0xFFFFFFF0);
+> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
+> +	isb();
+> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> +	report(read_sysreg(pmovsclr_el0) == 0x3,
+> +	       "Ran 20 mem accesses with expected overflows on both counters");
+> +	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
+> +			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
+> +			read_sysreg(pmovsclr_el0));
+> +}
+> +
+>  #endif
+>  
+>  /*
+> @@ -388,6 +648,15 @@ int main(int argc, char *argv[])
+>  	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>  		report_prefix_push(argv[1]);
+>  		test_event_introspection();
+> +	} else if (strcmp(argv[1], "event-counter-config") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_event_counter_config();
+> +	} else if (strcmp(argv[1], "basic-event-count") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_basic_event_count();
+> +	} else if (strcmp(argv[1], "mem-access") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_mem_access();
+>  	} else {
+>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 4433ef3..7a59403 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -72,6 +72,24 @@ groups = pmu
+>  arch = arm64
+>  extra_params = -append 'event-introspection'
+>  
+> +[pmu-event-counter-config]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'event-counter-config'
+> +
+> +[pmu-basic-event-count]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'basic-event-count'
+> +
+> +[pmu-mem-access]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'mem-access'
+> +
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+>  #file = pmu.flat
+> -- 
+> 2.20.1
+> 
+> 
 
 
