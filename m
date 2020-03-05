@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930F4C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF7E5C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:48:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C70D20637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:48:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7B9720637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:48:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x8iV2hyd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C70D20637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nClBpPxj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B9720637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tfI-0005c2-Dm
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:48:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
+	id 1j9tfd-00065v-OT
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:48:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tP9-0003YS-ID
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tPE-0003dv-GY
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tP8-0002MN-G3
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:23 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:32898)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tPD-0002Wc-E4
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:28 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46642)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tP7-0002Is-9F
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:22 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id x7so7821839wrr.0
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:21 -0800 (PST)
+ id 1j9tPD-0002VF-7l
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:27 -0500
+Received: by mail-wr1-x443.google.com with SMTP id n15so2459578wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=g0YUytWq4vRm1t30VeqE3UA29+mSL//Cjkgt5k66VTA=;
- b=x8iV2hydGzpeJ4kzI3VUJKaG9+ffGLgpAmVlq93+a0E//8p61SwZlpkniqi6yb8E+n
- vPDGg6EmHddn3/AO9y7dXVVYSJTJHJfb1Uy+4Cr9S+lFe5AhFA4cVbs8zIfeyvGi5c1w
- cRkiogeFN8AeHhBBHOFjM3BaHh3+ju/8nG2grclY0d+o126x0Cxn77gHmtRErRPh5i26
- we2lAkJamcUwDUsWD14q/WnIIpT8fOGZ9U1MlFrfkwJSHep2WX/u+gaDfHN8LlllIxgN
- 9geo9NUce87iQhg6CBNPebPZcNpktP8RkPTWUibP3xQT0xx59yvmUUrWt4FtqnC0zV+Y
- mlvQ==
+ bh=63BtL3A7s5V/jzIhDC3vd/bTesp/g8P1iFKQFff6LWo=;
+ b=nClBpPxjndfhpoJl1hjUUYvHDudxt3C40qKEBcV0F8m1tHwrctqPTgjSOgxDZX+Tjl
+ X+SxlJGMzcPujcLvLt+tgvhEe3sWUlOec9DZupQote12LvKPANjrzjSc1Gc8udC/LYZ3
+ I+yHGpCh9POwj3NGS1kIFucmbSJItJYcFfO3ioNzO4di+fMQbE1IoE8yDPSmzoAm7eGI
+ Ki8aAOwdGYQ8LB/Rz16JE8W9Q5dykHpEBZrYHh6KuHiaLv43CsBeRUnAMcH+q7rnWnm9
+ a1P36iJVlS0dWFlZ7+lpjWX3aiOG4pAzCHdN/ZdB3wFTku4Oui/loBzYYfT5e4jDBUL5
+ /OUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=g0YUytWq4vRm1t30VeqE3UA29+mSL//Cjkgt5k66VTA=;
- b=kfdlrszye2BK8p+fKZvTKenfw/iHU5nWIlMZIhQ9/Nwy2BOQXLsFu7R1wtf7we7GHm
- NCn3QB8Kz90D+eHqkNFRFfPyXif/SvgGfNVYfieW2pbbdn1rxuoDm9JKBbBAorIsS0F8
- EV30Goie9gty6mZ7pu+zDyo7ec1zEC1Db0zzsDNfNfYfLfhS1wpcM6c13rmM4qKlpcxf
- +HPBMrbg9RkqorRPqqyicdSmuBqy12rGfM88W6/Vd0DO7uJDqSGdXwD0b070l/gGPOB5
- qDK82d5k5bRKfDMHTWxuSXgM4MFGXKnnbEHvnrsXBW7zxeJIH4vfcsuDO9371JHw6RQq
- qUxA==
-X-Gm-Message-State: ANhLgQ0vmGPo6zjZflTTJBT99czaj0rFq5HEOYLvIHW3kQU41iKnQ2iT
- jtB6yt7NUm0C90gCcnpHUPhJ0qgSdnewDw==
-X-Google-Smtp-Source: ADFU+vuCYd9KioTfnwM+MYjRTZWneo55vGLDTE5uGYydMbF/6G7RL97eJBFNKnr9zEmSpWzhto0Wwg==
-X-Received: by 2002:adf:eece:: with SMTP id a14mr10861738wrp.311.1583425879905; 
- Thu, 05 Mar 2020 08:31:19 -0800 (PST)
+ bh=63BtL3A7s5V/jzIhDC3vd/bTesp/g8P1iFKQFff6LWo=;
+ b=c4h7oiD/MSaDN1VpeaB5McvTkOjgAlI06/105KeHne9DEOz0aKfD1ndyybMLrKdL4d
+ L4lIJo8oeZYzO1mbILcrgMETOryplwiGI2qQqLGAKuxeG/q3vSQ+HzRXFGwNEAZul7/C
+ lghHuSJB713imt+6F0vo7+8qE0Ey9z5P7vjwuRtu19Jmc420e9ZTCHn2C6p3Xxle0FlN
+ UgkbAfE5+yunB6IG1N82fE/fAWOHbcaBLcplpVpkMfu/HkCVLDfXTQd4zIyjeq+wrqQK
+ QfelKUAoJKOItrBHAGgPgWAks2DJCr3m5R4sjJj6fqitsMVGoTkfgf5Wlt+thK6XGg/A
+ XxHw==
+X-Gm-Message-State: ANhLgQ36OP4nWgZVDwzSuN4ZZ2NjspZTKug+A6Mvx9rN9yhXrTAG1y4v
+ Z4iPf4gDkPNtsbGbzGvCH3Rygd6Z2uzCLA==
+X-Google-Smtp-Source: ADFU+vuGyfydR8YAxAutrN36z0+zy9CFsH2Ns9QxkZPmrcrE2WUeuAZ24i9wcVfmfEGghWwaDDYLzg==
+X-Received: by 2002:adf:dd4d:: with SMTP id u13mr10990247wrm.70.1583425886040; 
+ Thu, 05 Mar 2020 08:31:26 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.18
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:19 -0800 (PST)
+ Thu, 05 Mar 2020 08:31:25 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/37] target/arm: Add HCR_EL2 bit definitions from ARMv8.6
-Date: Thu,  5 Mar 2020 16:30:39 +0000
-Message-Id: <20200305163100.22912-17-peter.maydell@linaro.org>
+Subject: [PULL 22/37] target/arm: Honor the HCR_EL2.TACR bit
+Date: Thu,  5 Mar 2020 16:30:45 +0000
+Message-Id: <20200305163100.22912-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
 References: <20200305163100.22912-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,46 +99,59 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200229012811.24129-3-richard.henderson@linaro.org
+This bit traps EL1 access to the auxiliary control registers.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200229012811.24129-9-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ target/arm/helper.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 0b84742b66a..0ae07a72e43 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1410,6 +1410,7 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
- #define HCR_TERR      (1ULL << 36)
- #define HCR_TEA       (1ULL << 37)
- #define HCR_MIOCNCE   (1ULL << 38)
-+/* RES0 bit 39 */
- #define HCR_APK       (1ULL << 40)
- #define HCR_API       (1ULL << 41)
- #define HCR_NV        (1ULL << 42)
-@@ -1418,13 +1419,19 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
- #define HCR_NV2       (1ULL << 45)
- #define HCR_FWB       (1ULL << 46)
- #define HCR_FIEN      (1ULL << 47)
-+/* RES0 bit 48 */
- #define HCR_TID4      (1ULL << 49)
- #define HCR_TICAB     (1ULL << 50)
-+#define HCR_AMVOFFEN  (1ULL << 51)
- #define HCR_TOCU      (1ULL << 52)
-+#define HCR_ENSCXT    (1ULL << 53)
- #define HCR_TTLBIS    (1ULL << 54)
- #define HCR_TTLBOS    (1ULL << 55)
- #define HCR_ATA       (1ULL << 56)
- #define HCR_DCT       (1ULL << 57)
-+#define HCR_TID5      (1ULL << 58)
-+#define HCR_TWEDEN    (1ULL << 59)
-+#define HCR_TWEDEL    MAKE_64BIT_MASK(60, 4)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index feb279f44e9..e362d420eb4 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -553,6 +553,16 @@ static CPAccessResult access_tsw(CPUARMState *env, const ARMCPRegInfo *ri,
+     return CP_ACCESS_OK;
+ }
  
- #define SCR_NS                (1U << 0)
- #define SCR_IRQ               (1U << 1)
++/* Check for traps from EL1 due to HCR_EL2.TACR.  */
++static CPAccessResult access_tacr(CPUARMState *env, const ARMCPRegInfo *ri,
++                                  bool isread)
++{
++    if (arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_TACR)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++    return CP_ACCESS_OK;
++}
++
+ static void dacr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -6961,8 +6971,8 @@ static const ARMCPRegInfo ats1cp_reginfo[] = {
+ static const ARMCPRegInfo actlr2_hactlr2_reginfo[] = {
+     { .name = "ACTLR2", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 3,
+-      .access = PL1_RW, .type = ARM_CP_CONST,
+-      .resetvalue = 0 },
++      .access = PL1_RW, .accessfn = access_tacr,
++      .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "HACTLR2", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 3,
+       .access = PL2_RW, .type = ARM_CP_CONST,
+@@ -7718,8 +7728,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         ARMCPRegInfo auxcr_reginfo[] = {
+             { .name = "ACTLR_EL1", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 1,
+-              .access = PL1_RW, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->reset_auxcr },
++              .access = PL1_RW, .accessfn = access_tacr,
++              .type = ARM_CP_CONST, .resetvalue = cpu->reset_auxcr },
+             { .name = "ACTLR_EL2", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 1,
+               .access = PL2_RW, .type = ARM_CP_CONST,
 -- 
 2.20.1
 
