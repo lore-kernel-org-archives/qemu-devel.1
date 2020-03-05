@@ -2,84 +2,72 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAB2C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D125C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3AB22073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:19:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NONVj+Nm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AB22073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C69B20717
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 23:36:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C69B20717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9zmO-0001Yo-Uz
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 18:19:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43077)
+	id 1jA02l-0007yM-6y
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 18:36:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j9zlF-0000aG-F4
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:38 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1jA02C-0007Sg-1p
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j9zlE-0002ld-Aw
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:18:37 -0500
-Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:35302)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j9zlD-0002kW-Qn; Thu, 05 Mar 2020 18:18:35 -0500
-Received: by mail-vs1-xe44.google.com with SMTP id u26so379131vsg.2;
- Thu, 05 Mar 2020 15:18:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=8G8DYzV4+k5eDdvlRAgIYoVYwz7I40ZoA9ZyhuMHNt0=;
- b=NONVj+NmsZBgXIsULysZoWvneAWUpVGagTFX7aDH759+CcPtugtTWe6Ej/EC806PPW
- CW0OlaN0zVXvUfNkrYR/GdiQ7DjkFH0qwl76qUM0G4kZLpvVTdgeN7YnNtt1CpN9rFK7
- Le5QNjkFq/CFeeMEygPLLAuQT5lJyDUA5YnTLyLJPUOlWQfYfNPjCT1vA9CH2FVLriiX
- jftMCWcnKg5Rz1wwn+b2BRfIH1R5BCqOQt6uFcrrm0w45YLrBtOm0hU1holOQ5Syyohs
- N0JIb8GkRSB7map0GKDWDaUjI9RQ9IMu4TsmV/syBrbujt/5T/RIAwUQdw2XcwBAXNPh
- exLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8G8DYzV4+k5eDdvlRAgIYoVYwz7I40ZoA9ZyhuMHNt0=;
- b=pN3NxR3PSU1/gg1qiFKSsNNKQd3sVFOOl9zX+nUxCCnxQFcZGIIvG0fZP/SW1ucDFe
- SMUj1vqZHxLC94F+4jb0LndF3MoW7T0YQ07DFusKc/Z3Gh5L0pBuN1r7k5J2Adgr0lmx
- 9lcwvePz4MBIE5NsjR1SfC/LkcVYpYtgRe+BAOaK4521GkanWC6A3GDeqZLa2n5VIyUq
- gFXh6E95ud3GMNz+IUQZmbj++F+bE0YAgGYKzRui0tSmScA6Cy/PqvSJ5g0EELGWwfzB
- KupF4nvqpm/ItSGMpvrEj2epwYSqexmGjwIB2Ds1vH/imIlmgaM7rA4Q6aP0qqt17E5K
- M30Q==
-X-Gm-Message-State: ANhLgQ0aAI5JtDc9l965xDWJyMJ3801lJMfpVdYwHXtBG09MnllOxYtp
- Y/NeyHxktJpvb/SODqCFZHl7qiX6jvC2FBOonag=
-X-Google-Smtp-Source: ADFU+vs4ziIyRL2LBoaIObKiQDaAYezXZhwa7vIGLSxBVKyqcTAfQTzPuZoPLzxMC1FIRp9ZV7ReEGq8ZAtyARIHW+8=
-X-Received: by 2002:a05:6102:3c2:: with SMTP id
- n2mr517363vsq.172.1583450314758; 
- Thu, 05 Mar 2020 15:18:34 -0800 (PST)
+ (envelope-from <balaton@eik.bme.hu>) id 1jA02A-0004T7-LY
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 18:36:07 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:49830)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jA024-00041q-GR; Thu, 05 Mar 2020 18:36:03 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 290FD74637E;
+ Fri,  6 Mar 2020 00:35:50 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id DFBCC74637C; Fri,  6 Mar 2020 00:35:49 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id DC87D74569F;
+ Fri,  6 Mar 2020 00:35:49 +0100 (CET)
+Date: Fri, 6 Mar 2020 00:35:49 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+In-Reply-To: <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
+Message-ID: <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
+ <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+ <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+ <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
+ <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
+ <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
+ <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <20200305175651.4563-1-philmd@redhat.com>
- <20200305175651.4563-7-philmd@redhat.com>
-In-Reply-To: <20200305175651.4563-7-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 5 Mar 2020 15:10:52 -0800
-Message-ID: <CAKmqyKN0f_Tx1x06i3X4Pp1s8EVV8-cvLex-U-nTUCFz=8bZTA@mail.gmail.com>
-Subject: Re: [PATCH 6/6] hw/net/can: Make CanBusClientInfo::can_receive()
- return a boolean
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e44
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,120 +79,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, "open list:New World" <qemu-ppc@nongnu.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Peter Chubb <peter.chubb@nicta.com.au>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 5, 2020 at 9:59 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
+On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
+> On 04/03/2020 22:33, BALATON Zoltan wrote:
+>>>>>>> AFAICT this then only leaves the question: why does the firmware set
+>>>>>>> PCI_INTERRUPT_LINE to 9, which is presumably why you are seeing problems running
+>>>>>>> MorphOS under QEMU.
+>>>>>>
+>>>>>> Linux does try to handle both true native mode and half-native mode. It only uses
+>>>>>> half-native mode if finds IRQ14 on Pegasos, otherwise skips Pegasos specific fixup
+>>>>>> and uses true native mode setup. I don't know what MorphOS does but I think it
+>>>>>> justs
+>>>>>> knows that Pegasos2 has this quirk and does not look at the device tree at all.
 >
-> The CanBusClientInfo::can_receive handler return whether the
-> device can or can not receive new frames. Make it obvious by
-> returning a boolean type.
+> I just a quick look at the PCI specification and found this interesting paragraph in
+> the section about "Interrupt Line":
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> "The Interrupt Line register is an eight-bit register used to communicate interrupt
+> line routing information. The register is read/write and must be implemented by any
+> device (or device function) that uses an interrupt pin. POST software will write the
+> routing information into this register as it initializes and configures the system."
+>
+> "The value in this register tells which input of the system interrupt controller(s)
+> the device's interrupt pin is connected to. The device itself does not use this
+> value, rather it is used by device drivers and operating systems. Device drivers and
+> operating systems can use this information to determine priority and vector
+> information. Values in this register are architecture-specific [43]."
+>
+> [43] For x86 based PCs, the values in this register correspond to IRQ numbers (0-15)
+> of the standard dual 8259 configuration. The value 255 is defined as meaning
+> "unknown" or "no connection" to the interrupt controller. Values between 15 and 254
+> are reserved.
+>
+>
+> The key part here is "The device itself does not use this value, rather it is used by
+> device drivers and operating systems" since this immediately tells us that the
+> existing code in hw/ide/via.c which uses the interrupt line value for IRQ routing is
+> incorrect and should be removed.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On real hardware this may be true but in QEMU how would it otherwise raise 
+the correct interrupt line the guest expects? This probably does not 
+matter for pegasos2 but I think is needed for 100% native mode used with 
+the fulong2e so it gets the IRQ it expects.
 
-Alistair
+> If we do that the next question is how does the VIA know whether the use the PCI
+> interrupt or the legacy interrupt? Another look at the datasheet showed that there is
 
-> ---
->  hw/net/can/can_sja1000.h | 2 +-
->  include/net/can_emu.h    | 2 +-
->  hw/net/can/can_sja1000.c | 8 ++++----
->  net/can/can_socketcan.c  | 4 ++--
->  4 files changed, 8 insertions(+), 8 deletions(-)
+I don't think via-ide ever uses a PCI interrupt, if you look at its 
+datasheet the description of the prog-if reg (0x9) says in native mode irq 
+is programmable via config reg 0x3c which then lists all the ISA IRQs as 
+possible values, default 14 and 0 meaning disable.
+
+> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
+> documented as having value 0 == Legacy IRQ routing which should be the initial value
+> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
+
+The VT8231 docs say this should always read 1 but may be this is somehow 
+set to 0 on the Pegasos2. What does that mean? Should we use this value 
+instead of the feature bit to force using legacy interrupts? We'd still 
+need a property in via-ide to set this reg or is it possible to set it 
+from board code overriding the default after device is created? That would 
+allow to drop patch 1. I can try this.
+
+> In your previous email you included a trace of the PCI configuration accesses to the
+> via-ide device. Can you try this again with the following diff and post the same
+> output once again?
 >
-> diff --git a/hw/net/can/can_sja1000.h b/hw/net/can/can_sja1000.h
-> index 220a622087..7ca9cd681e 100644
-> --- a/hw/net/can/can_sja1000.h
-> +++ b/hw/net/can/can_sja1000.h
-> @@ -137,7 +137,7 @@ void can_sja_disconnect(CanSJA1000State *s);
+> diff --git a/hw/ide/via.c b/hw/ide/via.c
+> index 096de8dba0..db9f4af861 100644
+> --- a/hw/ide/via.c
+> +++ b/hw/ide/via.c
+> @@ -139,7 +139,7 @@ static void via_ide_reset(DeviceState *dev)
+>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_2, 0x00000170);
+>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_3, 0x00000374);
+>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_4, 0x0000cc01); /* BMIBA: 20-23h */
+> -    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000010e);
+> +    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000000e);
 >
->  int can_sja_init(CanSJA1000State *s, qemu_irq irq);
->
-> -int can_sja_can_receive(CanBusClientState *client);
-> +bool can_sja_can_receive(CanBusClientState *client);
->
->  ssize_t can_sja_receive(CanBusClientState *client,
->                          const qemu_can_frame *frames, size_t frames_cnt)=
-;
-> diff --git a/include/net/can_emu.h b/include/net/can_emu.h
-> index d4fc51b57d..fce9770928 100644
-> --- a/include/net/can_emu.h
-> +++ b/include/net/can_emu.h
-> @@ -83,7 +83,7 @@ typedef struct CanBusClientState CanBusClientState;
->  typedef struct CanBusState CanBusState;
->
->  typedef struct CanBusClientInfo {
-> -    int (*can_receive)(CanBusClientState *);
-> +    bool (*can_receive)(CanBusClientState *);
->      ssize_t (*receive)(CanBusClientState *,
->          const struct qemu_can_frame *frames, size_t frames_cnt);
->  } CanBusClientInfo;
-> diff --git a/hw/net/can/can_sja1000.c b/hw/net/can/can_sja1000.c
-> index 39c78faf9b..ea915a023a 100644
-> --- a/hw/net/can/can_sja1000.c
-> +++ b/hw/net/can/can_sja1000.c
-> @@ -733,21 +733,21 @@ uint64_t can_sja_mem_read(CanSJA1000State *s, hwadd=
-r addr, unsigned size)
->      return temp;
->  }
->
-> -int can_sja_can_receive(CanBusClientState *client)
-> +bool can_sja_can_receive(CanBusClientState *client)
->  {
->      CanSJA1000State *s =3D container_of(client, CanSJA1000State, bus_cli=
-ent);
->
->      if (s->clock & 0x80) { /* PeliCAN Mode */
->          if (s->mode & 0x01) { /* reset mode. */
-> -            return 0;
-> +            return false;
->          }
->      } else { /* BasicCAN mode */
->          if (s->control & 0x01) {
-> -            return 0;
-> +            return false;
->          }
->      }
->
-> -    return 1; /* always return 1, when operation mode */
-> +    return true; /* always return true, when operation mode */
->  }
->
->  ssize_t can_sja_receive(CanBusClientState *client, const qemu_can_frame =
-*frames,
-> diff --git a/net/can/can_socketcan.c b/net/can/can_socketcan.c
-> index 29bfacd4f8..807f31fcde 100644
-> --- a/net/can/can_socketcan.c
-> +++ b/net/can/can_socketcan.c
-> @@ -110,9 +110,9 @@ static void can_host_socketcan_read(void *opaque)
->      }
->  }
->
-> -static int can_host_socketcan_can_receive(CanBusClientState *client)
-> +static bool can_host_socketcan_can_receive(CanBusClientState *client)
->  {
-> -    return 1;
-> +    return true;
->  }
->
->  static ssize_t can_host_socketcan_receive(CanBusClientState *client,
-> --
-> 2.21.1
->
->
+>     /* IDE chip enable, IDE configuration 1/2, IDE FIFO Configuration*/
+>     pci_set_long(pci_conf + 0x40, 0x0a090600);
+
+This does not change much:
+
+pci_cfg_write via-ide 12:1 @0x9 <- 0xf
+pci_cfg_write via-ide 12:1 @0x40 <- 0xb
+pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
+pci_cfg_write via-ide 12:1 @0x43 <- 0x35
+pci_cfg_write via-ide 12:1 @0x44 <- 0x18
+pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
+pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
+pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
+pci_cfg_write via-ide 12:1 @0x54 <- 0x14
+pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
+pci_cfg_read via-ide 12:1 @0xc -> 0x0
+pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
+pci_cfg_read via-ide 12:1 @0x3c -> 0xe
+pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
+pci_cfg_read via-ide 12:1 @0x3c -> 0xe
+pci_cfg_write via-ide 12:1 @0x3c <- 0x9
+
+compared to
+
+> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
+> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
+> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
+> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
+> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
+> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
+> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
+> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
+> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
+> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
+> pci_cfg_read via-ide 12:1 @0xc -> 0x0
+> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
+> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
+> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
+> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
+> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
+
+firmware does not seem to care about this value.
+
+Regards,
+BALATON Zoltan
 
