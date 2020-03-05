@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8997EC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F463C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:28:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61A5A208C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:27:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A5A208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 059C0208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:28:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 059C0208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9vD4-0002GK-Ik
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:27:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51635)
+	id 1j9vE1-00046c-7F
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:28:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51781)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j9vCA-0001JN-VO
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:08 -0500
+ (envelope-from <bounces@canonical.com>) id 1j9vD6-0002ZT-BN
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:27:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j9vC9-0006NS-Ba
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46212)
+ (envelope-from <bounces@canonical.com>) id 1j9vD4-00075G-M5
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:27:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48574)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j9vC9-0006Mw-6C
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:26:05 -0500
+ id 1j9vD4-00073l-Fr
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:27:02 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j9vC6-0001gS-57
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 18:26:02 +0000
+ id 1j9vD2-0001Z8-5c
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 18:27:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D090F2EAE0A
- for <qemu-devel@nongnu.org>; Thu,  5 Mar 2020 18:00:58 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1EBD52EAF7B
+ for <qemu-devel@nongnu.org>; Thu,  5 Mar 2020 18:01:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Mar 2020 17:17:36 -0000
+Date: Thu, 05 Mar 2020 17:21:07 -0000
 From: tstrike <1813165@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
 X-Launchpad-Bug-Reporter: Thomas (himbeere)
 X-Launchpad-Bug-Modifier: tstrike (tstrike34)
 References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <158342865638.12437.2872061254656621768.malone@wampee.canonical.com>
+Message-Id: <158342886801.11468.15864047318498999129.malone@wampee.canonical.com>
 Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 940718c5170285e3192da5c2ea57532cfcbe7c8a
+X-Launchpad-Hash: 55fa7d74d9518f922cb2338ab7dde110cda3ca2f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,87 +82,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hey folks, I am having the same problem.
+Here is the error:
 
-I recognize there was a patch a year ago (almost exactly one year ago)
-and I wonder it was included in later updates.
-
-That said, Ubuntu has upgraded. Recently I upgrade my machine. Here are
-some key stats.
-
-DistroRelease: Ubuntu 20.04
-Uname: Linux 5.4.0-14-generic x86_64
-UpgradeStatus: Upgraded to focal on 2020-02-12 (22 days ago)
-ProcVersionSignature: Ubuntu 5.4.0-14.17-generic 5.4.18
-RelatedPackageVersions:
- kvmtool                               N/A
- gir1.2-libvirt-glib-1.0               2.0.0-2
- gir1.2-libvirt-sandbox-1.0            N/A
- libnss-libvirt                        N/A
- libvirt-bin                           N/A
- libvirt-clients                       6.0.0-0ubuntu4
- libvirt-daemon                        6.0.0-0ubuntu4
- libvirt-daemon-driver-lxc             N/A
- libvirt-daemon-driver-qemu            6.0.0-0ubuntu4
- libvirt-daemon-driver-storage-gluster N/A
- libvirt-daemon-driver-storage-rbd     6.0.0-0ubuntu4
- libvirt-daemon-driver-storage-zfs     N/A
- libvirt-daemon-driver-vbox            N/A
- libvirt-daemon-driver-xen             N/A
- libvirt-daemon-system                 6.0.0-0ubuntu4
- libvirt-daemon-system-systemd         6.0.0-0ubuntu4
- libvirt-daemon-system-sysv            N/A
- libvirt-dbus                          N/A
- libvirt-dev                           6.0.0-0ubuntu4
- libvirt-doc                           N/A
- libvirt-glib-1.0-0                    2.0.0-2
- libvirt-glib-1.0-dev                  N/A
- libvirt-ocaml                         N/A
- libvirt-ocaml-dev                     N/A
- libvirt-sandbox-1.0-5                 N/A
- libvirt-sandbox-1.0-dev               N/A
- libvirt-sanlock                       N/A
- libvirt-wireshark                     N/A
- libvirt0                              6.0.0-0ubuntu4
- libvirtodbc0                          N/A
- libvirtualpg-dev                      N/A
- libvirtualpg0                         N/A
- libvirtuoso5.5-cil                    N/A
- nbdkit-plugin-libvirt                 N/A
- nova-compute-libvirt                  N/A
- php-libvirt-php                       N/A
- python3-libvirt                       6.0.0-0ubuntu3
- ruby-fog-libvirt                      0.6.0-1
- ruby-libvirt                          0.7.1-1
- uvtool-libvirt                        N/A
- vagrant-libvirt                       0.0.45-2
- virt-manager                          1:2.2.1-3ubuntu1
- qemu                                  1:4.2-3ubuntu1
- qemu-block-extra                      1:4.2-3ubuntu1
- qemu-efi                              N/A
- qemu-efi-aarch64                      N/A
- qemu-efi-arm                          N/A
- qemu-guest-agent                      N/A
- qemu-kvm                              1:4.2-3ubuntu1
- qemu-slof                             N/A
- qemu-system                           N/A
- qemu-system-arm                       N/A
- qemu-system-common                    1:4.2-3ubuntu1
- qemu-system-data                      1:4.2-3ubuntu1
- qemu-system-gui                       1:4.2-3ubuntu1
- qemu-system-mips                      N/A
- qemu-system-misc                      N/A
- qemu-system-ppc                       N/A
- qemu-system-s390x                     N/A
- qemu-system-sparc                     N/A
- qemu-system-x86                       1:4.2-3ubuntu1
- qemu-system-x86-microvm               N/A
- qemu-system-x86-xen                   N/A
- qemu-user                             N/A
- qemu-user-binfmt                      N/A
- qemu-user-static                      N/A
- qemu-utils                            1:4.2-3ubuntu1
- qemubuilder                           N/A
+2020-03-05T02:01:00.287202Z qemu-system-x86_64: warning: host doesn't suppo=
+rt requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+KVM internal error. Suberror: 1
+emulation failure
 
 -- =
 
