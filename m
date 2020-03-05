@@ -2,59 +2,70 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0482C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31937C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:47:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 953FF208CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:41:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953FF208CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 058E0208CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 06:47:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 058E0208CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9kC8-0007J1-Ob
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 01:41:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60657)
+	id 1j9kI5-0002fh-3k
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 01:47:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j9kAB-0003oJ-Vc
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:21 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j9kHS-00027W-Gl
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j9kAA-0006Ww-Mk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:19 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:34374 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j9kAA-0006UO-BG
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:39:18 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 73CE7614AEAA49713910;
- Thu,  5 Mar 2020 14:39:15 +0800 (CST)
-Received: from localhost.huawei.com (10.175.104.216) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 14:39:07 +0800
-From: Pan Nengyuan <pannengyuan@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device in
- mac_via
-Date: Thu, 5 Mar 2020 14:54:21 +0800
-Message-ID: <20200305065422.12707-3-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.18.2
+ (envelope-from <no-reply@patchew.org>) id 1j9kHQ-0005z9-UW
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:46:50 -0500
+Resent-Date: Thu, 05 Mar 2020 01:46:50 -0500
+Resent-Message-Id: <E1j9kHQ-0005z9-UW@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21192)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j9kHP-0005uo-US
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 01:46:48 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1583390791; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ByEIFKRNb4NuC3D7kuKUNKaq1ohUOev6SlWvvncnOxYGddT+KaB7YEnDOSZTSMK51UsI9Z9MUWbSrjlxun7lSVQRdDSxOYLD57xy+ISa0nxtvVeSx4/dm5HvdEn+6yR/QfahrTa0Yci6H0T3Q9P/5btvpKxwoz6wvh14fqdcv2Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583390791;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=U0mCt237GOSF99Qq9i2J67u8U41alymRVjO/8RHH9jY=; 
+ b=VRJfNeYonuM9a/81PkjVhJfgn2Pb6e39Djp9JejiKsYeOCABA6Y04NOgxyZtA4tfp+9b8GUsLYpmBdO3h/c8PA642eRQvCXr2y7qBGT2j2M96knZelCP57Fpu8N39CroXtDbs5LDHcC8Ksm6kmhTqlZtaKUAfvh5EkCH8Tw6IZY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583390787779664.3875363527235;
+ Wed, 4 Mar 2020 22:46:27 -0800 (PST)
 In-Reply-To: <20200305065422.12707-1-pannengyuan@huawei.com>
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
+Subject: Re: [PATCH v4 0/3] delay timer_new from init to realize to fix
+ memleaks.
+Message-ID: <158339078635.21741.17139522732073942467@abdcc9e1aa82>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.216]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pannengyuan@huawei.com
+Date: Wed, 4 Mar 2020 22:46:27 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,106 +77,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- Pan Nengyuan <pannengyuan@huawei.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent
- Vivier <laurent@vivier.eu>, euler.robot@huawei.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, euler.robot@huawei.com, pannengyuan@huawei.com,
+ qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch fix a bug in mac_via where it failed to actually realize devices it was using.
-And move the init codes which inits the mos6522 objects and properties on them from realize()
-into init(). However, we keep qdev_set_parent_bus in realize(), otherwise it will cause
-device-introspect-test test fail. Then do the realize mos6522 device in the mac_vir_realize.
-
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
----
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
-v4->v3:
-- split v3 into two patches, this patch fix incorrect creation of mos6522, move inits and props
-  from realize into init. The v3 is:
-  https://patchwork.kernel.org/patch/11407635/
----
- hw/misc/mac_via.c | 43 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 30 insertions(+), 13 deletions(-)
-
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index b7d0012794..4c5ad08805 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -868,24 +868,24 @@ static void mac_via_reset(DeviceState *dev)
- static void mac_via_realize(DeviceState *dev, Error **errp)
- {
-     MacVIAState *m = MAC_VIA(dev);
--    MOS6522State *ms;
-     struct tm tm;
-     int ret;
-+    Error *err = NULL;
- 
--    /* Init VIAs 1 and 2 */
--    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
--                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
- 
--    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
--                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
-+    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
--    /* Pass through mos6522 output IRQs */
--    ms = MOS6522(&m->mos6522_via1);
--    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
--                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
--    ms = MOS6522(&m->mos6522_via2);
--    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
--                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
-     /* Pass through mos6522 input IRQs */
-     qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
-@@ -932,6 +932,7 @@ static void mac_via_init(Object *obj)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     MacVIAState *m = MAC_VIA(obj);
-+    MOS6522State *ms;
- 
-     /* MMIO */
-     memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
-@@ -948,6 +949,22 @@ static void mac_via_init(Object *obj)
-     /* ADB */
-     qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
-                         TYPE_ADB_BUS, DEVICE(obj), "adb.0");
-+
-+    /* Init VIAs 1 and 2 */
-+    object_initialize_child(OBJECT(m), "via1", &m->mos6522_via1, 
-+                            sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1,
-+                            &error_abort, NULL);
-+    object_initialize_child(OBJECT(m), "via2", &m->mos6522_via2,
-+                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2,
-+                            &error_abort, NULL);
-+
-+    /* Pass through mos6522 output IRQs */
-+    ms = MOS6522(&m->mos6522_via1);
-+    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    ms = MOS6522(&m->mos6522_via2);
-+    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
- }
- 
- static void postload_update_cb(void *opaque, int running, RunState state)
--- 
-2.18.2
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwNTA2NTQyMi4xMjcw
+Ny0xLXBhbm5lbmd5dWFuQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2NCAwLzNdIGRlbGF5IHRpbWVyX25ldyBm
+cm9tIGluaXQgdG8gcmVhbGl6ZSB0byBmaXggbWVtbGVha3MuCk1lc3NhZ2UtaWQ6IDIwMjAwMzA1
+MDY1NDIyLjEyNzA3LTEtcGFubmVuZ3l1YW5AaHVhd2VpLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rl
+di9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+YmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwMzA1
+MDY1NDIyLjEyNzA3LTEtcGFubmVuZ3l1YW5AaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzIwMjAwMzA1
+MDY1NDIyLjEyNzA3LTEtcGFubmVuZ3l1YW5AaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCmU4N2FhOTkgaHcvbWlzYy9tb3M2NTIyOiBtb3ZlIHRpbWVyX25ldyBmcm9t
+IGluaXQoKSBpbnRvIHJlYWxpemUoKSB0byBhdm9pZCBtZW1sZWFrcwowYzY1ODhiIG1hY192aWE6
+IGZpeCBpbmNvcnJlY3QgY3JlYXRpb24gb2YgbW9zNjUyMiBkZXZpY2UgaW4gbWFjX3ZpYQoxYWZk
+YjRlIHMzOTB4OiBmaXggbWVtbGVha3MgaW4gY3B1X2ZpbmFsaXplCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IDFhZmRiNGUxODFmMSAoczM5MHg6IGZpeCBtZW1sZWFr
+cyBpbiBjcHVfZmluYWxpemUpCjIvMyBDaGVja2luZyBjb21taXQgMGM2NTg4YmIwOTkxIChtYWNf
+dmlhOiBmaXggaW5jb3JyZWN0IGNyZWF0aW9uIG9mIG1vczY1MjIgZGV2aWNlIGluIG1hY192aWEp
+CkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM3MTogRklMRTogaHcvbWlzYy9tYWNfdmlhLmM6
+OTU0OgorICAgIG9iamVjdF9pbml0aWFsaXplX2NoaWxkKE9CSkVDVChtKSwgInZpYTEiLCAmbS0+
+bW9zNjUyMl92aWExLCAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY2IGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDIvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8zIENoZWNraW5n
+IGNvbW1pdCBlODdhYTk5Mzc2ZDYgKGh3L21pc2MvbW9zNjUyMjogbW92ZSB0aW1lcl9uZXcgZnJv
+bSBpbml0KCkgaW50byByZWFsaXplKCkgdG8gYXZvaWQgbWVtbGVha3MpCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzA1MDY1NDIyLjEyNzA3
+LTEtcGFubmVuZ3l1YW5AaHVhd2VpLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
+ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
 
