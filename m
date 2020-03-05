@@ -2,61 +2,78 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A01C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A005C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:06:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17FD22073D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:05:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17FD22073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE62F2073D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 09:06:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fufWEg7f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE62F2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9mRM-0000zt-6g
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:05:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55281)
+	id 1j9mSB-0002Pk-6v
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 04:06:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j9mPr-0000Kz-VV
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:03:40 -0500
+ (envelope-from <drjones@redhat.com>) id 1j9mRP-0001A8-BJ
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:05:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j9mPq-00073Y-Sn
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:03:39 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:33104 helo=huawei.com)
+ (envelope-from <drjones@redhat.com>) id 1j9mRN-000818-H7
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:05:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24146
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j9mPq-00070t-G8; Thu, 05 Mar 2020 04:03:38 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 36EB956AC1CF26D48166;
- Thu,  5 Mar 2020 17:03:33 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.210) with Microsoft SMTP Server (TLS) id 14.3.439.0; Thu, 5 Mar 2020
- 17:03:23 +0800
-Subject: Re: [PATCH v4 1/3] s390x: fix memleaks in cpu_finalize
-To: David Hildenbrand <david@redhat.com>, <qemu-devel@nongnu.org>
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <20200305065422.12707-2-pannengyuan@huawei.com>
- <c61888fa-35d1-8619-79f1-2e36a5aca563@redhat.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <320c1d62-b7d9-65b0-6dc8-a29140a4f5ac@huawei.com>
-Date: Thu, 5 Mar 2020 17:03:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j9mRN-000801-95
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 04:05:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583399112;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/WRv5Va+ufzbIgCtr33R2bN2K8epUakX5vLunGi7LOQ=;
+ b=fufWEg7fmDqE2CRsDhTxhuzSpgPp0FgYfCuMhzh0vWA0r3pNhnUXUcVr2tpliBWPqbCqPW
+ 0H8s9+ZjwA4nmSlLm+ye9BJ/Rb/Evb0KJfiAzEUFGeKTLB72Ky6M3Kw8kp9EH7UhrfHbXd
+ 76e71zaLcuzFpYkQJYhmsg9yx0Yb18Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-jVH5lGAvPvCiYGHWiO7vAg-1; Thu, 05 Mar 2020 04:05:10 -0500
+X-MC-Unique: jVH5lGAvPvCiYGHWiO7vAg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA268DBAF;
+ Thu,  5 Mar 2020 09:05:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-110.brq.redhat.com
+ [10.40.204.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A9719272A9;
+ Thu,  5 Mar 2020 09:05:01 +0000 (UTC)
+Date: Thu, 5 Mar 2020 10:04:59 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event
+ Support
+Message-ID: <20200305090459.5hrrsf54zjxxoneq@kamzik.brq.redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-5-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c61888fa-35d1-8619-79f1-2e36a5aca563@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200130112510.15154-5-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,80 +85,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Jan 30, 2020 at 12:25:05PM +0100, Eric Auger wrote:
+> If event counters are implemented check the common events
+> required by the PMUv3 are implemented.
+> 
+> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+> either INST_RETIRED or INST_SPEC). Some others only are
+> required if the implementation implements some other features.
+> 
+> Check those wich are unconditionally required.
+> 
+> This test currently fails on TCG as neither INST_RETIRED
+> or INST_SPEC are supported.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - fix is_event_supported()
+> - fix boolean condition for PMU v4
+> - fix PMCEID0 definition
+> 
+> RFC ->v1:
+> - add a comment to explain the PMCEID0/1 splits
+> ---
+>  arm/pmu.c         | 62 +++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  6 +++++
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index d24857e..4a26a76 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>  	: "cc");
+>  }
+> +
+> +/* event counter tests only implemented for aarch64 */
+> +static void test_event_introspection(void) {}
+> +
+>  #elif defined(__aarch64__)
+>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+> @@ -139,6 +143,61 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr)
+>  	: "cc");
+>  }
+> +
+> +#define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
+> +
+> +static bool is_event_supported(uint32_t n, bool warn)
+> +{
+> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+> +	bool supported;
+> +	uint64_t reg;
+> +
+> +	/*
+> +	 * The low 32-bits of PMCEID0/1 respectly describe
+> +	 * event support for events 0-31/32-63. Their High
+> +	 * 32-bits describe support for extended events
+> +	 * starting at 0x4000, using the same split.
+> +	 */
+> +	if (n >= 0x0  && n <= 0x3F)
+> +		reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
+
+Maybe it's time to add
+
+#define upper_32_bits(n) ((u32)(((n) >> 16) >> 16))
+#define lower_32_bits(n) ((u32)(n))
+
+to the kvm-unit-tests framework.
+
+> +	else if  (n >= 0x4000 && n <= 0x403F)
+> +		reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
+> +	else
+> +		abort();
+
+assert(0) ensure we get a dump_stack() (although I haven't fixed
+dump_stack for arm64 yet...). Could also do the assert first
+
+assert((n >= 0x0  && n <= 0x3F) || (n >= 0x4000 && n <= 0x403F))
+if (n <= 0x3F)
+ ...
+else
+ ...
+
+What about defines for these hex numbers?
 
 
-On 3/5/2020 4:34 PM, David Hildenbrand wrote:
-> 
->>  #if !defined(CONFIG_USER_ONLY)
->>      MachineState *ms = MACHINE(qdev_get_machine());
->>      unsigned int max_cpus = ms->smp.max_cpus;
->> +
->> +    cpu->env.tod_timer =
->> +        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
->> +    cpu->env.cpu_timer =
->> +        timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
->> +
->>      if (cpu->env.core_id >= max_cpus) {
->>          error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
->>                     ", maximum core-id: %d", cpu->env.core_id,
->> @@ -224,9 +230,38 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
->>  
->>      scc->parent_realize(dev, &err);
->>  out:
->> +    if (cpu->env.tod_timer) {
->> +        timer_del(cpu->env.tod_timer);
->> +    }
->> +    if (cpu->env.cpu_timer) {
->> +        timer_del(cpu->env.cpu_timer);
->> +    }
->> +    timer_free(cpu->env.tod_timer);
->> +    timer_free(cpu->env.cpu_timer);
-> 
-> timer_free() should be sufficient, as it cannot be running, no?
+> +
+> +	supported =  reg & (1UL << (n & 0x3F));
+                   ^ extra space
 
-Yes, it's redundant.
+> +
+> +	if (!supported && warn)
+> +		report_info("event %d is not supported", n);
+> +	return supported;
+> +}
+> +
+> +static void test_event_introspection(void)
+> +{
+> +	bool required_events;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* PMUv3 requires an implementation includes some common events */
+> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+> +			   is_event_supported(0x1B, true) /* INST_PREC */);
 
-> 
->>      error_propagate(errp, err);
->>  }
->>  
->> +static void s390_cpu_unrealizefn(DeviceState *dev, Error **errp)
->> +{
->> +    S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
->> +    Error *err = NULL;
->> +
->> +#if !defined(CONFIG_USER_ONLY)
->> +    S390CPU *cpu = S390_CPU(dev);
->> +
->> +    timer_del(cpu->env.tod_timer);
->> +    timer_del(cpu->env.cpu_timer);
->> +    timer_free(cpu->env.tod_timer);
->> +    timer_free(cpu->env.cpu_timer);
->> +#endif
->> +
->> +    scc->parent_unrealize(dev, &err);
->> +    if (err != NULL) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +}
-> 
-> Simply a
-> 
-> scc->parent_unrealize(dev, errp) and you can drop the temporary variable.
+If defines are created then the comments can go away
 
-Fine, it looks more clear and I will change it.
-And I think it's the same on x86_cpu_unrealize/ppc_cpu_unrealize, I refer to the implement of them.
+	required_events = is_event_supported(SW_INCR, true) &&
+			  is_event_supported(CPU_CYCLES, true) &&
+			  (is_event_supported(INST_RETIRED, true) ||
+			   is_event_supported(INST_PREC, true));
 
-Thanks.
 
+> +
+> +	if (pmu.version == 0x4) {
+> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+> +		required_events = required_events &&
+> +				  is_event_supported(0x23, true) &&
+> +				  is_event_supported(0x24, true);
+> +	}
+> +
+> +	report(required_events, "Check required events are implemented");
+> +}
+> +
+>  #endif
+>  
+>  /*
+> @@ -326,6 +385,9 @@ int main(int argc, char *argv[])
+>  		       "Monotonically increasing cycle count");
+>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>  		pmccntr64_test();
+> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_event_introspection();
+
+prefix pop
+
+>  	} else {
+>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 79f0d7a..4433ef3 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -66,6 +66,12 @@ file = pmu.flat
+>  groups = pmu
+>  extra_params = -append 'cycle-counter 0'
+>  
+> +[pmu-event-introspection]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'event-introspection'
+> +
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+>  #file = pmu.flat
+> -- 
+> 2.20.1
 > 
-> 
+>
+
+Thanks,
+drew 
+
 
