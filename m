@@ -2,79 +2,109 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F04C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FBAC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48C66207FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:26:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3913D207FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 19:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m7+7yHGE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C66207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cIApefO9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3913D207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9w8U-0000n7-F3
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:26:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33920)
+	id 1j9w95-0001SF-9N
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 14:26:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j9w7B-00084L-5b
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:25:05 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j9w7n-0000OT-CB
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j9w77-00069P-Ba
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:25:01 -0500
-Received: from mail-vk1-xa42.google.com ([2607:f8b0:4864:20::a42]:32807)
+ (envelope-from <richard.henderson@linaro.org>) id 1j9w7l-0006nm-6U
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:25:38 -0500
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:40891)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j9w77-00068r-5b; Thu, 05 Mar 2020 14:24:57 -0500
-Received: by mail-vk1-xa42.google.com with SMTP id i78so1960042vke.0;
- Thu, 05 Mar 2020 11:24:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nERMIgwMPpXjInBPsYcdwdgeg/tMO/+VezQMC6AZnjI=;
- b=m7+7yHGEBqYtbWU+plEmgYj9RZvMXxXUNW4CWERmlSqngcMl81OGicP5lggkvTgiEq
- 2LTpAIEUohvOocpkd/l9sJaeNkXe15qQsOt8EczlOdmK7gL6wel8gnSeW82cd8sGYIc9
- v3Ag80JacKkN6BO8rffjHn06o9uBU8oexVfwDjiQ7T0PnrjObPEIl9GDJ6niJRVIybQ+
- eghDRPOhFM8XqPTsiNNzGXkhq0dv7AUktOuH+N/KOEnuN1pWT9b8QLT36KrFxsWqgk93
- KzdbUdptAtnRdE3UqglXb56No9X9Np57jHWvNqS5+TmdnqzYFmmFvUUhrq46jVNUljWR
- mtng==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j9w7j-0006mc-Cg
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 14:25:36 -0500
+Received: by mail-pf1-x436.google.com with SMTP id l184so3230106pfl.7
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 11:25:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=WyJyqiSUmQZcTxz7y2IjBR8U/XYz5RrHpQ4cTG+YLIg=;
+ b=cIApefO9ReLgiJFNPpbiAKDObTtDMAMJy9r+tF2N52dCx5cxG74aXl89XXpAKfULLV
+ xu1Yx/48xPGT09rmshScJpTrrVQCOmYMjkThijSL9gObuZxnLv5//sUNrlA7OLKq03Ys
+ lwh6kcrQdXUC/V7ADjKQPyhS6CclgqB394QIHBw719vIOkUNbt9BZh8BT52AT5lKmowT
+ KDB+Gf75iULHbNYtIuUxt+0EV3SNcGi6J8mLa9hQ2xu2WGCxkQNxJYs8+6SCFsgZrgZS
+ CEBX+vRe0FZ8DbE6/xHfFf58Qed0A/TJhBoW1kRbrL51XScyDp+eUQszas5vHHD/Avuu
+ aQPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nERMIgwMPpXjInBPsYcdwdgeg/tMO/+VezQMC6AZnjI=;
- b=ptogxaLmIWibUkxpnGPCIXldihzc/UZv3h5oP5s6oTSD8i8F5xEnG83wxP7bZiXG3s
- kAp9/2Dzxe0GsIar/JTtXGbn3waRLAASmgrwA0tix25Fo7WHL++JlA0woCph/5gX6cuV
- 2SMWYDxmE85kWotb93KTfSPFRviaTH0QNxe5RX2dkb1lmq5Z19K2t3RBZFx7vbOCoHN4
- tPlVPvF9X3NMv1vLQnz+tQ9a8b00W/zopD8xt+ovm9bVgwJQ/KPcdSFOkWjqNJsPKk2/
- D5N0HDMdiYynoF6RezGIaQyGgva6nDq+vNct5fEFQ+PtJfwyhCaVMHQkqwjnqVAvKnhA
- YsYA==
-X-Gm-Message-State: ANhLgQ1CcvUlXTGcTCQdW4HMftOf5YCHsyhC+ymiKAB9nL1K4hOl1k9r
- PnQKvHT1s7K7WBmoN5nmuAVyLo1o9ANhYy+jr6Y=
-X-Google-Smtp-Source: ADFU+vuzjvogBDwZseTEkuLqNIJHhJRZlCTYnjoBpzBzMaQt/gZ+QXkegOzoHwSXVXLcGKXLtmWClW2RZAoKqPV7R6o=
-X-Received: by 2002:a1f:ea02:: with SMTP id i2mr461116vkh.70.1583436296047;
- Thu, 05 Mar 2020 11:24:56 -0800 (PST)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WyJyqiSUmQZcTxz7y2IjBR8U/XYz5RrHpQ4cTG+YLIg=;
+ b=coxftcymfiyLGFvT/V9kzzDVoOarMqXbStckR0U1VSoqVmbVe5MUyEE+1KwWGRhdIu
+ PPPn8runNiwTMfInCM4eT6oi9MSQdw/SmUPVrcGG1rnNmfALHY9W7T/74lIav+JJeg6v
+ C5Qb+ucqPbHZ6Dld1q61jLab17vqYUYZ0hBu5MIio2VU9J20aK1KWsJf255QO9kRXfzY
+ kghXMdiyMndExwpZsrrWlAgnsLDTcX7SFoChRxL5iInMAbKH3I+4Dw4EwT2HWuPfqhYY
+ KOCFGifvN9M1NFa48/tfvoD97B/cz83hZBcPAi7POjN8gKvH/l1ya7Cj6gP8dFcOqM7U
+ kvbw==
+X-Gm-Message-State: ANhLgQ2fm3JIAstKU9YYKTNNTqsb75Lr6/RG+Z/OAXHSH8b2yvjNzEtC
+ xOSqLakrPp+4NwN1iAF2DoGUCw==
+X-Google-Smtp-Source: ADFU+vsXaZ8e08Ff/ACP+oSe1HYRvt8wdiEwpMdbSNZ3cC0kFYb4dgBxptpnsvrfT+m4qvdz8ew0Og==
+X-Received: by 2002:aa7:8513:: with SMTP id v19mr9556395pfn.222.1583436334396; 
+ Thu, 05 Mar 2020 11:25:34 -0800 (PST)
+Received: from [10.0.3.1] ([156.19.247.250])
+ by smtp.gmail.com with ESMTPSA id 1sm28809680pff.11.2020.03.05.11.25.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Mar 2020 11:25:33 -0800 (PST)
+Subject: Re: Fwd: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+To: G 3 <programmingkidx@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Dino Papararo <skizzato73@msn.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo
+ <intermediadc@hotmail.com>, David Gibson <david@gibson.dropbear.id.au>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+ <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+ <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
+ <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
+ <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87eeuhxw0y.fsf@linaro.org>
+ <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
+ <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
+ <878skpxltm.fsf@linaro.org> <FE03C155-E46D-4925-BA2B-FABBE2518C8C@gmail.com>
+ <2576fd41-8b01-91a0-ca56-792ce65b5092@linaro.org>
+ <alpine.BSF.2.22.395.2003021218180.72848@zero.eik.bme.hu>
+ <d136165f-46c7-8983-9725-2b224742deef@linaro.org>
+ <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
+ <CAKyx-3Pt2qLPXWQjBwrHn-nxR-9e++TioGp4cKFC3adMN3rtiw@mail.gmail.com>
+ <CAKyx-3OAVOvOiaWqUbVa4P35RtFS6bN0wbPuWa=6SFcB2zhL3Q@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <80805a79-b2e6-6283-61ee-ef91b5787314@linaro.org>
+Date: Thu, 5 Mar 2020 11:25:30 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200229141011.58989-1-root@stephanos.io>
-In-Reply-To: <20200229141011.58989-1-root@stephanos.io>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 5 Mar 2020 11:17:11 -0800
-Message-ID: <CAKmqyKP1QFiWSQzUsoV9TLWBQ8hrx+yg7UM2=DnAoCAanLRuwA@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/stm32f405: Add preliminary RCC emulation support
-To: Stephanos Ioannidis <root@stephanos.io>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAKyx-3OAVOvOiaWqUbVa4P35RtFS6bN0wbPuWa=6SFcB2zhL3Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a42
+X-Received-From: 2607:f8b0:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,1026 +116,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Feb 29, 2020 at 6:12 AM Stephanos Ioannidis <root@stephanos.io> wrote:
->
-> The RCC (reset and clock control) is a hardware peripheral reset and
-> clock configuration controller available on the STM32F4xx series
-> devices.
->
-> This commit adds preliminary support for the RCC peripheral emulation,
-> in order to support proper emulation of the firmware images that use
-> the STM32Cube driver, which configures and validates the RCC registers
-> during system initialisation.
->
-> In addition, the current STM32F405 SoC implementation does not specify
-> the Cortex-M SysTick clock scaling factor and this causes the QEMU to
-> become unresponsive as soon as the SysTick timer is enabled by the
-> guest. This problem is addressed by configuring the SysTick clock
-> scaling factor from the AHB clock frequency computed using the RCC
-> clock configurations.
+On 3/4/20 10:43 AM, G 3 wrote:
+> I am all intrigued by these vector instructions. Apple was really big on using
+> them back in the day so programs like Quicktime and iTunes definitely use them.
+> I'm not sure if the PowerPC's altivec vector instructions map to host vector
+> instructions already, but if they don't, mapping them would give us a huge
+> speedup in certain places. Would anyone know if this was already done in QEMU?
 
-Thanks for the patch!
+They are, provided that your x86 host supports AVX.  Which should be everything
+manufactured after about 2011.
 
-Would you mind splitting this patch up into three? One for the SysTick
-fix, one to add the RCC device (unused) and then one to connect it? It
-just makes reviewieing easier.
 
-If splitting it is too hard then don't worry about it, just something
-to keep in mind in the future.
-
->
-> Signed-off-by: Stephanos Ioannidis <root@stephanos.io>
-> ---
->  hw/arm/Kconfig                  |   1 +
->  hw/arm/netduinoplus2.c          |   1 +
->  hw/arm/stm32f405_soc.c          |  17 +-
->  hw/misc/Kconfig                 |   3 +
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/stm32f4xx_rcc.c         | 472 ++++++++++++++++++++++++++++++++
->  hw/misc/trace-events            |   4 +
->  include/hw/arm/stm32f405_soc.h  |   3 +
->  include/hw/misc/stm32f4xx_rcc.h | 316 +++++++++++++++++++++
->  9 files changed, 817 insertions(+), 1 deletion(-)
->  create mode 100644 hw/misc/stm32f4xx_rcc.c
->  create mode 100644 include/hw/misc/stm32f4xx_rcc.h
->
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 3d86691ae0..16442b3c4b 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -314,6 +314,7 @@ config STM32F205_SOC
->  config STM32F405_SOC
->      bool
->      select ARM_V7M
-> +    select STM32F4XX_RCC
->      select STM32F4XX_SYSCFG
->      select STM32F4XX_EXTI
->
-> diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
-> index e5e247edbe..37d57dafe4 100644
-> --- a/hw/arm/netduinoplus2.c
-> +++ b/hw/arm/netduinoplus2.c
-> @@ -36,6 +36,7 @@ static void netduinoplus2_init(MachineState *machine)
->
->      dev = qdev_create(NULL, TYPE_STM32F405_SOC);
->      qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
-> +    qdev_prop_set_uint32(dev, "hse-frequency", 25000000);
->      object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
->
->      armv7m_load_kernel(ARM_CPU(first_cpu),
-> diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-> index 9bcad97853..5abbbc96c0 100644
-> --- a/hw/arm/stm32f405_soc.c
-> +++ b/hw/arm/stm32f405_soc.c
-> @@ -30,6 +30,7 @@
->  #include "hw/arm/stm32f405_soc.h"
->  #include "hw/misc/unimp.h"
->
-> +#define RCC_ADDR                       0x40023800
->  #define SYSCFG_ADD                     0x40013800
->  static const uint32_t usart_addr[] = { 0x40011000, 0x40004400, 0x40004800,
->                                         0x40004C00, 0x40005000, 0x40011400,
-> @@ -59,6 +60,9 @@ static void stm32f405_soc_initfn(Object *obj)
->      sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
->                            TYPE_ARMV7M);
->
-> +    sysbus_init_child_obj(obj, "rcc", &s->rcc, sizeof(s->rcc),
-> +                          TYPE_STM32F4XX_RCC);
-> +
->      sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
->                            TYPE_STM32F4XX_SYSCFG);
->
-> @@ -130,6 +134,17 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
->          return;
->      }
->
-> +    /* Reset and clock control */
-> +    dev = DEVICE(&s->rcc);
-> +    qdev_prop_set_uint32(dev, "hse-frequency", s->hse_frequency);
-> +    object_property_set_bool(OBJECT(&s->rcc), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    busdev = SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(busdev, 0, RCC_ADDR);
-> +
->      /* System configuration controller */
->      dev = DEVICE(&s->syscfg);
->      object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
-> @@ -260,7 +275,6 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
->      create_unimplemented_device("GPIOH",       0x40021C00, 0x400);
->      create_unimplemented_device("GPIOI",       0x40022000, 0x400);
->      create_unimplemented_device("CRC",         0x40023000, 0x400);
-> -    create_unimplemented_device("RCC",         0x40023800, 0x400);
->      create_unimplemented_device("Flash Int",   0x40023C00, 0x400);
->      create_unimplemented_device("BKPSRAM",     0x40024000, 0x400);
->      create_unimplemented_device("DMA1",        0x40026000, 0x400);
-> @@ -274,6 +288,7 @@ static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
->
->  static Property stm32f405_soc_properties[] = {
->      DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
-> +    DEFINE_PROP_UINT32("hse-frequency", STM32F405State, hse_frequency, 0),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index bdd77d8020..0cb5f2af68 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -79,6 +79,9 @@ config IMX
->      select SSI
->      select USB_EHCI_SYSBUS
->
-> +config STM32F4XX_RCC
-> +    bool
-> +
->  config STM32F2XX_SYSCFG
->      bool
->
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index da993f45b7..58a856c00d 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -58,6 +58,7 @@ common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
->  common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
->  common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
->  common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
-> +common-obj-$(CONFIG_STM32F4XX_RCC) += stm32f4xx_rcc.o
->  common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
->  common-obj-$(CONFIG_STM32F4XX_SYSCFG) += stm32f4xx_syscfg.o
->  common-obj-$(CONFIG_STM32F4XX_EXTI) += stm32f4xx_exti.o
-> diff --git a/hw/misc/stm32f4xx_rcc.c b/hw/misc/stm32f4xx_rcc.c
-> new file mode 100644
-> index 0000000000..297f2430b8
-> --- /dev/null
-> +++ b/hw/misc/stm32f4xx_rcc.c
-> @@ -0,0 +1,472 @@
-> +/*
-> + * STM32F4xx RCC
-> + *
-> + * Copyright (c) 2020 Stephanos Ioannidis <root@stephanos.io>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "trace.h"
-> +#include "hw/irq.h"
-> +#include "hw/qdev-properties.h"
-> +#include "migration/vmstate.h"
-> +#include "hw/misc/stm32f4xx_rcc.h"
-> +#include "hw/timer/armv7m_systick.h"
-> +
-> +#define HSI_FREQ    (16000000)
-> +
-> +static void rcc_update_clock(STM32F4xxRccState *s)
-> +{
-> +    uint32_t pll_src, pll_prediv, pll_mult, pll_postdiv, pll_freq;
-> +    uint32_t ahb_div, ahb_freq;
-> +    uint32_t sysclk_freq;
-> +    uint32_t systick_freq;
-> +
-> +    /* Resolve PLL clock source */
-> +    pll_src = s->rcc_pllcfgr.pllsrc ? s->hse_frequency : HSI_FREQ;
-> +
-> +    /* Resolve PLL input division factor */
-> +    switch (s->rcc_pllcfgr.pllm) {
-> +    case 0b000010 ... 0b111111:
-
-It's probably best to use macros for these values.
-
-> +        pll_prediv = s->rcc_pllcfgr.pllm;
-> +        break;
-> +    default:
-> +        qemu_log_mask(
-> +            LOG_GUEST_ERROR,
-> +            "%s: Invalid PLLM\n", __func__);
-> +        return;
-> +    }
-> +
-> +    /* Resolve PLL VCO multiplication factor */
-> +    switch (s->rcc_pllcfgr.plln) {
-> +    case 0b000110010 ... 0b110110000:
-> +        pll_mult = s->rcc_pllcfgr.plln;
-> +        break;
-> +    default:
-> +        qemu_log_mask(
-> +            LOG_GUEST_ERROR,
-> +            "%s: Invalid PLLN\n", __func__);
-> +        return;
-> +    }
-> +
-> +    /* Resolve PLL output division factor */
-> +    switch (s->rcc_pllcfgr.pllp) {
-> +    case 0b00:
-> +        pll_postdiv = 2;
-> +        break;
-> +    case 0b01:
-> +        pll_postdiv = 4;
-> +        break;
-> +    case 0b10:
-> +        pll_postdiv = 6;
-> +        break;
-> +    case 0b11:
-> +        pll_postdiv = 8;
-> +        break;
-> +    }
-> +
-> +    /* Compute PLL output frequency */
-> +    pll_freq = pll_src / pll_prediv * pll_mult / pll_postdiv;
-> +
-> +    /* Resolve SYSCLK frequency */
-> +    switch (s->rcc_cfgr.sw) {
-> +    case 0b00: /* High-speed internal oscillator (fixed at 16MHz) */
-> +        sysclk_freq = HSI_FREQ;
-> +        break;
-> +    case 0b01: /* High-speed external oscillator */
-> +        sysclk_freq = s->hse_frequency;
-> +        break;
-> +    case 0b10: /* PLL */
-> +        sysclk_freq = pll_freq;
-> +        break;
-> +    default:
-> +        qemu_log_mask(
-> +            LOG_GUEST_ERROR,
-> +            "%s: Invalid system clock source selected\n", __func__);
-> +        return;
-> +    }
-> +
-> +    /* Resolve AHB prescaler division ratio */
-> +    switch (s->rcc_cfgr.hpre) {
-> +    case 0b0000 ... 0b0111:
-> +        ahb_div = 1;
-> +        break;
-> +    case 0b1000:
-> +        ahb_div = 2;
-> +        break;
-> +    case 0b1001:
-> +        ahb_div = 4;
-> +        break;
-> +    case 0b1010:
-> +        ahb_div = 8;
-> +        break;
-> +    case 0b1011:
-> +        ahb_div = 16;
-> +        break;
-> +    case 0b1100:
-> +        ahb_div = 64;
-> +        break;
-> +    case 0b1101:
-> +        ahb_div = 128;
-> +        break;
-> +    case 0b1110:
-> +        ahb_div = 256;
-> +        break;
-> +    case 0b1111:
-> +        ahb_div = 512;
-> +        break;
-> +    }
-> +
-> +    /* Compute AHB frequency */
-> +    ahb_freq = sysclk_freq / ahb_div;
-> +
-> +    /* Compute and set Cortex-M SysTick timer clock frequency */
-> +    systick_freq = ahb_freq / 8;
-> +    system_clock_scale = 1000000000 / systick_freq;
-> +}
-> +
-> +static void stm32f4xx_rcc_reset(DeviceState *dev)
-> +{
-> +    STM32F4xxRccState *s = STM32F4XX_RCC(dev);
-> +
-> +    /* Initialise register values */
-> +    s->rcc_cr.reg = 0x00000083;
-> +    s->rcc_pllcfgr.reg = 0x24003010;
-> +    s->rcc_cfgr.reg = 0x00000000;
-> +    s->rcc_cir.reg = 0x00000000;
-> +    s->rcc_ahb1rstr.reg = 0x00000000;
-> +    s->rcc_ahb2rstr.reg = 0x00000000;
-> +    s->rcc_ahb3rstr.reg = 0x00000000;
-> +    s->rcc_apb1rstr.reg = 0x00000000;
-> +    s->rcc_apb2rstr.reg = 0x00000000;
-
-I think you can use memset for all the 0 addresses (it actually might
-already be set to zero for you).
-
-> +    s->rcc_ahb1enr.reg = 0x00100000;
-> +    s->rcc_ahb2enr.reg = 0x00000000;
-> +    s->rcc_ahb3enr.reg = 0x00000000;
-> +    s->rcc_apb1enr.reg = 0x00000000;
-> +    s->rcc_apb2enr.reg = 0x00000000;
-> +    s->rcc_ahb1lpenr.reg = 0x7E6791FF;
-> +    s->rcc_ahb2lpenr.reg = 0x000000F1;
-> +    s->rcc_ahb3lpenr.reg = 0x00000001;
-> +    s->rcc_apb1lpenr.reg = 0x36FEC9FF;
-> +    s->rcc_apb2lpenr.reg = 0x00075F33;
-> +    s->rcc_bdcr.reg = 0x00000000;
-> +    s->rcc_csr.reg = 0x0E000000;
-> +    s->rcc_sscgr.reg = 0x00000000;
-> +    s->rcc_plli2scfgr.reg = 0x20003000;
-> +
-> +    /* Update clock based on the reset state */
-> +    rcc_update_clock(s);
-> +}
-> +
-> +static void rcc_cr_write(STM32F4xxRccState *s, RccCrType val)
-> +{
-> +    /* Set internal high-speed clock state */
-> +    s->rcc_cr.hsirdy = s->rcc_cr.hsion = val.hsion;
-> +    /* Set external high-speed clock state */
-> +    s->rcc_cr.hserdy = s->rcc_cr.hseon = val.hseon;
-> +    /* Set external clock bypass state */
-> +    s->rcc_cr.hsebyp = s->rcc_cr.hserdy && val.hsebyp;
-> +    /* Set PLL state */
-> +    s->rcc_cr.pllrdy = s->rcc_cr.pllon = val.pllon;
-> +    /* Set I2S PLL state */
-> +    s->rcc_cr.plli2srdy = s->rcc_cr.plli2son = val.plli2son;
-> +
-> +    /* Update clock */
-> +    rcc_update_clock(s);
-> +}
-> +
-> +static void rcc_pllcfgr_write(STM32F4xxRccState *s, RccPllcfgrType val)
-> +{
-> +    /* Set PLL entry clock source */
-> +    s->rcc_pllcfgr.pllsrc = val.pllsrc;
-> +    /* Set main PLL input division factor */
-> +    s->rcc_pllcfgr.pllm = val.pllm;
-> +    /* Set main PLL multiplication factor for VCO */
-> +    s->rcc_pllcfgr.plln = val.plln;
-> +    /* Set main PLL output division factor */
-> +    s->rcc_pllcfgr.pllp = val.pllp;
-> +
-> +    /* Update clock */
-> +    rcc_update_clock(s);
-> +}
-> +
-> +static void rcc_cfgr_write(STM32F4xxRccState *s, RccCfgrType val)
-> +{
-> +    /* Set clock switch status */
-> +    s->rcc_cfgr.sw = s->rcc_cfgr.sws = val.sw;
-> +    /* Set AHB prescaler clock division factor */
-> +    s->rcc_cfgr.hpre = val.hpre;
-> +
-> +    /* Update clock */
-> +    rcc_update_clock(s);
-> +}
-> +
-> +static void rcc_csr_write(STM32F4xxRccState *s, RccCsrType val)
-> +{
-> +    /* Set internal low-speed oscillator state */
-> +    s->rcc_csr.lsirdy = s->rcc_csr.lsion = val.lsion;
-> +
-> +    /* Update clock */
-> +    rcc_update_clock(s);
-> +}
-> +
-> +static uint64_t stm32f4xx_rcc_read(void *opaque, hwaddr addr,
-> +                                     unsigned int size)
-> +{
-> +    STM32F4xxRccState *s = opaque;
-> +
-> +    trace_stm32f4xx_rcc_read(addr);
-> +
-> +    switch (addr) {
-> +    case RCC_CR:
-> +        return s->rcc_cr.reg;
-> +    case RCC_PLLCFGR:
-> +        return s->rcc_pllcfgr.reg;
-> +    case RCC_CFGR:
-> +        return s->rcc_cfgr.reg;
-> +    case RCC_CIR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Clock interrupt configuration is not supported in QEMU\n",
-> +            __func__);
-> +        return s->rcc_cir.reg;
-> +    case RCC_AHB1RSTR:
-> +        return s->rcc_ahb1rstr.reg;
-> +    case RCC_AHB2RSTR:
-> +        return s->rcc_ahb2rstr.reg;
-> +    case RCC_AHB3RSTR:
-> +        return s->rcc_ahb3rstr.reg;
-> +    case RCC_APB1RSTR:
-> +        return s->rcc_apb1rstr.reg;
-> +    case RCC_APB2RSTR:
-> +        return s->rcc_apb2rstr.reg;
-> +    case RCC_AHB1ENR:
-> +        return s->rcc_ahb1enr.reg;
-> +    case RCC_AHB2ENR:
-> +        return s->rcc_ahb2enr.reg;
-> +    case RCC_AHB3ENR:
-> +        return s->rcc_ahb3enr.reg;
-> +    case RCC_APB1ENR:
-> +        return s->rcc_apb1enr.reg;
-> +    case RCC_APB2ENR:
-> +        return s->rcc_apb2enr.reg;
-> +    case RCC_AHB1LPENR:
-> +        return s->rcc_ahb1lpenr.reg;
-> +    case RCC_AHB2LPENR:
-> +        return s->rcc_ahb2lpenr.reg;
-> +    case RCC_AHB3LPENR:
-> +        return s->rcc_ahb3lpenr.reg;
-> +    case RCC_APB1LPENR:
-> +        return s->rcc_apb1lpenr.reg;
-> +    case RCC_APB2LPENR:
-> +        return s->rcc_apb2lpenr.reg;
-> +    case RCC_BDCR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Backup domain control is not supported in QEMU\n",
-> +            __func__);
-> +        return s->rcc_bdcr.reg;
-> +    case RCC_CSR:
-> +        return s->rcc_csr.reg;
-> +    case RCC_SSCGR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Spread spectrum clock generation is not supported in QEMU\n",
-> +            __func__);
-> +        return s->rcc_sscgr.reg;
-> +    case RCC_PLLI2SCFGR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: PLLI2S configuration is not supported in QEMU\n",
-> +            __func__);
-> +        return s->rcc_plli2scfgr.reg;
-> +    default:
-> +        qemu_log_mask(
-> +            LOG_GUEST_ERROR,
-> +            "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +        return 0;
-> +    }
-> +}
-> +
-> +static void stm32f4xx_rcc_write(void *opaque, hwaddr addr,
-> +                       uint64_t val64, unsigned int size)
-> +{
-> +    STM32F4xxRccState *s = opaque;
-> +    uint32_t value = val64;
-> +
-> +    trace_stm32f4xx_rcc_write(value, addr);
-> +
-> +    switch (addr) {
-> +    case RCC_CR:
-> +        rcc_cr_write(s, (RccCrType)value);
-> +        return;
-> +    case RCC_PLLCFGR:
-> +        rcc_pllcfgr_write(s, (RccPllcfgrType)value);
-> +        return;
-> +    case RCC_CFGR:
-> +        rcc_cfgr_write(s, (RccCfgrType)value);
-> +        return;
-> +    case RCC_CIR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Clock interrupt configuration is not supported in QEMU\n",
-> +            __func__);
-> +        return;
-> +    case RCC_AHB1RSTR ... RCC_APB2RSTR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Peripheral reset is a no-op in QEMU\n", __func__);
-> +        return;
-> +    case RCC_AHB1ENR:
-> +        /* Store peripheral enable status; otherwise, this is no-op */
-> +        s->rcc_ahb1enr.reg = value;
-> +        return;
-> +    case RCC_AHB2ENR:
-> +        s->rcc_ahb2enr.reg = value;
-> +        return;
-> +    case RCC_AHB3ENR:
-> +        s->rcc_ahb3enr.reg = value;
-> +        return;
-> +    case RCC_APB1ENR:
-> +        s->rcc_apb1enr.reg = value;
-> +        return;
-> +    case RCC_APB2ENR:
-> +        s->rcc_apb2enr.reg = value;
-> +        return;
-> +    case RCC_AHB1LPENR:
-> +        /* Store peripheral low power status; otherwise, this is no-op */
-> +        s->rcc_ahb1lpenr.reg = value;
-> +        return;
-> +    case RCC_AHB2LPENR:
-> +        s->rcc_ahb2lpenr.reg = value;
-> +        return;
-> +    case RCC_AHB3LPENR:
-> +        s->rcc_ahb3lpenr.reg = value;
-> +        return;
-> +    case RCC_APB1LPENR:
-> +        s->rcc_apb1lpenr.reg = value;
-> +        return;
-> +    case RCC_APB2LPENR:
-> +        s->rcc_apb2lpenr.reg = value;
-> +        return;
-> +    case RCC_BDCR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Backup domain control is not supported in QEMU\n",
-> +            __func__);
-> +        return;
-> +    case RCC_CSR:
-> +        rcc_csr_write(s, (RccCsrType)value);
-> +        return;
-> +    case RCC_SSCGR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: Spread spectrum clock generation is not supported in QEMU\n",
-> +            __func__);
-> +        return;
-> +    case RCC_PLLI2SCFGR:
-> +        qemu_log_mask(
-> +            LOG_UNIMP,
-> +            "%s: PLLI2S configuration is not supported in QEMU\n",
-> +            __func__);
-> +        return;
-> +    default:
-> +        qemu_log_mask(
-> +            LOG_GUEST_ERROR,
-> +            "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps stm32f4xx_rcc_ops = {
-> +    .read = stm32f4xx_rcc_read,
-> +    .write = stm32f4xx_rcc_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +};
-> +
-> +static void stm32f4xx_rcc_init(Object *obj)
-> +{
-> +    STM32F4xxRccState *s = STM32F4XX_RCC(obj);
-> +
-> +    memory_region_init_io(&s->mmio, obj, &stm32f4xx_rcc_ops, s,
-> +                          TYPE_STM32F4XX_RCC, 0x400);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +}
-> +
-> +static const VMStateDescription vmstate_stm32f4xx_rcc = {
-> +    .name = TYPE_STM32F4XX_RCC,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(rcc_cr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_pllcfgr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_cfgr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_cir.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb1rstr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb2rstr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb3rstr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb1rstr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb2rstr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb1enr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb2enr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb3enr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb1enr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb2enr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb1lpenr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb2lpenr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_ahb3lpenr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb1lpenr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_apb2lpenr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_bdcr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_csr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_sscgr.reg, STM32F4xxRccState),
-> +        VMSTATE_UINT32(rcc_plli2scfgr.reg, STM32F4xxRccState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static Property stm32f4xx_rcc_properties[] = {
-> +    DEFINE_PROP_UINT32("hse-frequency", STM32F4xxRccState, hse_frequency, 0),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void stm32f4xx_rcc_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = stm32f4xx_rcc_reset;
-> +    dc->vmsd = &vmstate_stm32f4xx_rcc;
-> +    device_class_set_props(dc, stm32f4xx_rcc_properties);
-> +}
-> +
-> +static const TypeInfo stm32f4xx_rcc_info = {
-> +    .name          = TYPE_STM32F4XX_RCC,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(STM32F4xxRccState),
-> +    .instance_init = stm32f4xx_rcc_init,
-> +    .class_init    = stm32f4xx_rcc_class_init,
-> +};
-> +
-> +static void stm32f4xx_rcc_register_types(void)
-> +{
-> +    type_register_static(&stm32f4xx_rcc_info);
-> +}
-> +
-> +type_init(stm32f4xx_rcc_register_types)
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 7f0f5dff3a..0fa47598b5 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -84,6 +84,10 @@ mos6522_set_sr_int(void) "set sr_int"
->  mos6522_write(uint64_t addr, uint64_t val) "reg=0x%"PRIx64 " val=0x%"PRIx64
->  mos6522_read(uint64_t addr, unsigned val) "reg=0x%"PRIx64 " val=0x%x"
->
-> +# stm32f4xx_rcc
-> +stm32f4xx_rcc_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
-> +stm32f4xx_rcc_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
-> +
->  # stm32f4xx_syscfg
->  stm32f4xx_syscfg_set_irq(int gpio, int line, int level) "Interupt: GPIO: %d, Line: %d; Level: %d"
->  stm32f4xx_pulse_exti(int irq) "Pulse EXTI: %d"
-> diff --git a/include/hw/arm/stm32f405_soc.h b/include/hw/arm/stm32f405_soc.h
-> index 1fe97f8c3a..037db62a58 100644
-> --- a/include/hw/arm/stm32f405_soc.h
-> +++ b/include/hw/arm/stm32f405_soc.h
-> @@ -25,6 +25,7 @@
->  #ifndef HW_ARM_STM32F405_SOC_H
->  #define HW_ARM_STM32F405_SOC_H
->
-> +#include "hw/misc/stm32f4xx_rcc.h"
->  #include "hw/misc/stm32f4xx_syscfg.h"
->  #include "hw/timer/stm32f2xx_timer.h"
->  #include "hw/char/stm32f2xx_usart.h"
-> @@ -54,9 +55,11 @@ typedef struct STM32F405State {
->      /*< public >*/
->
->      char *cpu_type;
-> +    uint32_t hse_frequency;
->
->      ARMv7MState armv7m;
->
-> +    STM32F4xxRccState rcc;
->      STM32F4xxSyscfgState syscfg;
->      STM32F4xxExtiState exti;
->      STM32F2XXUsartState usart[STM_NUM_USARTS];
-> diff --git a/include/hw/misc/stm32f4xx_rcc.h b/include/hw/misc/stm32f4xx_rcc.h
-> new file mode 100644
-> index 0000000000..5c269753c0
-> --- /dev/null
-> +++ b/include/hw/misc/stm32f4xx_rcc.h
-> @@ -0,0 +1,316 @@
-> +/*
-> + * STM32F4xx RCC
-> + *
-> + * Copyright (c) 2020 Stephanos Ioannidis <root@stephanos.io>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_STM_RCC_H
-> +#define HW_STM_RCC_H
-> +
-> +#include "hw/sysbus.h"
-> +#include "hw/hw.h"
-> +
-> +#define TYPE_STM32F4XX_RCC "stm32f4xx-rcc"
-> +#define STM32F4XX_RCC(obj) \
-> +    OBJECT_CHECK(STM32F4xxRccState, (obj), TYPE_STM32F4XX_RCC)
-> +
-> +#define RCC_CR         0x00
-> +#define RCC_PLLCFGR    0x04
-> +#define RCC_CFGR       0x08
-> +#define RCC_CIR        0x0C
-> +#define RCC_AHB1RSTR   0x10
-> +#define RCC_AHB2RSTR   0x14
-> +#define RCC_AHB3RSTR   0x18
-> +#define RCC_APB1RSTR   0x20
-> +#define RCC_APB2RSTR   0x24
-> +#define RCC_AHB1ENR    0x30
-> +#define RCC_AHB2ENR    0x34
-> +#define RCC_AHB3ENR    0x38
-> +#define RCC_APB1ENR    0x40
-> +#define RCC_APB2ENR    0x44
-> +#define RCC_AHB1LPENR  0x50
-> +#define RCC_AHB2LPENR  0x54
-> +#define RCC_AHB3LPENR  0x58
-> +#define RCC_APB1LPENR  0x60
-> +#define RCC_APB2LPENR  0x64
-> +#define RCC_BDCR       0x70
-> +#define RCC_CSR        0x74
-> +#define RCC_SSCGR      0x80
-> +#define RCC_PLLI2SCFGR 0x84
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t hsion : 1;
-> +        uint32_t hsirdy : 1;
-> +        uint32_t reserved0 : 1;
-> +        uint32_t hsitrim : 5;
-> +        uint32_t hsical : 8;
-> +        uint32_t hseon : 1;
-> +        uint32_t hserdy : 1;
-> +        uint32_t hsebyp : 1;
-> +        uint32_t csson : 1;
-> +        uint32_t reserved1 : 4;
-> +        uint32_t pllon : 1;
-> +        uint32_t pllrdy : 1;
-> +        uint32_t plli2son : 1;
-> +        uint32_t plli2srdy : 1;
-> +        uint32_t reserved2 : 4;
-> +    };
-> +    uint32_t reg;
-> +} RccCrType;
-
-This is a pretty interesting way to represent the registers, another
-option is to use the register fields (as seen here:
-https://gitlab.com/qemu-project/qemu/-/blob/master/hw/dma/xlnx-zynq-devcfg.c#L50).
-I don't think I have seen any other devices do it this way.
-
-The only issue with this way is that your read/write functions get pretty long.
-
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t pllm : 6;
-> +        uint32_t plln : 9;
-> +        uint32_t reserved0 : 1;
-> +        uint32_t pllp : 2;
-> +        uint32_t reserved1 : 4;
-> +        uint32_t pllsrc : 1;
-> +        uint32_t reserved2 : 1;
-> +        uint32_t pllq : 4;
-> +        uint32_t reserved3 : 4;
-> +    };
-> +    uint32_t reg;
-> +} RccPllcfgrType;
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t sw : 2;
-> +        uint32_t sws : 2;
-> +        uint32_t hpre : 4;
-> +        uint32_t reserved0 : 2;
-> +        uint32_t ppre1 : 3;
-> +        uint32_t ppre2: 3;
-> +        uint32_t rtcpre : 5;
-> +        uint32_t mco1 : 2;
-> +        uint32_t i2sscr : 1;
-> +        uint32_t mco1pre : 3;
-> +        uint32_t mco2pre : 3;
-> +        uint32_t mco2 : 2;
-> +    };
-> +    uint32_t reg;
-> +} RccCfgrType;
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t lsirdyf : 1;
-> +        uint32_t lserdyf : 1;
-> +        uint32_t hsirdyf : 1;
-> +        uint32_t hserdyf : 1;
-> +        uint32_t pllrdyf : 1;
-> +        uint32_t plli2srdyf : 1;
-> +        uint32_t reserved0 : 1;
-> +        uint32_t cssf : 1;
-> +        uint32_t lsirdyie : 1;
-> +        uint32_t lserdyie : 1;
-> +        uint32_t hsirdyie : 1;
-> +        uint32_t hserdyie : 1;
-> +        uint32_t pllrdyie : 1;
-> +        uint32_t plli2srdyie : 1;
-> +        uint32_t reserved1 : 2;
-> +        uint32_t lsirdyc : 1;
-> +        uint32_t lserdyc : 1;
-> +        uint32_t hsirdyc : 1;
-> +        uint32_t hserdyc : 1;
-> +        uint32_t pllrdyc : 1;
-> +        uint32_t plli2srdyc : 1;
-> +        uint32_t reserved2 : 1;
-> +        uint32_t cssc : 1;
-> +        uint32_t reserved3 : 8;
-> +    };
-> +    uint32_t reg;
-> +} RccCirType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb1rstrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb2rstrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb3rstrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb1rstrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb2rstrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb1enrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb2enrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb3enrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb1enrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb2enrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb1lpenrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb2lpenrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccAhb3lpenrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb1lpenrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccApb2lpenrType;
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t lseon : 1;
-> +        uint32_t lserdy : 1;
-> +        uint32_t lsebyp : 1;
-> +        uint32_t reserved0 : 5;
-> +        uint32_t rtcsel : 2;
-> +        uint32_t reserved1 : 5;
-> +        uint32_t rtcen : 1;
-> +        uint32_t bdrst : 1;
-> +        uint32_t reserved2 : 15;
-> +    };
-> +    uint32_t reg;
-> +} RccBdcrType;
-> +
-> +typedef union {
-> +    struct {
-> +        uint32_t lsion : 1;
-> +        uint32_t lsirdy : 1;
-> +        uint32_t reserved0 : 22;
-> +        uint32_t rmvf : 1;
-> +        uint32_t borrstf : 1;
-> +        uint32_t pinrstf : 1;
-> +        uint32_t porrstf : 1;
-> +        uint32_t sftrstf : 1;
-> +        uint32_t iwdgrstf : 1;
-> +        uint32_t wwdgrstf : 1;
-> +        uint32_t lpwrrstf : 1;
-> +    };
-> +    uint32_t reg;
-> +} RccCsrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccSscgrType;
-> +
-> +typedef struct {
-> +    /* Fields are not specified */
-> +    uint32_t reg;
-> +} RccPlli2scfgrType;
-> +
-> +typedef struct {
-> +    /* <private> */
-> +    SysBusDevice parent_obj;
-> +
-> +    /* <public> */
-> +    MemoryRegion mmio;
-> +    uint32_t hse_frequency;
-> +
-> +    /* Clock control register (RCC_CR) */
-> +    RccCrType rcc_cr;
-> +    /* PLL configuration register (RCC_PLLCFGR) */
-> +    RccPllcfgrType rcc_pllcfgr;
-> +    /* Clock configuration register (RCC_CFGR) */
-> +    RccCfgrType rcc_cfgr;
-> +    /* Clock interrupt register (RCC_CIR) */
-> +    RccCirType rcc_cir;
-> +    /* AHB1 peripheral reset register (RCC_AHB1RSTR) */
-> +    RccAhb1rstrType rcc_ahb1rstr;
-> +    /* AHB2 peripheral reset register (RCC_AHB2RSTR) */
-> +    RccAhb2rstrType rcc_ahb2rstr;
-> +    /* AHB3 peripheral reset register (RCC_AHB3RSTR) */
-> +    RccAhb3rstrType rcc_ahb3rstr;
-> +    /* APB1 peripheral reset register (RCC_APB1RSTR) */
-> +    RccApb1rstrType rcc_apb1rstr;
-> +    /* APB2 peripheral reset register (RCC_APB2RSTR) */
-> +    RccApb2rstrType rcc_apb2rstr;
-> +    /* AHB1 peripheral clock register (RCC_AHB1ENR) */
-> +    RccAhb1enrType rcc_ahb1enr;
-> +    /* AHB2 peripheral clock register (RCC_AHB2ENR) */
-> +    RccAhb2enrType rcc_ahb2enr;
-> +    /* AHB3 peripheral clock register (RCC_AHB3ENR) */
-> +    RccAhb3enrType rcc_ahb3enr;
-> +    /* APB1 peripheral clock register (RCC_APB1ENR) */
-> +    RccApb1enrType rcc_apb1enr;
-> +    /* APB2 peripheral clock register (RCC_APB1ENR) */
-> +    RccApb2enrType rcc_apb2enr;
-> +    /* AHB1 peripheral low power mode register (RCC_AHB1LPENR) */
-> +    RccAhb1lpenrType rcc_ahb1lpenr;
-> +    /* AHB2 peripheral low power mode register (RCC_AHB2LPENR) */
-> +    RccAhb2lpenrType rcc_ahb2lpenr;
-> +    /* AHB3 peripheral low power mode register (RCC_AHB3LPENR) */
-> +    RccAhb3lpenrType rcc_ahb3lpenr;
-> +    /* APB1 peripheral low power mode register (RCC_APB1LPENR) */
-> +    RccApb1lpenrType rcc_apb1lpenr;
-> +    /* APB2 peripheral low power mode register (RCC_APB2LPENR) */
-> +    RccApb2lpenrType rcc_apb2lpenr;
-> +    /* Backup domain control register (RCC_BDCR) */
-> +    RccBdcrType rcc_bdcr;
-> +    /* Clock control and status register (RCC_CSR) */
-> +    RccCsrType rcc_csr;
-> +    /* Spread spectrum clock generation register (RCC_SSCGR) */
-> +    RccSscgrType rcc_sscgr;
-> +    /* PLLI2S configuration register (RCC_PLLI2SCFGR) */
-> +    RccPlli2scfgrType rcc_plli2scfgr;
-> +} STM32F4xxRccState;
-
-Thanks for the patch overall it looks good, I will have to pull out
-the spec and double check everything. I just wanted to give you some
-feedback early.
-
-Alistair
-
-> +
-> +#endif
-> --
-> 2.17.1
->
->
+r~
 
