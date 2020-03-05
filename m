@@ -2,98 +2,148 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC2DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BCEC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83D3A20848
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KpjgaBvN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D3A20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C17520848
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C17520848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9pxN-0007DN-Le
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:50:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41701)
+	id 1j9pxT-0007Kh-My
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:50:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9psz-00073M-1j
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:58 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1j9prk-0003sM-7I
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9psx-0001Wi-Op
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:56 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34958
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9psx-0001WY-KY
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:45:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583412355;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JfaE+0axlKWiznACDUVr5NFMk2fsnhKxXDiz+PMDV4Y=;
- b=KpjgaBvN/geU6cdjF4P4+omH8MwS0MNBgj6JKGdzemTQEaTtSnJfeBHhzm/l4DU7Ok+Pkd
- lZbDj/V29baTT2/otwXt25KEASd6hqS+Gv/2VHtM/glfx6ZkJk3YGYNrWrFvb3AjC55EY3
- ah6xLMAvdRH/3E5ovs3PyY6+KOjIKnc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-_0KXLWMnN2qr69nfToXtVQ-1; Thu, 05 Mar 2020 07:45:51 -0500
-X-MC-Unique: _0KXLWMnN2qr69nfToXtVQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s10so494158wrr.21
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:45:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=42bbadqUAgxtcc+IIT/30qYCAcYJc9y0Vsbx4Pz3gIU=;
- b=Ecxn/RpEdytcNdeunmcLEY0BT/uZRhnzE8+7jgGtf7qtBslLcOe70To2TkDkQCP2Wf
- RZdqO2PBcKejleVBoYRxoVak93jMgeHCza+iAC0zdNjF+ud/vtEpsoLmHGWQUB8qA+6l
- Wy1Fzzzy5wU1wbwAiOUc3lCsl16ALg4ADvx4Rj47o+9ugx122RLe7DwWElKdb+BrXbMI
- Q6BFZpUqIJGvcrORdiLLWniv1RyFai2gtPtPnGIBsbFYrBn5evgU0izeX4WpEN4CLexo
- ohWVstE/hsvaXYD9J0YrJR9XI+wDcB2u0VejH4kx3i2HJdPFa09UMZrCHnXwvfioe1bU
- qViA==
-X-Gm-Message-State: ANhLgQ3+5qdlm+L2MKh39rzkhDLWEN87T1L1344Ju6DcIB0yTJCBRnn4
- MUokVZxH//k+wmD0LX6zwlcz8JaTnIPSGFNaE12zXy9YpUWdRu/edFmb78EKnt61vZKQgL3JWek
- 63NDsK55kx3it6VE=
-X-Received: by 2002:a1c:e146:: with SMTP id y67mr9108383wmg.81.1583412350052; 
- Thu, 05 Mar 2020 04:45:50 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vthWhcpjJ0QtztZkI8eKhbEYA0N0BtUoJ9LPdGVIeSPURfmP7IqY9VKyto/DkMvQ6hUEDzqPA==
-X-Received: by 2002:a1c:e146:: with SMTP id y67mr9108368wmg.81.1583412349872; 
- Thu, 05 Mar 2020 04:45:49 -0800 (PST)
-Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id j14sm44924328wrn.32.2020.03.05.04.45.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 04:45:49 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 4/9] hw/net/e1000: Add readops/writeops typedefs
-Date: Thu,  5 Mar 2020 13:45:20 +0100
-Message-Id: <20200305124525.14555-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200305124525.14555-1-philmd@redhat.com>
-References: <20200305124525.14555-1-philmd@redhat.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1j9pri-0000mz-Rd
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:44:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32846
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1j9pri-0000mP-GS
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:44:38 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 025CcvAn003170
+ for <qemu-devel@nongnu.org>; Thu, 5 Mar 2020 07:44:37 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yk043kduc-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 07:44:37 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Thu, 5 Mar 2020 12:44:35 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 5 Mar 2020 12:44:33 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 025CiWdY38142086
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 5 Mar 2020 12:44:32 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0D4624204C;
+ Thu,  5 Mar 2020 12:44:32 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AC64242041;
+ Thu,  5 Mar 2020 12:44:31 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  5 Mar 2020 12:44:31 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
+To: Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>
+References: <20200224150213.21253-1-pasic@linux.ibm.com>
+ <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
+ <20200225125641.72e8cc86.pasic@linux.ibm.com>
+ <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Thu, 5 Mar 2020 13:44:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+In-Reply-To: <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20030512-4275-0000-0000-000003A8A1A7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030512-4276-0000-0000-000038BDB17D
+Message-Id: <c019ecc6-900e-8653-a603-de8d03017e95@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-05_03:2020-03-05,
+ 2020-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 mlxscore=0
+ malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0 mlxlogscore=999
+ clxscore=1015 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003050082
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0b-001b2d01.pphosted.com id 025CcvAn003170
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,79 +155,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, Marc Hartmayer <mhartmay@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Express the macreg[] arrays using typedefs.
-No logical changes introduced here.
 
-Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/net/e1000.c       | 6 ++++--
- hw/net/e1000e_core.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 0b833d5a15..972d9b5083 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -1150,7 +1150,8 @@ set_ims(E1000State *s, int index, uint32_t val)
- }
-=20
- #define getreg(x)    [x] =3D mac_readreg
--static uint32_t (*macreg_readops[])(E1000State *, int) =3D {
-+typedef uint32_t (*readops)(E1000State *, int);
-+static readops macreg_readops[] =3D {
-     getreg(PBA),      getreg(RCTL),     getreg(TDH),      getreg(TXDCTL),
-     getreg(WUFC),     getreg(TDT),      getreg(CTRL),     getreg(LEDCTL),
-     getreg(MANC),     getreg(MDIC),     getreg(SWSM),     getreg(STATUS),
-@@ -1205,7 +1206,8 @@ static uint32_t (*macreg_readops[])(E1000State *, int=
-) =3D {
- enum { NREADOPS =3D ARRAY_SIZE(macreg_readops) };
-=20
- #define putreg(x)    [x] =3D mac_writereg
--static void (*macreg_writeops[])(E1000State *, int, uint32_t) =3D {
-+typedef void (*writeops)(E1000State *, int, uint32_t);
-+static writeops macreg_writeops[] =3D {
-     putreg(PBA),      putreg(EERD),     putreg(SWSM),     putreg(WUFC),
-     putreg(TDBAL),    putreg(TDBAH),    putreg(TXDCTL),   putreg(RDBAH),
-     putreg(RDBAL),    putreg(LEDCTL),   putreg(VET),      putreg(FCRUC),
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 94ea34dca5..38bdb90114 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -2855,7 +2855,8 @@ e1000e_set_gcr(E1000ECore *core, int index, uint32_t =
-val)
- }
-=20
- #define e1000e_getreg(x)    [x] =3D e1000e_mac_readreg
--static uint32_t (*e1000e_macreg_readops[])(E1000ECore *, int) =3D {
-+typedef uint32_t (*readops)(E1000ECore *, int);
-+static readops e1000e_macreg_readops[] =3D {
-     e1000e_getreg(PBA),
-     e1000e_getreg(WUFC),
-     e1000e_getreg(MANC),
-@@ -3061,7 +3062,8 @@ static uint32_t (*e1000e_macreg_readops[])(E1000ECore=
- *, int) =3D {
- enum { E1000E_NREADOPS =3D ARRAY_SIZE(e1000e_macreg_readops) };
-=20
- #define e1000e_putreg(x)    [x] =3D e1000e_mac_writereg
--static void (*e1000e_macreg_writeops[])(E1000ECore *, int, uint32_t) =3D {
-+typedef void (*writeops)(E1000ECore *, int, uint32_t);
-+static writeops e1000e_macreg_writeops[] =3D {
-     e1000e_putreg(PBA),
-     e1000e_putreg(SWSM),
-     e1000e_putreg(WUFC),
---=20
-2.21.1
+On 25.02.20 15:35, Viktor Mihajlovski wrote:
+>=20
+>=20
+> On 2/25/20 12:56 PM, Halil Pasic wrote:
+>> On Tue, 25 Feb 2020 10:39:40 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 24.02.20 16:02, Halil Pasic wrote:
+>>>> We expose loadparm as a r/w machine property, but if loadparm is set=
+ by
+>>>> the guest via DIAG 308, we don't update the property. Having a
+>>>> disconnect between the guest view and the QEMU property is not nice =
+in
+>>>> itself, but things get even worse for SCSI, where under certain
+>>>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
+>>>> expected" for details) we call s390_gen_initial_iplb() on resets
+>>>> effectively overwriting the guest/user supplied loadparm with the st=
+ale
+>>>> value.
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>>>> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the machi=
+ne"
+>>>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
+>>>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>>>> ---
+>>>> =C2=A0 hw/s390x/ipl.c | 21 +++++++++++++++++++++
+>>>> =C2=A0 1 file changed, 21 insertions(+)
+>>>>
+>>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> [...]
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 /* Sync loadparm */
+>>>> +=C2=A0=C2=A0=C2=A0 if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char ascii_loadparm[8];
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *ebcdic_loadparm=
+ =3D iplb->loadparm;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int i;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < 8 && e=
+bcdic_loadparm[i]; i++) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+ascii_loadparm[i] =3D ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ascii_loadparm[i] =3D 0;
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_str(=
+mo, ascii_loadparm, "loadparm", NULL);
+>>>> +=C2=A0=C2=A0=C2=A0 } else {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_set_str(=
+mo, "", "loadparm", NULL);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>
+>>> &error_abort instead of NULL, we certainly want to know if this would
+>>> ever surprisingly fail.
+>>
+>> IMHO this is a typical assert() situation where one would like to have
+>> a fast and obvious failure when testing, but not in production.
+>>
+>> AFAIU the guest can trigger this code at any time, and crashing the
+>> whole (production) system seems a bit heavy handed to me. The setter
+>> should only fail if something is buggy.
+>>
+>> But if the majority says &error_abort I can certainly do. Other opinio=
+ns?
+>>
+> We might consider to return 0x0402 (invalid parameter) from the diag308=
+ "set", which is less drastic and would allow the OS to do whatever it fi=
+nds appropriate to deal with the failure. Not that Linux would care about=
+ that today :-).
+
+I think it is not an error. It is perfectly fine for a guest to not set D=
+IAG308_FLAGS_LP_VALID if the guest does not want to set it. The LOADPARM =
+is supposed to be ignored then.
+
+So we have two options:
+a. leave the patch as-is. This means that we replace the loadparm with an=
+ empty string
+b. remove the else. THis means that we leave the global loadparm unchange=
+d if the guest does not specify one (but it specifies a new IPLB).
+
+I will double check what LPAR does.
+
 
 
