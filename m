@@ -2,82 +2,86 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9886BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EB4C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6726E20637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B8EC20637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="osTZE+Wm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6726E20637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VXpisTyW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8EC20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9tic-0002qO-JN
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:51:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60916)
+	id 1j9tiw-0003UZ-CO
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:51:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tY4-000380-5e
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:37 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP7-0003UR-NA
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tY2-0007A8-16
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:35 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42967)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tP6-0002Ik-Ee
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:21 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tY0-00076v-MW
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:33 -0500
-Received: by mail-oi1-x243.google.com with SMTP id l12so6593251oil.9
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:40:32 -0800 (PST)
+ id 1j9tP6-0002Hw-7t
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:20 -0500
+Received: by mail-wr1-x443.google.com with SMTP id x7so7821770wrr.0
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=uqrF7yqAMbwz92BOwVaq6smzSWGbuVcVn8Zf/0+Yiao=;
- b=osTZE+WmoTbxfXIYEBst6acHOaf56qEr67NzJNHaU3/MwJdFudZ21/LMb+yvUyJzfK
- eQfwlwcaZByJ8gBP5Sx/u+w73d2wnlQna8kvZho5yXzN2aikIgWrZvWN3cRLFhjvqCoN
- fr8BUTFccqr2qu9lhXvPFrspnISzh6U/Y58wOMPCGkIVeU81KeVDCABcjE8lgp4JcH37
- OCLAE0HfdNeKRKm73sFdqWk6PcZqgtJHgOYEiFbNj/7FEUMSshJgI0GGhaOjiBl7bwb1
- iitc0Fw3OjtfJYE/CeD5qpkisgpP2Oi2qoP90kcE5puNVA+ZBVFKjU83wIPXqck8GLPs
- WyCQ==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=NFX4grdK7w+WKiMmZVSRsIqgwMx/D40LsR4lowSjx90=;
+ b=VXpisTyWDwzKNQfaLDE3js9GFYi5ve+XisvQF7gNpmMioLoT1hoGAxxG7bkq1B+kk/
+ XmQ41G42W0/Td9TGwfSD9KA5lR/20sz4dsdB8M1jfhgqaCgAJ3CwowAlpLGDbdSRPv2i
+ qf7DnDyAxho+6EyArx/f3a1WAZm9Ldb5costwCCP1r8x7CIbuwrFHbrljCiIK0EEyqQ2
+ 9TfhLfPJR7N6ZwpdjywRZLqgO4ZT6n65MUDzeDu9eiHwjrlyLxBkQZEdc7O0OdKFdkVj
+ aAyOPygE7TKpwttpm/FiBQm4lQ4TQKnfJUybN2AGfJZznK8CBr8dc6e2RvSXuGwYX9Bx
+ VrJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=uqrF7yqAMbwz92BOwVaq6smzSWGbuVcVn8Zf/0+Yiao=;
- b=QSkVnAdoTqvgE/Y5J9Ea+9OsYEYVrWCrpPlO2c1fvBqUiRdO8u5+PcEYnKNEbAnFLL
- Hg6dYMYTH3qcJlj845fg6Rdfs33NrZdtOBQ1ptbW6KH9RrzrybX1wOr2bjmd1fjPeofO
- d1kZLpQ8akBZm6Gnq+XH9/JrdukRmZ8hsYXHqHqxmKwQxigoNTJpwk+SN5iCvQYipoMV
- jwjk/uQWg0qX4DlaJk/Jcfl88QyTD/8ovPA9z7uld5BJj1nS9Wzqmts6gQ/2bz9jYtKR
- 2u3vWrQK7lwC9ycS43A2b5+3VazN0doBsTrV600MXGt8Gglx2MSW3ZOr6I003jBa9PCT
- MngQ==
-X-Gm-Message-State: ANhLgQ0sBmHfOkOf7BhJzj+1XRKLIJ4531990nLwo2Ac6tldRds57ABi
- AqJq/k8xbdDZ9BTHPCO554rVIuqh42uLaqXHuEpaYA==
-X-Google-Smtp-Source: ADFU+vuQK7nk35vQJDuZObHA5SSeVLR1H2ZEdSd1MlWgW9mDUETvV6qgZsZTRM+9zwWMhCGcF26sS/mmYgR/eKN5Uug=
-X-Received: by 2002:a54:478b:: with SMTP id o11mr1345121oic.146.1583426431560; 
- Thu, 05 Mar 2020 08:40:31 -0800 (PST)
-MIME-Version: 1.0
-References: <20200305154142.63070-1-jingqi.liu@intel.com>
- <20200305161047.GB3627464@lpt>
-In-Reply-To: <20200305161047.GB3627464@lpt>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NFX4grdK7w+WKiMmZVSRsIqgwMx/D40LsR4lowSjx90=;
+ b=HIEjKaWib3tL3qABu8ZjaW231ufVJMZP+lzbT0OjnWfrJGbl85biH5gXpi3gU8SLnK
+ /USfgPRjH9nV2nad1FpRefByhpTmiBKcl96WBKult8o+8HLCBUBhvqoQ0OwhGzruPwPA
+ NteqEYmoh3wXJzl24Ikte+5P7uNchoVfgyFIe2RtYnIzTKsoX2ihJdRYW1RHFfwWv76b
+ Xct2hFg/9t2GVm8lHlAsBj572hKHSpgiADvpwlfVQgG3KY/7+kiAHfVkrbtUvGKZ+Fd2
+ MFRuILEEYp9j0f37za6jX6R8gMxYfJTpW4a9ObS6oOgx/1HLJaooo3URbPQr8RHxkXpJ
+ au/Q==
+X-Gm-Message-State: ANhLgQ2BLy0hYBnPsEgwDF58Tjb9AQHg5RjKfXEuv2spYSGossK5FJTm
+ rpP6bKmPoRinXX9A57K2O/z0DIk/yY9fhg==
+X-Google-Smtp-Source: ADFU+vtHXZJyxuiPPM248NGfc5c3JIUcew3Cq8vbd6FahCicgq7EnV7RIFPwG27s5OYyBVWR9ZKUNQ==
+X-Received: by 2002:adf:eccd:: with SMTP id s13mr10598329wro.278.1583425878824; 
+ Thu, 05 Mar 2020 08:31:18 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.17
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 08:31:18 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Mar 2020 16:40:20 +0000
-Message-ID: <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
-Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
-To: =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: qemu-devel@nongnu.org
+Subject: [PULL 15/37] target/arm: Improve masking of HCR/HCR2 RES0 bits
+Date: Thu,  5 Mar 2020 16:30:38 +0000
+Message-Id: <20200305163100.22912-16-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
+References: <20200305163100.22912-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,58 +93,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <jingqi.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 at 16:11, J=C3=A1n Tomko <jtomko@redhat.com> wrote:
->
-> On a Thursday in 2020, Jingqi Liu wrote:
-> >The CONFIG_LINUX symbol is always not defined in this file.
-> >This fixes that "config-host.h" header file is not included
-> >for getting macros.
-> >
-> >Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-> >---
-> > util/mmap-alloc.c | 2 ++
-> > 1 file changed, 2 insertions(+)
-> >
-> >diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> >index 27dcccd8ec..24c0e380f3 100644
-> >--- a/util/mmap-alloc.c
-> >+++ b/util/mmap-alloc.c
-> >@@ -10,6 +10,8 @@
-> >  * later.  See the COPYING file in the top-level directory.
-> >  */
-> >
-> >+#include "config-host.h"
-> >+
->
-> According to CODING_STYLE.rst, qemu/osdep.h is the header file
-> that should be included first, before all the other includes.
->
-> So the minimal fix would be moving qemu/osdep.h up here.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Yes, osdep must always be first.
+Don't merely start with v8.0, handle v7VE as well.  Ensure that writes
+from aarch32 mode do not change bits in the other half of the register.
+Protect reads of aa64 id registers with ARM_FEATURE_AARCH64.
 
-> > #ifdef CONFIG_LINUX
-> > #include <linux/mman.h>
-> > #else  /* !CONFIG_LINUX */
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200229012811.24129-2-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-Do we really need this? osdep.h will pull in sys/mman.h
-for you, which should define the MAP_* constants.
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 4eaf7333c7b..19a8be84938 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5086,11 +5086,15 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[] = {
+     REGINFO_SENTINEL
+ };
+ 
+-static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
++static void do_hcr_write(CPUARMState *env, uint64_t value, uint64_t valid_mask)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+-    /* Begin with bits defined in base ARMv8.0.  */
+-    uint64_t valid_mask = MAKE_64BIT_MASK(0, 34);
++
++    if (arm_feature(env, ARM_FEATURE_V8)) {
++        valid_mask |= MAKE_64BIT_MASK(0, 34);  /* ARMv8.0 */
++    } else {
++        valid_mask |= MAKE_64BIT_MASK(0, 28);  /* ARMv7VE */
++    }
+ 
+     if (arm_feature(env, ARM_FEATURE_EL3)) {
+         valid_mask &= ~HCR_HCD;
+@@ -5104,14 +5108,17 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+          */
+         valid_mask &= ~HCR_TSC;
+     }
+-    if (cpu_isar_feature(aa64_vh, cpu)) {
+-        valid_mask |= HCR_E2H;
+-    }
+-    if (cpu_isar_feature(aa64_lor, cpu)) {
+-        valid_mask |= HCR_TLOR;
+-    }
+-    if (cpu_isar_feature(aa64_pauth, cpu)) {
+-        valid_mask |= HCR_API | HCR_APK;
++
++    if (arm_feature(env, ARM_FEATURE_AARCH64)) {
++        if (cpu_isar_feature(aa64_vh, cpu)) {
++            valid_mask |= HCR_E2H;
++        }
++        if (cpu_isar_feature(aa64_lor, cpu)) {
++            valid_mask |= HCR_TLOR;
++        }
++        if (cpu_isar_feature(aa64_pauth, cpu)) {
++            valid_mask |= HCR_API | HCR_APK;
++        }
+     }
+ 
+     /* Clear RES0 bits.  */
+@@ -5143,12 +5150,17 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+     arm_cpu_update_vfiq(cpu);
+ }
+ 
++static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
++{
++    do_hcr_write(env, value, 0);
++}
++
+ static void hcr_writehigh(CPUARMState *env, const ARMCPRegInfo *ri,
+                           uint64_t value)
+ {
+     /* Handle HCR2 write, i.e. write to high half of HCR_EL2 */
+     value = deposit64(env->cp15.hcr_el2, 32, 32, value);
+-    hcr_write(env, NULL, value);
++    do_hcr_write(env, value, MAKE_64BIT_MASK(0, 32));
+ }
+ 
+ static void hcr_writelow(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -5156,7 +5168,7 @@ static void hcr_writelow(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     /* Handle HCR write, i.e. write to low half of HCR_EL2 */
+     value = deposit64(env->cp15.hcr_el2, 0, 32, value);
+-    hcr_write(env, NULL, value);
++    do_hcr_write(env, value, MAKE_64BIT_MASK(32, 32));
+ }
+ 
+ /*
+-- 
+2.20.1
 
-Also, you have no fallbmack for "I'm on Linux but the
-system headers don't define MAP_SHARED_VALIDATE or
-MAP_SYNC". Wouldn't it be better to just have
-#ifndef MAP_SYNC
-#define MAP_SYNC 0
-#endif
-
-etc ?
-
-thanks
--- PMM
 
