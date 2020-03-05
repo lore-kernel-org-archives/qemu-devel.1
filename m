@@ -2,88 +2,82 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 539B5C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9886BC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D75F20637
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:50:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6726E20637
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 16:51:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s+pNFh/b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D75F20637
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="osTZE+Wm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6726E20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9thz-0001HR-AU
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:50:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59406)
+	id 1j9tic-0002qO-JN
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 11:51:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tPL-0003kw-1O
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:36 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tY4-000380-5e
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j9tPJ-0002jt-Iv
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:34 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:38032)
+ (envelope-from <peter.maydell@linaro.org>) id 1j9tY2-0007A8-16
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:35 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42967)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j9tPJ-0002j5-Cg
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:31:33 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id u9so6433675wml.3
- for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:31:33 -0800 (PST)
+ id 1j9tY0-00076v-MW
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 11:40:33 -0500
+Received: by mail-oi1-x243.google.com with SMTP id l12so6593251oil.9
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 08:40:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=6W8jzw/Q8S/83WHGlolRYzdtVt9ZYOyZtLguuMV9df0=;
- b=s+pNFh/bqnRhFSESXDAQaPTs4lsSebmTBi5mPy+rxTau1/R/kKdojmbCKPaePk4EeA
- lPX7XZhglWReqR41vsawiWZomT1ssXDaxGj3n/cKxs4Bm7z4Y1thwUMGGhK29Qpm51+d
- LvasBo5O5MV9PJyt/BpQTcSM7ocMuNYja4Ra9h7G5wH9SZljSyhxXyRcU5n4LhQp+b+1
- P/5pDu4jO+CsEJYgxT7FJvV/osP9kaGs/Vtks/fj+v+x756188pOWWXNo1hGCwI+gogJ
- /cyNi1UUZx9aOmUfLy9oqeMx1Z5a3xS/WqqgxxstRL4k/UL+i9SQJIkzsadELl7FgiOc
- d3mQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=uqrF7yqAMbwz92BOwVaq6smzSWGbuVcVn8Zf/0+Yiao=;
+ b=osTZE+WmoTbxfXIYEBst6acHOaf56qEr67NzJNHaU3/MwJdFudZ21/LMb+yvUyJzfK
+ eQfwlwcaZByJ8gBP5Sx/u+w73d2wnlQna8kvZho5yXzN2aikIgWrZvWN3cRLFhjvqCoN
+ fr8BUTFccqr2qu9lhXvPFrspnISzh6U/Y58wOMPCGkIVeU81KeVDCABcjE8lgp4JcH37
+ OCLAE0HfdNeKRKm73sFdqWk6PcZqgtJHgOYEiFbNj/7FEUMSshJgI0GGhaOjiBl7bwb1
+ iitc0Fw3OjtfJYE/CeD5qpkisgpP2Oi2qoP90kcE5puNVA+ZBVFKjU83wIPXqck8GLPs
+ WyCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6W8jzw/Q8S/83WHGlolRYzdtVt9ZYOyZtLguuMV9df0=;
- b=nQ7vos/BM/qlSuix0BeO2Jx89BznRTb3iA+ihwJ87oQ54NO6j11ZXHMzeTfj7k8HvQ
- Wvxr5vUgSpwPzbid9K83PaD/DK4yox+CEAuc1jbsIU293TB2vqxw2vL5Jpa1O7aYMARW
- OfEjiGF/4l3g4QVPvRBH0urwopSezONyNDsLfXjpu+G2CrA6gNnJGcy2vWH3EIxfc1+V
- 3GuujuoFXTaJHqimOrw4+RfYX/3M2aiyOgfdKM6XWPrDe1NupjglUgshsQioIsB0pqms
- I2LaowLtd29A9aFyG4+3oT45Tkh7zXV2eIFkxkO7LLoFNsCYlR54QfS/tTQdoFQ+Wq40
- K16w==
-X-Gm-Message-State: ANhLgQ0JNUvywjpvEOZ5MTcUX+W3O1W8+LhGWw5WB92BsHcFIZoATr9I
- tmEiHblAgjAi22VysvNrLW7nwqdklC7TQg==
-X-Google-Smtp-Source: ADFU+vvY/Si3GfXHWBKJEipssf0WPzEazhTHczZOsV/G5TzhEobR3JILWVcQCpxfXMxz2l1YoA7CoQ==
-X-Received: by 2002:a1c:b743:: with SMTP id h64mr4973274wmf.88.1583425891883; 
- Thu, 05 Mar 2020 08:31:31 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w22sm10310729wmk.34.2020.03.05.08.31.31
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Mar 2020 08:31:31 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 27/37] hw/arm/cubieboard: use ARM Cortex-A8 as the default CPU
- in machine definition
-Date: Thu,  5 Mar 2020 16:30:50 +0000
-Message-Id: <20200305163100.22912-28-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200305163100.22912-1-peter.maydell@linaro.org>
-References: <20200305163100.22912-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=uqrF7yqAMbwz92BOwVaq6smzSWGbuVcVn8Zf/0+Yiao=;
+ b=QSkVnAdoTqvgE/Y5J9Ea+9OsYEYVrWCrpPlO2c1fvBqUiRdO8u5+PcEYnKNEbAnFLL
+ Hg6dYMYTH3qcJlj845fg6Rdfs33NrZdtOBQ1ptbW6KH9RrzrybX1wOr2bjmd1fjPeofO
+ d1kZLpQ8akBZm6Gnq+XH9/JrdukRmZ8hsYXHqHqxmKwQxigoNTJpwk+SN5iCvQYipoMV
+ jwjk/uQWg0qX4DlaJk/Jcfl88QyTD/8ovPA9z7uld5BJj1nS9Wzqmts6gQ/2bz9jYtKR
+ 2u3vWrQK7lwC9ycS43A2b5+3VazN0doBsTrV600MXGt8Gglx2MSW3ZOr6I003jBa9PCT
+ MngQ==
+X-Gm-Message-State: ANhLgQ0sBmHfOkOf7BhJzj+1XRKLIJ4531990nLwo2Ac6tldRds57ABi
+ AqJq/k8xbdDZ9BTHPCO554rVIuqh42uLaqXHuEpaYA==
+X-Google-Smtp-Source: ADFU+vuQK7nk35vQJDuZObHA5SSeVLR1H2ZEdSd1MlWgW9mDUETvV6qgZsZTRM+9zwWMhCGcF26sS/mmYgR/eKN5Uug=
+X-Received: by 2002:a54:478b:: with SMTP id o11mr1345121oic.146.1583426431560; 
+ Thu, 05 Mar 2020 08:40:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200305154142.63070-1-jingqi.liu@intel.com>
+ <20200305161047.GB3627464@lpt>
+In-Reply-To: <20200305161047.GB3627464@lpt>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Mar 2020 16:40:20 +0000
+Message-ID: <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
+To: =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,53 +89,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
+On Thu, 5 Mar 2020 at 16:11, J=C3=A1n Tomko <jtomko@redhat.com> wrote:
+>
+> On a Thursday in 2020, Jingqi Liu wrote:
+> >The CONFIG_LINUX symbol is always not defined in this file.
+> >This fixes that "config-host.h" header file is not included
+> >for getting macros.
+> >
+> >Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> >---
+> > util/mmap-alloc.c | 2 ++
+> > 1 file changed, 2 insertions(+)
+> >
+> >diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> >index 27dcccd8ec..24c0e380f3 100644
+> >--- a/util/mmap-alloc.c
+> >+++ b/util/mmap-alloc.c
+> >@@ -10,6 +10,8 @@
+> >  * later.  See the COPYING file in the top-level directory.
+> >  */
+> >
+> >+#include "config-host.h"
+> >+
+>
+> According to CODING_STYLE.rst, qemu/osdep.h is the header file
+> that should be included first, before all the other includes.
+>
+> So the minimal fix would be moving qemu/osdep.h up here.
 
-The Cubieboard is a singleboard computer with an Allwinner A10 System-on-Chip [1].
-As documented in the Allwinner A10 User Manual V1.5 [2], the SoC has an ARM
-Cortex-A8 processor. Currently the Cubieboard machine definition specifies the
-ARM Cortex-A9 in its description and as the default CPU.
+Yes, osdep must always be first.
 
-This patch corrects the Cubieboard machine definition to use the ARM Cortex-A8.
+> > #ifdef CONFIG_LINUX
+> > #include <linux/mman.h>
+> > #else  /* !CONFIG_LINUX */
 
-The only user-visible effect is that our textual description of the
-machine was wrong, because hw/arm/allwinner-a10.c always creates a
-Cortex-A8 CPU regardless of the default value in the MachineClass struct.
+Do we really need this? osdep.h will pull in sys/mman.h
+for you, which should define the MAP_* constants.
 
- [1] http://docs.cubieboard.org/products/start#cubieboard1
- [2] https://linux-sunxi.org/File:Allwinner_A10_User_manual_V1.5.pdf
+Also, you have no fallbmack for "I'm on Linux but the
+system headers don't define MAP_SHARED_VALIDATE or
+MAP_SYNC". Wouldn't it be better to just have
+#ifndef MAP_SYNC
+#define MAP_SYNC 0
+#endif
 
-Fixes: 8a863c8120994981a099
-Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Message-id: 20200227220149.6845-2-nieklinnenbank@gmail.com
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[note in commit message that the bug didn't have much visible effect]
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/cubieboard.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+etc ?
 
-diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index 089f9a30c12..0195925c73d 100644
---- a/hw/arm/cubieboard.c
-+++ b/hw/arm/cubieboard.c
-@@ -68,8 +68,8 @@ static void cubieboard_init(MachineState *machine)
- 
- static void cubieboard_machine_init(MachineClass *mc)
- {
--    mc->desc = "cubietech cubieboard (Cortex-A9)";
--    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
-+    mc->desc = "cubietech cubieboard (Cortex-A8)";
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a8");
-     mc->init = cubieboard_init;
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
--- 
-2.20.1
-
+thanks
+-- PMM
 
