@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52545C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A00C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:06:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1161A2146E
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 00:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0EB520842
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 01:05:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SGcIXsWF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1161A2146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRTeVE8X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0EB520842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ejV-0000dY-7P
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 19:51:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36860)
+	id 1j9exb-0006Ab-22
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 20:05:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9ehM-0006DL-Sg
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:49:13 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9ewe-0004A7-TQ
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9ehK-000353-VR
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:49:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58324
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j9ewd-0005L2-O6
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:05:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21241
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9ehK-000344-Sa
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 19:49:10 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9ewd-0005Km-Ky
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 20:04:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583369350;
+ s=mimecast20190719; t=1583370299;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PjETIBQNzsyZ+xRKKECdXFIBvuCR8b8nsZGdNL5G0cQ=;
- b=SGcIXsWFx38Rw9p3RdgS5rlMvU7HNrupyB2bOdVuXpsygYPuLUyCrVl6/1C0h27SunKwpO
- WhO5n4JfR/iBnUPrG4MabQrB/8QWe/sq2XL4/Fx5j0SWE6t44WuXVjfwauJjDRMtBD6RBQ
- 8uiImk2mgo4UU5fk8zMIEJoCtsKx04s=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-PPdQ8kBlM6SCWGzZ-SyncQ-1; Wed, 04 Mar 2020 19:49:09 -0500
-X-MC-Unique: PPdQ8kBlM6SCWGzZ-SyncQ-1
-Received: by mail-wm1-f71.google.com with SMTP id j130so1433890wmj.9
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 16:49:08 -0800 (PST)
+ bh=G7z8C3H465JpVsN6Yw+fEi9EeJJjIsNf/qW73pA0nsU=;
+ b=JRTeVE8X0F2062/RDKe1zI4YQw7iR2tV9EF7lfvvg+WHj731ipMM+fzZcK9TZGQA49W+IH
+ of2CrKOkLDOIiCpksPr/+DApUwUPZIEmSSN3MyrRzZWbfDHQg1BsfInLUMpES9kbbDW2nN
+ MJgGcbZOdfPKYYripNNjwEkTinM6KLw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-U59JyTFEM_idYbz-pvR4zw-1; Wed, 04 Mar 2020 20:04:55 -0500
+X-MC-Unique: U59JyTFEM_idYbz-pvR4zw-1
+Received: by mail-wr1-f69.google.com with SMTP id d7so1641176wrr.0
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 17:04:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ix/W8AfQRhp1de4p5m7tRDcjdb+HvfRtvsCyJ6jZ204=;
- b=NBNeX20ko0rPG9lNApAuS4vTVdM3heGeHdIpV7z5fHTlpk7HBqi7S2okheV7f6Ir5Y
- 9BBmO4FBvqXrbRWxCfAebyLgi2gRYcMEHW5a7jRsmlySRC7oG1j0awo6djz8TY5FCeqv
- RUw6FnDTBcnVOtQk+qD7MjxTc0h0zt52ZVEboyVUGFMPiywcrl2U7mAvuQ69AN50IXFk
- YaQmP6xllG2m7BP4/tfta6rThqxi/wl+1vKMxyF5SFp1qxmC3yYL0oUdOPNDoLmzlmWh
- Qgdlx/IETh6eHEZVf+lWGxUnnTVKdq3PUJZ/66ohsx/IKDEiJS4PJz7AhVkujqfSm+XB
- +2OQ==
-X-Gm-Message-State: ANhLgQ0dX1Wi9gdGtZCdDKCf0MNRm9TWBLGH/sVn1ulxM3aFqUQdosmH
- brteD4dYN70N58n7DVcFSAf3B2WwSANZ6uW40d20tw8STDXMKijp+Yt5p3KELt6ssoTwj4oIQ2i
- hRKfvLGZ9CxlxGXA=
-X-Received: by 2002:adf:aa9e:: with SMTP id h30mr6965776wrc.288.1583369347614; 
- Wed, 04 Mar 2020 16:49:07 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuXDgM4HSebXJGn832stjAWZU4tJW+9+FOFNtO829vUKDOFLVxkA8AQPdRL8cceKajnF7zyZg==
-X-Received: by 2002:adf:aa9e:: with SMTP id h30mr6965754wrc.288.1583369347474; 
- Wed, 04 Mar 2020 16:49:07 -0800 (PST)
+ bh=mERLJkA6KL9WHqzO6Je/w9Mt4U4fyGT4//wl15kUfLY=;
+ b=VFo6+gzHubDstvX1N2wN/dyDcN2I+x2MQpZFmrS8Q/mleA7Y7spUrYJgjZieM5tcp8
+ czee8HKjooPRN11PMiTu/bFWhXMCJSLvc9o5o7lFRglqfalDCvmXpjOVxoQXRs279KDy
+ ikTELU455NSWJaMxthk630oXfvKPsWsJDcDSX8Ct4qZRvQGNK99j0v/oJZ8ii/mlfLdw
+ RrEdJKSA6oZiOKlTfdgoqmTHuF34nokO2D/w2VYlMkMst9syUs98zKCAyma4B/3bujNP
+ 9P1I7gQbtspdxqym/Xsk6qX1vK6yBLidIXs4f+gePR63euyJ198d/VqilFrVZbWk4iQa
+ UPbw==
+X-Gm-Message-State: ANhLgQ0RIKTVrrVzvNEcju8Bc1+lyNS7/Y6LpnJ8uI+QjWYDj7wDdcbZ
+ yEY8v0RttmZxGSQvGujhif65Lx1VfCw6x9tn81etUX+KBTchNRpzywrp3vUid0yQQVvEbbsSlv6
+ cm1iSyE2sOqPp6SE=
+X-Received: by 2002:adf:80cb:: with SMTP id 69mr6444513wrl.320.1583370294397; 
+ Wed, 04 Mar 2020 17:04:54 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vvJ90DV5759BkuoDYTgS2LzEz7rlCGQ76Yc2MdMX8Uuwxeu1ZXbzStpDEg3Jd8tWL72k4I3gw==
+X-Received: by 2002:adf:80cb:: with SMTP id 69mr6444498wrl.320.1583370294189; 
+ Wed, 04 Mar 2020 17:04:54 -0800 (PST)
 Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id w9sm3321715wrn.35.2020.03.04.16.49.06
+ by smtp.gmail.com with ESMTPSA id c23sm4561228wme.39.2020.03.04.17.04.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 16:49:07 -0800 (PST)
+ Wed, 04 Mar 2020 17:04:53 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] Makefile: Let the 'help' target list the tools targets
-Date: Thu,  5 Mar 2020 01:48:55 +0100
-Message-Id: <20200305004855.9665-3-philmd@redhat.com>
+Subject: [PATCH 1/3] hw/net/e1000: Add readops/writeops typedefs
+Date: Thu,  5 Mar 2020 02:04:44 +0100
+Message-Id: <20200305010446.17029-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200305004855.9665-1-philmd@redhat.com>
-References: <20200305004855.9665-1-philmd@redhat.com>
+In-Reply-To: <20200305010446.17029-1-philmd@redhat.com>
+References: <20200305010446.17029-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -92,7 +92,7 @@ Content-Type: text/plain; charset=UTF-8;
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,52 +104,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-List the name of the tool targets when calling 'make help':
-
-  $ make help
-  [...]
-  Tools targets:
-    qemu-ga                        - Build qemu-ga tool
-    qemu-keymap                    - Build qemu-keymap tool
-    elf2dmp                        - Build elf2dmp tool
-    ivshmem-client                 - Build ivshmem-client tool
-    ivshmem-server                 - Build ivshmem-server tool
-    qemu-nbd                       - Build qemu-nbd tool
-    qemu-img                       - Build qemu-img tool
-    qemu-io                        - Build qemu-io tool
-    qemu-edid                      - Build qemu-edid tool
-    fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper tool
-    scsi/qemu-pr-helper            - Build qemu-pr-helper tool
+Express the macreg[] arrays using typedefs.
+No logical changes introduced here.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- Makefile | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/net/e1000.c       | 6 ++++--
+ hw/net/e1000e_core.c | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index a9ede4f428..4a1d3e2a79 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1240,6 +1240,11 @@ endif
- =09=09$(foreach t, $(TARGET_DIRS), \
- =09=09$(call print-help-run,$(t)/all,Build for $(t));) \
- =09=09echo '')
-+=09@$(if $(TOOLS), \
-+=09=09echo 'Tools targets:'; \
-+=09=09$(foreach t, $(TOOLS), \
-+=09=09$(call print-help-run,$(t),Build $(shell basename $(t)) tool);) \
-+=09=09echo '')
- =09@echo  'Cleaning targets:'
- =09$(call print-help,clean,Remove most generated files but keep the config=
-)
- ifdef CONFIG_GCOV
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 0b833d5a15..972d9b5083 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -1150,7 +1150,8 @@ set_ims(E1000State *s, int index, uint32_t val)
+ }
+=20
+ #define getreg(x)    [x] =3D mac_readreg
+-static uint32_t (*macreg_readops[])(E1000State *, int) =3D {
++typedef uint32_t (*readops)(E1000State *, int);
++static readops macreg_readops[] =3D {
+     getreg(PBA),      getreg(RCTL),     getreg(TDH),      getreg(TXDCTL),
+     getreg(WUFC),     getreg(TDT),      getreg(CTRL),     getreg(LEDCTL),
+     getreg(MANC),     getreg(MDIC),     getreg(SWSM),     getreg(STATUS),
+@@ -1205,7 +1206,8 @@ static uint32_t (*macreg_readops[])(E1000State *, int=
+) =3D {
+ enum { NREADOPS =3D ARRAY_SIZE(macreg_readops) };
+=20
+ #define putreg(x)    [x] =3D mac_writereg
+-static void (*macreg_writeops[])(E1000State *, int, uint32_t) =3D {
++typedef void (*writeops)(E1000State *, int, uint32_t);
++static writeops macreg_writeops[] =3D {
+     putreg(PBA),      putreg(EERD),     putreg(SWSM),     putreg(WUFC),
+     putreg(TDBAL),    putreg(TDBAH),    putreg(TXDCTL),   putreg(RDBAH),
+     putreg(RDBAL),    putreg(LEDCTL),   putreg(VET),      putreg(FCRUC),
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index 94ea34dca5..38bdb90114 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2855,7 +2855,8 @@ e1000e_set_gcr(E1000ECore *core, int index, uint32_t =
+val)
+ }
+=20
+ #define e1000e_getreg(x)    [x] =3D e1000e_mac_readreg
+-static uint32_t (*e1000e_macreg_readops[])(E1000ECore *, int) =3D {
++typedef uint32_t (*readops)(E1000ECore *, int);
++static readops e1000e_macreg_readops[] =3D {
+     e1000e_getreg(PBA),
+     e1000e_getreg(WUFC),
+     e1000e_getreg(MANC),
+@@ -3061,7 +3062,8 @@ static uint32_t (*e1000e_macreg_readops[])(E1000ECore=
+ *, int) =3D {
+ enum { E1000E_NREADOPS =3D ARRAY_SIZE(e1000e_macreg_readops) };
+=20
+ #define e1000e_putreg(x)    [x] =3D e1000e_mac_writereg
+-static void (*e1000e_macreg_writeops[])(E1000ECore *, int, uint32_t) =3D {
++typedef void (*writeops)(E1000ECore *, int, uint32_t);
++static writeops e1000e_macreg_writeops[] =3D {
+     e1000e_putreg(PBA),
+     e1000e_putreg(SWSM),
+     e1000e_putreg(WUFC),
 --=20
 2.21.1
 
