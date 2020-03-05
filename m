@@ -8,77 +8,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E1DC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1909C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C977820716
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E41B206E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0je2bOR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C977820716
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCyr1wQU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E41B206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9veg-00011I-04
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:55:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56663)
+	id 1j9vhJ-0003hi-QA
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:58:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j9vdr-0008L9-4l
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:54:44 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j9vgW-0002Uu-Bj
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j9vdq-00031b-5j
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:54:43 -0500
-Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:36069)
+ (envelope-from <alistair23@gmail.com>) id 1j9vgV-00062q-7R
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:57:28 -0500
+Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:33384)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j9vdq-00030U-1k; Thu, 05 Mar 2020 13:54:42 -0500
-Received: by mail-ua1-x941.google.com with SMTP id 8so1633456uar.3;
- Thu, 05 Mar 2020 10:54:41 -0800 (PST)
+ id 1j9vgV-00062g-3o; Thu, 05 Mar 2020 13:57:27 -0500
+Received: by mail-vs1-xe44.google.com with SMTP id n27so4317659vsa.0;
+ Thu, 05 Mar 2020 10:57:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=4ccAzLE5mOex00atH+3ibjDE0M2w31Q1GeIWisoI3V8=;
- b=M0je2bOREpJY9kDPQeRAiRVwI/6L5vd4zRRSQ8EG7q77YROj6qcj9EtnxcLU6BqeDC
- HXEKmEERNeM2IYqHZ1n87gN08mwgVbAzYZdVj0pJWSIXGqME1anhjZ8gUQTb/cFLNX2q
- TDw8DnQeTSpj5WgVQmC5I1yaYo+hlh3E43fcgfYZrZG1KlA6+vgTLvEktWrgaLItFPV6
- n5E1e/0hzGA2Q1bb9WEujDqQvupHoY0tV2lkO8HaWJCf6sjNyZKtApRO5HJnuVJawNYk
- /ewaP3um5bveMh+MTxqZhOrLC64JsC9BnzTwDELTLDv+nQ6zZKm48ZQ3J/kicw3IuZAa
- glew==
+ bh=+cwCOVnv5+gU2TUyJwi4lIiO3QoIvc60U3Qfp+LsFy4=;
+ b=XCyr1wQUFBCI0ywucxOCnp9ixudm1tl7SyMcnP+jTPgHEQYsicn+HZazpR+VG7TAey
+ CVIWmzEFVTCVaYDzTWI5TydemJ1/p4uoUldat2xvJazlkdWcgwMNs5oVr2NOBsH3dRPu
+ thBJmiAQ0+2Qzw1By/QNZM2Km5/Sy6Y13uczpRakcbofko7iNYMmfSl+ZD71CjawiDRM
+ JgZRq8yUBhzw7nkI6ffse3VCOIzN69GcCyF2NmDOGAYSGSyeTWF8aKnEzLVG0B504lQV
+ 4Z+jpACaU8dPLw6dHMdcPmeRqMG6RKXDauc4iaBOfEpzsd+aZ9W8gSFaSfvhXd6WVXjd
+ Y89A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=4ccAzLE5mOex00atH+3ibjDE0M2w31Q1GeIWisoI3V8=;
- b=shZmqJ/+vBxZhuCM1SYPVl1RoY80DydGJ0LxxPZcD2otMSkwu6vlWHSLvrPTquU6Nj
- mzWxBFh/ghfPOYm0I0oewTBlhubt+nTkXRrB0UGuSI88jRs3oxrlAzJuNTXuHaqOygYM
- 0apkkV+YN+LmMfzqhxgy//juQ+HQQCRMxafrswOvvVAlWuUYufFYlyKvoxO2HoTFnHtn
- yq5+xDtT+hwPpwGXaMHvKkuRS74hw745gdzkx2yOMV2FDPXRr6HY5fF9VmWj28xoEvzA
- aAHSL9/FeCaazUeXnZhhVRy/p1hAyLuo1dBhIhbAZo+zrQDS0xkAAbb1H9qg2Sn9u43R
- nHtQ==
-X-Gm-Message-State: ANhLgQ3Cr2RBUg+0vUvKWEIelhIc9O6w6tsug0zdHtXviWlb/ZjmKup9
- /VQMiJKQDd2ajXsO6QFWQ3W/EaJH4SvChQCdK4Y=
-X-Google-Smtp-Source: ADFU+vuL6GMuIOjCawEGirbjL3YloDRp4DSxlPEA2bXWaKFxyjsemJvpflyLrUogAxibFSmoO8bLx1QSk3I8MUxblIE=
-X-Received: by 2002:ab0:143:: with SMTP id 61mr5554738uak.85.1583434481347;
- Thu, 05 Mar 2020 10:54:41 -0800 (PST)
+ bh=+cwCOVnv5+gU2TUyJwi4lIiO3QoIvc60U3Qfp+LsFy4=;
+ b=McQ3Zbyw16QHrwwViKN8fj6l6BRvt5SQH1RFfJrON9R+A35abz2VXpNy++7KRCKTTC
+ 8bvpEgXLxe7DwcpFHjbYeTesjQDYIT1/k1HxAdXeCjYPg9oahe3GpTfgXZpfxxPo9pBH
+ aCQOQwWlY5osf646PJE65ZorQVFVgWTfEUCCSonAL8jAdZ7ACUVVUEQoCVxfHXBg9RKP
+ U1tDsKXAGKja1MJNDTAeRrefwGJXz9Z5+/TM/PvU2KETkR34oAQp6ZdAQg+dCP3XpBQh
+ jB/NVnRsR5uRo8UOaFeOK2EXU2LdYeunWop0E6BuM4wTwih6Y5Tz/iZpBPLHgtBTVoLV
+ 86fQ==
+X-Gm-Message-State: ANhLgQ1aZq7OB81RUqD4JGbdR0ewYgtavi/QcRYgPKlAqTJeJ5XDvOMc
+ dJi4VoEteNo9C8ddxpCzc92S4ydDVxh+Z39W7p8=
+X-Google-Smtp-Source: ADFU+vtlh6yXliaFmE+5Mo8US5oJAaxW/QM0dBGXURKTD29pbjz4pCeXevaiNVGhyU7CX/YBtJa+UFK6jz5RuXGXXQ0=
+X-Received: by 2002:a67:fa43:: with SMTP id j3mr201048vsq.70.1583434646438;
+ Thu, 05 Mar 2020 10:57:26 -0800 (PST)
 MIME-Version: 1.0
 References: <20200305175651.4563-1-philmd@redhat.com>
- <20200305175651.4563-3-philmd@redhat.com>
-In-Reply-To: <20200305175651.4563-3-philmd@redhat.com>
+ <20200305175651.4563-4-philmd@redhat.com>
+In-Reply-To: <20200305175651.4563-4-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 5 Mar 2020 10:46:59 -0800
-Message-ID: <CAKmqyKPmBZatnDW248EJ2YrDaW3+6Q1R9n1so9_j_zfy2KtW1g@mail.gmail.com>
-Subject: Re: [PATCH 2/6] hw/net/smc91c111: Let smc91c111_can_receive() return
- a boolean
+Date: Thu, 5 Mar 2020 10:49:44 -0800
+Message-ID: <CAKmqyKOkUTDes8E2Ywtg=z+rxO19CptaO+ERV26SoXo2C2vTcA@mail.gmail.com>
+Subject: Re: [PATCH 3/6] hw/net/rtl8139: Simplify if/else statement
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::941
+X-Received-From: 2607:f8b0:4864:20::e44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,10 +105,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 5, 2020 at 9:57 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Thu, Mar 5, 2020 at 9:59 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
 >
-> The smc91c111_can_receive() function simply returns a boolean value.
+> Rewrite:
+>
+>       if (E) {
+>           return A;
+>       } else {
+>           return B;
+>       }
+>       /* EOF */
+>   }
+>
+> as:
+>
+>       if (E) {
+>           return A;
+>       }
+>       return B;
+>   }
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -118,34 +133,32 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/net/smc91c111.c | 8 ++++----
+>  hw/net/rtl8139.c | 8 ++++----
 >  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
-> index e9eb6f6c05..02be60c955 100644
-> --- a/hw/net/smc91c111.c
-> +++ b/hw/net/smc91c111.c
-> @@ -130,16 +130,16 @@ static void smc91c111_update(smc91c111_state *s)
->      qemu_set_irq(s->irq, level);
+> diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
+> index ae4739bc09..ef3211537f 100644
+> --- a/hw/net/rtl8139.c
+> +++ b/hw/net/rtl8139.c
+> @@ -808,11 +808,11 @@ static int rtl8139_can_receive(NetClientState *nc)
+>          /* ??? Flow control not implemented in c+ mode.
+>             This is a hack to work around slirp deficiencies anyway.  */
+>          return 1;
+> -    } else {
+> -        avail =3D MOD2(s->RxBufferSize + s->RxBufPtr - s->RxBufAddr,
+> -                     s->RxBufferSize);
+> -        return (avail =3D=3D 0 || avail >=3D 1514 || (s->IntrMask & RxOv=
+erflow));
+>      }
+> +
+> +    avail =3D MOD2(s->RxBufferSize + s->RxBufPtr - s->RxBufAddr,
+> +                 s->RxBufferSize);
+> +    return avail =3D=3D 0 || avail >=3D 1514 || (s->IntrMask & RxOverflo=
+w);
 >  }
 >
-> -static int smc91c111_can_receive(smc91c111_state *s)
-> +static bool smc91c111_can_receive(smc91c111_state *s)
->  {
->      if ((s->rcr & RCR_RXEN) =3D=3D 0 || (s->rcr & RCR_SOFT_RST)) {
-> -        return 1;
-> +        return true;
->      }
->      if (s->allocated =3D=3D (1 << NUM_PACKETS) - 1 ||
->          s->rx_fifo_len =3D=3D NUM_PACKETS) {
-> -        return 0;
-> +        return false;
->      }
-> -    return 1;
-> +    return true;
->  }
->
->  static inline void smc91c111_flush_queued_packets(smc91c111_state *s)
+>  static ssize_t rtl8139_do_receive(NetClientState *nc, const uint8_t *buf=
+, size_t size_, int do_interrupt)
 > --
 > 2.21.1
 >
