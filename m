@@ -2,81 +2,98 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3001C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 605EAC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF569208CD
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2906D2146E
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 12:19:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xu9cRNOh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF569208CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fnl6zG/Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2906D2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47965 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9pRp-0003q0-QK
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:17:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36050)
+	id 1j9pTY-0006ne-An
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 07:19:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1j9pPt-0001uE-Hq
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:15:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9pNc-0006fk-MK
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:13:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1j9pPq-0003ig-Mk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:15:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35397
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j9pNW-0000ZI-CD
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:13:28 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34368
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j9pPq-0003iO-HS
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:15:50 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9pNW-0000Z1-93
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 07:13:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583410549;
+ s=mimecast20190719; t=1583410406;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dTvHwz0BYCjpRYfidZ38RpDHxPcWsEJwvR6bc5RxKdE=;
- b=Xu9cRNOhnO/netifiiguq9fxUeJ6lOplj+5ZzASz4kl3/IpckdU3WOLWdMBNqsGxwiWJc0
- TVkMHw0TU+Uybbiu/n0GprrvOahjwa96GaNkP0Ltw8wFcD7lXecCvPnMqeym8pVZBJfseW
- UHwyyJXqfJSguKhrjYInmo1YYSPrtps=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-C-YU4YG0NgaG4cejqAZqAg-1; Thu, 05 Mar 2020 07:15:47 -0500
-X-MC-Unique: C-YU4YG0NgaG4cejqAZqAg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C050107ACC9;
- Thu,  5 Mar 2020 12:15:46 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 865BF1CB;
- Thu,  5 Mar 2020 12:15:44 +0000 (UTC)
-Message-ID: <01d311ec104f7cc494875d3fb64c7d73657586ad.camel@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots (was: [PATCH
- 02/13] qcrypto-luks: implement encryption key management)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 05 Mar 2020 14:15:43 +0200
-In-Reply-To: <6e42d2ac5a761548ed3b4fdf7382441646839a9b.camel@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
- <6e42d2ac5a761548ed3b4fdf7382441646839a9b.camel@redhat.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ bh=2sgBvEl+jyE9C+iCwWb8YP4xhIVb5G0+M5zi3OeMCiY=;
+ b=fnl6zG/ZRmsm7LJg+Kdj6gS8p9GtQF2u/JN6N/oWDIL1usrPz+L1U3FJKB0OXdhVUje9XR
+ aHPo+iJ9PFXgDkIop50upY9wBNLOZvxkq0RiHZfvjWAZbAdXd4bK1ED0hzdOx4kWJVnsNI
+ Ya9GAjWj40oU3WIzLjXk2SL0BC7NpmQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-TQTl6SzuMjSIEYwmU9YioA-1; Thu, 05 Mar 2020 07:13:24 -0500
+X-MC-Unique: TQTl6SzuMjSIEYwmU9YioA-1
+Received: by mail-wm1-f71.google.com with SMTP id p4so2804278wmp.0
+ for <qemu-devel@nongnu.org>; Thu, 05 Mar 2020 04:13:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=zCxk3Zde/q44N7tBo+VCD7daM7l+u+3ZJi6pI1CFBvk=;
+ b=XBEEoE57KjhszqlrJPZRO4pSn7955axidwyNj1jp9X4jQNe31HhabfoPF9EtYh0dY+
+ rKKBXmh0pFoVXkhgyEq3ZwF81m3ZxT9n3sifFUZOhR3pSQcYKseIZj+ldB2saIHh+Hh/
+ vyHRcFdZqhuwNKpKZ+Q2UyBg8Jdg2lvfd1rXzakbsravhmh1YRoWhjT+Z5OprnMl7PXZ
+ evJTEP6/3sHQkjdVf0g3KR3POGTdHtfOkI7399dK8wANAC5quowuQMKpy/RfsVqvhlvm
+ FLkBboflTN5VMigksUoVSiXWbxqx2dvX2KYEJ4OfMkw6CLWrMo6PXDRBBI5IXgoj0Rjk
+ nQFQ==
+X-Gm-Message-State: ANhLgQ377+V22Y/RCnTlfYisSEkWVOIaz5iPO6TaWwDTmDn2s84JiEr/
+ q39EH73/sDId2D1og9bbPKE3Mh1Ifgh+HPtBpcn2h5pLazO1OaIWmYxB99gQOII/K1XTqIDkfrx
+ llJkAEs9aQqvC1gs=
+X-Received: by 2002:a1c:7512:: with SMTP id o18mr9237472wmc.110.1583410402942; 
+ Thu, 05 Mar 2020 04:13:22 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsyv14cLQAJgWrkpyBv8heTFTsU17i81cdnCyRW54J7QltDIZb5EMzm+eTTlyEz5Ghsr6m0YA==
+X-Received: by 2002:a1c:7512:: with SMTP id o18mr9237449wmc.110.1583410402688; 
+ Thu, 05 Mar 2020 04:13:22 -0800 (PST)
+Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id a1sm4091094wru.75.2020.03.05.04.13.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Mar 2020 04:13:22 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 5/7] hw/scsi/spapr_vscsi: Do not mix SRP IU size with DMA
+ buffer size
+Date: Thu,  5 Mar 2020 13:12:51 +0100
+Message-Id: <20200305121253.19078-6-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200305121253.19078-1-philmd@redhat.com>
+References: <20200305121253.19078-1-philmd@redhat.com>
+MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,220 +105,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-03-03 at 11:18 +0200, Maxim Levitsky wrote:
-> On Sat, 2020-02-15 at 15:51 +0100, Markus Armbruster wrote:
-> > Review of this patch led to a lengthy QAPI schema design discussion.
-> > Let me try to condense it into a concrete proposal.
-> > 
-> > This is about the QAPI schema, and therefore about QMP.  The
-> > human-friendly interface is out of scope.  Not because it's not
-> > important (it clearly is!), only because we need to *focus* to have a
-> > chance at success.
-> > 
-> > I'm going to include a few design options.  I'll mark them "Option:".
-> > 
-> > The proposed "amend" interface takes a specification of desired state,
-> > and figures out how to get from here to there by itself.  LUKS keyslots
-> > are one part of desired state.
-> > 
-> > We commonly have eight LUKS keyslots.  Each keyslot is either active or
-> > inactive.  An active keyslot holds a secret.
-> > 
-> > Goal: a QAPI type for specifying desired state of LUKS keyslots.
-> > 
-> > Proposal:
-> > 
-> >     { 'enum': 'LUKSKeyslotState',
-> >       'data': [ 'active', 'inactive' ] }
-> > 
-> >     { 'struct': 'LUKSKeyslotActive',
-> >       'data': { 'secret': 'str',
-> >                 '*iter-time': 'int } }
-> > 
-> >     { 'struct': 'LUKSKeyslotInactive',
-> >       'data': { '*old-secret': 'str' } }
-> > 
-> >     { 'union': 'LUKSKeyslotAmend',
-> >       'base': { '*keyslot': 'int',
-> >                 'state': 'LUKSKeyslotState' }
-> >       'discriminator': 'state',
-> >       'data': { 'active': 'LUKSKeyslotActive',
-> >                 'inactive': 'LUKSKeyslotInactive' } }
-> > 
-> > LUKSKeyslotAmend specifies desired state for a set of keyslots.
-> > 
-> > Four cases:
-> > 
-> > * @state is "active"
-> > 
-> >   Desired state is active holding the secret given by @secret.  Optional
-> >   @iter-time tweaks key stretching.
-> > 
-> >   The keyslot is chosen either by the user or by the system, as follows:
-> > 
-> >   - @keyslot absent
-> > 
-> >     One inactive keyslot chosen by the system.  If none exists, error.
-> > 
-> >   - @keyslot present
-> > 
-> >     The keyslot given by @keyslot.
-> > 
-> >     If it's already active holding @secret, no-op.  Rationale: the
-> >     current state is the desired state.
-> > 
-> >     If it's already active holding another secret, error.  Rationale:
-> >     update in place is unsafe.
-> > 
-> >     Option: delete the "already active holding @secret" case.  Feels
-> >     inelegant to me.  Okay if it makes things substantially simpler.
-> > 
-> > * @state is "inactive"
-> > 
-> >   Desired state is inactive.
-> > 
-> >   Error if the current state has active keyslots, but the desired state
-> >   has none.
-> > 
-> >   The user choses the keyslot by number and/or by the secret it holds,
-> >   as follows:
-> > 
-> >   - @keyslot absent, @old-secret present
-> > 
-> >     All active keyslots holding @old-secret.  If none exists, error.
-> > 
-> >   - @keyslot present, @old-secret absent
-> > 
-> >     The keyslot given by @keyslot.
-> > 
-> >     If it's already inactive, no-op.  Rationale: the current state is
-> >     the desired state.
-> > 
-> >   - both @keyslot and @old-secret present
-> > 
-> >     The keyslot given by keyslot.
-> > 
-> >     If it's inactive or holds a secret other than @old-secret, error.
-> > 
-> >     Option: error regardless of @old-secret, if that makes things
-> >     simpler.
-> > 
-> >   - neither @keyslot not @old-secret present
-> > 
-> >     All keyslots.  Note that this will error out due to "desired state
-> >     has no active keyslots" unless the current state has none, either.
-> > 
-> >     Option: error out unconditionally.
-> > 
-> > Note that LUKSKeyslotAmend can specify only one desired state for
-> > commonly just one keyslot.  Rationale: this satisfies practical needs.
-> > An array of LUKSKeyslotAmend could specify desired state for all
-> > keyslots.  However, multiple array elements could then apply to the same
-> > slot.  We'd have to specify how to resolve such conflicts, and we'd have
-> > to code up conflict detection.  Not worth it.
-> > 
-> > Examples:
-> > 
-> > * Add a secret to some free keyslot:
-> > 
-> >   { "state": "active", "secret": "CIA/GRU/MI6" }
-> > 
-> > * Deactivate all keyslots holding a secret:
-> > 
-> >   { "state": "inactive", "old-secret": "CIA/GRU/MI6" }
-> > 
-> > * Add a secret to a specific keyslot:
-> > 
-> >   { "state": "active", "secret": "CIA/GRU/MI6", "keyslot": 0 }
-> > 
-> > * Deactivate a specific keyslot:
-> > 
-> >   { "state": "inactive", "keyslot": 0 }
-> > 
-> >   Possibly less dangerous:
-> > 
-> >   { "state": "inactive", "keyslot": 0, "old-secret": "CIA/GRU/MI6" }
-> > 
-> > Option: Make use of Max's patches to support optional union tag with
-> > default value to let us default @state to "active".  I doubt this makes
-> > much of a difference in QMP.  A human-friendly interface should probably
-> > be higher level anyway (Daniel pointed to cryptsetup).
-> > 
-> > Option: LUKSKeyslotInactive member @old-secret could also be named
-> > @secret.  I don't care.
-> > 
-> > Option: delete @keyslot.  It provides low-level slot access.
-> > Complicates the interface.  Fine if we need lov-level slot access.  Do
-> > we?
-> > 
-> > I apologize for the time it has taken me to write this.
-> > 
-> > Comments?
-> 
-> I tried today to implement this but I hit a very unpleasant roadblock:
-> 
-> Since QCrypto is generic (even though it only implements currently luks for raw/qcow2 usage,
-> and legacy qcow2 aes encryption), I still can't assume that this is always the case.
-> Thus I implemented the Qcrypto amend API in this way:
-> 
-> ##
-> # @QCryptoBlockAmendOptions:
-> #
-> # The options that are available for all encryption formats
-> # when amending encryption settings
-> #
-> # Since: 5.0
-> ##
-> { 'union': 'QCryptoBlockAmendOptions',
->   'base': 'QCryptoBlockOptionsBase',
->   'discriminator': 'format',
->   'data': {
->           'luks': 'QCryptoBlockAmendOptionsLUKS' } }
-> 
-> However the QCryptoBlockAmendOptionsLUKS is a union too to be in line with the API proposal,
-> but that is not supported on QAPI level and after I and Markus talked about we are not sure
-> that it is worth it to implement this support only for this case.
-> 
-> So far I see the following solutions
-> 
-> 
-> 1. Drop the QCryptoBlockAmendOptionsLUKS union for now.
-> This will bring the schema pretty much to be the same as my original proposal,
-> however the API will be the same thus once nested unions are implemented this union
-> can always be introduced again.
-> 
-> 2. Drop the QCryptoBlockAmendOptions union. Strictly speaking this union is not needed
-> since it only has one member anyway, however this union is used both by qcow2 QAPI scheme,
-> so that it doesn't hardcode an encryption format for amend just like it doesn't for creation,
-> (this can be hardcoded for now as well for now as long as we don't have more amendable encryption formats).
-> However I also use the QCryptoBlockAmendOptions in C code in QCrypto API thus it will be ugly to use the 
-> QCryptoBlockAmendOptionsLUKS instead.
-> 
-> 
-> 3. Make QCryptoBlockAmendOptionsLUKS a struct and add to it a nested member with new union type 
-> (say QCryptoBlockAmendOptionsLUKS1) which will be exactly as QCryptoBlockAmendOptionsLUKS was.
-> 
-> This IMHO is even uglier since it changes the API (which we can't later fix) and adds both a dummy struct
-> field and a dummy struct name.
-> 
-> I personally vote 1.
+The 'union srp_iu' is meant as a pointer to any SRP Information
+Unit type, it is not related to the size of a VIO DMA buffer.
 
-Any update?
+Use a plain buffer for the VIO DMA read/write calls.
+We can remove the reserved buffer from the 'union srp_iu'.
 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> 
+This issue was noticed when replacing the zero-length arrays
+from hw/scsi/srp.h with flexible array member,
+'clang -fsanitize=3Dundefined' reported:
 
+  hw/scsi/spapr_vscsi.c:69:29: error: field 'iu' with variable sized type '=
+union viosrp_iu' not at the end of a struct or class is a GNU extension [-W=
+error,-Wgnu-variable-sized-type-not-at-end]
+       union viosrp_iu         iu;
+                               ^
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v2: Removed unuseful _Static_assert (dgibson)
+---
+ hw/scsi/viosrp.h      |  1 -
+ hw/scsi/spapr_vscsi.c | 10 +++++-----
+ 2 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/hw/scsi/viosrp.h b/hw/scsi/viosrp.h
+index 25676c2383..e5f9768e8f 100644
+--- a/hw/scsi/viosrp.h
++++ b/hw/scsi/viosrp.h
+@@ -49,7 +49,6 @@ union srp_iu {
+     struct srp_tsk_mgmt tsk_mgmt;
+     struct srp_cmd cmd;
+     struct srp_rsp rsp;
+-    uint8_t reserved[SRP_MAX_IU_LEN];
+ };
+=20
+ enum viosrp_crq_formats {
+diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
+index 70547f98ac..acf9bb50bc 100644
+--- a/hw/scsi/spapr_vscsi.c
++++ b/hw/scsi/spapr_vscsi.c
+@@ -66,7 +66,7 @@ typedef union vscsi_crq {
+=20
+ typedef struct vscsi_req {
+     vscsi_crq               crq;
+-    union viosrp_iu         iu;
++    uint8_t                 viosrp_iu_buf[SRP_MAX_IU_LEN];
+=20
+     /* SCSI request tracking */
+     SCSIRequest             *sreq;
+@@ -99,7 +99,7 @@ typedef struct {
+=20
+ static union viosrp_iu *req_iu(vscsi_req *req)
+ {
+-    return &req->iu;
++    return (union viosrp_iu *)req->viosrp_iu_buf;
+ }
+=20
+ static struct vscsi_req *vscsi_get_req(VSCSIState *s)
+@@ -183,7 +183,7 @@ static int vscsi_send_iu(VSCSIState *s, vscsi_req *req,
+=20
+     /* First copy the SRP */
+     rc =3D spapr_vio_dma_write(&s->vdev, req->crq.s.IU_data_ptr,
+-                             &req->iu, length);
++                             &req->viosrp_iu_buf, length);
+     if (rc) {
+         fprintf(stderr, "vscsi_send_iu: DMA write failure !\n");
+     }
+@@ -602,7 +602,7 @@ static const VMStateDescription vmstate_spapr_vscsi_req=
+ =3D {
+     .minimum_version_id =3D 1,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_BUFFER(crq.raw, vscsi_req),
+-        VMSTATE_BUFFER(iu.srp.reserved, vscsi_req),
++        VMSTATE_BUFFER(viosrp_iu_buf, vscsi_req),
+         VMSTATE_UINT32(qtag, vscsi_req),
+         VMSTATE_BOOL(active, vscsi_req),
+         VMSTATE_UINT32(data_len, vscsi_req),
+@@ -1103,7 +1103,7 @@ static void vscsi_got_payload(VSCSIState *s, vscsi_cr=
+q *crq)
+     }
+=20
+     /* XXX Handle failure differently ? */
+-    if (spapr_vio_dma_read(&s->vdev, crq->s.IU_data_ptr, &req->iu,
++    if (spapr_vio_dma_read(&s->vdev, crq->s.IU_data_ptr, &req->viosrp_iu_b=
+uf,
+                            crq->s.IU_length)) {
+         fprintf(stderr, "vscsi_got_payload: DMA read failure !\n");
+         vscsi_put_req(req);
+--=20
+2.21.1
 
 
