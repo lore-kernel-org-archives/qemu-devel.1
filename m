@@ -2,69 +2,69 @@ Return-Path: <SRS0=BVCf=4W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919B3C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB4BC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60AD020716
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51098208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Mar 2020 18:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMXSKKrm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60AD020716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+xz1yGU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51098208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ux7-00047B-Fo
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:10:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49509)
+	id 1j9vCn-0001wh-Fc
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 13:26:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9uwR-0003bo-KS
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:09:52 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9vBy-0001B9-It
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9uwQ-0007gN-1R
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:09:50 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52651
+ (envelope-from <jsnow@redhat.com>) id 1j9vBw-0006F0-M3
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34560
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9uwP-0007eW-Sx
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:09:49 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9vBw-0006EM-If
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 13:25:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583431788;
+ s=mimecast20190719; t=1583432751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=OBGVYdDhqv1Uj9uD+FjjBDoDrjilHLrtWZfGciPuB0I=;
- b=GMXSKKrmfcZv9bYPcWBG0OPJAqQ9iypk5M04s6ZMtP5pJiqpXlRm8To+W1cj/b6YYlqpWY
- A9pAM+VwomjxdPrTzEr6aWmbLJ3qk1Q6+kczr9plWdEQ2YxHUQ+w6IYjilDOAa4OsjNBiJ
- B70XkiIg9oytYWW+zWg7CgOfk0F53oE=
+ bh=Bzd0CxFe1i9bKiLXbe06FC3UnijR6HFoIvxvfmKyC0A=;
+ b=c+xz1yGUeTOrANknbwBdoaf0f/4SzX3zrn/OmheI+nNNejpHFojtm/aAvbjM77E8bFvucL
+ NBU8XiLCMoQxnZLW/OaLY/EBX3XCvt7Fby/iR164sja8lq4gGrcOu7Inp+T0ae2/EKRXWe
+ Nptf6tEHQ6FVAyyW1Kl6DLf7Mk37PeI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-r-BSOn0PMSqg6gEYzMSVwA-1; Thu, 05 Mar 2020 13:09:47 -0500
-X-MC-Unique: r-BSOn0PMSqg6gEYzMSVwA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-253-DzuKs0ZRNaOmM3Ty5H3A0g-1; Thu, 05 Mar 2020 13:25:48 -0500
+X-MC-Unique: DzuKs0ZRNaOmM3Ty5H3A0g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 373121005510;
- Thu,  5 Mar 2020 18:09:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2A9A13EA;
+ Thu,  5 Mar 2020 18:25:46 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3601272A7;
- Thu,  5 Mar 2020 18:09:44 +0000 (UTC)
-Subject: Re: [PATCH v2 4/4] qapi: Brush off some (py)lint
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200304155932.20452-1-armbru@redhat.com>
- <20200304155932.20452-5-armbru@redhat.com>
- <896c42b1-eaeb-51bd-1dc3-ba5508431149@redhat.com>
- <87blpb1h1i.fsf@dusky.pond.sub.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60CE08F34E;
+ Thu,  5 Mar 2020 18:25:44 +0000 (UTC)
+Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200304213818.15341-1-jsnow@redhat.com>
+ <20200304213818.15341-7-jsnow@redhat.com>
+ <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
+ <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
+ <20200305115548.GA5363@linux.fritz.box>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -140,18 +140,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <0f4f70fe-238d-0d8e-72e5-796db9d601fa@redhat.com>
-Date: Thu, 5 Mar 2020 13:09:44 -0500
+Message-ID: <d9500e3c-48d4-8ab2-51c7-9a914dd8ec49@redhat.com>
+Date: Thu, 5 Mar 2020 13:25:43 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <87blpb1h1i.fsf@dusky.pond.sub.org>
+In-Reply-To: <20200305115548.GA5363@linux.fritz.box>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -166,49 +166,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: crosa@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org,
- ehabkost@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: qemu-block@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/5/20 12:56 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 3/4/20 10:59 AM, Markus Armbruster wrote:
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  scripts/qapi/commands.py   |  2 +-
->>>  scripts/qapi/expr.py       |  3 +--
->>>  scripts/qapi/gen.py        |  9 ++++++---
->>>  scripts/qapi/introspect.py |  2 --
->>>  scripts/qapi/parser.py     |  6 ++----
->>>  scripts/qapi/schema.py     | 11 +++++------
->>>  6 files changed, 15 insertions(+), 18 deletions(-)
->>>
+On 3/5/20 6:55 AM, Kevin Wolf wrote:
+> Am 05.03.2020 um 00:14 hat John Snow geschrieben:
 >>
->> Looks okay. (I don't care as much about no-else-return being there or
->> not, and this module is your baby.)
-> 
-> I admit I personally prefer to elide the else there.  But my main
-> argument is consistent style.  Picking the one pylint wants makes
-> consistency easier.
-> 
->> Reviewed-by: John Snow <jsnow@redhat.com>
-> 
-> Thanks!
-> 
+>>
+>> On 3/4/20 4:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>=20
+> Adding back the context:
+>=20
+>> -        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitco=
+de, ' '.join(qemu_img_args + list(args))))
+>> +        sys.stderr.write('qemu-img received signal %i: %s\n' % (
+>> +            -exitcode, ' '.join(qemu_img_args + list(args))))
+>=20
+>>> Do we want to indent Python like C and align argument below opening
+>>> parenthesis? Except when using sys.stderr.write() you seem to do it.
+>>
+>> This isn't an argument to write, it's an argument to the format string,
+>> so I will say "no."
+>=20
+> The argument to write() is an expression. This expression contains the %
+> operator with both of its operands. It's still fully within the
+> parentheses of write(), so I think Philippe's question is valid.
+>=20
+>> For *where* I've placed the line break, this is the correct indentation.
+>> emacs's python mode will settle on this indent, too.
+>>
+>> https://python.org/dev/peps/pep-0008/#indentation
+>=20
+> The PEP-8 examples are not nested, so it's not completely clear. I
+> wonder if hanging indents wouldn't actually mean the following because
+> if you line wrap an argument list (which contains the whole %
+> expression), you're supposed to have nothing else on the line of the
+> opening parenthesis:
+>=20
+>     sys.stderr.write(
+>         'qemu-img received signal %i: %s\n'
+>         % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>=20
 
-I capitulated to Max and Kevin who disliked the same, and also
-personally agree I like to visually see the branches.
+This is fine too.
 
-(If we want a tree-wide python style it might be useful to converge the
-linting configurations at some point -- but not yet, and it's not as
-important as the more nuts and bolts cleanups to remove Python3. RB
-stands, of course.)
+> But anyway, I think the question is more whether we want to use hanging
+> indents at all (or at least if we want to use it even in cases where the
+> opening parenthesis isn't already at like 70 characters) when we're
+> avoiding it in our C coding style.
+>=20
+> There's no technical answer to this, it's a question of our preferences.
+>=20
 
---js
+Maybe it is ambiguous. Long lines are just ugly everywhere.
+
+>> (If anyone quotes Guido's belittling comment in this email, I will
+>> become cross.)
+>>
+>>
+>> But there are other places to put the line break. This is also
+>> technically valid:
+>>
+>> sys.stderr.write('qemu-img received signal %i: %s\n'
+>>                  % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>>
+>> And so is this:
+>>
+>>     sys.stderr.write('qemu-img received signal %i: %s\n' %
+>>                      (-exitcode, ' '.join(qemu_img_args + list(args))))
+>=20
+> PEP-8 suggests the former, but allows both styles:
+>=20
+> https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or-a=
+fter-a-binary-operator
+>=20
+
+So in summary:
+
+- Avoid nested hanging indents from format operators
+- Use a line break before the % format operator.
+- OPTIONALLY(?), use a hanging indent for the entire format string to
+reduce nesting depth.
+
+
+e.g., either this form:
+(using a line break before the binary operator and nesting to the
+argument level)
+
+write('hello %s'
+      % (world,))
+
+
+or optionally this form if it buys you a little more room:
+(using a hanging indent of 4 spaces and nesting arguments at that level)
+
+write(
+    'hello %s'
+    % ('world',))
+
+
+but not ever this form:
+(Using a hanging indent of 4 spaces from the opening paren of the format
+operand)
+
+write('hello %s' % (
+    'world',))
+
+
+
+yea/nea?
+
+(Kevin, Philippe, Markus, Max)
+
+>> (And so would be any other number of rewrites to use format codes,
+>> f-strings, or temporary variables to otherwise reduce the length of the
+>> line.)
+>>
+>> I will reluctantly admit that wrapping to 79 columns is useful in some
+>> contexts. The beauty of line continuations is something I have little
+>> desire to litigate, though.
+>>
+>> If there's some consensus on the true and beautiful way to do it, I will
+>> oblige -- but the thought of spinning more iterations until we find a
+>> color swatch we like is an unpleasant one.
+>=20
+> I'll accept any colour for the bikeshed, as long as it's green. ;-)
+>=20
+> Kevin
+>=20
 
 
