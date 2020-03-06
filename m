@@ -2,68 +2,68 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1A3C10F00
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C682C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBD462070A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C59D2073D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fo/Lhq4o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD462070A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YuuqoM5B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C59D2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAA6M-0000pz-V7
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:21:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58935)
+	id 1jAA8k-00021v-99
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:23:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jAA5n-0000MQ-LP
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:20:32 -0500
+ (envelope-from <david@redhat.com>) id 1jAA83-0001OH-DX
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jAA5l-0002aW-VM
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:20:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60537
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jAA82-00078m-Cg
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53242
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jAA5l-0002ZX-RX
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:20:29 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jAA82-00077L-9n
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583490029;
+ s=mimecast20190719; t=1583490169;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3FKeA2riCDE4camcidmhJrauYZYJKBFvqZXTe/rGUGk=;
- b=Fo/Lhq4oZLnd0TMAKbB9dOaFyYpK9dE/RIVdZwL9D7oVsdGaql+VI2hLDOipTFLKGhVZ5g
- nrt0eNrzC1yEYb0PtZ2FC1KKU2if1yACM6GwzQiQESZTYySMkF6s0+PdTRXdSTEwSRSP67
- Ti4SCIbv+aIG/l/CKyZ9nbZtgXt9Nn0=
+ bh=4+OOren8GJsyZVW7YMWNzxjsY5g0zNjR86SVAAMbL1o=;
+ b=YuuqoM5B1ZBu27ccXwC+Jc9P7e9Fw9hU/34KWi3BVaNEtowWTFkvjnl4wxAn/8razSo6bq
+ +0UtQdUzUwSw/HgLlg5Ui2rjaPUck7IvnZhcZuECGbg2SfiJgjYAiEvFWbEnjXadEYPzqe
+ rx3uC/x0FieGyZaoYA6gYzOU+dyBDkw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-oSn1uCJyPVSGNqymoiqjKQ-1; Fri, 06 Mar 2020 05:20:25 -0500
-X-MC-Unique: oSn1uCJyPVSGNqymoiqjKQ-1
+ us-mta-485-2HJ9Ru6mOz-qRIFXn_MMIQ-1; Fri, 06 Mar 2020 05:22:46 -0500
+X-MC-Unique: 2HJ9Ru6mOz-qRIFXn_MMIQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D2A4108442A;
- Fri,  6 Mar 2020 10:20:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9D508014CA;
+ Fri,  6 Mar 2020 10:22:44 +0000 (UTC)
 Received: from [10.36.117.101] (ovpn-117-101.ams2.redhat.com [10.36.117.101])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E5E7187B2F;
- Fri,  6 Mar 2020 10:20:19 +0000 (UTC)
-Subject: Re: [PATCH RFC 4/4] kvm: Implement atomic memory region resizes via
- region_resize()
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200303141939.352319-1-david@redhat.com>
- <20200303141939.352319-5-david@redhat.com>
- <102af47e-7ec0-7cf9-8ddd-0b67791b5126@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9572D91D87;
+ Fri,  6 Mar 2020 10:22:43 +0000 (UTC)
+Subject: Re: [PATCH v6 16/18] s390x: Add unpack facility feature to GA1
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-17-frankja@linux.ibm.com>
+ <9237b77a-4ae8-387c-9d98-aa66729db362@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,19 +109,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <3b67a5ba-dc21-ad42-4363-95bb685240b9@redhat.com>
-Date: Fri, 6 Mar 2020 11:20:19 +0100
+Message-ID: <fcfec7b7-8026-5f71-e3a8-a9120e847158@redhat.com>
+Date: Fri, 6 Mar 2020 11:22:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <102af47e-7ec0-7cf9-8ddd-0b67791b5126@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <9237b77a-4ae8-387c-9d98-aa66729db362@linux.ibm.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,85 +135,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06.03.20 10:50, Paolo Bonzini wrote:
-> On 03/03/20 15:19, David Hildenbrand wrote:
->> virtio-mem wants to resize (esp. grow) ram memory regions while the gu=
-est
->> is already aware of them and makes use of them. Resizing a KVM slot ca=
-n
->> only currently be done by removing it and re-adding it. While the kvm =
-slot
->> is temporarily removed, VCPUs that try to read from these slots will f=
-ault.
->=20
-
-s/try to read/try to access/
-
-> Only fetches I think?  Data reads and write would be treated as MMIO
-> accesses and they should just work (using either the old or new FlatVie=
-w).
-
-On x86-64, I saw KVM fault printks getting printed (it was about 1-2
-years ago, though, when I realized this was a problem). Could be that
-these were fetches. At least the guest eventually crashed :)
-
-On other archs (esp. s390x) guests will directly receive a
-PGM_ADDRESSING from KVM if they stumble over memory that is not covered
-by a kvm slot.
-
->=20
->> But also, other ioctls might depend on all slots being in place.
+On 06.03.20 11:14, Janosch Frank wrote:
+> On 3/4/20 12:42 PM, Janosch Frank wrote:
+>> From: Christian Borntraeger <borntraeger@de.ibm.com>
 >>
->> Let's inhibit most KVM ioctls while performing the resize. Once we hav=
-e an
->> ioctl that can perform atomic resizes (e.g., KVM_SET_USER_MEMORY_REGIO=
-N
->> extensions), we can make inhibiting optional at runtime.
+>> The unpack facility is an indication that diagnose 308 subcodes 8-10
+>> are available to the guest. That means, that the guest can put itself
+>> into protected mode.
 >>
->> Also, make sure to hold the kvm_slots_lock while performing both
->> actions (removing+re-adding).
+>> Once it is in protected mode, the hardware stops any attempt of VM
+>> introspection by the hypervisor.
 >>
->> Note: Resizes of memory regions currently seems to happen during bootu=
-p
->> only, so I don't think any existing RT users should be affected.
->=20
-> rwlocks are not efficient, they cause cache line contention.  For
-> MMIO-heavy workloads the impact will be very large (well, not that larg=
-e
-> because right now they all take the BQL, but one can always hope).
+>> Some features are currently not supported in protected mode:
+>>      * Passthrough devices
+>>      * Migration
+>>      * Huge page backings
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> This one will be the first patch (after sync) and will also get the
+> DEF_FEAT definition, so I can use it in the diag 308 8-10 patch
 
-Yeah, rwlocks are not optimal and I am still looking for better
-alternatives (suggestions welcome :) ). Using RCU might not work,
-because the rcu_read region might be too big (esp. while in KVM_RUN).
+You should still enable the whole machinery only after everything has
+been implemented. Moving the feature is fine.
 
-I had a prototype which used a bunch of atomics + qemu_cond_wait. But it
-was quite elaborate and buggy.
 
-(I assume only going into KVM_RUN is really affected, and I do wonder if
-it will be noticeable at all. Doing an ioctl is always already an
-expensive operation.)
-
-I can look into per-cpu locks instead of the rwlock.
-
->=20
-> I would very much prefer to add a KVM_SET_USER_MEMORY_REGION extension
-> right away.
->=20
-
-I really want to avoid dependencies on kernel features to at least make
-it work for now. Especially, resizing memory slots in KVM (especially
-while dirty bitmaps, rmaps, etc. are active) is non-trivial.
-
-Thanks Paolo!
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
