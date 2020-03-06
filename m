@@ -2,86 +2,81 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD70C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F613C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B95242051A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:36:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A5B520717
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:36:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ia7oHFmx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95242051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACtgPYPH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A5B520717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40217 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGtR-0005mj-Un
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:36:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50745)
+	id 1jAGtZ-00068Q-F4
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:36:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbl-0000YH-Hl
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:58 -0500
+ (envelope-from <jandryuk@gmail.com>) id 1jAGqu-0000po-QE
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:33:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbk-0007tQ-Aq
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:57 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37652)
+ (envelope-from <jandryuk@gmail.com>) id 1jAGqr-00065X-Ta
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:33:36 -0500
+Received: from mail-lj1-x236.google.com ([2a00:1450:4864:20::236]:42950)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jAGbk-0007qg-3h
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:56 -0500
-Received: by mail-wm1-x342.google.com with SMTP id a141so3186934wme.2
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:17:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=dELmma94fIMJnBaoti3wb6dHPUqTaIQs2QH0CFvzC6Q=;
- b=Ia7oHFmxq/KVNlHoiYLmJqILSun6LVFikeMRB4EnsbPZRegEZ2Ym/uOE6QygabsW1l
- T8tuGsxqYX2zVswSQob3vY3ii/uaXJAQnmdr6s1psJhbyOS8ffwc1cGyYvJ1Dlspk+l5
- qcwyMkGw8vQ8UVzmbNwrS4aEAfXAQwn1MbJLqrapSoXb0GVj8D4SbHoePmjXLU8RHFXd
- yUBQt0TS+3Duq8o9XNFJD5GGZqwINRsscE7l8QR+3b1BdMnLLrg3HsJUKbWJgYM5SgWW
- en+orkEIaMBmCoyv5GL7p2n9hzAeNCbI/JoQBs+HASyd9oNej6sZXBakc9AdOLcznRJV
- PDTg==
+ (Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1jAGqr-00062y-Lt
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:33:33 -0500
+Received: by mail-lj1-x236.google.com with SMTP id q19so3045201ljp.9
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:33:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eijE0ycxMZz5nfPaqfYDIiyOBeNFjIfRksRWHONug+w=;
+ b=ACtgPYPH46+6siS5M/Amt9Tb2vF/kYd9u+RS9jScz/QE568jLdhpvye4nnYLnWVXqz
+ YmmTdFAgcC6YvcZfkEuzltOiqMlGi/WTQEu1TZJg7b+XOPQoe/PxSaUQii1v+QoMs5JC
+ /FZHyXxj4vgRmV1veykk5SERkeXul1FKbQ03HKC7JD8lNm+RH+o3ycWUBfy5KG1Ql8fb
+ C0QLasvOb4b8yRspoAnaOq2XsERbL7kc3GXrhHmhi8oRC5hXZULrJV+RX66TpKP0sgxT
+ nXIwEgABK4QQ8jN8dguii5XXAFetnm+k0XCsbrMTQRzAwWrRWjJhrkg+KNa33D9V61XW
+ RJPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dELmma94fIMJnBaoti3wb6dHPUqTaIQs2QH0CFvzC6Q=;
- b=CwrNvPqcJ053JTI8Y8JCGNj8xvZ82zn4xN2gKsO69Znmmw5H5UqtTLqfofUb7KGxz4
- K9riV0NIBOcAyWOw8WxIPeJFvpATIDQnS+wEGiCwgKYHirxN0knKfrVnKZiTtvkBRrEI
- +jHNN96RCq3QSU8BK/COLyvs1gNvIKM5pYrz0GhIhf2Fu0K1VxqiLPsAe+bLTD8oQEaP
- 06QDghoYuJdmDJTu3zbQxfj/kunXi6tgrBC0+AI6TK8rAEDePA7mI5r0OGJXzmFv5O27
- mnnMlUr/sPMs0L55jlob0N6PYmDiURbtlgEayS0GI09tSkmyG+f9a5BW1vnQPj2KYQGy
- P9tg==
-X-Gm-Message-State: ANhLgQ27uIJVDgZti4vkTRbPbteiCQ2ZyDWV6RSq8yUisqiwFYBMH590
- PtB2BEvht1bQaVU+BACxy8JTp219ZHBBdg==
-X-Google-Smtp-Source: ADFU+vtbK1YMze99OmKgoB0yGavushKHedDKo/OrIrvbwifEVvMmqqfIAwssYab1N26+OspRzXQAXQ==
-X-Received: by 2002:a7b:c2a2:: with SMTP id c2mr4885331wmk.19.1583515074709;
- Fri, 06 Mar 2020 09:17:54 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f8sm6948346wmf.20.2020.03.06.09.17.53
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 09:17:54 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/7] hxtool: Remove Texinfo generation support
-Date: Fri,  6 Mar 2020 17:17:45 +0000
-Message-Id: <20200306171749.10756-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200306171749.10756-1-peter.maydell@linaro.org>
-References: <20200306171749.10756-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eijE0ycxMZz5nfPaqfYDIiyOBeNFjIfRksRWHONug+w=;
+ b=tUVLGeWqtqRMeoCSWUbQU9aGQZTprCwTjXRbD0h+3awY4q1iMGD8AZynZyqTe83dWE
+ NDwC/wL0Wv1H2u5wm59+zoauzerUbtfzm3qKgsnNo4OJ/mH+CV7ljUPQtgxTSttZkkog
+ 2Dy3SUYcJg1V2iOPF3zwHV7lOXWV9BBBTvargRauJkXDsPc41bCbGcPpILTytF9lDtci
+ PSMoNMc7da/vDQJrbiCNOaq9O7YSICMU4aHVAxUZQC+Q2LLjWLNL1hh7yza2gBC37Z2j
+ vvRfY6t8Vle6D9DWdRnp103NSy1g+qHUghlCW3kT6Jz1U2IEX95AKRQTPrYI/hGVN+Zk
+ oJHQ==
+X-Gm-Message-State: ANhLgQ3kyeNCqkon4c7yr8HvK6QEuej2fUsGsSvXpgngjWdDHCHDYibq
+ uDhoceP2IcmASKzB09rUJ9ONn2Mo16nwXIyZFc3+0w==
+X-Google-Smtp-Source: ADFU+vs8KjIYkm31rX48B6FLhkmjm9JeOhXahvvNb6pHG+SBD8GmREOhkp/arEa3wPhdtEM+eRAQIlJJoPCrNsRODAM=
+X-Received: by 2002:a2e:2c13:: with SMTP id s19mr2574415ljs.210.1583516011751; 
+ Fri, 06 Mar 2020 09:33:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200306140917.26726-1-jandryuk@gmail.com>
+ <158351119581.14529.12409093643313383178@39012742ff91>
+In-Reply-To: <158351119581.14529.12409093643313383178@39012742ff91>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Fri, 6 Mar 2020 12:33:20 -0500
+Message-ID: <CAKf6xpvVJd-ObnFcZLHte78-m1ebzaULx922n4aXXdOEUEiVOg@mail.gmail.com>
+Subject: Re: [PATCH] usb-serial: wakeup device on input
+To: QEMU <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::236
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,118 +88,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All the STEXI/ETEXI blocks and the Makfile rules that use them have now
-been removed from the codebase. We can remove the code from the hxtool
-script which handles the STEXI/ETEXI directives and the '-t' option.
+On Fri, Mar 6, 2020 at 11:13 AM <no-reply@patchew.org> wrote:
+>
+> Patchew URL: https://patchew.org/QEMU/20200306140917.26726-1-jandryuk@gma=
+il.com/
+>
+>
+>
+> Hi,
+>
+> This series failed the docker-clang@ubuntu build test. Please find the te=
+sting commands and
+> their output below. If you have Docker installed, you can probably reprod=
+uce it
+> locally.
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> make docker-image-ubuntu V=3D1 NETWORK=3D1
+> time make docker-test-clang@ubuntu SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- scripts/hxtool | 78 +-------------------------------------------------
- 1 file changed, 1 insertion(+), 77 deletions(-)
+I ran these two commands locally and they completed successfully.
 
-diff --git a/scripts/hxtool b/scripts/hxtool
-index 0003e7b673d..7b1452f3cf1 100644
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -7,7 +7,7 @@ hxtoh()
-         case $str in
-             HXCOMM*)
-             ;;
--            STEXI*|ETEXI*|SRST*|ERST*) flag=$(($flag^1))
-+            SRST*|ERST*) flag=$(($flag^1))
-             ;;
-             *)
-             test $flag -eq 1 && printf "%s\n" "$str"
-@@ -16,84 +16,8 @@ hxtoh()
-     done
- }
- 
--print_texi_heading()
--{
--    if test "$*" != ""; then
--        title="$*"
--        printf "@subsection %s\n" "${title%:}"
--    fi
--}
--
--hxtotexi()
--{
--    flag=0
--    rstflag=0
--    line=1
--    while read -r str; do
--        case "$str" in
--            HXCOMM*)
--            ;;
--            STEXI*)
--            if test $rstflag -eq 1 ; then
--                printf "line %d: syntax error: expected ERST, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected ETEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=1
--            ;;
--            ETEXI*)
--            if test $rstflag -eq 1 ; then
--                printf "line %d: syntax error: expected ERST, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            if test $flag -ne 1 ; then
--                printf "line %d: syntax error: expected STEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            flag=0
--            ;;
--            SRST*)
--            if test $rstflag -eq 1 ; then
--                printf "line %d: syntax error: expected ERST, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected ETEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            rstflag=1
--            ;;
--            ERST*)
--            if test $flag -eq 1 ; then
--                printf "line %d: syntax error: expected ETEXI, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            if test $rstflag -ne 1 ; then
--                printf "line %d: syntax error: expected SRST, found '%s'\n" "$line" "$str" >&2
--                exit 1
--            fi
--            rstflag=0
--            ;;
--            DEFHEADING*)
--            print_texi_heading "$(expr "$str" : "DEFHEADING(\(.*\))")"
--            ;;
--            ARCHHEADING*)
--            print_texi_heading "$(expr "$str" : "ARCHHEADING(\(.*\),.*)")"
--            ;;
--            *)
--            test $flag -eq 1 && printf '%s\n' "$str"
--            ;;
--        esac
--        line=$((line+1))
--    done
--}
--
- case "$1" in
- "-h") hxtoh ;;
--"-t") hxtotexi ;;
- *) exit 1 ;;
- esac
- 
--- 
-2.20.1
+>   LINK    fp-test
+> ---
+> dbus-daemon[5453]: Could not get password database information for UID of=
+ current process: User "???" unknown or no memory to allocate password entr=
+y
 
+Was there a problem with this container's password db and/or
+out-of-memory like this message states?
+
+Regards,
+Jason
+
+> **
+> ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.c:114:get_connecti=
+on: assertion failed (err =3D=3D NULL): The connection is closed (g-io-erro=
+r-quark, 18)
+> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.=
+c:114:get_connection: assertion failed (err =3D=3D NULL): The connection is=
+ closed (g-io-error-quark, 18)
+> Aborted (core dumped)
+> cleaning up pid 5453
+> make: *** [/tmp/qemu-test/src/tests/Makefile.include:632: check-qtest-i38=
+6] Error 1
+> make: *** Waiting for unfinished jobs....
+>
+> Looking for expected file 'tests/data/acpi/pc/FACP.bridge'
+> ---
+> dbus-daemon[6892]: Could not get password database information for UID of=
+ current process: User "???" unknown or no memory to allocate password entr=
+y
+>
+> **
+> ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.c:114:get_connecti=
+on: assertion failed (err =3D=3D NULL): The connection is closed (g-io-erro=
+r-quark, 18)
+> Aborted (core dumped)
+> cleaning up pid 6892
+> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.=
+c:114:get_connection: assertion failed (err =3D=3D NULL): The connection is=
+ closed (g-io-error-quark, 18)
+> make: *** [/tmp/qemu-test/src/tests/Makefile.include:632: check-qtest-x86=
+_64] Error 1
+>   TEST    check-qtest-arm: tests/qtest/test-hmp
+>   TEST    check-qtest-arm: tests/qtest/qos-test
+>   TEST    check-qtest-aarch64: tests/qtest/test-hmp
+> ---
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '=
+--label', 'com.qemu.instance.uuid=3D2e42e92cfb504ed5b5cb56b2c8b512df', '-u'=
+, '1003', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET_L=
+IST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '-e=
+', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache', =
+'-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '=
+/var/tmp/patchew-tester-tmp-dwbsabkq/src/docker-src.2020-03-06-10.32.46.219=
+4:/var/tmp/qemu:z,ro', 'qemu:ubuntu', '/var/tmp/qemu/run', 'test-clang']' r=
+eturned non-zero exit status 2.
+> filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3D2e42e92cfb504ed5b5cb=
+56b2c8b512df
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-dwbsabkq/src'
+> make: *** [docker-run-test-clang@ubuntu] Error 2
+>
+> real    40m29.624s
+> user    0m9.675s
+>
+>
+> The full log is available at
+> http://patchew.org/logs/20200306140917.26726-1-jandryuk@gmail.com/testing=
+.docker-clang@ubuntu/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
