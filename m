@@ -2,103 +2,69 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4443FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 14:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81916C10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 14:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D3402072D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 14:40:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wz3ZZtcr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D3402072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55E802084E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 14:42:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E802084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAE9R-0007m7-1d
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 09:40:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44351)
+	id 1jAEBT-0000TF-FL
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 09:42:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45973)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jAE8g-0007Kb-MV
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:39:47 -0500
+ (envelope-from <no-reply@patchew.org>) id 1jAEAt-0008ME-Ka
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:42:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jAE8f-00035l-5h
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:39:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51411
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jAE8e-00033i-W1
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:39:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583505584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dyVmr7aNt8RWb7ivdXkwQxg3/2gkQb2bOSMC9koKSyU=;
- b=Wz3ZZtcrWsgKgsJCOZK6ladIV4fjPm2LzWY84i2LAbFUfiIUkpCcZnds9/jekutjRZUTZn
- VSg2he1qNTYRoC9dLCvIFneTEcqukL2hjheKk9wUyS/VxgeOASvNgRrqQRg+s7wWTUrn3F
- H574rZIUlnGAH4qJVj2Rc/Ymdtn1s/U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-oYiygv_VMp-3Qlwp34SBVA-1; Fri, 06 Mar 2020 09:39:42 -0500
-X-MC-Unique: oYiygv_VMp-3Qlwp34SBVA-1
-Received: by mail-wm1-f70.google.com with SMTP id m4so969432wmi.5
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 06:39:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dyVmr7aNt8RWb7ivdXkwQxg3/2gkQb2bOSMC9koKSyU=;
- b=k23Q5/A1GRLsC0YJnkixRkNrXOL+bzmhaY+NiyIdvdP2kSW8/pw96FwzJY3szE4NwR
- n8ZNQ6RhO/UZx2Fc0gkffNvdWJTnSh25nx90WtVpfvTEiOqg3H9sS2PLhi2eSHr6yhyG
- kFJ/XVMDvgTVHPI8PCPeVfAPiAvwfDvCiZt/mUycIciQ61EWppGmyfqaOhuSfTc5HIjX
- Q1u3zD83UtCV6ijxo+LhGkT75W6oCk9dVrI9y13ggaLuk2sHsR3rrzr74QLE3Xm1V3g2
- bvbAMNeIxlrGoffTcE3biW4p9YnyQ4HMBRVusFcH4BsrCWTNRXVuDKVSca7+PhBztAOk
- vC3Q==
-X-Gm-Message-State: ANhLgQ23yPzV5wPTQoam3yVt6kz00m7w9XH71JMzhoh7z3da90tgqCpi
- CVPwkLPzNIAHAKxOJKxggXSxNn+xdNqteIV4du6c+bXwND0gPJwagYKJo0+eikIChu2V9tsd/d7
- ZXtGD17YbJW/VEKQ=
-X-Received: by 2002:a5d:4384:: with SMTP id i4mr4323114wrq.396.1583505581124; 
- Fri, 06 Mar 2020 06:39:41 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvaDWb7pBEzAZ78eCr8V+iO9t8Fp1wpAzMpXGVG1XSGWO2upieUdHbVIp58sVbwLcZ3gXAxFA==
-X-Received: by 2002:a5d:4384:: with SMTP id i4mr4323100wrq.396.1583505580881; 
- Fri, 06 Mar 2020 06:39:40 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8cd7:8509:4683:f03a?
- ([2001:b07:6468:f312:8cd7:8509:4683:f03a])
- by smtp.gmail.com with ESMTPSA id m21sm13636090wmi.27.2020.03.06.06.39.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Mar 2020 06:39:40 -0800 (PST)
-Subject: Re: [PATCH RFC 4/4] kvm: Implement atomic memory region resizes via
- region_resize()
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200303141939.352319-1-david@redhat.com>
- <20200303141939.352319-5-david@redhat.com>
- <102af47e-7ec0-7cf9-8ddd-0b67791b5126@redhat.com>
- <3b67a5ba-dc21-ad42-4363-95bb685240b9@redhat.com>
- <2a8d8b63-d54f-c1e7-9668-5d065e36aa1d@redhat.com>
- <d5704319-e9b8-be6b-6c95-d2e2edc6614c@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2b1d9549-5564-94e6-a55f-ca80996c6ef9@redhat.com>
-Date: Fri, 6 Mar 2020 15:39:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <no-reply@patchew.org>) id 1jAEAs-00004s-5O
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:42:03 -0500
+Resent-Date: Fri, 06 Mar 2020 09:42:03 -0500
+Resent-Message-Id: <E1jAEAs-00004s-5O@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21126)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jAEAr-0008R8-Tx
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 09:42:02 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1583505713; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=g0HrhG2LcLVDetJf/qss5oDeR1CxRarTihoXbWrZlreDsXZmg2ZFNojowG93mBXLRBXbUyg9avpMLpygn+vHfnazqNWm7U2BuvTkA1JoYg9D1IpQKJAnJsPLpOPkQh1U7EGmIfQpX7WxZQKWdtqma3SusCa9vxpwyQJR+UDSvC4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583505713;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=tf8ScGqSMNyLTy9M7zkhroZUSaSNoh3Otk7Yu3/wrQc=; 
+ b=JsrvHh3sTGYGx200OsNiQfbQEx1Ke/YdvOReUtJD8pWSDbi+F1WCTfkWZMyifdi9Izs70afh05OEydMy95ipyHkt/4l5E5rHXi+75XE6z1Y3fghRmR2VCSna16OwZGpb2145em3Yp+0i4dbcYlI1m1lSCpWqTyvG6SC+CsTocCg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583505710707674.502098843719;
+ Fri, 6 Mar 2020 06:41:50 -0800 (PST)
+In-Reply-To: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
+Subject: Re: [PATCH] modules: load modules from versioned /var/run dir
+Message-ID: <158350570928.14529.1394498842582357817@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <d5704319-e9b8-be6b-6c95-d2e2edc6614c@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: christian.ehrhardt@canonical.com
+Date: Fri, 6 Mar 2020 06:41:50 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,33 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
+ christian.ehrhardt@canonical.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/03/20 15:30, David Hildenbrand wrote:
->> Assuming we're only talking about CPU ioctls (seems like a good
->> approximation) maybe you could use start_exclusive/end_exclusive?  The
->> current_cpu->in_exclusive_context assignments can be made conditional on
->> "if (current_cpu)".
->>
->> However that means you have to drop the BQL, see
->> process_queued_cpu_work.  It may be a problem.
->>
-> Yeah, start_exclusive() is expected to be called without the BQL,
-> otherwise the other CPUs would not be able to make progress and can
-> eventually be "caught".
-> 
-> It's essentially the same reason why I can't use high-level
-> pause_all_vcpus()/resume_all_vcpus(). Will drop the BQL which is very
-> bad for resizing code.
-
-But any other synchronization primitive that you do which blocks all
-vCPUs will have the same issue, otherwise you get a deadlock.
-
-Paolo
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwNjEzMjY0OC4yNzU3
+Ny0xLWNocmlzdGlhbi5laHJoYXJkdEBjYW5vbmljYWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
+IGZhaWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0
+aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBE
+b2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0
+Cm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXIt
+dGVzdC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+CkZpbGU6ICIvdG1wL3FlbXUtbnNpc1xxZW11LWRvYy5odG1sIiAtPiBubyBmaWxlcyBmb3VuZC4K
+VXNhZ2U6IEZpbGUgWy9ub25mYXRhbF0gWy9hXSAoWy9yXSBbL3ggZmlsZXNwZWMgWy4uLl1dIGZp
+bGVzcGVjIFsuLi5dIHwKICAgL29uYW1lPW91dGZpbGUgb25lX2ZpbGVfb25seSkKRXJyb3IgaW4g
+c2NyaXB0ICIvdG1wL3FlbXUtdGVzdC9zcmMvcWVtdS5uc2kiIG9uIGxpbmUgMTgwIC0tIGFib3J0
+aW5nIGNyZWF0aW9uIHByb2Nlc3MKbWFrZTogKioqIFtNYWtlZmlsZToxMTYyOiBxZW11LXNldHVw
+LTQuMi41MC5leGVdIEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgog
+IEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgog
+ICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
+b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
+LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
+aWQ9ZDc4YWUxYmY5NDAyNGY3YzhhMDI1NWViMGQ2M2M4ZjEnLCAnLXUnLCAnMTAwMycsICctLXNl
+Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
+TElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywg
+J0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVf
+RElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1k
+b2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXct
+dGVzdGVyLXRtcC16Ymc4MnhyYi9zcmMvZG9ja2VyLXNyYy4yMDIwLTAzLTA2LTA5LjM4LjQxLjE4
+NTI6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVu
+JywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVy
+PS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZDc4YWUxYmY5NDAyNGY3Yzhh
+MDI1NWViMGQ2M2M4ZjEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06
+IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtemJnODJ4cmIv
+c3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJl
+YWwgICAgM204LjcxMXMKdXNlciAgICAwbTcuOTY5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMDYxMzI2NDguMjc1NzctMS1jaHJp
+c3RpYW4uZWhyaGFyZHRAY2Fub25pY2FsLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEv
+P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
