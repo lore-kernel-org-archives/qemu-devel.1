@@ -2,90 +2,143 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E31A8C10F00
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D45C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:49:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE0E32072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:48:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=phystech-edu.20150623.gappssmtp.com header.i=@phystech-edu.20150623.gappssmtp.com header.b="W1PYg+hy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0E32072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=phystech.edu
+	by mail.kernel.org (Postfix) with ESMTPS id C97222072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:49:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97222072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jABTJ-0005Wk-Qe
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:48:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48021)
+	id 1jABTo-0006JL-1h
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:49:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48492)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <viktor.prutyanov@phystech.edu>) id 1jABSQ-0004uq-Ek
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:47:59 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1jABT5-0005Re-85
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <viktor.prutyanov@phystech.edu>) id 1jABSN-0003fh-NO
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:47:56 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39911)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <viktor.prutyanov@phystech.edu>)
- id 1jABSN-0003bk-90
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:47:55 -0500
-Received: by mail-lj1-x242.google.com with SMTP id f10so1884871ljn.6
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 03:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=phystech-edu.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:in-reply-to:references
- :organization:mime-version:content-transfer-encoding;
- bh=DQ+V1IeSmPQO9wkH9m1UPFVySzxnNCk5Wge4L88LvqI=;
- b=W1PYg+hy2x5x1YUw6CmS5SJmWLzxlzPI9+OCbT4uBr8xkm+MVkBUGayr6zlCiVGo8w
- a2utMnYlY5LNGcS1WnQf4NQMMmdG6SQzKstfZ2Jl9/OurcU9GXpd7Y6nqGqDgjeqslEG
- jp61jQ30R1immi9L34eYN87MLtOEtO1xoqqSHrwPNS4GmS7yCUMpFnF50XemCuIM3xDU
- EeowFmzPggrZXk5O21mU9Tfhbm19zCqxDUXHJ49/tdDOqBvptdYT8FFuoLiOAAr9N5pF
- 7RElL++IUxGx4+UWtsKf5oMm7t3DtpnojauLQzab+zgkt3U/acAZkIA7TIePACMURfj5
- hIVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:organization:mime-version:content-transfer-encoding;
- bh=DQ+V1IeSmPQO9wkH9m1UPFVySzxnNCk5Wge4L88LvqI=;
- b=W+IGiG/gVCpIRqe2Wfs7obRWnKL5AAVnln+OpPw6rmMFJzUuF/B20OP3QFJ6r6KMAw
- aUQNw6rTyDzKOmAPOdJF8ixMmFw0pD08n4H91XBT5mWPFefzL68kXWTl4YQUGNeqMLPG
- 1Dvr3NTIyJaSF1PA3adtTNDFCG/6BAuaQLTtBB/m+vTNsyvJXgoxvF2YFGVtkZdedcS2
- cr/eYUHyk6c2of1nSdc4fPZejcrDYwrILm/o5BXw9LM2pMVjzhS2X/97635mQG3SdiJs
- x0BUVZ081JSCusORLszQzZbS4eL5I/3XsHXCES2tLI9B1MqNah+kItvJp8ACUWBLEIT4
- UNiw==
-X-Gm-Message-State: ANhLgQ1ybeBztnWHbQoGe/IepyV0/spbKlPfoCXCp+QCBhvR3fVAm2v1
- 74ABt+up4IoxaejrVmNrj9VZQw==
-X-Google-Smtp-Source: ADFU+vt5o1YUKRBnfj7lBa1ij+K9BW2EHcyy2plPPp+i5PiKcrxaXSuIi1rqNSQXkqKw6qJk15uDbw==
-X-Received: by 2002:a2e:998f:: with SMTP id w15mr49100lji.58.1583495273573;
- Fri, 06 Mar 2020 03:47:53 -0800 (PST)
-Received: from localhost ([93.175.11.132])
- by smtp.gmail.com with ESMTPSA id s8sm18949689ljs.45.2020.03.06.03.47.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 03:47:53 -0800 (PST)
-Date: Fri, 6 Mar 2020 14:47:49 +0300
-From: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH] contrib/elf2dmp: prevent uninitialized warning
-Message-ID: <20200306144749.64f08e84@phystech.edu>
-In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B66F9DA@dggemm531-mbx.china.huawei.com>
-References: <20200207041601.89668-1-kuhn.chenqun@huawei.com>
- <20200305215902.24bbe6ce@phystech.edu>
- <7412CDE03601674DA8197E2EBD8937E83B66F9DA@dggemm531-mbx.china.huawei.com>
-Organization: MIPT
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jABT4-0004Kq-4A
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44738
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jABT3-0004Jk-V3
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:38 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 026BisdD132772
+ for <qemu-devel@nongnu.org>; Fri, 6 Mar 2020 06:48:36 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yhr4mfun3-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 06:48:36 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 6 Mar 2020 11:48:34 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 6 Mar 2020 11:48:31 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 026BmUkg51249198
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 6 Mar 2020 11:48:30 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BFBFBAE051;
+ Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8F405AE04D;
+ Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
+Subject: Re: [PATCH v6 03/18] s390x: protvirt: Support unpack facility
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
+ <20200304114231.23493-4-frankja@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Fri, 6 Mar 2020 12:48:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+In-Reply-To: <20200304114231.23493-4-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20030611-0028-0000-0000-000003E1751D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030611-0029-0000-0000-000024A6AD31
+Message-Id: <41dabcca-2840-7420-5a46-bd9e6e575f12@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-06_03:2020-03-06,
+ 2020-03-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1015
+ mlxscore=0 phishscore=0 mlxlogscore=999 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003060085
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,126 +150,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Mar 2020 02:18:07 +0000
-"Chenqun (kuhn)" <kuhn.chenqun@huawei.com> wrote:
 
-> >-----Original Message-----
-> >From: Viktor Prutyanov [mailto:viktor.prutyanov@phystech.edu]
-> >Sent: Friday, March 6, 2020 2:59 AM
-> >To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>
-> >Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; Zhanghailiang
-> ><zhang.zhanghailiang@huawei.com>; qemu-trivial@nongnu.org
-> >Subject: Re: [PATCH] contrib/elf2dmp: prevent uninitialized warning
-> >
-> >On Fri, 7 Feb 2020 12:16:01 +0800
-> ><kuhn.chenqun@huawei.com> wrote:
-> > =20
-> >> From: Chen Qun <kuhn.chenqun@huawei.com>
-> >>
-> >> Fix compilation warnings:
-> >> contrib/elf2dmp/main.c:66:17: warning: =E2=80=98KdpDataBlockEncoded=E2=
-=80=99 may be
-> >> used uninitialized in this function [-Wmaybe-uninitialized]
-> >>          block =3D __builtin_bswap64(block ^ kdbe) ^ kwa;
-> >>                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >> contrib/elf2dmp/main.c:78:24: note: =E2=80=98KdpDataBlockEncoded=E2=80=
-=99 was
-> >> declared here uint64_t kwn, kwa, KdpDataBlockEncoded;
-> >>                         ^~~~~~~~~~~~~~~~~~~
-> >>
-> >> Reported-by: Euler Robot <euler.robot@huawei.com>
-> >> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> >> ---
-> >>  contrib/elf2dmp/main.c | 25 ++++++++++++-------------
-> >>  1 file changed, 12 insertions(+), 13 deletions(-)
-> >>
-> >> diff --git a/contrib/elf2dmp/main.c b/contrib/elf2dmp/main.c index
-> >> 9a2dbc2902..203b9e6d04 100644
-> >> --- a/contrib/elf2dmp/main.c
-> >> +++ b/contrib/elf2dmp/main.c
-> >> @@ -76,6 +76,7 @@ static KDDEBUGGER_DATA64 *get_kdbg(uint64_t
-> >> KernBase, struct pdb_reader *pdb, DBGKD_DEBUG_DATA_HEADER64 =20
-> >kdbg_hdr; =20
-> >>      bool decode =3D false;
-> >>      uint64_t kwn, kwa, KdpDataBlockEncoded;
-> >> +    uint64_t KiWaitNever, KiWaitAlways;
-> >>
-> >>      if (va_space_rw(vs,
-> >>                  KdDebuggerDataBlock + offsetof(KDDEBUGGER_DATA64,
-> >> Header), @@ -84,21 +85,19 @@ static KDDEBUGGER_DATA64
-> >> *get_kdbg(uint64_t KernBase, struct pdb_reader *pdb, return NULL;
-> >>      }
-> >>
-> >> -    if (memcmp(&kdbg_hdr.OwnerTag, OwnerTag, sizeof(OwnerTag))) {
-> >> -        uint64_t KiWaitNever, KiWaitAlways;
-> >> -
-> >> -        decode =3D true;
-> >> +    if (!SYM_RESOLVE(KernBase, pdb, KiWaitNever) ||
-> >> +            !SYM_RESOLVE(KernBase, pdb, KiWaitAlways) ||
-> >> +            !SYM_RESOLVE(KernBase, pdb, KdpDataBlockEncoded)) {
-> >> +        return NULL;
-> >> +    }
-> >>
-> >> -        if (!SYM_RESOLVE(KernBase, pdb, KiWaitNever) ||
-> >> -                !SYM_RESOLVE(KernBase, pdb, KiWaitAlways) ||
-> >> -                !SYM_RESOLVE(KernBase, pdb, KdpDataBlockEncoded))
-> >> {
-> >> -            return NULL;
-> >> -        }
-> >> +    if (va_space_rw(vs, KiWaitNever, &kwn, sizeof(kwn), 0) ||
-> >> +            va_space_rw(vs, KiWaitAlways, &kwa, sizeof(kwa), 0)) {
-> >> +        return NULL;
-> >> +    }
-> >>
-> >> -        if (va_space_rw(vs, KiWaitNever, &kwn, sizeof(kwn), 0) ||
-> >> -                va_space_rw(vs, KiWaitAlways, &kwa, sizeof(kwa),
-> >> 0)) {
-> >> -            return NULL;
-> >> -        }
-> >> +    if (memcmp(&kdbg_hdr.OwnerTag, OwnerTag, sizeof(OwnerTag))) {
-> >> +        decode =3D true;
-> >>
-> >>          printf("[KiWaitNever] =3D 0x%016"PRIx64"\n", kwn);
-> >>          printf("[KiWaitAlways] =3D 0x%016"PRIx64"\n", kwa); =20
-> >
-> >Hi!
-> >
-> >I suppose the problem is in your compiler, because kdbg_decode() is
-> >only used when KdpDataBlockEncoded is already initialized by
-> >SYM_RESOLVE().
-> > =20
-> Hi  Viktor,
->=20
->        I know it's actually initialized when  'decode =3D true;',
-> otherwise ' return kdbg;'  no need to initialize.=20
->      But usually the compiler cannot understand it, because it seems
-> that the initialization is only in the if() statement.
 
-As for me, my GCC 9.2.1 doesn't show any warning while building elf2dmp.
+On 04.03.20 12:42, Janosch Frank wrote:
+[...]
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 3dd396e870..69b1cc5dfc 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -37,6 +37,8 @@
+>  #include "sysemu/hw_accel.h"
+>  #include "hw/qdev-properties.h"
+>  #ifndef CONFIG_USER_ONLY
+> +#include "hw/s390x/s390-virtio-ccw.h"
+> +#include "hw/s390x/pv.h"
+>  #include "hw/boards.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/sysemu.h"
+> @@ -191,6 +193,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+>      MachineState *ms = MACHINE(qdev_get_machine());
+> +    S390CcwMachineState *ccw = S390_CCW_MACHINE(ms);
+>      unsigned int max_cpus = ms->smp.max_cpus;
+>      if (cpu->env.core_id >= max_cpus) {
+>          error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
 
-> If we put the initialization outside the if() statement, it might
-> looks better without affecting the functionality ?
+I messed this up and this can break for the none machine.
 
-For now, your original patch affects the functionality. The utility
-tries to resolve symbols as little as possible during conversion,
-because we don't know exactly how Windows kernel works. This is the
-reason why KDBG header should be checked before resolving 3 symbols.
-
->=20
-> Thanks.
-> >--
-> >Viktor Prutyanov =20
+Something like this on top:
 
 
 
---=20
-Viktor Prutyanov
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 7840e784f1..1b42b0fa25 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -181,6 +181,18 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
+     info->print_insn = print_insn_s390;
+ }
+ 
++static bool machine_is_pv(MachineState *ms)
++{
++    Object *obj;
++
++    /* we have to bail out for the "none" machine */
++    obj = object_dynamic_cast(OBJECT(ms), TYPE_S390_CCW_MACHINE);
++     if (!obj) {
++        return false;
++    }
++    return S390_CCW_MACHINE(obj)->pv;
++}
++
+ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
+@@ -198,7 +210,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #if !defined(CONFIG_USER_ONLY)
+     MachineState *ms = MACHINE(qdev_get_machine());
+-    S390CcwMachineState *ccw = S390_CCW_MACHINE(ms);
+     unsigned int max_cpus = ms->smp.max_cpus;
+     if (cpu->env.core_id >= max_cpus) {
+         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
+@@ -213,7 +224,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+         goto out;
+     }
+ 
+-    cpu->env.pv = ccw->pv;
++    cpu->env.pv = machine_is_pv(ms);
+     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
+     cs->cpu_index = cpu->env.core_id;
+ #endif
+
 
