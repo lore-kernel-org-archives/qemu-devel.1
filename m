@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A39DFC10F00
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272FDC10F25
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75FA9217F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75FA9217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 010D221D7E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:42:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 010D221D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA7dC-0005Zy-MD
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:42:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46342)
+	id 1jA7dI-0005iD-7T
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:42:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA7ZI-00056i-JI
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:38:50 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA7ZJ-00058U-5c
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:38:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA7ZG-0008Nm-PD
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:38:48 -0500
-Received: from relay.sw.ru ([185.231.240.75]:37982)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA7ZH-0008RZ-At
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:38:49 -0500
+Received: from relay.sw.ru ([185.231.240.75]:37990)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA7ZC-0007wn-KX; Fri, 06 Mar 2020 02:38:42 -0500
+ id 1jA7ZC-0007xB-Kd; Fri, 06 Mar 2020 02:38:43 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA7Z8-0002Qu-ON; Fri, 06 Mar 2020 10:38:38 +0300
+ id 1jA7Z8-0002Qu-1C; Fri, 06 Mar 2020 10:38:38 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 8/9] block/block-copy: reduce intersecting request lock
-Date: Fri,  6 Mar 2020 10:38:30 +0300
-Message-Id: <20200306073831.7737-9-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 1/9] job: refactor progress to separate object
+Date: Fri,  6 Mar 2020 10:38:23 +0300
+Message-Id: <20200306073831.7737-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200306073831.7737-1-vsementsov@virtuozzo.com>
 References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
@@ -59,239 +59,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, andrey.shinkevich@virtuozzo.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, block_copy operation lock the whole requested region. But
-there is no reason to lock clusters, which are already copied, it will
-disturb other parallel block_copy requests for no reason.
+We need it in separate to pass to the block-copy object in the next
+commit.
 
-Let's instead do the following:
-
-Lock only sub-region, which we are going to operate on. Then, after
-copying all dirty sub-regions, we should wait for intersecting
-requests block-copy, if they failed, we should retry these new dirty
-clusters.
-
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/block-copy.c | 128 ++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 104 insertions(+), 24 deletions(-)
+ include/qemu/job.h            | 11 ++-----
+ include/qemu/progress_meter.h | 58 +++++++++++++++++++++++++++++++++++
+ blockjob.c                    | 16 +++++-----
+ job-qmp.c                     |  4 +--
+ job.c                         |  6 ++--
+ qemu-img.c                    |  6 ++--
+ 6 files changed, 76 insertions(+), 25 deletions(-)
+ create mode 100644 include/qemu/progress_meter.h
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 2b29131653..d66b8eb691 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -39,29 +39,71 @@ static BlockCopyInFlightReq *find_conflicting_inflight_req(BlockCopyState *s,
-     return NULL;
- }
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index bd59cd8944..32aabb1c60 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -28,6 +28,7 @@
  
--static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
--                                                       int64_t offset,
--                                                       int64_t bytes)
+ #include "qapi/qapi-types-job.h"
+ #include "qemu/queue.h"
++#include "qemu/progress_meter.h"
+ #include "qemu/coroutine.h"
+ #include "block/aio.h"
+ 
+@@ -117,15 +118,7 @@ typedef struct Job {
+     /** True if this job should automatically dismiss itself */
+     bool auto_dismiss;
+ 
+-    /**
+-     * Current progress. The unit is arbitrary as long as the ratio between
+-     * progress_current and progress_total represents the estimated percentage
+-     * of work already done.
+-     */
+-    int64_t progress_current;
+-
+-    /** Estimated progress_current value at the completion of the job */
+-    int64_t progress_total;
++    ProgressMeter progress;
+ 
+     /**
+      * Return code from @run and/or @prepare callback(s).
+diff --git a/include/qemu/progress_meter.h b/include/qemu/progress_meter.h
+new file mode 100644
+index 0000000000..9a23ff071c
+--- /dev/null
++++ b/include/qemu/progress_meter.h
+@@ -0,0 +1,58 @@
 +/*
-+ * If there are no intersecting requests return false. Otherwise, wait for the
-+ * first found intersecting request to finish and return true.
-+ */
-+static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t offset,
-+                                             int64_t bytes)
- {
--    BlockCopyInFlightReq *req;
-+    BlockCopyInFlightReq *req = find_conflicting_inflight_req(s, offset, bytes);
- 
--    while ((req = find_conflicting_inflight_req(s, offset, bytes))) {
--        qemu_co_queue_wait(&req->wait_queue, NULL);
-+    if (!req) {
-+        return false;
-     }
-+
-+    qemu_co_queue_wait(&req->wait_queue, NULL);
-+
-+    return true;
- }
- 
-+/* Called only on full-dirty region */
- static void block_copy_inflight_req_begin(BlockCopyState *s,
-                                           BlockCopyInFlightReq *req,
-                                           int64_t offset, int64_t bytes)
- {
-+    assert(!find_conflicting_inflight_req(s, offset, bytes));
-+
-+    bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-+    s->in_flight_bytes += bytes;
-+
-     req->offset = offset;
-     req->bytes = bytes;
-     qemu_co_queue_init(&req->wait_queue);
-     QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
- }
- 
--static void coroutine_fn block_copy_inflight_req_end(BlockCopyInFlightReq *req)
-+/*
-+ * block_copy_inflight_req_shrink
++ * Helper functionality for some process progress tracking.
 + *
-+ * Drop the tail of the request to be handled later. Set dirty bits back and
-+ * wake up all requests waiting for us (may be some of them are not intersecting
-+ * with shrunk request)
++ * Copyright (c) 2011 IBM Corp.
++ * Copyright (c) 2012, 2018 Red Hat, Inc.
++ * Copyright (c) 2020 Virtuozzo International GmbH
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
-+static void coroutine_fn block_copy_inflight_req_shrink(BlockCopyState *s,
-+        BlockCopyInFlightReq *req, int64_t new_bytes)
- {
-+    if (new_bytes == req->bytes) {
-+        return;
-+    }
 +
-+    assert(new_bytes > 0 && new_bytes < req->bytes);
++#ifndef QEMU_PROGRESS_METER_H
++#define QEMU_PROGRESS_METER_H
 +
-+    bdrv_set_dirty_bitmap(s->copy_bitmap,
-+                          req->offset + new_bytes, req->bytes - new_bytes);
++typedef struct ProgressMeter {
++    /**
++     * Current progress. The unit is arbitrary as long as the ratio between
++     * current and total represents the estimated percentage
++     * of work already done.
++     */
++    uint64_t current;
 +
-+    req->bytes = new_bytes;
-+    qemu_co_queue_restart_all(&req->wait_queue);
++    /** Estimated current value at the completion of the process */
++    uint64_t total;
++} ProgressMeter;
++
++static inline void progress_work_done(ProgressMeter *pm, uint64_t done)
++{
++    pm->current += done;
 +}
 +
-+static void coroutine_fn block_copy_inflight_req_end(BlockCopyState *s,
-+                                                     BlockCopyInFlightReq *req,
-+                                                     int ret)
++static inline void progress_set_remaining(ProgressMeter *pm, uint64_t remaining)
 +{
-+    s->in_flight_bytes -= req->bytes;
-+    if (ret < 0) {
-+        bdrv_set_dirty_bitmap(s->copy_bitmap, req->offset, req->bytes);
-+    }
-     QLIST_REMOVE(req, list);
-     qemu_co_queue_restart_all(&req->wait_queue);
- }
-@@ -357,12 +399,19 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
-     return ret;
- }
- 
--int coroutine_fn block_copy(BlockCopyState *s,
--                            int64_t offset, int64_t bytes,
--                            bool *error_is_read)
-+/*
-+ * block_copy_dirty_clusters
-+ *
-+ * Copy dirty clusters in @offset/@bytes range.
-+ * Returns 1 if dirty clusters found and successfully copied, 0 if no dirty
-+ * clusters found and -errno on failure.
-+ */
-+static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-+                                                  int64_t offset, int64_t bytes,
-+                                                  bool *error_is_read)
- {
-     int ret = 0;
--    BlockCopyInFlightReq req;
-+    bool found_dirty = false;
- 
-     /*
-      * block_copy() user is responsible for keeping source and target in same
-@@ -374,10 +423,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
- 
--    block_copy_wait_inflight_reqs(s, offset, bytes);
--    block_copy_inflight_req_begin(s, &req, offset, bytes);
--
-     while (bytes) {
-+        BlockCopyInFlightReq req;
-         int64_t next_zero, cur_bytes, status_bytes;
- 
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
-@@ -387,6 +434,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             continue; /* already copied */
-         }
- 
-+        found_dirty = true;
-+
-         cur_bytes = MIN(bytes, s->copy_size);
- 
-         next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset,
-@@ -396,10 +445,14 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
-             cur_bytes = next_zero - offset;
-         }
-+        block_copy_inflight_req_begin(s, &req, offset, cur_bytes);
- 
-         ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
-+        assert(ret >= 0); /* never fail */
-+        cur_bytes = MIN(cur_bytes, status_bytes);
-+        block_copy_inflight_req_shrink(s, &req, cur_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
--            bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, status_bytes);
-+            block_copy_inflight_req_end(s, &req, 0);
-             progress_set_remaining(s->progress,
-                                    bdrv_get_dirty_count(s->copy_bitmap) +
-                                    s->in_flight_bytes);
-@@ -409,21 +462,15 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             continue;
-         }
- 
--        cur_bytes = MIN(cur_bytes, status_bytes);
--
-         trace_block_copy_process(s, offset);
- 
--        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
--        s->in_flight_bytes += cur_bytes;
--
-         co_get_from_shres(s->mem, cur_bytes);
-         ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
-                                  error_is_read);
-         co_put_to_shres(s->mem, cur_bytes);
--        s->in_flight_bytes -= cur_bytes;
-+        block_copy_inflight_req_end(s, &req, ret);
-         if (ret < 0) {
--            bdrv_set_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
--            break;
-+            return ret;
-         }
- 
-         progress_work_done(s->progress, cur_bytes);
-@@ -432,7 +479,40 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         bytes -= cur_bytes;
-     }
- 
--    block_copy_inflight_req_end(&req);
-+    return found_dirty;
++    pm->total = pm->current + remaining;
 +}
 +
-+/*
-+ * block_copy
-+ *
-+ * Copy requested region, accordingly to dirty bitmap.
-+ * Collaborate with parallel block_copy requests: if they success it help us. If
-+ * they fail, we retry not-copied regions. So, if we return error, it means that
-+ * io operation failed in context of _this_ block_copy call, not some parallel
-+ * operation.
-+ */
-+int coroutine_fn block_copy(BlockCopyState *s, int64_t offset, int64_t bytes,
-+                            bool *error_is_read)
++static inline void progress_increase_remaining(ProgressMeter *pm,
++                                               uint64_t delta)
 +{
-+    int ret;
++    pm->total += delta;
++}
 +
-+    do {
-+        ret = block_copy_dirty_clusters(s, offset, bytes, error_is_read);
-+
-+        if (ret == 0) {
-+            ret = block_copy_wait_one(s, offset, bytes);
-+        }
-+
-+        /*
-+         * We retry in two cases:
-+         * 1. Some progress done
-+         *    Something was copied, which means that there were yield points
-+         *    and some new dirty bits may have appeared (due to failed parallel
-+         *    block-copy requests).
-+         * 2. We have waited for some intersecting block-copy request
-+         *    It may have failed and produced new dirty bits.
-+         */
-+    } while (ret > 0);
++#endif /* QEMU_PROGRESS_METER_H */
+diff --git a/blockjob.c b/blockjob.c
+index 5d63b1e89d..fc850312c1 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -299,8 +299,8 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+     info->device    = g_strdup(job->job.id);
+     info->busy      = atomic_read(&job->job.busy);
+     info->paused    = job->job.pause_count > 0;
+-    info->offset    = job->job.progress_current;
+-    info->len       = job->job.progress_total;
++    info->offset    = job->job.progress.current;
++    info->len       = job->job.progress.total;
+     info->speed     = job->speed;
+     info->io_status = job->iostatus;
+     info->ready     = job_is_ready(&job->job),
+@@ -330,8 +330,8 @@ static void block_job_event_cancelled(Notifier *n, void *opaque)
  
-     return ret;
+     qapi_event_send_block_job_cancelled(job_type(&job->job),
+                                         job->job.id,
+-                                        job->job.progress_total,
+-                                        job->job.progress_current,
++                                        job->job.progress.total,
++                                        job->job.progress.current,
+                                         job->speed);
  }
+ 
+@@ -350,8 +350,8 @@ static void block_job_event_completed(Notifier *n, void *opaque)
+ 
+     qapi_event_send_block_job_completed(job_type(&job->job),
+                                         job->job.id,
+-                                        job->job.progress_total,
+-                                        job->job.progress_current,
++                                        job->job.progress.total,
++                                        job->job.progress.current,
+                                         job->speed,
+                                         !!msg,
+                                         msg);
+@@ -379,8 +379,8 @@ static void block_job_event_ready(Notifier *n, void *opaque)
+ 
+     qapi_event_send_block_job_ready(job_type(&job->job),
+                                     job->job.id,
+-                                    job->job.progress_total,
+-                                    job->job.progress_current,
++                                    job->job.progress.total,
++                                    job->job.progress.current,
+                                     job->speed);
+ }
+ 
+diff --git a/job-qmp.c b/job-qmp.c
+index fbfed25a00..fecc939ebd 100644
+--- a/job-qmp.c
++++ b/job-qmp.c
+@@ -143,8 +143,8 @@ static JobInfo *job_query_single(Job *job, Error **errp)
+         .id                 = g_strdup(job->id),
+         .type               = job_type(job),
+         .status             = job->status,
+-        .current_progress   = job->progress_current,
+-        .total_progress     = job->progress_total,
++        .current_progress   = job->progress.current,
++        .total_progress     = job->progress.total,
+         .has_error          = !!job->err,
+         .error              = job->err ? \
+                               g_strdup(error_get_pretty(job->err)) : NULL,
+diff --git a/job.c b/job.c
+index 04409b40aa..134a07b92e 100644
+--- a/job.c
++++ b/job.c
+@@ -369,17 +369,17 @@ void job_unref(Job *job)
+ 
+ void job_progress_update(Job *job, uint64_t done)
+ {
+-    job->progress_current += done;
++    progress_work_done(&job->progress, done);
+ }
+ 
+ void job_progress_set_remaining(Job *job, uint64_t remaining)
+ {
+-    job->progress_total = job->progress_current + remaining;
++    progress_set_remaining(&job->progress, remaining);
+ }
+ 
+ void job_progress_increase_remaining(Job *job, uint64_t delta)
+ {
+-    job->progress_total += delta;
++    progress_increase_remaining(&job->progress, delta);
+ }
+ 
+ void job_event_cancelled(Job *job)
+diff --git a/qemu-img.c b/qemu-img.c
+index 804630a368..59a720abf6 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -882,9 +882,9 @@ static void run_block_job(BlockJob *job, Error **errp)
+     do {
+         float progress = 0.0f;
+         aio_poll(aio_context, true);
+-        if (job->job.progress_total) {
+-            progress = (float)job->job.progress_current /
+-                       job->job.progress_total * 100.f;
++        if (job->job.progress.total) {
++            progress = (float)job->job.progress.current /
++                       job->job.progress.total * 100.f;
+         }
+         qemu_progress_print(progress, 0);
+     } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
 -- 
 2.21.0
 
