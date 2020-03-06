@@ -2,86 +2,102 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CFFC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10E63C3F2D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3079C2072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:57:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IzjSp/jb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3079C2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D11702072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:05:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11702072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA5zW-0004bE-8m
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 00:57:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36154)
+	id 1jA735-0000T9-B8
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:05:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jA5yw-0004AA-D1
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:57:11 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA71N-0008NI-1u
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:03:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jA5yu-0005Vm-HW
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:57:09 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50683
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jA5yu-0005Qv-Cr
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:57:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583474227;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XSM7iVRJ99l1TUhE/BveXrJDnUQbBSOVRpZCMG7YiHI=;
- b=IzjSp/jbix5Akr3kstwCBCc9OY/qyWMT+y+fTwU38PgIcnihtt/fJgC+cCbNNeZcUPMvoB
- MJAWK0gbyRA2NJS/NvTudskYYrdYSDVg5DbaXhVYNjVpbQ6AAEtm9xL9MWYEcFG65LBXnc
- 9NjkixUUJSbVuxLduy8uvNCcOaZ8Zcc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-48TXb1gIOQSLefOn-DZ5sw-1; Fri, 06 Mar 2020 00:57:03 -0500
-X-MC-Unique: 48TXb1gIOQSLefOn-DZ5sw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB0FE107ACC9;
- Fri,  6 Mar 2020 05:57:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CCC6D5C21B;
- Fri,  6 Mar 2020 05:56:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4EAC111386A6; Fri,  6 Mar 2020 06:56:58 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Subject: Re: [PATCH] console: make QMP screendump use coroutine
-References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
- <87a74ueudt.fsf@dusky.pond.sub.org>
- <CAJ+F1C+GY6d8Jr+NjSMuXpX+QiMsFQ9qd-rEJyp+oF9Ld6Z1wQ@mail.gmail.com>
-Date: Fri, 06 Mar 2020 06:56:58 +0100
-In-Reply-To: <CAJ+F1C+GY6d8Jr+NjSMuXpX+QiMsFQ9qd-rEJyp+oF9Ld6Z1wQ@mail.gmail.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 5 Mar 2020
- 16:08:00 +0100")
-Message-ID: <87k13y9gb9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA71L-0001g1-9t
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:03:44 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:35214
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jA71L-0001WA-3D; Fri, 06 Mar 2020 02:03:43 -0500
+Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jA71U-00017F-8P; Fri, 06 Mar 2020 07:03:52 +0000
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
+ <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+ <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+ <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
+ <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
+ <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
+ <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <071fff0a-e922-502d-da18-2572f73cecdf@ilande.co.uk>
+Date: Fri, 6 Mar 2020 07:03:25 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,140 +109,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On 05/03/2020 23:35, BALATON Zoltan wrote:
 
-> Hi
->
-> On Thu, Mar 5, 2020 at 3:46 PM Markus Armbruster <armbru@redhat.com> wrot=
-e:
->>
->> I tried to observe the main loop keeps running while the screendump does
->> its work.
->>
->> The main loop appears to lack trace points.  Alright, if there's no
->> hammer handy, I'll use a rock:
->>
->> diff --git a/softmmu/vl.c b/softmmu/vl.c
->> index 5549f4b619..b6561a65d7 100644
->> --- a/softmmu/vl.c
->> +++ b/softmmu/vl.c
->> @@ -1661,6 +1661,7 @@ void qemu_main_loop(void)
->>  #ifdef CONFIG_PROFILER
->>          ti =3D profile_getclock();
->>  #endif
->> +        printf("*** main loop\n");
->>          main_loop_wait(false);
->>  #ifdef CONFIG_PROFILER
->>          dev_time +=3D profile_getclock() - ti;
+>> I just a quick look at the PCI specification and found this interesting paragraph in
+>> the section about "Interrupt Line":
 >>
 >>
->> First experiment: does the main loop continue to run when writing out
->> the screendump blocks / would block?
+>> "The Interrupt Line register is an eight-bit register used to communicate interrupt
+>> line routing information. The register is read/write and must be implemented by any
+>> device (or device function) that uses an interrupt pin. POST software will write the
+>> routing information into this register as it initializes and configures the system."
 >>
->> Observe qmp_screendump() opens the file without O_EXCL.  Great, that
->> lets me block output by making it open a FIFO.
+>> "The value in this register tells which input of the system interrupt controller(s)
+>> the device's interrupt pin is connected to. The device itself does not use this
+>> value, rather it is used by device drivers and operating systems. Device drivers and
+>> operating systems can use this information to determine priority and vector
+>> information. Values in this register are architecture-specific [43]."
 >>
->> Terminal#1:
->>
->>     $ mkfifo s
->>
->> Terminal#2:
->>
->>     $ upstream-qemu -S -display none -chardev socket,id=3Dqmp,path=3Dtes=
-t-qmp,server=3Don,wait=3Doff -mon mode=3Dcontrol,chardev=3Dqmp
->>     *** main loop
->>     *** main loop
->>     *** main loop
->>
->> Keeps printing at a steady pace.
->>
->> Terminal#3:
->>
->>     $ socat "READLINE,history=3D$HOME/.qmp_history,prompt=3DQMP>" UNIX-C=
-ONNECT:$HOME/work/images/test-qmp
->>     {"QMP": {"version": {"qemu": {"micro": 50, "minor": 2, "major": 4}, =
-"package": "v4.2.0-2069-g5e5ae6b644-dirty"}, "capabilities": ["oob"]}}
->>     QMP>{"execute": "qmp_capabilities"}
->>     {"return": {}}
->>     QMP>{"execute": "screendump", "arguments": {"filename": "s"}}
->>
->> The printing in terminal#2 stops.  This is expected; qemu_open() calls
->> open(), which blocks, because the FIFO has no reader.
->>
->> Terminal#1:
->>
->>     $ exec 4<s
->>
->> Now the FIFO has a reader.  Terminal#2 remains quiet.
->>
->> We now hang in ppm_save().  Abridged stack backtrace:
->>
->>     #0  0x00007ffff519d0f5 in writev () at /lib64/libc.so.6
->>     #1  0x0000555555e15f61 in qio_channel_file_writev
->>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, fds=3D0x0=
-, nfds=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel-file.c:1=
-23
->>     #2  0x0000555555e133d3 in qio_channel_writev_full
->>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, fds=3D0x0=
-, nfds=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel.c:86
->>     #3  0x0000555555e137a2 in qio_channel_writev
->>         (ioc=3D0x5555567bf5f0, iov=3D0x555556a441b0, niov=3D1, errp=3D0x=
-7fffe9d81d10)
->>         at /work/armbru/qemu/io/channel.c:207
->>     #4  0x0000555555e13696 in qio_channel_writev_all
->>         (ioc=3D0x5555567bf5f0, iov=3D0x7fffe9d81bd0, niov=3D1, errp=3D0x=
-7fffe9d81d10)
->>         at /work/armbru/qemu/io/channel.c:171
->>     #5  0x0000555555e139b1 in qio_channel_write_all
->>         (ioc=3D0x5555567bf5f0, buf=3D0x555556b05200 "", buflen=3D1920, e=
-rrp=3D0x7fffe9d81d10) at /work/armbru/qemu/io/channel.c:257
->>     #6  0x0000555555cd74ff in ppm_save
->>         (fd=3D22, image=3D0x5555568ffdd0, errp=3D0x7fffe9d81d10)
->>         at /work/armbru/qemu/ui/console.c:336
->>     #7  0x0000555555cd77e6 in qmp_screendump
->>         (filename=3D0x555556ea0900 "s", has_device=3Dfalse, device=3D0x0=
-, has_head=3Dfalse, head=3D0, errp=3D0x7fffe9d81d10) at /work/armbru/qemu/u=
-i/console.c:401
->>
->> A brief inspection of qio_channel_file_writev() and
->> qio_channel_writev_all() suggests this might work if you make the output
->> file descriptor non-blocking.
->
-> Right, the goal was rather originally to fix rhbz#1230527. We got
-> coroutine IO by accident, and I was too optimistic about default
-> behaviour change ;) I will update the patch.
->
->>
->>     $ head -c 1 <&4 | hexdump -C
->>     00000000  50                                                |P|
->>     00000001
->>
->> Still quiet.
->>
->>     $ cat <&4 >/dev/null
->>
->> The printing resumes.
->>
->>     $ exec 4<&-
+>> [43] For x86 based PCs, the values in this register correspond to IRQ numbers (0-15)
+>> of the standard dual 8259 configuration. The value 255 is defined as meaning
+>> "unknown" or "no connection" to the interrupt controller. Values between 15 and 254
+>> are reserved.
 >>
 >>
->> Second experiment: does the main loop continue to run while we wait for
->> graphic_hw_update_done()?
->>
->> Left as an exercise for the patch submitter ;)
->>
->>
->
-> With your main loop printf, one printf in graphic_hw_update() and one
-> in graphic_hw_update_done() ? (rather part of testing commit
-> 4d6316218bf7bf3b8c7c7165b072cc314511a7a7, soon 4y old!)
+>> The key part here is "The device itself does not use this value, rather it is used by
+>> device drivers and operating systems" since this immediately tells us that the
+>> existing code in hw/ide/via.c which uses the interrupt line value for IRQ routing is
+>> incorrect and should be removed.
+> 
+> On real hardware this may be true but in QEMU how would it otherwise raise the
+> correct interrupt line the guest expects? This probably does not matter for pegasos2
+> but I think is needed for 100% native mode used with the fulong2e so it gets the IRQ
+> it expects.
 
-We might also need to artificially delay graphic_hw_update_done().
+That's easy - remember that both the PCI and IRQ interrupts are separate pins on the
+chip, so all that needs to be done is expose the legacy IRQ via qdev and use that to
+wire it up to your interrupt controller.
 
+>> If we do that the next question is how does the VIA know whether the use the PCI
+>> interrupt or the legacy interrupt? Another look at the datasheet showed that there is
+> 
+> I don't think via-ide ever uses a PCI interrupt, if you look at its datasheet the
+> description of the prog-if reg (0x9) says in native mode irq is programmable via
+> config reg 0x3c which then lists all the ISA IRQs as possible values, default 14 and
+> 0 meaning disable.
+> 
+>> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
+>> documented as having value 0 == Legacy IRQ routing which should be the initial value
+>> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
+> 
+> The VT8231 docs say this should always read 1 but may be this is somehow set to 0 on
+> the Pegasos2. What does that mean? Should we use this value instead of the feature
+> bit to force using legacy interrupts? We'd still need a property in via-ide to set
+> this reg or is it possible to set it from board code overriding the default after
+> device is created? That would allow to drop patch 1. I can try this.
+
+Okay so this is interesting: I've been switching between the VT8231 and the VT82C686B
+datasheets, and there is a difference here. You are correct in what you say above in
+that the 8231 docs specify that this is set to 1, but on the 686B this is clearly not
+the case.
+
+What is rather unusual here is that both the 8231 and 686B have exactly the same
+device and vendor ids, so I'm not sure how you'd distinguish between them?
+
+>> In your previous email you included a trace of the PCI configuration accesses to the
+>> via-ide device. Can you try this again with the following diff and post the same
+>> output once again?
+>>
+>> diff --git a/hw/ide/via.c b/hw/ide/via.c
+>> index 096de8dba0..db9f4af861 100644
+>> --- a/hw/ide/via.c
+>> +++ b/hw/ide/via.c
+>> @@ -139,7 +139,7 @@ static void via_ide_reset(DeviceState *dev)
+>>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_2, 0x00000170);
+>>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_3, 0x00000374);
+>>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_4, 0x0000cc01); /* BMIBA: 20-23h */
+>> -    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000010e);
+>> +    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000000e);
+>>
+>>     /* IDE chip enable, IDE configuration 1/2, IDE FIFO Configuration*/
+>>     pci_set_long(pci_conf + 0x40, 0x0a090600);
+> 
+> This does not change much:
+> 
+> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
+> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
+> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
+> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
+> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
+> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
+> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
+> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
+> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
+> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
+> pci_cfg_read via-ide 12:1 @0xc -> 0x0
+> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
+> pci_cfg_read via-ide 12:1 @0x3c -> 0xe
+> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
+> pci_cfg_read via-ide 12:1 @0x3c -> 0xe
+> pci_cfg_write via-ide 12:1 @0x3c <- 0x9
+> 
+> compared to
+> 
+>> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
+>> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
+>> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
+>> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
+>> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
+>> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
+>> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
+>> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
+>> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
+>> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+>> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
+>> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
+>> pci_cfg_read via-ide 12:1 @0xc -> 0x0
+>> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
+>> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
+>> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
+>> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
+>> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
+> 
+> firmware does not seem to care about this value.
+
+I think this proves what I was saying about the legacy interrupt routing, but of
+course this is based upon the 686B rather than the 8231.
+
+
+ATB,
+
+Mark.
 
