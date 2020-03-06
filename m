@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D775C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A00CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B6E220658
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 064B720658
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:24:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AylwNDHA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6E220658
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ba6jpOv1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064B720658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGh7-0008Nq-Iy
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:23:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48538)
+	id 1jAGiT-0001qd-7H
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:24:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jAGZU-0004y5-Dm
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:38 -0500
+ (envelope-from <kwolf@redhat.com>) id 1jAGZS-0004vT-Ps
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jAGZR-0007vT-41
+ (envelope-from <kwolf@redhat.com>) id 1jAGZP-0007o3-4u
  for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:34 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27482
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52150
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZP-0007hX-DE
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:31 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZN-0007Si-9k
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583514929;
+ s=mimecast20190719; t=1583514922;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6p3TjbQSljy3PxeMic9zxvyIGW696lE+YkRxW225DQY=;
- b=AylwNDHAQgn5oeTNvCt34YXM9j5uCp1db2bXoFCESje1HXOgk3lunNjcU+lEGeLJrNy0vm
- z+1Fgj1Utf8dYf2eTq+Klo319egnpJxLQROBQYxRr3XXY804Ldkq8ijAFx0CPCjOb48oSt
- uL7gIF8A8mUTbloh7EAhCCt9BqAZmSA=
+ bh=ledCnVT86UWg6PpI68aRbcjxettn9pRF0oqqQq3IUhE=;
+ b=Ba6jpOv1hODjY+qg+43+AY4Hjo1n4NuAAnOHzhbHlw8gdhe81MZMSjonllsl+FbWuwtLa+
+ aZhw9Ewg74NQX2N0m59KCyKfIY8syjZSpMXqrk7Ubdcq3zmGrCNrC8mte+XeYrQi1Ky7Sv
+ shCoT3mTULz70k0MSGb8so0C6ewCn6g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-jwwA-qrANyS-ynHBZp_n4Q-1; Fri, 06 Mar 2020 12:15:25 -0500
-X-MC-Unique: jwwA-qrANyS-ynHBZp_n4Q-1
+ us-mta-392-zx_17npdNLqEvOOvGo8Ohw-1; Fri, 06 Mar 2020 12:15:20 -0500
+X-MC-Unique: zx_17npdNLqEvOOvGo8Ohw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14F0513F6;
- Fri,  6 Mar 2020 17:15:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECD4C107ACCC;
+ Fri,  6 Mar 2020 17:15:18 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1782173873;
- Fri,  6 Mar 2020 17:15:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F168573873;
+ Fri,  6 Mar 2020 17:15:17 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 14/29] qemu-storage-daemon: Add --object option
-Date: Fri,  6 Mar 2020 18:14:43 +0100
-Message-Id: <20200306171458.1848-15-kwolf@redhat.com>
+Subject: [PULL 10/29] block: Move common QMP commands to block-core QAPI module
+Date: Fri,  6 Mar 2020 18:14:39 +0100
+Message-Id: <20200306171458.1848-11-kwolf@redhat.com>
 In-Reply-To: <20200306171458.1848-1-kwolf@redhat.com>
 References: <20200306171458.1848-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -73,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,138 +90,653 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a command line option to create user-creatable QOM objects.
+block-core is for everything that isn't related to the system emulator.
+Internal snapshots, the NBD server and quorum events make sense in the
+tools, too, so move them to block-core.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200224143008.13362-9-kwolf@redhat.com>
+Message-Id: <20200224143008.13362-5-kwolf@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-storage-daemon.c | 47 +++++++++++++++++++++++++++++++++++++++++++
- Makefile.objs         |  2 +-
- qom/Makefile.objs     |  1 +
- 3 files changed, 49 insertions(+), 1 deletion(-)
+ qapi/block-core.json | 283 ++++++++++++++++++++++++++++++++++++++++++
+ qapi/block.json      | 284 -------------------------------------------
+ 2 files changed, 283 insertions(+), 284 deletions(-)
 
-diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index c30caaf59e..0cd8144c81 100644
---- a/qemu-storage-daemon.c
-+++ b/qemu-storage-daemon.c
-@@ -33,15 +33,19 @@
- #include "qapi/error.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qmp/qdict.h"
- #include "qapi/qobject-input-visitor.h"
-=20
- #include "qemu-common.h"
- #include "qemu-version.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qemu/help_option.h"
- #include "qemu/log.h"
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
-+#include "qemu/option.h"
-+#include "qom/object_interfaces.h"
-=20
- #include "trace/control.h"
-=20
-@@ -63,12 +67,31 @@ static void help(void)
- "             [,driver specific parameters...]\n"
- "                         configure a block backend\n"
- "\n"
-+"  --object help          list object types that can be added\n"
-+"  --object <type>,help   list properties for the given object type\n"
-+"  --object <type>[,<property>=3D<value>...]\n"
-+"                         create a new object of type <type>, setting\n"
-+"                         properties in the order they are specified. Note=
-\n"
-+"                         that the 'id' property must be set.\n"
-+"                         See the qemu(1) man page for documentation of th=
-e\n"
-+"                         objects that can be added.\n"
-+"\n"
- QEMU_HELP_BOTTOM "\n",
-     error_get_progname());
- }
-=20
- enum {
-     OPTION_BLOCKDEV =3D 256,
-+    OPTION_OBJECT,
-+};
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 85e27bb61f..60860ead68 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -5447,3 +5447,286 @@
+   'data' : { 'node-name': 'str',
+              'iothread': 'StrOrNull',
+              '*force': 'bool' } }
 +
-+static QemuOptsList qemu_object_opts =3D {
-+    .name =3D "object",
-+    .implied_opt_name =3D "qom-type",
-+    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
-+    .desc =3D {
-+        { }
-+    },
- };
-=20
- static void process_options(int argc, char *argv[])
-@@ -78,6 +101,7 @@ static void process_options(int argc, char *argv[])
-     static const struct option long_options[] =3D {
-         {"blockdev", required_argument, NULL, OPTION_BLOCKDEV},
-         {"help", no_argument, NULL, 'h'},
-+        {"object", required_argument, NULL, OPTION_OBJECT},
-         {"trace", required_argument, NULL, 'T'},
-         {"version", no_argument, NULL, 'V'},
-         {0, 0, 0, 0}
-@@ -121,6 +145,29 @@ static void process_options(int argc, char *argv[])
-                 qapi_free_BlockdevOptions(options);
-                 break;
-             }
-+        case OPTION_OBJECT:
-+            {
-+                QemuOpts *opts;
-+                const char *type;
-+                QDict *args;
-+                QObject *ret_data =3D NULL;
++##
++# @nbd-server-start:
++#
++# Start an NBD server listening on the given host and port.  Block
++# devices can then be exported using @nbd-server-add.  The NBD
++# server will present them as named exports; for example, another
++# QEMU instance could refer to them as "nbd:HOST:PORT:exportname=3DNAME".
++#
++# @addr: Address on which to listen.
++# @tls-creds: ID of the TLS credentials object (since 2.6).
++# @tls-authz: ID of the QAuthZ authorization object used to validate
++#             the client's x509 distinguished name. This object is
++#             is only resolved at time of use, so can be deleted and
++#             recreated on the fly while the NBD server is active.
++#             If missing, it will default to denying access (since 4.0).
++#
++# Returns: error if the server is already running.
++#
++# Since: 1.3.0
++##
++{ 'command': 'nbd-server-start',
++  'data': { 'addr': 'SocketAddressLegacy',
++            '*tls-creds': 'str',
++            '*tls-authz': 'str'} }
 +
-+                /* FIXME The keyval parser rejects 'help' arguments, so we=
- must
-+                 * unconditionall try QemuOpts first. */
-+                opts =3D qemu_opts_parse(&qemu_object_opts,
-+                                       optarg, true, &error_fatal);
-+                type =3D qemu_opt_get(opts, "qom-type");
-+                if (type && user_creatable_print_help(type, opts)) {
-+                    exit(EXIT_SUCCESS);
-+                }
-+                qemu_opts_del(opts);
++##
++# @nbd-server-add:
++#
++# Export a block node to QEMU's embedded NBD server.
++#
++# @device: The device name or node name of the node to be exported
++#
++# @name: Export name. If unspecified, the @device parameter is used as the
++#        export name. (Since 2.12)
++#
++# @description: Free-form description of the export, up to 4096 bytes.
++#               (Since 5.0)
++#
++# @writable: Whether clients should be able to write to the device via the
++#            NBD connection (default false).
++#
++# @bitmap: Also export the dirty bitmap reachable from @device, so the
++#          NBD client can use NBD_OPT_SET_META_CONTEXT with
++#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
++#
++# Returns: error if the server is not running, or export with the same nam=
+e
++#          already exists.
++#
++# Since: 1.3.0
++##
++{ 'command': 'nbd-server-add',
++  'data': {'device': 'str', '*name': 'str', '*description': 'str',
++           '*writable': 'bool', '*bitmap': 'str' } }
 +
-+                args =3D keyval_parse(optarg, "qom-type", &error_fatal);
-+                qmp_object_add(args, &ret_data, &error_fatal);
-+                qobject_unref(args);
-+                qobject_unref(ret_data);
-+                break;
-+            }
-         default:
-             g_assert_not_reached();
-         }
-diff --git a/Makefile.objs b/Makefile.objs
-index 3db3a7db6e..b5d9e1e134 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -31,7 +31,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- # storage-daemon-obj-y is code used by qemu-storage-daemon (these objects =
-are
- # used for system emulation, too, but specified separately there)
++##
++# @NbdServerRemoveMode:
++#
++# Mode for removing an NBD export.
++#
++# @safe: Remove export if there are no existing connections, fail otherwis=
+e.
++#
++# @hard: Drop all connections immediately and remove export.
++#
++# Potential additional modes to be added in the future:
++#
++# hide: Just hide export from new clients, leave existing connections as i=
+s.
++# Remove export after all clients are disconnected.
++#
++# soft: Hide export from new clients, answer with ESHUTDOWN for all furthe=
+r
++# requests from existing clients.
++#
++# Since: 2.12
++##
++{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
++
++##
++# @nbd-server-remove:
++#
++# Remove NBD export by name.
++#
++# @name: Export name.
++#
++# @mode: Mode of command operation. See @NbdServerRemoveMode description.
++#        Default is 'safe'.
++#
++# Returns: error if
++#            - the server is not running
++#            - export is not found
++#            - mode is 'safe' and there are existing connections
++#
++# Since: 2.12
++##
++{ 'command': 'nbd-server-remove',
++  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
++
++##
++# @nbd-server-stop:
++#
++# Stop QEMU's embedded NBD server, and unregister all devices previously
++# added via @nbd-server-add.
++#
++# Since: 1.3.0
++##
++{ 'command': 'nbd-server-stop' }
++
++##
++# @QuorumOpType:
++#
++# An enumeration of the quorum operation types
++#
++# @read: read operation
++#
++# @write: write operation
++#
++# @flush: flush operation
++#
++# Since: 2.6
++##
++{ 'enum': 'QuorumOpType',
++  'data': [ 'read', 'write', 'flush' ] }
++
++##
++# @QUORUM_FAILURE:
++#
++# Emitted by the Quorum block driver if it fails to establish a quorum
++#
++# @reference: device name if defined else node name
++#
++# @sector-num: number of the first sector of the failed read operation
++#
++# @sectors-count: failed read operation sector count
++#
++# Note: This event is rate-limited.
++#
++# Since: 2.0
++#
++# Example:
++#
++# <- { "event": "QUORUM_FAILURE",
++#      "data": { "reference": "usr1", "sector-num": 345435, "sectors-count=
+": 5 },
++#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
++#
++##
++{ 'event': 'QUORUM_FAILURE',
++  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count': 'int=
+' } }
++
++##
++# @QUORUM_REPORT_BAD:
++#
++# Emitted to report a corruption of a Quorum file
++#
++# @type: quorum operation type (Since 2.6)
++#
++# @error: error message. Only present on failure. This field
++#         contains a human-readable error message. There are no semantics =
+other
++#         than that the block layer reported an error and clients should n=
+ot
++#         try to interpret the error string.
++#
++# @node-name: the graph node name of the block driver state
++#
++# @sector-num: number of the first sector of the failed read operation
++#
++# @sectors-count: failed read operation sector count
++#
++# Note: This event is rate-limited.
++#
++# Since: 2.0
++#
++# Example:
++#
++# 1. Read operation
++#
++# { "event": "QUORUM_REPORT_BAD",
++#      "data": { "node-name": "node0", "sector-num": 345435, "sectors-coun=
+t": 5,
++#                "type": "read" },
++#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
++#
++# 2. Flush operation
++#
++# { "event": "QUORUM_REPORT_BAD",
++#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count": 2=
+097120,
++#                "type": "flush", "error": "Broken pipe" },
++#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
++#
++##
++{ 'event': 'QUORUM_REPORT_BAD',
++  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
++            'sector-num': 'int', 'sectors-count': 'int' } }
++
++##
++# @BlockdevSnapshotInternal:
++#
++# @device: the device name or node-name of a root node to generate the sna=
+pshot
++#          from
++#
++# @name: the name of the internal snapshot to be created
++#
++# Notes: In transaction, if @name is empty, or any snapshot matching @name
++#        exists, the operation will fail. Only some image formats support =
+it,
++#        for example, qcow2, rbd, and sheepdog.
++#
++# Since: 1.7
++##
++{ 'struct': 'BlockdevSnapshotInternal',
++  'data': { 'device': 'str', 'name': 'str' } }
++
++##
++# @blockdev-snapshot-internal-sync:
++#
++# Synchronously take an internal snapshot of a block device, when the
++# format of the image used supports it. If the name is an empty
++# string, or a snapshot with name already exists, the operation will
++# fail.
++#
++# For the arguments, see the documentation of BlockdevSnapshotInternal.
++#
++# Returns: - nothing on success
++#          - If @device is not a valid block device, GenericError
++#          - If any snapshot matching @name exists, or @name is empty,
++#            GenericError
++#          - If the format of the image used does not support it,
++#            BlockFormatFeatureNotSupported
++#
++# Since: 1.7
++#
++# Example:
++#
++# -> { "execute": "blockdev-snapshot-internal-sync",
++#      "arguments": { "device": "ide-hd0",
++#                     "name": "snapshot0" }
++#    }
++# <- { "return": {} }
++#
++##
++{ 'command': 'blockdev-snapshot-internal-sync',
++  'data': 'BlockdevSnapshotInternal' }
++
++##
++# @blockdev-snapshot-delete-internal-sync:
++#
++# Synchronously delete an internal snapshot of a block device, when the fo=
+rmat
++# of the image used support it. The snapshot is identified by name or id o=
+r
++# both. One of the name or id is required. Return SnapshotInfo for the
++# successfully deleted snapshot.
++#
++# @device: the device name or node-name of a root node to delete the snaps=
+hot
++#          from
++#
++# @id: optional the snapshot's ID to be deleted
++#
++# @name: optional the snapshot's name to be deleted
++#
++# Returns: - SnapshotInfo on success
++#          - If @device is not a valid block device, GenericError
++#          - If snapshot not found, GenericError
++#          - If the format of the image used does not support it,
++#            BlockFormatFeatureNotSupported
++#          - If @id and @name are both not specified, GenericError
++#
++# Since: 1.7
++#
++# Example:
++#
++# -> { "execute": "blockdev-snapshot-delete-internal-sync",
++#      "arguments": { "device": "ide-hd0",
++#                     "name": "snapshot0" }
++#    }
++# <- { "return": {
++#                    "id": "1",
++#                    "name": "snapshot0",
++#                    "vm-state-size": 0,
++#                    "date-sec": 1000012,
++#                    "date-nsec": 10,
++#                    "vm-clock-sec": 100,
++#                    "vm-clock-nsec": 20
++#      }
++#    }
++#
++##
++{ 'command': 'blockdev-snapshot-delete-internal-sync',
++  'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
++  'returns': 'SnapshotInfo' }
+diff --git a/qapi/block.json b/qapi/block.json
+index da19834db4..d2f3fc01ed 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -60,23 +60,6 @@
+ { 'enum': 'FloppyDriveType',
+   'data': ['144', '288', '120', 'none', 'auto']}
 =20
--storage-daemon-obj-y =3D block/
-+storage-daemon-obj-y =3D block/ qom/
- storage-daemon-obj-y +=3D blockdev.o iothread.o
+-##
+-# @BlockdevSnapshotInternal:
+-#
+-# @device: the device name or node-name of a root node to generate the sna=
+pshot
+-#          from
+-#
+-# @name: the name of the internal snapshot to be created
+-#
+-# Notes: In transaction, if @name is empty, or any snapshot matching @name
+-#        exists, the operation will fail. Only some image formats support =
+it,
+-#        for example, qcow2, rbd, and sheepdog.
+-#
+-# Since: 1.7
+-##
+-{ 'struct': 'BlockdevSnapshotInternal',
+-  'data': { 'device': 'str', 'name': 'str' } }
+-
+ ##
+ # @PRManagerInfo:
+ #
+@@ -104,84 +87,6 @@
+ { 'command': 'query-pr-managers', 'returns': ['PRManagerInfo'],
+   'allow-preconfig': true }
 =20
- ######################################################################
-diff --git a/qom/Makefile.objs b/qom/Makefile.objs
-index f9d77350ac..1b45d104ba 100644
---- a/qom/Makefile.objs
-+++ b/qom/Makefile.objs
-@@ -2,3 +2,4 @@ qom-obj-y =3D object.o container.o qom-qobject.o
- qom-obj-y +=3D object_interfaces.o
+-
+-##
+-# @blockdev-snapshot-internal-sync:
+-#
+-# Synchronously take an internal snapshot of a block device, when the
+-# format of the image used supports it. If the name is an empty
+-# string, or a snapshot with name already exists, the operation will
+-# fail.
+-#
+-# For the arguments, see the documentation of BlockdevSnapshotInternal.
+-#
+-# Returns: - nothing on success
+-#          - If @device is not a valid block device, GenericError
+-#          - If any snapshot matching @name exists, or @name is empty,
+-#            GenericError
+-#          - If the format of the image used does not support it,
+-#            BlockFormatFeatureNotSupported
+-#
+-# Since: 1.7
+-#
+-# Example:
+-#
+-# -> { "execute": "blockdev-snapshot-internal-sync",
+-#      "arguments": { "device": "ide-hd0",
+-#                     "name": "snapshot0" }
+-#    }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'blockdev-snapshot-internal-sync',
+-  'data': 'BlockdevSnapshotInternal' }
+-
+-##
+-# @blockdev-snapshot-delete-internal-sync:
+-#
+-# Synchronously delete an internal snapshot of a block device, when the fo=
+rmat
+-# of the image used support it. The snapshot is identified by name or id o=
+r
+-# both. One of the name or id is required. Return SnapshotInfo for the
+-# successfully deleted snapshot.
+-#
+-# @device: the device name or node-name of a root node to delete the snaps=
+hot
+-#          from
+-#
+-# @id: optional the snapshot's ID to be deleted
+-#
+-# @name: optional the snapshot's name to be deleted
+-#
+-# Returns: - SnapshotInfo on success
+-#          - If @device is not a valid block device, GenericError
+-#          - If snapshot not found, GenericError
+-#          - If the format of the image used does not support it,
+-#            BlockFormatFeatureNotSupported
+-#          - If @id and @name are both not specified, GenericError
+-#
+-# Since: 1.7
+-#
+-# Example:
+-#
+-# -> { "execute": "blockdev-snapshot-delete-internal-sync",
+-#      "arguments": { "device": "ide-hd0",
+-#                     "name": "snapshot0" }
+-#    }
+-# <- { "return": {
+-#                    "id": "1",
+-#                    "name": "snapshot0",
+-#                    "vm-state-size": 0,
+-#                    "date-sec": 1000012,
+-#                    "date-nsec": 10,
+-#                    "vm-clock-sec": 100,
+-#                    "vm-clock-nsec": 20
+-#      }
+-#    }
+-#
+-##
+-{ 'command': 'blockdev-snapshot-delete-internal-sync',
+-  'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
+-  'returns': 'SnapshotInfo' }
+-
+ ##
+ # @eject:
+ #
+@@ -210,111 +115,6 @@
+             '*id': 'str',
+             '*force': 'bool' } }
 =20
- common-obj-$(CONFIG_SOFTMMU) +=3D qom-hmp-cmds.o qom-qmp-cmds.o
-+storage-daemon-obj-y +=3D qom-qmp-cmds.o
+-##
+-# @nbd-server-start:
+-#
+-# Start an NBD server listening on the given host and port.  Block
+-# devices can then be exported using @nbd-server-add.  The NBD
+-# server will present them as named exports; for example, another
+-# QEMU instance could refer to them as "nbd:HOST:PORT:exportname=3DNAME".
+-#
+-# @addr: Address on which to listen.
+-# @tls-creds: ID of the TLS credentials object (since 2.6).
+-# @tls-authz: ID of the QAuthZ authorization object used to validate
+-#             the client's x509 distinguished name. This object is
+-#             is only resolved at time of use, so can be deleted and
+-#             recreated on the fly while the NBD server is active.
+-#             If missing, it will default to denying access (since 4.0).
+-#
+-# Returns: error if the server is already running.
+-#
+-# Since: 1.3.0
+-##
+-{ 'command': 'nbd-server-start',
+-  'data': { 'addr': 'SocketAddressLegacy',
+-            '*tls-creds': 'str',
+-            '*tls-authz': 'str'} }
+-
+-##
+-# @nbd-server-add:
+-#
+-# Export a block node to QEMU's embedded NBD server.
+-#
+-# @device: The device name or node name of the node to be exported
+-#
+-# @name: Export name. If unspecified, the @device parameter is used as the
+-#        export name. (Since 2.12)
+-#
+-# @description: Free-form description of the export, up to 4096 bytes.
+-#               (Since 5.0)
+-#
+-# @writable: Whether clients should be able to write to the device via the
+-#            NBD connection (default false).
+-#
+-# @bitmap: Also export the dirty bitmap reachable from @device, so the
+-#          NBD client can use NBD_OPT_SET_META_CONTEXT with
+-#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
+-#
+-# Returns: error if the server is not running, or export with the same nam=
+e
+-#          already exists.
+-#
+-# Since: 1.3.0
+-##
+-{ 'command': 'nbd-server-add',
+-  'data': {'device': 'str', '*name': 'str', '*description': 'str',
+-           '*writable': 'bool', '*bitmap': 'str' } }
+-
+-##
+-# @NbdServerRemoveMode:
+-#
+-# Mode for removing an NBD export.
+-#
+-# @safe: Remove export if there are no existing connections, fail otherwis=
+e.
+-#
+-# @hard: Drop all connections immediately and remove export.
+-#
+-# Potential additional modes to be added in the future:
+-#
+-# hide: Just hide export from new clients, leave existing connections as i=
+s.
+-# Remove export after all clients are disconnected.
+-#
+-# soft: Hide export from new clients, answer with ESHUTDOWN for all furthe=
+r
+-# requests from existing clients.
+-#
+-# Since: 2.12
+-##
+-{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
+-
+-##
+-# @nbd-server-remove:
+-#
+-# Remove NBD export by name.
+-#
+-# @name: Export name.
+-#
+-# @mode: Mode of command operation. See @NbdServerRemoveMode description.
+-#        Default is 'safe'.
+-#
+-# Returns: error if
+-#            - the server is not running
+-#            - export is not found
+-#            - mode is 'safe' and there are existing connections
+-#
+-# Since: 2.12
+-##
+-{ 'command': 'nbd-server-remove',
+-  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
+-
+-##
+-# @nbd-server-stop:
+-#
+-# Stop QEMU's embedded NBD server, and unregister all devices previously
+-# added via @nbd-server-add.
+-#
+-# Since: 1.3.0
+-##
+-{ 'command': 'nbd-server-stop' }
+-
+ ##
+ # @DEVICE_TRAY_MOVED:
+ #
+@@ -367,87 +167,3 @@
+ ##
+ { 'event': 'PR_MANAGER_STATUS_CHANGED',
+   'data': { 'id': 'str', 'connected': 'bool' } }
+-
+-##
+-# @QuorumOpType:
+-#
+-# An enumeration of the quorum operation types
+-#
+-# @read: read operation
+-#
+-# @write: write operation
+-#
+-# @flush: flush operation
+-#
+-# Since: 2.6
+-##
+-{ 'enum': 'QuorumOpType',
+-  'data': [ 'read', 'write', 'flush' ] }
+-
+-##
+-# @QUORUM_FAILURE:
+-#
+-# Emitted by the Quorum block driver if it fails to establish a quorum
+-#
+-# @reference: device name if defined else node name
+-#
+-# @sector-num: number of the first sector of the failed read operation
+-#
+-# @sectors-count: failed read operation sector count
+-#
+-# Note: This event is rate-limited.
+-#
+-# Since: 2.0
+-#
+-# Example:
+-#
+-# <- { "event": "QUORUM_FAILURE",
+-#      "data": { "reference": "usr1", "sector-num": 345435, "sectors-count=
+": 5 },
+-#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+-#
+-##
+-{ 'event': 'QUORUM_FAILURE',
+-  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count': 'int=
+' } }
+-
+-##
+-# @QUORUM_REPORT_BAD:
+-#
+-# Emitted to report a corruption of a Quorum file
+-#
+-# @type: quorum operation type (Since 2.6)
+-#
+-# @error: error message. Only present on failure. This field
+-#         contains a human-readable error message. There are no semantics =
+other
+-#         than that the block layer reported an error and clients should n=
+ot
+-#         try to interpret the error string.
+-#
+-# @node-name: the graph node name of the block driver state
+-#
+-# @sector-num: number of the first sector of the failed read operation
+-#
+-# @sectors-count: failed read operation sector count
+-#
+-# Note: This event is rate-limited.
+-#
+-# Since: 2.0
+-#
+-# Example:
+-#
+-# 1. Read operation
+-#
+-# { "event": "QUORUM_REPORT_BAD",
+-#      "data": { "node-name": "node0", "sector-num": 345435, "sectors-coun=
+t": 5,
+-#                "type": "read" },
+-#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+-#
+-# 2. Flush operation
+-#
+-# { "event": "QUORUM_REPORT_BAD",
+-#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count": 2=
+097120,
+-#                "type": "flush", "error": "Broken pipe" },
+-#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
+-#
+-##
+-{ 'event': 'QUORUM_REPORT_BAD',
+-  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
+-            'sector-num': 'int', 'sectors-count': 'int' } }
 --=20
 2.20.1
 
