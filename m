@@ -2,98 +2,61 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFFAC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4239C10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:30:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9762B207FD
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:26:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYM5gmdA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9762B207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7AD8E2073D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:30:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AD8E2073D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAABb-0003dp-LV
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:26:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38297)
+	id 1jAAFG-00051T-Fa
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:30:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jAAAz-00038C-MR
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:54 -0500
+ (envelope-from <groug@kaod.org>) id 1jAAEL-0004Ww-Qn
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:29:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jAAAy-0004Kd-Bt
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53341
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1jAAEJ-00038v-Mm
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:29:21 -0500
+Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:42324)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jAAAy-0004Ic-7C
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583490351;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nwTG91Z0UrMLSgqKM3z5NdRNykS8obtcjvFPhfrFI/I=;
- b=hYM5gmdAQopjxNxxcTouZmNmEhlMZIgN0znrY5QBnGqhFiK9expBuheyQutHGTwYkxxRKm
- Fv1fu9UJ0AkFif0dUY6fautJOd6k5T6xoYYta7iYY/2/Ru5n3aAME6BET9nwLXMPakJ1t6
- bsoFz/QJEUfJVKaajI51E6Cmfpl6aRI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-4AHpjZ5bPCioD01wLDEcvw-1; Fri, 06 Mar 2020 05:25:50 -0500
-X-MC-Unique: 4AHpjZ5bPCioD01wLDEcvw-1
-Received: by mail-qk1-f198.google.com with SMTP id v189so1150766qkb.16
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 02:25:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=AW4v09Vd96b9fi6my7L4ohTPyY7UcwbrJewejEw9AHI=;
- b=NmFT3HqfH3tE5CRN97PnuRaP1x8D8q9fUp7TIZyFxsI/OC7x/EFXcsnx/lb4YFeVrq
- 7sCji3av+JjdpQRunBIQhlY/Ai5o6VtDP1X5fVBYJ1UHrcAKVZHLBM9Ld+bFo7ii1GIg
- lvEM8tGEubdKXSPk2BCpsoWApJX0qzoOfQPiAaFZ2J/xAWWDvfACVYEoFqqHggH2Z8Nk
- hkkYtQTCA6Yp20DQ45dO8lk1UanwPTIcZKncQGUNLjVYBU9ShOi+Xmk+T0YnUGm0Io1r
- mqPxz5TGM1aLBUP2Il1WFqSSHSscm2mtGE+CCN/5M7NuBj/O5AI5BSnsrfXC4e6MWTCC
- urzw==
-X-Gm-Message-State: ANhLgQ1naJKdm/5Bw3hIOGHkfV2FX3y9HAyrh/x+j6IqlDQw03gxm/HA
- hdfohHowHEDjX4BT7xcEX75Mv+Z9uH3MrhaX0ffm8lAasdjOBHtdQUrOIC3oQS7qAUW91agYKem
- G+bxUOGfr390qioE=
-X-Received: by 2002:a0c:d603:: with SMTP id c3mr2229030qvj.45.1583490348813;
- Fri, 06 Mar 2020 02:25:48 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vu2UbDFSCHwP7D6rxln5dc25KjIVhA8b+6v+G8yPgus7XWeJKbhuCu72TIXr2yIW4uSaXeF9w==
-X-Received: by 2002:a0c:d603:: with SMTP id c3mr2229017qvj.45.1583490348535;
- Fri, 06 Mar 2020 02:25:48 -0800 (PST)
-Received: from redhat.com (bzq-79-180-48-224.red.bezeqint.net. [79.180.48.224])
- by smtp.gmail.com with ESMTPSA id a23sm17214816qko.77.2020.03.06.02.25.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 02:25:47 -0800 (PST)
-Date: Fri, 6 Mar 2020 05:25:43 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Subject: Re: [PATCH 1/3] virtio-net: introduce RSS RX steering feature
-Message-ID: <20200306052517-mutt-send-email-mst@kernel.org>
-References: <20200226174809.9675-1-yuri.benditovich@daynix.com>
- <20200226174809.9675-2-yuri.benditovich@daynix.com>
- <20200305082023-mutt-send-email-mst@kernel.org>
- <CAOEp5Oc+dTzJHzof9suUbXEgBnYoa4bh87K-ALWMzw_MzYf4Mw@mail.gmail.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jAAEJ-00033E-Gk
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:29:19 -0500
+Received: from player738.ha.ovh.net (unknown [10.108.35.119])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 86E3E24640B
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 11:29:17 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 4B46D103D5B09;
+ Fri,  6 Mar 2020 10:28:58 +0000 (UTC)
+Date: Fri, 6 Mar 2020 11:28:56 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v8 01/10] error: auto propagated local_err
+Message-ID: <20200306112856.2ec79faf@bahia.home>
+In-Reply-To: <20200306051536.27803-2-vsementsov@virtuozzo.com>
+References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
+ <20200306051536.27803-2-vsementsov@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <CAOEp5Oc+dTzJHzof9suUbXEgBnYoa4bh87K-ALWMzw_MzYf4Mw@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+X-Ovh-Tracer-Id: 2737344149911279955
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudduvddgudeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 87.98.178.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,142 +68,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, armbru@redhat.com,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 06, 2020 at 11:29:50AM +0200, Yuri Benditovich wrote:
->=20
->=20
-> On Thu, Mar 5, 2020 at 3:21 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->=20
->     On Wed, Feb 26, 2020 at 07:48:07PM +0200, Yuri Benditovich wrote:
->     > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
->     > ---
->     >=A0 include/standard-headers/linux/virtio_net.h | 37 +++++++++++++++=
-++++--
->     >=A0 1 file changed, 35 insertions(+), 2 deletions(-)
->=20
->=20
->     It will take a bit until next merge window when the linux
->     headers will be updated.
->     Until that happens you can just put these defines where
->     they are used.
->=20
->=20
-> We also extend the configuration virtio_net_config structure and its
-> field 'supported_hash_types' uses these defines. Please advise.
+On Fri,  6 Mar 2020 08:15:27 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
+> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+> functions with an errp OUT parameter.
+>=20
+> It has three goals:
+>=20
+> 1. Fix issue with error_fatal and error_prepend/error_append_hint: user
+> can't see this additional information, because exit() happens in
+> error_setg earlier than information is added. [Reported by Greg Kurz]
+>=20
+> 2. Fix issue with error_abort and error_propagate: when we wrap
+> error_abort by local_err+error_propagate, the resulting coredump will
+> refer to error_propagate and not to the place where error happened.
+> (the macro itself doesn't fix the issue, but it allows us to [3.] drop
+> the local_err+error_propagate pattern, which will definitely fix the
+> issue) [Reported by Kevin Wolf]
+>=20
+> 3. Drop local_err+error_propagate pattern, which is used to workaround
+> void functions with errp parameter, when caller wants to know resulting
+> status. (Note: actually these functions could be merely updated to
+> return int error code).
+>=20
+> To achieve these goals, later patches will add invocations
+> of this macro at the start of functions with either use
+> error_prepend/error_append_hint (solving 1) or which use
+> local_err+error_propagate to check errors, switching those
+> functions to use *errp instead (solving 2 and 3).
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>=20
 
-Make a private copy of it with a different name for now.
-Add a comment so we don't forget to remove down the road.
+Thanks for this impressive work Vladimir !
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Paul Durrant <paul@xen.org>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Stefan Berger <stefanb@linux.ibm.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Cc: qemu-block@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> Cc: xen-devel@lists.xenproject.org
 >=20
+>  include/qapi/error.h | 203 ++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 170 insertions(+), 33 deletions(-)
 >=20
->     > diff --git a/include/standard-headers/linux/virtio_net.h b/include/
->     standard-headers/linux/virtio_net.h
->     > index 260c3681d7..3bc100afe3 100644
->     > --- a/include/standard-headers/linux/virtio_net.h
->     > +++ b/include/standard-headers/linux/virtio_net.h
->     > @@ -57,6 +57,7 @@
->     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 * Steering */
->     >=A0 #define VIRTIO_NET_F_CTRL_MAC_ADDR 23=A0 =A0 =A0 =A0 /* Set MAC =
-address */
->     >=A0
->     > +#define VIRTIO_NET_F_RSS=A0 =A0 =A0 =A060=A0 =A0 /* Supports RSS R=
-X steering */
->     >=A0 #define VIRTIO_NET_F_STANDBY=A0 =A062=A0 =A0 /* Act as standby f=
-or another
->     device
->     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 * with the same MAC.
->     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 */
->     > @@ -69,6 +70,16 @@
->     >=A0 #define VIRTIO_NET_S_LINK_UP 1=A0 =A0 =A0 =A0/* Link is up */
->     >=A0 #define VIRTIO_NET_S_ANNOUNCE=A0 =A0 =A0 =A0 2=A0 =A0 =A0 =A0/* =
-Announcement is needed *
->     /
->     >=A0
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0 (=
-1 << 0)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
-1 << 1)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
-1 << 2)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0 (=
-1 << 3)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
-1 << 4)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
-1 << 5)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
-1 << 6)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX=A0 =A0 =A0 =A0 =A0 =A0 (1 =
-<< 7)
->     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX=A0 =A0 =A0 =A0 =A0 =A0 (1 =
-<< 8)
->     > +
->     >=A0 struct virtio_net_config {
->     >=A0 =A0 =A0 =A0/* The config defining mac address (if VIRTIO_NET_F_M=
-AC) */
->     >=A0 =A0 =A0 =A0uint8_t mac[ETH_ALEN];
->     > @@ -92,6 +103,14 @@ struct virtio_net_config {
->     >=A0 =A0 =A0 =A0 * Any other value stands for unknown.
->     >=A0 =A0 =A0 =A0 */
->     >=A0 =A0 =A0 =A0uint8_t duplex;
->     > +
->     > +=A0 =A0 =A0/* maximal size of RSS key */
->     > +=A0 =A0 =A0uint8_t rss_max_key_size;
->     > +=A0 =A0 =A0/* maximal number of indirection table entries */
->     > +=A0 =A0 =A0uint16_t rss_max_indirection_table_length;
->     > +=A0 =A0 =A0/* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
->     > +=A0 =A0 =A0uint32_t supported_hash_types;
->     > +
->     >=A0 } QEMU_PACKED;
->     >=A0
->     >=A0 /*
->     > @@ -237,15 +256,29 @@ struct virtio_net_ctrl_mac {
->     >=A0 =A0* Accordingly, driver should not transmit new packets=A0 on v=
-irtqueues
->     other than
->     >=A0 =A0* specified.
->     >=A0 =A0*/
->     > +#define VIRTIO_NET_CTRL_MQ=A0 =A04
->     > + #define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET=A0 =A0 =A0 =A0 0
->     > + #define VIRTIO_NET_CTRL_MQ_RSS_CONFIG=A0 =A0 =A0 =A0 =A0 1
->     > +
->     > +/* for VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET */
->     >=A0 struct virtio_net_ctrl_mq {
->     >=A0 =A0 =A0 =A0__virtio16 virtqueue_pairs;
->     >=A0 };
->     >=A0
->     > -#define VIRTIO_NET_CTRL_MQ=A0 =A04
->     > - #define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET=A0 =A0 =A0 =A0 0
->     >=A0 =A0#define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_MIN=A0 =A0 =A0 =A0 1
->     >=A0 =A0#define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_MAX=A0 =A0 =A0 =A0 0x8000
->     >=A0
->     > +/* for VIRTIO_NET_CTRL_MQ_RSS_CONFIG */
->     > +struct virtio_net_rss_config {
->     > +=A0 =A0 uint32_t hash_types;
->     > +=A0 =A0 uint16_t indirection_table_mask;
->     > +=A0 =A0 uint16_t unclassified_queue;
->     > +=A0 =A0 uint16_t indirection_table[1/* + indirection_table_mask*/]=
-;
->     > +=A0 =A0 uint16_t max_tx_vq;
->     > +=A0 =A0 uint8_t hash_key_length;
->     > +=A0 =A0 uint8_t hash_key_data[/*hash_key_length*/];
->     > +};
->     > +
->     >=A0 /*
->     >=A0 =A0* Control network offloads
->     >=A0 =A0*
->     > --
->     > 2.17.1
->=20
->=20
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index ad5b6e896d..bb9bcf02fb 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -15,6 +15,8 @@
+>  /*
+>   * Error reporting system loosely patterned after Glib's GError.
+>   *
+> + * =3D Deal with Error object =3D
+> + *
+>   * Create an error:
+>   *     error_setg(&err, "situation normal, all fouled up");
+>   *
+> @@ -47,28 +49,88 @@
+>   * reporting it (primarily useful in testsuites):
+>   *     error_free_or_abort(&err);
+>   *
+> - * Pass an existing error to the caller:
+> - *     error_propagate(errp, err);
+> - * where Error **errp is a parameter, by convention the last one.
+> + * =3D Deal with Error ** function parameter =3D
+>   *
+> - * Pass an existing error to the caller with the message modified:
+> - *     error_propagate_prepend(errp, err);
+> + * Function may use error system to return errors. In this case function
+> + * defines Error **errp parameter, which should be the last one (except =
+for
+> + * functions which varidic argument list), which has the following API:
+>   *
+> - * Avoid
+> - *     error_propagate(errp, err);
+> - *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+> - * because this fails to prepend when @errp is &error_fatal.
+> + * Caller may pass as errp:
+> + * 1. &error_abort
+> + *    This means abort on any error
+> + * 2. &error_fatal
+> + *    Exit with non-zero return code on error
+> + * 3. NULL
+> + *    Ignore errors
+> + * 4. Another value
+> + *    On error allocate error object and set errp
+>   *
+> - * Create a new error and pass it to the caller:
+> - *     error_setg(errp, "situation normal, all fouled up");
+> + * Error API functions with Error ** (like error_setg) argument supports=
+ these
+> + * rules, so user functions just need to use them appropriately (read be=
+low).
+>   *
+> - * Call a function and receive an error from it:
+> + * Simple pass error to the caller:
+> + *     error_setg(errp, "Some error");
+> + *
+> + * Subcall of another errp-based function, passing the error to the call=
+er
+> + *     f(..., errp);
+> + *
+> + * =3D=3D Checking success of subcall =3D=3D
+> + *
+> + * If function returns error code in addition to errp (which is recommen=
+ded),
+> + * you don't need any additional code, just do:
+> + *     int ret =3D f(..., errp);
+> + *     if (ret < 0) {
+> + *         ... handle error ...
+> + *         return ret;
+> + *     }
+> + *
+> + * If function returns nothing (which is not recommended API) and the on=
+ly way
+> + * to check success is checking errp, we must care about cases [1-3] abo=
+ve. We
+> + * need to use macro ERRP_AUTO_PROPAGATE (see below for details) like th=
+is:
+> + *
+> + *     int our_func(..., Error **errp) {
+> + *         ERRP_AUTO_PROPAGATE();
+> + *         ...
+> + *         subcall(..., errp);
+> + *         if (*errp) {
+> + *             ...
+> + *             return -ERRNO;
+> + *         }
+> + *         ...
+> + *     }
+> + *
+> + * ERRP_AUTO_PROPAGATE cares about Error ** API, wraps original errp if =
+needed,
+> + * so that it can be safely used (including dereferencing), and auto-pro=
+pagates
+> + * error to original errp on function end.
+> + *
+> + * In some cases, we need to check result of subcall, but do not want to
+> + * propagate the Error object to our caller. In such cases we don't need
+> + * ERRP_AUTO_PROPAGATE, but just a local Error object:
+> + *
+> + * Receive an error and not pass it:
+>   *     Error *err =3D NULL;
+> - *     foo(arg, &err);
+> + *     subcall(arg, &err);
+>   *     if (err) {
+>   *         handle the error...
+> + *         error_free(err);
+>   *     }
+>   *
+> + * Note, that before ERRP_AUTO_PROPAGATE introduction the pattern above =
+(with
+> + * error_propagate() instead of error_free()) was used to check and pass=
+ error
+> + * to the caller. Now this is DEPRECATED* (see below).
+> + *
+> + * Note also, that if you want to use error_append_hint/error_prepend or=
+ their
+> + * variants, you must use ERRP_AUTO_PROPAGATE too. Otherwise, in case of
+> + * error_fatal, you'll miss the chance to insert your additional informa=
+tion
+> + * into Error object.
+> + *
+> + * In rare cases, we need to pass existing Error object to the caller by=
+ hand:
+> + *     error_propagate(errp, err);
+> + *
+> + * Pass an existing error to the caller with the message modified:
+> + *     error_propagate_prepend(errp, err);
+> + *
+> + *
+>   * Call a function ignoring errors:
+>   *     foo(arg, NULL);
+>   *
+> @@ -78,26 +140,6 @@
+>   * Call a function treating errors as fatal:
+>   *     foo(arg, &error_fatal);
+>   *
+> - * Receive an error and pass it on to the caller:
+> - *     Error *err =3D NULL;
+> - *     foo(arg, &err);
+> - *     if (err) {
+> - *         handle the error...
+> - *         error_propagate(errp, err);
+> - *     }
+> - * where Error **errp is a parameter, by convention the last one.
+> - *
+> - * Do *not* "optimize" this to
+> - *     foo(arg, errp);
+> - *     if (*errp) { // WRONG!
+> - *         handle the error...
+> - *     }
+> - * because errp may be NULL!
+> - *
+> - * But when all you do with the error is pass it on, please use
+> - *     foo(arg, errp);
+> - * for readability.
+> - *
+>   * Receive and accumulate multiple errors (first one wins):
+>   *     Error *err =3D NULL, *local_err =3D NULL;
+>   *     foo(arg, &err);
+> @@ -114,6 +156,61 @@
+>   *         handle the error...
+>   *     }
+>   * because this may pass a non-null err to bar().
+> + *
+> + * DEPRECATED*
+> + *
+> + * The following pattern of receiving checking and passing the caller of=
+ the
+> + * error by hand is deprecated now:
+> + *
+> + *     Error *err =3D NULL;
+> + *     foo(arg, &err);
+> + *     if (err) {
+> + *         handle the error...
+> + *         error_propagate(errp, err);
+> + *     }
+> + *
+> + * Instead, use ERRP_AUTO_PROPAGATE macro (defined below).
+> + *
+> + * The old pattern is deprecated because of two things:
+> + *
+> + * 1. Issue with error_abort and error_propagate: when we wrap error_abo=
+rt by
+> + * local_err+error_propagate, the resulting coredump will refer to
+> + * error_propagate and not to the place where error happened.
+> + *
+> + * 2. A lot of extra code of the same pattern
+> + *
+> + * How to update old code to use ERRP_AUTO_PROPAGATE?
+> + *
+> + * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function s=
+tart,
+> + * than you may safely dereference errp to check errors and do not need =
+any
+> + * additional local Error variables or calls to error_propagate().
+> + *
+> + * Example:
+> + *
+> + * old code
+> + *
+> + *     void fn(..., Error **errp) {
+> + *         Error *err =3D NULL;
+> + *         foo(arg, &err);
+> + *         if (err) {
+> + *             handle the error...
+> + *             error_propagate(errp, err);
+> + *             return;
+> + *         }
+> + *         ...
+> + *     }
+> + *
+> + * updated code
+> + *
+> + *     void fn(..., Error **errp) {
+> + *         ERRP_AUTO_PROPAGATE();
+> + *         foo(arg, errp);
+> + *         if (*errp) {
+> + *             handle the error...
+> + *             return;
+> + *         }
+> + *         ...
+> + *     }
+>   */
+> =20
+>  #ifndef ERROR_H
+> @@ -322,6 +419,46 @@ void error_set_internal(Error **errp,
+>                          ErrorClass err_class, const char *fmt, ...)
+>      GCC_FMT_ATTR(6, 7);
+> =20
+> +typedef struct ErrorPropagator {
+> +    Error *local_err;
+> +    Error **errp;
+> +} ErrorPropagator;
+> +
+> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+> +{
+> +    error_propagate(prop->errp, prop->local_err);
+> +}
+> +
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_clean=
+up);
+> +
+> +/*
+> + * ERRP_AUTO_PROPAGATE
+> + *
+> + * This macro is created to be the first line of a function which use
+> + * Error **errp parameter to report error. It's needed only in cases whe=
+re we
+> + * want to use error_prepend, error_append_hint or dereference *errp. It=
+'s
+> + * still safe (but useless) in other cases.
+> + *
+> + * If errp is NULL or points to error_fatal, it is rewritten to point to=
+ a
+> + * local Error object, which will be automatically propagated to the ori=
+ginal
+> + * errp on function exit (see error_propagator_cleanup).
+> + *
+> + * After invocation of this macro it is always safe to dereference errp
+> + * (as it's not NULL anymore) and to add information by error_prepend or
+> + * error_append_hint (as, if it was error_fatal, we swapped it with a
+> + * local_error to be propagated on cleanup).
+> + *
+> + * Note: we don't wrap the error_abort case, as we want resulting coredu=
+mp
+> + * to point to the place where the error happened, not to error_propagat=
+e.
+> + */
+> +#define ERRP_AUTO_PROPAGATE() \
+> +    g_auto(ErrorPropagator) _auto_errp_prop =3D {.errp =3D errp}; \
+> +    do { \
+> +        if (!errp || errp =3D=3D &error_fatal) { \
+> +            errp =3D &_auto_errp_prop.local_err; \
+> +        } \
+> +    } while (0)
+> +
+>  /*
+>   * Special error destination to abort on error.
+>   * See error_setg() and error_propagate() for details.
 
 
