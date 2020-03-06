@@ -2,83 +2,86 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EBCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E48EFC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C13A52073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B09C62072D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:52:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4eQuMnO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C13A52073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2+iX9+m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B09C62072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jACN0-0000Ge-WB
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:46:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42126)
+	id 1jACSx-0001h1-QO
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:52:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jACMD-0008HX-G8
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:45:38 -0500
+ (envelope-from <stefanha@gmail.com>) id 1jACSN-0001Dw-Sb
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:52:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jACMC-0007eD-1j
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:45:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41396
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jACMA-0007a5-Ek
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:45:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583498732;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=93KZEIQMh+dQ90r0OOOU4q3Y1wqJWDCA80Z2dOF09Rg=;
- b=G4eQuMnOpaJB2Nk7v0RPX5DMovbj7wqUNtgpEe0x2aJ4r6oaUIooMajzU0Ctzc2mjUaedK
- kdhF9lUIpLuQBauqMw/mQYqXoTtecELiTSYP66jB1YeOYsbd3nrNL263W7x1lsUVt4wHOz
- L2KcewbfxC510Lr8E1bMJkAuNvcDbWg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-WwtAUbNZNSqRfA0sSyLvqg-1; Fri, 06 Mar 2020 07:45:31 -0500
-X-MC-Unique: WwtAUbNZNSqRfA0sSyLvqg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7CE3107ACCC;
- Fri,  6 Mar 2020 12:45:29 +0000 (UTC)
-Received: from [10.3.117.177] (ovpn-117-177.phx2.redhat.com [10.3.117.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3261A10016EB;
- Fri,  6 Mar 2020 12:45:29 +0000 (UTC)
-Subject: Re: [PATCH v8 09/10] nbd: introduce ERRP_AUTO_PROPAGATE
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
- <20200306051536.27803-10-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0a5a6162-1ee0-e9bc-27ac-7a0f4956cc44@redhat.com>
-Date: Fri, 6 Mar 2020 06:45:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <stefanha@gmail.com>) id 1jACSM-0006hg-OR
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:51:59 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45549)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jACSM-0006c2-GE
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:51:58 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id v2so2195583wrp.12
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 04:51:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=AR9boo+HyGf0bthWuBFuPsIoff2oor8etcaKa83eczo=;
+ b=f2+iX9+mAOxrGjJHBtQZLN5x+GW4VeE6cC+LQJ7RTWm2Ylmrl+6+RpC/TiNSpM+sCd
+ xVsUlqVG2SFYrSUj1GQguDcjnFB+YhprGPOIEfs7j0UWQlONRseY+ilaJeUhj7f/WCJQ
+ z9wpzaae9TpZq7toitYjReQEdOEIXqQ/5CphzDmjOZd9rSL4Eqoukc5xPqRJzguklhSY
+ cVcYC9RdGh1C9+hC3xqfYnALP157GueJfWAUm6HwCel4UFKd6k5zOKPdlps74q0dD8Sq
+ 1qqeEl0iIvpkk5sDSOip0YaHolaEIjvZJ3vdQB1qO176RwQ9kWH6/BpRsld7m0/Do23H
+ qUFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=AR9boo+HyGf0bthWuBFuPsIoff2oor8etcaKa83eczo=;
+ b=FBq+qodl0Cn+8jJlGiG8s2AribPEfkfoQRHZbN5EpZDZOyU+bWrP3A+qV9IpOtEvy8
+ 3kAEkOnmiKsBWbq59bYhSlHKz8hm21DtCapjYTLE1Z4LPNH2Ip/rWQ1YvVklb3F9jJGr
+ 3gp41r3S0fY39wMEqJ8kB+ZMr5oxsPX6gjb6d0XVtkoLlxh4z2SUJ2YnneurS4/hEuj4
+ /3QRsxmGBkBXpMYot+Ammyqb6Q2WU4hcTHW0Rzm5BcXxUjWqYoJzs7eDCWW+9+P5wdSv
+ JM5EOnwcV6RdBk199gxL1h+WD9XCR33PsTaoiawUHMpJtKvQbw9NFgDzmod4e9SnW9ls
+ 9ozg==
+X-Gm-Message-State: ANhLgQ2yN52mbmUtJop/KFs5VvZ+OGo+sWumHrti2CgXPCB17wVhxG2I
+ 1ttkjaKz88XRST2UuzxgKtc=
+X-Google-Smtp-Source: ADFU+vuGsJ1dlulLFNjfSWFruInFcllZNCDbNbAbn/MN1U0jTIVRJIfNZu8AYqVbDllxE4u9PYVAow==
+X-Received: by 2002:a5d:4f0e:: with SMTP id c14mr3955993wru.100.1583499116995; 
+ Fri, 06 Mar 2020 04:51:56 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id n3sm13080421wmc.42.2020.03.06.04.51.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Mar 2020 04:51:56 -0800 (PST)
+Date: Fri, 6 Mar 2020 12:51:55 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: Wiki user request
+Message-ID: <20200306125155.GJ1335569@stefanha-x1.localdomain>
+References: <b4440411-cc60-cd7e-988e-458baf0c8b6d@xcancerberox.com.ar>
+ <CAAdtpL4Fg3rjxOXxGA=sSLpsXrT1E0Ko1kjt1YugvRCtKPi-hw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200306051536.27803-10-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="GvznHscUikHnwW2p"
+Content-Disposition: inline
+In-Reply-To: <CAAdtpL4Fg3rjxOXxGA=sSLpsXrT1E0Ko1kjt1YugvRCtKPi-hw@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,47 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- armbru@redhat.com, qemu-block@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/5/20 11:15 PM, Vladimir Sementsov-Ogievskiy wrote:
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp == &error_fatal
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
-> 
-> If we want to check error after errp-function call, we need to
-> introduce local_err and then propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->     &error_fatal, this means that we don't break error_abort
->     (we'll abort on error_set, not on error_propagate)
-> 
-> This commit is generated by command
-> 
->      sed -n '/^Network Block Device (NBD)$/,/^$/{s/^F: //p}' \
->          MAINTAINERS | \
->      xargs git ls-files | grep '\.[hc]$' | \
->      xargs spatch \
->          --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->          --macro-file scripts/cocci-macro-file.h \
->          --in-place --no-show-diff --max-width 80
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--GvznHscUikHnwW2p
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Mar 04, 2020 at 12:57:14PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Ping?
+
+Joaquin's account has been created.
+
+Any QEMU wiki user can create accounts for other people!  Log in and go
+to https://wiki.qemu.org/Special:SpecialPages and click the create
+account link.
+
+Stefan
+
+--GvznHscUikHnwW2p
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5iR2sACgkQnKSrs4Gr
+c8g9qwgAvqwRfjtuRcePjdKdlstoQozeB/T1BgS6cUDoJw5RyiIkNpKYzYNSTkWa
+suS0SY2WRtWfHaZ/b72wLER0uIibnw+tA2mTFgo/mmuN4Qui62fgKJD8YiqV/o/6
+h7U11qnZFMwPY4M/gKoQabDGiWRYuA59nTfUtDoRPUW320iqVt8XwEbw/uFgwm9e
+k2UrAngjVV2Pn9dqqqtEWmMuBsfpYSwVWIk2bYdo//ZZ8Hxo/nIr4TWkqFEAJ9Ul
+GXZ6Qf+GCBOQAprTnt9iR1bVQ4u6oPpCKhhCbjruUkTamEc4B0zj82rvaYJH/4mM
+SM3PfucP8x1ei/njcoU2PpDeBDGW0A==
+=p7ro
+-----END PGP SIGNATURE-----
+
+--GvznHscUikHnwW2p--
 
