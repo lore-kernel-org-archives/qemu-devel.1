@@ -2,81 +2,73 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E48DDC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5317DC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE12B2073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:53:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dy0Ip5ts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE12B2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DAF912073B
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:56:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAF912073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jABXy-0000r1-Sy
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:53:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52210)
+	id 1jABar-0002XH-V0
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:56:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jABXO-0000Pc-9H
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:53:07 -0500
+ (envelope-from <bounces@canonical.com>) id 1jABa4-0001v8-0b
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jABXN-0000MT-6d
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:53:06 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:41613)
+ (envelope-from <bounces@canonical.com>) id 1jABa2-0002dJ-K8
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:55:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36330)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jABXN-0000Lj-2L
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:53:05 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id i1so2242000oie.8
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 03:53:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=ekQJ5vDDs11mk4Nivfm+28gsZpR0FxODrIYKM6TLLvM=;
- b=dy0Ip5tsuU4RRXprnXnlYPnOtk2o3xapdQCP5tQjVGaIAG1ZE3+BV8BkZ4VXPSpJPg
- gW5rr+ihXdb3jvkrXQTOH3UbJM4vTIPl3xX4j+yrmmDmVU5aZiGpCx9s1Jf2IsgOybxl
- ls5zB1C4S6YLwhSLF9ceYtlR/kvQ9Vsy2ei8i/aDTZ8ISGuXJ3UhkuUrazS8mb5hHu7q
- mwPLG5RH4LnxXkTeOxZjHoWssbNiHZCD5qg39ipZOD89ryTAT0Iq1Loi2XKffet2Q3Wr
- Ik9xCwvjLkFcDsO4eGDRTcZYlj1xO06su2cWA+6szfElVlNuaYdoZZ2026JzSKzsaze/
- Mxrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=ekQJ5vDDs11mk4Nivfm+28gsZpR0FxODrIYKM6TLLvM=;
- b=lM4xhjB4YliLKFVlcNKkmAGhp6Bay+FBSnDmR0ahMd2SUW4P9bkSvqwhz0uEVhaclz
- 4gMsi1pnHtaED+MQ4rKK0lyOSAdZl9TZAkUnv0LVNtrIdkuiLSB3QOsrCqBvwGKV/i8I
- BxpGfVTvgGNtnYToRpOWKK2pkgcObZtPa9H6aFU3ixW3YZYQ92I6ziZ3zbqqmmZgvoUu
- zULz9F4FcZRr9qXXNqwbJfdRIXaoNif94oeMFHr/1T/7iuKBIbOMuzn7NuqQF0kKw4wV
- Xb1i8aHpShrn5sNrSRbQeVZW+ptj+IyQJzwYZh65S5lsJaxqsAZu218OvWG5Z5GMU6J2
- 801Q==
-X-Gm-Message-State: ANhLgQ1khkzCVVvuH1rJP/6j6/giEJdEJ1SKwruw9RfIC1ErnX8yrqSC
- tklzxS3KFnPVNL6+Ss18RsBPtHJHFQrnR2t+xlj06pNVnkI=
-X-Google-Smtp-Source: ADFU+vvlu9ujRuIzr7b0rC9ejID4+t2dFb5owQKD9ZlzObBEDvG/wj+WcwuCIWAkIQlFQVHu6HX9RUDgxt4FLim8X5s=
-X-Received: by 2002:a54:4f16:: with SMTP id e22mr2345776oiy.170.1583495584103; 
- Fri, 06 Mar 2020 03:53:04 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jABa2-0002bQ-Dy
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:55:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jABZz-0004hB-RF
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 11:55:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C981B2E80D0
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 11:55:47 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200306110959.29461-1-peter.maydell@linaro.org>
-In-Reply-To: <20200306110959.29461-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Mar 2020 11:52:52 +0000
-Message-ID: <CAFEAcA_sFWhtfX2dy8g0r-rJMz9oUZ=jYpDZohZLm1bNJ+4GkQ@mail.gmail.com>
-Subject: Re: [PULL 00/33] docs queue
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Mar 2020 11:49:28 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alexandre-becholey bonzini
+X-Launchpad-Bug-Reporter: =?utf-8?q?Alexandre_B=C3=A9choley_=28alexandre-be?=
+ =?utf-8?q?choley=29?=
+X-Launchpad-Bug-Modifier: Paolo Bonzini (bonzini)
+References: <158257353920.30257.1886439598745813406.malonedeb@wampee.canonical.com>
+Message-Id: <158349536811.25994.11144359433290328732.malone@gac.canonical.com>
+Subject: [Bug 1864536] Re: Support for XSAVES intel instructions in QEMU
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b286c2237a572779e984053e435414d820cbc868
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,28 +77,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1864536 <1864536@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Mar 2020 at 11:10, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> As promised, here's a pull request with the patches which do the
-> qemu-doc rST conversion.
->
-> Minor changes since the patchset was posted:
->  * rebased
->  * the two auto-generated patches have been regenerated, to account
->    for the qemu-options.hx changes that went into master since the
->    patchset was posted
->
-> I have also now done the testing of the OSX change to the docs link.
-> We've agreed to leave updating the Windows installer for later.
+Are you using Libvirt?  If so, you can just remove xsaves in the Libvirt
+XML ("<feature policy=3D'disable' name=3D'xsaves'/>">).
 
-Applied, thanks.
+It seems to me that this is a Hyper-V bug, but I understand that this is
+not a configuration that happens on real hardware.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Adding the flag to all Skylake and newer systems (including Denverton
+and Snowridge) is the best choice, but we cannot just add it; if you
+want to send a patch, see the "Intel Atom Processor (SnowRidge)" model
+for an example of how to do it.
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1864536
+
+Title:
+  Support for XSAVES intel instructions in QEMU
+
+Status in QEMU:
+  New
+
+Bug description:
+  Dear QEMU developers,
+
+  I am running Hyper-V on qemu+kvm. During it initialization, it checks
+  for XSAVES support: first it executes CPUID with EAX =3D 0xd and ECX =3D 1
+  and looks at bit 3 in the returned value of EAX (Supports
+  XSAVES/XRSTORS and IA32_XSS [1]), and then it reads the MSR
+  IA32_VMX_PROCBASED_CTLS2 (index 0x48B) and looks at bit 20 (Enable
+  XSAVES/XSTORS [2]). If CPUID shows that XSAVES is supported and the
+  bit is not enabled in the MSR, Hyper-V decides to fail and stops its
+  initialization. It used to work until last spring/summer where
+  something might have changed in either KVM or QEMU.
+
+  It seems that KVM sets the correct flags (in CPUID and the MSR) when the =
+host CPU supports XSAVES. In QEMU, based on comments in target/i386/cpu.c i=
+t seems that XSAVES is not added in
+  builtin_x86_defs[].features[FEAT_VMX_SECONDARY_CTLS] because it might bre=
+ak live migration. Therefore, when setting the MSR for the vcpu, QEMU is ma=
+sking off the feature.
+
+  I have tested two possible solutions:
+  - adding the flag in .features[FEAT_VMX_SECONDARY_CTLS]
+  - removing the support of the instruction in feature_word_info[FEAT_XSAVE=
+].feat_names
+
+  Both solutions work and Hyper-v is happily running. I can provide a
+  patch for the solution you might consider applying. Otherwise, is
+  there a better way to fix the issue?
+
+  Qemu version: 4.2.0
+  Kernel version: 5.5.4
+  Qemu command: https://gist.github.com/0xabe-io/b4d797538e2160252addc1d1d6=
+4738e2
+
+  =
+
+  Many thanks,
+  Alexandre
+
+  Ref:
+  [1] Intel SDM Volume 2A, chapter 3, page 196
+  [2] Intel SDM Volume 3C, chapter 24, page 11
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1864536/+subscriptions
 
