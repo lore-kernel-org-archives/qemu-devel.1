@@ -1,53 +1,78 @@
 Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 874EBC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3BCC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:28:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E24720848
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:27:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E24720848
+	by mail.kernel.org (Postfix) with ESMTPS id 855032084E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:28:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855032084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAD0w-0003tc-JG
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:27:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55082)
+	id 1jAD1k-0004jJ-O6
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:28:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jAD09-0003IZ-R1
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:26:54 -0500
+ id 1jAD0r-0003y7-WB
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:27:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jAD08-0007eS-L4
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:26:53 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:40120)
+ id 1jAD0r-0003la-22
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:27:37 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:40132)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jAD08-0007PI-EN
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:26:52 -0500
-Received: from 2.general.paelzer.uk.vpn ([10.172.196.173]
- helo=localhost.localdomain) by youngberry.canonical.com with esmtpsa
+ id 1jAD0q-0003fw-RO
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:27:37 -0500
+Received: from mail-vs1-f70.google.com ([209.85.217.70])
+ by youngberry.canonical.com with esmtps
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
  (envelope-from <christian.ehrhardt@canonical.com>)
- id 1jAD06-0001t2-J5; Fri, 06 Mar 2020 13:26:50 +0000
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] modules: load modules from versioned /var/run dir
-Date: Fri,  6 Mar 2020 14:26:48 +0100
-Message-Id: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
-X-Mailer: git-send-email 2.25.1
+ id 1jAD0p-0001zF-Ta
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:27:36 +0000
+Received: by mail-vs1-f70.google.com with SMTP id 123so248008vsg.2
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 05:27:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xZvT8uUNZMylziLw6p34RRvwz28sCmZkC3j+MAmH1cY=;
+ b=o78Oaj4YUahXBVxnsHQ527M6mdo+EsfpMM94PDOCQki6eNOQWZ2qXnvYg3wbJdqEdF
+ wZb7ygiih4673ValaNauwtX60GAiZUQXhOfqVlVKzF1bjp2amtY6L7j5ljFfjaezlBy3
+ KiZy16e5zSv4t+gbX+KiYtuvTju7z+f4zXHmapGbbP9jQCSmsev5vT/zKke02mzUTOiC
+ PXebKJDvWrHZkfzNQL7ZOuMfLxX9EpjM93onoZbuaz5218/63ZSEWp0RI8DmsphhGtb4
+ s/J49SrJOhWowq9g7HVHcInAVLcK/qAjHZXMPwPAEveq1hcNEUZIGO6MYH/PtGvQ2tyT
+ aX0Q==
+X-Gm-Message-State: ANhLgQ06mglfHvYtgx1B3fqHVWzdK6/fCg4tMMYVBtUV9gUX0hlB/rYo
+ M2eb7gPDyhrgjGxssDEhdgpkUjJKZ7lnpoZu/gjbBs2z9gI3mwSQTvWyuukpnY2agZJxVaBpZnm
+ 4wffUDxD0G6dcDAWpMf2/e+mLH4mSPdrvv4xHr1NSq/FEMITp
+X-Received: by 2002:ab0:670c:: with SMTP id q12mr1616902uam.120.1583501255078; 
+ Fri, 06 Mar 2020 05:27:35 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vs3w+81WB1bvMo8BztGMuU9IcVTk151PZqqCudO7ulAafDNjlarUkHe2rMqIlh0Gj+5/qQrJuBZzgYPMfP0mvE=
+X-Received: by 2002:ab0:670c:: with SMTP id q12mr1616893uam.120.1583501254865; 
+ Fri, 06 Mar 2020 05:27:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAATJJ0L+jdk3ggWx61=AGoTd-FZ64tJ1tzPK8Frgg9Ez+dv6XQ@mail.gmail.com>
+ <20200304093946.18682-1-christian.ehrhardt@canonical.com>
+ <20200306105426.GH1335569@stefanha-x1.localdomain>
+In-Reply-To: <20200306105426.GH1335569@stefanha-x1.localdomain>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Fri, 6 Mar 2020 14:27:09 +0100
+Message-ID: <CAATJJ0+XYK5My==A0o+o9BhRDuN9H3=GQX89kMB1VbfNM4QFOw@mail.gmail.com>
+Subject: Re: [PATCH] modules: load modules from versioned /var/run dir
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000cc51e505a02f9d31"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 91.189.89.112
 X-BeenThere: qemu-devel@nongnu.org
@@ -62,66 +87,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On upgrades the old .so files usually are replaced. But on the other
-hand since a qemu process represents a guest instance it is usually kept
-around.
+--000000000000cc51e505a02f9d31
+Content-Type: text/plain; charset="UTF-8"
 
-That makes late addition of dynamic features e.g. 'hot-attach of a ceph
-disk' fail by trying to load a new version of e.f. block-rbd.so into an
-old still running qemu binary.
+On Fri, Mar 6, 2020 at 11:54 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-This adds a fallback to also load modules from a versioned directory in the
-temporary /var/run path. That way qemu is providing a way for packaging
-to store modules of an upgraded qemu package as needed until the next reboot.
+> On Wed, Mar 04, 2020 at 10:39:46AM +0100, Christian Ehrhardt wrote:
+>
+> Please start a new email thread.  Patches sent as replies to existing
+> email threads are easily missed by humans and tooling also doesn't
+> recognize them.
+>
 
-An example how that can then be used in packaging can be seen in:
-https://git.launchpad.net/~paelzer/ubuntu/+source/qemu/log/?h=bug-1847361-miss-old-so-on-upgrade-UBUNTU
+Sure, thanks Stefan for the hint about how that will be processed/looked at
+by maintainers and reviewers.
 
-Fixes: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1847361
-Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
----
- util/module.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/util/module.c b/util/module.c
-index 236a7bb52a..d2446104be 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -19,6 +19,7 @@
- #endif
- #include "qemu/queue.h"
- #include "qemu/module.h"
-+#include "qemu-version.h"
- 
- typedef struct ModuleEntry
- {
-@@ -170,6 +171,7 @@ bool module_load_one(const char *prefix, const char *lib_name)
- #ifdef CONFIG_MODULES
-     char *fname = NULL;
-     char *exec_dir;
-+    char *version_dir;
-     const char *search_dir;
-     char *dirs[4];
-     char *module_name;
-@@ -201,6 +203,11 @@ bool module_load_one(const char *prefix, const char *lib_name)
-     dirs[n_dirs++] = g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
-     dirs[n_dirs++] = g_strdup_printf("%s/..", exec_dir ? : "");
-     dirs[n_dirs++] = g_strdup_printf("%s", exec_dir ? : "");
-+    version_dir = g_strcanon(g_strdup(QEMU_PKGVERSION),
-+                             G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-.~",
-+                             '_');
-+    dirs[n_dirs++] = g_strdup_printf("/var/run/qemu/%s", version_dir);
-+
-     assert(n_dirs <= ARRAY_SIZE(dirs));
- 
-     g_free(exec_dir);
 -- 
-2.25.1
+Christian Ehrhardt
+Staff Engineer, Ubuntu Server
+Canonical Ltd
 
+--000000000000cc51e505a02f9d31
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Mar 6, 2020 at 11:54 AM Stefa=
+n Hajnoczi &lt;<a href=3D"mailto:stefanha@gmail.com">stefanha@gmail.com</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On W=
+ed, Mar 04, 2020 at 10:39:46AM +0100, Christian Ehrhardt wrote:<br>
+<br>
+Please start a new email thread.=C2=A0 Patches sent as replies to existing<=
+br>
+email threads are easily missed by humans and tooling also doesn&#39;t<br>
+recognize them.<br>
+</blockquote></div><div><br></div><div>Sure, thanks Stefan for the hint abo=
+ut how that will be processed/looked at by maintainers and reviewers.</div>=
+<div><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature">Christian =
+Ehrhardt<br>Staff Engineer, Ubuntu Server<br>Canonical Ltd</div></div>
+
+--000000000000cc51e505a02f9d31--
 
