@@ -2,103 +2,67 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EABB2C3F2D4
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB28C3F2D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF9F208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF9F208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 5B3E4208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RtcDdwPx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B3E4208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA7O7-0008PE-Uh
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:27:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45797)
+	id 1jA7OU-0000sZ-I9
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:27:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA7N2-0006l9-Ab
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:09 -0500
+ (envelope-from <amit@kernel.org>) id 1jA7NW-0007lX-Ua
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA7N0-0001bb-VT
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:08 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:35248
- helo=mail.default.ilande.uk0.bigv.io)
+ (envelope-from <amit@kernel.org>) id 1jA7NV-0003Pu-K0
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:38 -0500
+Received: from merlin.infradead.org ([2001:8b0:10b:1231::1]:47122)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jA7N0-0001Mo-Nu; Fri, 06 Mar 2020 02:26:06 -0500
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jA7NH-0001AE-In; Fri, 06 Mar 2020 07:26:23 +0000
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
- <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
- <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
- <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
- <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
- <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <e8f3fe10-7a44-5552-bb80-7bc24fe68cc6@ilande.co.uk>
-Date: Fri, 6 Mar 2020 07:25:59 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+ (Exim 4.71) (envelope-from <amit@kernel.org>) id 1jA7NV-0002u9-15
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Mime-Version:
+ Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+ :Reply-To:Content-ID:Content-Description;
+ bh=f1Ax7wWv2VU0DXiWyuT9CCi8qfaEMBtTjZAQ/j5/gdY=; b=RtcDdwPxakl5bwDkB+Fcwk5Bqe
+ puXAPI3WGNCZ8pBi5gQkBn7Aoxdrnmnwdk/qz7oOop40esg79cILjqE7xLPFqcmET6ctLwf/0kIFp
+ xg19giDOkIeWsQSxamU6HcvJmS2nPaCPZOhTMYxC2/rDqRKMRb5PIUEN71hg5mvzYXZPPbtdBLfT/
+ 30No0nkliQ0B+o0ZmbqLyfH2BFF3DqldTt6JsNKMtAZTD+klrmMSl61QFQXlHq4DVRZ8xVEBcuKxz
+ MfpH0UwfvMEzJ4qoeQSdpLSqRhbGwRL6jjcTWjUxYrzsqELezDvFa/aUY7mW6RKn/YZvYQ7cnwlEm
+ MLcM8sYw==;
+Received: from [54.239.6.185] (helo=u0c626add9cce5a.drs10.amazon.com)
+ by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+ id 1jA7NL-0000Gv-Vy; Fri, 06 Mar 2020 07:26:28 +0000
+Message-ID: <dd5130d76c914846989d52a6c9a8ba5f0a34c12e.camel@kernel.org>
+Subject: Re: [PATCH v2] virtio-serial-bus: do cleanup on the error path in
+ realize() to avoid memleaks
+From: Amit Shah <amit@kernel.org>
+To: Pan Nengyuan <pannengyuan@huawei.com>, lvivier@redhat.com,
+ mst@redhat.com,  marcandre.lureau@redhat.com, pbonzini@redhat.com
+Date: Fri, 06 Mar 2020 08:26:23 +0100
+In-Reply-To: <20200306025030.28824-1-pannengyuan@huawei.com>
+References: <20200306025030.28824-1-pannengyuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Received-From: 2001:8b0:10b:1231::1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,66 +74,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/03/2020 00:21, BALATON Zoltan wrote:
-
-> On Fri, 6 Mar 2020, BALATON Zoltan wrote:
->> On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
->>> On 04/03/2020 22:33, BALATON Zoltan wrote:
->>> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
->>> documented as having value 0 == Legacy IRQ routing which should be the initial value
->>> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
->>
->> The VT8231 docs say this should always read 1 but may be this is somehow set to 0
->> on the Pegasos2. What does that mean? Should we use this value instead of the
->> feature bit to force using legacy interrupts? We'd still need a property in via-ide
->> to set this reg or is it possible to set it from board code overriding the default
->> after device is created? That would allow to drop patch 1. I can try this.
+On Fri, 2020-03-06 at 10:50 +0800, Pan Nengyuan wrote:
+> port->bh forgot to delete on the error path, this patch add it to fix
+> memleaks. It's easy to reproduce as follow(add a same nr port):
+>     {'execute': 'device_add', 'arguments': {'id':
+> 'virtio_serial_pci0', 'driver': 'virtio-serial-pci', 'bus': 'pci.0',
+> 'addr': '0x5'}, 'id': 'yVkZcGgV'}
+>     {'execute': 'device_add', 'arguments': {'id': 'port1', 'driver':
+> 'virtserialport', 'name': 'port1', 'chardev': 'channel1', 'bus':
+> 'virtio_serial_pci0.0', 'nr': 1}, 'id': '3dXdUgJA'}
+>     {'execute': 'device_add', 'arguments': {'id': 'port2', 'driver':
+> 'virtserialport', 'name': 'port2', 'chardev': 'channel2', 'bus':
+> 'virtio_serial_pci0.0', 'nr': 1}, 'id': 'qLzcCkob'}
+>     {'execute': 'device_add', 'arguments': {'id': 'port2', 'driver':
+> 'virtserialport', 'name': 'port2', 'chardev': 'channel2', 'bus':
+> 'virtio_serial_pci0.0', 'nr': 2}, 'id': 'qLzcCkob'}
 > 
-> This seemed like it could simplify patches a bit but it does not work. Setting this
-> reg to 0 breaks Linux and MorphOS which then think the device does not have an
-> interrupt at all and fail as before waiting for the irq. So we still need the feature
-> bit, cant use this reg to force legacy interrupts. I've spent considerable time
-> testing different OSes before I've ended up with this patch series I've submitted and
-> I could not find a simpler way that works with everything.
+> The leak stack:
+> Direct leak of 40 byte(s) in 1 object(s) allocated from:
+>     #0 0x7f04a8008ae8 in __interceptor_malloc
+> (/lib64/libasan.so.5+0xefae8)
+>     #1 0x7f04a73cf1d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
+>     #2 0x56273eaee484 in aio_bh_new
+> /mnt/sdb/backup/qemu/util/async.c:125
+>     #3 0x56273eafe9a8 in qemu_bh_new /mnt/sdb/backup/qemu/util/main-
+> loop.c:532
+>     #4 0x56273d52e62e in virtser_port_device_realize
+> /mnt/sdb/backup/qemu/hw/char/virtio-serial-bus.c:946
+>     #5 0x56273dcc5040 in device_set_realized
+> /mnt/sdb/backup/qemu/hw/core/qdev.c:891
+>     #6 0x56273e5ebbce in property_set_bool
+> /mnt/sdb/backup/qemu/qom/object.c:2238
+>     #7 0x56273e5e5a9c in object_property_set
+> /mnt/sdb/backup/qemu/qom/object.c:1324
+>     #8 0x56273e5ef5f8 in object_property_set_qobject
+> /mnt/sdb/backup/qemu/qom/qom-qobject.c:26
+>     #9 0x56273e5e5e6a in object_property_set_bool
+> /mnt/sdb/backup/qemu/qom/object.c:1390
+>     #10 0x56273daa40de in qdev_device_add /mnt/sdb/backup/qemu/qdev-
+> monitor.c:680
+>     #11 0x56273daa53e9 in qmp_device_add /mnt/sdb/backup/qemu/qdev-
+> monitor.c:805
+> 
+> Fixes: 199646d81522509ac2dba6d28c31e8c7d807bc93
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+> v1->v2:
+> - simply create port->bh last in virtser_port_device_realize() to fix
+> memleaks.(Suggested by Markus Armbruster)
 
-I appreciate that testing these things can take a lot of time, but what is important
-thing to ask here is whether these hacks are attempting to work around something in
-QEMU that doesn't match the hardware specification, and to me it feels that this is
-what is happening here.
+v2 looks much better.
 
-Obviously this thread has become quite long (and even I'm struggling to find previous
-discussions) but here is my summary below:
+Reviewed-by: Amit Shah <amit@kernel.org>
 
-- I don't think the patch in its current form is the right way to do this. Instead of
-adding a feature bit to fudge the existing IRQ routing when the existing IRQ routing
-is wrong, let's fix the existing IRQ routing instead.
+> ---
+>  hw/char/virtio-serial-bus.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-
+> bus.c
+> index 941ed5aca9..99a65bab7f 100644
+> --- a/hw/char/virtio-serial-bus.c
+> +++ b/hw/char/virtio-serial-bus.c
+> @@ -943,7 +943,6 @@ static void
+> virtser_port_device_realize(DeviceState *dev, Error **errp)
+>      Error *err = NULL;
+>  
+>      port->vser = bus->vser;
+> -    port->bh = qemu_bh_new(flush_queued_data_bh, port);
+>  
+>      assert(vsc->have_data);
+>  
+> @@ -992,6 +991,7 @@ static void
+> virtser_port_device_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> +    port->bh = qemu_bh_new(flush_queued_data_bh, port);
+>      port->elem = NULL;
+>  }
+>  
 
-- There is no mention of "non-100%" native mode in the 8231 or 686B datasheet: this
-is simply a term used within the Linux patches. The controller is either in native
-mode, or legacy mode. It may be that guests are making use of some undefined
-behaviour here.
-
-- The code that uses the value of PCI_INTERRUPT_LINE in via-ide is incorrect (as your
-patch comment points out, some guests ignore it anyway).
-
-- There is different behaviour here between the 8231 and 686B in this area, despite
-having the same vendor/device id.
-
-
-The first thing you need to fix is the PCI_INTERRUPT_LINE part; I would start by
-removing the existing code and instead expose a qdev named gpio "legacy-irq" and
-wiring that up to your interrupt controller. Note you'd have to do the same for
-fulong2e, but that is reasonably trivial.
-
-
-ATB,
-
-Mark.
 
