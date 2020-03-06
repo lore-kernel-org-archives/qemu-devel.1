@@ -2,85 +2,103 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4DCC10F25
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 19:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3214C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 20:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28C9720656
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 19:52:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qniVqyqb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28C9720656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 91DA4206CC
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 20:37:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91DA4206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAJ1U-00040D-BG
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 14:52:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44369)
+	id 1jAJiQ-0003q5-Mv
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 15:37:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jAJ0g-0003UB-UO
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 14:51:52 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAJhq-0003NG-Dc
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 15:36:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jAJ0f-0003gL-OT
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 14:51:50 -0500
-Received: from mail-vk1-xa42.google.com ([2607:f8b0:4864:20::a42]:39039)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jAJ0f-0003f3-IV; Fri, 06 Mar 2020 14:51:49 -0500
-Received: by mail-vk1-xa42.google.com with SMTP id t129so940808vkg.6;
- Fri, 06 Mar 2020 11:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jtvBEhmbkno0g0p63SO8wukXuC60CI3AMLSaeMMvhTw=;
- b=qniVqyqbqQXLum2Ow8fSpKWv3OCgV1pUpNfmW1n9kUPoMfN+iMW1tx3QJz/Q1VnZaw
- S8BeDWoDa4h5x/XkvzKe60JSAeImFRx/rIRxMKbEMmBOiaYaqiWArBEt9SYUZXrsj6Gl
- jN2/OUUjLMkUWKSWoWEBZhGVxrcr3TkUdCO9M6cNxjFFf724AwM/P43rFZ9o/HkRgkCD
- B5P4DPo2AeIRLkSHL9t5SFB/9bSq0TOAGmUnud00zmulzd0zAGQhpTDK9dRnj1F+y/+h
- emt+K6FpUyPut9gC0lV9LD1ZdaDMYsYWu/cW1KA1zKHrDh6gXRA3YkQFCvoB8YKScXEH
- AGuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jtvBEhmbkno0g0p63SO8wukXuC60CI3AMLSaeMMvhTw=;
- b=WPepJ2i/UMI5LWDOELEnT0G2vAsQgMZ7g/kTlGp4haDi0x3WfZzHfDKsbTigmkRmee
- 3U5QCocdgMUzx9pPxriasDGYZbj4CrAshIgdwn4xxj2jt15jRm7SaL12BFBIiKfjdLOY
- MVuBUR2G8MLxSKMs/zXnPgaSw9lFBBwqxvsVGFm/Fgehfk9LVaWyvGIK7A3A9H1rB5Cu
- aEyGv9iZ8nH5SF5nmEwBnNali737ZJIzN7zw8SdAwIrO8fA+YC6IkW4Ituggse+S3Frx
- NbB0CNLQVKwuE2O3ncQJE/x920ejqH6WsrkejocU3ONmK7ZvwwRVtGcWhj1hydMtkN5k
- caDw==
-X-Gm-Message-State: ANhLgQ3dpA4MQfYbZFH75Htg7xK2dWx45i1Jh9c+e32LFLZ6RpBQmwdY
- TjFdrr0BqceKB3ju5NEUBb2rmTQm+GuwEeuZdI4=
-X-Google-Smtp-Source: ADFU+vvWqwScidltFbrxAW4rZinVUrKRubTyb/BS/fOwuOU0p5HekGM4mpQrEgdIhF8GlDVgjVKBlOQ8mx2n6fh5u4o=
-X-Received: by 2002:a1f:9d16:: with SMTP id g22mr2670145vke.22.1583524308549; 
- Fri, 06 Mar 2020 11:51:48 -0800 (PST)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAJho-0004RM-NB
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 15:36:26 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:37018
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jAJho-0004Hr-H9; Fri, 06 Mar 2020 15:36:24 -0500
+Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jAJi2-0003k3-Ch; Fri, 06 Mar 2020 20:36:38 +0000
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+ <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+ <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
+ <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
+ <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
+ <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
+ <071fff0a-e922-502d-da18-2572f73cecdf@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003061221220.10004@zero.eik.bme.hu>
+ <bb74c3a0-7d58-11d8-2558-d24057383d0e@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003062008070.34226@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <5380d048-8224-78a5-04b6-d946987fef08@ilande.co.uk>
+Date: Fri, 6 Mar 2020 20:36:11 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <cover.1583285287.git.alistair.francis@wdc.com>
- <e91f9fccc49a42482d964f380b2ae085de5bfab2.1583285287.git.alistair.francis@wdc.com>
- <CAEUhbmWFPVOZ6Sxjd+VUENqyPxCe89QYKWP-nKSkH3Co-=FYbg@mail.gmail.com>
- <CAKmqyKNrG4Uh_WKwEfiX=HpFoFiforzjKxnY+dZmBQBdKfZceg@mail.gmail.com>
- <CAEUhbmXTzjukKbaXqS+ivxtxbu+tcVFDCg1hcSw5roQjJhx9og@mail.gmail.com>
- <CAKmqyKMLcKKGbA3gJGDMgw77vWNdsU_GhkqC+m9OsN5tBFv0OQ@mail.gmail.com>
- <CAEUhbmX8ytjiH6JWdvZLveSaN6PS7zHF9wRcDM_yxCA48wn6tQ@mail.gmail.com>
-In-Reply-To: <CAEUhbmX8ytjiH6JWdvZLveSaN6PS7zHF9wRcDM_yxCA48wn6tQ@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 6 Mar 2020 11:51:21 -0800
-Message-ID: <CAKmqyKM=+xA28qo=1vXWNYf2JNDKKWmr4t6+4UxVUk+BGVt3tw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] riscv/sifive_u: Add a serial property to the
- sifive_u SoC
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <alpine.BSF.2.22.395.2003062008070.34226@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a42
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,96 +110,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 5, 2020 at 4:09 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Alistair,
->
-> On Fri, Mar 6, 2020 at 12:53 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Thu, Mar 5, 2020 at 1:31 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > Hi Alistair,
-> > >
-> > > On Thu, Mar 5, 2020 at 7:13 AM Alistair Francis <alistair23@gmail.com> wrote:
-> > > >
-> > > > On Wed, Mar 4, 2020 at 6:47 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > > >
-> > > > > Hi Alistair,
-> > > > >
-> > > > > On Wed, Mar 4, 2020 at 9:37 AM Alistair Francis
-> > > > > <alistair.francis@wdc.com> wrote:
-> > > > > >
-> > > > > > At present the board serial number is hard-coded to 1, and passed
-> > > > > > to OTP model during initialization. Firmware (FSBL, U-Boot) uses
-> > > > > > the serial number to generate a unique MAC address for the on-chip
-> > > > > > ethernet controller. When multiple QEMU 'sifive_u' instances are
-> > > > > > created and connected to the same subnet, they all have the same
-> > > > > > MAC address hence it creates a unusable network.
-> > > > > >
-> > > > > > A new "serial" property is introduced to the sifive_u SoC to specify
-> > > > > > the board serial number. When not given, the default serial number
-> > > > > > 1 is used.
-> > > > > >
-> > > > > > Suggested-by: Bin Meng <bmeng.cn@gmail.com>
-> > > > > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > > > > > ---
-> > > > > >  hw/riscv/sifive_u.c         | 8 +++++++-
-> > > > > >  include/hw/riscv/sifive_u.h | 2 ++
-> > > > > >  2 files changed, 9 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> > > > > > index 9a0145b5b4..e52f9d0bd4 100644
-> > > > > > --- a/hw/riscv/sifive_u.c
-> > > > > > +++ b/hw/riscv/sifive_u.c
-> > > > > > @@ -488,7 +488,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
-> > > > > >                            TYPE_SIFIVE_U_PRCI);
-> > > > > >      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
-> > > > > >                            TYPE_SIFIVE_U_OTP);
-> > > > > > -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
-> > > > > > +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", s->serial);
-> > > > > >      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-> > > > > >                            TYPE_CADENCE_GEM);
-> > > > > >  }
-> > > > > > @@ -607,10 +607,16 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-> > > > > >          memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
-> > > > > >  }
-> > > > > >
-> > > > > > +static Property riscv_sifive_u_soc_props[] = {
-> > > > > > +    DEFINE_PROP_UINT32("serial", SiFiveUSoCState, serial, OTP_SERIAL),
-> > > > > > +    DEFINE_PROP_END_OF_LIST()
-> > > > >
-> > > > > I am not sure how adding another level of property in the SoC could
-> > > > > solve the 'make check' error.
-> > > >
-> > > > The problem is that you were adding a machine property and then you
-> > > > had the SoC reach up to the machine object to get the serial value.
-> > > > This isn't correct and is why the tests fail.
-> > > >
-> > >
-> > > So looks the failure was due to a check in the test codes only? As I
-> > > did not see QEMU crashed during my normal usage.
-> >
-> > No, the bug was in the actual implementation. You were just lucky that
-> > you didn't see any issues as in your case you could access the machine
-> > state. The make check probably added the SoC individually and hence
-> > caught the bug.
->
-> That sounds like the difference that caused the crash in the test.
-> Thanks for helping this!
+On 06/03/2020 19:38, BALATON Zoltan wrote:
 
-No worries!
+> On Fri, 6 Mar 2020, Mark Cave-Ayland wrote:
+>> On 06/03/2020 12:06, BALATON Zoltan wrote:
+>>> On Fri, 6 Mar 2020, Mark Cave-Ayland wrote:
+>>>> On 05/03/2020 23:35, BALATON Zoltan wrote:
+>>>>> On real hardware this may be true but in QEMU how would it otherwise raise the
+>>>>> correct interrupt line the guest expects? This probably does not matter for
+>>>>> pegasos2
+>>>>> but I think is needed for 100% native mode used with the fulong2e so it gets the
+>>>>> IRQ
+>>>>> it expects.
+>>>>
+>>>> That's easy - remember that both the PCI and IRQ interrupts are separate pins on the
+>>>> chip, so all that needs to be done is expose the legacy IRQ via qdev and use that to
+>>>> wire it up to your interrupt controller.
+>>>
+>>> This "chip" is part of an integrated southbridge/superio/everything chip the also
+>>> includes the two PICs and how they are internally connected is not known so we would
+>>> be guessing here anyway. I don't see a need to make it more complicated than it is
+>>> now by modeling internal pins but how would I wire up gpio to the i8259 model and
+>>> where should I connect the PCI irq?
+>>
+>> For now I would say not to worry about the PCI IRQ: the reason for discussing this
+>> before was because we believed that if the controller was in native mode it must be
+>> using the IRQ in PCI_INTERRUPT_LINE. But from yesterday's read of the specification
+>> we know that PCI_INTERRUPT_LINE is never used by the device itself, and so given that
+>> the existing via-ide device doesn't currently attempt to use the PCI IRQ in
+>> via_ide_set_irq() then we should be good.
+>>
+>> If someone had a machine somewhere that did use the PCI IRQ then it would need
+>> investigation, but since there isn't then I don't see any need to do this now.
+>>
+>>>> Okay so this is interesting: I've been switching between the VT8231 and the
+>>>> VT82C686B
+>>>> datasheets, and there is a difference here. You are correct in what you say above in
+>>>> that the 8231 docs specify that this is set to 1, but on the 686B this is clearly
+>>>> not
+>>>> the case.
+>>>
+>>> The 82C686B says this reg can be 0 or 1, where 0 is legacy interrupt routing and 1 is
+>>> native mode. Given that we only model native mode of the chip it does not make sense
+>>> to set it to anything else than 1 and setting it to 0 confuses MorphOS and Linux on
+>>> pegasos2 while setting it to 1 works with everything I've tried both on pegasos2 and
+>>> fulong2e even if that may not completely match how it's implemented in hardware.
+>>>
+>>>> What is rather unusual here is that both the 8231 and 686B have exactly the same
+>>>> device and vendor ids, so I'm not sure how you'd distinguish between them?
+>>>
+>>> Guests distinguish by looking at the parent device (function 0) which is the chip
+>>> this IDE device is part of (on function 1).
+>>
+>> Okay thanks, that's useful to know.
+>>
+>> I've done a quick grep of the source tree and AFAICT the only IDE controller that
+>> tries to use the PCI_INTERRUPT_LINE register is via-ide, which means this should be
+>> fairly easy. In short:
+>>
+>> 1) Add qemu_irq legacy_irqs[2] into PCIIDEState
+>>
+>> (You could argue that it should belong in a separate VIAIDEState, however quite a few
+>> of the BMDMA controllers in QEMU don't have their own device state and just use
+>> PCIIDEState. And whilst via-ide is the only one that currently needs support for
+>> legacy IRQs, I think it's good to put it there in case other controllers need it in
+>> future)
+>>
+>> 2) Add via_ide_initfn() to hw/ide/via.c and add qdev_init_gpio_out_named() with a
+>> name of "legacy-irq" to it
+> 
+> I don't like this. This adds two via-ide specific data to to common PCI IDE code
+> where it does not belong and subclassing it just for this also seems to be more
+> changes than really needed. Reusing the existing CMD646 field and generalising it to
+> allow implementation specific feature flags seems much less intrusive and not less
+> clean than your proposal.
 
-Alistair
+It's not VIA-specific though: the ISA legacy and PCI buses have different electrical
+characteristics and so by definition their signals must be driven by separate
+physical pins. Have a look at the CMD646 datasheet for example, and you will see that
+separate pins exist for legacy and PCI native IRQs.
 
->
-> Regards,
-> Bin
+>> 3) Inline via_ide_init() into hw/mips/mips_fulong2e.c, changing pci_create_simple()
+>> to pci_create() because the device shouldn't be realised immediately
+>>
+>> 4) In vt82c686b_southbridge_init use qdev_connect_gpio_out_named() to connect
+>> legacy_irq[0] to 8259 IRQ 14 and legacy_irq[1] to 8259 IRQ 15, and then realise the
+>> device
+> 
+> How do I connect gpios to 8259 interrupts? That seems to be internal state of 8259
+> that I'm not sure how to access cleanly from code instantiating it. Is this better
+> than my patch? It seems it achieves the same via-ide specific behaviour just in a
+> more complicated way and would still need the feature bit to know when to use
+> legacy_irq[1].
+
+We know from the PCI specification that the existing code for via-ide is incorrect,
+and given that none of the other IDE controllers in QEMU use PCI_INTERRUPT_LINE in
+this way then both of these strongly suggest that current via-ide implementation is
+wrong. Rather than add a hack on top of a hack then the simplest solution is to
+physically wire the IRQ pin using qdev at the board level, as is done on real hardware.
+
+Looking at the code it seems that i8259_init() returns the PIC IRQ array so it should
+just be a case of returning the nth entry and using that with qdev_init_gpio_out_named().
+
+>> 5) Remove the PCI_INTERRUPT_LINE logic from via_ide_set_irq() and instead just do
+>> qemu_set_irq() on legacy_irq[0] (in theory I guess it should be legacy_irq[n] but it
+>> seems that both drives on MIPS and Pegasos both use IRQ 14).
+> 
+> According to the 8231 datasheet in legacy mode (and on pegasos2's half-native mode)
+> the interrupts should be 14 and 15 so legacy_irq[n] with your way but in 100% native
+> mode (used on the fulong2e) it should be the one set in PCI_INTERRUPT_LINE. The 686B
+> datasheet does not detail this but I believe it works the same. Since we currently
+> fixed the native mode interrupt to 14 to work around pegasos2 firmware and QEMU PCI
+> reset interactions using legacy_irq[0] might work but is not correct, the current way
+> using PCI_INTERRUPT_LINE is better modelling what hardware does in my opinion.
+
+This is not correct though: please re-read my previous email which quotes from the
+PCI specification itself that defines PCI_INTERRUPT_LINE has *no effect* upon the
+device itself, and is merely advisory to the OS. Possibly the MIPS BIOS could be
+placing a value other than 14 there, but if it does then that suggests the board IRQs
+are physically wired differently which again should be handled at board level by qdev.
+
+
+ATB,
+
+Mark.
 
