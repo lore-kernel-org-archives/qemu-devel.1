@@ -2,80 +2,70 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29573C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80861C10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:41:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA9642072D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7s0xNP2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9642072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A84A20848
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:41:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A84A20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jADC0-0004U8-5B
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:39:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37952)
+	id 1jADDw-0006GU-Jg
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:41:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1jAD9U-0001vj-AM
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:36:34 -0500
+ (envelope-from <no-reply@patchew.org>) id 1jADD6-0005Td-5d
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:40:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1jAD9S-0006UX-FJ
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:36:32 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37845
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1jAD9S-0006R6-AE
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:36:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583501790;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=93QMUec0Md5U37TbVtP0qnLf/Lf51HVAtIB5qCx9+iw=;
- b=W7s0xNP272kDIjzcat5PSZq0Qsreq6CX1dpd4hcin02ViTZoYMJc9B2dO/fYDrQtvSN36s
- QVW9MN54Z/+t8zIAtfPDf16xw+8Dx25kjjtRexuhMuz48HDI6gRzcIfBDvG4tbSfcODomu
- viHc0mq+INhAs5aADKojqBjv29nv/68=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-BYdikcd5NFqVY393qbJCcQ-1; Fri, 06 Mar 2020 08:36:26 -0500
-X-MC-Unique: BYdikcd5NFqVY393qbJCcQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F728107ACC7;
- Fri,  6 Mar 2020 13:36:24 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B247091D9B;
- Fri,  6 Mar 2020 13:36:18 +0000 (UTC)
-Date: Fri, 6 Mar 2020 14:36:16 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v3 14/14] arm/arm64: ITS: pending table
- migration test
-Message-ID: <20200306133616.pp5vf2xramt5afvr@kamzik.brq.redhat.com>
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-15-eric.auger@redhat.com>
- <20200207140627.rikkw5coe7naxssb@kamzik.brq.redhat.com>
- <24940769-6e50-2585-4572-44422ca21613@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jADD4-0002IT-Gx
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:40:15 -0500
+Resent-Date: Fri, 06 Mar 2020 08:40:15 -0500
+Resent-Message-Id: <E1jADD4-0002IT-Gx@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21173)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jADD4-0001wj-7e
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:40:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1583501999; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=GrbCC4o7p+pEMA8zt7ieNo8DmAX90we7HXlpa6OjBGH91RCpC3yKvCX5xGdNwx6ySrc+1FWk5/IiEoOPnsxA1Fv9Esw2PeBN9J1uRwmj3jUmRnTBS9HAKapynDrIzxkm/vSdzc22nOfeusbyt31XRGS4Mmg80+D5Ntqi7WyPMtw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583501999;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=IGxHQ+EX5UVp1JXtB5fMpdaEDT2EqJlvz1z5BWQskMY=; 
+ b=B+KYf2WrcoRtDK3JlZI9gGE8AxUyBcrAQlAIDhUTqTCAAxpJXuUJSWyol5QyfuKntPZEQ2s7kJz6gbsaIlFQ5hn187goLa9WGhJYsgnK3TOohiwTLQyYruQ2zkoQJ5lnB/rECuya2rq4lIFdWdFaI+5qVQ8/w+hiLrSTSxtTMsg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583501996993966.6885888090575;
+ Fri, 6 Mar 2020 05:39:56 -0800 (PST)
+In-Reply-To: <20200306120735.24457-1-jingqi.liu@intel.com>
+Subject: Re: [PATCH] util: fix to check if target OS is linux in
+ util/mmap-alloc.c
+Message-ID: <158350199555.14529.11886087445555494002@39012742ff91>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <24940769-6e50-2585-4572-44422ca21613@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jingqi.liu@intel.com
+Date: Fri, 6 Mar 2020 05:39:56 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,331 +77,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jtomko@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, jingqi.liu@intel.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 06, 2020 at 02:21:37PM +0100, Auger Eric wrote:
-> Hi Drew,
-> 
-> On 2/7/20 3:06 PM, Andrew Jones wrote:
-> > On Tue, Jan 28, 2020 at 11:34:59AM +0100, Eric Auger wrote:
-> >> Add two new migration tests. One testing the migration of
-> >> a topology where collection were unmapped. The second test
-> >> checks the migration of the pending table.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v2 -> v3:
-> >> - tests belong to both its and migration groups
-> >> ---
-> >>  arm/gic.c         | 150 ++++++++++++++++++++++++++++++++++++++++++++++
-> >>  arm/unittests.cfg |  16 +++++
-> >>  2 files changed, 166 insertions(+)
-> >>
-> >> diff --git a/arm/gic.c b/arm/gic.c
-> >> index fa8626a..ec3dd3a 100644
-> >> --- a/arm/gic.c
-> >> +++ b/arm/gic.c
-> >> @@ -195,6 +195,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
-> >>  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
-> >>  	lpi_stats.observed.cpu_id = smp_processor_id();
-> >>  	lpi_stats.observed.lpi_id = irqnr;
-> >> +	acked[lpi_stats.observed.cpu_id]++;
-> >>  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
-> >>  }
-> >>  
-> >> @@ -239,6 +240,18 @@ static void secondary_lpi_test(void)
-> >>  	while (1)
-> >>  		wfi();
-> >>  }
-> >> +
-> >> +static void check_lpi_hits(int *expected)
-> >> +{
-> >> +	int i;
-> >> +
-> >> +	for (i = 0; i < nr_cpus; i++) {
-> >> +		if (acked[i] != expected[i])
-> >> +			report(false, "expected %d LPIs on PE #%d, %d observed",
-> >> +			       expected[i], i, acked[i]);
-> > 
-> > report_info
-> > pass = false
-> > 
-> >> +		}
-> >> +	report(true, "check LPI on all vcpus");
-> > 
-> > report(pass, ...);
-> I still don't get the issue.
-
-Your messages aren't consistent and have dynamic info. You need
-
-report_info(...); // dynamic info
-if (failure_condition) {
-   pass_boolean = false;
-}
-report(pass_boolean, single_message_for_both_pass_and_failure);
-
-> > 
-> >> +}
-> >>  #endif
-> >>  
-> >>  static void gicv2_ipi_send_self(void)
-> >> @@ -594,6 +607,8 @@ static void gic_test_mmio(void)
-> >>  static void test_its_introspection(void) {}
-> >>  static void test_its_trigger(void) {}
-> >>  static void test_its_migration(void) {}
-> >> +static void test_migrate_unmapped_collection(void) {}
-> >> +static void test_its_pending_migration(void) {}
-> > 
-> > I'm not sure what's worse. This pile of stubs or one #ifdef in main()
-> > wrapping all the calls.
-> Those stubs now are in the arm header.
-> > 
-> >>  
-> >>  #else /* __arch64__ */
-> >>  
-> >> @@ -666,6 +681,18 @@ static bool its_prerequisites(int nb_cpus)
-> >>  	return false;
-> >>  }
-> >>  
-> >> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
-> >> +		    struct its_collection *col)
-> >> +{
-> >> +	if (!dev || !col)
-> > 
-> > I don't think col can be null, and this doesn't look like the right place
-> > to check if dev is null.  If we're bothiner to call set_lpi, then I
-> > think we should already expect dev to be good to go.
-> put an assert() instead
-> > 
-> >> +		report_abort("wrong device or collection");
-> >> +
-> >> +	its_send_mapti(dev, physid, eventid, col);
-> >> +
-> >> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
-> >> +	its_send_invall(col);
-> >> +}
-> >> +
-> >>  /*
-> >>   * Setup the configuration for those mappings:
-> >>   * dev_id=2 event=20 -> vcpu 3, intid=8195
-> >> @@ -806,6 +833,121 @@ static void test_its_migration(void)
-> >>  	its_send_int(dev7, 255);
-> >>  	check_lpi_stats();
-> >>  }
-> >> +
-> >> +static void test_migrate_unmapped_collection(void)
-> >> +{
-> >> +	struct its_collection *col;
-> >> +	struct its_device *dev2, *dev7;
-> >> +	u8 config;
-> >> +
-> >> +	if (its_setup1())
-> >> +		return;
-> >> +
-> >> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> >> +	dev2 = its_get_device(2);
-> >> +	dev7 = its_get_device(7);
-> >> +
-> >> +	/* MAPTI with the collection unmapped */
-> >> +	set_lpi(dev2, 0, 8192, col);
-> >> +
-> >> +	puts("Now migrate the VM, then press a key to continue...\n");
-> >> +	(void)getchar();
-> >> +	report(true, "Migration complete");
-> > 
-> > report_info
-> yep
-> > 
-> >> +
-> >> +	/* on the destination, map the collection */
-> >> +	its_send_mapc(col, true);
-> >> +
-> >> +	lpi_stats_expect(2, 8196);
-> >> +	its_send_int(dev7, 255);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	config = gicv3_lpi_get_config(8192);
-> >> +	report(config == LPI_PROP_DEFAULT,
-> >> +	       "Config of LPI 8192 was properly migrated");
-> >> +
-> >> +	lpi_stats_expect(nr_cpus - 1, 8192);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* unmap the collection */
-> >> +	its_send_mapc(col, false);
-> >> +
-> >> +	lpi_stats_expect(-1, -1);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* remap event 0 onto lpiid 8193 */
-> >> +	set_lpi(dev2, 0, 8193, col);
-> >> +	lpi_stats_expect(-1, -1);
-> >> +	its_send_int(dev2, 0);
-> >> +	check_lpi_stats();
-> >> +
-> >> +	/* remap the collection */
-> >> +	its_send_mapc(col, true);
-> >> +	lpi_stats_expect(nr_cpus - 1, 8193);
-> >> +}
-> >> +
-> >> +static void test_its_pending_migration(void)
-> >> +{
-> >> +	struct its_device *dev;
-> >> +	struct its_collection *collection[2];
-> >> +	int expected[NR_CPUS];
-> > 
-> > expected = malloc(nr_cpus * sizeof(int));
-> > 
-> > I know there are other places using NR_CPUS right now that don't have to,
-> > but we shouldn't add more. Eventually I'll change the other places too.
-> OK
-> > 
-> >> +	u64 pendbaser;
-> >> +	void *ptr;
-> >> +	int i;
-> >> +
-> >> +	if (its_prerequisites(4))
-> >> +		return;
-> >> +
-> >> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> >> +	its_send_mapd(dev, true);
-> >> +
-> >> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
-> >> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
-> >> +	its_send_mapc(collection[0], true);
-> >> +	its_send_mapc(collection[1], true);
-> >> +
-> >> +	/* disable lpi at redist level */
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, false);
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, false);
-> >> +
-> >> +	/* even lpis are assigned to even cpu */
-> >> +	for (i = 0; i < 256; i++) {
-> >> +		struct its_collection *col = i % 2 ? collection[0] :
-> >> +						     collection[1];
-> >> +		int vcpu = col->target_address >> 16;
-> > 
-> > I'm lost with the even/odd (nr_cpus - 1)/(nr_cpus - 2) stuff, and won't
-> > it swap if nr_cpus is odd vs. even?
-> > 
-> > Shouldn't we just have something like
-> > 
-> >   pe1 = nr_cpus - 1;
-> >   pe2 = nr_cpus - 2;
-> >   col1 = its_create_collection(pe1, pe1);
-> >   col2 = its_create_collection(pe2, pe2);
-> > 
-> > without mentioning even and odd?
-> OK
-> > 
-> >> +
-> >> +		its_send_mapti(dev, 8192 + i, i, col);
-> >> +		gicv3_lpi_set_config(8192 + i, LPI_PROP_DEFAULT);
-> >> +		gicv3_lpi_set_pending_table_bit(vcpu, 8192 + i, true);
-> >> +	}
-> >> +	its_send_invall(collection[0]);
-> >> +	its_send_invall(collection[1]);
-> >> +
-> >> +	/* Set the PTZ bit on each pendbaser */
-> >> +
-> >> +	expected[nr_cpus - 1] = 128;
-> >> +	expected[nr_cpus - 2] = 128;
-> >> +
-> >> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
-> >> +	pendbaser = readq(ptr);
-> >> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> >> +
-> >> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
-> >> +	pendbaser = readq(ptr);
-> >> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
-> >> +
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, true);
-> >> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, true);
-> >> +
-> >> +	puts("Now migrate the VM, then press a key to continue...\n");
-> >> +	(void)getchar();
-> >> +	report(true, "Migration complete");
-> > 
-> > report_info
-> OK
-> > 
-> >> +
-> >> +	mdelay(1000);
-> > 
-> > This delay needs a comment explaining why it's here.
-> OK
-> 
-> Thanks
-> 
-> Eric
-> > 
-> >> +
-> >> +	check_lpi_hits(expected);
-> >> +}
-> >>  #endif
-> >>  
-> >>  int main(int argc, char **argv)
-> >> @@ -847,6 +989,14 @@ int main(int argc, char **argv)
-> >>  		report_prefix_push(argv[1]);
-> >>  		test_its_migration();
-> >>  		report_prefix_pop();
-> >> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
-> >> +		report_prefix_push(argv[1]);
-> >> +		test_its_pending_migration();
-> >> +		report_prefix_pop();
-> >> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
-> >> +		report_prefix_push(argv[1]);
-> >> +		test_migrate_unmapped_collection();
-> >> +		report_prefix_pop();
-> >>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
-> >>  		report_prefix_push(argv[1]);
-> >>  		test_its_introspection();
-> >> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> >> index 8b8ec79..d917157 100644
-> >> --- a/arm/unittests.cfg
-> >> +++ b/arm/unittests.cfg
-> >> @@ -144,6 +144,22 @@ extra_params = -machine gic-version=3 -append 'its-migration'
-> >>  groups = its migration
-> >>  arch = arm64
-> >>  
-> >> +[its-pending-migration]
-> >> +file = gic.flat
-> >> +smp = $MAX_SMP
-> >> +accel = kvm
-> >> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
-> >> +groups = its migration
-> >> +arch = arm64
-> >> +
-> >> +[its-migrate-unmapped-collection]
-> >> +file = gic.flat
-> >> +smp = $MAX_SMP
-> >> +accel = kvm
-> >> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
-> >> +groups = its migration
-> >> +arch = arm64
-> >> +
-> >>  # Test PSCI emulation
-> >>  [psci]
-> >>  file = psci.flat
-> >> -- 
-> >> 2.20.1
-> >>
-> >>
-> > 
-> > Thanks,
-> > drew 
-> > 
-> 
-> 
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwNjEyMDczNS4yNDQ1
+Ny0xLWppbmdxaS5saXVAaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
+ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
+LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
+ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZpbGU6ICIvdG1w
+L3FlbXUtbnNpc1xxZW11LWRvYy5odG1sIiAtPiBubyBmaWxlcyBmb3VuZC4KVXNhZ2U6IEZpbGUg
+Wy9ub25mYXRhbF0gWy9hXSAoWy9yXSBbL3ggZmlsZXNwZWMgWy4uLl1dIGZpbGVzcGVjIFsuLi5d
+IHwKICAgL29uYW1lPW91dGZpbGUgb25lX2ZpbGVfb25seSkKRXJyb3IgaW4gc2NyaXB0ICIvdG1w
+L3FlbXUtdGVzdC9zcmMvcWVtdS5uc2kiIG9uIGxpbmUgMTgwIC0tIGFib3J0aW5nIGNyZWF0aW9u
+IHByb2Nlc3MKbWFrZTogKioqIFtNYWtlZmlsZToxMTYyOiBxZW11LXNldHVwLTQuMi41MC5leGVd
+IEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVz
+dHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQo
+bWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1
+YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9j
+a2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MTI5NjM3Y2E0
+MjVmNGZhZTgyMzM0OWNkMmVhM2Q0YjAnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcs
+ICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUn
+LCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUn
+LCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
+L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hl
+Oi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1s
+Y2FpZmk3Ny9zcmMvZG9ja2VyLXNyYy4yMDIwLTAzLTA2LTA4LjM2LjI5LjUyNzg6L3Zhci90bXAv
+cWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWlu
+Z3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxh
+YmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MTI5NjM3Y2E0MjVmNGZhZTgyMzM0OWNkMmVhM2Q0
+YjAKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGly
+ZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbGNhaWZpNzcvc3JjJwptYWtlOiAq
+KiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgM20yNi41
+MzRzCnVzZXIgICAgMG03LjkyNnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
+Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzA2MTIwNzM1LjI0NDU3LTEtamluZ3FpLmxpdUBpbnRl
+bC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
