@@ -2,83 +2,86 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D434FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90137C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:37:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0B012072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C3532072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:37:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HECo2tFG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0B012072A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mit8FxkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3532072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGuL-0007tU-QQ
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:37:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
+	id 1jAGv0-0000RT-Hk
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:37:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbj-0000Tp-Ig
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:56 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1jAGbw-0000eQ-1h
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbi-0007mU-AU
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:55 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39895)
+ (envelope-from <peter.maydell@linaro.org>) id 1jAGbs-0008ES-5J
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:18:05 -0500
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:36179)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jAGbi-0007ey-1f
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:54 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id y17so3266068wrn.6
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:17:53 -0800 (PST)
+ id 1jAGbr-000887-CM
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:18:04 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id i14so3195297wmb.1
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:18:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=HxBRa5zP5bAdChIgC8UmIomdyrcpexWIdFB2HnoF5Oc=;
- b=HECo2tFGlBspdhsJe3z64FxVcnDeXR1LTZPzs7NhvlIIFDXGOd84iWPQBLA3tinzGT
- tJLzXzpSVvJdID2pMtwo2q1UzMye3acpBSwOW3a27NvthEcSSAkVLmmzwYkTBMi3yUNU
- eX4X/Z7N+NOsF5Ju529BLCVFIsxgw2T59gRstjnrnjzpxyKINMrU34Zaquk3q02CRlgQ
- LCmRjp7bucBwmhq6dW0w6ayq/7/ZLtGWSALW560eRTDfk0j/gO3Mc+v1QdXMvxoRe8HM
- paQlroWZX03Rn7/tYdgBVZc7HB/ALznL7kctIK8r1tnP8doGLYrLmIAsE6P335seAnuU
- v7QA==
+ bh=AHdCZ6f524TmUpBjUFoFjPeX4noFjGjqB5SJT2Ug8KE=;
+ b=mit8FxkHjUBzMGABXzUXDuH8/C+4cQE9KtQvG43DvAPodGs7bHWKUsQikZeOEw+voT
+ 6QDkg97lOpBUn6nxLbgNNBLaNojZu6ZZwwcZt06/9kdNtnIhVHqwCXlLi+Vuahz8ttuI
+ O4dzRLowSX+vZ06IA6IJjwq+yyB9CgdZya0DmnU/KGgJKREKD0ml4qcfb82DWD+QxfOS
+ rcs5/RIw+b+lA7Yf53DFmzw1PYj5wLaauGSx0mgbJ1t2Bg+fpnWe3EM2RN4ajDISwysp
+ UdtzEYgEE2TzHk2dFcdxuKGbcRfWkHSMSu255p00C1O3vnnvDWljJQroOUfJv1c2tNVx
+ Aczw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=HxBRa5zP5bAdChIgC8UmIomdyrcpexWIdFB2HnoF5Oc=;
- b=AS2OmpYwhlcSicJaygiWRvVaus01gJtpAkBljn+hFgVpZUxOx3TdBZxIF08ZytB82Q
- kGB7X6YnGV6fNDVmAA6VMRk1VvBxntAIKbw4LxQcjKHAdG+Au3P0GZ+HhTllJ/DLVeMN
- n3y7IfqLfffCaRpy4Xv5ltIbbgwYHNI3NFUEN/RjtelVODkYLUQboQ1t1QtR6qhJzWRC
- LMaLwiU6xYe/ywkWXAHuqlEScP1guWNmK7qT4axXfytboJVKbK5Ovu7M6CL6kJ3WmXmC
- nAgc53JPiw5iJNDiRFTbs+3tDCMkFABz65Zo7rWbne5duYbUDxcpY4corliKh6ynwlMV
- KVbw==
-X-Gm-Message-State: ANhLgQ30HSHOQm3W2LUBu30ByKvKZ4V+8QWfiKGeDlozRiLkKjxu8LmL
- k6O1hE99aYavkuw/DJlF/lMI8z2FlVozxg==
-X-Google-Smtp-Source: ADFU+vsoCb3Ukiah8o1qb6Ul/0R0YZCllfi4s7mxBQCmfXnOhXO72IxOKWprRMRG72P4kXqzgIEi1Q==
-X-Received: by 2002:a5d:6986:: with SMTP id g6mr5007274wru.421.1583515071691; 
- Fri, 06 Mar 2020 09:17:51 -0800 (PST)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=AHdCZ6f524TmUpBjUFoFjPeX4noFjGjqB5SJT2Ug8KE=;
+ b=GkyeVqasxy0NeyLWi4br5+7U7+PWsGrBG7VtCmIlnD2Gccs0KhfzxwUZj4agGllXRr
+ dQ+7clwmcDGUppi/maMGECKAZbAS1y58YVSI8xWBg2BEhE7QYozvz7YWQFX9mtEet/+5
+ uDJeE5P3spZaCCt4AKw2GFIOwyCyiKe+YbES8Wl9xQBiWyj+L4hyPFyKkgHa+Q1aHcsd
+ aoYvSJYD9kNZFrP76mRY0u7SLeqvdRZn2kk4ORvbwa7biEiUTYSiozJnndNePZGjT0Rc
+ esHd1Mw4fvMuGd7TbhldTTOeq3QQ3dLOa83sIiWnTKuy5bDqEU89Sxi2eFKkwm9mJ22A
+ +7Rw==
+X-Gm-Message-State: ANhLgQ1s2fGtBEttLLB7FU9W7SSYHh7oDw1eqTWmh5+gAkOxQGZRksDx
+ 4Vx1Nbj7ZuZJxMPEonccLJSqRpUJyeCSFg==
+X-Google-Smtp-Source: ADFU+vvgmCciq++L4mDIssDTMI5iHQls2jRpxND6t7vLJtYnyHZO13b/saDQuAUz6zghzPsQ1t18uw==
+X-Received: by 2002:a1c:4b0f:: with SMTP id y15mr4960232wma.87.1583515078968; 
+ Fri, 06 Mar 2020 09:17:58 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f8sm6948346wmf.20.2020.03.06.09.17.50
+ by smtp.gmail.com with ESMTPSA id f8sm6948346wmf.20.2020.03.06.09.17.58
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 09:17:51 -0800 (PST)
+ Fri, 06 Mar 2020 09:17:58 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/7] post-rst-conversion cleanups
-Date: Fri,  6 Mar 2020 17:17:42 +0000
-Message-Id: <20200306171749.10756-1-peter.maydell@linaro.org>
+Subject: [PATCH 7/7] docs/qemu-option-trace.rst.inc: Remove redundant comment
+Date: Fri,  6 Mar 2020 17:17:49 +0000
+Message-Id: <20200306171749.10756-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200306171749.10756-1-peter.maydell@linaro.org>
+References: <20200306171749.10756-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,38 +97,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series has some small cleanups now that the conversion
-of qemu-doc to rST has gone into master:
- * reorder the index.html.in/index.rst as it looks a bit odd
-   now that qemu-doc.html has gone from the top of the list
- * remove various bits of redundant code, makefile runes, etc
- * update some comments still talking about texi
- * add a missing dependency so that editing the Sphinx
-   extension source code triggers a rebuild of the docs
+The Texinfo version of the tracing options documentation has now
+been deleted, so we can remove the now-redundant comment at the top
+of the rST version that was reminding us that the two should be
+kept in sync.
 
-thanks
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ docs/qemu-option-trace.rst.inc | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Peter Maydell (7):
-  Makefile: Remove redundant Texinfo related code
-  Update comments in .hx files that mention Texinfo
-  hxtool: Remove Texinfo generation support
-  docs/sphinx/hxtool.py: Remove STEXI/ETEXI support
-  Makefile: Make all Sphinx documentation depend on the extensions
-  docs/index.rst, docs/index.html.in: Reorder manuals
-  docs/qemu-option-trace.rst.inc: Remove redundant comment
-
- Makefile                       | 14 ++----
- docs/index.html.in             | 10 ++---
- docs/index.rst                 |  8 ++--
- docs/qemu-option-trace.rst.inc |  4 --
- docs/sphinx/hxtool.py          | 28 ++----------
- hmp-commands-info.hx           |  8 ++--
- hmp-commands.hx                |  8 ++--
- qemu-options.hx                |  8 ++--
- scripts/hxtool                 | 78 +---------------------------------
- 9 files changed, 29 insertions(+), 137 deletions(-)
-
+diff --git a/docs/qemu-option-trace.rst.inc b/docs/qemu-option-trace.rst.inc
+index 23cfcb48537..7e09773a9c5 100644
+--- a/docs/qemu-option-trace.rst.inc
++++ b/docs/qemu-option-trace.rst.inc
+@@ -1,7 +1,3 @@
+-..
+-  The contents of this file must be kept in sync with qemu-option-trace.texi
+-  until all the users of the texi file have been converted to rst and
+-  the texi file can be removed.
+ 
+ Specify tracing options.
+ 
 -- 
 2.20.1
 
