@@ -2,149 +2,93 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF62C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE2FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:45:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A492073D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:43:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A492073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 62B2C2073D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:45:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIFYlFW3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B2C2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA8Zv-0002lu-VJ
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:43:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49895)
+	id 1jA8bT-0003fW-Gn
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:45:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jA8ZL-0002IP-E6
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:42:56 -0500
+ (envelope-from <armbru@redhat.com>) id 1jA8ad-0003Dw-00
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jA8ZK-00060C-39
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:42:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37108
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jA8ZJ-0005wl-Ts
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:42:54 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0268dJrd009980
- for <qemu-devel@nongnu.org>; Fri, 6 Mar 2020 03:42:53 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ykd49jkrd-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 03:42:52 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 6 Mar 2020 08:42:51 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 6 Mar 2020 08:42:48 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0268glfF54132984
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 6 Mar 2020 08:42:47 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 274F4AE04D;
- Fri,  6 Mar 2020 08:42:47 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E1E60AE045;
- Fri,  6 Mar 2020 08:42:46 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri,  6 Mar 2020 08:42:46 +0000 (GMT)
-Subject: Re: [PULL 000/136] Misc patches for 2020-02-25 (refactoring and
- Coccinelle edition)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>, Marc Hartmayer <mhartmay@linux.ibm.com>,
- bauerchen <bauerchen@tencent.com>
-References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
- <1b22b296-3973-95ad-3216-29aaca90ccb4@de.ibm.com>
- <44ff0c5a-c07c-b247-1ef6-8ee37dbbb6c8@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Fri, 6 Mar 2020 09:42:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <armbru@redhat.com>) id 1jA8aa-0001RU-LQ
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:44:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23314
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jA8aa-0001OF-Bv
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:44:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583484250;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Pic61oybC1s+l4VvC5sRclvtZmiaXpiie5vaT0tErr4=;
+ b=dIFYlFW3a2zwM7rlN63SXYm1TSrryXE+02rJhJe0ISrx/lVde3JiSUHL3aTq2+X4xrAF3K
+ L7gQMMaNAjnH5nXIaJczlu72RMfSFPRJkNmyLNjBpn8auQ/KJNTugNLPCYYiQvA8lTw/Kd
+ QR5c6jtVK2MATqk4VLcVNyXfmNO7fVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-CPpwM6I9PLGTaFrPvYjWjg-1; Fri, 06 Mar 2020 03:44:09 -0500
+X-MC-Unique: CPpwM6I9PLGTaFrPvYjWjg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5597219057A0;
+ Fri,  6 Mar 2020 08:44:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BAB119756;
+ Fri,  6 Mar 2020 08:44:05 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id DEBD911386A6; Fri,  6 Mar 2020 09:44:03 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org>
+ <20200221100700.GA5254@linux.fritz.box>
+ <87pne751g9.fsf@dusky.pond.sub.org>
+ <CAJ+F1CKbZiVk0DCQxMojxu8FyEskg5Cw32B08Vi9emaEMw79fQ@mail.gmail.com>
+ <87imjm96qy.fsf@dusky.pond.sub.org>
+ <20200302153626.GD4965@linux.fritz.box>
+ <875zflevh1.fsf@dusky.pond.sub.org>
+ <CAJ+F1CK=15RH6VOTEyogp3xht-DQj2zQvwrukXNZKPBCUCX1aA@mail.gmail.com>
+Date: Fri, 06 Mar 2020 09:44:03 +0100
+In-Reply-To: <CAJ+F1CK=15RH6VOTEyogp3xht-DQj2zQvwrukXNZKPBCUCX1aA@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 3 Mar 2020
+ 17:03:25 +0100")
+Message-ID: <87sgil7u0c.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <44ff0c5a-c07c-b247-1ef6-8ee37dbbb6c8@de.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20030608-0016-0000-0000-000002EDB498
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030608-0017-0000-0000-000033510BB1
-Message-Id: <e58ce0a4-4f44-4e0e-66a5-1531f564ab8a@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-06_02:2020-03-05,
- 2020-03-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0
- mlxscore=0 spamscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003060062
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,69 +100,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ David Alan Gilbert <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-And with
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 897e8f3ba6..5d95a2049b 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -470,6 +470,7 @@ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
-     char *addr = area;
-     int i = 0;
- 
-+    qemu_cond_init(&page_cond);
-     memset_thread_failed = false;
-     threads_created_flag = false;
-     memset_num_threads = get_memset_num_threads(smp_cpus);
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-I get the next one:
+> Hi
+>
+> On Tue, Mar 3, 2020 at 8:41 AM Markus Armbruster <armbru@redhat.com> wrot=
+e:
+[...]
+>> >> Let's take a step back.
+>> >>
+>> >> The actual problem is to find the coroutine in graphic_hw_update_done=
+(),
+>> >> so you can wake it.
+>> >>
+>> >> Your solution stores the coroutine in the QemuConsole, because that's
+>> >> readily available in graphic_hw_update_done().
+>> >>
+>> >> However, it really, really doesn't belong there, it belongs to the
+>> >> monitor.  Works anyway only because QMP commands execute one after th=
+e
+>> >> other.
 
-qemu-system-s390x: /home/cborntra/REPOS/qemu/util/qemu-thread-posix.c:76: qemu_mutex_lock_impl: Assertion `mutex->initialized' failed.
+As discussed in the "[PATCH v4 1/4] qapi: Add a 'coroutine' flag for
+commands" sub-thread, HMP commands may execute interleaved.  Your code
+still works, because it only ever abuses QemuConsole with QMP.  But it's
+brittle.
 
+Looks like we'll change HMP not to run interleaved.  That adds a belt to
+the suspenders.  You might argue that's robust enough.
 
+But it's not just the brittleness I dislike.  Storing per-monitor-
+command data in QemuConsole is ugly as sin.  Arguing that it works
+because commands are strictly serialized, and that burying one more
+dependence on such serialization deep in command code won't make the
+situation appreciably worse, doesn't change the fact that QemuConsole
+has no business holding per-monitor-command data.
 
-On 06.03.20 09:34, Christian Borntraeger wrote:
-> 
-> 
-> On 06.03.20 09:02, Christian Borntraeger wrote:
+>> >>
+>> >> Kevin suggested using a CoQueue to avoid this unspoken dependency.  Y=
+ou
+>> >> object, because it could make readers assume multiple screendump
+>> >> commands could run concurrently, which is not the case.
+>> >>
+>> >> Alright, let's KISS: since there's just one main loop, there's just o=
+ne
+>> >> coroutine: @qmp_dispatcher_co.  Let's use that, so the dependency on
+>> >> "one command after the other" is explicit and obvious.
+>> >
+>> > Ugh... If you choose that this is the way to go, please add an asserti=
+on
+>> > at least that we are indeed in qmp_dispatcher_co before yielding.
 >>
->> On 25.02.20 12:48, Paolo Bonzini wrote:
->>> The following changes since commit c1e667d2598b9b3ce62b8e89ed22dd38dfe9f57f:
->>>
->>>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-02-24 11:38:54 +0000)
->>>
->>> are available in the git repository at:
->>>
->>>
->>>   git://github.com/bonzini/qemu.git tags/for-upstream
->>>
->>> for you to fetch changes up to 4db373bef1544b3b5e02ed376d0788c5b6a7548b:
->>>
->>>   Merge branch 'exec_rw_const_v4' of https://github.com/philmd/qemu into HEAD (2020-02-25 09:37:42 +0100)
->>>
->>> ----------------------------------------------------------------
->>>
->>> * device_del fix (Julia)
->>> * FXAM fix (myself)
->>> * memdev refactoring (Igor)
->>> * memory region API cleanups (Peter, Philippe)
+>> No objection.
 >>
->> Marc Hartmayer reported the following 
->> qemu-system-s390x: /home/cborntra/REPOS/qemu/util/qemu-thread-posix.c:161: qemu_cond_broadcast: Assertion `cond->initialized' failed.
+>> To apply the QMP coroutine infrastructure for 5.0, I need a user.  We
+>> have two: block_resize from Kevin, and screendump from Marc-Andr=C3=A9.
+>> Neither is quite ready, yet.  I'll wait for a respin of either one.
 >>
->> I can reproduce that as soon as I use -mem-path and -mem-prealloc together.
->>
-> 
-> Ok I bisected this to 
-> 
-> commit 037fb5eb3941c80a2b7c36a843e47207ddb004d4
-> Author: bauerchen <bauerchen@tencent.com>
-> Date:   Tue Feb 11 17:10:35 2020 +0800
-> 
->     mem-prealloc: optimize large guest startup
-> 
+>
+> Is this the change you expect?
+>
+> diff --git a/ui/console.c b/ui/console.c
+> index 57df3a5439..d6a8bf0cee 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -167,7 +167,7 @@ struct QemuConsole {
+>      QEMUFIFO out_fifo;
+>      uint8_t out_fifo_buf[16];
+>      QEMUTimer *kbd_timer;
+> -    Coroutine *screendump_co;
+> +    bool wake_qmp_dispatcher_on_update;
+>
+>      QTAILQ_ENTRY(QemuConsole) next;
+>  };
+
+No, because it still stores per-command data in QemuConsole.  You need
+to, because...
+
+> @@ -263,8 +263,8 @@ static void gui_setup_refresh(DisplayState *ds)
+>
+>  void graphic_hw_update_done(QemuConsole *con)
+>  {
+> -    if (con && con->screendump_co) {
+> -        aio_co_wake(con->screendump_co);
+> +    if (con->wake_qmp_dispatcher_on_update) {
+> +        aio_co_wake(qmp_dispatcher_co);
+
+... you may call aio_co_wake() only while @qmp_dispatcher_co is waiting
+for it after yielding ...
+
+>      }
+>  }
+>
+> @@ -376,12 +376,15 @@ void qmp_screendump(const char *filename, bool
+> has_device, const char *device,
+>      }
+>
+>      if (qemu_in_coroutine()) {
+> -        assert(!con->screendump_co);
+> -        con->screendump_co =3D qemu_coroutine_self();
+> +        /*
+> +         * The coroutine code is generic, but we are supposed to be on
+> +         * the QMP dispatcher coroutine, and we will resume only that no=
+w.
+> +         */
+> +        assert(qemu_coroutine_self() =3D=3D qmp_dispatcher_co);
+> +        con->wake_qmp_dispatcher_on_update =3D true;
+>          aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>                                  graphic_hw_update_bh, con);
+>          qemu_coroutine_yield();
+
+... here.  I missed that need when I suggested to use
+@qmp_dispatcher_co.  Sorry.
+
+> -        con->screendump_co =3D NULL;
+> +        con->wake_qmp_dispatcher_on_update =3D false;
+>      }
+
+Have a look at qxl, the only provider of asynchronous .gfx_update().
+The actual work is done in qxl-render.c.  qxl_render_update(),
+qxl_render_update_area_bh(), qxl_render_update_area_unlocked(),
+qxl_render_update_area_done() cooperate carefully to support multiple
+updates in flight.
+
+I guess that's necessary because we also call graphic_hw_update() from
+display code such as ui/vnc.c and ui/spice-display.c.
+
+Before your patch, none of these users waits for an asynchronous update
+to complete, as far as I can tell.  Afterwards, QMP screendump does.
+Whether more users should I can't tell.  Gerd, can you?
+
+Your patch communicates completion to screendump by making
+graphic_hw_update() wake a coroutine.  It stores the coroutine in
+QemuConsole, exploiting that only one call site actually waits for an
+asynchronous update to complete, and that caller is never reentered.
+
+This new mechanism is not usable for any other caller, unless it somehow
+synchronizes with screendump to avoid reentrance.
+
+Shouldn't we offer a more generally useful way to wait for asynchronous
+update to complete?  Kevin's idea to use a queue of waiters sounds more
+appropriate than ever to me.
 
 
