@@ -2,86 +2,84 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E48EFC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32141C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B09C62072D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F05B921775
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:53:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2+iX9+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B09C62072D
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0V/hPPO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F05B921775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jACSx-0001h1-QO
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:52:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50951)
+	id 1jACTt-0002WJ-3W
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:53:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jACSN-0001Dw-Sb
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:52:00 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jACSk-0001at-GO
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:52:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jACSM-0006hg-OR
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:51:59 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45549)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jACSi-0007h0-Fu
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:52:22 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45267)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jACSM-0006c2-GE
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:51:58 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id v2so2195583wrp.12
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 04:51:58 -0800 (PST)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jACSi-0007e7-9E
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:52:20 -0500
+Received: by mail-wr1-x444.google.com with SMTP id v2so2196961wrp.12
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 04:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=AR9boo+HyGf0bthWuBFuPsIoff2oor8etcaKa83eczo=;
- b=f2+iX9+mAOxrGjJHBtQZLN5x+GW4VeE6cC+LQJ7RTWm2Ylmrl+6+RpC/TiNSpM+sCd
- xVsUlqVG2SFYrSUj1GQguDcjnFB+YhprGPOIEfs7j0UWQlONRseY+ilaJeUhj7f/WCJQ
- z9wpzaae9TpZq7toitYjReQEdOEIXqQ/5CphzDmjOZd9rSL4Eqoukc5xPqRJzguklhSY
- cVcYC9RdGh1C9+hC3xqfYnALP157GueJfWAUm6HwCel4UFKd6k5zOKPdlps74q0dD8Sq
- 1qqeEl0iIvpkk5sDSOip0YaHolaEIjvZJ3vdQB1qO176RwQ9kWH6/BpRsld7m0/Do23H
- qUFg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ZICCo4TUf5G6LQkMng9dbkynMnvkJScM5ClPSfxPVV0=;
+ b=L0V/hPPOA95Qx5I44qrewO72Y+r6t062fjodT24VesCD+olpB2CgEmrJy0KlZSM/V7
+ 9w6bgbP4xOvaqztKiv8w7TLyivgvKm/RtiUokcVgWmsgo8mWUPftpNkGzw34dymaP24c
+ 4bA7dLRlcnt2OoIzpiRMIwPS/BlVgYIEndjDfDGnBckF385UGv15wnNwOIdaDV9X65J4
+ Ek30/+lAcQza+oTwM9GPlSBCXW0/GiMOTlzhFpDOAzDyqvYDgct7kroA8TKRSfKnaYZC
+ WLeEdBS0BHkCY86bKRk6uJmrQZZEvgqW17SmUQhYv8XdxbumPVGrI7LWqIRqoMUu+pHQ
+ f0Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=AR9boo+HyGf0bthWuBFuPsIoff2oor8etcaKa83eczo=;
- b=FBq+qodl0Cn+8jJlGiG8s2AribPEfkfoQRHZbN5EpZDZOyU+bWrP3A+qV9IpOtEvy8
- 3kAEkOnmiKsBWbq59bYhSlHKz8hm21DtCapjYTLE1Z4LPNH2Ip/rWQ1YvVklb3F9jJGr
- 3gp41r3S0fY39wMEqJ8kB+ZMr5oxsPX6gjb6d0XVtkoLlxh4z2SUJ2YnneurS4/hEuj4
- /3QRsxmGBkBXpMYot+Ammyqb6Q2WU4hcTHW0Rzm5BcXxUjWqYoJzs7eDCWW+9+P5wdSv
- JM5EOnwcV6RdBk199gxL1h+WD9XCR33PsTaoiawUHMpJtKvQbw9NFgDzmod4e9SnW9ls
- 9ozg==
-X-Gm-Message-State: ANhLgQ2yN52mbmUtJop/KFs5VvZ+OGo+sWumHrti2CgXPCB17wVhxG2I
- 1ttkjaKz88XRST2UuzxgKtc=
-X-Google-Smtp-Source: ADFU+vuGsJ1dlulLFNjfSWFruInFcllZNCDbNbAbn/MN1U0jTIVRJIfNZu8AYqVbDllxE4u9PYVAow==
-X-Received: by 2002:a5d:4f0e:: with SMTP id c14mr3955993wru.100.1583499116995; 
- Fri, 06 Mar 2020 04:51:56 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id n3sm13080421wmc.42.2020.03.06.04.51.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 04:51:56 -0800 (PST)
-Date: Fri, 6 Mar 2020 12:51:55 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: Wiki user request
-Message-ID: <20200306125155.GJ1335569@stefanha-x1.localdomain>
-References: <b4440411-cc60-cd7e-988e-458baf0c8b6d@xcancerberox.com.ar>
- <CAAdtpL4Fg3rjxOXxGA=sSLpsXrT1E0Ko1kjt1YugvRCtKPi-hw@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ZICCo4TUf5G6LQkMng9dbkynMnvkJScM5ClPSfxPVV0=;
+ b=uTroJERE+94brQitwyDCVxrdntGKfqE/nWPoYlkM8iwrFefu5L8sTzmsf6BLGQY7uB
+ aL833aJdoWNTk494hQx/guy8Jdov4cPVk1BO/Vyxfny2nIjjInNosj32g8CdKBQ7gBNT
+ Aovh3eibmogoqSQfNkhzSwc8bpkZzHJB0Vda5hvT2oTyLxSDQRIofc48cF+RBhcIK7IY
+ Ex4/DGTXrN2xk8Ma1+2MaLAExsSUaHbVJD6fYfcLtLKhY4DY4RnxE+t4JANE/IZwCIGH
+ wEMumoRlBQacOGhk7euZiTEB5rr9lHwvGVil4iWPEU6wltuCZ34+F9o4J8ScAyPq+3Cm
+ Xw+g==
+X-Gm-Message-State: ANhLgQ0EU+pDjzSNNreNJr+zOmN36jamiHAZt/h0F663Y4NBg5R5yH5S
+ jnhzceYRpdR//58t9rOutLaa4WfRwirgFPRZu9g=
+X-Google-Smtp-Source: ADFU+vtPC062XAlS1F5cKDdUHuwPNVE5yCe9j+ZF3XjIO/5gg+LN+5/7Z7k0F5iuGXB9ldx/l6TiYqGsSLs4hZvFXHI=
+X-Received: by 2002:a05:6000:4a:: with SMTP id
+ k10mr3721518wrx.381.1583499139190; 
+ Fri, 06 Mar 2020 04:52:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GvznHscUikHnwW2p"
-Content-Disposition: inline
-In-Reply-To: <CAAdtpL4Fg3rjxOXxGA=sSLpsXrT1E0Ko1kjt1YugvRCtKPi-hw@mail.gmail.com>
+References: <20200224182454.24610-1-sebastien.boeuf@intel.com>
+ <20200306123453.GI1335569@stefanha-x1.localdomain>
+In-Reply-To: <20200306123453.GI1335569@stefanha-x1.localdomain>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 6 Mar 2020 13:52:06 +0100
+Message-ID: <CAJ+F1CJpMzra8VSYWKgtwZJkxvEX_HTqT=Sr9yvmX=NMH=9MSg@mail.gmail.com>
+Subject: Re: [PATCH v2] docs: Update vhost-user spec regarding backend program
+ conventions
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +91,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi
 
---GvznHscUikHnwW2p
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 6, 2020 at 1:35 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Mon, Feb 24, 2020 at 07:24:54PM +0100, Sebastien Boeuf wrote:
+> > The vhost-user specification is not clearly stating the expected
+> > behavior from a backend program whenever the client disconnects.
+> >
+> > This patch addresses the issue by defining the default behavior and
+> > proposing an alternative through a command line option.
+> >
+> > By default, a backend program will terminate whenever the client
+> > disconnects, unless told otherwise through the newly introduced
+> > option --keep-listening.
+> >
+> > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  docs/interop/vhost-user.rst | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+>
+> Perhaps --keep-listening should be optional?
 
-On Wed, Mar 04, 2020 at 12:57:14PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Ping?
+I think it should be optional, and flagged by a capability.
 
-Joaquin's account has been created.
+>
+> If the maintainers are happy with the patch as is then so am I:
+>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Any QEMU wiki user can create accounts for other people!  Log in and go
-to https://wiki.qemu.org/Special:SpecialPages and click the create
-account link.
 
-Stefan
 
---GvznHscUikHnwW2p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5iR2sACgkQnKSrs4Gr
-c8g9qwgAvqwRfjtuRcePjdKdlstoQozeB/T1BgS6cUDoJw5RyiIkNpKYzYNSTkWa
-suS0SY2WRtWfHaZ/b72wLER0uIibnw+tA2mTFgo/mmuN4Qui62fgKJD8YiqV/o/6
-h7U11qnZFMwPY4M/gKoQabDGiWRYuA59nTfUtDoRPUW320iqVt8XwEbw/uFgwm9e
-k2UrAngjVV2Pn9dqqqtEWmMuBsfpYSwVWIk2bYdo//ZZ8Hxo/nIr4TWkqFEAJ9Ul
-GXZ6Qf+GCBOQAprTnt9iR1bVQ4u6oPpCKhhCbjruUkTamEc4B0zj82rvaYJH/4mM
-SM3PfucP8x1ei/njcoU2PpDeBDGW0A==
-=p7ro
------END PGP SIGNATURE-----
-
---GvznHscUikHnwW2p--
+--=20
+Marc-Andr=C3=A9 Lureau
 
