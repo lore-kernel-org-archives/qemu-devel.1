@@ -2,76 +2,72 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F641C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C73AC10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BA8E2073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:41:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA8E2073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 30A0C2073B
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 12:41:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A0C2073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jACIO-0005e5-Gz
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:41:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33555)
+	id 1jACIe-0005xZ-BP
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 07:41:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jACHM-0004t4-1v
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:40:37 -0500
+ (envelope-from <bounces@canonical.com>) id 1jACHh-00055j-GB
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jACHK-0007rO-Hc
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:40:35 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:64311)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jACHG-0007Tb-QY; Fri, 06 Mar 2020 07:40:31 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E56C67476D5;
- Fri,  6 Mar 2020 13:40:26 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id A49727475F6; Fri,  6 Mar 2020 13:40:26 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id A14BF74638A;
- Fri,  6 Mar 2020 13:40:26 +0100 (CET)
-Date: Fri, 6 Mar 2020 13:40:26 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-In-Reply-To: <e8f3fe10-7a44-5552-bb80-7bc24fe68cc6@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003061306500.10004@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
- <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
- <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
- <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
- <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
- <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
- <e8f3fe10-7a44-5552-bb80-7bc24fe68cc6@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <bounces@canonical.com>) id 1jACHf-0000HB-Bt
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:40:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42054)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jACHd-0000CO-EQ
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 07:40:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jACHa-0001LQ-Fp
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 12:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7683C2E80C3
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 12:40:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Mar 2020 12:32:47 -0000
+From: Gerd Hoffmann <1863023@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: kraxel-redhat yifanlu
+X-Launchpad-Bug-Reporter: Yifan (yifanlu)
+X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
+References: <158154403075.14879.10753031266357045514.malonedeb@soybean.canonical.com>
+Message-Id: <158349796809.11926.16006452736724629765.malone@soybean.canonical.com>
+Subject: [Bug 1863023] Re: Deadlock in QXL
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e8a849f859ce107448660abfd3cbd271ff93a4c0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,108 +76,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1863023 <1863023@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Mar 2020, Mark Cave-Ayland wrote:
-> On 06/03/2020 00:21, BALATON Zoltan wrote:
->> On Fri, 6 Mar 2020, BALATON Zoltan wrote:
->>> On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
->>>> On 04/03/2020 22:33, BALATON Zoltan wrote:
->>>> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
->>>> documented as having value 0 == Legacy IRQ routing which should be the initial value
->>>> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
->>>
->>> The VT8231 docs say this should always read 1 but may be this is somehow set to 0
->>> on the Pegasos2. What does that mean? Should we use this value instead of the
->>> feature bit to force using legacy interrupts? We'd still need a property in via-ide
->>> to set this reg or is it possible to set it from board code overriding the default
->>> after device is created? That would allow to drop patch 1. I can try this.
->>
->> This seemed like it could simplify patches a bit but it does not work. Setting this
->> reg to 0 breaks Linux and MorphOS which then think the device does not have an
->> interrupt at all and fail as before waiting for the irq. So we still need the feature
->> bit, cant use this reg to force legacy interrupts. I've spent considerable time
->> testing different OSes before I've ended up with this patch series I've submitted and
->> I could not find a simpler way that works with everything.
->
-> I appreciate that testing these things can take a lot of time, but what is important
-> thing to ask here is whether these hacks are attempting to work around something in
-> QEMU that doesn't match the hardware specification, and to me it feels that this is
-> what is happening here.
+Any change if you remove the graphic_hw_update() call in
+qxl_enter_vga_mode()?
 
-It may be we need to work around some incomplete modelling of devices in 
-QEMU, e.g. we only model the native mode of these IDE interfaces so 
-anything involving legacy mode is out of scope. To also emulate legacy 
-mode we'd need changing common ISA code and maybe PIC code as well. As 
-those parts are also used by other more commonly used machine models I'd 
-avoid breaking those and rather implement it confined to these machines 
-that are not yet finished or complete anyway than try to change all 
-dependent devices that would need even more testing. These "hacks" could 
-be cleaned up later and this would not be the only hack in QEMU, I don't 
-have time to fix everything and it's unreasonable to demand it I think. 
-I'd suggest to take this patch as it is now and if you don't like it you 
-can submit patches that clean it up the way you think is correct or submit 
-an alternative patch now that shows how do you think it can be done in a 
-cleaner way because I don't see it and don't have more time for it now.
+-- =
 
-> Obviously this thread has become quite long (and even I'm struggling to find previous
-> discussions) but here is my summary below:
->
-> - I don't think the patch in its current form is the right way to do this. Instead of
-> adding a feature bit to fudge the existing IRQ routing when the existing IRQ routing
-> is wrong, let's fix the existing IRQ routing instead.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863023
 
-I think that would involve changing parts which could break other machines 
-so I'd rather go with a featute bit only affecting pegasos2 and fulonge2 
-than touch i8259 or ISA emulation basing that on some guess how the real 
-chip may be implemented. Is it possible to implement what you propose 
-without changing common IDE, ISA and PIC emulation only in via-ide and 
-fulong2e code?
+Title:
+  Deadlock in QXL
 
-> - There is no mention of "non-100%" native mode in the 8231 or 686B datasheet: this
-> is simply a term used within the Linux patches. The controller is either in native
-> mode, or legacy mode. It may be that guests are making use of some undefined
-> behaviour here.
+Status in QEMU:
+  New
 
-Yes, this is a Linux term and Linux also uses a feature bit to enable this 
-workaround. If that's good enough for Linux why isn't it good enough for 
-you?
+Bug description:
+  This is on qemu 4.2.0 OSX host, running fresh Windows 7 with SPICE
+  guest tools just installed.
 
-> - The code that uses the value of PCI_INTERRUPT_LINE in via-ide is incorrect (as your
-> patch comment points out, some guests ignore it anyway).
+  Command line: `qemu-system-x86_64 -qmp
+  tcp:localhost:4444,server,nowait -smp cpus=3D2 -boot order=3Dd -m 2048
+  -soundhw hda -drive file=3Dhda.img,if=3Dide,media=3Ddisk -spice
+  port=3D5930,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
+  ,playback-compression=3Doff,streaming-video=3Doff -vga qxl -device
+  rtl8139,netdev=3Dnet0 -netdev user,id=3Dnet0`
 
-You're misunderstanding the comment. The via_ide_config_read function is 
-needed to restore value in interrupt line that common PCI reset code 
-deletes. Linux depends on this value to be the same as on real hardware so 
-this is needed to work around QEMU and Linux pecularities.
+  After the Windows logo, the screen is black. I dump the two vCPU
+  threads:
 
-I've tried using PCI_INTERRUPT_PIN in place of the feature bit but setting 
-that to 0 breaks Linux and MorphOS on pegasos2 because these apparently 
-expect this to be set to 1 corresponding to native mode. (Firmware only 
-sets native mode enable bits in prog-if but datasheet says this reg should 
-be 1 by default and other PCI docs say 0 here means no interrupt used so 
-maybe that's why Linux and MorphOS don't like it.)
+  ```
+  * thread #16
+    * frame #0: 0x00007fff523b8ce6 libsystem_kernel.dylib`__psynch_cvwait +=
+ 10
+      frame #1: 0x00007fff52467185 libsystem_pthread.dylib`_pthread_cond_wa=
+it + 701
+      frame #2: 0x0000000110bf88bd qemu-system-x86_64`qemu_cond_wait_impl(c=
+ond=3D0x000000011121e8d0, mutex=3D0x000000011120ba48, file=3D"cpus-common.c=
+", line=3D144) at qemu-thread-posix.c:173:11 [opt]
+      frame #3: 0x0000000110926a59 qemu-system-x86_64`do_run_on_cpu(cpu=3D<=
+unavailable>, func=3D<unavailable>, data=3D<unavailable>, mutex=3D0x0000000=
+11120ba48) at cpus-common.c:144:9 [opt]
+      frame #4: 0x000000011080c50a qemu-system-x86_64`memory_region_snapsho=
+t_and_clear_dirty at memory.c:2595:5 [opt]
+      frame #5: 0x000000011080c4d7 qemu-system-x86_64`memory_region_snapsho=
+t_and_clear_dirty(mr=3D<unavailable>, addr=3D0, size=3D2359296, client=3D<u=
+navailable>) at memory.c:2107 [opt]
+      frame #6: 0x0000000110849fe1 qemu-system-x86_64`vga_update_display [i=
+nlined] vga_draw_graphic(s=3D<unavailable>, full_update=3D0) at vga.c:1661:=
+16 [opt]
+      frame #7: 0x000000011084996a qemu-system-x86_64`vga_update_display(op=
+aque=3D<unavailable>) at vga.c:1785 [opt]
+      frame #8: 0x00000001109b261d qemu-system-x86_64`qxl_hard_reset(d=3D0x=
+00007f84f8730000, loadvm=3D0) at qxl.c:1285:5 [opt]
+      frame #9: 0x000000011080ac97 qemu-system-x86_64`memory_region_write_a=
+ccessor(mr=3D0x00007f84f8741fb0, addr=3D5, value=3D<unavailable>, size=3D1,=
+ shift=3D<unavailable>, mask=3D<unavailable>, attrs=3DMemTxAttrs @ 0x000070=
+000786d890) at memory.c:483:5 [opt]
+      frame #10: 0x000000011080ab31 qemu-system-x86_64`memory_region_dispat=
+ch_write [inlined] access_with_adjusted_size(addr=3D<unavailable>, value=3D=
+0x00000000015c6100, size=3D<unavailable>, access_size_min=3D<unavailable>, =
+access_size_max=3D<unavailable>, access_fn=3D<unavailable>, mr=3D<unavailab=
+le>, attrs=3D<unavailable>) at memory.c:544:18 [opt]
+      frame #11: 0x000000011080aafd qemu-system-x86_64`memory_region_dispat=
+ch_write(mr=3D<unavailable>, addr=3D<unavailable>, data=3D22831360, op=3D32=
+644, attrs=3DMemTxAttrs @ 0x000070000786d8c0) at memory.c:1475 [opt]
+      frame #12: 0x00000001107b080d qemu-system-x86_64`address_space_stb(as=
+=3D<unavailable>, addr=3D<unavailable>, val=3D22831360, attrs=3DMemTxAttrs =
+@ r12, result=3D0x0000000000000000) at memory_ldst.inc.c:378:13 [opt]
+      frame #13: 0x0000000118570230
 
-> - There is different behaviour here between the 8231 and 686B in this area, despite
-> having the same vendor/device id.
->
->
-> The first thing you need to fix is the PCI_INTERRUPT_LINE part; I would start by
-> removing the existing code and instead expose a qdev named gpio "legacy-irq" and
-> wiring that up to your interrupt controller. Note you'd have to do the same for
-> fulong2e, but that is reasonably trivial.
+  * thread #18
+    * frame #0: 0x00007fff523b8ce6 libsystem_kernel.dylib`__psynch_cvwait +=
+ 10
+      frame #1: 0x00007fff52467185 libsystem_pthread.dylib`_pthread_cond_wa=
+it + 701
+      frame #2: 0x0000000110bf88bd qemu-system-x86_64`qemu_cond_wait_impl(c=
+ond=3D0x000000011121e860, mutex=3D0x000000011121e818, file=3D"cpus-common.c=
+", line=3D196) at qemu-thread-posix.c:173:11 [opt]
+      frame #3: 0x0000000110926c44 qemu-system-x86_64`start_exclusive at cp=
+us-common.c:196:9 [opt]
+      frame #4: 0x0000000110837c35 qemu-system-x86_64`cpu_exec_step_atomic(=
+cpu=3D0x00007f8518290000) at cpu-exec.c:265:9 [opt]
+      frame #5: 0x00000001107fcf95 qemu-system-x86_64`qemu_tcg_cpu_thread_f=
+n(arg=3D0x00007f8518290000) at cpus.c:1799:17 [opt]
+      frame #6: 0x0000000110bf911e qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:519:9 [opt]
+      frame #7: 0x00007fff52466e65 libsystem_pthread.dylib`_pthread_start +=
+ 148
+      frame #8: 0x00007fff5246283b libsystem_pthread.dylib`thread_start + 15
+  ```
 
-Please go ahead and do it but if you don't submit an alternative patch 
-before the freeze I'd ask John and Peter to make a judgement here and tell 
-if my series is acceptable or not in its current form and if it is then 
-please merge it and leave clean ups for subsequent patches. This is 
-blocking my further patches to implement pegasos2 emulation.
+  Seems like thread #16 had a STB to QXL MMIO registers which caused it
+  to call `qxl_hard_reset` and eventually made its way to
+  `do_run_on_cpu` which waits for `qemu_work_cond`. The only way
+  `qemu_work_cond` is set is if one of the two vCPU executes the queued
+  work at the end of the TCG execution. Thread #16 is stuck waiting, so
+  what about thread #18? Thread #18 is waiting for `exclusive_cond`
+  which is set once all the other CPUs are done running (but thread #16
+  is waiting still). So classic deadlock.
 
-Regards,
-BALATON Zoltan
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863023/+subscriptions
 
