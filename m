@@ -2,87 +2,74 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC46BC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91208C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F1C2072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:10:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hp4gqjGV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F1C2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66CBA2072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CBA2072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA90T-0006JT-Kt
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 04:10:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45632)
+	id 1jA91G-0007Bt-Is
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 04:11:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1jA8zt-0005mt-6a
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:10:22 -0500
+ (envelope-from <bounces@canonical.com>) id 1jA90a-0006Yk-IE
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1jA8zr-0008Q9-Rd
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:10:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25679
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jA8zr-0008N7-MA
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:10:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583485818;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x2OytJ2ingUzW6byBRRXUqfMXnh9rKtoQxsDTKOxHZU=;
- b=Hp4gqjGVLHy3fyPrg8h/wg+EPsirz6p5keSRCnPWYVY3c8WVKKavrj1vFSsz9FsueNbR+0
- vZfRlLbGWRbDMPH+rPM8A4bD1oG/v1uuBG8sgxr3Ah31LXIwQmiyIIhAkajODJABDOZo7j
- Zr3QdpLQ+6KpF+NBh+SMyibOB7Mua0I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-mW9GIMYsMg6qhCep6A_1sg-1; Fri, 06 Mar 2020 04:10:17 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02C10189F760;
- Fri,  6 Mar 2020 09:10:16 +0000 (UTC)
-Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 86CC65DA7B;
- Fri,  6 Mar 2020 09:10:15 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Michal =?utf-8?B?UHLDrXZvem7DrWs=?= <mprivozn@redhat.com>
-Subject: Re: [PATCH] configure: Improve zstd test
-In-Reply-To: <5b2ff215-ef9c-2981-5467-b79ad7af7a34@redhat.com> ("Michal
- =?utf-8?B?UHLDrXZvem7DrWsiJ3M=?= message of "Fri, 6 Mar 2020 09:49:59
- +0100")
-References: <20200305103427.157658-1-quintela@redhat.com>
- <87imji6eio.fsf@linaro.org> <87h7z2g6te.fsf@secure.laptop>
- <5b2ff215-ef9c-2981-5467-b79ad7af7a34@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Fri, 06 Mar 2020 10:10:10 +0100
-Message-ID: <871rq5g87h.fsf@secure.laptop>
+ (envelope-from <bounces@canonical.com>) id 1jA90Z-0002YD-B1
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:11:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jA90Z-0002VV-4w
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:11:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jA90X-0001cD-Cu
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:11:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 03D932E80CD
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 09:11:01 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: mW9GIMYsMg6qhCep6A_1sg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Mar 2020 09:04:25 -0000
+From: Gerd Hoffmann <1743191@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: regression
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gson kraxel-redhat ottaviocr philmd
+X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
+X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
+References: <151591854188.4596.10964938100242408667.malonedeb@wampee.canonical.com>
+Message-Id: <158348546579.12734.18206344320523628353.malone@wampee.canonical.com>
+Subject: [Bug 1743191] Re: Interacting with NetBSD serial console boot blocks
+ no longer works
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a9bc81463059c47416f4d642beb06b20b1e3334d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,92 +78,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Reply-To: Bug 1743191 <1743191@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Michal Pr=C3=ADvozn=C3=ADk <mprivozn@redhat.com> wrote:
-> On 5. 3. 2020 16:27, Juan Quintela wrote:
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->>> Juan Quintela <quintela@redhat.com> writes:
->>>
->>>> There were one error on the test (missing an s for --exists).
->>>> But we really need a recent zstd (0.8.1).
->>>> That version was released in 2016, so it is newer that some of our tra=
-vis
->>>> images.  Just check for the version that we need.
->>>>
->>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>>> Reported-by: Richard Henderson <richard.henderson@linaro.org>
->>>> ---
->>>>  configure | 3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/configure b/configure
->>>> index 7b373bc0bb..1bf48df1ef 100755
->>>> --- a/configure
->>>> +++ b/configure
->>>> @@ -2464,7 +2464,8 @@ fi
->>>>  # zstd check
->>>> =20
->>>>  if test "$zstd" !=3D "no" ; then
->>>> -    if $pkg_config --exist libzstd ; then
->>>> +    libzstd_minver=3D"0.8.1"
->>>> +    if $pkg_config --atleast-version=3D$libzstd_minver libzstd ; then
->>>>          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
->>>>          zstd_libs=3D"$($pkg_config --libs libzstd)"
->>>>          LIBS=3D"$zstd_libs $LIBS"
->>>
->>> Hmm still breaks with:
->>>
->>>    make docker-test-build@ubuntu J=3D9 V=3D1
->>=20
->> Thanks.
->>=20
->>> With:
->>>
->>>   FY_SOURCE=3D2 -g   -c -o monitor/qmp.o /tmp/qemu-test/src/monitor/qmp=
-.c
->>>   /tmp/qemu-test/src/migration/multifd-zstd.c: In function 'zstd_send_p=
-repare':
->>>   /tmp/qemu-test/src/migration/multifd-zstd.c:125:9: error: unknown typ=
-e name 'ZSTD_EndDirective'; did you mean 'ZSTD_DDict'?
->>>            ZSTD_EndDirective flush =3D ZSTD_e_continue;
->>>            ^~~~~~~~~~~~~~~~~
->>=20
->> Greate, more things were introduced later.
->> As it would be too easy, the zstd repository is not lineal, you need to
->> checkout the tag you want to see when something has been introduced.
->>=20
->> Will try to get this fixed.
->>=20
->> Sorry for the inconveniences.
->>=20
->>=20
->>>   Version: 1.3.8+dfsg-3
->>>   Depends: libzstd1 (=3D 1.3.8+dfsg-3)
->>>   Description: fast lossless compression algorithm -- development files
->>=20
->> I don't undertsand now.
->>=20
->> ZSTD_EndDirective was included in 1.3.0.
->>=20
->> I can just change that for 1.3.9, but I don't know why is that there.
->> Could you do a grep ZSTD_EndDirective /usr/lib/zstd.h?
->
-> Thing is, they have so called experimental APIs. You get them only if
-> you define ZSTD_STATIC_LINKING_ONLY before including zstd.h. So the
-> plain grep of a symbol tells us nothing. We need to check if it's not in
-> #ifdef. Looks like 1.3.9 is the minimal version which has everything we
-> want.
+Workaround: add "-vga none" to the qemu command line.
 
-So easy!!!!!
+-- =
 
-I was arriving to that conclusion after brute force.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1743191
 
-Later, Juan.
+Title:
+  Interacting with NetBSD serial console boot blocks no longer works
 
+Status in QEMU:
+  New
+
+Bug description:
+  The NetBSD boot blocks display a menu allowing the user to make a
+  selection using the keyboard.  For example, when booting a NetBSD
+  installation CD-ROM, the menu looks like this:
+
+           1. Install NetBSD
+           2. Install NetBSD (no ACPI)
+           3. Install NetBSD (no ACPI, no SMP)
+           4. Drop to boot prompt
+
+      Choose an option; RETURN for default; SPACE to stop countdown.
+      Option 1 will be chosen in 30 seconds.
+
+  When booting NetBSD in a recent qemu using an emulated serial console,
+  making this menu selection no longer works: when you type the selected
+  number, the keyboard input is ignored, and the 30-second countdown
+  continues.  In older versions of qemu, it works.
+
+  To reproduce the problem, run:
+
+     wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-7.1.1/amd64/installation/=
+cdrom/boot-com.iso
+     qemu-system-x86_64 -nographic -cdrom boot-com.iso
+
+  During the 30-second countdown, press 4
+
+  Expected behavior: The countdown stops and you get a ">" prompt
+
+  Incorrect behavior: The countdown continues
+
+  There may also be some corruption of the terminal output; for example,
+  "Option 1 will be chosen in 30 seconds" may be displayed as "Option 1
+  will be chosen in p0 seconds".
+
+  Using bisection, I have determined that the problem appeared with qemu
+  commit 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787, in which seabios was
+  updated to 1.11 prerelease, and the problem is still there as of
+  commit 7398166ddf7c6dbbc9cae6ac69bb2feda14b40ac.  The host operating
+  system used for the tests was Debian 9 x86_64.
+
+  Credit for discovering this bug goes to Paul Goyette.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1743191/+subscriptions
 
