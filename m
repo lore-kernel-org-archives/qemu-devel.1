@@ -2,92 +2,160 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26616C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4E2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0C3E20675
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:34:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAAA62067C
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ehNTCMlb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C3E20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g85BHdIK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAAA62067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAHo7-0002XI-WC
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 13:34:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42815)
+	id 1jAHou-0003hi-5H
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 13:35:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43964)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
- id 1jAHlY-0008Ei-RI
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:32:10 -0500
+ (envelope-from <jsnow@redhat.com>) id 1jAHns-0002Or-6m
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:34:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
- id 1jAHlV-0003TC-Hv
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:32:08 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:47157)
+ (envelope-from <jsnow@redhat.com>) id 1jAHnq-0006uk-Ed
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:34:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24353
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
- id 1jAHlU-0003KV-3b; Fri, 06 Mar 2020 13:32:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1583519530; x=1615055530;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=1JeTRPvUN2oTLk94mGKUmLQehnYPanz9NfGRjax3WoI=;
- b=ehNTCMlbAvCqn0lEOzUyJqlg9MBvn8EW2ILcRpAyARzur+YDSudCavKw
- 4TotekGMn72D6XW4rQPs718VE6cHYwIVfuidIKMP4WXinL1hrTHXGBeCN
- O1kewx6c+syB196PgHXKqesisR3aDTJCau9PKPcWq2HJceWUnWj48YjX7
- XzhZCVkDHMjvXeUgvhCZpMMr8GGspxoYc3nxwcX6qArRqMErZAsSb5Lwq
- kZ47YB+O9vatJeb5/3kPLryHdRFXmhyoHMGylb61j1Cjo/WdIvIiZZgyt
- +ZQJ28jraa3D21BMGa9wFDl+BQHtUkJtyIwFEZ+Qf1gDz4I4nGovAVO9n w==;
-IronPort-SDR: RHCB5OB/brG715H467zo86Pc+BRJin8q+TEITekcXlMY8GebteuTRRrn773/YdxjbzzhjurhYR
- nqi6otKIW+WzJWS6uhT7YhYssPsZ6eWI6qLX0qMOlJrSxNUynnf5GOPwcP7bxGshHerr8p0EXZ
- K/k/ZF1/fHWjvAUD3nRHt84M84XYrKjAxu46eQdCPzoyDi4f6rrPNwja0/OKOMhpFBc8cMzS4X
- ZWNlfPK6OrWrOQl4NIDCy2tOKhU9w0NWaZQFfQIpPM0esLIKByoAfXuyR3w3dR9Hs67dGw8qSj
- 0Uo=
-X-IronPort-AV: E=Sophos;i="5.70,523,1574092800"; d="scan'208";a="233755482"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2020 02:31:42 +0800
-IronPort-SDR: LpiPJQywcJ8OBwIYqxwsHblSqHw/3DpC5HRW0tVYVduYbf86ZswiGvB+Ci24vUKAqcNjASQvU+
- MyKspaFe0eiXr7KDhxRk9dG3cuIlclwyRDUm1rzxAmGaFS5Vw9xW5ygvT//SWDsF2/bscJNfLX
- 0SfGVYnT5kN/C5Av5RbkXtgjSpUzIC5jHS952+f/8hFQFcQ1SJYKFodkDgh+vXiu5zukB23SxR
- ISaL2XNiw8xnEqE59lG9qdKMI8pYrvjAiCXJ4tM2oQ8DLycO5I8AZ5BYCmnvWPDZNgZjF+JS5y
- +rHpRGdUVK7eSDUvW+WW1ady
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 06 Mar 2020 10:23:50 -0800
-IronPort-SDR: a0dH2Q1dRwYQjeRjE08ZsJSSVyig2nBK6mXpxSyWy9iaUEo43NopNbyIpyDKPznGd0FDQ6VvYq
- WvqP84idCuZvLtIyhBp48p1Kf+bRJLE2Pgb4BHeeRUITHtfwY0eeDcVgALTOQEvwc1+GB5su2N
- 7xzdt2/pVgk8vMxA+/JXfSbQU4C/v4YI7hMVildA+AggEavhhwmFSafJ14faAlcQUd3bchb0Ip
- KJTB3vHcjppccHwZTUnlaVQUhWcbdaRnGq9enAzt3z3of6smQdRqvvJg+arRQB7LwYRA+8iA5B
- BvQ=
-WDCIronportException: Internal
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip02.wdc.com with ESMTP; 06 Mar 2020 10:31:40 -0800
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org, qemu-riscv@nongnu.org, aleksandar.m.mail@gmail.com,
- laurent@vivier.eu
-Subject: [PATCH v6 1/4] linux-user: Protect more syscalls
-Date: Fri,  6 Mar 2020 10:24:22 -0800
-Message-Id: <a933ba620f7a471fe04aa9d2a929bad280d008cb.1583518447.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1583518447.git.alistair.francis@wdc.com>
-References: <cover.1583518447.git.alistair.francis@wdc.com>
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jAHnq-0006tr-9M
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:34:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583519669;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=BfwwFmbejcrgVH/lJHQplE3tlfvLzUnUA7qeySx87FI=;
+ b=g85BHdIKaDrrq+Cd9nZwbxzcv1T3y5AGqUA56ad63JE4BM9Q6XyuXptpfpbDFBK2c6ppjg
+ 0V6HVT8vkhcAWavGxoFPh5QFSMwCyJI9gdaoolw/8IQkBdX0Bo2ez14TvKjP4/TUcMqiqw
+ OwS5R66+gBRiXECWA8Z6fLAOZCdWcV8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-7q8Z4s6dMqqJzyBtmJQajA-1; Fri, 06 Mar 2020 13:34:26 -0500
+X-MC-Unique: 7q8Z4s6dMqqJzyBtmJQajA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26DA9800D50;
+ Fri,  6 Mar 2020 18:34:25 +0000 (UTC)
+Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7890A91D94;
+ Fri,  6 Mar 2020 18:34:23 +0000 (UTC)
+Subject: Re: [PATCH v7 06/10] iotests: limit line length to 79 chars
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200304213818.15341-1-jsnow@redhat.com>
+ <20200304213818.15341-7-jsnow@redhat.com>
+ <a23da70f-a46f-acc8-18b4-c1b2e5cea60c@redhat.com>
+ <c57333a3-baf3-cc00-7f99-6fce2de91a7f@redhat.com>
+ <20200305115548.GA5363@linux.fritz.box>
+ <d9500e3c-48d4-8ab2-51c7-9a914dd8ec49@redhat.com>
+ <20200306101425.GC7240@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ed00ca8a-f6bf-71b8-dcd3-dbd0902e9306@redhat.com>
+Date: Fri, 6 Mar 2020 13:34:22 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.143.124
+In-Reply-To: <20200306101425.GC7240@linux.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,391 +167,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
+Cc: qemu-block@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New y2038 safe 32-bit architectures (like RISC-V) don't support old
-syscalls with a 32-bit time_t. The kernel defines new *_time64 versions
-of these syscalls. Add some more #ifdefs to syscall.c in linux-user to
-allow us to compile without these old syscalls.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- linux-user/strace.c  |  2 ++
- linux-user/syscall.c | 68 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 69 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 4f7130b2ff..6420ccd97b 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -775,6 +775,7 @@ print_syscall_ret_newselect(const struct syscallname *name, abi_long ret)
- #define TARGET_TIME_OOP      3   /* leap second in progress */
- #define TARGET_TIME_WAIT     4   /* leap second has occurred */
- #define TARGET_TIME_ERROR    5   /* clock not synchronized */
-+#ifdef TARGET_NR_adjtimex
- static void
- print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
- {
-@@ -813,6 +814,7 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
- 
-     qemu_log("\n");
- }
-+#endif
- 
- UNUSED static struct flags access_flags[] = {
-     FLAG_GENERIC(F_OK),
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8d27d10807..1a7df23440 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -742,21 +742,30 @@ safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
- safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
- safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
-               int, flags, mode_t, mode)
-+#if defined(TARGET_NR_wait4) || defined(TARGET_NR_waitpid)
- safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
-               struct rusage *, rusage)
-+#endif
- safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
-               int, options, struct rusage *, rusage)
- safe_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
-+#if defined(TARGET_NR_select) || defined(TARGET_NR__newselect) || \
-+    defined(TARGET_NR_pselect6)
- safe_syscall6(int, pselect6, int, nfds, fd_set *, readfds, fd_set *, writefds, \
-               fd_set *, exceptfds, struct timespec *, timeout, void *, sig)
-+#endif
-+#if defined(TARGET_NR_ppoll) || defined(TARGET_NR_poll)
- safe_syscall5(int, ppoll, struct pollfd *, ufds, unsigned int, nfds,
-               struct timespec *, tsp, const sigset_t *, sigmask,
-               size_t, sigsetsize)
-+#endif
- safe_syscall6(int, epoll_pwait, int, epfd, struct epoll_event *, events,
-               int, maxevents, int, timeout, const sigset_t *, sigmask,
-               size_t, sigsetsize)
-+#ifdef TARGET_NR_futex
- safe_syscall6(int,futex,int *,uaddr,int,op,int,val, \
-               const struct timespec *,timeout,int *,uaddr2,int,val3)
-+#endif
- safe_syscall2(int, rt_sigsuspend, sigset_t *, newset, size_t, sigsetsize)
- safe_syscall2(int, kill, pid_t, pid, int, sig)
- safe_syscall2(int, tkill, int, tid, int, sig)
-@@ -776,12 +785,16 @@ safe_syscall6(ssize_t, recvfrom, int, fd, void *, buf, size_t, len,
- safe_syscall3(ssize_t, sendmsg, int, fd, const struct msghdr *, msg, int, flags)
- safe_syscall3(ssize_t, recvmsg, int, fd, struct msghdr *, msg, int, flags)
- safe_syscall2(int, flock, int, fd, int, operation)
-+#ifdef TARGET_NR_rt_sigtimedwait
- safe_syscall4(int, rt_sigtimedwait, const sigset_t *, these, siginfo_t *, uinfo,
-               const struct timespec *, uts, size_t, sigsetsize)
-+#endif
- safe_syscall4(int, accept4, int, fd, struct sockaddr *, addr, socklen_t *, len,
-               int, flags)
-+#if defined(TARGET_NR_nanosleep)
- safe_syscall2(int, nanosleep, const struct timespec *, req,
-               struct timespec *, rem)
-+#endif
- #ifdef TARGET_NR_clock_nanosleep
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
-@@ -803,10 +816,14 @@ safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-               unsigned, nsops, const struct timespec *, timeout)
- #endif
- #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
-+# ifdef TARGET_NR_mq_timedsend
- safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
-               size_t, len, unsigned, prio, const struct timespec *, timeout)
-+# endif
-+# ifdef TARGET_NR_mq_timedreceive
- safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
-               size_t, len, unsigned *, prio, const struct timespec *, timeout)
-+# endif
- #endif
- /* We do ioctl like this rather than via safe_syscall3 to preserve the
-  * "third argument might be integer or pointer or not present" behaviour of
-@@ -946,6 +963,8 @@ abi_long do_brk(abi_ulong new_brk)
-     return target_brk;
- }
- 
-+#if defined(TARGET_NR_select) || defined(TARGET_NR__newselect) || \
-+    defined(TARGET_NR_pselect6)
- static inline abi_long copy_from_user_fdset(fd_set *fds,
-                                             abi_ulong target_fds_addr,
-                                             int n)
-@@ -1021,6 +1040,7 @@ static inline abi_long copy_to_user_fdset(abi_ulong target_fds_addr,
- 
-     return 0;
- }
-+#endif
- 
- #if defined(__alpha__)
- #define HOST_HZ 1024
-@@ -1067,6 +1087,7 @@ static inline abi_long host_to_target_rusage(abi_ulong target_addr,
-     return 0;
- }
- 
-+#ifdef TARGET_NR_setrlimit
- static inline rlim_t target_to_host_rlim(abi_ulong target_rlim)
- {
-     abi_ulong target_rlim_swap;
-@@ -1082,7 +1103,9 @@ static inline rlim_t target_to_host_rlim(abi_ulong target_rlim)
-     
-     return result;
- }
-+#endif
- 
-+#if defined(TARGET_NR_getrlimit) || defined(TARGET_NR_ugetrlimit)
- static inline abi_ulong host_to_target_rlim(rlim_t rlim)
- {
-     abi_ulong target_rlim_swap;
-@@ -1096,6 +1119,7 @@ static inline abi_ulong host_to_target_rlim(rlim_t rlim)
-     
-     return result;
- }
-+#endif
- 
- static inline int target_to_host_resource(int code)
- {
-@@ -1186,6 +1210,12 @@ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
-     return 0;
- }
- 
-+#if defined(TARGET_NR_futex) || \
-+    defined(TARGET_NR_rt_sigtimedwait) || \
-+    defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6) || \
-+    defined(TARGET_NR_nanosleep) || defined(TARGET_NR_clock_settime) || \
-+    defined(TARGET_NR_utimensat) || defined(TARGET_NR_mq_timedsend) || \
-+    defined(TARGET_NR_mq_timedreceive)
- static inline abi_long target_to_host_timespec(struct timespec *host_ts,
-                                                abi_ulong target_addr)
- {
-@@ -1199,6 +1229,7 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
-     unlock_user_struct(target_ts, target_addr, 0);
-     return 0;
- }
-+#endif
- 
- static inline abi_long host_to_target_timespec(abi_ulong target_addr,
-                                                struct timespec *host_ts)
-@@ -1228,6 +1259,7 @@ static inline abi_long host_to_target_timespec64(abi_ulong target_addr,
-     return 0;
- }
- 
-+#if defined(TARGET_NR_settimeofday)
- static inline abi_long copy_from_user_timezone(struct timezone *tz,
-                                                abi_ulong target_tz_addr)
- {
-@@ -1244,6 +1276,7 @@ static inline abi_long copy_from_user_timezone(struct timezone *tz,
- 
-     return 0;
- }
-+#endif
- 
- #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
- #include <mqueue.h>
-@@ -6565,6 +6598,8 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
- }
- #endif
- 
-+#if defined(TARGET_NR_timer_settime) || \
-+    (defined(TARGET_NR_timerfd_settime) && defined(CONFIG_TIMERFD))
- static inline abi_long target_to_host_itimerspec(struct itimerspec *host_itspec,
-                                                  abi_ulong target_addr)
- {
-@@ -6584,7 +6619,11 @@ static inline abi_long target_to_host_itimerspec(struct itimerspec *host_itspec,
-     unlock_user_struct(target_itspec, target_addr, 1);
-     return 0;
- }
-+#endif
- 
-+#if ((defined(TARGET_NR_timerfd_gettime) || \
-+      defined(TARGET_NR_timerfd_settime)) && defined(CONFIG_TIMERFD)) || \
-+    defined(TARGET_NR_timer_gettime) || defined(TARGET_NR_timer_settime)
- static inline abi_long host_to_target_itimerspec(abi_ulong target_addr,
-                                                struct itimerspec *host_its)
- {
-@@ -6603,7 +6642,10 @@ static inline abi_long host_to_target_itimerspec(abi_ulong target_addr,
-     unlock_user_struct(target_itspec, target_addr, 0);
-     return 0;
- }
-+#endif
- 
-+#if defined(TARGET_NR_adjtimex) || \
-+    (defined(TARGET_NR_clock_adjtime) && defined(CONFIG_CLOCK_ADJTIME))
- static inline abi_long target_to_host_timex(struct timex *host_tx,
-                                             abi_long target_addr)
- {
-@@ -6673,7 +6715,7 @@ static inline abi_long host_to_target_timex(abi_long target_addr,
-     unlock_user_struct(target_tx, target_addr, 1);
-     return 0;
- }
--
-+#endif
- 
- static inline abi_long target_to_host_sigevent(struct sigevent *host_sevp,
-                                                abi_ulong target_addr)
-@@ -6840,6 +6882,7 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
-    futexes locally would make futexes shared between multiple processes
-    tricky.  However they're probably useless because guest atomic
-    operations won't work either.  */
-+#if defined(TARGET_NR_futex)
- static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
-                     target_ulong uaddr2, int val3)
- {
-@@ -6886,6 +6929,7 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
-         return -TARGET_ENOSYS;
-     }
- }
-+#endif
- #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
- static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
-                                      abi_long handle, abi_long mount_id,
-@@ -8494,6 +8538,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#ifdef TARGET_NR_rt_sigtimedwait
-     case TARGET_NR_rt_sigtimedwait:
-         {
-             sigset_t set;
-@@ -8530,6 +8575,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-     case TARGET_NR_rt_sigqueueinfo:
-         {
-             siginfo_t uinfo;
-@@ -8629,6 +8675,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#if defined(TARGET_NR_gettimeofday)
-     case TARGET_NR_gettimeofday:
-         {
-             struct timeval tv;
-@@ -8639,6 +8686,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-+#if defined(TARGET_NR_settimeofday)
-     case TARGET_NR_settimeofday:
-         {
-             struct timeval tv, *ptv = NULL;
-@@ -8660,6 +8709,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- 
-             return get_errno(settimeofday(ptv, ptz));
-         }
-+#endif
- #if defined(TARGET_NR_select)
-     case TARGET_NR_select:
- #if defined(TARGET_WANT_NI_OLD_SELECT)
-@@ -9131,6 +9181,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #ifdef TARGET_NR_sendmmsg
-     case TARGET_NR_sendmmsg:
-         return do_sendrecvmmsg(arg1, arg2, arg3, arg4, 1);
-+#endif
-+#ifdef TARGET_NR_recvmmsg
-     case TARGET_NR_recvmmsg:
-         return do_sendrecvmmsg(arg1, arg2, arg3, arg4, 0);
- #endif
-@@ -9305,6 +9357,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return do_syscall(cpu_env, arg1 & 0xffff, arg2, arg3, arg4, arg5,
-                           arg6, arg7, arg8, 0);
- #endif
-+#if defined(TARGET_NR_wait4)
-     case TARGET_NR_wait4:
-         {
-             int status;
-@@ -9332,6 +9385,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
- #ifdef TARGET_NR_swapoff
-     case TARGET_NR_swapoff:
-         if (!(p = lock_user_string(arg1)))
-@@ -9476,6 +9530,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return do_vm86(cpu_env, arg1, arg2);
- #endif
- #endif
-+#if defined(TARGET_NR_adjtimex)
-     case TARGET_NR_adjtimex:
-         {
-             struct timex host_buf;
-@@ -9491,6 +9546,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
- #if defined(TARGET_NR_clock_adjtime) && defined(CONFIG_CLOCK_ADJTIME)
-     case TARGET_NR_clock_adjtime:
-         {
-@@ -10007,6 +10063,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return get_errno(sched_get_priority_max(arg1));
-     case TARGET_NR_sched_get_priority_min:
-         return get_errno(sched_get_priority_min(arg1));
-+#ifdef TARGET_NR_sched_rr_get_interval
-     case TARGET_NR_sched_rr_get_interval:
-         {
-             struct timespec ts;
-@@ -10016,6 +10073,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-+#if defined(TARGET_NR_nanosleep)
-     case TARGET_NR_nanosleep:
-         {
-             struct timespec req, rem;
-@@ -10026,6 +10085,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-     case TARGET_NR_prctl:
-         switch (arg1) {
-         case PR_GET_PDEATHSIG:
-@@ -11496,8 +11556,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-         return ret;
- #endif
-+#ifdef TARGET_NR_futex
-     case TARGET_NR_futex:
-         return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
-+#endif
- #if defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)
-     case TARGET_NR_inotify_init:
-         ret = get_errno(sys_inotify_init());
-@@ -11562,6 +11624,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         unlock_user (p, arg1, 0);
-         return ret;
- 
-+#ifdef TARGET_NR_mq_timedsend
-     case TARGET_NR_mq_timedsend:
-         {
-             struct timespec ts;
-@@ -11577,7 +11640,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             unlock_user (p, arg2, arg3);
-         }
-         return ret;
-+#endif
- 
-+#ifdef TARGET_NR_mq_timedreceive
-     case TARGET_NR_mq_timedreceive:
-         {
-             struct timespec ts;
-@@ -11598,6 +11663,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 put_user_u32(prio, arg4);
-         }
-         return ret;
-+#endif
- 
-     /* Not implemented for now... */
- /*     case TARGET_NR_mq_notify: */
--- 
-2.25.1
+On 3/6/20 5:14 AM, Kevin Wolf wrote:
+> Am 05.03.2020 um 19:25 hat John Snow geschrieben:
+>> On 3/5/20 6:55 AM, Kevin Wolf wrote:
+>>> Am 05.03.2020 um 00:14 hat John Snow geschrieben:
+>>>>
+>>>>
+>>>> On 3/4/20 4:58 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>
+>>> Adding back the context:
+>>>
+>>>> -        sys.stderr.write('qemu-img received signal %i: %s\n' % (-exit=
+code, ' '.join(qemu_img_args + list(args))))
+>>>> +        sys.stderr.write('qemu-img received signal %i: %s\n' % (
+>>>> +            -exitcode, ' '.join(qemu_img_args + list(args))))
+>>>
+>>>>> Do we want to indent Python like C and align argument below opening
+>>>>> parenthesis? Except when using sys.stderr.write() you seem to do it.
+>>>>
+>>>> This isn't an argument to write, it's an argument to the format string=
+,
+>>>> so I will say "no."
+>>>
+>>> The argument to write() is an expression. This expression contains the =
+%
+>>> operator with both of its operands. It's still fully within the
+>>> parentheses of write(), so I think Philippe's question is valid.
+>>>
+>>>> For *where* I've placed the line break, this is the correct indentatio=
+n.
+>>>> emacs's python mode will settle on this indent, too.
+>>>>
+>>>> https://python.org/dev/peps/pep-0008/#indentation
+>>>
+>>> The PEP-8 examples are not nested, so it's not completely clear. I
+>>> wonder if hanging indents wouldn't actually mean the following because
+>>> if you line wrap an argument list (which contains the whole %
+>>> expression), you're supposed to have nothing else on the line of the
+>>> opening parenthesis:
+>>>
+>>>     sys.stderr.write(
+>>>         'qemu-img received signal %i: %s\n'
+>>>         % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>>>
+>>
+>> This is fine too.
+>>
+>>> But anyway, I think the question is more whether we want to use hanging
+>>> indents at all (or at least if we want to use it even in cases where th=
+e
+>>> opening parenthesis isn't already at like 70 characters) when we're
+>>> avoiding it in our C coding style.
+>>>
+>>> There's no technical answer to this, it's a question of our preferences=
+.
+>>>
+>>
+>> Maybe it is ambiguous. Long lines are just ugly everywhere.
+>>
+>>>> (If anyone quotes Guido's belittling comment in this email, I will
+>>>> become cross.)
+>>>>
+>>>>
+>>>> But there are other places to put the line break. This is also
+>>>> technically valid:
+>>>>
+>>>> sys.stderr.write('qemu-img received signal %i: %s\n'
+>>>>                  % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>>>>
+>>>> And so is this:
+>>>>
+>>>>     sys.stderr.write('qemu-img received signal %i: %s\n' %
+>>>>                      (-exitcode, ' '.join(qemu_img_args + list(args)))=
+)
+>>>
+>>> PEP-8 suggests the former, but allows both styles:
+>>>
+>>> https://www.python.org/dev/peps/pep-0008/#should-a-line-break-before-or=
+-after-a-binary-operator
+>>>
+>>
+>> So in summary:
+>>
+>> - Avoid nested hanging indents from format operators
+>> - Use a line break before the % format operator.
+>> - OPTIONALLY(?), use a hanging indent for the entire format string to
+>> reduce nesting depth.
+>=20
+> Yes, though I don't think of it as a special case for format strings. So
+> I would phrase it like this:
+>=20
+> - Don't use hanging indent for any nested parentheses unless the outer
+>   parentheses use hanging indents, too.
+> - Use a line break before binary operators.
+> - OPTIONALLY, use a hanging indent for the top level(s) to reduce
+>   nesting depth.
+>=20
+> The first one is the only rule that involves some interpretation of
+> PEP-8, the rest seems to be its unambiguous recommendation.
+>=20
+> Anyway, so I would apply the exact same rules to the following (imagine
+> even longer expressions, especially the last example doesn't make sense
+> with the short numbers):
+>=20
+> * bad:
+>     really_long_function_name(-1234567890 + 987654321 * (
+>         1337 / 42))
+>=20
+> * ok:
+>     really_long_function_name(-1234567890 + 987654321
+>                               * (1337 / 42))
+>=20
+> * ok:
+>     really_long_function_name(
+>         -1234567890 + 987654321
+>         * (1337 / 42))
+>=20
+> * ok:
+>     really_long_function_name(
+>         -1234567890 + 987654321 * (
+>             1337 / 42))
+>=20
+>> e.g., either this form:
+>> (using a line break before the binary operator and nesting to the
+>> argument level)
+>>
+>> write('hello %s'
+>>       % (world,))
+>>
+>>
+>> or optionally this form if it buys you a little more room:
+>> (using a hanging indent of 4 spaces and nesting arguments at that level)
+>>
+>> write(
+>>     'hello %s'
+>>     % ('world',))
+>>
+>>
+>> but not ever this form:
+>> (Using a hanging indent of 4 spaces from the opening paren of the format
+>> operand)
+>>
+>> write('hello %s' % (
+>>     'world',))
+>>
+>>
+>>
+>> yea/nea?
+>>
+>> (Kevin, Philippe, Markus, Max)
+>=20
+> Looks good to me.
+>=20
+> Kevin
+>=20
+
+Great, thanks!
+
+I am sorry for having been so tetchy. I appreciate the reviews.
+
+--js
 
 
