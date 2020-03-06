@@ -2,72 +2,88 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD24C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 00:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318AFC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 00:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D812220717
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 00:22:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D812220717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 0604120717
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 00:23:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0604120717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA0l4-0007rY-3w
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 19:22:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52871)
+	id 1jA0lp-00013X-6r
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 19:23:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jA0k5-0007Lk-Qc
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 19:21:30 -0500
+ (envelope-from <leonardo@linux.ibm.com>) id 1jA0l3-0008Ew-W7
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 19:22:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jA0k4-0004yH-Hf
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 19:21:29 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:16019)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jA0jx-0004iN-Gc; Thu, 05 Mar 2020 19:21:25 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 01DF874637E;
- Fri,  6 Mar 2020 01:21:19 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id CD01574637C; Fri,  6 Mar 2020 01:21:18 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id CB0E574569F;
- Fri,  6 Mar 2020 01:21:18 +0100 (CET)
-Date: Fri, 6 Mar 2020 01:21:18 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-In-Reply-To: <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
- <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
- <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
- <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
- <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
- <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <leonardo@linux.ibm.com>) id 1jA0l2-0006Es-RI
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 19:22:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61292)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <leonardo@linux.ibm.com>)
+ id 1jA0kz-00067c-HS; Thu, 05 Mar 2020 19:22:26 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0260K25K044563; Thu, 5 Mar 2020 19:22:18 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yk4jpe5up-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 05 Mar 2020 19:22:17 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0260FD2h019951;
+ Fri, 6 Mar 2020 00:22:16 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03wdc.us.ibm.com with ESMTP id 2yffk7f8eh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 06 Mar 2020 00:22:16 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0260MDQY56426904
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 6 Mar 2020 00:22:13 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A05827805E;
+ Fri,  6 Mar 2020 00:22:13 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6ABCE7805C;
+ Fri,  6 Mar 2020 00:22:12 +0000 (GMT)
+Received: from LeoBras.aus.stglabs.ibm.com (unknown [9.18.235.147])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri,  6 Mar 2020 00:22:12 +0000 (GMT)
+From: Leonardo Bras <leonardo@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>, bharata.rao@in.ibm.com
+Subject: [RFC PATCH 1/1] ppc/spapr: Add hotplugged flag on DIMM LMBs on
+ drmem_v2
+Date: Thu,  5 Mar 2020 21:22:02 -0300
+Message-Id: <20200306002202.176732-1-leonardo@linux.ibm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-05_08:2020-03-05,
+ 2020-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 mlxlogscore=999
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 mlxscore=0
+ impostorscore=0 clxscore=1011 spamscore=0 suspectscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003060000
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,107 +95,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Leonardo Bras <leonardo@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Mar 2020, BALATON Zoltan wrote:
-> On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
->> On 04/03/2020 22:33, BALATON Zoltan wrote:
->> another possibility: PCI configuration space register 0x3d (Interrupt pin) 
->> is
->> documented as having value 0 == Legacy IRQ routing which should be the 
->> initial value
->> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ 
->> routing.
->
-> The VT8231 docs say this should always read 1 but may be this is somehow set 
-> to 0 on the Pegasos2. What does that mean? Should we use this value instead 
-> of the feature bit to force using legacy interrupts? We'd still need a 
-> property in via-ide to set this reg or is it possible to set it from board 
-> code overriding the default after device is created? That would allow to drop 
-> patch 1. I can try this.
+On reboot, all memory that was previously added using object_add and
+device_add is placed in this DIMM area.
 
-This seemed like it could simplify patches a bit but it does not work. 
-Setting this reg to 0 breaks Linux and MorphOS which then think the device 
-does not have an interrupt at all and fail as before waiting for the irq. 
-So we still need the feature bit, cant use this reg to force legacy 
-interrupts. I've spent considerable time testing different OSes before 
-I've ended up with this patch series I've submitted and I could not find a 
-simpler way that works with everything.
+The new SPAPR_LMB_FLAGS_HOTPLUGGED flag helps Linux to put this memory in
+the correct memory zone, so no unmovable allocations are made there,
+allowing the object to be easily hot-removed by device_del and
+object_del.
 
-Regards,
-BALATON Zoltan
+Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
 
->> In your previous email you included a trace of the PCI configuration 
->> accesses to the
->> via-ide device. Can you try this again with the following diff and post the 
->> same
->> output once again?
->> 
->> diff --git a/hw/ide/via.c b/hw/ide/via.c
->> index 096de8dba0..db9f4af861 100644
->> --- a/hw/ide/via.c
->> +++ b/hw/ide/via.c
->> @@ -139,7 +139,7 @@ static void via_ide_reset(DeviceState *dev)
->>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_2, 0x00000170);
->>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_3, 0x00000374);
->>     pci_set_long(pci_conf + PCI_BASE_ADDRESS_4, 0x0000cc01); /* BMIBA: 
->> 20-23h */
->> -    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000010e);
->> +    pci_set_long(pci_conf + PCI_INTERRUPT_LINE, 0x0000000e);
->>
->>     /* IDE chip enable, IDE configuration 1/2, IDE FIFO Configuration*/
->>     pci_set_long(pci_conf + 0x40, 0x0a090600);
->
-> This does not change much:
->
-> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
-> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
-> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
-> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
-> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
-> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
-> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
-> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
-> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
-> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
-> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
-> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
-> pci_cfg_read via-ide 12:1 @0xc -> 0x0
-> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
-> pci_cfg_read via-ide 12:1 @0x3c -> 0xe
-> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
-> pci_cfg_read via-ide 12:1 @0x3c -> 0xe
-> pci_cfg_write via-ide 12:1 @0x3c <- 0x9
->
-> compared to
->
->> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
->> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
->> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
->> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
->> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
->> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
->> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
->> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
->> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
->> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
->> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
->> pci_cfg_read via-ide 12:1 @0xc -> 0x0
->> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
->> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
->> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
->> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
->
-> firmware does not seem to care about this value.
->
-> Regards,
-> BALATON Zoltan
->
+---
+The new flag was already proposed on Power Architecture documentation,
+and it's waiting for approval.
+
+I would like to get your comments on this change, but it's still not
+ready for being merged.
+
+Matching Linux change is here:
+http://patchwork.ozlabs.org/patch/1249917/
+---
+ hw/ppc/spapr.c         | 3 ++-
+ include/hw/ppc/spapr.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index cc10798be4..01611b7953 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -699,7 +699,8 @@ static int spapr_populate_drmem_v2(SpaprMachineState *spapr, void *fdt,
+         g_assert(drc);
+         elem = spapr_get_drconf_cell(size / lmb_size, addr,
+                                      spapr_drc_index(drc), node,
+-                                     SPAPR_LMB_FLAGS_ASSIGNED);
++                                     (SPAPR_LMB_FLAGS_ASSIGNED |
++                                      SPAPR_LMB_FLAGS_HOTPLUGGED);
+         QSIMPLEQ_INSERT_TAIL(&drconf_queue, elem, entry);
+         nr_entries++;
+         cur_addr = addr + size;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 09110961a5..64a138d4d4 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -870,6 +870,7 @@ int spapr_rtc_import_offset(SpaprRtcState *rtc, int64_t legacy_offset);
+ #define SPAPR_LMB_FLAGS_ASSIGNED 0x00000008
+ #define SPAPR_LMB_FLAGS_DRC_INVALID 0x00000020
+ #define SPAPR_LMB_FLAGS_RESERVED 0x00000080
++#define SPAPR_LMB_FLAGS_HOTPLUGGED 0x00000100
+ 
+ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
+ 
+-- 
+2.24.1
+
 
