@@ -6,66 +6,64 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B4BC10F25
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFA8C10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:36:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B371206D5
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:33:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B371206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 32CF22084E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:36:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32CF22084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAD6Y-0000C2-AB
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:33:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58494)
+	id 1jAD9C-0001Gr-CB
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:36:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jAD3q-0006OX-VL
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:30:44 -0500
+ (envelope-from <bounces@canonical.com>) id 1jAD8d-0000rN-4i
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jAD3p-0003QW-Gn
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:30:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51294)
+ (envelope-from <bounces@canonical.com>) id 1jAD8b-0006o6-JL
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:35:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52530)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jAD3p-0003Hr-Ap
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:30:41 -0500
+ id 1jAD8b-0006YG-Cj
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:35:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jAD3o-0006q7-2n
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 13:30:40 +0000
+ id 1jAD8Z-0007fS-OV
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 13:35:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 11F222E80C0
- for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 13:30:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 93CF12E80CC
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 13:35:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Mar 2020 13:24:54 -0000
-From: Gerd Hoffmann <1743191@bugs.launchpad.net>
+Date: Fri, 06 Mar 2020 13:27:02 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: regression
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gson kraxel-redhat ottaviocr philmd stefanha
-X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <151591854188.4596.10964938100242408667.malonedeb@wampee.canonical.com>
-Message-Id: <158350109449.12121.2672684123892693893.malone@soybean.canonical.com>
-Subject: [Bug 1743191] Re: Interacting with NetBSD serial console boot blocks
- no longer works
+X-Launchpad-Bug-Commenters: ajbennee kraxel-redhat yifanlu
+X-Launchpad-Bug-Reporter: Yifan (yifanlu)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <158154403075.14879.10753031266357045514.malonedeb@soybean.canonical.com>
+Message-Id: <158350122239.7008.6769954600414271713.malone@chaenomeles.canonical.com>
+Subject: [Bug 1863023] Re: Deadlock in QXL
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8623b79506b53eb1c4c0887eb69a91da300fd418
+X-Launchpad-Hash: 3ebda4d2562bdbb45834bfa89a2c65940a2c2dfe
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,81 +76,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1743191 <1743191@bugs.launchpad.net>
+Reply-To: Bug 1863023 <1863023@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ah, it's a special serial console boot iso.  I was trying the normal
-NetBSD-<version>-amd64.iso.
-
-So, it seems seabios sercon and bootloader are fighting over the serial
-line.
-
-seabios enables sercon for no-graphical guests ("-machine graphics=3Doff",
-"-nographics" enables this too).
-
-So one option is to turn off seabios sercon: "qemu -nographic -machine
-graphics=3Don".
-
-The other option is to turn on seabios sercon and use the normal
-boot.iso (this needs the "-vga none" workaround from comment 3, or the
-sercon patch).
+I can't see where the do_run_on_cpu is called in memory.c at 4.2. Is it
+reproducible on the latest state of master.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1743191
+https://bugs.launchpad.net/bugs/1863023
 
 Title:
-  Interacting with NetBSD serial console boot blocks no longer works
+  Deadlock in QXL
 
 Status in QEMU:
   New
 
 Bug description:
-  The NetBSD boot blocks display a menu allowing the user to make a
-  selection using the keyboard.  For example, when booting a NetBSD
-  installation CD-ROM, the menu looks like this:
+  This is on qemu 4.2.0 OSX host, running fresh Windows 7 with SPICE
+  guest tools just installed.
 
-           1. Install NetBSD
-           2. Install NetBSD (no ACPI)
-           3. Install NetBSD (no ACPI, no SMP)
-           4. Drop to boot prompt
+  Command line: `qemu-system-x86_64 -qmp
+  tcp:localhost:4444,server,nowait -smp cpus=3D2 -boot order=3Dd -m 2048
+  -soundhw hda -drive file=3Dhda.img,if=3Dide,media=3Ddisk -spice
+  port=3D5930,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
+  ,playback-compression=3Doff,streaming-video=3Doff -vga qxl -device
+  rtl8139,netdev=3Dnet0 -netdev user,id=3Dnet0`
 
-      Choose an option; RETURN for default; SPACE to stop countdown.
-      Option 1 will be chosen in 30 seconds.
+  After the Windows logo, the screen is black. I dump the two vCPU
+  threads:
 
-  When booting NetBSD in a recent qemu using an emulated serial console,
-  making this menu selection no longer works: when you type the selected
-  number, the keyboard input is ignored, and the 30-second countdown
-  continues.  In older versions of qemu, it works.
+  ```
+  * thread #16
+    * frame #0: 0x00007fff523b8ce6 libsystem_kernel.dylib`__psynch_cvwait +=
+ 10
+      frame #1: 0x00007fff52467185 libsystem_pthread.dylib`_pthread_cond_wa=
+it + 701
+      frame #2: 0x0000000110bf88bd qemu-system-x86_64`qemu_cond_wait_impl(c=
+ond=3D0x000000011121e8d0, mutex=3D0x000000011120ba48, file=3D"cpus-common.c=
+", line=3D144) at qemu-thread-posix.c:173:11 [opt]
+      frame #3: 0x0000000110926a59 qemu-system-x86_64`do_run_on_cpu(cpu=3D<=
+unavailable>, func=3D<unavailable>, data=3D<unavailable>, mutex=3D0x0000000=
+11120ba48) at cpus-common.c:144:9 [opt]
+      frame #4: 0x000000011080c50a qemu-system-x86_64`memory_region_snapsho=
+t_and_clear_dirty at memory.c:2595:5 [opt]
+      frame #5: 0x000000011080c4d7 qemu-system-x86_64`memory_region_snapsho=
+t_and_clear_dirty(mr=3D<unavailable>, addr=3D0, size=3D2359296, client=3D<u=
+navailable>) at memory.c:2107 [opt]
+      frame #6: 0x0000000110849fe1 qemu-system-x86_64`vga_update_display [i=
+nlined] vga_draw_graphic(s=3D<unavailable>, full_update=3D0) at vga.c:1661:=
+16 [opt]
+      frame #7: 0x000000011084996a qemu-system-x86_64`vga_update_display(op=
+aque=3D<unavailable>) at vga.c:1785 [opt]
+      frame #8: 0x00000001109b261d qemu-system-x86_64`qxl_hard_reset(d=3D0x=
+00007f84f8730000, loadvm=3D0) at qxl.c:1285:5 [opt]
+      frame #9: 0x000000011080ac97 qemu-system-x86_64`memory_region_write_a=
+ccessor(mr=3D0x00007f84f8741fb0, addr=3D5, value=3D<unavailable>, size=3D1,=
+ shift=3D<unavailable>, mask=3D<unavailable>, attrs=3DMemTxAttrs @ 0x000070=
+000786d890) at memory.c:483:5 [opt]
+      frame #10: 0x000000011080ab31 qemu-system-x86_64`memory_region_dispat=
+ch_write [inlined] access_with_adjusted_size(addr=3D<unavailable>, value=3D=
+0x00000000015c6100, size=3D<unavailable>, access_size_min=3D<unavailable>, =
+access_size_max=3D<unavailable>, access_fn=3D<unavailable>, mr=3D<unavailab=
+le>, attrs=3D<unavailable>) at memory.c:544:18 [opt]
+      frame #11: 0x000000011080aafd qemu-system-x86_64`memory_region_dispat=
+ch_write(mr=3D<unavailable>, addr=3D<unavailable>, data=3D22831360, op=3D32=
+644, attrs=3DMemTxAttrs @ 0x000070000786d8c0) at memory.c:1475 [opt]
+      frame #12: 0x00000001107b080d qemu-system-x86_64`address_space_stb(as=
+=3D<unavailable>, addr=3D<unavailable>, val=3D22831360, attrs=3DMemTxAttrs =
+@ r12, result=3D0x0000000000000000) at memory_ldst.inc.c:378:13 [opt]
+      frame #13: 0x0000000118570230
 
-  To reproduce the problem, run:
+  * thread #18
+    * frame #0: 0x00007fff523b8ce6 libsystem_kernel.dylib`__psynch_cvwait +=
+ 10
+      frame #1: 0x00007fff52467185 libsystem_pthread.dylib`_pthread_cond_wa=
+it + 701
+      frame #2: 0x0000000110bf88bd qemu-system-x86_64`qemu_cond_wait_impl(c=
+ond=3D0x000000011121e860, mutex=3D0x000000011121e818, file=3D"cpus-common.c=
+", line=3D196) at qemu-thread-posix.c:173:11 [opt]
+      frame #3: 0x0000000110926c44 qemu-system-x86_64`start_exclusive at cp=
+us-common.c:196:9 [opt]
+      frame #4: 0x0000000110837c35 qemu-system-x86_64`cpu_exec_step_atomic(=
+cpu=3D0x00007f8518290000) at cpu-exec.c:265:9 [opt]
+      frame #5: 0x00000001107fcf95 qemu-system-x86_64`qemu_tcg_cpu_thread_f=
+n(arg=3D0x00007f8518290000) at cpus.c:1799:17 [opt]
+      frame #6: 0x0000000110bf911e qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:519:9 [opt]
+      frame #7: 0x00007fff52466e65 libsystem_pthread.dylib`_pthread_start +=
+ 148
+      frame #8: 0x00007fff5246283b libsystem_pthread.dylib`thread_start + 15
+  ```
 
-     wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-7.1.1/amd64/installation/=
-cdrom/boot-com.iso
-     qemu-system-x86_64 -nographic -cdrom boot-com.iso
-
-  During the 30-second countdown, press 4
-
-  Expected behavior: The countdown stops and you get a ">" prompt
-
-  Incorrect behavior: The countdown continues
-
-  There may also be some corruption of the terminal output; for example,
-  "Option 1 will be chosen in 30 seconds" may be displayed as "Option 1
-  will be chosen in p0 seconds".
-
-  Using bisection, I have determined that the problem appeared with qemu
-  commit 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787, in which seabios was
-  updated to 1.11 prerelease, and the problem is still there as of
-  commit 7398166ddf7c6dbbc9cae6ac69bb2feda14b40ac.  The host operating
-  system used for the tests was Debian 9 x86_64.
-
-  Credit for discovering this bug goes to Paul Goyette.
+  Seems like thread #16 had a STB to QXL MMIO registers which caused it
+  to call `qxl_hard_reset` and eventually made its way to
+  `do_run_on_cpu` which waits for `qemu_work_cond`. The only way
+  `qemu_work_cond` is set is if one of the two vCPU executes the queued
+  work at the end of the TCG execution. Thread #16 is stuck waiting, so
+  what about thread #18? Thread #18 is waiting for `exclusive_cond`
+  which is set once all the other CPUs are done running (but thread #16
+  is waiting still). So classic deadlock.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1743191/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1863023/+subscriptions
 
