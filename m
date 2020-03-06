@@ -2,84 +2,82 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32EB1C10F25
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2247FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:50:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0280C2073D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE56E20866
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cXz8NvjQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0280C2073D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRV0EFUJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE56E20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA8eM-00058z-5B
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:48:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55873)
+	id 1jA8h5-0006d4-W8
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:50:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jA8db-0004Qi-Cw
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:47:20 -0500
+ (envelope-from <mprivozn@redhat.com>) id 1jA8gJ-0005qb-In
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:50:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jA8dZ-0008Ki-RY
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:47:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43446
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mprivozn@redhat.com>) id 1jA8gI-00020i-7g
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:50:07 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40337
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jA8dU-0008Dd-OY
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:47:13 -0500
+ (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1jA8gI-0001w7-3T
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:50:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583484432;
+ s=mimecast20190719; t=1583484605;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sq19uiYcnGylfdNqIKtaPqUrfK1PWX84fJ9AJQFeyjo=;
- b=cXz8NvjQ/rGVn38bIbJtOLRENigCgk1/XbwdqXvaTT4wdvk4huvCgBUQ3eff6KowZc46aR
- OKpYGMy5vkBrPdBULUaFGYGHiC0tV09/i2h8+492Wmr5mNSw0V1mHIFi7TRmQZQZIrnLlA
- QyPkrG1CnCI1gy3//FQBinLlUW+BsB4=
+ bh=JAlr59J7wONsILeUjB8F1sjGwaXVlSm4K8ZCjsOmptY=;
+ b=dRV0EFUJ0L/GIdQaxHIbtbn8EEUXcqLpPp0H6RYIfNQl323bn1TO4PC376uefz8nhAjiC2
+ DiKqmOFBI/wBr033N7ZvVBdWRwKc7yrDUfh6poHilO/yXwdppLOoZGJax+FzEvVyajK+ZS
+ aap63D7VvqaXdQh1P9UgV91RdkLJ0wk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-Rra_508PPTmzmoVbi6CsZQ-1; Fri, 06 Mar 2020 03:47:08 -0500
-X-MC-Unique: Rra_508PPTmzmoVbi6CsZQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-318-sB2tFOZ4PKuG2ivL4qYzpw-1; Fri, 06 Mar 2020 03:50:03 -0500
+X-MC-Unique: sB2tFOZ4PKuG2ivL4qYzpw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34389107ACCA;
- Fri,  6 Mar 2020 08:47:06 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 267F75DA76;
- Fri,  6 Mar 2020 08:47:01 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 09/14] arm/arm64: ITS: Device and
- collection Initialization
-To: Andrew Jones <drjones@redhat.com>
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-10-eric.auger@redhat.com>
- <20200207125140.656ctxlmk3d4au7g@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <4d7f5611-e8e1-c143-1f2b-074222fda4c4@redhat.com>
-Date: Fri, 6 Mar 2020 09:47:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACE0D107ACCA;
+ Fri,  6 Mar 2020 08:50:02 +0000 (UTC)
+Received: from [10.40.205.44] (ovpn-205-44.brq.redhat.com [10.40.205.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80EC31001902;
+ Fri,  6 Mar 2020 08:50:01 +0000 (UTC)
+Subject: Re: [PATCH] configure: Improve zstd test
+To: quintela@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200305103427.157658-1-quintela@redhat.com>
+ <87imji6eio.fsf@linaro.org> <87h7z2g6te.fsf@secure.laptop>
+From: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+Message-ID: <5b2ff215-ef9c-2981-5467-b79ad7af7a34@redhat.com>
+Date: Fri, 6 Mar 2020 09:49:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200207125140.656ctxlmk3d4au7g@kamzik.brq.redhat.com>
+In-Reply-To: <87h7z2g6te.fsf@secure.laptop>
+Content-Language: sk-SK
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,170 +89,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
+On 5. 3. 2020 16:27, Juan Quintela wrote:
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>> Juan Quintela <quintela@redhat.com> writes:
+>>
+>>> There were one error on the test (missing an s for --exists).
+>>> But we really need a recent zstd (0.8.1).
+>>> That version was released in 2016, so it is newer that some of our trav=
+is
+>>> images.  Just check for the version that we need.
+>>>
+>>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>>> Reported-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  configure | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 7b373bc0bb..1bf48df1ef 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -2464,7 +2464,8 @@ fi
+>>>  # zstd check
+>>> =20
+>>>  if test "$zstd" !=3D "no" ; then
+>>> -    if $pkg_config --exist libzstd ; then
+>>> +    libzstd_minver=3D"0.8.1"
+>>> +    if $pkg_config --atleast-version=3D$libzstd_minver libzstd ; then
+>>>          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
+>>>          zstd_libs=3D"$($pkg_config --libs libzstd)"
+>>>          LIBS=3D"$zstd_libs $LIBS"
+>>
+>> Hmm still breaks with:
+>>
+>>    make docker-test-build@ubuntu J=3D9 V=3D1
+>=20
+> Thanks.
+>=20
+>> With:
+>>
+>>   FY_SOURCE=3D2 -g   -c -o monitor/qmp.o /tmp/qemu-test/src/monitor/qmp.=
+c
+>>   /tmp/qemu-test/src/migration/multifd-zstd.c: In function 'zstd_send_pr=
+epare':
+>>   /tmp/qemu-test/src/migration/multifd-zstd.c:125:9: error: unknown type=
+ name 'ZSTD_EndDirective'; did you mean 'ZSTD_DDict'?
+>>            ZSTD_EndDirective flush =3D ZSTD_e_continue;
+>>            ^~~~~~~~~~~~~~~~~
+>=20
+> Greate, more things were introduced later.
+> As it would be too easy, the zstd repository is not lineal, you need to
+> checkout the tag you want to see when something has been introduced.
+>=20
+> Will try to get this fixed.
+>=20
+> Sorry for the inconveniences.
+>=20
+>=20
+>>   Version: 1.3.8+dfsg-3
+>>   Depends: libzstd1 (=3D 1.3.8+dfsg-3)
+>>   Description: fast lossless compression algorithm -- development files
+>=20
+> I don't undertsand now.
+>=20
+> ZSTD_EndDirective was included in 1.3.0.
+>=20
+> I can just change that for 1.3.9, but I don't know why is that there.
+> Could you do a grep ZSTD_EndDirective /usr/lib/zstd.h?
 
-On 2/7/20 1:51 PM, Andrew Jones wrote:
-> On Tue, Jan 28, 2020 at 11:34:54AM +0100, Eric Auger wrote:
->> Introduce an helper functions to register
->> - a new device, characterized by its device id and the
->>   max number of event IDs that dimension its ITT (Interrupt
->>   Translation Table).  The function allocates the ITT.
->>
->> - a new collection, characterized by its ID and the
->>   target processing engine (PE).
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - s/report_abort/assert
->>
->> v1 -> v2:
->> - s/nb_/nr_
->> ---
->>  lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++-
->>  lib/arm/gic-v3-its.c     | 44 ++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 63 insertions(+), 1 deletion(-)
->>
->> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
->> index fe73c04..acd97a9 100644
->> --- a/lib/arm/asm/gic-v3-its.h
->> +++ b/lib/arm/asm/gic-v3-its.h
->> @@ -31,6 +31,19 @@ struct its_baser {
->>  };
->>  
->>  #define GITS_BASER_NR_REGS              8
->> +#define GITS_MAX_DEVICES		8
->> +#define GITS_MAX_COLLECTIONS		8
->> +
->> +struct its_device {
->> +	u32 device_id;	/* device ID */
->> +	u32 nr_ites;	/* Max Interrupt Translation Entries */
->> +	void *itt;	/* Interrupt Translation Table GPA */
->> +};
->> +
->> +struct its_collection {
->> +	u64 target_address;
->> +	u16 col_id;
->> +};
->>  
->>  struct its_data {
->>  	void *base;
->> @@ -38,6 +51,10 @@ struct its_data {
->>  	struct its_baser baser[GITS_BASER_NR_REGS];
->>  	struct its_cmd_block *cmd_base;
->>  	struct its_cmd_block *cmd_write;
->> +	struct its_device devices[GITS_MAX_DEVICES];
->> +	u32 nr_devices;		/* Allocated Devices */
->> +	struct its_collection collections[GITS_MAX_COLLECTIONS];
->> +	u32 nr_collections;	/* Allocated Collections */
->>  };
->>  
->>  extern struct its_data its_data;
->> @@ -90,7 +107,6 @@ extern struct its_data its_data;
->>  #define GITS_BASER_TYPE_DEVICE		1
->>  #define GITS_BASER_TYPE_COLLECTION	4
->>  
->> -
->>  struct its_cmd_block {
->>  	u64 raw_cmd[4];
->>  };
->> @@ -100,6 +116,8 @@ extern void its_init(void);
->>  extern int its_parse_baser(int i, struct its_baser *baser);
->>  extern struct its_baser *its_lookup_baser(int type);
->>  extern void its_enable_defaults(void);
->> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
->> +extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->>  
->>  #else /* __arm__ */
->>  
->> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
->> index d1e7e52..c2dcd01 100644
->> --- a/lib/arm/gic-v3-its.c
->> +++ b/lib/arm/gic-v3-its.c
->> @@ -175,3 +175,47 @@ void its_enable_defaults(void)
->>  
->>  	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
->>  }
->> +
->> +struct its_device *its_create_device(u32 device_id, int nr_ites)
->> +{
->> +	struct its_baser *baser;
->> +	struct its_device *new;
->> +	unsigned long n, order;
->> +
->> +	assert(its_data.nr_devices < GITS_MAX_DEVICES);
->> +
->> +	baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
->> +	if (!baser)
->> +		return NULL;
-> 
-> Should we assert here if we can't find a GITS_BASER_TYPE_DEVICE ?
-> It seems none of the callers of its_create_device are checking
-> for null.
-I removed that code which is useless.
-> 
->> +
->> +	new = &its_data.devices[its_data.nr_devices];
->> +
->> +	new->device_id = device_id;
->> +	new->nr_ites = nr_ites;
->> +
->> +	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
->> +	order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
-> 
-> I've seen this calculation several times now, so I think an
-> arch-neutral order calculator is in order:
-> 
->  int get_order(size_t size);
-> 
->> +	new->itt = (void *)virt_to_phys(alloc_pages(order));
-I added this get_order helper in lib/alloc_page.h/c
-> 
-> If this is a physical address then shouldn't itt be phys_addr_t ?
-> 
->> +
->> +	its_data.nr_devices++;
->> +	return new;
->> +}
-ITT now is a GVA (void *).
->> +
->> +struct its_collection *its_create_collection(u32 col_id, u32 pe)
->> +{
->> +	struct its_collection *new;
->> +
->> +	assert(its_data.nr_collections < GITS_MAX_COLLECTIONS);
->> +
->> +	new = &its_data.collections[its_data.nr_collections];
->> +
->> +	new->col_id = col_id;
->> +
->> +	if (its_data.typer.pta)
->> +		new->target_address = (u64)gicv3_data.redist_base[pe];
->> +	else
->> +		new->target_address = pe << 16;
->> +
->> +	its_data.nr_collections++;
->> +	return new;
->> +}
->> -- 
->> 2.20.1
->>
-> 
-> Thanks,
-> drew 
-> 
-Thanks
+Thing is, they have so called experimental APIs. You get them only if
+you define ZSTD_STATIC_LINKING_ONLY before including zstd.h. So the
+plain grep of a symbol tells us nothing. We need to check if it's not in
+#ifdef. Looks like 1.3.9 is the minimal version which has everything we
+want.
 
-Eric
+Michal
 
 
