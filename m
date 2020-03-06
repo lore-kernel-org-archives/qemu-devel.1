@@ -2,103 +2,127 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3611C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F40E3C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:46:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 790D021775
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:45:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790D021775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id AE56D20714
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 18:46:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9byNlg1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE56D20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAHyf-0001yH-M8
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 13:45:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49722)
+	id 1jAHzm-0003DP-Up
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 13:46:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAHxi-0000hI-IH
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:44:43 -0500
+ (envelope-from <david@redhat.com>) id 1jAHyY-000266-1l
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:45:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAHxg-0008Nk-MS
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:44:42 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:36772
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jAHxg-0008Iy-8n; Fri, 06 Mar 2020 13:44:40 -0500
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jAHxt-0003Hf-Q5; Fri, 06 Mar 2020 18:44:54 +0000
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
- <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
- <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
- <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
- <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
- <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
- <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
- <e8f3fe10-7a44-5552-bb80-7bc24fe68cc6@ilande.co.uk>
- <alpine.BSF.2.22.395.2003061306500.10004@zero.eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <19993bf1-a695-2a5d-dce8-f1b2b6677bf5@ilande.co.uk>
-Date: Fri, 6 Mar 2020 18:44:29 +0000
+ (envelope-from <david@redhat.com>) id 1jAHyV-0000pY-O3
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:45:33 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39906
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jAHyV-0000nK-Je
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 13:45:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583520330;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=gZ8D8bSzvU+VfWuIBEvBFUuWOOGIuMzewyP2W4Fquqk=;
+ b=T9byNlg1ussENgzAi46vVZwI9GSO83hGiPEiK+PnOckfxJfH5ddVL+QwmahafMjlla8yJs
+ RLcv6raH4LgP6xHRSaRDo+K3v2f+ONVn2co9mVQuVZUQ2of+MUb/+I7TFhFxrDYMLgzSlY
+ 7SMvYBV8wifB6J5O2cOz4o5+/m3c33Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-VwZwz4UTMqC8O9EfSA1FRQ-1; Fri, 06 Mar 2020 13:45:23 -0500
+X-MC-Unique: VwZwz4UTMqC8O9EfSA1FRQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92C26100550D;
+ Fri,  6 Mar 2020 18:45:22 +0000 (UTC)
+Received: from [10.36.117.101] (ovpn-117-101.ams2.redhat.com [10.36.117.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85BE273884;
+ Fri,  6 Mar 2020 18:45:14 +0000 (UTC)
+Subject: Re: [PATCH v3 10/13] migration/ram: Handle RAM block resizes during
+ postcopy
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200226155304.60219-1-david@redhat.com>
+ <20200226155304.60219-11-david@redhat.com> <20200306165615.GG3033@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <22b7bb96-961b-edfd-2fda-cf123e7cf03c@redhat.com>
+Date: Fri, 6 Mar 2020 19:45:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2003061306500.10004@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200306165615.GG3033@work-vm>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,112 +134,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/03/2020 12:40, BALATON Zoltan wrote:
-
-> On Fri, 6 Mar 2020, Mark Cave-Ayland wrote:
->> On 06/03/2020 00:21, BALATON Zoltan wrote:
->>> On Fri, 6 Mar 2020, BALATON Zoltan wrote:
->>>> On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
->>>>> On 04/03/2020 22:33, BALATON Zoltan wrote:
->>>>> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
->>>>> documented as having value 0 == Legacy IRQ routing which should be the initial
->>>>> value
->>>>> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
->>>>
->>>> The VT8231 docs say this should always read 1 but may be this is somehow set to 0
->>>> on the Pegasos2. What does that mean? Should we use this value instead of the
->>>> feature bit to force using legacy interrupts? We'd still need a property in via-ide
->>>> to set this reg or is it possible to set it from board code overriding the default
->>>> after device is created? That would allow to drop patch 1. I can try this.
->>>
->>> This seemed like it could simplify patches a bit but it does not work. Setting this
->>> reg to 0 breaks Linux and MorphOS which then think the device does not have an
->>> interrupt at all and fail as before waiting for the irq. So we still need the feature
->>> bit, cant use this reg to force legacy interrupts. I've spent considerable time
->>> testing different OSes before I've ended up with this patch series I've submitted and
->>> I could not find a simpler way that works with everything.
+On 06.03.20 17:56, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> Resizing while migrating is dangerous and does not work as expected.
+>> The whole migration code works on the usable_length of ram blocks and do=
+es
+>> not expect this to change at random points in time.
 >>
->> I appreciate that testing these things can take a lot of time, but what is important
->> thing to ask here is whether these hacks are attempting to work around something in
->> QEMU that doesn't match the hardware specification, and to me it feels that this is
->> what is happening here.
-> 
-> It may be we need to work around some incomplete modelling of devices in QEMU, e.g.
-> we only model the native mode of these IDE interfaces so anything involving legacy
-> mode is out of scope. To also emulate legacy mode we'd need changing common ISA code
-> and maybe PIC code as well. As those parts are also used by other more commonly used
-> machine models I'd avoid breaking those and rather implement it confined to these
-> machines that are not yet finished or complete anyway than try to change all
-> dependent devices that would need even more testing. These "hacks" could be cleaned
-> up later and this would not be the only hack in QEMU, I don't have time to fix
-> everything and it's unreasonable to demand it I think. I'd suggest to take this patch
-> as it is now and if you don't like it you can submit patches that clean it up the way
-> you think is correct or submit an alternative patch now that shows how do you think
-> it can be done in a cleaner way because I don't see it and don't have more time for
-> it now.
-> 
->> Obviously this thread has become quite long (and even I'm struggling to find previous
->> discussions) but here is my summary below:
+>> In the case of postcopy, relying on used_length is racy as soon as the
+>> guest is running. Also, when used_length changes we might leave the
+>> uffd handler registered for some memory regions, reject valid pages
+>> when migrating and fail when sending the recv bitmap to the source.
 >>
->> - I don't think the patch in its current form is the right way to do this. Instead of
->> adding a feature bit to fudge the existing IRQ routing when the existing IRQ routing
->> is wrong, let's fix the existing IRQ routing instead.
-> 
-> I think that would involve changing parts which could break other machines so I'd
-> rather go with a featute bit only affecting pegasos2 and fulonge2 than touch i8259 or
-> ISA emulation basing that on some guess how the real chip may be implemented. Is it
-> possible to implement what you propose without changing common IDE, ISA and PIC
-> emulation only in via-ide and fulong2e code?
-> 
->> - There is no mention of "non-100%" native mode in the 8231 or 686B datasheet: this
->> is simply a term used within the Linux patches. The controller is either in native
->> mode, or legacy mode. It may be that guests are making use of some undefined
->> behaviour here.
-> 
-> Yes, this is a Linux term and Linux also uses a feature bit to enable this
-> workaround. If that's good enough for Linux why isn't it good enough for you?
-> 
->> - The code that uses the value of PCI_INTERRUPT_LINE in via-ide is incorrect (as your
->> patch comment points out, some guests ignore it anyway).
-> 
-> You're misunderstanding the comment. The via_ide_config_read function is needed to
-> restore value in interrupt line that common PCI reset code deletes. Linux depends on
-> this value to be the same as on real hardware so this is needed to work around QEMU
-> and Linux pecularities.
-> 
-> I've tried using PCI_INTERRUPT_PIN in place of the feature bit but setting that to 0
-> breaks Linux and MorphOS on pegasos2 because these apparently expect this to be set
-> to 1 corresponding to native mode. (Firmware only sets native mode enable bits in
-> prog-if but datasheet says this reg should be 1 by default and other PCI docs say 0
-> here means no interrupt used so maybe that's why Linux and MorphOS don't like it.)
-> 
->> - There is different behaviour here between the 8231 and 686B in this area, despite
->> having the same vendor/device id.
+>> Resizing can be trigger *after* (but not during) a reset in
+>> ACPI code by the guest
+>> - hw/arm/virt-acpi-build.c:acpi_ram_update()
+>> - hw/i386/acpi-build.c:acpi_ram_update()
 >>
+>> Let's remember the original used_length in a separate variable and
+>> use it in relevant postcopy code. Make sure to update it when we resize
+>> during precopy, when synchronizing the RAM block sizes with the source.
 >>
->> The first thing you need to fix is the PCI_INTERRUPT_LINE part; I would start by
->> removing the existing code and instead expose a qdev named gpio "legacy-irq" and
->> wiring that up to your interrupt controller. Note you'd have to do the same for
->> fulong2e, but that is reasonably trivial.
-> 
-> Please go ahead and do it but if you don't submit an alternative patch before the
-> freeze I'd ask John and Peter to make a judgement here and tell if my series is
-> acceptable or not in its current form and if it is then please merge it and leave
-> clean ups for subsequent patches. This is blocking my further patches to implement
-> pegasos2 emulation.
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Juan Quintela <quintela@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Richard Henderson <richard.henderson@linaro.org>
+>> Cc: Shannon Zhao <shannon.zhao@linaro.org>
+>> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Peter Xu <peterx@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  include/exec/ramblock.h  | 10 ++++++++++
+>>  migration/postcopy-ram.c | 15 ++++++++++++---
+>>  migration/ram.c          | 11 +++++++++--
+>>  3 files changed, 31 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
+>> index 07d50864d8..664701b759 100644
+>> --- a/include/exec/ramblock.h
+>> +++ b/include/exec/ramblock.h
+>> @@ -59,6 +59,16 @@ struct RAMBlock {
+>>       */
+>>      unsigned long *clear_bmap;
+>>      uint8_t clear_bmap_shift;
+>> +
+>> +    /*
+>> +     * RAM block length that corresponds to the used_length on the migr=
+ation
+>> +     * source (after RAM block sizes were synchronized). Especially, af=
+ter
+>> +     * starting to run the guest, used_length and postcopy_length can d=
+iffer.
+>> +     * Used to register/unregister uffd handlers and as the size of the=
+ received
+>> +     * bitmap. Receiving any page beyond this length will bail out, as =
+it
+>> +     * could not have been valid on the source.
+>> +     */
+>> +    ram_addr_t postcopy_length;
+>>  };
+>>  #endif
+>>  #endif
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index a36402722b..c68caf4e42 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -17,6 +17,7 @@
+>>   */
+>> =20
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/rcu.h"
+>>  #include "exec/target_page.h"
+>>  #include "migration.h"
+>>  #include "qemu-file.h"
+>> @@ -31,6 +32,7 @@
+>>  #include "qemu/error-report.h"
+>>  #include "trace.h"
+>>  #include "hw/boards.h"
+>> +#include "exec/ramblock.h"
+>> =20
+>>  /* Arbitrary limit on size of each discard command,
+>>   * keeps them around ~200 bytes
+>> @@ -456,6 +458,13 @@ static int init_range(RAMBlock *rb, void *opaque)
+>>      ram_addr_t length =3D qemu_ram_get_used_length(rb);
+>>      trace_postcopy_init_range(block_name, host_addr, offset, length);
+>> =20
+>> +    /*
+>> +     * Save the used_length before running the guest. In case we have t=
+o
+>> +     * resize RAM blocks when syncing RAM block sizes from the source d=
+uring
+>> +     * precopy, we'll update it manually via the ram block notifier.
+>> +     */
+>> +    rb->postcopy_length =3D length;
+>> +
+>>      /*
+>>       * We need the whole of RAM to be truly empty for postcopy, so thin=
+gs
+>>       * like ROMs and any data tables built during init must be zero'd
+>> @@ -478,7 +487,7 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+>>      const char *block_name =3D qemu_ram_get_idstr(rb);
+>>      void *host_addr =3D qemu_ram_get_host_addr(rb);
+>>      ram_addr_t offset =3D qemu_ram_get_offset(rb);
+>> -    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+>> +    ram_addr_t length =3D rb->postcopy_length;
+>>      MigrationIncomingState *mis =3D opaque;
+>>      struct uffdio_range range_struct;
+>>      trace_postcopy_cleanup_range(block_name, host_addr, offset, length)=
+;
+>> @@ -600,7 +609,7 @@ static int nhp_range(RAMBlock *rb, void *opaque)
+>>      const char *block_name =3D qemu_ram_get_idstr(rb);
+>>      void *host_addr =3D qemu_ram_get_host_addr(rb);
+>>      ram_addr_t offset =3D qemu_ram_get_offset(rb);
+>> -    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+>> +    ram_addr_t length =3D rb->postcopy_length;
+>>      trace_postcopy_nhp_range(block_name, host_addr, offset, length);
+>> =20
+>>      /*
+>> @@ -644,7 +653,7 @@ static int ram_block_enable_notify(RAMBlock *rb, voi=
+d *opaque)
+>>      struct uffdio_register reg_struct;
+>> =20
+>>      reg_struct.range.start =3D (uintptr_t)qemu_ram_get_host_addr(rb);
+>> -    reg_struct.range.len =3D qemu_ram_get_used_length(rb);
+>> +    reg_struct.range.len =3D rb->postcopy_length;
+>>      reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
+>> =20
+>>      /* Now tell our userfault_fd that it's responsible for this area */
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 1a5ff07997..ee5c3d5784 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -244,7 +244,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+>>          return -1;
+>>      }
+>> =20
+>> -    nbits =3D block->used_length >> TARGET_PAGE_BITS;
+>> +    nbits =3D block->postcopy_length >> TARGET_PAGE_BITS;
+>> =20
+>>      /*
+>>       * Make sure the tmp bitmap buffer is big enough, e.g., on 32bit
+>> @@ -3160,7 +3160,13 @@ static int ram_load_postcopy(QEMUFile *f)
+>>                  break;
+>>              }
+>> =20
+>> -            if (!offset_in_ramblock(block, addr)) {
+>> +            /*
+>> +             * Relying on used_length is racy and can result in false p=
+ositives.
+>> +             * We might place pages beyond used_length in case RAM was =
+shrunk
+>> +             * while in postcopy, which is fine - trying to place via
+>> +             * UFFDIO_COPY/UFFDIO_ZEROPAGE will never segfault.
+>> +             */
+>=20
+> Is this actually safe? Imagine that the region had got shrunk, would it
+> still be mmap'd in there - or could there now be a space where something
+> else might have landed in?
 
-I believe I've answered this in detail in my previous email, so I suggest we keep the
-discussion there so it's all in one place.
+Yes, it's safe. The mapping of resizeable RAM blocks will currently not
+change when resized. See patch #13 on how this is handled when the
+mapping actually change (preparation for resizeable allocations [1]).
 
+[1]
+https://lore.kernel.org/qemu-devel/20200305142945.216465-1-david@redhat.com=
+/
 
-ATB,
+--=20
+Thanks,
 
-Mark.
+David / dhildenb
+
 
