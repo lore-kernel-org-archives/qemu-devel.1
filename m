@@ -2,75 +2,81 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FBAC10F00
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1076C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:05:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A07092073D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:02:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A07092073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AD8AA2073D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 09:05:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHvWmpi4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8AA2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA8rp-0002uJ-O2
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 04:02:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59878)
+	id 1jA8uv-0003xH-Ok
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 04:05:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jA8r9-0002SB-6D
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:01:20 -0500
+ (envelope-from <kraxel@redhat.com>) id 1jA8ty-0003Vv-NY
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jA8r7-0007Sg-P1
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:01:19 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46926)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jA8r7-0007Ft-6j
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:01:17 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jA8qu-0007r6-Jn
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:01:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C2B9D2E80E1
- for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 09:01:02 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <kraxel@redhat.com>) id 1jA8ts-00056A-EU
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:04:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57827
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jA8ts-00054D-Ai
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 04:04:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583485447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=JzA6zltuRXqG9mVlWv6KVNMKJq/OIb9HaK02b7II9lc=;
+ b=FHvWmpi4mbXEary5BdUaaUP7z1o6wYC1zH+B+Zird8flrKW/RA+VMfaAl0mkjNBasYBMmS
+ +VXVn+c18klGskmZlxv46SPDotSZ7cArn43dRRHMc8ti+T8M7eyvNradERu0Z5yqz8BQep
+ 2kqFTMBCro9WflOCpv+8k+yl4CFz0D0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-4fkIqenJP_uvrOq6Aj-blw-1; Fri, 06 Mar 2020 04:04:03 -0500
+X-MC-Unique: 4fkIqenJP_uvrOq6Aj-blw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3728107ACCA;
+ Fri,  6 Mar 2020 09:04:02 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-150.ams2.redhat.com
+ [10.36.116.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C28A51001902;
+ Fri,  6 Mar 2020 09:03:59 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0D6829DB3; Fri,  6 Mar 2020 10:03:59 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: seabios@seabios.org
+Subject: [PATCH] sercon: vbe modeset is int 10h function 4f02 not 4f00
+Date: Fri,  6 Mar 2020 10:03:21 +0100
+Message-Id: <20200306090321.24811-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Mar 2020 08:48:29 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1743191@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: regression
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gson ottaviocr philmd
-X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <151591854188.4596.10964938100242408667.malonedeb@wampee.canonical.com>
-Message-Id: <158348450918.12287.1343027774050033739.malone@wampee.canonical.com>
-Subject: [Bug 1743191] Re: Interacting with NetBSD serial console boot blocks
- no longer works
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 91f9c00c5ab4eb1450d4336ac78a40fd746d7759
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,69 +85,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1743191 <1743191@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Possibly related thread:
-"Do we need a cpu with TSC support to run SeaBIOS?"
-https://www.mail-archive.com/seabios@seabios.org/msg11726.html
+Fixes console redirection for NetBSD primary bootloader.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
 https://bugs.launchpad.net/bugs/1743191
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ src/sercon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Title:
-  Interacting with NetBSD serial console boot blocks no longer works
+diff --git a/src/sercon.c b/src/sercon.c
+index a5dadb7261af..66a1f2412e77 100644
+--- a/src/sercon.c
++++ b/src/sercon.c
+@@ -464,7 +464,7 @@ static void sercon_104f(struct bregs *regs)
+         regs->ax =3D 0x0100;
+     } else {
+         // Disable sercon entry point on any vesa modeset
+-        if (regs->al =3D=3D 0x00)
++        if (regs->al =3D=3D 0x02)
+             SET_LOW(sercon_enable, 0);
+     }
+ }
+--=20
+2.18.2
 
-Status in QEMU:
-  New
-
-Bug description:
-  The NetBSD boot blocks display a menu allowing the user to make a
-  selection using the keyboard.  For example, when booting a NetBSD
-  installation CD-ROM, the menu looks like this:
-
-           1. Install NetBSD
-           2. Install NetBSD (no ACPI)
-           3. Install NetBSD (no ACPI, no SMP)
-           4. Drop to boot prompt
-
-      Choose an option; RETURN for default; SPACE to stop countdown.
-      Option 1 will be chosen in 30 seconds.
-
-  When booting NetBSD in a recent qemu using an emulated serial console,
-  making this menu selection no longer works: when you type the selected
-  number, the keyboard input is ignored, and the 30-second countdown
-  continues.  In older versions of qemu, it works.
-
-  To reproduce the problem, run:
-
-     wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-7.1.1/amd64/installation/=
-cdrom/boot-com.iso
-     qemu-system-x86_64 -nographic -cdrom boot-com.iso
-
-  During the 30-second countdown, press 4
-
-  Expected behavior: The countdown stops and you get a ">" prompt
-
-  Incorrect behavior: The countdown continues
-
-  There may also be some corruption of the terminal output; for example,
-  "Option 1 will be chosen in 30 seconds" may be displayed as "Option 1
-  will be chosen in p0 seconds".
-
-  Using bisection, I have determined that the problem appeared with qemu
-  commit 083fab0290f2c40d3d04f7f22eed9c8f2d5b6787, in which seabios was
-  updated to 1.11 prerelease, and the problem is still there as of
-  commit 7398166ddf7c6dbbc9cae6ac69bb2feda14b40ac.  The host operating
-  system used for the tests was Debian 9 x86_64.
-
-  Credit for discovering this bug goes to Paul Goyette.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1743191/+subscriptions
 
