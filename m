@@ -2,49 +2,48 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2200BC3F2D7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5C8C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB0362072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:18:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0362072A
+	by mail.kernel.org (Postfix) with ESMTPS id A5C392072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:18:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C392072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA5N8-0003wg-5F
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 00:18:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51401)
+	id 1jA5NA-00041e-QT
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 00:18:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kt-000869-81
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:48 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kz-0008ID-Rg
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kr-0000DZ-Q6
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:47 -0500
-Received: from relay.sw.ru ([185.231.240.75]:33980)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Ky-0000op-5z
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:53 -0500
+Received: from relay.sw.ru ([185.231.240.75]:34040)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA5Kr-00007c-Hh; Fri, 06 Mar 2020 00:15:45 -0500
+ id 1jA5Kx-0000iM-Sf; Fri, 06 Mar 2020 00:15:52 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA5Kn-0001tg-WE; Fri, 06 Mar 2020 08:15:42 +0300
+ id 1jA5Kl-0001tg-L3; Fri, 06 Mar 2020 08:15:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 09/10] nbd: introduce ERRP_AUTO_PROPAGATE
-Date: Fri,  6 Mar 2020 08:15:35 +0300
-Message-Id: <20200306051536.27803-10-vsementsov@virtuozzo.com>
+Subject: [PATCH v8 00/10] error: auto propagated local_err part I
+Date: Fri,  6 Mar 2020 08:15:26 +0300
+Message-Id: <20200306051536.27803-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200306051536.27803-1-vsementsov@virtuozzo.com>
-References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -60,214 +59,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+File with errp-cleaning APIs dropped for two reasons:
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+1. I'm tired after a 3-days war with coccinelle, and don't want to add more
+   patches here.
 
-This commit is generated by command
+2. Markus noted, that we forget two more functions which needs such wrappers
+   and corresponding conversion, so seems better to handle all these things
+   in same manner for now.
 
-    sed -n '/^Network Block Device (NBD)$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
+changes in v8:
+
+01: - update comments
+    - fix bug in macro [Markus]
+    - use do {} while(0)
+
+02: a lot of changes
+    - about error propagation: try to update only patterns where we propagate
+      local_error to errp. So, patches 09 and 10 changed (wow!)
+    - Now clearing functions are not defined. Still, do the conversion, so
+      that when script applied where these functions needed, compilation will
+      be broken.
+    - improve ordering of hunks, and comment everything
+
+09,10: drop hunks, which are converted for nothing.
+
+v8 is available at
+ https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v8
+v7 is available at
+ https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v7
+ 
+In these series, there is no commit-per-subsystem script, each generated
+commit is generated in separate.
+
+Still, generating commands are very similar, and looks like
+
+    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
     xargs git ls-files | grep '\.[hc]$' | \
     xargs spatch \
         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
         --macro-file scripts/cocci-macro-file.h \
         --in-place --no-show-diff --max-width 80
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/nbd.h |  1 +
- block/nbd.c         | 21 +++++++++------------
- nbd/client.c        |  5 +++++
- nbd/server.c        |  5 +++++
- 4 files changed, 20 insertions(+), 12 deletions(-)
+Note, that in each generated commit, generation command is the only
+text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
+commits (for example, after rebase, or change in coccinelle script), you
+may use the following command:
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 7f46932d80..4ab8d917ed 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -360,6 +360,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
- static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-                            const char *desc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret = qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
- 
-     if (ret < 0) {
-diff --git a/block/nbd.c b/block/nbd.c
-index 976be76647..70274c31de 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1410,16 +1410,15 @@ static void nbd_client_close(BlockDriverState *bs)
- static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
-                                                   Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     QIOChannelSocket *sioc;
--    Error *local_err = NULL;
- 
-     sioc = qio_channel_socket_new();
-     qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
- 
--    qio_channel_socket_connect_sync(sioc, saddr, &local_err);
--    if (local_err) {
-+    qio_channel_socket_connect_sync(sioc, saddr, errp);
-+    if (*errp) {
-         object_unref(OBJECT(sioc));
--        error_propagate(errp, local_err);
-         return NULL;
-     }
- 
-@@ -1725,10 +1724,10 @@ static bool nbd_process_legacy_socket_options(QDict *output_options,
- static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
-                                  Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SocketAddress *saddr = NULL;
-     QDict *addr = NULL;
-     Visitor *iv = NULL;
--    Error *local_err = NULL;
- 
-     qdict_extract_subqdict(options, &addr, "server.");
-     if (!qdict_size(addr)) {
-@@ -1741,9 +1740,8 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
-         goto done;
-     }
- 
--    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_SocketAddress(iv, NULL, &saddr, errp);
-+    if (*errp) {
-         goto done;
-     }
- 
-@@ -1836,15 +1834,14 @@ static QemuOptsList nbd_runtime_opts = {
- static int nbd_process_options(BlockDriverState *bs, QDict *options,
-                                Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVNBDState *s = bs->opaque;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     int ret = -EINVAL;
- 
-     opts = qemu_opts_create(&nbd_runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         goto error;
-     }
- 
-diff --git a/nbd/client.c b/nbd/client.c
-index ba173108ba..e258ef3f7e 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -68,6 +68,7 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
-                                    uint32_t len, const char *data,
-                                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NBDOption req;
-     QEMU_BUILD_BUG_ON(sizeof(req) != 16);
- 
-@@ -153,6 +154,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
- static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
-                                 bool strict, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *msg = NULL;
- 
-     if (!(reply->type & (1 << 31))) {
-@@ -337,6 +339,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
- static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
-                               NBDExportInfo *info, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NBDOptionReply reply;
-     uint32_t len = strlen(info->name);
-     uint16_t type;
-@@ -882,6 +885,7 @@ static int nbd_start_negotiate(AioContext *aio_context, QIOChannel *ioc,
-                                bool structured_reply, bool *zeroes,
-                                Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     uint64_t magic;
- 
-     trace_nbd_start_negotiate(tlscreds, hostname ? hostname : "<null>");
-@@ -1017,6 +1021,7 @@ int nbd_receive_negotiate(AioContext *aio_context, QIOChannel *ioc,
-                           const char *hostname, QIOChannel **outioc,
-                           NBDExportInfo *info, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int result;
-     bool zeroes;
-     bool base_allocation = info->base_allocation;
-diff --git a/nbd/server.c b/nbd/server.c
-index 11a31094ff..ffc0cc69a7 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -211,6 +211,7 @@ static int GCC_FMT_ATTR(4, 0)
- nbd_negotiate_send_rep_verr(NBDClient *client, uint32_t type,
-                             Error **errp, const char *fmt, va_list va)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *msg = NULL;
-     int ret;
-     size_t len;
-@@ -369,6 +370,7 @@ static int nbd_opt_read_name(NBDClient *client, char **name, uint32_t *length,
- static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
-                                        Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     size_t name_len, desc_len;
-     uint32_t len;
-     const char *name = exp->name ? exp->name : "";
-@@ -432,6 +434,7 @@ static void nbd_check_meta_export(NBDClient *client)
- static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zeroes,
-                                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     g_autofree char *name = NULL;
-     char buf[NBD_REPLY_EXPORT_NAME_SIZE] = "";
-     size_t len;
-@@ -1272,6 +1275,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
-  */
- static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] = "";
-     int ret;
- 
-@@ -1646,6 +1650,7 @@ void nbd_export_close(NBDExport *exp)
- 
- void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
-         nbd_export_close(exp);
-         return;
+git rebase -x "sh -c \"git show --pretty= --name-only | xargs git checkout HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~7
+
+Which will start automated interactive rebase for generated patches,
+which will stop if generated patch changed
+(you may do git commit --amend to apply updated generated changes).
+
+Note:
+  git show --pretty= --name-only   - lists files, changed in HEAD
+  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
+
+
+Check for compilation of changed .c files
+git rebase -x "sh -c \"git show --pretty= --name-only | sed -n 's/\.c$/.o/p' | xargs make -j9\"" HEAD~7
+
+
+Vladimir Sementsov-Ogievskiy (10):
+  error: auto propagated local_err
+  scripts: add coccinelle script to use auto propagated errp
+  hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+  SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
+  pflash: introduce ERRP_AUTO_PROPAGATE
+  fw_cfg: introduce ERRP_AUTO_PROPAGATE
+  virtio-9p: introduce ERRP_AUTO_PROPAGATE
+  TPM: introduce ERRP_AUTO_PROPAGATE
+  nbd: introduce ERRP_AUTO_PROPAGATE
+  xen: introduce ERRP_AUTO_PROPAGATE
+
+ include/block/nbd.h                           |   1 +
+ include/qapi/error.h                          | 206 +++++++++++++---
+ block/nbd.c                                   |  21 +-
+ hw/9pfs/9p-local.c                            |  12 +-
+ hw/9pfs/9p.c                                  |   1 +
+ hw/block/dataplane/xen-block.c                |  17 +-
+ hw/block/pflash_cfi01.c                       |   7 +-
+ hw/block/pflash_cfi02.c                       |   7 +-
+ hw/block/xen-block.c                          | 125 ++++------
+ hw/nvram/fw_cfg.c                             |  14 +-
+ hw/pci-host/xen_igd_pt.c                      |   7 +-
+ hw/sd/sdhci-pci.c                             |   7 +-
+ hw/sd/sdhci.c                                 |  21 +-
+ hw/sd/ssi-sd.c                                |  26 +-
+ hw/tpm/tpm_util.c                             |   7 +-
+ hw/xen/xen-backend.c                          |   7 +-
+ hw/xen/xen-bus.c                              |  92 +++----
+ hw/xen/xen-host-pci-device.c                  |  27 +-
+ hw/xen/xen_pt.c                               |  25 +-
+ hw/xen/xen_pt_config_init.c                   |  20 +-
+ nbd/client.c                                  |   5 +
+ nbd/server.c                                  |   5 +
+ tpm.c                                         |   7 +-
+ scripts/coccinelle/auto-propagated-errp.cocci | 231 ++++++++++++++++++
+ 24 files changed, 617 insertions(+), 281 deletions(-)
+ create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul@xen.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Stefan Berger <stefanb@linux.ibm.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org
+
 -- 
 2.21.0
 
