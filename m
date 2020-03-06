@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37504C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DFCC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 041872051A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:17:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 359A12051A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:17:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THdfdnPO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041872051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFxM2mlT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359A12051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGb5-0007LJ-25
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:17:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48260)
+	id 1jAGbB-0007Yp-Cu
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:17:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jAGZA-0004gE-39
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:19 -0500
+ (envelope-from <kwolf@redhat.com>) id 1jAGZD-0004h2-68
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jAGZ8-00075P-6g
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55162
+ (envelope-from <kwolf@redhat.com>) id 1jAGZC-0007I2-6I
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26418
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZ8-00074F-3Q
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:14 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZC-0007Fa-30
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583514913;
+ s=mimecast20190719; t=1583514917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Omoi/sEq5CITopR+p4fflWC2UR9+E6aTKjKMk9A1Res=;
- b=THdfdnPOrdfpTinlcn6KADwLQY4db+27xFzASJ0WMFqM34/OF2N4XLyh2LUKBftiREnEh/
- i0QR9DYizJILK84w/VKuU9ys47A5qA/romNGYWmJAboft5zMxPe8ffrlrCXoNM3YNZTNHy
- kFK/r09Ly+nvftzVf7TjNeajrJQUwUM=
+ bh=ufqkwBBJxhlrM4CdXSrri08cBhDgmuBGZ+/JGrVUiPE=;
+ b=OFxM2mlTlmwTp4lVNrzDM74KsLrESYZpExmFFVqcu1QRF5ul1oVCWNoEqJyaepLtYHidZh
+ r8ZUMOfXmio+1z05xCOkVAOpLezcDoTXk7CxLwWXSgETZB9IhgKgXFusEfbWNhAJDMbrfE
+ 9dmQNpdVu4YKT9CYDzRXx7jfyO63CcI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-wDEMXzbSMhedwOdEZQxCog-1; Fri, 06 Mar 2020 12:15:09 -0500
-X-MC-Unique: wDEMXzbSMhedwOdEZQxCog-1
+ us-mta-203-nMatS8S4Psuy3DzG2B6qvw-1; Fri, 06 Mar 2020 12:15:13 -0500
+X-MC-Unique: nMatS8S4Psuy3DzG2B6qvw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71EC7801E6D;
- Fri,  6 Mar 2020 17:15:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48EC9107ACC7;
+ Fri,  6 Mar 2020 17:15:12 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E2E973873;
- Fri,  6 Mar 2020 17:15:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B9C473892;
+ Fri,  6 Mar 2020 17:15:11 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 02/29] iotests/026: Test EIO on preallocated zero cluster
-Date: Fri,  6 Mar 2020 18:14:31 +0100
-Message-Id: <20200306171458.1848-3-kwolf@redhat.com>
+Subject: [PULL 05/29] block: Introduce 'bdrv_reopen_commit_post' step
+Date: Fri,  6 Mar 2020 18:14:34 +0100
+Message-Id: <20200306171458.1848-6-kwolf@redhat.com>
 In-Reply-To: <20200306171458.1848-1-kwolf@redhat.com>
 References: <20200306171458.1848-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -73,7 +73,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,94 +91,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Peter Krempa <pkrempa@redhat.com>
 
-Test what happens when writing data to a preallocated zero cluster, but
-the data write fails.
+Add another step in the reopen process where driver can execute code
+after permission changes are comitted.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200225143130.111267-3-mreitz@redhat.com>
+Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+Message-Id: <adc02cf591c3cb34e98e33518eb1c540a0f27db1.1582893284.git.pkremp=
+a@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/026             | 21 +++++++++++++++++++++
- tests/qemu-iotests/026.out         | 10 ++++++++++
- tests/qemu-iotests/026.out.nocache | 10 ++++++++++
- 3 files changed, 41 insertions(+)
+ include/block/block_int.h | 1 +
+ block.c                   | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index a4aa74764f..0c1273c339 100755
---- a/tests/qemu-iotests/026
-+++ b/tests/qemu-iotests/026
-@@ -218,6 +218,27 @@ _make_test_img 64M
- $QEMU_IO -c "write 0 1M" -c "write 0 1M" "$BLKDBG_TEST_IMG" | _filter_qemu=
-_io
- _check_test_img
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6f9fd5e20e..f422c0bff0 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -122,6 +122,7 @@ struct BlockDriver {
+     int (*bdrv_reopen_prepare)(BDRVReopenState *reopen_state,
+                                BlockReopenQueue *queue, Error **errp);
+     void (*bdrv_reopen_commit)(BDRVReopenState *reopen_state);
++    void (*bdrv_reopen_commit_post)(BDRVReopenState *reopen_state);
+     void (*bdrv_reopen_abort)(BDRVReopenState *reopen_state);
+     void (*bdrv_join_options)(QDict *options, QDict *old_options);
 =20
-+echo
-+echo =3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=
-=3D
-+echo
+diff --git a/block.c b/block.c
+index 876bd45182..aaa387504e 100644
+--- a/block.c
++++ b/block.c
+@@ -3695,6 +3695,15 @@ cleanup_perm:
+             }
+         }
+     }
 +
-+cat > "$TEST_DIR/blkdebug.conf" <<EOF
-+[inject-error]
-+event =3D "write_aio"
-+errno =3D "5"
-+once =3D "on"
-+EOF
++    if (ret =3D=3D 0) {
++        QTAILQ_FOREACH_REVERSE(bs_entry, bs_queue, entry) {
++            BlockDriverState *bs =3D bs_entry->state.bs;
 +
-+_make_test_img $CLUSTER_SIZE
-+# Create a preallocated zero cluster
-+$QEMU_IO -c "write 0 $CLUSTER_SIZE" -c "write -z 0 $CLUSTER_SIZE" "$TEST_I=
-MG" \
-+    | _filter_qemu_io
-+# Try to overwrite it (prompting an I/O error from blkdebug), thus
-+# triggering the alloc abort code
-+$QEMU_IO -c "write 0 $CLUSTER_SIZE" "$BLKDBG_TEST_IMG" | _filter_qemu_io
-+
-+_check_test_img
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
-index ff0817b6f2..83989996ff 100644
---- a/tests/qemu-iotests/026.out
-+++ b/tests/qemu-iotests/026.out
-@@ -643,4 +643,14 @@ write failed: Input/output error
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
-+
-+=3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+write failed: Input/output error
-+No errors were found on the image.
- *** done
-diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.ou=
-t.nocache
-index 495d013007..9359d26d7e 100644
---- a/tests/qemu-iotests/026.out.nocache
-+++ b/tests/qemu-iotests/026.out.nocache
-@@ -651,4 +651,14 @@ write failed: Input/output error
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- No errors were found on the image.
-+
-+=3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 1024/1024 bytes at offset 0
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+write failed: Input/output error
-+No errors were found on the image.
- *** done
++            if (bs->drv->bdrv_reopen_commit_post)
++                bs->drv->bdrv_reopen_commit_post(&bs_entry->state);
++        }
++    }
+ cleanup:
+     QTAILQ_FOREACH_SAFE(bs_entry, bs_queue, entry, next) {
+         if (ret) {
 --=20
 2.20.1
 
