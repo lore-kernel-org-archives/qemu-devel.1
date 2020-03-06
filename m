@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47992C3F2D7
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FAEC3F2D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15CC22072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:16:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15CC22072A
+	by mail.kernel.org (Postfix) with ESMTPS id 585E62072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 05:16:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 585E62072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA5Lj-0001G1-7V
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 00:16:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51378)
+	id 1jA5Ln-0001Fb-HV
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 00:16:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Ks-000861-SW
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:47 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kr-0000Da-QC
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kr-00085y-Qr
  for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:46 -0500
-Received: from relay.sw.ru ([185.231.240.75]:33970)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jA5Kq-00006e-F3
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:45 -0500
+Received: from relay.sw.ru ([185.231.240.75]:33962)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA5Kr-00007f-IC
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:45 -0500
+ id 1jA5Kq-0008Nl-7I
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 00:15:44 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1jA5Kn-0001tg-Bp; Fri, 06 Mar 2020 08:15:41 +0300
+ id 1jA5Km-0001tg-Fj; Fri, 06 Mar 2020 08:15:40 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 06/10] fw_cfg: introduce ERRP_AUTO_PROPAGATE
-Date: Fri,  6 Mar 2020 08:15:32 +0300
-Message-Id: <20200306051536.27803-7-vsementsov@virtuozzo.com>
+Subject: [PATCH v8 03/10] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+Date: Fri,  6 Mar 2020 08:15:29 +0300
+Message-Id: <20200306051536.27803-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200306051536.27803-1-vsementsov@virtuozzo.com>
 References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -61,85 +60,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ vsementsov@virtuozzo.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+It's wrong to use same err object as errp parameter for several
+function calls without intermediate checking for error: we'll crash if
+try to set err object twice.
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+Fix that, using new ERRP_AUTO_PROPAGATE macro.
 
-This commit is generated by command
-
-    sed -n '/^Firmware configuration (fw_cfg)$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/nvram/fw_cfg.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ hw/sd/ssi-sd.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 179b302f01..22ff2be0c0 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1142,12 +1142,11 @@ static Property fw_cfg_io_properties[] = {
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 91db069212..bc44e1a0f5 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
  
- static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+ static void ssi_sd_realize(SSISlave *d, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     FWCfgIoState *s = FW_CFG_IO(dev);
--    Error *local_err = NULL;
+     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
+     DeviceState *carddev;
+     DriveInfo *dinfo;
+-    Error *err = NULL;
  
--    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    fw_cfg_file_slots_allocate(FW_CFG(s), errp);
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+                         DEVICE(d), "sd-bus");
+@@ -254,14 +254,26 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     dinfo = drive_get_next(IF_SD);
+     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     if (dinfo) {
+-        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
++        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), errp);
++        if (*errp) {
++            goto fail;
++        }
++    }
++
++    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
 +    if (*errp) {
-         return;
++        goto fail;
      }
- 
-@@ -1193,14 +1192,13 @@ static Property fw_cfg_mem_properties[] = {
- 
- static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     FWCfgMemState *s = FW_CFG_MEM(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
--    Error *local_err = NULL;
- 
--    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    fw_cfg_file_slots_allocate(FW_CFG(s), errp);
+-    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
+-    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+-    if (err) {
+-        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
+-        return;
++
++    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
 +    if (*errp) {
-         return;
++        goto fail;
      }
++
++    return;
++
++fail:
++    error_prepend(errp, "failed to init SD card: ");
+ }
  
+ static void ssi_sd_reset(DeviceState *dev)
 -- 
 2.21.0
 
