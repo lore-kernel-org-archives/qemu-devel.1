@@ -2,86 +2,73 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D255C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ECDC10F00
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 676D92073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:22:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sf0eFa6Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676D92073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F9A920848
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9A920848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jACwC-0001Pt-JV
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:22:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48369)
+	id 1jAD00-00031X-CF
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:26:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jACvE-0000VB-5b
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:21:49 -0500
+ (envelope-from <bounces@canonical.com>) id 1jACz8-0002YE-TC
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jACvC-00018l-Bl
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:21:48 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48005
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jACvC-000175-6k
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:21:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583500905;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cVRgDjzEFn402rwE5zuLyWDYpg4LE6SIPEw7AIm4jpA=;
- b=Sf0eFa6QoIeFMK8siFB5tj1FzeyuAWhZ6/2OCP+RGZq4MJxdHhUA1kE0pO0jqOzZMTZ67H
- mk3COAQgjdu9GW15sKfaOoUpE6IK7tzfGGrVjiYTyU192byeGX+GHPhAzmOTQMGBllJf15
- S7fABgBwYp3QluIN4KuQXZUhpUMTNSY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-uYyAV_1IOQGVsFU--xc_Wg-1; Fri, 06 Mar 2020 08:21:43 -0500
-X-MC-Unique: uYyAV_1IOQGVsFU--xc_Wg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B67D01005509;
- Fri,  6 Mar 2020 13:21:41 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E40C78D560;
- Fri,  6 Mar 2020 13:21:38 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 14/14] arm/arm64: ITS: pending table
- migration test
-To: Andrew Jones <drjones@redhat.com>
-References: <20200128103459.19413-1-eric.auger@redhat.com>
- <20200128103459.19413-15-eric.auger@redhat.com>
- <20200207140627.rikkw5coe7naxssb@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <24940769-6e50-2585-4572-44422ca21613@redhat.com>
-Date: Fri, 6 Mar 2020 14:21:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <bounces@canonical.com>) id 1jACz3-0007mW-U1
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:25:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51116)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jACz3-0007Vd-MS
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:25:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jACz1-0006ZR-PE
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 13:25:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BDD7C2E80C7
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 13:25:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200207140627.rikkw5coe7naxssb@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Mar 2020 13:17:45 -0000
+From: tstrike <1813165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
+ tstrike34 vkuznets
+X-Launchpad-Bug-Reporter: Thomas (himbeere)
+X-Launchpad-Bug-Modifier: tstrike (tstrike34)
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <158350066522.26815.12160642359431177562.malone@gac.canonical.com>
+Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f5119ae926b9fd6b405e84884bb63e2c982ccf41
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,319 +77,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
+Ok Vitaly I will take a look and report back.
 
-On 2/7/20 3:06 PM, Andrew Jones wrote:
-> On Tue, Jan 28, 2020 at 11:34:59AM +0100, Eric Auger wrote:
->> Add two new migration tests. One testing the migration of
->> a topology where collection were unmapped. The second test
->> checks the migration of the pending table.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - tests belong to both its and migration groups
->> ---
->>  arm/gic.c         | 150 ++++++++++++++++++++++++++++++++++++++++++++++
->>  arm/unittests.cfg |  16 +++++
->>  2 files changed, 166 insertions(+)
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index fa8626a..ec3dd3a 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -195,6 +195,7 @@ static void lpi_handler(struct pt_regs *regs __unused)
->>  	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
->>  	lpi_stats.observed.cpu_id = smp_processor_id();
->>  	lpi_stats.observed.lpi_id = irqnr;
->> +	acked[lpi_stats.observed.cpu_id]++;
->>  	smp_wmb(); /* pairs with rmb in check_lpi_stats */
->>  }
->>  
->> @@ -239,6 +240,18 @@ static void secondary_lpi_test(void)
->>  	while (1)
->>  		wfi();
->>  }
->> +
->> +static void check_lpi_hits(int *expected)
->> +{
->> +	int i;
->> +
->> +	for (i = 0; i < nr_cpus; i++) {
->> +		if (acked[i] != expected[i])
->> +			report(false, "expected %d LPIs on PE #%d, %d observed",
->> +			       expected[i], i, acked[i]);
-> 
-> report_info
-> pass = false
-> 
->> +		}
->> +	report(true, "check LPI on all vcpus");
-> 
-> report(pass, ...);
-I still don't get the issue.
-> 
->> +}
->>  #endif
->>  
->>  static void gicv2_ipi_send_self(void)
->> @@ -594,6 +607,8 @@ static void gic_test_mmio(void)
->>  static void test_its_introspection(void) {}
->>  static void test_its_trigger(void) {}
->>  static void test_its_migration(void) {}
->> +static void test_migrate_unmapped_collection(void) {}
->> +static void test_its_pending_migration(void) {}
-> 
-> I'm not sure what's worse. This pile of stubs or one #ifdef in main()
-> wrapping all the calls.
-Those stubs now are in the arm header.
-> 
->>  
->>  #else /* __arch64__ */
->>  
->> @@ -666,6 +681,18 @@ static bool its_prerequisites(int nb_cpus)
->>  	return false;
->>  }
->>  
->> +static void set_lpi(struct its_device *dev, u32 eventid, u32 physid,
->> +		    struct its_collection *col)
->> +{
->> +	if (!dev || !col)
-> 
-> I don't think col can be null, and this doesn't look like the right place
-> to check if dev is null.  If we're bothiner to call set_lpi, then I
-> think we should already expect dev to be good to go.
-put an assert() instead
-> 
->> +		report_abort("wrong device or collection");
->> +
->> +	its_send_mapti(dev, physid, eventid, col);
->> +
->> +	gicv3_lpi_set_config(physid, LPI_PROP_DEFAULT);
->> +	its_send_invall(col);
->> +}
->> +
->>  /*
->>   * Setup the configuration for those mappings:
->>   * dev_id=2 event=20 -> vcpu 3, intid=8195
->> @@ -806,6 +833,121 @@ static void test_its_migration(void)
->>  	its_send_int(dev7, 255);
->>  	check_lpi_stats();
->>  }
->> +
->> +static void test_migrate_unmapped_collection(void)
->> +{
->> +	struct its_collection *col;
->> +	struct its_device *dev2, *dev7;
->> +	u8 config;
->> +
->> +	if (its_setup1())
->> +		return;
->> +
->> +	col = its_create_collection(nr_cpus - 1, nr_cpus - 1);
->> +	dev2 = its_get_device(2);
->> +	dev7 = its_get_device(7);
->> +
->> +	/* MAPTI with the collection unmapped */
->> +	set_lpi(dev2, 0, 8192, col);
->> +
->> +	puts("Now migrate the VM, then press a key to continue...\n");
->> +	(void)getchar();
->> +	report(true, "Migration complete");
-> 
-> report_info
-yep
-> 
->> +
->> +	/* on the destination, map the collection */
->> +	its_send_mapc(col, true);
->> +
->> +	lpi_stats_expect(2, 8196);
->> +	its_send_int(dev7, 255);
->> +	check_lpi_stats();
->> +
->> +	config = gicv3_lpi_get_config(8192);
->> +	report(config == LPI_PROP_DEFAULT,
->> +	       "Config of LPI 8192 was properly migrated");
->> +
->> +	lpi_stats_expect(nr_cpus - 1, 8192);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* unmap the collection */
->> +	its_send_mapc(col, false);
->> +
->> +	lpi_stats_expect(-1, -1);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* remap event 0 onto lpiid 8193 */
->> +	set_lpi(dev2, 0, 8193, col);
->> +	lpi_stats_expect(-1, -1);
->> +	its_send_int(dev2, 0);
->> +	check_lpi_stats();
->> +
->> +	/* remap the collection */
->> +	its_send_mapc(col, true);
->> +	lpi_stats_expect(nr_cpus - 1, 8193);
->> +}
->> +
->> +static void test_its_pending_migration(void)
->> +{
->> +	struct its_device *dev;
->> +	struct its_collection *collection[2];
->> +	int expected[NR_CPUS];
-> 
-> expected = malloc(nr_cpus * sizeof(int));
-> 
-> I know there are other places using NR_CPUS right now that don't have to,
-> but we shouldn't add more. Eventually I'll change the other places too.
-OK
-> 
->> +	u64 pendbaser;
->> +	void *ptr;
->> +	int i;
->> +
->> +	if (its_prerequisites(4))
->> +		return;
->> +
->> +	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
->> +	its_send_mapd(dev, true);
->> +
->> +	collection[0] = its_create_collection(nr_cpus - 1, nr_cpus - 1);
->> +	collection[1] = its_create_collection(nr_cpus - 2, nr_cpus - 2);
->> +	its_send_mapc(collection[0], true);
->> +	its_send_mapc(collection[1], true);
->> +
->> +	/* disable lpi at redist level */
->> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, false);
->> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, false);
->> +
->> +	/* even lpis are assigned to even cpu */
->> +	for (i = 0; i < 256; i++) {
->> +		struct its_collection *col = i % 2 ? collection[0] :
->> +						     collection[1];
->> +		int vcpu = col->target_address >> 16;
-> 
-> I'm lost with the even/odd (nr_cpus - 1)/(nr_cpus - 2) stuff, and won't
-> it swap if nr_cpus is odd vs. even?
-> 
-> Shouldn't we just have something like
-> 
->   pe1 = nr_cpus - 1;
->   pe2 = nr_cpus - 2;
->   col1 = its_create_collection(pe1, pe1);
->   col2 = its_create_collection(pe2, pe2);
-> 
-> without mentioning even and odd?
-OK
-> 
->> +
->> +		its_send_mapti(dev, 8192 + i, i, col);
->> +		gicv3_lpi_set_config(8192 + i, LPI_PROP_DEFAULT);
->> +		gicv3_lpi_set_pending_table_bit(vcpu, 8192 + i, true);
->> +	}
->> +	its_send_invall(collection[0]);
->> +	its_send_invall(collection[1]);
->> +
->> +	/* Set the PTZ bit on each pendbaser */
->> +
->> +	expected[nr_cpus - 1] = 128;
->> +	expected[nr_cpus - 2] = 128;
->> +
->> +	ptr = gicv3_data.redist_base[nr_cpus - 1] + GICR_PENDBASER;
->> +	pendbaser = readq(ptr);
->> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +	ptr = gicv3_data.redist_base[nr_cpus - 2] + GICR_PENDBASER;
->> +	pendbaser = readq(ptr);
->> +	writeq(pendbaser & ~GICR_PENDBASER_PTZ, ptr);
->> +
->> +	gicv3_lpi_rdist_ctrl(nr_cpus - 1, true);
->> +	gicv3_lpi_rdist_ctrl(nr_cpus - 2, true);
->> +
->> +	puts("Now migrate the VM, then press a key to continue...\n");
->> +	(void)getchar();
->> +	report(true, "Migration complete");
-> 
-> report_info
-OK
-> 
->> +
->> +	mdelay(1000);
-> 
-> This delay needs a comment explaining why it's here.
-OK
+-- =
 
-Thanks
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
 
-Eric
-> 
->> +
->> +	check_lpi_hits(expected);
->> +}
->>  #endif
->>  
->>  int main(int argc, char **argv)
->> @@ -847,6 +989,14 @@ int main(int argc, char **argv)
->>  		report_prefix_push(argv[1]);
->>  		test_its_migration();
->>  		report_prefix_pop();
->> +	} else if (!strcmp(argv[1], "its-pending-migration")) {
->> +		report_prefix_push(argv[1]);
->> +		test_its_pending_migration();
->> +		report_prefix_pop();
->> +	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
->> +		report_prefix_push(argv[1]);
->> +		test_migrate_unmapped_collection();
->> +		report_prefix_pop();
->>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
->>  		report_prefix_push(argv[1]);
->>  		test_its_introspection();
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 8b8ec79..d917157 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -144,6 +144,22 @@ extra_params = -machine gic-version=3 -append 'its-migration'
->>  groups = its migration
->>  arch = arm64
->>  
->> +[its-pending-migration]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +accel = kvm
->> +extra_params = -machine gic-version=3 -append 'its-pending-migration'
->> +groups = its migration
->> +arch = arm64
->> +
->> +[its-migrate-unmapped-collection]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +accel = kvm
->> +extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
->> +groups = its migration
->> +arch = arm64
->> +
->>  # Test PSCI emulation
->>  [psci]
->>  file = psci.flat
->> -- 
->> 2.20.1
->>
->>
-> 
-> Thanks,
-> drew 
-> 
+Title:
+  KVM internal error. Suberror: 1 emulation failure
 
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Devs.
+
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
+
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
 
