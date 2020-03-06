@@ -2,59 +2,58 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DATE_IN_FUTURE_06_12,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A44C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 02:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE10C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 02:35:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFF2F207FD
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 02:24:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF2F207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA5A206D7
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 02:35:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA5A206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA2eg-0000iE-1Q
-	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 21:24:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57679)
+	id 1jA2q6-0006EG-H5
+	for qemu-devel@archiver.kernel.org; Thu, 05 Mar 2020 21:35:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luwei.kang@intel.com>) id 1jA2cW-0005KW-Lf
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:21:49 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1jA2pP-0005hc-T0
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:35:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <luwei.kang@intel.com>) id 1jA2cU-0003QW-Vk
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:21:48 -0500
-Received: from mga12.intel.com ([192.55.52.136]:23297)
+ (envelope-from <pannengyuan@huawei.com>) id 1jA2pO-00005V-HS
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:35:07 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3185 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
- id 1jA2cU-0003LI-MX
- for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:21:46 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 05 Mar 2020 18:21:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,520,1574150400"; d="scan'208";a="413742185"
-Received: from snr.bj.intel.com ([10.240.193.90])
- by orsmga005.jf.intel.com with ESMTP; 05 Mar 2020 18:21:39 -0800
-From: Luwei Kang <luwei.kang@intel.com>
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com,
- marcel.apfelbaum@gmail.com
-Subject: [PATCH v1 1/3] i386: Add "pebs" parameter to enable PEBS feature
-Date: Fri,  6 Mar 2020 18:20:03 +0800
-Message-Id: <1583490005-27761-2-git-send-email-luwei.kang@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1583490005-27761-1-git-send-email-luwei.kang@intel.com>
-References: <1583490005-27761-1-git-send-email-luwei.kang@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.136
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1jA2pO-0008Qj-6z
+ for qemu-devel@nongnu.org; Thu, 05 Mar 2020 21:35:06 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 337FE1B246B4C60AD2D9;
+ Fri,  6 Mar 2020 10:35:00 +0800 (CST)
+Received: from localhost.huawei.com (10.175.104.216) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 6 Mar 2020 10:34:49 +0800
+From: Pan Nengyuan <pannengyuan@huawei.com>
+To: <lvivier@redhat.com>, <amit@kernel.org>, <mst@redhat.com>,
+ <marcandre.lureau@redhat.com>, <pbonzini@redhat.com>
+Subject: [PATCH v2] virtio-serial-bus: do cleanup on the error path in
+ realize() to avoid memleaks
+Date: Fri, 6 Mar 2020 10:50:30 +0800
+Message-ID: <20200306025030.28824-1-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.18.2
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.216]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,102 +65,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Luwei Kang <luwei.kang@intel.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
+Cc: zhang.zhanghailiang@huawei.com, Pan Nengyuan <pannengyuan@huawei.com>,
+ qemu-devel@nongnu.org, euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PEBS virtualization enabling in KVM guest will be supported start from
-IceLake hardware. This patch introduce a new CPU parameter "pebs" to enable
-PEBS feature. The paramter of "pebs" is false by default.
+port->bh forgot to delete on the error path, this patch add it to fix memleaks. It's easy to reproduce as follow(add a same nr port):
+    {'execute': 'device_add', 'arguments': {'id': 'virtio_serial_pci0', 'driver': 'virtio-serial-pci', 'bus': 'pci.0', 'addr': '0x5'}, 'id': 'yVkZcGgV'}
+    {'execute': 'device_add', 'arguments': {'id': 'port1', 'driver': 'virtserialport', 'name': 'port1', 'chardev': 'channel1', 'bus': 'virtio_serial_pci0.0', 'nr': 1}, 'id': '3dXdUgJA'}
+    {'execute': 'device_add', 'arguments': {'id': 'port2', 'driver': 'virtserialport', 'name': 'port2', 'chardev': 'channel2', 'bus': 'virtio_serial_pci0.0', 'nr': 1}, 'id': 'qLzcCkob'}
+    {'execute': 'device_add', 'arguments': {'id': 'port2', 'driver': 'virtserialport', 'name': 'port2', 'chardev': 'channel2', 'bus': 'virtio_serial_pci0.0', 'nr': 2}, 'id': 'qLzcCkob'}
 
-PDCM,DTES64,DTS are needed by PEBS feature. Expose these feature bits to
-KVM guest when the KVM support PEBS virtualization and the "pebs" parameter
-is true.
+The leak stack:
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7f04a8008ae8 in __interceptor_malloc (/lib64/libasan.so.5+0xefae8)
+    #1 0x7f04a73cf1d5 in g_malloc (/lib64/libglib-2.0.so.0+0x531d5)
+    #2 0x56273eaee484 in aio_bh_new /mnt/sdb/backup/qemu/util/async.c:125
+    #3 0x56273eafe9a8 in qemu_bh_new /mnt/sdb/backup/qemu/util/main-loop.c:532
+    #4 0x56273d52e62e in virtser_port_device_realize /mnt/sdb/backup/qemu/hw/char/virtio-serial-bus.c:946
+    #5 0x56273dcc5040 in device_set_realized /mnt/sdb/backup/qemu/hw/core/qdev.c:891
+    #6 0x56273e5ebbce in property_set_bool /mnt/sdb/backup/qemu/qom/object.c:2238
+    #7 0x56273e5e5a9c in object_property_set /mnt/sdb/backup/qemu/qom/object.c:1324
+    #8 0x56273e5ef5f8 in object_property_set_qobject /mnt/sdb/backup/qemu/qom/qom-qobject.c:26
+    #9 0x56273e5e5e6a in object_property_set_bool /mnt/sdb/backup/qemu/qom/object.c:1390
+    #10 0x56273daa40de in qdev_device_add /mnt/sdb/backup/qemu/qdev-monitor.c:680
+    #11 0x56273daa53e9 in qmp_device_add /mnt/sdb/backup/qemu/qdev-monitor.c:805
 
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+Fixes: 199646d81522509ac2dba6d28c31e8c7d807bc93
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
- hw/i386/pc.c      |  1 +
- target/i386/cpu.c | 14 ++++++++++++++
- target/i386/cpu.h |  7 +++++++
- 3 files changed, 22 insertions(+)
+v1->v2:
+- simply create port->bh last in virtser_port_device_realize() to fix memleaks.(Suggested by Markus Armbruster)
+---
+ hw/char/virtio-serial-bus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 96715f8..aeb9fb9 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -316,6 +316,7 @@ GlobalProperty pc_compat_1_5[] = {
-     { "Nehalem-" TYPE_X86_CPU, "min-level", "2" },
-     { "virtio-net-pci", "any_layout", "off" },
-     { TYPE_X86_CPU, "pmu", "on" },
-+    { TYPE_X86_CPU, "pebs", "on" },
-     { "i440FX-pcihost", "short_root_bus", "0" },
-     { "q35-pcihost", "short_root_bus", "0" },
- };
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index cc586dc..1ca56de 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3306,6 +3306,7 @@ static void max_x86_cpu_initfn(Object *obj)
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 941ed5aca9..99a65bab7f 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -943,7 +943,6 @@ static void virtser_port_device_realize(DeviceState *dev, Error **errp)
+     Error *err = NULL;
+ 
+     port->vser = bus->vser;
+-    port->bh = qemu_bh_new(flush_queued_data_bh, port);
+ 
+     assert(vsc->have_data);
+ 
+@@ -992,6 +991,7 @@ static void virtser_port_device_realize(DeviceState *dev, Error **errp)
+         return;
      }
  
-     object_property_set_bool(OBJECT(cpu), true, "pmu", &error_abort);
-+    object_property_set_bool(OBJECT(cpu), true, "pebs", &error_abort);
++    port->bh = qemu_bh_new(flush_queued_data_bh, port);
+     port->elem = NULL;
  }
  
- static const TypeInfo max_x86_cpu_type_info = {
-@@ -4511,11 +4512,23 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         if ((*ecx & CPUID_EXT_XSAVE) && (env->cr[4] & CR4_OSXSAVE_MASK)) {
-             *ecx |= CPUID_EXT_OSXSAVE;
-         }
-+        if (kvm_enabled() && cpu->enable_pmu && cpu->enable_pebs) {
-+            *ecx |= kvm_arch_get_supported_cpuid(cs->kvm_state, 0x1, 0, R_ECX) &
-+                                            (CPUID_EXT_PDCM | CPUID_EXT_DTES64);
-+        } else {
-+            *ecx &= ~(CPUID_EXT_PDCM | CPUID_EXT_DTES64);
-+        }
-         *edx = env->features[FEAT_1_EDX];
-         if (cs->nr_cores * cs->nr_threads > 1) {
-             *ebx |= (cs->nr_cores * cs->nr_threads) << 16;
-             *edx |= CPUID_HT;
-         }
-+        if (kvm_enabled() && cpu->enable_pmu && cpu->enable_pebs) {
-+            *edx |= kvm_arch_get_supported_cpuid(cs->kvm_state, 0x1, 0, R_EDX) &
-+                                            CPUID_DTS;
-+        } else {
-+            *edx &= ~CPUID_DTS;
-+        }
-         break;
-     case 2:
-         /* cache info: needed for Pentium Pro compatibility */
-@@ -6129,6 +6142,7 @@ static Property x86_cpu_properties[] = {
- #endif
-     DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
-     DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-+    DEFINE_PROP_BOOL("pebs", X86CPU, enable_pebs, false),
- 
-     DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
-                        HYPERV_SPINLOCK_NEVER_RETRY),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 5352c9f..398810f 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1664,6 +1664,13 @@ struct X86CPU {
-      */
-     bool enable_pmu;
- 
-+    /* Enable PEBS CPUID bits. This can't be enabled by default yet because
-+     * it doesn't have ABI stability guarantees, as it passes all PEBS CPUID
-+     * bits returned by GET_SUPPORTED_CPUID (that depend on host CPU and kernel
-+     * capabilities) directly to the guest.
-+     */
-+    bool enable_pebs;
-+
-     /* LMCE support can be enabled/disabled via cpu option 'lmce=on/off'. It is
-      * disabled by default to avoid breaking migration between QEMU with
-      * different LMCE configurations.
 -- 
-1.8.3.1
+2.18.2
 
 
