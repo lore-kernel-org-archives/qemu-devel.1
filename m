@@ -2,86 +2,79 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8A9C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E830BC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 591942051A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B47DE2051A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vMiVjIeA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591942051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="el9Mhymn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B47DE2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGpN-0005O8-FH
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:32:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50687)
+	id 1jAGpm-00064C-VI
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbj-0000Tn-IO
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:56 -0500
+ (envelope-from <kwolf@redhat.com>) id 1jAGZb-00058T-6E
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGbi-0007mZ-Ax
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:55 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42183)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jAGbi-0007jX-42
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:17:54 -0500
-Received: by mail-wr1-x433.google.com with SMTP id v11so3244516wrm.9
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:17:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=/M3Q1G0HKQfPtdI//TVmv2AXSWRuvnLUfsWsWozX0D8=;
- b=vMiVjIeAxCSysxI6JPX156+OLh+tgh/KmamOQ9kWVz99yx50EFmilqfi+Du8WgkJt7
- dmwTwe2pHPpeMfH9O42kpkugO8n0i7f46KGO++0YSw7O6usRvWgWiGDXElzvThC4td+o
- ij2MmT9GHTDTcqVokYkzETUm74jQb9/CwFYF/hOBZ5M+25z4AU5+QLm76PZBJidLOMtP
- KkzIauGdbzUKRSs/wnKap2WSAnUYSeJ03BfemZLkY5JNbLKE0KXpRpYLzBYKb9B9ZLjI
- 3cdhAw8b7YmrKwssOwll0b3EeaKZeU9S1rFU5Sd0gICf+UkbEvwPwFhHl+VMmnGoCc7D
- 3G0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=/M3Q1G0HKQfPtdI//TVmv2AXSWRuvnLUfsWsWozX0D8=;
- b=lbLYs36JrHzFnMdoSXsRpcJGR4gGLFuLMijv0noV5mC+VzLE5skSos2ax4Si8isSLA
- Oc3gSd4KK6ENZn7HjU93irKZV6gyK4d9Bwo2zzN/mXU29vdSxyVW4kZbss16PFnzTL53
- hl6VkJxUGY46pBAjX9+KjnUIiCO5RgQG2ZQ1M30uM+2eg8VEKgSz6xkG/uLABevNaHxq
- O74iPNL0E4HEpRwNDUiRws/VuGv/m6Iee6pMiMJNd+f+HveeSv5IAJOFxZr7sBUAllcj
- zMGR2xre6rcFEyCOr8/w03yCtYd/WVPRyitwHcpNHF7EFg4e0z/ONN7QiPMJ1MLLQHGz
- oLcQ==
-X-Gm-Message-State: ANhLgQ2UcKPaGpmo/qAcxwBijzJD4v1zDzDGDnH6BnC7+GqMsMHmCWeB
- Y9zSDGmuMaE5lSMSNcYubPrIL12zyGiNAA==
-X-Google-Smtp-Source: ADFU+vtlRjyus0oCpLOlKh+eLSWNzXhLOPdPTC8SEDPk4wIrTpII0/jC0xQJ8o68Zo4PU4Y4BbkbWw==
-X-Received: by 2002:adf:f70f:: with SMTP id r15mr5041239wrp.269.1583515072719; 
- Fri, 06 Mar 2020 09:17:52 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id f8sm6948346wmf.20.2020.03.06.09.17.51
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 09:17:52 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/7] Makefile: Remove redundant Texinfo related code
-Date: Fri,  6 Mar 2020 17:17:43 +0000
-Message-Id: <20200306171749.10756-2-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200306171749.10756-1-peter.maydell@linaro.org>
-References: <20200306171749.10756-1-peter.maydell@linaro.org>
+ (envelope-from <kwolf@redhat.com>) id 1jAGZX-0008EL-6L
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36780
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZW-00087u-SY
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583514937;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Mbw4HbYb99OtnGt7aGdhL5RvddHPOhZRBDe1Yhk3G2Q=;
+ b=el9MhymnvvQyNJYatl8wKS4CHYkAjiocppDgpjt/YRQ/jkXzbUMghtp2P/bSsZlGrUQBr+
+ ozGOmPbhRLrZQKhMVpikeZjPmqMz5KhVkrg/ygRtpAl2Vy/vYwMQskD197wH6kHXHAgUZg
+ tRYezGLtJO3JQKJOJFzFJr34b700FjM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-gXU9R7scNZuchjE97FPnRg-1; Fri, 06 Mar 2020 12:15:35 -0500
+X-MC-Unique: gXU9R7scNZuchjE97FPnRg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E78F8010D9;
+ Fri,  6 Mar 2020 17:15:34 +0000 (UTC)
+Received: from linux.fritz.box.com (unknown [10.36.118.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 374B573873;
+ Fri,  6 Mar 2020 17:15:33 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 22/29] monitor: Create QAPIfied monitor_init()
+Date: Fri,  6 Mar 2020 18:14:51 +0100
+Message-Id: <20200306171458.1848-23-kwolf@redhat.com>
+In-Reply-To: <20200306171458.1848-1-kwolf@redhat.com>
+References: <20200306171458.1848-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,48 +86,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recent conversion of qemu-doc.texi to rST forgot a few stray bits
-of makefile code that are now redundant. Remove them.
+This adds a new QAPI-based monitor_init() function. The existing
+monitor_init_opts() is rewritten to simply put its QemuOpts parameter
+into a visitor and pass the resulting QAPI object to monitor_init().
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This will cause some change in those error messages for the monitor
+options in the system emulator that are now generated by the visitor
+rather than explicitly checked in monitor_init_opts().
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200224143008.13362-17-kwolf@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- Makefile | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ qapi/control.json         | 36 ++++++++++++++++++
+ include/monitor/monitor.h |  2 +
+ monitor/monitor.c         | 77 +++++++++++++++++++++------------------
+ 3 files changed, 80 insertions(+), 35 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 9d4b2241265..2ccd80065b6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -761,7 +761,7 @@ rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(M
- endef
- 
- distclean: clean
--	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
-+	rm -f config-host.mak config-host.h* config-host.ld $(DOCS)
- 	rm -f tests/tcg/config-*.mak
- 	rm -f config-all-devices.mak config-all-disas.mak config.status
- 	rm -f $(SUBDIR_DEVICES_MAK)
-@@ -1088,15 +1088,6 @@ $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
- 	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
-              "GEN","$@")
- 
--qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
+diff --git a/qapi/control.json b/qapi/control.json
+index 759c20e76f..3ee086aec7 100644
+--- a/qapi/control.json
++++ b/qapi/control.json
+@@ -216,3 +216,39 @@
+ # <- { "return": {} }
+ ##
+ { 'command': 'quit' }
++
++##
++# @MonitorMode:
++#
++# An enumeration of monitor modes.
++#
++# @readline: HMP monitor (human-oriented command line interface)
++#
++# @control: QMP monitor (JSON-based machine interface)
++#
++# Since: 5.0
++##
++{ 'enum': 'MonitorMode', 'data': [ 'readline', 'control' ] }
++
++##
++# @MonitorOptions:
++#
++# Options to be used for adding a new monitor.
++#
++# @id:          Name of the monitor
++#
++# @mode:        Selects the monitor mode (default: readline)
++#
++# @pretty:      Enables pretty printing (QMP only)
++#
++# @chardev:     Name of a character device to expose the monitor on
++#
++# Since: 5.0
++##
++{ 'struct': 'MonitorOptions',
++  'data': {
++      '*id': 'str',
++      '*mode': 'MonitorMode',
++      '*pretty': 'bool',
++      'chardev': 'str'
++  } }
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index b7bdd2bb2a..db1112552c 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -7,6 +7,7 @@
+=20
+ extern __thread Monitor *cur_mon;
+ typedef struct MonitorHMP MonitorHMP;
++typedef struct MonitorOptions MonitorOptions;
+=20
+ #define QMP_REQ_QUEUE_LEN_MAX 8
+=20
+@@ -18,6 +19,7 @@ void monitor_init_globals(void);
+ void monitor_init_globals_core(void);
+ void monitor_init_qmp(Chardev *chr, bool pretty);
+ void monitor_init_hmp(Chardev *chr, bool use_readline);
++int monitor_init(MonitorOptions *opts, Error **errp);
+ int monitor_init_opts(QemuOpts *opts, Error **errp);
+ void monitor_cleanup(void);
+=20
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index c1a6c4460f..f8a6ef795b 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -25,7 +25,9 @@
+ #include "qemu/osdep.h"
+ #include "monitor-internal.h"
+ #include "qapi/error.h"
++#include "qapi/opts-visitor.h"
+ #include "qapi/qapi-emit-events.h"
++#include "qapi/qapi-visit-control.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qemu/error-report.h"
+@@ -609,50 +611,55 @@ void monitor_init_globals_core(void)
+                                    NULL);
+ }
+=20
+-int monitor_init_opts(QemuOpts *opts, Error **errp)
++int monitor_init(MonitorOptions *opts, Error **errp)
+ {
+     Chardev *chr;
+-    bool qmp;
+-    bool pretty =3D false;
+-    const char *chardev;
+-    const char *mode;
 -
--qemu-monitor.texi: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
- docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
- 	@cp -p $< $@
- 
--- 
+-    mode =3D qemu_opt_get(opts, "mode");
+-    if (mode =3D=3D NULL) {
+-        mode =3D "readline";
+-    }
+-    if (strcmp(mode, "readline") =3D=3D 0) {
+-        qmp =3D false;
+-    } else if (strcmp(mode, "control") =3D=3D 0) {
+-        qmp =3D true;
+-    } else {
+-        error_setg(errp, "unknown monitor mode \"%s\"", mode);
++
++    chr =3D qemu_chr_find(opts->chardev);
++    if (chr =3D=3D NULL) {
++        error_setg(errp, "chardev \"%s\" not found", opts->chardev);
+         return -1;
+     }
+=20
+-    if (!qmp && qemu_opt_get(opts, "pretty")) {
+-        warn_report("'pretty' is deprecated for HMP monitors, it has no ef=
+fect "
+-                    "and will be removed in future versions");
+-    }
+-    if (qemu_opt_get_bool(opts, "pretty", 0)) {
+-        pretty =3D true;
++    switch (opts->mode) {
++    case MONITOR_MODE_CONTROL:
++        monitor_init_qmp(chr, opts->pretty);
++        break;
++    case MONITOR_MODE_READLINE:
++        if (opts->pretty) {
++            warn_report("'pretty' is deprecated for HMP monitors, it has n=
+o "
++                        "effect and will be removed in future versions");
++        }
++        monitor_init_hmp(chr, true);
++        break;
++    default:
++        g_assert_not_reached();
+     }
+=20
+-    chardev =3D qemu_opt_get(opts, "chardev");
+-    if (!chardev) {
+-        error_report("chardev is required");
+-        exit(1);
+-    }
+-    chr =3D qemu_chr_find(chardev);
+-    if (chr =3D=3D NULL) {
+-        error_setg(errp, "chardev \"%s\" not found", chardev);
+-        return -1;
++    return 0;
++}
++
++int monitor_init_opts(QemuOpts *opts, Error **errp)
++{
++    Visitor *v;
++    MonitorOptions *options;
++    Error *local_err =3D NULL;
++
++    v =3D opts_visitor_new(opts);
++    visit_type_MonitorOptions(v, NULL, &options, &local_err);
++    visit_free(v);
++
++    if (local_err) {
++        goto out;
+     }
+=20
+-    if (qmp) {
+-        monitor_init_qmp(chr, pretty);
+-    } else {
+-        monitor_init_hmp(chr, true);
++    monitor_init(options, &local_err);
++    qapi_free_MonitorOptions(options);
++
++out:
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return -1;
+     }
+     return 0;
+ }
+--=20
 2.20.1
 
 
