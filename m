@@ -2,96 +2,100 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51804C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CFDC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:38:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DA1B206E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:36:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0232073D
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 08:38:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAcAoP26"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DA1B206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLMNSmlY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0232073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA8Sr-0004C5-AZ
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:36:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32827)
+	id 1jA8Uc-0006Ro-H9
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 03:38:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1jA8S0-0003DI-D8
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:35:21 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1jA8Te-0005KJ-Bt
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1jA8Ry-0006Br-Tu
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:35:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41089
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1jA8Tc-00080o-Tu
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:37:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55108
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1jA8Ry-00065k-Lc
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:35:18 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jA8Tc-0007vJ-PE
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 03:37:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583483717;
+ s=mimecast20190719; t=1583483819;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XWv3fus2L7H2323rMlCgsZpBwmTa/a2TdmhRV0Z03mc=;
- b=iAcAoP26OBBdoyjX4AzTMAzzCCI4o3+cOOwTn0wIJScdij/iTCqVTLWUsIFhP6qRbYecUg
- t37RT1KHUmyfxfSwfTzL/X20zOIoRSdiNi81uaOHP57R3R9hHTr4c/F8V5O0vP1Gs9z5oP
- lOeBKBOkZ6BewwIAVaz+1OL3cuqADrM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-4y-sWxxANvWulXMd6LSJlg-1; Fri, 06 Mar 2020 03:35:13 -0500
-X-MC-Unique: 4y-sWxxANvWulXMd6LSJlg-1
-Received: by mail-wm1-f69.google.com with SMTP id i16so591921wmd.9
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 00:35:13 -0800 (PST)
+ bh=19lh3jsSD1mF3JqH3mn55RbQxq+w9hyFeQ2KzS/qOV4=;
+ b=WLMNSmlYFb63FxorJejy7H3tz0VRcWf/+8/FHJwsVv/oQpBf5hZDwknp3RjZVCSzhdsgmD
+ 82q1Mz7opFwuu7Q16Im0JA4ExwTo88hnGPKc+I7105244WM4XnJJddq1Hcgk9UDqVCg8Tc
+ 7ZKCwCf8vg6eY2776IGfZ1UIfqSdeTk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-Y-YvSTNGMAu5c4wKx8sr8Q-1; Fri, 06 Mar 2020 03:36:56 -0500
+X-MC-Unique: Y-YvSTNGMAu5c4wKx8sr8Q-1
+Received: by mail-wr1-f70.google.com with SMTP id n12so687233wrp.19
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 00:36:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=RKachxydLyto2q4Ymb4IfwUkM5Jy4dcvVP49rY8s//M=;
- b=uRAzXVmxbc4nAeqd+gPuUFe4xEqJIfYf8J3FwsugE08JZgI2OXVvsRcUugoYZ4oVF0
- rkmMU+/CpZFTge6nFHTZJkSJJvo/RNQ53BUMTUvUJGSMzXo9LuxaxOMIYWGg/SaLabDs
- ngELeRQUSOROdEJm686YHNL7Z0WxYIi/gc/CB39Perx+LkmzAbI4SQcAbyhW3GR97ImE
- E0tMIIqfJmZRjMQwRCMkrgiM14afpHjwFKEhyhQcTTK9dcn/yb14UliE3nnAcBFy8uEb
- RdctXolEmVm0BtFLfukHcVuKev683xlvElXghfT3JKUTrgyDPtzIxXaP7vxZWXnqRTS8
- l+WA==
-X-Gm-Message-State: ANhLgQ32p9C2QdiUiEsS2ZxOPLEf5+uPOTSPplAZ8Jk8IbHy+meMLkRp
- FnCq1ioJ9d7QcYgkLJK/Od0EGDqMtAHkmUgPcOz1hn7QlFIDwrisZpe3+WydHJ82KlVtlybZXYT
- 8hOqS3mYC5xxNlO4=
-X-Received: by 2002:a1c:1d84:: with SMTP id d126mr2663668wmd.187.1583483712442; 
- Fri, 06 Mar 2020 00:35:12 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuP32RN2TFNB1cPcOUALI9ZCfi1sCzQ1Ftp9XjEiX3n466cl1Daxrp+ntpWxlrwY53j25U7Ag==
-X-Received: by 2002:a1c:1d84:: with SMTP id d126mr2663643wmd.187.1583483712228; 
- Fri, 06 Mar 2020 00:35:12 -0800 (PST)
-Received: from steredhat (host34-204-dynamic.43-79-r.retail.telecomitalia.it.
- [79.43.204.34])
- by smtp.gmail.com with ESMTPSA id z10sm12739769wmk.31.2020.03.06.00.35.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 Mar 2020 00:35:11 -0800 (PST)
-Date: Fri, 6 Mar 2020 09:35:09 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] tests/docker: Install tools to cross-debug and build
- Linux kernels
-Message-ID: <20200306083509.dijhmlnbxjlol5yg@steredhat>
-References: <20200212202738.12986-1-philmd@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=19lh3jsSD1mF3JqH3mn55RbQxq+w9hyFeQ2KzS/qOV4=;
+ b=Ny3PiWDUaxp7Df12HmI7hdIMHj+wHDEMuK8gbXUSD5Z4r4hkTN0SjfYieFvQs4XHLc
+ Whjhcyf9dUhWRs9a9UWU8gsoX7LZkqHPorVmW9zNPLrCxD99vHFdtWYZGnL1Iy4sO7fo
+ mMyZTvI5cYshbV1RwfIvR2TwzDN5ngwEyr+VgWiKQVz18Elpqj+jKNt8vUNS1IWgamQ6
+ zbQOD2xsf1MWngMsny1Mx9hdF1Bdq8OmaqE1OYlNtNroy3P/MfBqIdVFObPon88clrMG
+ aIh5mD+rmQKFRRCwgUMiOuLe5V6ksq3kRJ4GHQaWcJy+dZoOuxrXuoBrbuqqjQUnshih
+ nGPQ==
+X-Gm-Message-State: ANhLgQ2QIKzvI1B8rP/0nlcw13om0EVFd2TOkTjwyOSDMjmtz0od3MPB
+ jQ+sV/Gb/BjIeGY8Embqs+y5IqxVw+akEIWbqcgds5LO9d5mQmYn2iOIz3uozdKBAqDB/hDLZYD
+ teJ3xqjWrFQR9Nj8=
+X-Received: by 2002:a1c:2d4f:: with SMTP id t76mr2728271wmt.60.1583483815161; 
+ Fri, 06 Mar 2020 00:36:55 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtxItmlPUu6O0jUJo8iIAucrBvT5r52QpX/m5XSThW7Yy9P48SOvKJgodt+Mi6McXCMxaj/bg==
+X-Received: by 2002:a1c:2d4f:: with SMTP id t76mr2728247wmt.60.1583483814842; 
+ Fri, 06 Mar 2020 00:36:54 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:b99a:4374:773d:f32e?
+ ([2001:b07:6468:f312:b99a:4374:773d:f32e])
+ by smtp.gmail.com with ESMTPSA id q3sm12027909wmj.38.2020.03.06.00.36.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Mar 2020 00:36:54 -0800 (PST)
+Subject: Re: [PATCH v4 0/2] Add AVX512F optimization option and
+ buffer_zero_avx512()
+To: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org,
+ richard.henderson@linaro.org, laurent@vivier.eu, philmd@redhat.com,
+ berrange@redhat.com
+References: <1582979675-22550-1-git-send-email-robert.hu@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <912797a8-2199-dea1-61fb-970e0b24dfa7@redhat.com>
+Date: Fri, 6 Mar 2020 09:36:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200212202738.12986-1-philmd@redhat.com>
+In-Reply-To: <1582979675-22550-1-git-send-email-robert.hu@linux.intel.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,87 +107,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: robert.hu@intel.com, chao.p.peng@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 12, 2020 at 09:27:38PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> We often run Linux kernels to test QEMU. We sometimes need
-> to build them manually to use non-default features. We only
-> miss the tiny 'bc' tool.
->=20
-> The ncurses library is helpful to run 'make menuconfig'.
->=20
-> Finally, gdb-multiarch allow us to debug a TCG guest when its
-> architecture is different than the host.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  tests/docker/dockerfiles/debian10.docker | 3 +++
->  tests/docker/dockerfiles/debian9.docker  | 3 +++
->  2 files changed, 6 insertions(+)
+On 29/02/20 13:34, Robert Hoo wrote:
+> 1) Introduce {enable,disable}-avx512f configure option
+> 
+> 2) Implement new buffer_zero_avx512() with AVX512F instructions
+> 
+> Changes in v4:
+> In init_cpuid_cache(), stringently test AVX512F OS level enablement.
+> 
+> Changes in v3:
+> In init_accel(), init length_to_accel value in every accel case, because
+> in unit test, it will be invoked several times with different accel cases.
+> (Thanks Richard's careful review)
+> 
+> Changes in v2:
+> 1. Fixes wrong definition of CACHE_SSE2 in v1.
+> 2. Fixes not handle <256 length case in buffer_zero_avx512() implementaion.
+> (Follow Richard's suggestion: handle the case in select_accel_fn(), and have a
+> global variable alongside buffer_accel)
+> 3. Changes avx512f configuration option's default status to disabled.
+> 4. Ran 'make check-unit' on this patch, on both a Ivybridge machine and a
+> CascadeLake machine.
+> 
+> 
+> Robert Hoo (2):
+>   configure: add configure option avx512f_opt
+>   util: add util function buffer_zero_avx512()
+> 
+>  configure            | 41 +++++++++++++++++++++++++++++
+>  include/qemu/cpuid.h |  3 +++
+>  util/bufferiszero.c  | 74 +++++++++++++++++++++++++++++++++++++++++++++-------
+>  3 files changed, 108 insertions(+), 10 deletions(-)
+> 
 
-Make sense to add these packages:
+Queued, thanks.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
-
->=20
-> diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dock=
-erfiles/debian10.docker
-> index 5de79ae552..2fcdc406e8 100644
-> --- a/tests/docker/dockerfiles/debian10.docker
-> +++ b/tests/docker/dockerfiles/debian10.docker
-> @@ -17,14 +17,17 @@ RUN apt update && \
->      DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
->      DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->      apt install -y --no-install-recommends \
-> +        bc \
->          bison \
->          build-essential \
->          ca-certificates \
->          clang \
->          dbus \
->          flex \
-> +        gdb-multiarch \
->          gettext \
->          git \
-> +        libncurses5-dev \
->          pkg-config \
->          psmisc \
->          python3 \
-> diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/docke=
-rfiles/debian9.docker
-> index 8cbd742bb5..92edbbf0f4 100644
-> --- a/tests/docker/dockerfiles/debian9.docker
-> +++ b/tests/docker/dockerfiles/debian9.docker
-> @@ -17,13 +17,16 @@ RUN apt update && \
->      DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
->      DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->      apt install -y --no-install-recommends \
-> +        bc \
->          bison \
->          build-essential \
->          ca-certificates \
->          clang \
->          flex \
-> +        gdb-multiarch \
->          gettext \
->          git \
-> +        libncurses5-dev \
->          pkg-config \
->          psmisc \
->          python3 \
-> --=20
-> 2.21.1
->=20
->=20
+Paolo
 
 
