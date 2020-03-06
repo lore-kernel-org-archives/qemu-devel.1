@@ -2,60 +2,65 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E9CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5E1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:03:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D6F520848
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:00:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6F520848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38B6420726
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:03:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="if5D5cks"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38B6420726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAAia-0007dN-Rd
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:00:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45391)
+	id 1jAAli-0001bk-7Y
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:03:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51780)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tianjia.zhang@linux.alibaba.com>) id 1jAAhr-0007Br-3w
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:59:51 -0500
+ (envelope-from <berto@igalia.com>) id 1jAAkQ-0000sE-IY
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tianjia.zhang@linux.alibaba.com>) id 1jAAhk-0001Qs-RA
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:59:45 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:54289)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tianjia.zhang@linux.alibaba.com>)
- id 1jAAhk-0000qL-Gq
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:59:44 -0500
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R401e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04428;
- MF=tianjia.zhang@linux.alibaba.com; NM=1; PH=DS; RN=2; SR=0;
- TI=SMTPD_---0TrozvF9_1583492361; 
-Received: from 30.27.224.42(mailfrom:tianjia.zhang@linux.alibaba.com
- fp:SMTPD_---0TrozvF9_1583492361) by smtp.aliyun-inc.com(127.0.0.1);
- Fri, 06 Mar 2020 18:59:22 +0800
-Subject: Re: [PATCH] tests: Fix a bug with count variables
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20200207115433.118254-1-tianjia.zhang@linux.alibaba.com>
- <20200212135937.GD432724@stefanha-x1.localdomain>
- <6a59cc95-4c75-6b36-eaf7-c5a5d2ecdf2d@linux.alibaba.com>
-Message-ID: <1e613efd-6e9a-218a-35a4-b60d58086a7f@linux.alibaba.com>
-Date: Fri, 6 Mar 2020 18:59:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <berto@igalia.com>) id 1jAAkP-0002tR-7J
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:02:30 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:43086)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jAAkO-0002gl-Ix; Fri, 06 Mar 2020 06:02:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=DeL0a7YjU2R9PbdSA9cay0PiC0uIWJp67ePHFkkGUpA=; 
+ b=if5D5cksjzYicETnVSWnbWdBScQ7kqcsh1L1qAEa6/FQp+buTYYMKmjRQbm3CnZTUwRVC1XiQ2JA310ZeHYljXAnYfBfE6Gd6LziIB0VudPuwkP0NaiDfDDG5WvJdbBX0wGkKHxj/JC//iIhn2tsVtCtYGa+0zu+68uTQ9BAmVrxPh8DUWTlBIraewXw5q6AuLcxAry0vDShqHInbViwgSral/EHuzSxZkTeqHgiipGR5gAWWlsiIxP+Hbmj+dpWZthtVM0+RZZKcJx56jUSZPqYhCZYwOofE0Pyk/iuwOtp3v1P19+/5jgDmSH3PQGWWg7B9v2GXfq7DGVTAxDlQQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jAAkI-0004u0-No; Fri, 06 Mar 2020 12:02:22 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jAAkI-0005as-DF; Fri, 06 Mar 2020 12:02:22 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v8 01/10] error: auto propagated local_err
+In-Reply-To: <20200306051536.27803-2-vsementsov@virtuozzo.com>
+References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
+ <20200306051536.27803-2-vsementsov@virtuozzo.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 06 Mar 2020 12:02:22 +0100
+Message-ID: <w51mu8tsq4h.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <6a59cc95-4c75-6b36-eaf7-c5a5d2ecdf2d@linux.alibaba.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,37 +72,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri 06 Mar 2020 06:15:27 AM CET, Vladimir Sementsov-Ogievskiy wrote:
 
+Sorry I just gave a quick look at these patches and noticed this:
 
-On 2020/3/6 18:22, Tianjia Zhang wrote:
-> 
-> On 2020/2/12 21:59, Stefan Hajnoczi wrote:
->> On Fri, Feb 07, 2020 at 07:54:33PM +0800, Tianjia Zhang wrote:
->>> The counting code here should use the local variable n_nodes_local.
->>> Otherwise, the variable n_nodes is counting incorrectly, causing the
->>> counting logic of the code to be wrong.
->>>
->>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->>> ---
->>>   tests/test-rcu-list.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>
-> 
-> Hi,
-> 
-> I see that this patch has not entered the mainline. It has been more 
-> than 20 days. Dont forget it.
-> 
-> Thanks,
-> Tianjia
+> + * Function may use error system to return errors. In this case function
+> + * defines Error **errp parameter, which should be the last one (except for
+> + * functions which varidic argument list), which has the following API:
 
-Thanks and Best,
-Tianjia
+I don't think that "functions which varidic argument list" is correct
+English. Perhaps something like "except for variadic functions" or
+"except for functions with a variable number of arguments".
+
+Berto
 
