@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F773C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBB6C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6E72051A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A88A22051A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:31:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cuQ+Q4TW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6E72051A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Anm25XWz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88A22051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGnT-0002Us-5r
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:30:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48763)
+	id 1jAGot-0004XX-Oa
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:31:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jAGZa-00056L-1h
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:45 -0500
+ (envelope-from <kwolf@redhat.com>) id 1jAGZc-0005BC-FD
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jAGZX-0008Fy-L1
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33262
+ (envelope-from <kwolf@redhat.com>) id 1jAGZZ-0008Lt-MX
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:44 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44375
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZX-0008E7-Fq
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:39 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jAGZZ-0008Ka-GA
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:15:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583514938;
+ s=mimecast20190719; t=1583514941;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FfVKE4oQOv+fEEApXhx4oJW0V8OXPw6JlAQlw/LRLN4=;
- b=cuQ+Q4TWA0RTy1RlmEiUigA0gGBuqVbz8oMSqenycF5EYlc1gUg93rh9WT1QOB6H5thd8g
- T0RmkWc7/ffkDYi3/hIfFvV1Q+7x4Zk+SbOsMN/uEe9/AXRtsCQcAW4ZM0kKVWjzlZ+VK5
- 0oyuK7H3oCfGAE1DITcFcK+CSmiGDQg=
+ bh=sByuPQu8tf0E78pwh2F877wIZuRaSQbvuW4w6ZxbEyM=;
+ b=Anm25XWzDa+93b+X1GZcI/4rDqdPqvLDpSn84kMMGXKp1oKnbmKYsoZIP8Oz5Lou3CQjtH
+ 5JHrh7SuzrRaRIlesNGhlnP6BBJO4VdrhqYaIjfXbxvzCYWEnbkcoIeL95/jsITetmHbg1
+ oqC3tfTjVW6apNmclMg8aRnVMAyglNQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-6XZNeu-rOqG2R3Jc9Q75Yg-1; Fri, 06 Mar 2020 12:15:36 -0500
-X-MC-Unique: 6XZNeu-rOqG2R3Jc9Q75Yg-1
+ us-mta-138-Ks7aPuPpPbS29lNpJAn68g-1; Fri, 06 Mar 2020 12:15:39 -0500
+X-MC-Unique: Ks7aPuPpPbS29lNpJAn68g-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 725A213F5;
- Fri,  6 Mar 2020 17:15:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEA2E184C804;
+ Fri,  6 Mar 2020 17:15:37 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76A3673873;
- Fri,  6 Mar 2020 17:15:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0544373873;
+ Fri,  6 Mar 2020 17:15:36 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 23/29] qmp: Fail gracefully if chardev is already in use
-Date: Fri,  6 Mar 2020 18:14:52 +0100
-Message-Id: <20200306171458.1848-24-kwolf@redhat.com>
+Subject: [PULL 25/29] monitor: Add allow_hmp parameter to monitor_init()
+Date: Fri,  6 Mar 2020 18:14:54 +0100
+Message-Id: <20200306171458.1848-26-kwolf@redhat.com>
 In-Reply-To: <20200306171458.1848-1-kwolf@redhat.com>
 References: <20200306171458.1848-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -90,138 +90,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trying to attach a QMP monitor to a chardev that is already in use
-results in a crash because monitor_init_qmp() passes &error_abort to
-qemu_chr_fe_init():
-
-$ ./x86_64-softmmu/qemu-system-x86_64 --chardev stdio,id=3Dfoo --mon foo,mo=
-de=3Dcontrol --mon foo,mode=3Dcontrol
-Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:220:
-qemu-system-x86_64: --mon foo,mode=3Dcontrol: Device 'foo' is in use
-Abgebrochen (Speicherabzug geschrieben)
-
-Fix this by allowing monitor_init_qmp() to return an error and passing
-any error in qemu_chr_fe_init() to its caller instead of aborting.
+Add a new parameter allow_hmp to monitor_init() so that the storage
+daemon can disable HMP.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200224143008.13362-18-kwolf@redhat.com>
+Message-Id: <20200224143008.13362-20-kwolf@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
+ qapi/control.json         |  3 ++-
  include/monitor/monitor.h |  2 +-
- monitor/monitor.c         |  7 ++++++-
- monitor/qmp.c             | 11 +++++++----
- stubs/monitor-core.c      |  2 +-
- tests/test-util-sockets.c |  2 +-
- 5 files changed, 16 insertions(+), 8 deletions(-)
+ monitor/monitor.c         | 12 ++++++++++--
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
+diff --git a/qapi/control.json b/qapi/control.json
+index 3ee086aec7..85b12fe0fb 100644
+--- a/qapi/control.json
++++ b/qapi/control.json
+@@ -237,7 +237,8 @@
+ #
+ # @id:          Name of the monitor
+ #
+-# @mode:        Selects the monitor mode (default: readline)
++# @mode:        Selects the monitor mode (default: readline in the system
++#               emulator, control in qemu-storage-daemon)
+ #
+ # @pretty:      Enables pretty printing (QMP only)
+ #
 diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index db1112552c..e55a3b57e0 100644
+index ad823b9edb..1018d754a6 100644
 --- a/include/monitor/monitor.h
 +++ b/include/monitor/monitor.h
-@@ -17,7 +17,7 @@ bool monitor_cur_is_qmp(void);
-=20
- void monitor_init_globals(void);
+@@ -19,7 +19,7 @@ void monitor_init_globals(void);
  void monitor_init_globals_core(void);
--void monitor_init_qmp(Chardev *chr, bool pretty);
-+void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp);
- void monitor_init_hmp(Chardev *chr, bool use_readline);
- int monitor_init(MonitorOptions *opts, Error **errp);
+ void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp);
+ void monitor_init_hmp(Chardev *chr, bool use_readline, Error **errp);
+-int monitor_init(MonitorOptions *opts, Error **errp);
++int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp);
  int monitor_init_opts(QemuOpts *opts, Error **errp);
+ void monitor_cleanup(void);
+=20
 diff --git a/monitor/monitor.c b/monitor/monitor.c
-index f8a6ef795b..00d287655e 100644
+index 2282bf6780..125494410a 100644
 --- a/monitor/monitor.c
 +++ b/monitor/monitor.c
-@@ -614,6 +614,7 @@ void monitor_init_globals_core(void)
- int monitor_init(MonitorOptions *opts, Error **errp)
+@@ -611,7 +611,7 @@ void monitor_init_globals_core(void)
+                                    NULL);
+ }
+=20
+-int monitor_init(MonitorOptions *opts, Error **errp)
++int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp)
  {
      Chardev *chr;
-+    Error *local_err =3D NULL;
-=20
-     chr =3D qemu_chr_find(opts->chardev);
-     if (chr =3D=3D NULL) {
-@@ -623,7 +624,7 @@ int monitor_init(MonitorOptions *opts, Error **errp)
-=20
-     switch (opts->mode) {
-     case MONITOR_MODE_CONTROL:
--        monitor_init_qmp(chr, opts->pretty);
-+        monitor_init_qmp(chr, opts->pretty, &local_err);
-         break;
-     case MONITOR_MODE_READLINE:
-         if (opts->pretty) {
-@@ -636,6 +637,10 @@ int monitor_init(MonitorOptions *opts, Error **errp)
-         g_assert_not_reached();
+     Error *local_err =3D NULL;
+@@ -622,11 +622,19 @@ int monitor_init(MonitorOptions *opts, Error **errp)
+         return -1;
      }
 =20
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return -1;
++    if (!opts->has_mode) {
++        opts->mode =3D allow_hmp ? MONITOR_MODE_READLINE : MONITOR_MODE_CO=
+NTROL;
 +    }
-     return 0;
- }
-=20
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index 8379c8f96e..f89e7daf27 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -395,10 +395,16 @@ static void monitor_qmp_setup_handlers_bh(void *opaqu=
-e)
-     monitor_list_append(&mon->common);
- }
-=20
--void monitor_init_qmp(Chardev *chr, bool pretty)
-+void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp)
- {
-     MonitorQMP *mon =3D g_new0(MonitorQMP, 1);
-=20
-+    if (!qemu_chr_fe_init(&mon->common.chr, chr, errp)) {
-+        g_free(mon);
-+        return;
-+    }
-+    qemu_chr_fe_set_echo(&mon->common.chr, true);
 +
-     /* Note: we run QMP monitor in I/O thread when @chr supports that */
-     monitor_data_init(&mon->common, true, false,
-                       qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT=
-));
-@@ -408,9 +414,6 @@ void monitor_init_qmp(Chardev *chr, bool pretty)
-     qemu_mutex_init(&mon->qmp_queue_lock);
-     mon->qmp_requests =3D g_queue_new();
+     switch (opts->mode) {
+     case MONITOR_MODE_CONTROL:
+         monitor_init_qmp(chr, opts->pretty, &local_err);
+         break;
+     case MONITOR_MODE_READLINE:
++        if (!allow_hmp) {
++            error_setg(errp, "Only QMP is supported");
++            return -1;
++        }
+         if (opts->pretty) {
+             warn_report("'pretty' is deprecated for HMP monitors, it has n=
+o "
+                         "effect and will be removed in future versions");
+@@ -658,7 +666,7 @@ int monitor_init_opts(QemuOpts *opts, Error **errp)
+         goto out;
+     }
 =20
--    qemu_chr_fe_init(&mon->common.chr, chr, &error_abort);
--    qemu_chr_fe_set_echo(&mon->common.chr, true);
--
-     json_message_parser_init(&mon->parser, handle_qmp_command, mon, NULL);
-     if (mon->common.use_io_thread) {
-         /*
-diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
-index 403c00a6d0..6cff1c4e1d 100644
---- a/stubs/monitor-core.c
-+++ b/stubs/monitor-core.c
-@@ -5,7 +5,7 @@
+-    monitor_init(options, &local_err);
++    monitor_init(options, true, &local_err);
+     qapi_free_MonitorOptions(options);
 =20
- __thread Monitor *cur_mon;
-=20
--void monitor_init_qmp(Chardev *chr, bool pretty)
-+void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp)
- {
- }
-=20
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 8ce55efe70..2edb4c539d 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -71,7 +71,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Erro=
-r **errp)
-  */
- __thread Monitor *cur_mon;
- int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort(); =
-}
--void monitor_init_qmp(Chardev *chr, bool pretty) {}
-+void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp) {}
- void monitor_init_hmp(Chardev *chr, bool use_readline) {}
-=20
-=20
+ out:
 --=20
 2.20.1
 
