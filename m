@@ -2,143 +2,91 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D45C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB2DC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C97222072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:49:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97222072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 587B620848
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 11:51:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hqD/ilEG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 587B620848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jABTo-0006JL-1h
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:49:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48492)
+	id 1jABW2-0007Sb-HY
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 06:51:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jABT5-0005Re-85
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:40 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1jABVT-00071N-49
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:51:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jABT4-0004Kq-4A
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44738
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jABT3-0004Jk-V3
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:48:38 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 026BisdD132772
- for <qemu-devel@nongnu.org>; Fri, 6 Mar 2020 06:48:36 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yhr4mfun3-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 06:48:36 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 6 Mar 2020 11:48:34 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 6 Mar 2020 11:48:31 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 026BmUkg51249198
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 6 Mar 2020 11:48:30 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BFBFBAE051;
- Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8F405AE04D;
- Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri,  6 Mar 2020 11:48:30 +0000 (GMT)
-Subject: Re: [PATCH v6 03/18] s390x: protvirt: Support unpack facility
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-4-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Fri, 6 Mar 2020 12:48:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <alex.bennee@linaro.org>) id 1jABVR-0006l6-RL
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:51:06 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39273)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jABVR-0006kR-IZ
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 06:51:05 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y17so2002566wrn.6
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 03:51:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=IzWAOuUZuk3+qrPCYpt5N4XDCb784IMTeW0/XwQlziY=;
+ b=hqD/ilEGCUQFBbFkxZvNorYg/DFQ0IaUBYvKZbPC80jsAbs9JfEL0FsQlagZ9wDjuY
+ R57oUA3ch/n0VAZl+m99RVTd4JIsc78fa4caIEFUlaw7J/ELZ/DnT/O7CQ4lqs8p6cfE
+ x3POw9YtiDBSAQKzJ6PCGJOetME4Krfa8IDeJKXnyLtxHn7TDVJNw9S2w9M42UR4k3Pb
+ 3Ck9VBFlJX0fndRY2Hn4x5y1Y0zhxacRBDRXJkmc76ZRmt4SUbTEaUkaQEz9UbMC22FT
+ AkrwQUTDbeY3Drzzg36q3E805dAoj3yhMY4TwO7dOXek7iSRlwqWbsR5MVgTwC8W7Dgc
+ VS1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=IzWAOuUZuk3+qrPCYpt5N4XDCb784IMTeW0/XwQlziY=;
+ b=dFeSpKXCxN3LI7XY0SQglkPfgo5zKZbPRt+7dIKofzA27y8/D6s5a8hRb8ZP7eHYtd
+ MxpKHhFDah4GRfkLLV0xzansvRAAenZg5KuVbTNsKDARkCUQx1N5fBUOrEStgOvAHr91
+ Vx4gEqTzoOWwlz6qIIH7Cyj1EL3mLTBQt+DTZAJbzc2GDu3/zNU0MOUymARzSO1nyRU8
+ OZsfBAeEe1xWWNpuY9hZ4ww4bBq2MrFPcRroRMGLS4uaqErwWQC4ZnckahAt1IRsXQs6
+ +f9+sABdpin73/cST4yp5loc7JPcduRmuNMutVSLFE/qOS7xgQpZ0mPWmYu7Rea6Mp+r
+ paAQ==
+X-Gm-Message-State: ANhLgQ13dn6JRKgP6Nvycpg5F1hejj0pBHAl5sZcjmJJFlqMzjCBvNz7
+ C5IBVJpW8plUexryZUjJ+S+LBQ==
+X-Google-Smtp-Source: ADFU+vt3Rbm4mw2+xk0H9WbyxMiithM7TkwjVbzf7BFBxGHAwHSEaPnrYavwvGAGt/qnpuTiKMy2PA==
+X-Received: by 2002:a5d:6986:: with SMTP id g6mr3699051wru.421.1583495464082; 
+ Fri, 06 Mar 2020 03:51:04 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f8sm5929376wmf.20.2020.03.06.03.51.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Mar 2020 03:51:02 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 44D7F1FF87;
+ Fri,  6 Mar 2020 11:51:02 +0000 (GMT)
+References: <20200212202738.12986-1-philmd@redhat.com>
+ <4481651f-1c10-ca86-dc57-02aaff7d2a1a@redhat.com>
+ <030679b1-2fb7-0687-9ac7-f2cfe4ed8b02@redhat.com>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH] tests/docker: Install tools to cross-debug and build
+ Linux kernels
+In-reply-to: <030679b1-2fb7-0687-9ac7-f2cfe4ed8b02@redhat.com>
+Date: Fri, 06 Mar 2020 11:51:02 +0000
+Message-ID: <87a74t66s9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200304114231.23493-4-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20030611-0028-0000-0000-000003E1751D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030611-0029-0000-0000-000024A6AD31
-Message-Id: <41dabcca-2840-7420-5a46-bd9e6e575f12@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-06_03:2020-03-06,
- 2020-03-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015
- mlxscore=0 phishscore=0 mlxlogscore=999 suspectscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003060085
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,82 +98,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-On 04.03.20 12:42, Janosch Frank wrote:
-[...]
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 3dd396e870..69b1cc5dfc 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -37,6 +37,8 @@
->  #include "sysemu/hw_accel.h"
->  #include "hw/qdev-properties.h"
->  #ifndef CONFIG_USER_ONLY
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/pv.h"
->  #include "hw/boards.h"
->  #include "sysemu/arch_init.h"
->  #include "sysemu/sysemu.h"
-> @@ -191,6 +193,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
->  
->  #if !defined(CONFIG_USER_ONLY)
->      MachineState *ms = MACHINE(qdev_get_machine());
-> +    S390CcwMachineState *ccw = S390_CCW_MACHINE(ms);
->      unsigned int max_cpus = ms->smp.max_cpus;
->      if (cpu->env.core_id >= max_cpus) {
->          error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
+> ping ping?
 
-I messed this up and this can break for the none machine.
+Queued to testing/next, thanks. Sorry for the delay.
 
-Something like this on top:
+>
+> On 2/24/20 1:20 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 2/12/20 9:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>
+>>> We often run Linux kernels to test QEMU. We sometimes need
+>>> to build them manually to use non-default features. We only
+>>> miss the tiny 'bc' tool.
+>>>
+>>> The ncurses library is helpful to run 'make menuconfig'.
+>>>
+>>> Finally, gdb-multiarch allow us to debug a TCG guest when its
+>>> architecture is different than the host.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>>   tests/docker/dockerfiles/debian10.docker | 3 +++
+>>>   tests/docker/dockerfiles/debian9.docker  | 3 +++
+>>>   2 files changed, 6 insertions(+)
+>>>
+>>> diff --git a/tests/docker/dockerfiles/debian10.docker
+>>> b/tests/docker/dockerfiles/debian10.docker
+>>> index 5de79ae552..2fcdc406e8 100644
+>>> --- a/tests/docker/dockerfiles/debian10.docker
+>>> +++ b/tests/docker/dockerfiles/debian10.docker
+>>> @@ -17,14 +17,17 @@ RUN apt update && \
+>>>       DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
+>>>       DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>>>       apt install -y --no-install-recommends \
+>>> +        bc \
+>>>           bison \
+>>>           build-essential \
+>>>           ca-certificates \
+>>>           clang \
+>>>           dbus \
+>>>           flex \
+>>> +        gdb-multiarch \
+>>>           gettext \
+>>>           git \
+>>> +        libncurses5-dev \
+>>>           pkg-config \
+>>>           psmisc \
+>>>           python3 \
+>>> diff --git a/tests/docker/dockerfiles/debian9.docker
+>>> b/tests/docker/dockerfiles/debian9.docker
+>>> index 8cbd742bb5..92edbbf0f4 100644
+>>> --- a/tests/docker/dockerfiles/debian9.docker
+>>> +++ b/tests/docker/dockerfiles/debian9.docker
+>>> @@ -17,13 +17,16 @@ RUN apt update && \
+>>>       DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata && \
+>>>       DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>>>       apt install -y --no-install-recommends \
+>>> +        bc \
+>>>           bison \
+>>>           build-essential \
+>>>           ca-certificates \
+>>>           clang \
+>>>           flex \
+>>> +        gdb-multiarch \
+>>>           gettext \
+>>>           git \
+>>> +        libncurses5-dev \
+>>>           pkg-config \
+>>>           psmisc \
+>>>           python3 \
+>>>
+>> ping?
 
 
-
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 7840e784f1..1b42b0fa25 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -181,6 +181,18 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-     info->print_insn = print_insn_s390;
- }
- 
-+static bool machine_is_pv(MachineState *ms)
-+{
-+    Object *obj;
-+
-+    /* we have to bail out for the "none" machine */
-+    obj = object_dynamic_cast(OBJECT(ms), TYPE_S390_CCW_MACHINE);
-+     if (!obj) {
-+        return false;
-+    }
-+    return S390_CCW_MACHINE(obj)->pv;
-+}
-+
- static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-@@ -198,7 +210,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- 
- #if !defined(CONFIG_USER_ONLY)
-     MachineState *ms = MACHINE(qdev_get_machine());
--    S390CcwMachineState *ccw = S390_CCW_MACHINE(ms);
-     unsigned int max_cpus = ms->smp.max_cpus;
-     if (cpu->env.core_id >= max_cpus) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-@@ -213,7 +224,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
-     }
- 
--    cpu->env.pv = ccw->pv;
-+    cpu->env.pv = machine_is_pv(ms);
-     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
-     cs->cpu_index = cpu->env.core_id;
- #endif
-
+--=20
+Alex Benn=C3=A9e
 
