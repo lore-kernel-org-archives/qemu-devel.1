@@ -2,128 +2,98 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C682C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFFAC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C59D2073D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9762B207FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 10:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YuuqoM5B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C59D2073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hYM5gmdA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9762B207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAA8k-00021v-99
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:23:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33640)
+	id 1jAABb-0003dp-LV
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 05:26:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jAA83-0001OH-DX
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:52 -0500
+ (envelope-from <mst@redhat.com>) id 1jAAAz-00038C-MR
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jAA82-00078m-Cg
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53242
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1jAAAy-0004Kd-Bt
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53341
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jAA82-00077L-9n
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:22:50 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jAAAy-0004Ic-7C
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 05:25:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583490169;
+ s=mimecast20190719; t=1583490351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4+OOren8GJsyZVW7YMWNzxjsY5g0zNjR86SVAAMbL1o=;
- b=YuuqoM5B1ZBu27ccXwC+Jc9P7e9Fw9hU/34KWi3BVaNEtowWTFkvjnl4wxAn/8razSo6bq
- +0UtQdUzUwSw/HgLlg5Ui2rjaPUck7IvnZhcZuECGbg2SfiJgjYAiEvFWbEnjXadEYPzqe
- rx3uC/x0FieGyZaoYA6gYzOU+dyBDkw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-2HJ9Ru6mOz-qRIFXn_MMIQ-1; Fri, 06 Mar 2020 05:22:46 -0500
-X-MC-Unique: 2HJ9Ru6mOz-qRIFXn_MMIQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9D508014CA;
- Fri,  6 Mar 2020 10:22:44 +0000 (UTC)
-Received: from [10.36.117.101] (ovpn-117-101.ams2.redhat.com [10.36.117.101])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9572D91D87;
- Fri,  6 Mar 2020 10:22:43 +0000 (UTC)
-Subject: Re: [PATCH v6 16/18] s390x: Add unpack facility feature to GA1
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-17-frankja@linux.ibm.com>
- <9237b77a-4ae8-387c-9d98-aa66729db362@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <fcfec7b7-8026-5f71-e3a8-a9120e847158@redhat.com>
-Date: Fri, 6 Mar 2020 11:22:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ in-reply-to:in-reply-to:references:references;
+ bh=nwTG91Z0UrMLSgqKM3z5NdRNykS8obtcjvFPhfrFI/I=;
+ b=hYM5gmdAQopjxNxxcTouZmNmEhlMZIgN0znrY5QBnGqhFiK9expBuheyQutHGTwYkxxRKm
+ Fv1fu9UJ0AkFif0dUY6fautJOd6k5T6xoYYta7iYY/2/Ru5n3aAME6BET9nwLXMPakJ1t6
+ bsoFz/QJEUfJVKaajI51E6Cmfpl6aRI=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-4AHpjZ5bPCioD01wLDEcvw-1; Fri, 06 Mar 2020 05:25:50 -0500
+X-MC-Unique: 4AHpjZ5bPCioD01wLDEcvw-1
+Received: by mail-qk1-f198.google.com with SMTP id v189so1150766qkb.16
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 02:25:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=AW4v09Vd96b9fi6my7L4ohTPyY7UcwbrJewejEw9AHI=;
+ b=NmFT3HqfH3tE5CRN97PnuRaP1x8D8q9fUp7TIZyFxsI/OC7x/EFXcsnx/lb4YFeVrq
+ 7sCji3av+JjdpQRunBIQhlY/Ai5o6VtDP1X5fVBYJ1UHrcAKVZHLBM9Ld+bFo7ii1GIg
+ lvEM8tGEubdKXSPk2BCpsoWApJX0qzoOfQPiAaFZ2J/xAWWDvfACVYEoFqqHggH2Z8Nk
+ hkkYtQTCA6Yp20DQ45dO8lk1UanwPTIcZKncQGUNLjVYBU9ShOi+Xmk+T0YnUGm0Io1r
+ mqPxz5TGM1aLBUP2Il1WFqSSHSscm2mtGE+CCN/5M7NuBj/O5AI5BSnsrfXC4e6MWTCC
+ urzw==
+X-Gm-Message-State: ANhLgQ1naJKdm/5Bw3hIOGHkfV2FX3y9HAyrh/x+j6IqlDQw03gxm/HA
+ hdfohHowHEDjX4BT7xcEX75Mv+Z9uH3MrhaX0ffm8lAasdjOBHtdQUrOIC3oQS7qAUW91agYKem
+ G+bxUOGfr390qioE=
+X-Received: by 2002:a0c:d603:: with SMTP id c3mr2229030qvj.45.1583490348813;
+ Fri, 06 Mar 2020 02:25:48 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vu2UbDFSCHwP7D6rxln5dc25KjIVhA8b+6v+G8yPgus7XWeJKbhuCu72TIXr2yIW4uSaXeF9w==
+X-Received: by 2002:a0c:d603:: with SMTP id c3mr2229017qvj.45.1583490348535;
+ Fri, 06 Mar 2020 02:25:48 -0800 (PST)
+Received: from redhat.com (bzq-79-180-48-224.red.bezeqint.net. [79.180.48.224])
+ by smtp.gmail.com with ESMTPSA id a23sm17214816qko.77.2020.03.06.02.25.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Mar 2020 02:25:47 -0800 (PST)
+Date: Fri, 6 Mar 2020 05:25:43 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH 1/3] virtio-net: introduce RSS RX steering feature
+Message-ID: <20200306052517-mutt-send-email-mst@kernel.org>
+References: <20200226174809.9675-1-yuri.benditovich@daynix.com>
+ <20200226174809.9675-2-yuri.benditovich@daynix.com>
+ <20200305082023-mutt-send-email-mst@kernel.org>
+ <CAOEp5Oc+dTzJHzof9suUbXEgBnYoa4bh87K-ALWMzw_MzYf4Mw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <9237b77a-4ae8-387c-9d98-aa66729db362@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CAOEp5Oc+dTzJHzof9suUbXEgBnYoa4bh87K-ALWMzw_MzYf4Mw@mail.gmail.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,39 +105,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06.03.20 11:14, Janosch Frank wrote:
-> On 3/4/20 12:42 PM, Janosch Frank wrote:
->> From: Christian Borntraeger <borntraeger@de.ibm.com>
->>
->> The unpack facility is an indication that diagnose 308 subcodes 8-10
->> are available to the guest. That means, that the guest can put itself
->> into protected mode.
->>
->> Once it is in protected mode, the hardware stops any attempt of VM
->> introspection by the hypervisor.
->>
->> Some features are currently not supported in protected mode:
->>      * Passthrough devices
->>      * Migration
->>      * Huge page backings
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> This one will be the first patch (after sync) and will also get the
-> DEF_FEAT definition, so I can use it in the diag 308 8-10 patch
-
-You should still enable the whole machinery only after everything has
-been implemented. Moving the feature is fine.
+On Fri, Mar 06, 2020 at 11:29:50AM +0200, Yuri Benditovich wrote:
+>=20
+>=20
+> On Thu, Mar 5, 2020 at 3:21 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>=20
+>     On Wed, Feb 26, 2020 at 07:48:07PM +0200, Yuri Benditovich wrote:
+>     > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+>     > ---
+>     >=A0 include/standard-headers/linux/virtio_net.h | 37 +++++++++++++++=
+++++--
+>     >=A0 1 file changed, 35 insertions(+), 2 deletions(-)
+>=20
+>=20
+>     It will take a bit until next merge window when the linux
+>     headers will be updated.
+>     Until that happens you can just put these defines where
+>     they are used.
+>=20
+>=20
+> We also extend the configuration virtio_net_config structure and its
+> field 'supported_hash_types' uses these defines. Please advise.
 
 
--- 
-Thanks,
+Make a private copy of it with a different name for now.
+Add a comment so we don't forget to remove down the road.
 
-David / dhildenb
+>=20
+>=20
+>     > diff --git a/include/standard-headers/linux/virtio_net.h b/include/
+>     standard-headers/linux/virtio_net.h
+>     > index 260c3681d7..3bc100afe3 100644
+>     > --- a/include/standard-headers/linux/virtio_net.h
+>     > +++ b/include/standard-headers/linux/virtio_net.h
+>     > @@ -57,6 +57,7 @@
+>     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 * Steering */
+>     >=A0 #define VIRTIO_NET_F_CTRL_MAC_ADDR 23=A0 =A0 =A0 =A0 /* Set MAC =
+address */
+>     >=A0
+>     > +#define VIRTIO_NET_F_RSS=A0 =A0 =A0 =A060=A0 =A0 /* Supports RSS R=
+X steering */
+>     >=A0 #define VIRTIO_NET_F_STANDBY=A0 =A062=A0 =A0 /* Act as standby f=
+or another
+>     device
+>     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 * with the same MAC.
+>     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 */
+>     > @@ -69,6 +70,16 @@
+>     >=A0 #define VIRTIO_NET_S_LINK_UP 1=A0 =A0 =A0 =A0/* Link is up */
+>     >=A0 #define VIRTIO_NET_S_ANNOUNCE=A0 =A0 =A0 =A0 2=A0 =A0 =A0 =A0/* =
+Announcement is needed *
+>     /
+>     >=A0
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0 (=
+1 << 0)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
+1 << 1)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
+1 << 2)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0 (=
+1 << 3)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
+1 << 4)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
+1 << 5)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX=A0 =A0 =A0 =A0 =A0 =A0 =A0(=
+1 << 6)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX=A0 =A0 =A0 =A0 =A0 =A0 (1 =
+<< 7)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX=A0 =A0 =A0 =A0 =A0 =A0 (1 =
+<< 8)
+>     > +
+>     >=A0 struct virtio_net_config {
+>     >=A0 =A0 =A0 =A0/* The config defining mac address (if VIRTIO_NET_F_M=
+AC) */
+>     >=A0 =A0 =A0 =A0uint8_t mac[ETH_ALEN];
+>     > @@ -92,6 +103,14 @@ struct virtio_net_config {
+>     >=A0 =A0 =A0 =A0 * Any other value stands for unknown.
+>     >=A0 =A0 =A0 =A0 */
+>     >=A0 =A0 =A0 =A0uint8_t duplex;
+>     > +
+>     > +=A0 =A0 =A0/* maximal size of RSS key */
+>     > +=A0 =A0 =A0uint8_t rss_max_key_size;
+>     > +=A0 =A0 =A0/* maximal number of indirection table entries */
+>     > +=A0 =A0 =A0uint16_t rss_max_indirection_table_length;
+>     > +=A0 =A0 =A0/* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
+>     > +=A0 =A0 =A0uint32_t supported_hash_types;
+>     > +
+>     >=A0 } QEMU_PACKED;
+>     >=A0
+>     >=A0 /*
+>     > @@ -237,15 +256,29 @@ struct virtio_net_ctrl_mac {
+>     >=A0 =A0* Accordingly, driver should not transmit new packets=A0 on v=
+irtqueues
+>     other than
+>     >=A0 =A0* specified.
+>     >=A0 =A0*/
+>     > +#define VIRTIO_NET_CTRL_MQ=A0 =A04
+>     > + #define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET=A0 =A0 =A0 =A0 0
+>     > + #define VIRTIO_NET_CTRL_MQ_RSS_CONFIG=A0 =A0 =A0 =A0 =A0 1
+>     > +
+>     > +/* for VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET */
+>     >=A0 struct virtio_net_ctrl_mq {
+>     >=A0 =A0 =A0 =A0__virtio16 virtqueue_pairs;
+>     >=A0 };
+>     >=A0
+>     > -#define VIRTIO_NET_CTRL_MQ=A0 =A04
+>     > - #define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET=A0 =A0 =A0 =A0 0
+>     >=A0 =A0#define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_MIN=A0 =A0 =A0 =A0 1
+>     >=A0 =A0#define VIRTIO_NET_CTRL_MQ_VQ_PAIRS_MAX=A0 =A0 =A0 =A0 0x8000
+>     >=A0
+>     > +/* for VIRTIO_NET_CTRL_MQ_RSS_CONFIG */
+>     > +struct virtio_net_rss_config {
+>     > +=A0 =A0 uint32_t hash_types;
+>     > +=A0 =A0 uint16_t indirection_table_mask;
+>     > +=A0 =A0 uint16_t unclassified_queue;
+>     > +=A0 =A0 uint16_t indirection_table[1/* + indirection_table_mask*/]=
+;
+>     > +=A0 =A0 uint16_t max_tx_vq;
+>     > +=A0 =A0 uint8_t hash_key_length;
+>     > +=A0 =A0 uint8_t hash_key_data[/*hash_key_length*/];
+>     > +};
+>     > +
+>     >=A0 /*
+>     >=A0 =A0* Control network offloads
+>     >=A0 =A0*
+>     > --
+>     > 2.17.1
+>=20
+>=20
 
 
