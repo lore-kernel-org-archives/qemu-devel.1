@@ -2,69 +2,82 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C83C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DDAC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 279BF24671
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:05:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279BF24671
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 51D302072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 13:07:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdfBc5+N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51D302072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jACfZ-0001pU-AC
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:05:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46771)
+	id 1jACh1-0002sJ-IH
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 08:07:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48771)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jACew-0001JF-E7
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:04:59 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1jACgI-0002Jq-8P
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:06:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jACet-0003wn-TP
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:04:57 -0500
-Resent-Date: Fri, 06 Mar 2020 08:04:57 -0500
-Resent-Message-Id: <E1jACet-0003wn-TP@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21136)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jACet-0003hv-LM
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:04:55 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1583499877; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=NOZOgkr5RLOjRRUn/YtdGVHVTmCptXhxtY2TUrYHdqKzjBGBGj3mkKEQfhHffkPNlQnxEnHSE3bHTW3groEZQTxNSTh+OJXfnVe4v0BUf0Qr/MwkVKvGPf+fbViFHIwWwQpOEmKNM5rR8PkMwZAqXvmAIQH/7nFJGm/Y0CDDF2U=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583499877;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=HgFVB9uvE6197YcFbfrWqZxxpW1LU3aRIz6q8Se6p9o=; 
- b=AceGdbC9hY7JMLd58wHd/EO3e8sQVQXTleA2Naxq+ge6hZcvbZsbaEzdTgxGOmO1dSZLj+zHb9k1KVrLAbwpSyyNN3+MU9c74NPi8Eh5QcNp5byYMAN1GqDd++pi1oZSIckB79vbiPkQReoSzJX4eABIQU0cA/v7LD7UIx0hJZI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583499874197344.925068085053;
- Fri, 6 Mar 2020 05:04:34 -0800 (PST)
-In-Reply-To: <158349633705.1237488.8895481990204796135.stgit@bahia.lan>
-Subject: Re: [PATCH] 9p/proxy: Fix export_flags
-Message-ID: <158349987298.14529.13594208466433957287@39012742ff91>
+ (envelope-from <eric.auger@redhat.com>) id 1jACgG-0001W7-6e
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:06:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20818
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jACgG-0001Qh-2R
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 08:06:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583499979;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=T5LShtWZWpYWyqheSZzbznDplp/cdC8Q/qoN9VsXBss=;
+ b=MdfBc5+NfnUtZ1havp9hEd3SGU/hwnphJkmmMnnSXGPmFa8Qx3am19KBPNhe5Jnzv5C+XL
+ PHXRctUiYilQuwrL9nNDynXD52uhZ0Kk/fjrMY649wuqGD6lJJ8seGt7y1jebJs4WtCU7I
+ iXQs1cooXJyPrKE1EyHKHMlpfMNoFEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-5nYdyAr6P2-pLpzRykT7LQ-1; Fri, 06 Mar 2020 08:06:15 -0500
+X-MC-Unique: 5nYdyAr6P2-pLpzRykT7LQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32DDC18A6EC0;
+ Fri,  6 Mar 2020 13:06:13 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BBBE85D9CD;
+ Fri,  6 Mar 2020 13:06:09 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 13/14] arm/arm64: ITS: migration tests
+To: Andrew Jones <drjones@redhat.com>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-14-eric.auger@redhat.com>
+ <20200207134923.4gh5cz2qokuzei2m@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <eeb138b4-4b4d-78d5-e5b1-6e9ad33f5a3a@redhat.com>
+Date: Fri, 6 Mar 2020 14:06:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: groug@kaod.org
-Date: Fri, 6 Mar 2020 05:04:34 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200207134923.4gh5cz2qokuzei2m@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,48 +89,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu_oss@crudebyte.com, qemu-devel@nongnu.org,
- stgraber@ubuntu.com
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTgzNDk2MzM3MDUuMTIzNzQ4
-OC44ODk1NDgxOTkwMjA0Nzk2MTM1LnN0Z2l0QGJhaGlhLmxhbi8KCgoKSGksCgpUaGlzIHNlcmll
-cyBmYWlsZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQg
-dGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUg
-RG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4K
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82
-NAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2Vy
-LXRlc3QtbWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpGaWxlOiAiL3RtcC9xZW11LW5zaXNccWVtdS1kb2MuaHRtbCIgLT4gbm8gZmlsZXMgZm91bmQu
-ClVzYWdlOiBGaWxlIFsvbm9uZmF0YWxdIFsvYV0gKFsvcl0gWy94IGZpbGVzcGVjIFsuLi5dXSBm
-aWxlc3BlYyBbLi4uXSB8CiAgIC9vbmFtZT1vdXRmaWxlIG9uZV9maWxlX29ubHkpCkVycm9yIGlu
-IHNjcmlwdCAiL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUubnNpIiBvbiBsaW5lIDE4MCAtLSBhYm9y
-dGluZyBjcmVhdGlvbiBwcm9jZXNzCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTE2MjogcWVtdS1zZXR1
-cC00LjIuNTAuZXhlXSBFcnJvciAxClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToK
-ICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4K
-ICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0
-Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRv
-JywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51
-dWlkPTVhMmYyZWYzNDZkZTQ4ZDliN2E5YmExYTRkYjQyZmNiJywgJy11JywgJzEwMDEnLCAnLS1z
-ZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VU
-X0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScs
-ICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hF
-X0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1k
-b2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXct
-dGVzdGVyLXRtcC1pMnN2N3lyai9zcmMvZG9ja2VyLXNyYy4yMDIwLTAzLTA2LTA4LjAwLjUzLjE2
-NjkzOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1
-bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRl
-cj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTVhMmYyZWYzNDZkZTQ4ZDli
-N2E5YmExYTRkYjQyZmNiCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFd
-OiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWkyc3Y3eXJq
-L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpy
-ZWFsICAgIDNtNDAuMzI2cwp1c2VyICAgIDBtOC42OTBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
-YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTgzNDk2MzM3MDUuMTIzNzQ4OC44ODk1
-NDgxOTkwMjA0Nzk2MTM1LnN0Z2l0QGJhaGlhLmxhbi90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRv
-cmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
-dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Drew,
+
+On 2/7/20 2:49 PM, Andrew Jones wrote:
+> On Tue, Jan 28, 2020 at 11:34:58AM +0100, Eric Auger wrote:
+>> This test maps LPIs (populates the device table, the collection table,
+>> interrupt translation tables, configuration table), migrates and make
+>> sure the translation is correct on the destination.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  arm/gic.c                | 59 ++++++++++++++++++++++++++++++++++++----
+>>  arm/unittests.cfg        |  8 ++++++
+>>  lib/arm/asm/gic-v3-its.h |  2 ++
+>>  lib/arm/gic-v3-its.c     | 22 +++++++++++++++
+>>  4 files changed, 85 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index 50104b1..fa8626a 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -593,6 +593,7 @@ static void gic_test_mmio(void)
+>>  
+>>  static void test_its_introspection(void) {}
+>>  static void test_its_trigger(void) {}
+>> +static void test_its_migration(void) {}
+>>  
+>>  #else /* __arch64__ */
+>>  
+>> @@ -665,13 +666,19 @@ static bool its_prerequisites(int nb_cpus)
+>>  	return false;
+>>  }
+>>  
+>> -static void test_its_trigger(void)
+>> +/*
+>> + * Setup the configuration for those mappings:
+>> + * dev_id=2 event=20 -> vcpu 3, intid=8195
+>> + * dev_id=7 event=255 -> vcpu 2, intid=8196
+>> + * LPIs ready to hit
+>> + */
+>> +static int its_setup1(void)
+>>  {
+>>  	struct its_collection *col3, *col2;
+>>  	struct its_device *dev2, *dev7;
+>>  
+>>  	if (its_prerequisites(4))
+>> -		return;
+>> +		return -1;
+> 
+> Why not make its_setup1 a bool? Where true means success and false mean
+> failure?
+I tend to prefer the std error return value convention that the bool
+return value. I aligned its_prerequisites accordingly.
+> 
+>>  
+>>  	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+>>  	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+>> @@ -685,14 +692,10 @@ static void test_its_trigger(void)
+>>  	its_send_invall(col2);
+>>  	its_send_invall(col3);
+>>  
+>> -	report_prefix_push("int");
+>>  	/*
+>>  	 * dev=2, eventid=20  -> lpi= 8195, col=3
+>>  	 * dev=7, eventid=255 -> lpi= 8196, col=2
+>> -	 * Trigger dev2, eventid=20 and dev7, eventid=255
+>> -	 * Check both LPIs hit
+>>  	 */
+>> -
+>>  	its_send_mapd(dev2, true);
+>>  	its_send_mapd(dev7, true);
+>>  
+>> @@ -703,6 +706,23 @@ static void test_its_trigger(void)
+>>  		       20 /* event id */, col3);
+>>  	its_send_mapti(dev7, 8196 /* lpi id */,
+>>  		       255 /* event id */, col2);
+>> +	return 0;
+>> +}
+>> +
+>> +static void test_its_trigger(void)
+>> +{
+>> +	struct its_collection *col3, *col2;
+>> +	struct its_device *dev2, *dev7;
+>> +
+>> +	if (its_setup1())
+>> +		return;
+>> +
+>> +	col3 = its_get_collection(3);
+>> +	col2 = its_get_collection(2);
+>> +	dev2 = its_get_device(2);
+>> +	dev7 = its_get_device(7);
+>> +
+>> +	report_prefix_push("int");
+>>  
+>>  	lpi_stats_expect(3, 8195);
+>>  	its_send_int(dev2, 20);
+>> @@ -763,6 +783,29 @@ static void test_its_trigger(void)
+>>  	check_lpi_stats();
+>>  	report_prefix_pop();
+>>  }
+>> +
+>> +static void test_its_migration(void)
+>> +{
+>> +	struct its_device *dev2, *dev7;
+>> +
+>> +	if (its_setup1())
+>> +		return;
+>> +
+>> +	dev2 = its_get_device(2);
+>> +	dev7 = its_get_device(7);
+>> +
+>> +	puts("Now migrate the VM, then press a key to continue...\n");
+>> +	(void)getchar();
+>> +	report(true, "Migration complete");
+> 
+> This seems more like a report_info place. If migration fails and
+> we don't complete we'll never get the report FAIL anyway.
+OK
+> 
+>> +
+>> +	lpi_stats_expect(3, 8195);
+>> +	its_send_int(dev2, 20);
+>> +	check_lpi_stats();
+>> +
+>> +	lpi_stats_expect(2, 8196);
+>> +	its_send_int(dev7, 255);
+>> +	check_lpi_stats();
+>> +}
+>>  #endif
+>>  
+>>  int main(int argc, char **argv)
+>> @@ -800,6 +843,10 @@ int main(int argc, char **argv)
+>>  		report_prefix_push(argv[1]);
+>>  		test_its_trigger();
+>>  		report_prefix_pop();
+>> +	} else if (!strcmp(argv[1], "its-migration")) {
+>> +		report_prefix_push(argv[1]);
+>> +		test_its_migration();
+>> +		report_prefix_pop();
+>>  	} else if (strcmp(argv[1], "its-introspection") == 0) {
+>>  		report_prefix_push(argv[1]);
+>>  		test_its_introspection();
+>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>> index bfafec5..8b8ec79 100644
+>> --- a/arm/unittests.cfg
+>> +++ b/arm/unittests.cfg
+>> @@ -136,6 +136,14 @@ extra_params = -machine gic-version=3 -append 'its-trigger'
+>>  groups = its
+>>  arch = arm64
+>>  
+>> +[its-migration]
+>> +file = gic.flat
+>> +smp = $MAX_SMP
+>> +accel = kvm
+>> +extra_params = -machine gic-version=3 -append 'its-migration'
+>> +groups = its migration
+>> +arch = arm64
+>> +
+>>  # Test PSCI emulation
+>>  [psci]
+>>  file = psci.flat
+>> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+>> index 0e5c5b6..febc2b2 100644
+>> --- a/lib/arm/asm/gic-v3-its.h
+>> +++ b/lib/arm/asm/gic-v3-its.h
+>> @@ -151,6 +151,8 @@ extern void its_send_invall(struct its_collection *col);
+>>  extern void its_send_movi(struct its_device *dev,
+>>  			  struct its_collection *col, u32 id);
+>>  extern void its_send_sync(struct its_collection *col);
+>> +extern struct its_device *its_get_device(u32 id);
+>> +extern struct its_collection *its_get_collection(u32 id);
+>>  
+>>  #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
+>>  #define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
+>> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+>> index c2dcd01..099940e 100644
+>> --- a/lib/arm/gic-v3-its.c
+>> +++ b/lib/arm/gic-v3-its.c
+>> @@ -219,3 +219,25 @@ struct its_collection *its_create_collection(u32 col_id, u32 pe)
+>>  	its_data.nr_collections++;
+>>  	return new;
+>>  }
+>> +
+>> +struct its_device *its_get_device(u32 id)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < GITS_MAX_DEVICES; i++) {
+>> +		if (its_data.devices[i].device_id == id)
+>> +			return &its_data.devices[i];
+>> +	}
+>> +	return NULL;
+>> +}
+>> +
+>> +struct its_collection *its_get_collection(u32 id)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i = 0; i < GITS_MAX_COLLECTIONS; i++) {
+>> +		if (its_data.collections[i].col_id == id)
+>> +			return &its_data.collections[i];
+>> +	}
+>> +	return NULL;
+>> +}
+> 
+> The callers aren't checking for NULL. Should we assert here
+> or in the caller?
+Added the assert here.
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> drew
+> 
+> 
+>> -- 
+>> 2.20.1
+>>
+
 
