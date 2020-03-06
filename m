@@ -2,84 +2,73 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 522E4C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 16:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB32C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 16:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083A42072A
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 16:44:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qc7v6BpC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083A42072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E4E4C2072A
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 16:46:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E4C2072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAG51-0001jj-7L
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 11:44:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54441)
+	id 1jAG7C-0003hj-3h
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 11:46:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jAG47-00013T-Dq
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:43:12 -0500
+ (envelope-from <bounces@canonical.com>) id 1jAG6V-00032R-TR
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jAG45-0007q3-Pm
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:43:10 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26935
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jAG45-0007nh-HM
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:43:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583512988;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=fDODrePrkT9nqUWcNW4xVEQs8r2GEs5sWXvCHbj4BJM=;
- b=Qc7v6BpCqjfQj6FbJl6J3Xf68D33EweomTf8jzDtMrXRuSS/6iKAbyX6bLxmQ9K0PQyLYI
- 9BTceKlWYzYHKwDDV+99eQiICPspoJYCk0MpAyPol2nsvDX344sroWHWpoJdelAY76tLtq
- VxgkI35z1QT2Sn63MddqU0bSK4jyoek=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-xhJytotcMcGC4FUk6RKIpw-1; Fri, 06 Mar 2020 11:43:05 -0500
-X-MC-Unique: xhJytotcMcGC4FUk6RKIpw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B66E818A5507;
- Fri,  6 Mar 2020 16:43:02 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 97FF491D8A;
- Fri,  6 Mar 2020 16:42:49 +0000 (UTC)
-Date: Fri, 6 Mar 2020 16:42:48 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Subject: Re: [PATCH v5 50/50] multi-process: add configure and usage
- information
-Message-ID: <20200306164248.GC1438162@stefanha-x1.localdomain>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <bbba8cdef9f876ec6d194f3e1974347860eca732.1582576372.git.jag.raman@oracle.com>
- <20200227165804.GE315098@stefanha-x1.localdomain>
- <20200228184343.GB25838@flaka>
+ (envelope-from <bounces@canonical.com>) id 1jAG6U-0003tX-Fk
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:45:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jAG6U-0003qQ-9l
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 11:45:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jAG6S-0003qp-N6
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 16:45:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 913492E80CC
+ for <qemu-devel@nongnu.org>; Fri,  6 Mar 2020 16:45:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200228184343.GB25838@flaka>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uh9ZiVrAOUUm9fzH"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Mar 2020 16:36:34 -0000
+From: tstrike <1813165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
+ tstrike34 vkuznets
+X-Launchpad-Bug-Reporter: Thomas (himbeere)
+X-Launchpad-Bug-Modifier: tstrike (tstrike34)
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <158351259422.7585.8058152568234704679.malone@chaenomeles.canonical.com>
+Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 945e0a517dd375d954338a6b81fdb81bddc1d2a4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,127 +77,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
- thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- dgilbert@redhat.com, liran.alon@oracle.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---uh9ZiVrAOUUm9fzH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Nested Configuration check
+tstrike39@islandhealthcenter-media:~$ sudo cat /sys/module/kvm_intel/parame=
+ters/nested
+[sudo] password for tstrike39: =
 
-On Fri, Feb 28, 2020 at 10:43:44AM -0800, Elena Ufimtseva wrote:
-> On Thu, Feb 27, 2020 at 04:58:04PM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Feb 24, 2020 at 03:55:41PM -0500, Jagannathan Raman wrote:
-> > > +* The devices to be emulated in the separate process are defined as
-> > > +  before with addition of "rid" suboption that serves as a remote gr=
-oup
-> > > +  identificator.
-> > > +
-> > > +  -device <device options>,rid=3D"remote process id"
-> > > +
-> > > +  For example, for non multi-process qemu:
-> > > +    -device lsi53c895a,id=3Dscsi0 device
-> > > +    -device scsi-hd,drive=3Ddrive0,bus=3Dscsi0.0,scsi-id=3D0
-> > > +    -drive id=3Ddrive0,file=3Ddata-disk.img
-> > > +
-> > > +  and for multi-process qemu and no libvirt
-> > > +  support (i.e. QEMU forks child processes):
-> > > +    -device lsi53c895a,id=3Dscsi0,rid=3D0
-> > > +    -device scsi-hd,drive=3Ddrive0,bus=3Dscsi0.0,scsi-id=3D0,rid=3D0
-> >=20
-> > This approach is invasive:
-> >  * lsi53c895a should not need to be modified with a new rid=3D option.
-> >  * QEMU should not know about the scsi-hd device or drive0.  Only the
-> >    device emulation process needs to know about scsi-hd.
-> >=20
-> > In order to cleanly separate QEMU and the device emulation process
-> > syntax like this is needed:
-> >=20
-> >   -object remote-device,id=3Drid0,...
-> >   -device remote-pci-device,id=3Dscsi0,remote-device=3Drid0
-> >=20
-> > The "remote-device" object could be part of remote-pci-device, but
-> > keeping it separate may be useful in the future in order to support
-> > things like reconnection.
-> >=20
-> > The generic "remote-pci-device" device handles any remote PCI device,
-> > not just the LSI SCSI controller.
-> >=20
-> > Do you agree with this approach?
-> >=20
->=20
-> We discussed these changes and they seem to be along the lines with
-> the future work on vfio over socket approach we will be working on later.
->=20
-> Could we for this experimental version have the changes you propose here
-> with one modification - instead of having generic remote-pci-device imply=
- that that is LSI
-> device? And while we work towards vfio over socket this will become any r=
-emote
-> PCI device?
+Y
 
-Yes, that sounds good.
 
-> > > +  The drives to be emulated by the remote process are specified as p=
-art of
-> > > +  this command sub-option. The device to be used to connect to the m=
-onitor
-> > > +  is also specified as part of this suboption.
-> > > +
-> > > +  For example, the following option adds a drive and monitor to the =
-remote
-> > > +  process:
-> > > +  -remote rid=3D0,exec=3D"qemu-scsi-dev",command=3D"-drive id=3Ddriv=
-e0,,file=3Ddata-disk.img -monitor unix:/home/qmp-sock,,server,,nowait"
-> > > +
-> > > +  Note: There's an issue with this "command" sub-option which we are=
- in the
-> > > +  process of fixing. To work around this issue, it requires addition=
-al
-> > > +  "comma" characters as illustrated above, and in the example below.
-> >=20
-> > command=3D (which could be called args=3D for clarity) will be difficul=
-t to
-> > use not just because of comma escaping but also because of double-quote
-> > escaping.  How do you pass a command-line argument that contains spaces=
-?
->=20
-> Yes, this is not great. And spaces are the problem at the moment.
-> I am looking if the -object has some properties that can allow for arbitr=
-ary
-> strings. Maybe such as data for "secret" object  would do?
+Not UEFI enabled
 
-I'm not aware of a way to avoid the comma escaping.  The space escaping
-is a question of how the remote process is spawned.  If the command-line
-is processed by a shell like with system(3) then backslash can be used
-to escape spaces.
+-- =
 
-Stefan
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
 
---uh9ZiVrAOUUm9fzH
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+  KVM internal error. Suberror: 1 emulation failure
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5ifYgACgkQnKSrs4Gr
-c8hCBAf/d7+5+qufheB2wuJIIeVxgTuVIqGMEtNesBk/225W0XXSF+dA3X9tmhLX
-QvT5JTzAHgfFQyqJsFwPo3ydMlIzb1ilWLwVvhyJ5y/0tJmQbdnmRM6AoM2LaN2N
-iAqHpKhmcqdKZoGGnyBpQheugJF+pN1lIx4Z3IWxAvLH40fam1TdsJ5rE9P/jRs3
-sxH5VBlLzGNlxT6N5rk+NL9e8/9X5NizGGEjIDNg6tE6Hn6tJ/GrOndZt1sqQYbu
-DsYeZTfjQfCVUgvzszDY+2llTyykzhpSE7hZCIOTMDyghrSHZKHZ5DnmVNuPO4U5
-/APVtJtXl+Dx3T6ed2n0C+hGk52o1w==
-=FEeU
------END PGP SIGNATURE-----
+Bug description:
+  Hello Devs.
 
---uh9ZiVrAOUUm9fzH--
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
 
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
 
