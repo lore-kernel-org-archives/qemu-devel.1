@@ -2,79 +2,88 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B93C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C10C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFC702072D
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FE5820656
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 17:40:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gVYuRnhm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC702072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HtmpVxtX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FE5820656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAGwn-00049v-3t
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:39:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57816)
+	id 1jAGxf-0005s8-CH
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 12:40:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGns-0003cn-IC
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:30:30 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1jAGoe-0004jf-7b
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jAGnq-0002lk-WB
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:30:28 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38411)
+ (envelope-from <palmerdabbelt@google.com>) id 1jAGoc-0003ia-Bq
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:31:15 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38737)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jAGnq-0002ka-Or
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:30:26 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i14so3191728otp.5
- for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:30:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BvCQy0kyPwALTUk5RFGZrnw8ZEltk1JAwNW0S3Tg67o=;
- b=gVYuRnhmTvt6eFKZZOr71jtPdXNvXYg+wA6b9PKOOFEmSYhAYy0EJoQ5/ZsWFmD/cB
- BvjTVvyxo2vh/aAvM+2TxD3F8JO1pK6XxcjUdi4ecLuA57H+GOjfu35Om2PRnSS8xT2+
- tEdIdhOwrDfexQ7cVakBZi2fzUb27ywrJiMa3oqJRXE6yww3xxzXPbSpf68KM2mrXs6q
- uJVGaB/f9odRG5yOvqZYY8D1KSGmyrepxnFQYg69/DBJAzPs1ONTWCl5W0ILtCCEqsAH
- t4mjm42cqARKtm39eMy3Jb4PRwgTWWwdqphBJVRwo+j1w/AU+8KqlKGDwzEIeEIt+Tmn
- oEdw==
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1jAGoa-0003eG-LI
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 12:31:13 -0500
+Received: by mail-pl1-x641.google.com with SMTP id w3so1135273plz.5
+ for <qemu-devel@nongnu.org>; Fri, 06 Mar 2020 09:31:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UygXtcOquP2uukbvmDPtogXvWNDERxgs47LKEBGVpuM=;
+ b=HtmpVxtXBu3s2SvVO1xTXufD//yEf3iSUGLoHJIoG4H9Yb/6hfBjd316S4JUUpeTD+
+ y/te8aR1QUYTmo88SFNHAMA70YFBNDXVPy3GzUSIsbP+qhq3G2f7M0oQpsYkmKsB40pu
+ HbavdHJBOOLxhl6idIfOdGmDKvVuTItmQ9X07SyNx/S5jhXN42u6+MfzeU73zwuM7qhb
+ 0Rmg/LF+nR4UafazVAviL3EaYH0iqBwrdR0qzsb+pqXjsxQBltPAi2lXca8Fx/6Uu3f9
+ WVWQd+lwMSK71PcUfljfz8UdcXA0g35Q3Dvf++jkWSDErePJso0QgIptvoRO58bBzSxA
+ l/5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BvCQy0kyPwALTUk5RFGZrnw8ZEltk1JAwNW0S3Tg67o=;
- b=kqOQNFFlD9XbI/kDFsTtVQPqREfZuozUo8zIVgIqSHdqb2FlDSQxa2StRMw3/dE3Q8
- YOGZXLODWDmT4FbWNs1b5xr82MxmhZV3iRISUkMeiXDVTG50H1GSzXKyNAB20IxmE8QA
- OcP3lYRFyr0syG0+fpXZIixfnhckP5Zq9ytd1SO947TBigaY7Ee0ZoimXiQWgWp2aMqF
- /E5cIUCWEFUV/7urmZWwIILr7oQR33ihSZ9Im55fMDFzHV9BnlFMk15mRX8pmpmwJorB
- /vDuM6Rf63Mr3DZ8YL0tnunl3dHOpW+Cai3fQaKHYz8EQfTQkFqRs5xE3HULMKl0RjJK
- b3Wg==
-X-Gm-Message-State: ANhLgQ2KB41muPuPEj42ZHx5EOPyhiJsCUxel5lZi2dVF06GDEvbJm0N
- uXEVk2PNW+pU5RKvhNSkzQZNRpTgHW2g+XJEmWEowmM2THg=
-X-Google-Smtp-Source: ADFU+vsywG79mCIJd6ycdD303RuOEgTBjTXNrAXXRA/3zBrh8MMSeacsHvLqkevvNoH4lKWJW8+uhSrBh5L30aXAONg=
-X-Received: by 2002:a9d:75ca:: with SMTP id c10mr3240502otl.97.1583515824698; 
- Fri, 06 Mar 2020 09:30:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20200225140437.20609-1-peter.maydell@linaro.org>
-In-Reply-To: <20200225140437.20609-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Mar 2020 17:30:13 +0000
-Message-ID: <CAFEAcA8w8_P4-qkDnh8uM7YdumXb_fQTNVZN8yOj=J2NG4WKLw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/12] Convert QAPI doc comments to generate rST
- instead of texinfo
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=UygXtcOquP2uukbvmDPtogXvWNDERxgs47LKEBGVpuM=;
+ b=Oqgd7OHqg57kWeK7xG22dq7fB/XTOfRrOnAyTxxtcHkbry3L8rC66YLoG08uITIota
+ Tu+hSuJfnoOVrFFpn9zfDDR17KOd1SDlUHfjsaMgob78bmnoPUjEbxYD5Wkvh+WeBRHe
+ 7GO0auls+kYb+HG1LUmBZ6xdC9x3H/n8/7QGzMgZ5/3yDX0CQMcOa0hyeVi6tFOmb39L
+ Dy703QrHb0M2fTvNbnt6zLzF2LpoTZ0kZrOVEAVq/gROOZwH4ISWVGbuyljykhhjUlO9
+ 18ReGC+Vp9HelIf4NUwZixdiz7GZpl1EIyZYpnhFeFnvuqKcLx2bLMaZuHOnHhqNZe5v
+ 0k3A==
+X-Gm-Message-State: ANhLgQ0dlM/ejA05Go8uGZzQUYnQwqqF9ui9hMpUuls9qUZXFNy20uyt
+ WeTy/KAHBh5ZFhoQ1kG8posGzw==
+X-Google-Smtp-Source: ADFU+vumMQk9seVGom+SQkz8SLHJHP4r/sBiSaGD3PvX50CI6YaRXuXsCCDA7xcrJq6Zro3KEvKE/Q==
+X-Received: by 2002:a17:90a:d101:: with SMTP id
+ l1mr4874944pju.130.1583515869863; 
+ Fri, 06 Mar 2020 09:31:09 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
+ by smtp.gmail.com with ESMTPSA id i5sm10206907pju.42.2020.03.06.09.31.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Mar 2020 09:31:08 -0800 (PST)
+Date: Fri, 06 Mar 2020 09:31:08 -0800 (PST)
+X-Google-Original-Date: Fri, 06 Mar 2020 09:30:47 PST (-0800)
+Subject: Re: [PATCH 1/1] target/riscv: Fix VS mode interrupts forwarding.
+In-Reply-To: <CAKmqyKMDPXLig4E4VJvqwvd7O7DtFD0PmWD44zoGDY-izJLsHQ@mail.gmail.com>
+CC: rajnesh.kanwal49@gmail.com, josemartins90@gmail.com, qemu-riscv@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+To: alistair23@gmail.com
+Message-ID: <mhng-4a8f061d-5e72-44e7-a2a2-b72cd52332a3@palmerdabbelt-glaptop1>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +95,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Feb 2020 at 14:04, Peter Maydell <peter.maydell@linaro.org> wrote:
+On Wed, 26 Feb 2020 09:55:34 PST (-0800), alistair23@gmail.com wrote:
+> On Wed, Feb 26, 2020 at 12:54 AM Rajnesh Kanwal
+> <rajnesh.kanwal49@gmail.com> wrote:
+>>
+>> Here is the link to the patch
+>> https://lists.nongnu.org/archive/html/qemu-riscv/2020-01/msg00191.html
 >
-> This series switches all our QAPI doc comments over from
-> texinfo format to rST.
+> Ah, it doesn't look like it made it to the QEMU-devel list. Can you
+> re-send it to QEMU-devel?
 
-> Git branch of this series also available at
-> https://git.linaro.org/people/peter.maydell/qemu-arm.git sphinx-conversions
+I can't find the older patch in my inbox, so I'm just taking this one.
 
-I've just updated this git branch with a rebase on top of:
- * current master, which has the qemu-doc conversion
- * the minor-cleanups patchset I just posted
-
-No serious changes to the meat of the series:
- * some new text in migration.json needed indenting to
-   match this series' stricter requirements
- * fixups of (textual) makefile conflicts
- * five new patches at the end which delete all the
-   texinfo machinery since once the qapi generation
-   is converted we don't need texinfo at all
-
-I'll probably send a new set of patches to the list next
-week; this set should still be fine for review though.
-
-thanks
--- PMM
+>
+> Alistair
+>
+>>
+>> -Rajnesh
+>>
+>> On Tue, Feb 25, 2020 at 12:06 AM Alistair Francis <alistair23@gmail.com> wrote:
+>>>
+>>> On Sun, Feb 23, 2020 at 11:23 AM Jose Martins <josemartins90@gmail.com> wrote:
+>>> >
+>>> > Hello rajnesh,
+>>> >
+>>> > I had already submitted almost this exact patch a few weeks ago.
+>>>
+>>> To QEMU? I don't see the patch.
+>>>
+>>> Alistair
+>>>
+>>> >
+>>> > Jose
+>>> >
+>>> > On Sun, 23 Feb 2020 at 13:51, <rajnesh.kanwal49@gmail.com> wrote:
+>>> > >
+>>> > > From: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
+>>> > >
+>>> > > Currently riscv_cpu_local_irq_pending is used to find out pending
+>>> > > interrupt and VS mode interrupts are being shifted to represent
+>>> > > S mode interrupts in this function. So when the cause returned by
+>>> > > this function is passed to riscv_cpu_do_interrupt to actually
+>>> > > forward the interrupt, the VS mode forwarding check does not work
+>>> > > as intended and interrupt is actually forwarded to hypervisor. This
+>>> > > patch fixes this issue.
+>>> > >
+>>> > > Signed-off-by: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
+>>> > > ---
+>>> > >  target/riscv/cpu_helper.c | 9 ++++++++-
+>>> > >  1 file changed, 8 insertions(+), 1 deletion(-)
+>>> > >
+>>> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>>> > > index b9e90dfd9a..59535ecba6 100644
+>>> > > --- a/target/riscv/cpu_helper.c
+>>> > > +++ b/target/riscv/cpu_helper.c
+>>> > > @@ -46,7 +46,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+>>> > >      target_ulong pending = env->mip & env->mie &
+>>> > >                                 ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
+>>> > >      target_ulong vspending = (env->mip & env->mie &
+>>> > > -                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)) >> 1;
+>>> > > +                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
+>>> > >
+>>> > >      target_ulong mie    = env->priv < PRV_M ||
+>>> > >                            (env->priv == PRV_M && mstatus_mie);
+>>> > > @@ -900,6 +900,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+>>> > >
+>>> > >              if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
+>>> > >                  !force_hs_execp) {
+>>> > > +                /*
+>>> > > +                 * See if we need to adjust cause. Yes if its VS mode interrupt
+>>> > > +                 * no if hypervisor has delegated one of hs mode's interrupt
+>>> > > +                 */
+>>> > > +                if (cause == IRQ_VS_TIMER || cause == IRQ_VS_SOFT ||
+>>> > > +                    cause == IRQ_VS_EXT)
+>>> > > +                    cause = cause - 1;
+>>> > >                  /* Trap to VS mode */
+>>> > >              } else if (riscv_cpu_virt_enabled(env)) {
+>>> > >                  /* Trap into HS mode, from virt */
+>>> > > --
+>>> > > 2.17.1
+>>> > >
+>>> > >
+>>> >
 
