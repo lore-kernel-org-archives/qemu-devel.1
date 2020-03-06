@@ -2,68 +2,92 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AF5C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 21:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B13C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 21:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56286205C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 21:35:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56286205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E3B1220674
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 21:45:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rb3lspD/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B1220674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAKdS-0007Fa-Gz
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 16:35:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52989)
+	id 1jAKmE-0000y0-1J
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 16:45:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jAKcp-0006lO-BL
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 16:35:21 -0500
+ (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
+ id 1jAKlP-0008Vr-GB
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 16:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jAKcn-0004lR-67
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 16:35:19 -0500
-Resent-Date: Fri, 06 Mar 2020 16:35:18 -0500
-Resent-Message-Id: <E1jAKcn-0004lR-67@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21189)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jAKcm-0004iS-U1; Fri, 06 Mar 2020 16:35:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1583530506; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=RXy0e8GMXz5VGciGgEV4lCHl3POfnRSlgAlPVNuQgfyW27yR8ceu+sdSV2rh2W6m4gJyIAef6UmFsQCPCHCYnNcx6ZfAPDhCgLj9+ZNCS0Y3kfcpTgusFEDUiSXn4+t+W+RJaH/XilNkzy6Pdyu2Ya4NTlGqdjnNaYOexbUp6z8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583530506;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=LEm1Grxizek+4I9dzJuUmh+u/i9ioGbb7zodL/UzWBo=; 
- b=ltSb56qjfVS9LfeOi2gbY9XhkTImCLqkdJMaa+HNdSKMwIDx3y/iA1unWU2JKDGEhvf/K4Q5ZSbJr7ooiwMdmAfibUhCebMlTTXawPfqXhFnclTCq8ymMZJ1oFgBym6HuN8ryIZiAxnwg6b9tNwe+x5heFBUs0WNIkblpAeFuTI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583530504152656.9099466882875;
- Fri, 6 Mar 2020 13:35:04 -0800 (PST)
-In-Reply-To: <cover.1583518447.git.alistair.francis@wdc.com>
-Subject: Re: [PATCH v6 0/4]  linux-user: generate syscall_nr.sh for RISC-V
-Message-ID: <158353050270.16632.901515388326556131@39012742ff91>
+ (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
+ id 1jAKlO-0002T4-3E
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 16:44:11 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:5208)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=32724e9af=alistair.francis@wdc.com>)
+ id 1jAKlN-0002PM-QB; Fri, 06 Mar 2020 16:44:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1583531054; x=1615067054;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=05Q1mBpOGmEOAS6Fful2qHlv72Yzd6EzLEwaVFrElcg=;
+ b=rb3lspD/A5+FH/RZzVfg3hldak8+gpsElC1JGJhJAGqHfp5hAlm/8b+i
+ FBxJSHzSg7s/o4+cvjGOQDFQb5EgQlbByz4E280h4HQQU9HRy4R0x8ON4
+ 3XeKbyrCFZiUeUnMi0hSqklzTnHFTX6fknPZlhQZSXr8HHaSp+eJiPi8G
+ L7bnzyY1tVBkHeZlUbOTcOqWdmotwUnMCX4HfqH9gnypl0K0YsMCgDdQM
+ pAqyn2pibqvxB8LEAAVG81T2JkRnJ8+bNDkZkEPPN51cs0FRY+vZ/4Y/T
+ XnnnorDAJJT0618TTvdWZ1fgufI8mkXgPNLLSbiBabMaty0AJZzLBH8GV Q==;
+IronPort-SDR: /rCpoR6/JoQeWjZqlxn8h9dkJKsjY/BbjJ0qt9tkEuOycwsom1JFukJsEHNHCxUNRpNGCWMbPv
+ WeVUhZpHV5gtHT3X3cnoL5qcPC51m8NLZLJ/1te+JZuLTwPe6+mA+1cgphAknkO2/RfXqkHZih
+ XX6/Ip/vvxLDYLs864gtUZsO3CjtL0Bdk9Hub4uyIIQXmg02iuS7VKaYL8Ngs69WAxwBB9/wYV
+ JN7SeWWt4MAWWNM5lFHFDbpWbdr2DdOO4dYFM5mox2K1oEX9WGXWqvbKdqU7Cqu1fCg71MdQ1U
+ gP0=
+X-IronPort-AV: E=Sophos;i="5.70,523,1574092800"; d="scan'208";a="233784271"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2020 05:44:08 +0800
+IronPort-SDR: EnvuAOlnYxCmFXTBIro8FdSq6bdSc0IxLNbvXhhcqLOMnhMtEtG3X5kSWInJP4h8iKJJu+puAG
+ aq3qwTaYmRoFmlRSGn2RjFxtHOrYDj8tcWH7DCsRjl88nM0mDIlZbp0wSxPSIOmC1TXBFYBd6+
+ I8nngBlSMhvUdpNIb+IT2ctuEznxOrg/Lb96vOLIPEtEb2uwd/QyRE2h5oobo+giu/OgdlVpAC
+ GlvS78wI2hVvOjjyvcBbVperYuYqDed1w14tmF9HP/LtRV9QDDFvPhmEN7MkHyAZWbDJ+yCCBV
+ FkvFthrt+szMmziTo+97YHQQ
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Mar 2020 13:35:52 -0800
+IronPort-SDR: nH/w6hAdohxTcymeNl5wzeCRd8cJDJoh8f1NcjM2LHH3zPPPAejXn7ufbYRA45arRQxlFK3XXm
+ ++ZFfI/0atFMGGHFV4M/pQKiWiCznAAjpQLpOTJz7g2aWZlajbWKxLC4GLBeL57nsNX25zToRO
+ 11P1Vnxh8gS93sNiEShcLwwkdYc6uwgsBm/IrgF3t/7o9JXfClCDz0s6rjANdMq+vTlH3+XzMH
+ rLNLXu873oetn3qK77w0KImt2BpRgK3p2U1K6KBywdBfYMoHetT/E6TAR0xfISW28eJARg97tm
+ eiQ=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip02.wdc.com with ESMTP; 06 Mar 2020 13:44:07 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v3 1/3] riscv/sifive_u: Fix up file ordering
+Date: Fri,  6 Mar 2020 13:36:47 -0800
+Message-Id: <b1b13c2243ecfe08e688240a38fec4ebe8794017.1583530528.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1583530528.git.alistair.francis@wdc.com>
+References: <cover.1583530528.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alistair.francis@wdc.com
-Date: Fri, 6 Mar 2020 13:35:04 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.143.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,161 +99,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu,
- alistair.francis@wdc.com, alistair23@gmail.com, palmer@dabbelt.com,
- aleksandar.m.mail@gmail.com
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTgzNTE4NDQ3Lmdp
-dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2NiAwLzRdICBsaW51eC11c2VyOiBnZW5l
-cmF0ZSBzeXNjYWxsX25yLnNoIGZvciBSSVNDLVYKTWVzc2FnZS1pZDogY292ZXIuMTU4MzUxODQ0
-Ny5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvY292ZXIuMTU4MzUxODQ0
-Ny5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tIC0+IHBhdGNoZXcvY292ZXIuMTU4MzUxODQ0
-Ny5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNmM4YjJhNSBsaW51eC11c2VyL3Jpc2N2OiBVcGRhdGUgdGhlIHN5c2NhbGxfbnIncyB0
-byB0aGUgNS41IGtlcm5lbAphOGMzNTA1IGxpbnV4LXVzZXI6IFN1cHBvcnQgZnV0ZXhfdGltZTY0
-CjUwMjBjMjMgbGludXgtdXNlci9zeXNjYWxsOiBBZGQgc3VwcG9ydCBmb3IgY2xvY2tfZ2V0dGlt
-ZTY0L2Nsb2NrX3NldHRpbWU2NAoyMjI5MzAyIGxpbnV4LXVzZXI6IFByb3RlY3QgbW9yZSBzeXNj
-YWxscwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS80IENoZWNraW5nIGNvbW1pdCAyMjI5MzAyMWEw
-NmIgKGxpbnV4LXVzZXI6IFByb3RlY3QgbW9yZSBzeXNjYWxscykKMi80IENoZWNraW5nIGNvbW1p
-dCA1MDIwYzIzODJiOWUgKGxpbnV4LXVzZXIvc3lzY2FsbDogQWRkIHN1cHBvcnQgZm9yIGNsb2Nr
-X2dldHRpbWU2NC9jbG9ja19zZXR0aW1lNjQpCjMvNCBDaGVja2luZyBjb21taXQgYThjMzUwNWM2
-ZmY0IChsaW51eC11c2VyOiBTdXBwb3J0IGZ1dGV4X3RpbWU2NCkKV0FSTklORzogYXJjaGl0ZWN0
-dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzIzOiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGwuYzoyNDg6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4KQoKV0FSTklORzogYXJj
-aGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzI2OiBGSUxFOiBs
-aW51eC11c2VyL3N5c2NhbGwuYzoyNTE6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4X3RpbWU2NCkK
-CldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVk
-CiM0MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzA4OgorI2lmIGRlZmluZWQoVEFSR0VU
-X05SX2Z1dGV4X3RpbWU2NCkgJiYgZGVmaW5lZChfX05SX2Z1dGV4X3RpbWU2NCkKCkVSUk9SOiBz
-cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQzOiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGwuYzozMDk6Citfc3lzY2FsbDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICos
-dWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVp
-cmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
-bC5jOjMwOToKK19zeXNjYWxsNihpbnQsc3lzX2Z1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQs
-b3AsaW50LHZhbCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4Ok94VikKIzQzOiBGSUxFOiBsaW51eC11c2Vy
-L3N5c2NhbGwuYzozMDk6Citfc3lzY2FsbDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICosdWFk
-ZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0MzogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6MzA5OgorX3N5c2NhbGw2KGludCxzeXNfZnV0ZXhfdGlt
-ZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywn
-IChjdHg6VnhWKQojNDM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjMwOToKK19zeXNjYWxs
-NihpbnQsc3lzX2Z1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQsb3AsaW50LHZhbCwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
-cmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0MzogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6MzA5OgorX3N5c2NhbGw2KGludCxzeXNfZnV0ZXhfdGltZTY0LGludCAqLHVhZGRy
-LGludCxvcCxpbnQsdmFsLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4
-VikKIzQzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMDk6Citfc3lzY2FsbDYoaW50LHN5
-c19mdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBy
-ZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4Ok94VikKIzQ0OiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzozMTA6CisgICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxp
-bnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NDogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEwOgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1l
-c3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhh
-dCAnLCcgKGN0eDpPeFYpCiM0NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEwOgorICAg
-ICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2
-YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
-UlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NDogRklMRTog
-bGludXgtdXNlci9zeXNjYWxsLmM6MzEwOgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3Bl
-YyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVk
-IGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
-OjMxMDoKKyAgICAgICAgICBjb25zdCBzdHJ1Y3QgdGltZXNwZWMgKix0aW1lb3V0LGludCAqLHVh
-ZGRyMixpbnQsdmFsMykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
-cyBzaG91bGQgYmUgYXZvaWRlZAojNTQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc3NToK
-KyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXgpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMg
-ZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
-Ojc3OToKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXhfdGltZTY0KQoKRVJST1I6IHNwYWNlIHJlcXVp
-cmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNTk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
-bC5jOjc4MDoKK3NhZmVfc3lzY2FsbDYoaW50LGZ1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQs
-b3AsaW50LHZhbCwgXAogICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
-YWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM1OTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6
-NzgwOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxp
-bnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
-cmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpPeFYpCiM1OTogRklMRTogbGludXgtdXNlci9z
-eXNjYWxsLmM6NzgwOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRy
-LGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM1OTogRklM
-RTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgwOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGlt
-ZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAn
-LCcgKGN0eDpWeFYpCiM1OTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgwOgorc2FmZV9z
-eXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
-YWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNTk6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjc4MDoKK3NhZmVfc3lzY2FsbDYoaW50LGZ1dGV4X3RpbWU2NCxpbnQgKix1
-YWRkcixpbnQsb3AsaW50LHZhbCwgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzU5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODA6CitzYWZlX3N5c2Nh
-bGw2KGludCxmdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsIFwKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6T3hWKQojNjA6IEZJTEU6IGxpbnV4
-LXVzZXIvc3lzY2FsbC5jOjc4MToKKyAgICAgICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVj
-ICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
-dHg6VnhWKQojNjA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MToKKyAgICAgICAgICAg
-ICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMp
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpPeFYpCiM2MDogRklMRTogbGludXgt
-dXNlci9zeXNjYWxsLmM6NzgxOgorICAgICAgICAgICAgICBjb25zdCBzdHJ1Y3QgdGltZXNwZWMg
-Kix0aW1lb3V0LGludCAqLHVhZGRyMixpbnQsdmFsMykKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRl
-ciB0aGF0ICcsJyAoY3R4OlZ4VikKIzYwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODE6
-CisgICAgICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFk
-ZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
-Y3R4OlZ4VikKIzYwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODE6CisgICAgICAgICAg
-ICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwz
-KQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
-YmUgYXZvaWRlZAojOTM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY5MzI6CisjaWZkZWYg
-X19OUl9mdXRleF90aW1lNjQKCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVz
-IHNob3VsZCBiZSBhdm9pZGVkCiMxMTE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY5NDU6
-CisjaWZkZWYgX19OUl9mdXRleAoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmlu
-ZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzEyNTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Njk1
-ODoKKyNpZmRlZiBfX05SX2Z1dGV4X3RpbWU2NAoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNp
-ZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzEyODogRklMRTogbGludXgtdXNlci9zeXNj
-YWxsLmM6Njk2MToKKyNpZmRlZiBfX05SX2Z1dGV4CgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3Bl
-Y2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTM1OiBGSUxFOiBsaW51eC11c2VyL3N5
-c2NhbGwuYzo2OTY3OgorI2lmZGVmIF9fTlJfZnV0ZXhfdGltZTY0CgpXQVJOSU5HOiBhcmNoaXRl
-Y3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTM4OiBGSUxFOiBsaW51
-eC11c2VyL3N5c2NhbGwuYzo2OTcwOgorI2lmZGVmIF9fTlJfZnV0ZXgKCldBUk5JTkc6IGFyY2hp
-dGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxNTA6IEZJTEU6IGxp
-bnV4LXVzZXIvc3lzY2FsbC5jOjY5ODM6CisjaWZkZWYgX19OUl9mdXRleF90aW1lNjQKCldBUk5J
-Tkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMxNTk6
-IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY5OTI6CisjaWZkZWYgX19OUl9mdXRleAoKdG90
-YWw6IDI0IGVycm9ycywgMTMgd2FybmluZ3MsIDE2MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzQg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvNCBDaGVja2luZyBjb21taXQgNmM4YjJhNWFk
-MGVkIChsaW51eC11c2VyL3Jpc2N2OiBVcGRhdGUgdGhlIHN5c2NhbGxfbnIncyB0byB0aGUgNS41
-IGtlcm5lbCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4OTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC80IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1ODM1MTg0NDcuZ2l0LmFsaXN0YWlyLmZyYW5jaXNA
-d2RjLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Split the file into clear machine and SoC sections.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_u.c | 109 ++++++++++++++++++++++----------------------
+ 1 file changed, 55 insertions(+), 54 deletions(-)
+
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 156a003642..4688837216 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -308,7 +308,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     g_free(nodename);
+ }
+ 
+-static void riscv_sifive_u_init(MachineState *machine)
++static void sifive_u_machine_init(MachineState *machine)
+ {
+     const struct MemmapEntry *memmap = sifive_u_memmap;
+     SiFiveUState *s = RISCV_U_MACHINE(machine);
+@@ -399,6 +399,60 @@ static void riscv_sifive_u_init(MachineState *machine)
+                           &address_space_memory);
+ }
+ 
++static bool sifive_u_machine_get_start_in_flash(Object *obj, Error **errp)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    return s->start_in_flash;
++}
++
++static void sifive_u_machine_set_start_in_flash(Object *obj, bool value, Error **errp)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    s->start_in_flash = value;
++}
++
++static void sifive_u_machine_instance_init(Object *obj)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    s->start_in_flash = false;
++    object_property_add_bool(obj, "start-in-flash", sifive_u_machine_get_start_in_flash,
++                             sifive_u_machine_set_start_in_flash, NULL);
++    object_property_set_description(obj, "start-in-flash",
++                                    "Set on to tell QEMU's ROM to jump to " \
++                                    "flash. Otherwise QEMU will jump to DRAM",
++                                    NULL);
++}
++
++
++static void sifive_u_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "RISC-V Board compatible with SiFive U SDK";
++    mc->init = sifive_u_machine_init;
++    mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
++    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
++    mc->default_cpus = mc->min_cpus;
++}
++
++static const TypeInfo sifive_u_machine_typeinfo = {
++    .name       = MACHINE_TYPE_NAME("sifive_u"),
++    .parent     = TYPE_MACHINE,
++    .class_init = sifive_u_machine_class_init,
++    .instance_init = sifive_u_machine_instance_init,
++    .instance_size = sizeof(SiFiveUState),
++};
++
++static void sifive_u_machine_init_register_types(void)
++{
++    type_register_static(&sifive_u_machine_typeinfo);
++}
++
++type_init(sifive_u_machine_init_register_types)
++
+ static void riscv_sifive_u_soc_init(Object *obj)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -439,33 +493,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
+                           TYPE_CADENCE_GEM);
+ }
+ 
+-static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    return s->start_in_flash;
+-}
+-
+-static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    s->start_in_flash = value;
+-}
+-
+-static void riscv_sifive_u_machine_instance_init(Object *obj)
+-{
+-    SiFiveUState *s = RISCV_U_MACHINE(obj);
+-
+-    s->start_in_flash = false;
+-    object_property_add_bool(obj, "start-in-flash", sifive_u_get_start_in_flash,
+-                             sifive_u_set_start_in_flash, NULL);
+-    object_property_set_description(obj, "start-in-flash",
+-                                    "Set on to tell QEMU's ROM to jump to " \
+-                                    "flash. Otherwise QEMU will jump to DRAM",
+-                                    NULL);
+-}
+-
+ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -603,29 +630,3 @@ static void riscv_sifive_u_soc_register_types(void)
+ }
+ 
+ type_init(riscv_sifive_u_soc_register_types)
+-
+-static void riscv_sifive_u_machine_class_init(ObjectClass *oc, void *data)
+-{
+-    MachineClass *mc = MACHINE_CLASS(oc);
+-
+-    mc->desc = "RISC-V Board compatible with SiFive U SDK";
+-    mc->init = riscv_sifive_u_init;
+-    mc->max_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + SIFIVE_U_COMPUTE_CPU_COUNT;
+-    mc->min_cpus = SIFIVE_U_MANAGEMENT_CPU_COUNT + 1;
+-    mc->default_cpus = mc->min_cpus;
+-}
+-
+-static const TypeInfo riscv_sifive_u_machine_typeinfo = {
+-    .name       = MACHINE_TYPE_NAME("sifive_u"),
+-    .parent     = TYPE_MACHINE,
+-    .class_init = riscv_sifive_u_machine_class_init,
+-    .instance_init = riscv_sifive_u_machine_instance_init,
+-    .instance_size = sizeof(SiFiveUState),
+-};
+-
+-static void riscv_sifive_u_machine_init_register_types(void)
+-{
+-    type_register_static(&riscv_sifive_u_machine_typeinfo);
+-}
+-
+-type_init(riscv_sifive_u_machine_init_register_types)
+-- 
+2.25.1
+
 
