@@ -2,88 +2,103 @@ Return-Path: <SRS0=PWAB=4X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD68EC3F2D5
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EABB2C3F2D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87DB5208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:26:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVt6H9C1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87DB5208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BEF9F208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Mar 2020 07:27:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF9F208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jA7NA-0006ei-RX
-	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:26:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43793)
+	id 1jA7O7-0008PE-Uh
+	for qemu-devel@archiver.kernel.org; Fri, 06 Mar 2020 02:27:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jA7MS-0006Ar-Mr
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:25:33 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA7N2-0006l9-Ab
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jA7MR-0006w7-3w
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:25:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29963
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jA7MQ-0006rG-Sz
- for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:25:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583479530;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LB9xvf82J1ob4BEcwh3Uro+BKLuMDFp2I5RxQI68aro=;
- b=QVt6H9C1JQj5bFeZzvc77NsBLLlSpa3L1aJ1qqkkpyWIqvn6o02fAK/uyLj/8KQZQ6Bnij
- NYn6D/7+YrrvrrzgBLEGpI4dPHDxasH7DDcJW+YQf4gb8D3dsyzvDRqG09bMhR41QThIy/
- qZJcfRJjqxGeYN5B0nq8rwBb/Ha3E/0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-7dDDL_OBM7W3SHfLf1s5-w-1; Fri, 06 Mar 2020 02:25:26 -0500
-X-MC-Unique: 7dDDL_OBM7W3SHfLf1s5-w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 735A01007273;
- Fri,  6 Mar 2020 07:25:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5700E5C28C;
- Fri,  6 Mar 2020 07:25:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CA61F11386A6; Fri,  6 Mar 2020 08:25:20 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v4 1/4] qapi: Add a 'coroutine' flag for commands
-References: <20200121181122.15941-1-kwolf@redhat.com>
- <20200121181122.15941-2-kwolf@redhat.com>
- <87lfq0yp9v.fsf@dusky.pond.sub.org>
- <20200122101021.GB5268@linux.fritz.box>
- <87h7z2ddjj.fsf@dusky.pond.sub.org>
- <20200305160654.GC5363@linux.fritz.box>
-Date: Fri, 06 Mar 2020 08:25:20 +0100
-In-Reply-To: <20200305160654.GC5363@linux.fritz.box> (Kevin Wolf's message of
- "Thu, 5 Mar 2020 17:06:54 +0100")
-Message-ID: <87pndq7xnj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jA7N0-0001bb-VT
+ for qemu-devel@nongnu.org; Fri, 06 Mar 2020 02:26:08 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:35248
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jA7N0-0001Mo-Nu; Fri, 06 Mar 2020 02:26:06 -0500
+Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jA7NH-0001AE-In; Fri, 06 Mar 2020 07:26:23 +0000
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
+ <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+ <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+ <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
+ <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003032356230.41934@zero.eik.bme.hu>
+ <a579c016-fd6c-ad4f-c091-2286265c9a57@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003042227190.70853@zero.eik.bme.hu>
+ <b3bce0d3-3ab3-7fb3-ed3c-60f1f19159d6@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003060007040.48868@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <e8f3fe10-7a44-5552-bb80-7bc24fe68cc6@ilande.co.uk>
+Date: Fri, 6 Mar 2020 07:25:59 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <alpine.BSF.2.22.395.2003060115170.85813@zero.eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,118 +110,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, David Alan Gilbert <dgilbert@redhat.com>,
- marcandre.lureau@gmail.com, stefanha@redhat.com,
- =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 06/03/2020 00:21, BALATON Zoltan wrote:
 
-> Am 05.03.2020 um 16:30 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->>=20
->> > Am 22.01.2020 um 07:32 hat Markus Armbruster geschrieben:
->> >> Kevin Wolf <kwolf@redhat.com> writes:
->> >>=20
->> >> > This patch adds a new 'coroutine' flag to QMP command definitions t=
-hat
->> >> > tells the QMP dispatcher that the command handler is safe to be run=
- in a
->> >> > coroutine.
->> >>=20
->> >> I'm afraid I missed this question in my review of v3: when is a handl=
-er
->> >> *not* safe to be run in a coroutine?
->> >
->> > That's a hard one to answer fully.
->> >
->> > Basically, I think the biggest problem is with calling functions that
->> > change their behaviour if run in a coroutine compared to running them
->> > outside of coroutine context. In most cases the differences like havin=
-g
->> > a nested event loop instead of yielding are just fine, but they are
->> > still subtly different.
->> >
->> > I know this is vague, but I can assure you that problematic cases exis=
-t.
->> > I hit one of them with my initial hack that just moved everything into=
- a
->> > coroutine. It was related to graph modifications and bdrv_drain and
->> > resulted in a hang. For the specifics, I would have to try and reprodu=
-ce
->> > the problem again.
->>=20
->> I'm afraid it's even more complicated.
->>=20
->> Monitors (HMP and QMP) run in the main loop.  Before this patch, HMP and
->> QMP commands run start to finish, one after the other.
->>=20
->> After this patch, QMP commands may elect to yield.  QMP commands still
->> run one after the other (the shared dispatcher ensures this even when we
->> have multiple QMP monitors).
->>=20
->> However, *HMP* commands can now run interleaved with a coroutine-enabled
->> QMP command, i.e. between a yield and its re-enter.
->
-> I guess that's right. :-(
->
->> Consider an HMP screendump running in the middle of a coroutine-enabled
->> QMP screendump, using Marc-Andr=C3=A9's patch.  As far as I can tell, it
->> works, because:
->>=20
->> 1. HMP does not run in a coroutine.  If it did, and both dumps dumped
->> the same @con, then it would overwrite con->screndump_co.  If we ever
->> decide to make HMP coroutine-capable so it doesn't block the main loop,
->> this will become unsafe in a nasty way.
->
-> At the same time, switching HMP to coroutines would give us an easy way
-> to fix the problem: Just use a CoMutex so that HMP and QMP commands
-> never run in parallel. Unless we actually _want_ to run both at the same
-> time for some commands, but I don't see why.
+> On Fri, 6 Mar 2020, BALATON Zoltan wrote:
+>> On Thu, 5 Mar 2020, Mark Cave-Ayland wrote:
+>>> On 04/03/2020 22:33, BALATON Zoltan wrote:
+>>> another possibility: PCI configuration space register 0x3d (Interrupt pin) is
+>>> documented as having value 0 == Legacy IRQ routing which should be the initial value
+>>> on reset, but QEMU incorrectly sets it to 1 which indicates PCI IRQ routing.
+>>
+>> The VT8231 docs say this should always read 1 but may be this is somehow set to 0
+>> on the Pegasos2. What does that mean? Should we use this value instead of the
+>> feature bit to force using legacy interrupts? We'd still need a property in via-ide
+>> to set this reg or is it possible to set it from board code overriding the default
+>> after device is created? That would allow to drop patch 1. I can try this.
+> 
+> This seemed like it could simplify patches a bit but it does not work. Setting this
+> reg to 0 breaks Linux and MorphOS which then think the device does not have an
+> interrupt at all and fail as before waiting for the irq. So we still need the feature
+> bit, cant use this reg to force legacy interrupts. I've spent considerable time
+> testing different OSes before I've ended up with this patch series I've submitted and
+> I could not find a simpler way that works with everything.
 
-As long as running QMP commands from *all* monitors one after the other
-is good enough, I can't see why running HMP commands interleaved is
-worth the risk.
+I appreciate that testing these things can take a lot of time, but what is important
+thing to ask here is whether these hacks are attempting to work around something in
+QEMU that doesn't match the hardware specification, and to me it feels that this is
+what is happening here.
 
-> While we don't have this, maybe it's worth considering if there is
-> another simple way to achieve the same thing. Could QMP just suspend all
-> HMP monitors while it's executing a command? At first sight it seems
-> that this would work only for "interactive" monitors.
+Obviously this thread has become quite long (and even I'm struggling to find previous
+discussions) but here is my summary below:
 
-I believe the non-"interactive" HMP code is used only by gdbstub.c.
+- I don't think the patch in its current form is the right way to do this. Instead of
+adding a feature bit to fudge the existing IRQ routing when the existing IRQ routing
+is wrong, let's fix the existing IRQ routing instead.
 
-I keep forgetting our GDB server stub creates an "HMP" monitor.
-Possibly because I don't understand why.  Alex, Philippe, can you
-enlighten me?
+- There is no mention of "non-100%" native mode in the 8231 or 686B datasheet: this
+is simply a term used within the Linux patches. The controller is either in native
+mode, or legacy mode. It may be that guests are making use of some undefined
+behaviour here.
 
-Aside: I figure the distribution of work between monitor_init(),
-monitor_init_hmp() and monitor_init_qmp() could be improved.
+- The code that uses the value of PCI_INTERRUPT_LINE in via-ide is incorrect (as your
+patch comment points out, some guests ignore it anyway).
 
->> 2. graphic_hw_update() is safe to call even while another
->> graphic_hw_update() runs.  qxl_render_update() appears to ensure that
->> with the help of qxl->ssd.lock.
->>=20
->> 3. There is no 3[*].
->>=20
->> My point is: this is a non-trivial argument.  Whether a QMP command
->> handler is safe to run in a coroutine depends on how it interacts with
->> all the stuff that can run interleaved with it.  Typically includes
->> itself via its HMP buddy.
->
-> If the handler doesn't yield, it's still trivial. So I think my original
-> statement that with the existing QMP handlers, the problem is with code
-> that behaves different between coroutine and non-coroutine calls, is
-> still true because that is the only code that could possibly yield with
-> existing QMP command handlers.
->
-> Of course, you're right that handlers that actually can yield need to be
-> careful that they can deal with whatever happens until they are
-> reentered. And that seems to include HMP handlers.
->
-> Kevin
+- There is different behaviour here between the 8231 and 686B in this area, despite
+having the same vendor/device id.
 
+
+The first thing you need to fix is the PCI_INTERRUPT_LINE part; I would start by
+removing the existing code and instead expose a qdev named gpio "legacy-irq" and
+wiring that up to your interrupt controller. Note you'd have to do the same for
+fulong2e, but that is reasonably trivial.
+
+
+ATB,
+
+Mark.
 
