@@ -2,99 +2,83 @@ Return-Path: <SRS0=oVW3=4Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1604BC10F00
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Mar 2020 17:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C1EC10F00
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Mar 2020 17:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4F6F2070A
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Mar 2020 17:38:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPjeGiqs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4F6F2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2AB962051A
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Mar 2020 17:42:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB962051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAdPa-0003Um-4U
-	for qemu-devel@archiver.kernel.org; Sat, 07 Mar 2020 12:38:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54386)
+	id 1jAdSn-0004cL-Cc
+	for qemu-devel@archiver.kernel.org; Sat, 07 Mar 2020 12:42:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jAdP0-00030M-BN
- for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:38:19 -0500
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jAdSC-00048C-Vo
+ for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jAdOy-0003h1-T2
- for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:38:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58570
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jAdSA-00046y-Rw
+ for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:41:36 -0500
+Received: from smtp.lg.ehu.es ([158.227.0.66]:14445 helo=smtp.ehu.eus)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jAdOy-0003dg-MK
- for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:38:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583602695;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QPMONysU5i67ApYeahZG5wNj2ytX4NLqpcIr2IVegV0=;
- b=VPjeGiqsGUwBjrF6vzhVHr6yBN9FXizaBwe9Msgr6LEf2gZEYO5lrnAzMSNgrZ12VNpNW9
- DNNEVMO2EaawMl0RZLx6BTIhGr2S+CtKz4ovHupWPiZsLmE6t8dqPBmldEUy8VbYSoHhkE
- 4lU0Cbb6ciRHgvjFDHk74PwQalfwH0k=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-MWoZI9v6N9OlVQ6wgjoYmA-1; Sat, 07 Mar 2020 12:38:11 -0500
-X-MC-Unique: MWoZI9v6N9OlVQ6wgjoYmA-1
-Received: by mail-wm1-f70.google.com with SMTP id v21so1594476wml.5
- for <qemu-devel@nongnu.org>; Sat, 07 Mar 2020 09:38:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QPMONysU5i67ApYeahZG5wNj2ytX4NLqpcIr2IVegV0=;
- b=UoW2aWX5+TO5/xo/D1Fo4KUSaMO6CrxCs3TIYuBZqGcGIhoZlAITAHtsL10OWHosNN
- ZPRwPDDJenXZmu80+ejd4FB4MX1AlFGnoX11ceCL5WWB0jcBbzM5aXNBAjlwQ5c/acFZ
- eRBF6Ld0kSfaGLXl2sgXLJcB05boZbKHt8S/zPjk84llLfGrjTOmNGwzWmVkXjvc+cya
- tBd/0bs0ha2P/VcYNpQGYReBj5iKCdETgnaGAVSlrYdEXCxvW3ZaP6o2xYvRMK82dXDX
- 1xcQzNzFOD5iYgz8/pYzy6vslh2zcfIH65jprttBw56NIwCyMIoTusgE8D9fYtyWJT7o
- qrcQ==
-X-Gm-Message-State: ANhLgQ3ISrPEWOe6Uo38VOQpxL6yzLjm9A+XspCBsuiJY3vOcX2ywat1
- Dta9enfLtx9FXAIrD/htX9MItdlBeuVIz6qZrYE/Lpk5DOKro8cBES7SQygPGCbR8aoRp09QYYK
- jPGDIO7hxgOtUVZk=
-X-Received: by 2002:a5d:5286:: with SMTP id c6mr10260920wrv.418.1583602690276; 
- Sat, 07 Mar 2020 09:38:10 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vs3uVPfDxbdukcxQyNbqjpEe66/X24fVLoCnHqW+EgWf3TpVg/5ZM9McjOw5XUrXxevVdSymA==
-X-Received: by 2002:a5d:5286:: with SMTP id c6mr10260909wrv.418.1583602690055; 
- Sat, 07 Mar 2020 09:38:10 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id f9sm1972896wrc.71.2020.03.07.09.38.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 07 Mar 2020 09:38:09 -0800 (PST)
-Subject: Re: [PATCH v32 22/22] qemu-doc.texi: Add RX section.
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
- <20200224141923.82118-23-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5b20d7bb-d808-bbf0-621e-c7494beae4bd@redhat.com>
-Date: Sat, 7 Mar 2020 18:38:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+ id 1jAdSA-0003zV-FY
+ for qemu-devel@nongnu.org; Sat, 07 Mar 2020 12:41:34 -0500
+Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
+ by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 056C337D18;
+ Sat,  7 Mar 2020 18:41:32 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CE9DC11004A;
+ Sat,  7 Mar 2020 18:41:31 +0100 (CET)
+Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C17DF110045;
+ Sat,  7 Mar 2020 18:41:31 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.73])
+ by imsva1.lgp.ehu.es (Postfix) with ESMTPS;
+ Sat,  7 Mar 2020 18:41:31 +0100 (CET)
+Received: from afee69d503a7 (unknown [81.0.0.187])
+ by smtp1 (Postfix) with ESMTPSA id 6D33537D18;
+ Sat,  7 Mar 2020 18:41:31 +0100 (CET)
+Date: Sat, 7 Mar 2020 17:41:30 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v8 7/9] qemu-binfmt-conf.sh: generalize <CPU> to positional
+ [TARGETS]
+Message-ID: <20200307174130.GH9@afee69d503a7>
 MIME-Version: 1.0
-In-Reply-To: <20200224141923.82118-23-ysato@users.sourceforge.jp>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Greylist: ACL 184 matched, not delayed by milter-greylist-4.6.2 (smtp1
+ [10.0.100.73]); Sat, 07 Mar 2020 18:41:31 +0100 (CET)
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25276.001
+X-TM-AS-Result: No--6.998-7.0-31-10
+X-imss-scan-details: No--6.998-7.0-31-10
+X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25276.001
+X-TMASE-Result: 10--6.998000-10.000000
+X-TMASE-MatchedRID: nrHYWZvpVHs8mRT0SYY6fggKAWhuC2ojb6bRSg4rpzvnCThanP/ghHPB
+ OaeKbK/+oLBWQm3Xk4ruUwVp7PnaAt6mdwOBRvHdweku330t3msk970gYOLoHXqm3WhT4L+kMrJ
+ 18VCI8ftc9zRCuEq6hBseEDo3eR11BeNKlUefbYOSbFkwrmkQ4ktc8DbogbSEN2WxgvaD/zvwVK
+ uSbLr8UjTz5aD5P/nAfEtOTuUcA9bRQdw4XFGJY2Fzg+No/uuNp1Pjcaldww1dmCn0mOn8zNY8Z
+ /9YK9FIHZltZHq3316JylXyVqjzn3P1PdPbavOpbWsCUkrA4EnKIqAq0jIHigaYevV4zG3ZhOta
+ jKU/o8zXTlm90lXFO7qojq4R9iDw/3sP+ok2e+YoSebb2328i+uLFZZYlisfQ6tklRJO9ij9bMg
+ 3kSk56LG0WsdjH6wrKrauXd3MZDWXf5sC39gVVJFVR9JrQm2XD61E1PCtdJD/ZxLWCRuw8s++cy
+ dLfhbO66XHIc5w+gc=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
+X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
+ milter-greylist-4.6.2 (postfix.smtp1.imsva1 [10.0.100.73]);
+ Sat, 07 Mar 2020 18:41:32 +0100 (CET)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 158.227.0.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,89 +90,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+This breaks brackward compatibility.
 
-On 2/24/20 3:19 PM, Yoshinori Sato wrote:
-> Describe emulated target specification. And two examples.
-> 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->   qemu-doc.texi | 44 ++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 44 insertions(+)
-> 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 33b9597b1d..d80a9c64f7 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -1719,6 +1719,7 @@ differences are mentioned in the following sections.
->   * Microblaze System emulator::
->   * SH4 System emulator::
->   * Xtensa System emulator::
-> +* RX System emulator::
->   @end menu
->   
->   @node PowerPC System emulator
-> @@ -2487,6 +2488,49 @@ so should only be used with trusted guest OS.
->   
->   @c man end
->   
-> +@node RX System emulator
-> +@section RX System emulator
-> +@cindex system emulation (RX)
-> +
-> +Use the executable @file{qemu-system-rx} to simulate a Virtual RX target.
-> +This target emulated following devices.
-> +
-> +@itemize @minus
-> +@item
-> +R5F562N8 MCU
-> +@item
-> +On-chip memory (ROM 512KB, RAM 96KB)
-> +@item
-> +Interrupt Control Unit (ICUa)
-> +@item
-> +8Bit Timer x 1CH (TMR0,1)
-> +@item
-> +Compare Match Timer x 2CH (CMT0,1)
-> +@item
-> +Serial Communication Interface x 1CH (SCI0)
-> +@item
-> +External memory 16MByte
-> +@end itemize
-> +
-> +Example of @file{qemu-system-rx} usage for rx is shown below:
-> +
-> +Download @code{u-boot_image} from @url{https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz}
-> +
-> +Start emulation of rx-virt:
-> +@example
-> +qemu-system-rx -bios @code{u-boot_image}
-> +@end example
-> +
-> +Download @code{kernel_image} from @url{https://osdn.net/users/ysato/pf/qemu/dl/zImage}
-> +
-> +Download @code{device_tree_blob} from @url{https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb}
-> +
-> +Start emulation of rx-virt:
-> +@example
-> +qemu-system-rx -kernel @code{kernel_image} -dtb @code{device_tree_blob} \
-> +  -append "earlycon"
-> +@end example
-> +
->   @node QEMU User space emulator
->   @chapter QEMU User space emulator
->   
-> 
+Option '--systemd CPU' allows to register binfmt interpreters for a
+single target architecture or for 'ALL' (of them). This patch
+generalizes the approach to support it in any mode (default, '--debian'
+or '--systemd'). To do so, option 'systemd' is changed to be boolean
+(no args). Then, all the positional arguments are considered to be a
+list of target architectures.
 
-In commit 3a8273b1ab3 the this file has been removed (due to the 
-conversion to the rST format).
+If no positional arguments are provided, all of the architectures in
+qemu_target_list are registered. Conversely, argument value 'NONE'
+allows to make a 'dry run' of the script. I.e., checks are executed
+according to the mode, but no interpreter is registered.
 
-Can you send a single patch (not the rest) with your documentation in 
-rST format please?
+Support QEMU_TARGETS environment variable, consistently with 'path',
+'suffix', 'persistent' and 'credential', The supported formats are
+the same as for positional arguments, which have priority. If both
+the variable and the list of positional arguments are empty, defaults
+to qemu_target_list.
+
+Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
+ scripts/qemu-binfmt-conf.sh | 80 +++++++++++++++++++++----------------
+ 1 file changed, 46 insertions(+), 34 deletions(-)
+
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 80ec164eab..d5d3484b58 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -6,6 +6,28 @@ ppc ppc64 ppc64le m68k mips mipsel mipsn32 mipsn32el mips64 mips64el \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
+ microblaze microblazeel or1k x86_64"
+ 
++# check if given TARGETS is/are in the supported target list
++qemu_check_target_list() {
++    if [ $# -eq 0 ] ; then
++      checked_target_list="$qemu_target_list"
++      return
++    fi
++    unset checked_target_list
++    for target ; do
++        for cpu in $qemu_target_list ; do
++            if [ "x$cpu" = "x$target" ] ; then
++                checked_target_list="$checked_target_list $target"
++                break
++            fi
++        done
++        if [ "x$cpu" != "x$target" ] ; then
++            echo "ERROR: unknown CPU \"$target\"" 1>&2
++            usage
++            exit 1
++        fi
++    done
++}
++
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+ i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ i386_family=i386
+@@ -171,14 +193,16 @@ qemu_get_family() {
+ 
+ usage() {
+     cat <<EOF
++Usage: qemu-binfmt-conf.sh [options] [TARGETS]
+ 
+-Usage: qemu-binfmt-conf.sh [options]
+-
+-Configure binfmt_misc to use qemu interpreter
++Configure binfmt_misc to use qemu interpreter for the given TARGETS.
+ 
+ Options and associated environment variables:
+ 
+ Argument             Env-variable     Description
++TARGETS              QEMU_TARGETS     A single arch name or a list of them (see all names below);
++                                      if empty, configure all known targets;
++                                      if 'NONE', no interpreter is configured.
+ -h|--help                             display this usage
+ -Q|--path PATH       QEMU_PATH        set path to qemu interpreter(s)
+ -F|--suffix SUFFIX   QEMU_SUFFIX      add a suffix to the default interpreter name
+@@ -188,12 +212,12 @@ Argument             Env-variable     Description
+                                       to the binary to interpret
+ -e|--exportdir PATH                   define where to write configuration files
+                                       (default: $SYSTEMDDIR or $DEBIANDIR)
+--s|--systemd CPU                      don't write into /proc, generate file for
+-                                      systemd-binfmt.service for the given CPU; if CPU is "ALL",
+-                                      generate a file for all known cpus.
++-s|--systemd                          don't write into /proc, generate file(s) for
++                                      systemd-binfmt.service;
+ -d|--debian                           don't write into /proc, generate update-binfmts templates
+ 
+ Defaults:
++QEMU_TARGETS=$QEMU_TARGETS
+ QEMU_PATH=$QEMU_PATH
+ QEMU_SUFFIX=$QEMU_SUFFIX
+ QEMU_PERSISTENT=$QEMU_PERSISTENT
+@@ -207,14 +231,10 @@ To remove interpreter, use :
+ 
+     sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+ 
+-With systemd, binfmt files are loaded by systemd-binfmt.service
++The environment variable HOST_ARCH allows to override 'uname' to generate configuration files for
++a different architecture than the current one.
+ 
+-The environment variable HOST_ARCH allows to override 'uname' to generate configuration files for a
+-different architecture than the current one.
+-
+-where CPU is one of:
+-
+-    $qemu_target_list
++QEMU target list: $qemu_target_list
+ 
+ EOF
+ }
+@@ -298,9 +318,15 @@ qemu_set_binfmts() {
+     # probe cpu type
+     host_family=$(qemu_get_family)
+ 
+-    # register the interpreter for each cpu except for the native one
++    # reduce the list of target interpreters to those given in the CLI
++    targets=${@:-$QEMU_TARGET}
++    if [ "x$targets" = "xNONE" ] ; then
++      return
++    fi
++    qemu_check_target_list $targets
+ 
+-    for cpu in ${qemu_target_list} ; do
++    # register the interpreter for each target except for the native one
++    for cpu in $checked_target_list ; do
+         magic=$(eval echo \$${cpu}_magic)
+         mask=$(eval echo \$${cpu}_mask)
+         family=$(eval echo \$${cpu}_family)
+@@ -328,12 +354,13 @@ BINFMT_SET=qemu_register_interpreter
+ SYSTEMDDIR="/etc/binfmt.d"
+ DEBIANDIR="/usr/share/binfmts"
+ 
++QEMU_TARGETS="${QEMU_TARGETS:-}"
+ QEMU_PATH="${QEMU_PATH:-/usr/local/bin}"
+ QEMU_SUFFIX="${QEMU_SUFFIX:-}"
+ QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
+ QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
+ 
+-options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
++options=$(getopt -o dsQ:S:e:hcp -l debian,systemd,path:,suffix:,exportdir:,help,credential,persistent -- "$@")
+ eval set -- "$options"
+ 
+ while true ; do
+@@ -347,23 +374,6 @@ while true ; do
+         CHECK=qemu_check_systemd
+         BINFMT_SET=qemu_generate_systemd
+         EXPORTDIR=${EXPORTDIR:-$SYSTEMDDIR}
+-        shift
+-        # check given cpu is in the supported CPU list
+-        if [ "$1" != "ALL" ] ; then
+-            for cpu in ${qemu_target_list} ; do
+-                if [ "$cpu" = "$1" ] ; then
+-                    break
+-                fi
+-            done
+-
+-            if [ "$cpu" = "$1" ] ; then
+-                qemu_target_list="$1"
+-            else
+-                echo "ERROR: unknown CPU \"$1\"" 1>&2
+-                usage
+-                exit 1
+-            fi
+-        fi
+         ;;
+     -Q|--path)
+         shift
+@@ -394,5 +404,7 @@ while true ; do
+     shift
+ done
+ 
++shift
++
+ $CHECK
+-qemu_set_binfmts
++qemu_set_binfmts "$@"
+-- 
+2.25.1
+
 
 
