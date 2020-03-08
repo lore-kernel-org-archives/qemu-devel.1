@@ -2,64 +2,71 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA9AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 18:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAC0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:10:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E98520663
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 18:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF726206D5
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:10:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Fkdg+/4V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E98520663
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="OItPfyrW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF726206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jB160-000389-Da
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 14:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33300)
+	id 1jB1Jw-0004iI-Vf
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 15:10:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jB14s-0002Y9-B9
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 14:55:07 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jB1J8-0004EJ-K3
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jB14r-00014J-4f
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 14:55:06 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:40179)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jB1J7-000686-OQ
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:09:50 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:36813)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jB14q-000138-KY
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 14:55:05 -0400
+ id 1jB1J7-00067k-Hs; Sun, 08 Mar 2020 15:09:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
  MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
  Content-ID:Content-Description;
- bh=mme8EQYQogC5iE3rdRBviCaYxePS+3awRA3YPZI8xrc=; b=Fkdg+/4VEASmh6c2kLIJBDstg5
- eP2JCBt39BHVieQjTHTArr7DhF2oo4Xum86DmUafY7hAag7FNldOTTUtL4Dh+ovGEEutrP1eDH6TX
- 1iy0PJAcqkHe0Kcj+YQi7thUIsC25gRCu/rt+Gv1dmUJwCbg6l7Z2GQDZYTMbvd/xRN0x2hSebCd1
- 6TjNjnJVLC6AvB2N4MOa3iUVFcuZL+IwQuuwTY72uzd9c2rnD3YB7dQuilcKGwUpykVsbh655dPFc
- sh4jFg5iIYq75XvEdoBKKVByBfVwa+E7Y0l6WcGGPhf4+DXooCtGS1xvvM3yVZj+J4MpjfQMx/aCK
- VbxHrfPQVpZJB7pTgXm0a2J7coUv/KxUIC5kK8oCakDRtTK6HVp3HQyzdnXBqzUdFD+RWg2QzPBF8
- v7FZ4gNLtGojZy1vOBSUr8CvgC4fgJsylZoAOFM0fjtR82xkHtjBgAJP2ZpnLsYhJobpTXdG+gdh0
- 2h0QrnSBhuCGyeW/7ZHL3Tjxu6j+9doaCr91hElDJYajNbZAH7LFUwga+v6EHbMT1sdKLrBE6uSkJ
- iz53MEd3q//rFw70MAZLmqPchj6ldGnv3pCe+eveYgtVHx3d8uddC8BBFdghrArz1nN/ro98IqCvL
- yoo8EXJk4y421EZrKUSQoTXhz/tm/vW1dlJCGCg0A=;
+ bh=birF46cwsW7C6DhQDRE9C+H8AQVRyDMCb4zehSH4F/s=; b=OItPfyrWlkKge220ZyC5tY92fJ
+ alkWr36lOR3DVJq/+AXYApAyPYL9p2p8M4JC87AsINnxoCCKzYNLAXw+PiY3MVHTyc976beNkYDZN
+ dQ2qB8Trd0R3ni5YW1iE8Yb1+uh3VBxBhn1e9jzojPHlrmviMOtTriqCzMntPmz+FG3fiyRT629W7
+ 1dFcYkmg+05uBq0nqpxbrpdn/t3LwQcB8MayaECXCseVijFYDeEKV7SM/K+JBzovia6WxWFJguA17
+ cXHKvmd9rAp7/tlUgz5gG4QXqrQSade8ZrUaE5RmgeAssPW3LVxViIS6BM6S0XYOTzdvYR+5Q9hqD
+ +iBaDXddyuJJ7vb7VWxIcMa+RtOANGcb1VqcP3cMySoTzri0gAy2DBWBrttebQ3JPI600YWEQdyZA
+ fqIzoWbrudapC/Gz3V4Y0lx+EBZoZP5IP067sIt4y8XGRYowsOwdTSLp9FqqanbzNoOqeKx6rQqzT
+ RTs6dqyFysf3DqOaJK81hJ5jcD1NHCmNWle2hUITLFq+Es44DpwCtPch5R9iXSm/4ERC3zBz56KnQ
+ ufnA2wgAwbB3JD6D/5bgAwkwh0ppa8QczIoBbm5R7FaZP1yaNvAGEbPGUwRi1l2dkkvrpKcnYLQ1A
+ QPSqT/H05L9QC/bqfBGrt6B4UfYgKNnF3vofEfbIs=;
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
 Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>, armbru@redhat.com, Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v8 07/10] virtio-9p: introduce ERRP_AUTO_PROPAGATE
-Date: Sun, 08 Mar 2020 19:55:00 +0100
-Message-ID: <2907258.0NpiEhWDFd@silver>
-In-Reply-To: <20200306051536.27803-8-vsementsov@virtuozzo.com>
+ Kevin Wolf <kwolf@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
+ Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>,
+ Greg Kurz <groug@kaod.org>, armbru@redhat.com,
+ Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
+Subject: Re: [PATCH v8 02/10] scripts: add coccinelle script to use auto
+ propagated errp
+Date: Sun, 08 Mar 2020 20:09:45 +0100
+Message-ID: <2464375.yLZ1CyT5Wr@silver>
+In-Reply-To: <20200306051536.27803-3-vsementsov@virtuozzo.com>
 References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
- <20200306051536.27803-8-vsementsov@virtuozzo.com>
+ <20200306051536.27803-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="iso-8859-1"
@@ -80,100 +87,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 6. M=E4rz 2020 06:15:33 CET Vladimir Sementsov-Ogievskiy wrote:
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp =3D=3D &error_fatal
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
->=20
-> If we want to check error after errp-function call, we need to
-> introduce local_err and then propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->    &error_fatal, this means that we don't break error_abort
->    (we'll abort on error_set, not on error_propagate)
->=20
-> This commit is generated by command
->=20
->     sed -n '/^virtio-9p$/,/^$/{s/^F: //p}' MAINTAINERS | \
->     xargs git ls-files | grep '\.[hc]$' | \
->     xargs spatch \
->         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->         --macro-file scripts/cocci-macro-file.h \
->         --in-place --no-show-diff --max-width 80
->=20
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Acked-by: Greg Kurz <groug@kaod.org>
+On Freitag, 6. M=E4rz 2020 06:15:28 CET Vladimir Sementsov-Ogievskiy wrote:
+> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci
+> b/scripts/coccinelle/auto-propagated-errp.cocci new file mode 100644
+> index 0000000000..bff274bd6d
+> --- /dev/null
+> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+> @@ -0,0 +1,231 @@
+> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+> +//
+> +// Copyright (c) 2020 Virtuozzo International GmbH.
 
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Just in case:
 
-> ---
->  hw/9pfs/9p-local.c | 12 +++++-------
->  hw/9pfs/9p.c       |  1 +
->  2 files changed, 6 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index 54e012e5b4..0361e0c0b4 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -1479,10 +1479,10 @@ static void error_append_security_model_hint(Error
-> *const *errp)
->=20
->  static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error
-> **errp) {
-> +    ERRP_AUTO_PROPAGATE();
->      const char *sec_model =3D qemu_opt_get(opts, "security_model");
->      const char *path =3D qemu_opt_get(opts, "path");
->      const char *multidevs =3D qemu_opt_get(opts, "multidevs");
-> -    Error *local_err =3D NULL;
->=20
->      if (!sec_model) {
->          error_setg(errp, "security_model property not set");
-> @@ -1516,11 +1516,10 @@ static int local_parse_opts(QemuOpts *opts,
-> FsDriverEntry *fse, Error **errp) fse->export_flags &=3D
-> ~V9FS_FORBID_MULTIDEVS;
->              fse->export_flags &=3D ~V9FS_REMAP_INODES;
->          } else {
-> -            error_setg(&local_err, "invalid multidevs property '%s'",
-> +            error_setg(errp, "invalid multidevs property '%s'",
->                         multidevs);
-> -            error_append_hint(&local_err, "Valid options are: multidevs=
-=3D"
-> +            error_append_hint(errp, "Valid options are: multidevs=3D"
->                                "[remap|forbid|warn]\n");
-> -            error_propagate(errp, local_err);
->              return -1;
->          }
->      }
-> @@ -1530,9 +1529,8 @@ static int local_parse_opts(QemuOpts *opts,
-> FsDriverEntry *fse, Error **errp) return -1;
->      }
->=20
-> -    if (fsdev_throttle_parse_opts(opts, &fse->fst, &local_err)) {
-> -        error_propagate_prepend(errp, local_err,
-> -                                "invalid throttle configuration: ");
-> +    if (fsdev_throttle_parse_opts(opts, &fse->fst, errp)) {
-> +        error_prepend(errp, "invalid throttle configuration: ");
->          return -1;
->      }
->=20
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 9e046f7acb..3aa6a57f3a 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -4023,6 +4023,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
->  int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
->                                 Error **errp)
->  {
-> +    ERRP_AUTO_PROPAGATE();
->      int i, len;
->      struct stat stat;
->      FsDriverEntry *fse;
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+
+Best regards,
+Christian Schoenebeck
 
 
 
