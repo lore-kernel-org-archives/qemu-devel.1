@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AD7C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14AC2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:32:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C428D20838
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:30:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD9BA206D7
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:32:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXuqkajN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C428D20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqFyHif6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD9BA206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAsGR-0003pu-1Q
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 05:30:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56140)
+	id 1jAsIJ-0005Pu-1J
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 05:32:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jAsBY-0003fC-GX
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:25:27 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jAsBY-0003du-8E
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:25:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jAsBV-0000Ej-8d
+ (envelope-from <mlevitsk@redhat.com>) id 1jAsBW-0000Ff-RV
  for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:25:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28176
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24120
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jAsBV-0000EX-3L
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:25:21 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jAsBW-0000FS-OI
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:25:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583659520;
+ s=mimecast20190719; t=1583659522;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8+yO139i+hn7PfOJhB1m/WxK+oxaY6buL5siIDKC+HE=;
- b=BXuqkajNS1o0dMhuJPSPZ7Tlx6ShEs95Db6ZTkTwO2mp0O6Xkoxk8GPBMR7yk4t3z+7Wzo
- iNM8ry29bx3CjLjnOw0OuhfuQMgUnUBcYMLYJCuqgm0wU5Jg4HKkPykAUia3W8xsP+3RMI
- n4IVNuUqrSkzmJZ2bv0h6+LcdfIj5nc=
+ bh=5ICFbxacI83VgTIlkhxD7c4tDRUEMLoHCXrDPHn0udY=;
+ b=HqFyHif6jINzJRMggsZa7Vc0az5YA3nPqAkPhZwU/PyBGO34jMOj2Qw/FSL9/O9zouVu8d
+ iUxGs8rUFEEFPseBMDroi/N9YtCwQSPr4S+5KKvdKIy/VFUBeUiArO72VXac1dtiY23JJz
+ HjkoZYz77MgWTHE6VlNMlRkY5UEzEB4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-naY0NY3NNCujlk567qHVRA-1; Sun, 08 Mar 2020 05:25:17 -0400
-X-MC-Unique: naY0NY3NNCujlk567qHVRA-1
+ us-mta-411-gAa3995UPjiwbhbVg_fZUQ-1; Sun, 08 Mar 2020 05:25:20 -0400
+X-MC-Unique: gAa3995UPjiwbhbVg_fZUQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D086A108443A;
- Sun,  8 Mar 2020 09:25:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C6D88010F1;
+ Sun,  8 Mar 2020 09:25:19 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6CD3B10027B8;
- Sun,  8 Mar 2020 09:25:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DC69101D486;
+ Sun,  8 Mar 2020 09:25:17 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/11] monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
-Date: Sun,  8 Mar 2020 11:24:39 +0200
-Message-Id: <20200308092440.23564-11-mlevitsk@redhat.com>
+Subject: [PATCH v5 11/11] monitor/hmp: Move hmp_drive_add_node to
+ block-hmp-cmds.c
+Date: Sun,  8 Mar 2020 11:24:40 +0200
+Message-Id: <20200308092440.23564-12-mlevitsk@redhat.com>
 In-Reply-To: <20200308092440.23564-1-mlevitsk@redhat.com>
 References: <20200308092440.23564-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
@@ -72,7 +73,7 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,909 +96,154 @@ Sender: "Qemu-devel"
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- block/monitor/block-hmp-cmds.c | 389 +++++++++++++++++++++++++++++++++
- include/block/block-hmp-cmds.h |   4 +
- include/monitor/hmp.h          |   4 -
- monitor/hmp-cmds.c             | 388 --------------------------------
- 4 files changed, 393 insertions(+), 392 deletions(-)
+ block/monitor/block-hmp-cmds.c | 30 ++++++++++++++++++++++++
+ blockdev.c                     | 43 +++++++---------------------------
+ include/block/block_int.h      |  5 ++--
+ 3 files changed, 41 insertions(+), 37 deletions(-)
 
 diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
 c
-index 5beb7df2f7..aebf1dce0d 100644
+index aebf1dce0d..c3a6368dfc 100644
 --- a/block/monitor/block-hmp-cmds.c
 +++ b/block/monitor/block-hmp-cmds.c
-@@ -46,10 +46,12 @@
- #include "qemu/config-file.h"
- #include "qemu/option.h"
- #include "qemu/sockets.h"
-+#include "qemu/cutils.h"
- #include "sysemu/sysemu.h"
- #include "monitor/monitor.h"
- #include "monitor/hmp.h"
- #include "block/nbd.h"
-+#include "block/qapi.h"
- #include "block/block_int.h"
+@@ -56,6 +56,36 @@
  #include "block/block-hmp-cmds.h"
  #include "qemu-io.h"
-@@ -594,3 +596,390 @@ fail:
-     blk_unref(local_blk);
-     hmp_handle_error(mon, err);
- }
-+
-+static void print_block_info(Monitor *mon, BlockInfo *info,
-+                             BlockDeviceInfo *inserted, bool verbose)
+=20
++static void hmp_drive_add_node(Monitor *mon, const char *optstr)
 +{
-+    ImageInfo *image_info;
++    QemuOpts *opts;
++    QDict *qdict;
++    Error *local_err =3D NULL;
 +
-+    assert(!info || !info->has_inserted || info->inserted =3D=3D inserted)=
-;
-+
-+    if (info && *info->device) {
-+        monitor_printf(mon, "%s", info->device);
-+        if (inserted && inserted->has_node_name) {
-+            monitor_printf(mon, " (%s)", inserted->node_name);
-+        }
-+    } else {
-+        assert(info || inserted);
-+        monitor_printf(mon, "%s",
-+                       inserted && inserted->has_node_name ? inserted->nod=
-e_name
-+                       : info && info->has_qdev ? info->qdev
-+                       : "<anonymous>");
-+    }
-+
-+    if (inserted) {
-+        monitor_printf(mon, ": %s (%s%s%s)\n",
-+                       inserted->file,
-+                       inserted->drv,
-+                       inserted->ro ? ", read-only" : "",
-+                       inserted->encrypted ? ", encrypted" : "");
-+    } else {
-+        monitor_printf(mon, ": [not inserted]\n");
-+    }
-+
-+    if (info) {
-+        if (info->has_qdev) {
-+            monitor_printf(mon, "    Attached to:      %s\n", info->qdev);
-+        }
-+        if (info->has_io_status && info->io_status !=3D BLOCK_DEVICE_IO_ST=
-ATUS_OK) {
-+            monitor_printf(mon, "    I/O status:       %s\n",
-+                           BlockDeviceIoStatus_str(info->io_status));
-+        }
-+
-+        if (info->removable) {
-+            monitor_printf(mon, "    Removable device: %slocked, tray %s\n=
-",
-+                           info->locked ? "" : "not ",
-+                           info->tray_open ? "open" : "closed");
-+        }
-+    }
-+
-+
-+    if (!inserted) {
++    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
++    if (!opts) {
 +        return;
 +    }
 +
-+    monitor_printf(mon, "    Cache mode:       %s%s%s\n",
-+                   inserted->cache->writeback ? "writeback" : "writethroug=
-h",
-+                   inserted->cache->direct ? ", direct" : "",
-+                   inserted->cache->no_flush ? ", ignore flushes" : "");
++    qdict =3D qemu_opts_to_qdict(opts, NULL);
 +
-+    if (inserted->has_backing_file) {
-+        monitor_printf(mon,
-+                       "    Backing file:     %s "
-+                       "(chain depth: %" PRId64 ")\n",
-+                       inserted->backing_file,
-+                       inserted->backing_file_depth);
++    if (!qdict_get_try_str(qdict, "node-name")) {
++        qobject_unref(qdict);
++        error_report("'node-name' needs to be specified");
++        goto out;
 +    }
 +
-+    if (inserted->detect_zeroes !=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF) {
-+        monitor_printf(mon, "    Detect zeroes:    %s\n",
-+                BlockdevDetectZeroesOptions_str(inserted->detect_zeroes));
-+    }
-+
-+    if (inserted->bps  || inserted->bps_rd  || inserted->bps_wr  ||
-+        inserted->iops || inserted->iops_rd || inserted->iops_wr)
-+    {
-+        monitor_printf(mon, "    I/O throttling:   bps=3D%" PRId64
-+                        " bps_rd=3D%" PRId64  " bps_wr=3D%" PRId64
-+                        " bps_max=3D%" PRId64
-+                        " bps_rd_max=3D%" PRId64
-+                        " bps_wr_max=3D%" PRId64
-+                        " iops=3D%" PRId64 " iops_rd=3D%" PRId64
-+                        " iops_wr=3D%" PRId64
-+                        " iops_max=3D%" PRId64
-+                        " iops_rd_max=3D%" PRId64
-+                        " iops_wr_max=3D%" PRId64
-+                        " iops_size=3D%" PRId64
-+                        " group=3D%s\n",
-+                        inserted->bps,
-+                        inserted->bps_rd,
-+                        inserted->bps_wr,
-+                        inserted->bps_max,
-+                        inserted->bps_rd_max,
-+                        inserted->bps_wr_max,
-+                        inserted->iops,
-+                        inserted->iops_rd,
-+                        inserted->iops_wr,
-+                        inserted->iops_max,
-+                        inserted->iops_rd_max,
-+                        inserted->iops_wr_max,
-+                        inserted->iops_size,
-+                        inserted->group);
-+    }
-+
-+    if (verbose) {
-+        monitor_printf(mon, "\nImages:\n");
-+        image_info =3D inserted->image;
-+        while (1) {
-+                bdrv_image_info_dump(image_info);
-+            if (image_info->has_backing_image) {
-+                image_info =3D image_info->backing_image;
-+            } else {
-+                break;
-+            }
-+        }
-+    }
-+}
-+
-+void hmp_info_block(Monitor *mon, const QDict *qdict)
-+{
-+    BlockInfoList *block_list, *info;
-+    BlockDeviceInfoList *blockdev_list, *blockdev;
-+    const char *device =3D qdict_get_try_str(qdict, "device");
-+    bool verbose =3D qdict_get_try_bool(qdict, "verbose", false);
-+    bool nodes =3D qdict_get_try_bool(qdict, "nodes", false);
-+    bool printed =3D false;
-+
-+    /* Print BlockBackend information */
-+    if (!nodes) {
-+        block_list =3D qmp_query_block(NULL);
-+    } else {
-+        block_list =3D NULL;
-+    }
-+
-+    for (info =3D block_list; info; info =3D info->next) {
-+        if (device && strcmp(device, info->value->device)) {
-+            continue;
-+        }
-+
-+        if (info !=3D block_list) {
-+            monitor_printf(mon, "\n");
-+        }
-+
-+        print_block_info(mon, info->value, info->value->has_inserted
-+                                           ? info->value->inserted : NULL,
-+                         verbose);
-+        printed =3D true;
-+    }
-+
-+    qapi_free_BlockInfoList(block_list);
-+
-+    if ((!device && !nodes) || printed) {
-+        return;
-+    }
-+
-+    /* Print node information */
-+    blockdev_list =3D qmp_query_named_block_nodes(false, false, NULL);
-+    for (blockdev =3D blockdev_list; blockdev; blockdev =3D blockdev->next=
-) {
-+        assert(blockdev->value->has_node_name);
-+        if (device && strcmp(device, blockdev->value->node_name)) {
-+            continue;
-+        }
-+
-+        if (blockdev !=3D blockdev_list) {
-+            monitor_printf(mon, "\n");
-+        }
-+
-+        print_block_info(mon, NULL, blockdev->value, verbose);
-+    }
-+    qapi_free_BlockDeviceInfoList(blockdev_list);
-+}
-+
-+void hmp_info_blockstats(Monitor *mon, const QDict *qdict)
-+{
-+    BlockStatsList *stats_list, *stats;
-+
-+    stats_list =3D qmp_query_blockstats(false, false, NULL);
-+
-+    for (stats =3D stats_list; stats; stats =3D stats->next) {
-+        if (!stats->value->has_device) {
-+            continue;
-+        }
-+
-+        monitor_printf(mon, "%s:", stats->value->device);
-+        monitor_printf(mon, " rd_bytes=3D%" PRId64
-+                       " wr_bytes=3D%" PRId64
-+                       " rd_operations=3D%" PRId64
-+                       " wr_operations=3D%" PRId64
-+                       " flush_operations=3D%" PRId64
-+                       " wr_total_time_ns=3D%" PRId64
-+                       " rd_total_time_ns=3D%" PRId64
-+                       " flush_total_time_ns=3D%" PRId64
-+                       " rd_merged=3D%" PRId64
-+                       " wr_merged=3D%" PRId64
-+                       " idle_time_ns=3D%" PRId64
-+                       "\n",
-+                       stats->value->stats->rd_bytes,
-+                       stats->value->stats->wr_bytes,
-+                       stats->value->stats->rd_operations,
-+                       stats->value->stats->wr_operations,
-+                       stats->value->stats->flush_operations,
-+                       stats->value->stats->wr_total_time_ns,
-+                       stats->value->stats->rd_total_time_ns,
-+                       stats->value->stats->flush_total_time_ns,
-+                       stats->value->stats->rd_merged,
-+                       stats->value->stats->wr_merged,
-+                       stats->value->stats->idle_time_ns);
-+    }
-+
-+    qapi_free_BlockStatsList(stats_list);
-+}
-+
-+void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
-+{
-+    BlockJobInfoList *list;
-+    Error *err =3D NULL;
-+
-+    list =3D qmp_query_block_jobs(&err);
-+    assert(!err);
-+
-+    if (!list) {
-+        monitor_printf(mon, "No active jobs\n");
-+        return;
-+    }
-+
-+    while (list) {
-+        if (strcmp(list->value->type, "stream") =3D=3D 0) {
-+            monitor_printf(mon, "Streaming device %s: Completed %" PRId64
-+                           " of %" PRId64 " bytes, speed limit %" PRId64
-+                           " bytes/s\n",
-+                           list->value->device,
-+                           list->value->offset,
-+                           list->value->len,
-+                           list->value->speed);
-+        } else {
-+            monitor_printf(mon, "Type %s, device %s: Completed %" PRId64
-+                           " of %" PRId64 " bytes, speed limit %" PRId64
-+                           " bytes/s\n",
-+                           list->value->type,
-+                           list->value->device,
-+                           list->value->offset,
-+                           list->value->len,
-+                           list->value->speed);
-+        }
-+        list =3D list->next;
-+    }
-+
-+    qapi_free_BlockJobInfoList(list);
-+}
-+
-+void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
-+{
-+    BlockDriverState *bs, *bs1;
-+    BdrvNextIterator it1;
-+    QEMUSnapshotInfo *sn_tab, *sn;
-+    bool no_snapshot =3D true;
-+    int nb_sns, i;
-+    int total;
-+    int *global_snapshots;
-+    AioContext *aio_context;
-+
-+    typedef struct SnapshotEntry {
-+        QEMUSnapshotInfo sn;
-+        QTAILQ_ENTRY(SnapshotEntry) next;
-+    } SnapshotEntry;
-+
-+    typedef struct ImageEntry {
-+        const char *imagename;
-+        QTAILQ_ENTRY(ImageEntry) next;
-+        QTAILQ_HEAD(, SnapshotEntry) snapshots;
-+    } ImageEntry;
-+
-+    QTAILQ_HEAD(, ImageEntry) image_list =3D
-+        QTAILQ_HEAD_INITIALIZER(image_list);
-+
-+    ImageEntry *image_entry, *next_ie;
-+    SnapshotEntry *snapshot_entry;
-+
-+    bs =3D bdrv_all_find_vmstate_bs();
++    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
 +    if (!bs) {
-+        monitor_printf(mon, "No available block device supports snapshots\=
-n");
-+        return;
-+    }
-+    aio_context =3D bdrv_get_aio_context(bs);
-+
-+    aio_context_acquire(aio_context);
-+    nb_sns =3D bdrv_snapshot_list(bs, &sn_tab);
-+    aio_context_release(aio_context);
-+
-+    if (nb_sns < 0) {
-+        monitor_printf(mon, "bdrv_snapshot_list: error %d\n", nb_sns);
-+        return;
++        error_report_err(local_err);
++        goto out;
 +    }
 +
-+    for (bs1 =3D bdrv_first(&it1); bs1; bs1 =3D bdrv_next(&it1)) {
-+        int bs1_nb_sns =3D 0;
-+        ImageEntry *ie;
-+        SnapshotEntry *se;
-+        AioContext *ctx =3D bdrv_get_aio_context(bs1);
-+
-+        aio_context_acquire(ctx);
-+        if (bdrv_can_snapshot(bs1)) {
-+            sn =3D NULL;
-+            bs1_nb_sns =3D bdrv_snapshot_list(bs1, &sn);
-+            if (bs1_nb_sns > 0) {
-+                no_snapshot =3D false;
-+                ie =3D g_new0(ImageEntry, 1);
-+                ie->imagename =3D bdrv_get_device_name(bs1);
-+                QTAILQ_INIT(&ie->snapshots);
-+                QTAILQ_INSERT_TAIL(&image_list, ie, next);
-+                for (i =3D 0; i < bs1_nb_sns; i++) {
-+                    se =3D g_new0(SnapshotEntry, 1);
-+                    se->sn =3D sn[i];
-+                    QTAILQ_INSERT_TAIL(&ie->snapshots, se, next);
-+                }
-+            }
-+            g_free(sn);
-+        }
-+        aio_context_release(ctx);
-+    }
-+
-+    if (no_snapshot) {
-+        monitor_printf(mon, "There is no snapshot available.\n");
-+        return;
-+    }
-+
-+    global_snapshots =3D g_new0(int, nb_sns);
-+    total =3D 0;
-+    for (i =3D 0; i < nb_sns; i++) {
-+        SnapshotEntry *next_sn;
-+        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs1) =3D=3D 0) {
-+            global_snapshots[total] =3D i;
-+            total++;
-+            QTAILQ_FOREACH(image_entry, &image_list, next) {
-+                QTAILQ_FOREACH_SAFE(snapshot_entry, &image_entry->snapshot=
-s,
-+                                    next, next_sn) {
-+                    if (!strcmp(sn_tab[i].name, snapshot_entry->sn.name)) =
-{
-+                        QTAILQ_REMOVE(&image_entry->snapshots, snapshot_en=
-try,
-+                                      next);
-+                        g_free(snapshot_entry);
-+                    }
-+                }
-+            }
-+        }
-+    }
-+    monitor_printf(mon, "List of snapshots present on all disks:\n");
-+
-+    if (total > 0) {
-+        bdrv_snapshot_dump(NULL);
-+        monitor_printf(mon, "\n");
-+        for (i =3D 0; i < total; i++) {
-+            sn =3D &sn_tab[global_snapshots[i]];
-+            /*
-+             * The ID is not guaranteed to be the same on all images, so
-+             * overwrite it.
-+             */
-+            pstrcpy(sn->id_str, sizeof(sn->id_str), "--");
-+            bdrv_snapshot_dump(sn);
-+            monitor_printf(mon, "\n");
-+        }
-+    } else {
-+        monitor_printf(mon, "None\n");
-+    }
-+
-+    QTAILQ_FOREACH(image_entry, &image_list, next) {
-+        if (QTAILQ_EMPTY(&image_entry->snapshots)) {
-+            continue;
-+        }
-+        monitor_printf(mon,
-+                       "\nList of partial (non-loadable) snapshots on '%s'=
-:\n",
-+                       image_entry->imagename);
-+        bdrv_snapshot_dump(NULL);
-+        monitor_printf(mon, "\n");
-+        QTAILQ_FOREACH(snapshot_entry, &image_entry->snapshots, next) {
-+            bdrv_snapshot_dump(&snapshot_entry->sn);
-+            monitor_printf(mon, "\n");
-+        }
-+    }
-+
-+    QTAILQ_FOREACH_SAFE(image_entry, &image_list, next, next_ie) {
-+        SnapshotEntry *next_sn;
-+        QTAILQ_FOREACH_SAFE(snapshot_entry, &image_entry->snapshots, next,
-+                            next_sn) {
-+            g_free(snapshot_entry);
-+        }
-+        g_free(image_entry);
-+    }
-+    g_free(sn_tab);
-+    g_free(global_snapshots);
++    bdrv_set_monitor_owned(bs);
++out:
++    qemu_opts_del(opts);
 +}
-diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.=
-h
-index c2d18fba06..3412e108ca 100644
---- a/include/block/block-hmp-cmds.h
-+++ b/include/block/block-hmp-cmds.h
-@@ -46,5 +46,9 @@ void hmp_eject(Monitor *mon, const QDict *qdict);
-=20
- void hmp_qemu_io(Monitor *mon, const QDict *qdict);
-=20
-+void hmp_info_block(Monitor *mon, const QDict *qdict);
-+void hmp_info_blockstats(Monitor *mon, const QDict *qdict);
-+void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
-+void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
-=20
- #endif
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index 47a7cad734..e33ca5a911 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -30,8 +30,6 @@ void hmp_info_migrate_capabilities(Monitor *mon, const QD=
-ict *qdict);
- void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict);
- void hmp_info_migrate_cache_size(Monitor *mon, const QDict *qdict);
- void hmp_info_cpus(Monitor *mon, const QDict *qdict);
--void hmp_info_block(Monitor *mon, const QDict *qdict);
--void hmp_info_blockstats(Monitor *mon, const QDict *qdict);
- void hmp_info_vnc(Monitor *mon, const QDict *qdict);
- void hmp_info_spice(Monitor *mon, const QDict *qdict);
- void hmp_info_balloon(Monitor *mon, const QDict *qdict);
-@@ -39,7 +37,6 @@ void hmp_info_irq(Monitor *mon, const QDict *qdict);
- void hmp_info_pic(Monitor *mon, const QDict *qdict);
- void hmp_info_rdma(Monitor *mon, const QDict *qdict);
- void hmp_info_pci(Monitor *mon, const QDict *qdict);
--void hmp_info_block_jobs(Monitor *mon, const QDict *qdict);
- void hmp_info_tpm(Monitor *mon, const QDict *qdict);
- void hmp_info_iothreads(Monitor *mon, const QDict *qdict);
- void hmp_quit(Monitor *mon, const QDict *qdict);
-@@ -62,7 +59,6 @@ void hmp_balloon(Monitor *mon, const QDict *qdict);
- void hmp_loadvm(Monitor *mon, const QDict *qdict);
- void hmp_savevm(Monitor *mon, const QDict *qdict);
- void hmp_delvm(Monitor *mon, const QDict *qdict);
--void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 99aa31aefa..dc790f1801 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -47,7 +47,6 @@
- #include "qapi/string-output-visitor.h"
- #include "qom/object_interfaces.h"
- #include "ui/console.h"
--#include "block/qapi.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "exec/ramlist.h"
-@@ -470,213 +469,6 @@ void hmp_info_migrate_cache_size(Monitor *mon, const =
-QDict *qdict)
-                    qmp_query_migrate_cache_size(NULL) >> 10);
- }
-=20
--static void print_block_info(Monitor *mon, BlockInfo *info,
--                             BlockDeviceInfo *inserted, bool verbose)
--{
--    ImageInfo *image_info;
--
--    assert(!info || !info->has_inserted || info->inserted =3D=3D inserted)=
-;
--
--    if (info && *info->device) {
--        monitor_printf(mon, "%s", info->device);
--        if (inserted && inserted->has_node_name) {
--            monitor_printf(mon, " (%s)", inserted->node_name);
--        }
--    } else {
--        assert(info || inserted);
--        monitor_printf(mon, "%s",
--                       inserted && inserted->has_node_name ? inserted->nod=
-e_name
--                       : info && info->has_qdev ? info->qdev
--                       : "<anonymous>");
--    }
--
--    if (inserted) {
--        monitor_printf(mon, ": %s (%s%s%s)\n",
--                       inserted->file,
--                       inserted->drv,
--                       inserted->ro ? ", read-only" : "",
--                       inserted->encrypted ? ", encrypted" : "");
--    } else {
--        monitor_printf(mon, ": [not inserted]\n");
--    }
--
--    if (info) {
--        if (info->has_qdev) {
--            monitor_printf(mon, "    Attached to:      %s\n", info->qdev);
--        }
--        if (info->has_io_status && info->io_status !=3D BLOCK_DEVICE_IO_ST=
-ATUS_OK) {
--            monitor_printf(mon, "    I/O status:       %s\n",
--                           BlockDeviceIoStatus_str(info->io_status));
--        }
--
--        if (info->removable) {
--            monitor_printf(mon, "    Removable device: %slocked, tray %s\n=
-",
--                           info->locked ? "" : "not ",
--                           info->tray_open ? "open" : "closed");
--        }
--    }
--
--
--    if (!inserted) {
--        return;
--    }
--
--    monitor_printf(mon, "    Cache mode:       %s%s%s\n",
--                   inserted->cache->writeback ? "writeback" : "writethroug=
-h",
--                   inserted->cache->direct ? ", direct" : "",
--                   inserted->cache->no_flush ? ", ignore flushes" : "");
--
--    if (inserted->has_backing_file) {
--        monitor_printf(mon,
--                       "    Backing file:     %s "
--                       "(chain depth: %" PRId64 ")\n",
--                       inserted->backing_file,
--                       inserted->backing_file_depth);
--    }
--
--    if (inserted->detect_zeroes !=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF) {
--        monitor_printf(mon, "    Detect zeroes:    %s\n",
--                BlockdevDetectZeroesOptions_str(inserted->detect_zeroes));
--    }
--
--    if (inserted->bps  || inserted->bps_rd  || inserted->bps_wr  ||
--        inserted->iops || inserted->iops_rd || inserted->iops_wr)
--    {
--        monitor_printf(mon, "    I/O throttling:   bps=3D%" PRId64
--                        " bps_rd=3D%" PRId64  " bps_wr=3D%" PRId64
--                        " bps_max=3D%" PRId64
--                        " bps_rd_max=3D%" PRId64
--                        " bps_wr_max=3D%" PRId64
--                        " iops=3D%" PRId64 " iops_rd=3D%" PRId64
--                        " iops_wr=3D%" PRId64
--                        " iops_max=3D%" PRId64
--                        " iops_rd_max=3D%" PRId64
--                        " iops_wr_max=3D%" PRId64
--                        " iops_size=3D%" PRId64
--                        " group=3D%s\n",
--                        inserted->bps,
--                        inserted->bps_rd,
--                        inserted->bps_wr,
--                        inserted->bps_max,
--                        inserted->bps_rd_max,
--                        inserted->bps_wr_max,
--                        inserted->iops,
--                        inserted->iops_rd,
--                        inserted->iops_wr,
--                        inserted->iops_max,
--                        inserted->iops_rd_max,
--                        inserted->iops_wr_max,
--                        inserted->iops_size,
--                        inserted->group);
--    }
--
--    if (verbose) {
--        monitor_printf(mon, "\nImages:\n");
--        image_info =3D inserted->image;
--        while (1) {
--                bdrv_image_info_dump(image_info);
--            if (image_info->has_backing_image) {
--                image_info =3D image_info->backing_image;
--            } else {
--                break;
--            }
--        }
--    }
--}
--
--void hmp_info_block(Monitor *mon, const QDict *qdict)
--{
--    BlockInfoList *block_list, *info;
--    BlockDeviceInfoList *blockdev_list, *blockdev;
--    const char *device =3D qdict_get_try_str(qdict, "device");
--    bool verbose =3D qdict_get_try_bool(qdict, "verbose", false);
--    bool nodes =3D qdict_get_try_bool(qdict, "nodes", false);
--    bool printed =3D false;
--
--    /* Print BlockBackend information */
--    if (!nodes) {
--        block_list =3D qmp_query_block(NULL);
--    } else {
--        block_list =3D NULL;
--    }
--
--    for (info =3D block_list; info; info =3D info->next) {
--        if (device && strcmp(device, info->value->device)) {
--            continue;
--        }
--
--        if (info !=3D block_list) {
--            monitor_printf(mon, "\n");
--        }
--
--        print_block_info(mon, info->value, info->value->has_inserted
--                                           ? info->value->inserted : NULL,
--                         verbose);
--        printed =3D true;
--    }
--
--    qapi_free_BlockInfoList(block_list);
--
--    if ((!device && !nodes) || printed) {
--        return;
--    }
--
--    /* Print node information */
--    blockdev_list =3D qmp_query_named_block_nodes(false, false, NULL);
--    for (blockdev =3D blockdev_list; blockdev; blockdev =3D blockdev->next=
-) {
--        assert(blockdev->value->has_node_name);
--        if (device && strcmp(device, blockdev->value->node_name)) {
--            continue;
--        }
--
--        if (blockdev !=3D blockdev_list) {
--            monitor_printf(mon, "\n");
--        }
--
--        print_block_info(mon, NULL, blockdev->value, verbose);
--    }
--    qapi_free_BlockDeviceInfoList(blockdev_list);
--}
--
--void hmp_info_blockstats(Monitor *mon, const QDict *qdict)
--{
--    BlockStatsList *stats_list, *stats;
--
--    stats_list =3D qmp_query_blockstats(false, false, NULL);
--
--    for (stats =3D stats_list; stats; stats =3D stats->next) {
--        if (!stats->value->has_device) {
--            continue;
--        }
--
--        monitor_printf(mon, "%s:", stats->value->device);
--        monitor_printf(mon, " rd_bytes=3D%" PRId64
--                       " wr_bytes=3D%" PRId64
--                       " rd_operations=3D%" PRId64
--                       " wr_operations=3D%" PRId64
--                       " flush_operations=3D%" PRId64
--                       " wr_total_time_ns=3D%" PRId64
--                       " rd_total_time_ns=3D%" PRId64
--                       " flush_total_time_ns=3D%" PRId64
--                       " rd_merged=3D%" PRId64
--                       " wr_merged=3D%" PRId64
--                       " idle_time_ns=3D%" PRId64
--                       "\n",
--                       stats->value->stats->rd_bytes,
--                       stats->value->stats->wr_bytes,
--                       stats->value->stats->rd_operations,
--                       stats->value->stats->wr_operations,
--                       stats->value->stats->flush_operations,
--                       stats->value->stats->wr_total_time_ns,
--                       stats->value->stats->rd_total_time_ns,
--                       stats->value->stats->flush_total_time_ns,
--                       stats->value->stats->rd_merged,
--                       stats->value->stats->wr_merged,
--                       stats->value->stats->idle_time_ns);
--    }
--
--    qapi_free_BlockStatsList(stats_list);
--}
-=20
- #ifdef CONFIG_VNC
- /* Helper for hmp_info_vnc_clients, _servers */
-@@ -1056,44 +848,6 @@ void hmp_info_pci(Monitor *mon, const QDict *qdict)
-     qapi_free_PciInfoList(info_list);
- }
-=20
--void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
--{
--    BlockJobInfoList *list;
--    Error *err =3D NULL;
--
--    list =3D qmp_query_block_jobs(&err);
--    assert(!err);
--
--    if (!list) {
--        monitor_printf(mon, "No active jobs\n");
--        return;
--    }
--
--    while (list) {
--        if (strcmp(list->value->type, "stream") =3D=3D 0) {
--            monitor_printf(mon, "Streaming device %s: Completed %" PRId64
--                           " of %" PRId64 " bytes, speed limit %" PRId64
--                           " bytes/s\n",
--                           list->value->device,
--                           list->value->offset,
--                           list->value->len,
--                           list->value->speed);
--        } else {
--            monitor_printf(mon, "Type %s, device %s: Completed %" PRId64
--                           " of %" PRId64 " bytes, speed limit %" PRId64
--                           " bytes/s\n",
--                           list->value->type,
--                           list->value->device,
--                           list->value->offset,
--                           list->value->len,
--                           list->value->speed);
--        }
--        list =3D list->next;
--    }
--
--    qapi_free_BlockJobInfoList(list);
--}
--
- void hmp_info_tpm(Monitor *mon, const QDict *qdict)
++
+ void hmp_drive_add(Monitor *mon, const QDict *qdict)
  {
-     TPMInfoList *info_list, *info;
-@@ -1356,148 +1110,6 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, err);
+     Error *err =3D NULL;
+diff --git a/blockdev.c b/blockdev.c
+index b38c247cdc..257cb37682 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -64,9 +64,14 @@
+ #include "qemu/main-loop.h"
+ #include "qemu/throttle-options.h"
+=20
+-static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
++QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
+     QTAILQ_HEAD_INITIALIZER(monitor_bdrv_states);
+=20
++void bdrv_set_monitor_owned(BlockDriverState *bs)
++{
++    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
++}
++
+ static const char *const if_name[IF_COUNT] =3D {
+     [IF_NONE] =3D "none",
+     [IF_IDE] =3D "ide",
+@@ -640,7 +645,7 @@ err_no_opts:
  }
 =20
--void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+ /* Takes the ownership of bs_opts */
+-static BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
++BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
+ {
+     int bdrv_flags =3D 0;
+=20
+@@ -3719,38 +3724,6 @@ out:
+     aio_context_release(aio_context);
+ }
+=20
+-
+-void hmp_drive_add_node(Monitor *mon, const char *optstr)
 -{
--    BlockDriverState *bs, *bs1;
--    BdrvNextIterator it1;
--    QEMUSnapshotInfo *sn_tab, *sn;
--    bool no_snapshot =3D true;
--    int nb_sns, i;
--    int total;
--    int *global_snapshots;
--    AioContext *aio_context;
+-    QemuOpts *opts;
+-    QDict *qdict;
+-    Error *local_err =3D NULL;
 -
--    typedef struct SnapshotEntry {
--        QEMUSnapshotInfo sn;
--        QTAILQ_ENTRY(SnapshotEntry) next;
--    } SnapshotEntry;
+-    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
+-    if (!opts) {
+-        return;
+-    }
 -
--    typedef struct ImageEntry {
--        const char *imagename;
--        QTAILQ_ENTRY(ImageEntry) next;
--        QTAILQ_HEAD(, SnapshotEntry) snapshots;
--    } ImageEntry;
+-    qdict =3D qemu_opts_to_qdict(opts, NULL);
 -
--    QTAILQ_HEAD(, ImageEntry) image_list =3D
--        QTAILQ_HEAD_INITIALIZER(image_list);
+-    if (!qdict_get_try_str(qdict, "node-name")) {
+-        qobject_unref(qdict);
+-        error_report("'node-name' needs to be specified");
+-        goto out;
+-    }
 -
--    ImageEntry *image_entry, *next_ie;
--    SnapshotEntry *snapshot_entry;
--
--    bs =3D bdrv_all_find_vmstate_bs();
+-    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
 -    if (!bs) {
--        monitor_printf(mon, "No available block device supports snapshots\=
-n");
--        return;
--    }
--    aio_context =3D bdrv_get_aio_context(bs);
--
--    aio_context_acquire(aio_context);
--    nb_sns =3D bdrv_snapshot_list(bs, &sn_tab);
--    aio_context_release(aio_context);
--
--    if (nb_sns < 0) {
--        monitor_printf(mon, "bdrv_snapshot_list: error %d\n", nb_sns);
--        return;
+-        error_report_err(local_err);
+-        goto out;
 -    }
 -
--    for (bs1 =3D bdrv_first(&it1); bs1; bs1 =3D bdrv_next(&it1)) {
--        int bs1_nb_sns =3D 0;
--        ImageEntry *ie;
--        SnapshotEntry *se;
--        AioContext *ctx =3D bdrv_get_aio_context(bs1);
+-    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
 -
--        aio_context_acquire(ctx);
--        if (bdrv_can_snapshot(bs1)) {
--            sn =3D NULL;
--            bs1_nb_sns =3D bdrv_snapshot_list(bs1, &sn);
--            if (bs1_nb_sns > 0) {
--                no_snapshot =3D false;
--                ie =3D g_new0(ImageEntry, 1);
--                ie->imagename =3D bdrv_get_device_name(bs1);
--                QTAILQ_INIT(&ie->snapshots);
--                QTAILQ_INSERT_TAIL(&image_list, ie, next);
--                for (i =3D 0; i < bs1_nb_sns; i++) {
--                    se =3D g_new0(SnapshotEntry, 1);
--                    se->sn =3D sn[i];
--                    QTAILQ_INSERT_TAIL(&ie->snapshots, se, next);
--                }
--            }
--            g_free(sn);
--        }
--        aio_context_release(ctx);
--    }
--
--    if (no_snapshot) {
--        monitor_printf(mon, "There is no snapshot available.\n");
--        return;
--    }
--
--    global_snapshots =3D g_new0(int, nb_sns);
--    total =3D 0;
--    for (i =3D 0; i < nb_sns; i++) {
--        SnapshotEntry *next_sn;
--        if (bdrv_all_find_snapshot(sn_tab[i].name, &bs1) =3D=3D 0) {
--            global_snapshots[total] =3D i;
--            total++;
--            QTAILQ_FOREACH(image_entry, &image_list, next) {
--                QTAILQ_FOREACH_SAFE(snapshot_entry, &image_entry->snapshot=
-s,
--                                    next, next_sn) {
--                    if (!strcmp(sn_tab[i].name, snapshot_entry->sn.name)) =
-{
--                        QTAILQ_REMOVE(&image_entry->snapshots, snapshot_en=
-try,
--                                      next);
--                        g_free(snapshot_entry);
--                    }
--                }
--            }
--        }
--    }
--
--    monitor_printf(mon, "List of snapshots present on all disks:\n");
--
--    if (total > 0) {
--        bdrv_snapshot_dump(NULL);
--        monitor_printf(mon, "\n");
--        for (i =3D 0; i < total; i++) {
--            sn =3D &sn_tab[global_snapshots[i]];
--            /* The ID is not guaranteed to be the same on all images, so
--             * overwrite it.
--             */
--            pstrcpy(sn->id_str, sizeof(sn->id_str), "--");
--            bdrv_snapshot_dump(sn);
--            monitor_printf(mon, "\n");
--        }
--    } else {
--        monitor_printf(mon, "None\n");
--    }
--
--    QTAILQ_FOREACH(image_entry, &image_list, next) {
--        if (QTAILQ_EMPTY(&image_entry->snapshots)) {
--            continue;
--        }
--        monitor_printf(mon,
--                       "\nList of partial (non-loadable) snapshots on '%s'=
-:\n",
--                       image_entry->imagename);
--        bdrv_snapshot_dump(NULL);
--        monitor_printf(mon, "\n");
--        QTAILQ_FOREACH(snapshot_entry, &image_entry->snapshots, next) {
--            bdrv_snapshot_dump(&snapshot_entry->sn);
--            monitor_printf(mon, "\n");
--        }
--    }
--
--    QTAILQ_FOREACH_SAFE(image_entry, &image_list, next, next_ie) {
--        SnapshotEntry *next_sn;
--        QTAILQ_FOREACH_SAFE(snapshot_entry, &image_entry->snapshots, next,
--                            next_sn) {
--            g_free(snapshot_entry);
--        }
--        g_free(image_entry);
--    }
--    g_free(sn_tab);
--    g_free(global_snapshots);
--
+-out:
+-    qemu_opts_del(opts);
 -}
 -
- void hmp_announce_self(Monitor *mon, const QDict *qdict)
+ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
  {
-     const char *interfaces_str =3D qdict_get_try_str(qdict, "interfaces");
+     BlockDriverState *bs;
+@@ -3780,7 +3753,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error=
+ **errp)
+         goto fail;
+     }
+=20
+-    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
++    bdrv_set_monitor_owned(bs);
+=20
+ fail:
+     visit_free(v);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f422c0bff0..3f70a98b2d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1216,8 +1216,6 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+                             BlockCompletionFunc *cb, void *opaque,
+                             JobTxn *txn, Error **errp);
+=20
+-void hmp_drive_add_node(Monitor *mon, const char *optstr);
+-
+ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   const char *child_name,
+                                   const BdrvChildRole *child_role,
+@@ -1322,4 +1320,7 @@ int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src=
+, uint64_t src_offset,
+=20
+ int refresh_total_sectors(BlockDriverState *bs, int64_t hint);
+=20
++void bdrv_set_monitor_owned(BlockDriverState *bs);
++BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp);
++
+ #endif /* BLOCK_INT_H */
 --=20
 2.17.2
 
