@@ -2,65 +2,65 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC018C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0238DC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A932067C
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:34:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A932067C
+	by mail.kernel.org (Postfix) with ESMTPS id CDE192067C
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 19:36:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE192067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jB1gx-0003DM-Tg
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 15:34:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37235)
+	id 1jB1iY-0004x9-1o
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 15:36:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <volker.ruemelin@t-online.de>) id 1jB1g5-0002M8-BM
+ (envelope-from <volker.ruemelin@t-online.de>) id 1jB1g5-0002M3-4Q
  for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <volker.ruemelin@t-online.de>) id 1jB1g3-0006yz-Ab
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:33:32 -0400
-Received: from mailout09.t-online.de ([194.25.134.84]:48622)
+ (envelope-from <volker.ruemelin@t-online.de>) id 1jB1g4-0006zS-2I
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:33:33 -0400
+Received: from mailout03.t-online.de ([194.25.134.81]:34764)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <volker.ruemelin@t-online.de>)
- id 1jB1g3-0006wU-0p
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:33:31 -0400
-Received: from fwd25.aul.t-online.de (fwd25.aul.t-online.de [172.20.26.130])
- by mailout09.t-online.de (Postfix) with SMTP id 19EDE4230EEB;
- Sun,  8 Mar 2020 20:33:29 +0100 (CET)
+ id 1jB1g3-0006y8-O0
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 15:33:32 -0400
+Received: from fwd30.aul.t-online.de (fwd30.aul.t-online.de [172.20.26.135])
+ by mailout03.t-online.de (Postfix) with SMTP id 3BF4B427E7BA;
+ Sun,  8 Mar 2020 20:33:30 +0100 (CET)
 Received: from linpower.localnet
- (GWwSMcZCohoZDM9rI++fNADFZQEoH8vN3SJNnetaZW4WDBrCd9lH8gqyjD6HFGTwwa@[79.208.31.100])
- by fwd25.t-online.de
+ (bKrPuwZpghIMNnwLloP6R4aXGWFA3l4WO3GmYYVfqsj5gGep5BSwUkf0Y5u7mHrgLk@[79.208.31.100])
+ by fwd30.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1jB1fw-1s6DFQ0; Sun, 8 Mar 2020 20:33:24 +0100
+ esmtp id 1jB1g2-3QOuAq0; Sun, 8 Mar 2020 20:33:30 +0100
 Received: by linpower.localnet (Postfix, from userid 1000)
- id 94C5D200637; Sun,  8 Mar 2020 20:33:21 +0100 (CET)
+ id 978482006CE; Sun,  8 Mar 2020 20:33:21 +0100 (CET)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>,
  Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH v2 2/6] audio: change naming scheme of FLOAT_CONV macros
-Date: Sun,  8 Mar 2020 20:33:17 +0100
-Message-Id: <20200308193321.20668-2-vr_qemu@t-online.de>
+Subject: [PATCH v2 4/6] audio: change mixing engine float range to [-1.f, 1.f]
+Date: Sun,  8 Mar 2020 20:33:19 +0100
+Message-Id: <20200308193321.20668-4-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <2a4ade5f-d39b-3094-578f-6cced4650720@t-online.de>
 References: <2a4ade5f-d39b-3094-578f-6cced4650720@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-ID: GWwSMcZCohoZDM9rI++fNADFZQEoH8vN3SJNnetaZW4WDBrCd9lH8gqyjD6HFGTwwa
-X-TOI-MSGID: b5b192e7-bc73-4bf1-bcc8-50842ebb173f
+X-ID: bKrPuwZpghIMNnwLloP6R4aXGWFA3l4WO3GmYYVfqsj5gGep5BSwUkf0Y5u7mHrgLk
+X-TOI-MSGID: 89289e91-17ab-489f-bae7-5654794d4ba6
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 194.25.134.84
+X-Received-From: 194.25.134.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,85 +80,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch changes the naming scheme of the FLOAT_CONV_TO and
-FLOAT_CONV_FROM macros to the scheme used in mixeng_template.h.
+Currently the internal float range of the mixing engine is
+[-.5f, .5f]. PulseAudio, SDL2 and libasound use a [-1.f, 1.f]
+range. This means with float samples the audio playback volume
+is 6dB too low and audio recording signals will be clipped in
+most cases.
+
+To avoid another scaling factor in the conv_natural_float_* and
+clip_natural_float_* functions with FLOAT_MIXENG defined this
+patch changes the mixing engine float range to [-1.f, 1.f].
 
 Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 ---
- audio/mixeng.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ audio/mixeng.c          |  4 ++--
+ audio/mixeng_template.h | 17 ++++++++---------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/audio/mixeng.c b/audio/mixeng.c
-index c14b0d874c..b57fad83bf 100644
+index 725b529be7..739a500449 100644
 --- a/audio/mixeng.c
 +++ b/audio/mixeng.c
-@@ -268,17 +268,17 @@ f_sample *mixeng_clip[2][2][2][3] =3D {
- };
-=20
- #ifdef FLOAT_MIXENG
--#define FLOAT_CONV_TO(x) (x)
--#define FLOAT_CONV_FROM(x) (x)
-+#define CONV_NATURAL_FLOAT(x) (x)
-+#define CLIP_NATURAL_FLOAT(x) (x)
+@@ -271,11 +271,11 @@ f_sample *mixeng_clip[2][2][2][3] =3D {
+ #define CONV_NATURAL_FLOAT(x) (x)
+ #define CLIP_NATURAL_FLOAT(x) (x)
  #else
- static const float float_scale =3D UINT_MAX;
--#define FLOAT_CONV_TO(x) ((x) * float_scale)
-+#define CONV_NATURAL_FLOAT(x) ((x) * float_scale)
+-static const float float_scale =3D UINT_MAX;
++static const float float_scale =3D UINT_MAX / 2.f;
+ #define CONV_NATURAL_FLOAT(x) ((x) * float_scale)
 =20
  #ifdef RECIPROCAL
- static const float float_scale_reciprocal =3D 1.f / UINT_MAX;
--#define FLOAT_CONV_FROM(x) ((x) * float_scale_reciprocal)
-+#define CLIP_NATURAL_FLOAT(x) ((x) * float_scale_reciprocal)
+-static const float float_scale_reciprocal =3D 1.f / UINT_MAX;
++static const float float_scale_reciprocal =3D 2.f / UINT_MAX;
+ #define CLIP_NATURAL_FLOAT(x) ((x) * float_scale_reciprocal)
  #else
--#define FLOAT_CONV_FROM(x) ((x) / float_scale)
-+#define CLIP_NATURAL_FLOAT(x) ((x) / float_scale)
+ #define CLIP_NATURAL_FLOAT(x) ((x) / float_scale)
+diff --git a/audio/mixeng_template.h b/audio/mixeng_template.h
+index 77cc89b9e8..fc8e1d4d9e 100644
+--- a/audio/mixeng_template.h
++++ b/audio/mixeng_template.h
+@@ -41,32 +41,31 @@ static inline mixeng_real glue (conv_, ET) (IN_T v)
+=20
+ #ifdef RECIPROCAL
+ #ifdef SIGNED
+-    return nv * (1.f / (mixeng_real) (IN_MAX - IN_MIN));
++    return nv * (2.f / ((mixeng_real)IN_MAX - IN_MIN));
+ #else
+-    return (nv - HALF) * (1.f / (mixeng_real) IN_MAX);
++    return (nv - HALF) * (2.f / (mixeng_real)IN_MAX);
+ #endif
+ #else  /* !RECIPROCAL */
+ #ifdef SIGNED
+-    return nv / (mixeng_real) ((mixeng_real) IN_MAX - IN_MIN);
++    return nv / (((mixeng_real)IN_MAX - IN_MIN) / 2.f);
+ #else
+-    return (nv - HALF) / (mixeng_real) IN_MAX;
++    return (nv - HALF) / ((mixeng_real)IN_MAX / 2.f);
  #endif
  #endif
-=20
-@@ -288,7 +288,7 @@ static void conv_natural_float_to_mono(struct st_samp=
-le *dst, const void *src,
-     float *in =3D (float *)src;
-=20
-     while (samples--) {
--        dst->r =3D dst->l =3D FLOAT_CONV_TO(*in++);
-+        dst->r =3D dst->l =3D CONV_NATURAL_FLOAT(*in++);
-         dst++;
-     }
  }
-@@ -299,8 +299,8 @@ static void conv_natural_float_to_stereo(struct st_sa=
-mple *dst, const void *src,
-     float *in =3D (float *)src;
 =20
-     while (samples--) {
--        dst->l =3D FLOAT_CONV_TO(*in++);
--        dst->r =3D FLOAT_CONV_TO(*in++);
-+        dst->l =3D CONV_NATURAL_FLOAT(*in++);
-+        dst->r =3D CONV_NATURAL_FLOAT(*in++);
-         dst++;
+ static inline IN_T glue (clip_, ET) (mixeng_real v)
+ {
+-    if (v >=3D 0.5) {
++    if (v >=3D 1.f) {
+         return IN_MAX;
+-    }
+-    else if (v < -0.5) {
++    } else if (v < -1.f) {
+         return IN_MIN;
      }
- }
-@@ -316,7 +316,7 @@ static void clip_natural_float_from_mono(void *dst, c=
-onst struct st_sample *src,
-     float *out =3D (float *)dst;
 =20
-     while (samples--) {
--        *out++ =3D FLOAT_CONV_FROM(src->l) + FLOAT_CONV_FROM(src->r);
-+        *out++ =3D CLIP_NATURAL_FLOAT(src->l) + CLIP_NATURAL_FLOAT(src->=
-r);
-         src++;
-     }
+ #ifdef SIGNED
+-    return ENDIAN_CONVERT ((IN_T) (v * ((mixeng_real) IN_MAX - IN_MIN)))=
+;
++    return ENDIAN_CONVERT((IN_T)(v * (((mixeng_real)IN_MAX - IN_MIN) / 2=
+.f)));
+ #else
+-    return ENDIAN_CONVERT ((IN_T) ((v * IN_MAX) + HALF));
++    return ENDIAN_CONVERT((IN_T)((v * ((mixeng_real)IN_MAX / 2.f)) + HAL=
+F));
+ #endif
  }
-@@ -327,8 +327,8 @@ static void clip_natural_float_from_stereo(
-     float *out =3D (float *)dst;
 =20
-     while (samples--) {
--        *out++ =3D FLOAT_CONV_FROM(src->l);
--        *out++ =3D FLOAT_CONV_FROM(src->r);
-+        *out++ =3D CLIP_NATURAL_FLOAT(src->l);
-+        *out++ =3D CLIP_NATURAL_FLOAT(src->r);
-         src++;
-     }
- }
 --=20
 2.16.4
 
