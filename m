@@ -2,81 +2,78 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7889CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 13:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4916CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 15:20:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E76420848
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 13:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C92920848
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 15:20:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WRlLMhsT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E76420848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFJZ34/Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C92920848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAwAG-00014w-FV
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 09:40:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53925)
+	id 1jAxjJ-0001hH-4g
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 11:20:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36827)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jAw9e-0000gO-Bh
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:39:43 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jAxi1-0008Qb-OE
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 11:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jAw9d-0001Rs-9l
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:39:42 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36315)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jAw9c-0001RQ-6s
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:39:41 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j14so7016875otq.3
- for <qemu-devel@nongnu.org>; Sun, 08 Mar 2020 06:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qaLQB60mLc0a24h1kEuz7djD22ltvJvtl5ExQk4HHys=;
- b=WRlLMhsTWF6dGyUleAMXFA4+tF9Qnfmzla3JgaOZO8KmZkQ73qh4WzL56PXCt8xp3P
- ke3zd/OybuG89CkkjQgR/iGB8oWiqMITlwKcSny9owCuNUU0qB+3yWPZU0OmsaNdqjS6
- n72pOYknZ1Qchtu3YMrgswQYDhf8SXjrQNKcR+N74c4dizdxJCAS+jVg89W5JO9Y4Xo5
- s6KBCeOmJXJRkT4W+fq/Nmp16bPPadC0ngjQ/bqT0/P/Ep5cxCcB1kP+IetxRCNqmTPA
- g2gtG35szOfdY+zKpMRutfB/AbLCizRn0YWUctiq8G/lZAvXJHJDY4FyURuHwr6D83Df
- 2noA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qaLQB60mLc0a24h1kEuz7djD22ltvJvtl5ExQk4HHys=;
- b=X3Yo0Xt6BH+kyheD/VteCKL4UuMoCA+6952JrcA/SSAY0I/bYKKWAKsx1uM14iFSKb
- +0LmXMDcvUAC5zgVSEqZGgzoA3rO9m/xX8VLUEuNY3iXHC1RTHaIv77JdXxYuJh4Fcss
- MwatObVrvLlDw84J0DLnBb7jaXpuhI2Y30eEROcAXubrj4M4H2V3J2WPzYID+L+23Npj
- GiwV8Z9jBIQIfVamg4ozO96a6C27EPmYUdGzaPTAf+EduJyEMxH0muWRJGfPUSj9smCO
- 3NVMTROjkEsue/hQTTX8yt0qcPgj9CG6+Ud/iJPpoQcJFD6xDZu52skqfe4061SXip63
- FPHA==
-X-Gm-Message-State: ANhLgQ3OZf2Yo4rkOYs+QXDW/7+fLzKyrj7I7WknvH0OnofPqeXmA5rN
- 3wwQve/2L+D7h2uFCKzQ03pXRamIdijf1P5wsOUNQQ==
-X-Google-Smtp-Source: ADFU+vuSkyHHHUvVxRFJGzbxaOQkk+ry5U+JlFcSqIzz1jcLKjUX+5Y7NE+XNApU4qo4JY2CROntQmCLb3nTPuMgfSU=
-X-Received: by 2002:a05:6830:19e2:: with SMTP id
- t2mr2498553ott.97.1583674779119; 
- Sun, 08 Mar 2020 06:39:39 -0700 (PDT)
+ (envelope-from <mlevitsk@redhat.com>) id 1jAxi0-0001YT-Hd
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 11:19:17 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37423
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jAxi0-0001Y9-DW
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 11:19:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583680756;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p4mD2j69lZMc/286pLcPBYvxejRLX142BSHlfkTXC/0=;
+ b=cFJZ34/YHGjmOPKh4QtVh+15Jr/9Bo0wsr4mQXgHxLHtcuIfGH4BxlR/Cw4CKy9N40x45h
+ EgTULjH0wVWpH8Cdh9NhxbYk/tL0KLcrF+WBxaxLm8yZOJagweGVxh+eqgjcq0KQoDgjWf
+ /vo53R/SRbEdGbDz9eatRL4FkjYC9ao=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-buLFlTbQOSCTOttYu_ay7A-1; Sun, 08 Mar 2020 11:19:14 -0400
+X-MC-Unique: buLFlTbQOSCTOttYu_ay7A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D72D1005512;
+ Sun,  8 Mar 2020 15:19:13 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B5A645C1B0;
+ Sun,  8 Mar 2020 15:19:10 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 01/14] qcrypto/core: add generic infrastructure for crypto
+ options amendment
+Date: Sun,  8 Mar 2020 17:18:50 +0200
+Message-Id: <20200308151903.25941-2-mlevitsk@redhat.com>
+In-Reply-To: <20200308151903.25941-1-mlevitsk@redhat.com>
+References: <20200308151903.25941-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <8af2cdaa-7e3e-409f-5351-7fc54e00aab5@ilande.co.uk>
-In-Reply-To: <8af2cdaa-7e3e-409f-5351-7fc54e00aab5@ilande.co.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 8 Mar 2020 13:39:28 +0000
-Message-ID: <CAFEAcA_8SWR6MrNL98GFNASs0_qE_U4pgiw_LyiydKVaSb7C8A@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] delay timer_new from init to realize to fix
- memleaks.
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,47 +85,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Euler Robot <euler.robot@huawei.com>, Pan Nengyuan <pannengyuan@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 8 Mar 2020 at 11:58, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> I just tried this patchset applied on top of git master and it causes qemu-system-ppc
-> to segfault on startup:
->
-> $ gdb --args ./qemu-system-ppc
-> ...
-> ...
-> Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-> 0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
-> 429         QEMUTimerList *timer_list = ts->timer_list;
-> (gdb) bt
-> #0  0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
-> #1  0x0000555555b5d2c1 in mos6522_reset (dev=0x555556e0ac50) at hw/misc/mos6522.c:468
-> #2  0x0000555555b63570 in mos6522_cuda_reset (dev=0x555556e0ac50) at
-> hw/misc/macio/cuda.c:599
+This will be used first to implement luks keyslot management.
 
-It looks like we haven't caught all the cases of "somebody created a
-MOS6522 (or one of its subclasses) but forgot to realize it". This
-particular one I think is the s->cuda which is inited in macio_oldworld_init()
-but not realized in macio_oldworld_realize(). I think that pmu_init() in
-hw/misc/macio/pmu.c also has this bug. We need to go through and
-audit all the places where we create TYPE_MOS6522 or any of its
-subclasses and make sure they are also realizing the devices they create.
-(The presence of the new 3-phase reset infrastructure in the backtrace
-is a red herring here -- this would have crashed the same way with the
-old code too.)
+block_crypto_amend_opts_init will be used to convert
+qemu-img cmdline to QCryptoBlockAmendOptions
 
-We should probably find some generic place in Device code where we
-can stick an assert "are we trying to reset an unrealized device?"
-because I bet we have other instances of this bug which we haven't
-noticed because the reset function happens to not misbehave on
-an inited-but-not-realized device...
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ block/crypto.c         | 17 +++++++++++++++++
+ block/crypto.h         |  3 +++
+ crypto/block.c         | 31 +++++++++++++++++++++++++++++++
+ crypto/blockpriv.h     |  8 ++++++++
+ include/crypto/block.h | 22 ++++++++++++++++++++++
+ qapi/crypto.json       | 16 ++++++++++++++++
+ 6 files changed, 97 insertions(+)
 
-thanks
--- PMM
+diff --git a/block/crypto.c b/block/crypto.c
+index 24823835c1..ecf96a7a9b 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -184,6 +184,23 @@ block_crypto_create_opts_init(QDict *opts, Error **err=
+p)
+     return ret;
+ }
+=20
++QCryptoBlockAmendOptions *
++block_crypto_amend_opts_init(QDict *opts, Error **errp)
++{
++    Visitor *v;
++    QCryptoBlockAmendOptions *ret;
++
++    v =3D qobject_input_visitor_new_flat_confused(opts, errp);
++    if (!v) {
++        return NULL;
++    }
++
++    visit_type_QCryptoBlockAmendOptions(v, NULL, &ret, errp);
++
++    visit_free(v);
++    return ret;
++}
++
+=20
+ static int block_crypto_open_generic(QCryptoBlockFormat format,
+                                      QemuOptsList *opts_spec,
+diff --git a/block/crypto.h b/block/crypto.h
+index b935695e79..06e044c9be 100644
+--- a/block/crypto.h
++++ b/block/crypto.h
+@@ -91,6 +91,9 @@
+ QCryptoBlockCreateOptions *
+ block_crypto_create_opts_init(QDict *opts, Error **errp);
+=20
++QCryptoBlockAmendOptions *
++block_crypto_amend_opts_init(QDict *opts, Error **errp);
++
+ QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QDict *opts, Error **errp);
+=20
+diff --git a/crypto/block.c b/crypto/block.c
+index 325752871c..0ce67db641 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -115,6 +115,37 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateO=
+ptions *options,
+ }
+=20
+=20
++int qcrypto_block_amend_options(QCryptoBlock *block,
++                                QCryptoBlockReadFunc readfunc,
++                                QCryptoBlockWriteFunc writefunc,
++                                void *opaque,
++                                QCryptoBlockAmendOptions *options,
++                                bool force,
++                                Error **errp)
++{
++    if (options->format !=3D block->format) {
++        error_setg(errp,
++                   "Cannot amend encryption format");
++        return -1;
++    }
++
++    if (!block->driver->amend) {
++        error_setg(errp,
++                   "Crypto format %s doesn't support format options amendm=
+ent",
++                   QCryptoBlockFormat_str(block->format));
++        return -1;
++    }
++
++    return block->driver->amend(block,
++                                readfunc,
++                                writefunc,
++                                opaque,
++                                options,
++                                force,
++                                errp);
++}
++
++
+ QCryptoBlockInfo *qcrypto_block_get_info(QCryptoBlock *block,
+                                          Error **errp)
+ {
+diff --git a/crypto/blockpriv.h b/crypto/blockpriv.h
+index 71c59cb542..3c7ccea504 100644
+--- a/crypto/blockpriv.h
++++ b/crypto/blockpriv.h
+@@ -62,6 +62,14 @@ struct QCryptoBlockDriver {
+                   void *opaque,
+                   Error **errp);
+=20
++    int (*amend)(QCryptoBlock *block,
++                 QCryptoBlockReadFunc readfunc,
++                 QCryptoBlockWriteFunc writefunc,
++                 void *opaque,
++                 QCryptoBlockAmendOptions *options,
++                 bool force,
++                 Error **errp);
++
+     int (*get_info)(QCryptoBlock *block,
+                     QCryptoBlockInfo *info,
+                     Error **errp);
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index d49d2c2da9..e4553cf33d 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -144,6 +144,28 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateO=
+ptions *options,
+                                    void *opaque,
+                                    Error **errp);
+=20
++/**
++ * qcrypto_block_amend_options:
++ * @block: the block encryption object
++ *
++ * @readfunc: callback for reading data from the volume header
++ * @writefunc: callback for writing data to the volume header
++ * @opaque: data to pass to @readfunc and @writefunc
++ * @options: the new/amended encryption options
++ * @force: hint for the driver to allow unsafe operation
++ * @errp: error pointer
++ *
++ * Changes the crypto options of the encryption format
++ *
++ */
++int qcrypto_block_amend_options(QCryptoBlock *block,
++                                QCryptoBlockReadFunc readfunc,
++                                QCryptoBlockWriteFunc writefunc,
++                                void *opaque,
++                                QCryptoBlockAmendOptions *options,
++                                bool force,
++                                Error **errp);
++
+=20
+ /**
+  * qcrypto_block_get_info:
+diff --git a/qapi/crypto.json b/qapi/crypto.json
+index b2a4cff683..3fd0ce177e 100644
+--- a/qapi/crypto.json
++++ b/qapi/crypto.json
+@@ -309,3 +309,19 @@
+   'base': 'QCryptoBlockInfoBase',
+   'discriminator': 'format',
+   'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
++
++
++
++##
++# @QCryptoBlockAmendOptions:
++#
++# The options that are available for all encryption formats
++# when amending encryption settings
++#
++# Since: 5.0
++##
++{ 'union': 'QCryptoBlockAmendOptions',
++  'base': 'QCryptoBlockOptionsBase',
++  'discriminator': 'format',
++  'data': {
++            } }
+--=20
+2.17.2
+
 
