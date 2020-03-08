@@ -2,88 +2,98 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCE7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 11:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A01C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 12:18:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9D9D2072A
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 11:59:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D9D2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id F11262084E
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 12:18:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lu1h1cbk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F11262084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAuaO-0005i4-Uj
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 07:59:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43742)
+	id 1jAutH-0000jc-4R
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 08:18:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAuZd-00057z-Tt
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 07:58:27 -0400
+ (envelope-from <mst@redhat.com>) id 1jAusd-0000IG-7S
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jAuZc-0002bX-Cj
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 07:58:25 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39542
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jAuZc-0002ZC-6p
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 07:58:24 -0400
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jAuZt-0002di-Qt; Sun, 08 Mar 2020 11:58:42 +0000
-To: Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <8af2cdaa-7e3e-409f-5351-7fc54e00aab5@ilande.co.uk>
-Date: Sun, 8 Mar 2020 11:58:16 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <mst@redhat.com>) id 1jAusZ-0003kn-U1
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:18:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46554
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jAusZ-0003ke-NT
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:17:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583669878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xv/lGL0FwDoI4ITkE+v8VTdGzu6alGDSlXWh9FhRhiw=;
+ b=Lu1h1cbkqpZ9VMVFzStIO3gElqK/cdg4HrfUSFr+P+gbP1BcWvIMqIQZMKv3HLrdSr/WsP
+ CB2aBHcmTKy8cTEVmNlEfV++UgrUuYRl5gsTlfMdlJVroSstLF4ycdZdtZvctYrxwZtstb
+ sVBwGrd0lVBQzTvKDEJMWbXVjKq4vpg=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-1peQGePeMd2n0bDxpuoIlA-1; Sun, 08 Mar 2020 08:17:55 -0400
+X-MC-Unique: 1peQGePeMd2n0bDxpuoIlA-1
+Received: by mail-qt1-f199.google.com with SMTP id r19so4882110qtb.10
+ for <qemu-devel@nongnu.org>; Sun, 08 Mar 2020 05:17:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=ZmjBBAPKtXDEcqlwn1BHM1yl6//yeHM3M224ogp6tOY=;
+ b=lbkKFopQ9o1ObRJF9ZD40pubXmzrnFuCYMJ8foZLDR+PwlhHrAewi7SDoqnV3VM8eX
+ sG9qY6kyat1akgesRFBbTLfH7zRpHoiLDGHqwUM+kecEHBHDsgDEOtO82Z1AI43zKx/6
+ FjYc76PVolGjPqoTlFMNKaHaezUXiaSiIzcXchzlfXsG4aAMUtjRKk+hTm5rTbjQfs4x
+ Yn7McgyX1dKq8jaKqUR66ToR2PnGbs7npaWfke5ltGwua4B3WggrATICEcxZQSVvJqC8
+ M21yfJ9yX+D/kiGWTZR07hweWz/st91bfChZQS2dGTpvMPjueIAC2dbniB/PyVz1xkaf
+ HclA==
+X-Gm-Message-State: ANhLgQ0uKZxhgJ5hxuPGRN6d577Q4pCm7vGEUdjvYKi6Zu+LlhsOZgp6
+ +wMH3Kr/OAhJtMTDTzRAhggnEhLGMra7oCRkT8y7/7keT8w6kxhO27XP2oDJ/GCi3/lUaXuyp/A
+ kXvgB9MIGQaVfYv0=
+X-Received: by 2002:ac8:5058:: with SMTP id h24mr10508260qtm.384.1583669874832; 
+ Sun, 08 Mar 2020 05:17:54 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs2xv+unjFb8Xf3e+LPOG8gnHOG8FZ8J2DpYWBxftNF0dQmpp6f0NRZyIKxUfCW0OuK5U0SfA==
+X-Received: by 2002:ac8:5058:: with SMTP id h24mr10508244qtm.384.1583669874519; 
+ Sun, 08 Mar 2020 05:17:54 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id 11sm21228306qkr.101.2020.03.08.05.17.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 08 Mar 2020 05:17:53 -0700 (PDT)
+Date: Sun, 8 Mar 2020 08:17:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH 0/3] reference implementation of RSS
+Message-ID: <20200308081509-mutt-send-email-mst@kernel.org>
+References: <20200226174809.9675-1-yuri.benditovich@daynix.com>
+ <87242152-5823-59a0-b0ce-2aa555559391@redhat.com>
+ <CAOEp5OfPkQsWs=kYzwxHA0t_gv0iFb4OD6Wppde+qo42wr-eGg@mail.gmail.com>
+ <20200308040540-mutt-send-email-mst@kernel.org>
+ <CAOEp5OewvnX9zxidQ2Tp1FTH+V7HYhoCUrJ4hY3U6obSwnOysg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305065422.12707-1-pannengyuan@huawei.com>
+In-Reply-To: <CAOEp5OewvnX9zxidQ2Tp1FTH+V7HYhoCUrJ4hY3U6obSwnOysg@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v4 0/3] delay timer_new from init to realize to fix
- memleaks.
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,89 +105,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- euler.robot@huawei.com
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/03/2020 06:54, Pan Nengyuan wrote:
+On Sun, Mar 08, 2020 at 11:56:38AM +0200, Yuri Benditovich wrote:
+> On Sun, Mar 8, 2020 at 10:06 AM Michael S. Tsirkin <mst@redhat.com> wrote=
+:
+> >
+> > On Fri, Mar 06, 2020 at 11:50:30AM +0200, Yuri Benditovich wrote:
+> > >
+> > >
+> > > On Fri, Mar 6, 2020 at 11:27 AM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > >
+> > >
+> > >     On 2020/2/27 =E4=B8=8A=E5=8D=881:48, Yuri Benditovich wrote:
+> > >     > Support for VIRTIO_NET_F_RSS feature in QEMU for reference
+> > >     > purpose. Implements Toeplitz hash calculation for incoming
+> > >     > packets according to configuration provided by driver.
+> > >     >
+> > >     > This series requires previously submitted and accepted
+> > >     > patch to be applied:
+> > >     > https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg06448.=
+html
+> > >     >
+> > >     > Yuri Benditovich (3):
+> > >     >    virtio-net: introduce RSS RX steering feature
+> > >     >    virtio-net: implement RSS configuration command
+> > >     >    virtio-net: implement RX RSS processing
+> > >     >
+> > >     >   hw/net/trace-events                         |   3 +
+> > >     >   hw/net/virtio-net.c                         | 234
+> > >     +++++++++++++++++++-VIRTIO_NET_F_RSS
+> > >     >   include/hw/virtio/virtio-net.h              |  12 +
+> > >     >   include/standard-headers/linux/virtio_net.h |  37 +++-
+> > >     >   4 files changed, 273 insertions(+), 13 deletions(-)
+> > >     >
+> > >
+> > >     One question before the reviewing.
+> > >
+> > >     Do we need to deal with migration (which I think yes)?
+> > >
+> > >
+> > > I think we don't (yet) as this is a reference implementation and the =
+main goal
+> > > is to provide the functional reference for hardware solution.
+> >
+> >
+> > That's fine, but then we must block migration, and add appropriate code
+> > comments. Just silently losing data isn't a good idea.
+>=20
+> Note that there is no data lost, just the configuration of RSS is not mig=
+rating.
+> So, qemu just will not redirect the data to different queues after migrat=
+ion.
 
-> This series delay timer_new from init into realize to avoid memleaks when we call 'device_list_properties'.
-> And do timer_free only in s390x_cpu_finalize because it's hotplugable. However, mos6522_realize is never called 
-> at all due to the incorrect creation of it. So we aslo fix the incorrect creation in mac_via first, then move the
-> timer_new to mos6522_realize().
-> 
-> v1:
->    - Delay timer_new() from init() to realize() to fix memleaks.
-> v2:
->    - Similarly to other cleanups, move timer_new into realize in target/s390x/cpu.c (Suggested by Philippe Mathieu-Daudé).
->    - Send these two patches as a series instead of send each as a single patch but with wrong subject in v1.
-> v3:
->    - It's not valid in mos6522 if we move timer_new from init to realize, because it's never called at all.
->      Thus, we remove null check in reset, and add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
->    - split patch by device to make it more clear.
-> v4:
->    - Aslo do timer_free on the error path in realize() and fix some coding style. Then use device_class_set_parent_unrealize to declare unrealize. 
->    - split the mos6522 patch into two, one to fix incorrect creation of mos6522, the other to fix memleak.
-> 
-> Pan Nengyuan (3):
->   s390x: fix memleaks in cpu_finalize
->   mac_via: fix incorrect creation of mos6522 device in mac_via
->   hw/misc/mos6522: move timer_new from init() into realize() to avoid
->     memleaks
-> 
->  hw/misc/mac_via.c      | 43 +++++++++++++++++++++++++++++-------------
->  hw/misc/mos6522.c      |  6 ++++++
->  target/s390x/cpu-qom.h |  1 +
->  target/s390x/cpu.c     | 41 ++++++++++++++++++++++++++++++++++++----
->  4 files changed, 74 insertions(+), 17 deletions(-)
+Right. Unlike auto-mq, the spec doesn't say the direction is best effort th=
+ough,
+so that would be a spec violation.
 
-I just tried this patchset applied on top of git master and it causes qemu-system-ppc
-to segfault on startup:
+> I would add the migration prevention in the next series with
+> implementation of hash delivery to prevent different packet sizes in
+> driver and qemu.
 
-$ gdb --args ./qemu-system-ppc
-...
-...
-Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
-429         QEMUTimerList *timer_list = ts->timer_list;
-(gdb) bt
-#0  0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
-#1  0x0000555555b5d2c1 in mos6522_reset (dev=0x555556e0ac50) at hw/misc/mos6522.c:468
-#2  0x0000555555b63570 in mos6522_cuda_reset (dev=0x555556e0ac50) at
-hw/misc/macio/cuda.c:599
-#3  0x0000555555ad9dd5 in device_transitional_reset (obj=0x555556e0ac50) at
-hw/core/qdev.c:1136
-#4  0x0000555555ae0755 in resettable_phase_hold (obj=0x555556e0ac50, opaque=0x0,
-type=RESET_TYPE_COLD) at hw/core/resettable.c:182
-#5  0x0000555555add5f8 in bus_reset_child_foreach (obj=0x555556a472a0,
-cb=0x555555ae0605 <resettable_phase_hold>, opaque=0x0, type=RESET_TYPE_COLD) at
-hw/core/bus.c:94
-#6  0x0000555555ae0418 in resettable_child_foreach (rc=0x55555696af80,
-obj=0x555556a472a0, cb=0x555555ae0605 <resettable_phase_hold>, opaque=0x0,
-type=RESET_TYPE_COLD) at hw/core/resettable.c:96
-#7  0x0000555555ae06db in resettable_phase_hold (obj=0x555556a472a0, opaque=0x0,
-type=RESET_TYPE_COLD) at hw/core/resettable.c:173
-#8  0x0000555555ae02ab in resettable_assert_reset (obj=0x555556a472a0,
-type=RESET_TYPE_COLD) at hw/core/resettable.c:60
-#9  0x0000555555ae01ef in resettable_reset (obj=0x555556a472a0, type=RESET_TYPE_COLD)
-at hw/core/resettable.c:45
-#10 0x0000555555ae0afa in resettable_cold_reset_fn (opaque=0x555556a472a0) at
-hw/core/resettable.c:269
-#11 0x0000555555ae13a0 in qemu_devices_reset () at hw/core/reset.c:69
-#12 0x000055555597d54c in qemu_system_reset (reason=SHUTDOWN_CAUSE_NONE) at
-/home/build/src/qemu/git/qemu/softmmu/vl.c:1393
-#13 0x00005555559855bb in qemu_init (argc=1, argv=0x7fffffffea78,
-envp=0x7fffffffea88) at /home/build/src/qemu/git/qemu/softmmu/vl.c:4418
-#14 0x0000555555e1b646 in main (argc=1, argv=0x7fffffffea78, envp=0x7fffffffea88) at
-/home/build/src/qemu/git/qemu/softmmu/main.c:48
+And hopefully full migration support will follow.
+
+One other thing to check is vhost - I didn't check
+what happens with this patchset but
+I think at a minimum we need to fail vhost init,
+until the backend implements the feature biit.
 
 
-Possibly related to some of the new reset changes?
+> >
+> > > I agree with the general direction that for complete support of RSS a=
+nd hash
+> > > delivery the best way is to do that in kernel using bpf.
+> > > For that, IMO, the bpf should be a part of the kernel (it uses skb fi=
+elds) and
+> > > the tap should receive just RSS parameters for it.
+> > > At this stage we definitely will need to add migration support and pr=
+opagation
+> > > of RSS parameters.
+> > >
+> > >
+> > >
+> > >     Thanks
+> > >
+> > >
+> >
 
-
-ATB,
-
-Mark.
 
