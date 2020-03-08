@@ -2,81 +2,113 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4DFC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C02C10F27
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:53:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4512206D7
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:33:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zb6HLDpy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4512206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C171520828
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 09:53:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C171520828
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAsJI-0006Gf-Sf
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 05:33:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56576)
+	id 1jAscG-00021H-VE
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 05:53:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1jAsFK-0002E6-TE
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:29:20 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jAsba-0001Uk-Dy
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1jAsFJ-0003ay-8r
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:29:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26887
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jAsFJ-0003an-40
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:29:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583659756;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kCkj20MHdZycDHpXlUDSvRfUd+qu4sPBNgTaonrYSZM=;
- b=Zb6HLDpy0RUSUkZFhZPzMte3vxa44uWzEZtOduXd0e7JyMqU9/oDHwXHXJVmQKprITyxri
- ctQ321d05rMHthw97UYogsi0X7QX+VfMYzont+OxNEeM1EWNi3N/o4FipzfEUNOgMhWYS6
- ENqeoW0pnL2U5wxktbhe7UKto0QI0rw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-JVzFiI25Mz65_gceXJUM1g-1; Sun, 08 Mar 2020 05:29:14 -0400
-X-MC-Unique: JVzFiI25Mz65_gceXJUM1g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3A2F8017CC;
- Sun,  8 Mar 2020 09:29:13 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E1EF60304;
- Sun,  8 Mar 2020 09:29:09 +0000 (UTC)
-Message-ID: <9cf9655745608e9a12208524dc72196493644290.camel@redhat.com>
-Subject: Re: [PATCH v5 05/11] monitor/hmp: move hmp_drive_mirror and
- hmp_drive_backup to block-hmp-cmds.c Moved code was added after 2012-01-13,
- thus under GPLv2+
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Sun, 08 Mar 2020 11:29:08 +0200
-In-Reply-To: <20200308092440.23564-6-mlevitsk@redhat.com>
-References: <20200308092440.23564-1-mlevitsk@redhat.com>
- <20200308092440.23564-6-mlevitsk@redhat.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+ (envelope-from <laurent@vivier.eu>) id 1jAsbZ-00065J-EB
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 05:52:18 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:44857)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jAsbX-00061x-AU; Sun, 08 Mar 2020 05:52:15 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MnpwC-1jiLxF1FAQ-00pLph; Sun, 08 Mar 2020 10:52:07 +0100
+Subject: Re: [PATCH] dp8393x: Mask EOL bit from descriptor addresses, take 2
+To: Jason Wang <jasowang@redhat.com>
+References: <alpine.LNX.2.22.394.2003041421280.12@nippy.intranet>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2116e607-52c8-7e7d-8ac1-c80d4628b2de@vivier.eu>
+Date: Sun, 8 Mar 2020 10:52:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <alpine.LNX.2.22.394.2003041421280.12@nippy.intranet>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PZOKLY9nZKzq4x7v0oNVyW/EBJAiqI9pSaeMD3ZOE3JgTYlq5Rl
+ JnVaE7O4bSyQ6HPLADMRlfoXv01gddudzHrno8A5edIYGs3f/kbndxbZJJ3SCUfYeoK40P/
+ e8aftKLWhb+lpMahSbxxJf0BkOCXFrAIqP2Q4RgkeuFcBUa6NOJWio88Uxlq6k/RRMn6v9Q
+ DDToCAhHjxEr2c4tpem0g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cCB1db2V8S0=:swgEqX4kAwfUinbPbrQV1e
+ jeat35sXng4elqrrJwdgmEQLSrJ5GDky7+NIU7UhJeZqtTirg4pC2M2HIpLW0BbZeBEg6bjiF
+ IeJgJyXMTXPfBj6LSR2xKe2SUTRnuklOpZjLDawPrfZrso6bhw9JbgkUwvrts0MJAPPgccfgO
+ aQLuCzKGCrRPhQhq72yael3OdxnqHuVnyzgxaDhHrChb3rejWrrPwpeM2wKdJ1O4F2JYFZQ5E
+ WMjWVC9omIN3IolaVxleACtK1I8irk6nVMhGokqihFOyWqUeYtTNdD3Om+efzv+/DLWGxNKQ2
+ pehS8xsbserYzXhR/JNVHGiNeGheSOSZmWHs1UeLEsa55dzv066vB1pMKDcj7OZQMs2fJ02qv
+ 3JU9Mmqwlx47QC/9Zcaznw+oyY8N9V7lQwOkrtrk5Fpi8LfyBe0/IImnlUaj+X/AcBsKQaVPg
+ Ldx1T2gNqLMWPpdPQeV0FE1kCaldmv+Xk9mwFWhdaNXIBFalOEhtMHGhY/uOBvzEG9ev7sW4U
+ r6d/+g/y5e99nV8nduJwjtKPEXCNu+BCfV19fAsAuqFtPbB8oU6NS5wQ5wQVP6pfArpND+1jv
+ cYU88QG5rKVU+1866rzZmkeLTPeUQycL0S4mvqtOJlq4r2zlwmIaoneyPneEPgMNOnpiQkGRO
+ OJ1aDsHt4k3BIwDMIxU2DZ5arRa8ZlrsJVM0zRqFv5UuRIxxcmSUCQTGjloOKUz0eiUeX/xJc
+ ZeAB5uiu0SEHP1IY2LT0wpYeM8rWrgkMCbe3xvmLqCUcMGTeYkO18vEqxUqlf0oXJQXJo3iwo
+ 5JHk5kaYsgMRNPPOA948eMX+QcCHRmT+1o3dVZZL72KCNnFWlGmRGIrE7QQY7WLd0Fwda4l
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,226 +120,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-I see that I have the same issue of long subject line here.
-Its because I forgot the space after first line, when adding this.
-If I need to resend another version of this patchset I'll fix this,
-but otherwise maybe that can be fixed when applying this to one of maintainer's
-trees.
-
-Sorry for noise.
-
-Best regards,
-	Maxim Levitsky
-
-On Sun, 2020-03-08 at 11:24 +0200, Maxim Levitsky wrote:
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  block/monitor/block-hmp-cmds.c | 60 ++++++++++++++++++++++++++++++++++
->  include/block/block-hmp-cmds.h | 12 +++++--
->  include/monitor/hmp.h          |  2 --
->  monitor/hmp-cmds.c             | 58 --------------------------------
->  4 files changed, 69 insertions(+), 63 deletions(-)
+Le 04/03/2020 à 04:23, Finn Thain a écrit :
+> A portion of a recent patch got lost due to a merge snafu. That patch is
+> now commit 88f632fbb1 ("dp8393x: Mask EOL bit from descriptor addresses").
+> This patch restores the portion that got lost.
 > 
-> diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-> index ad727a6b08..d6dd5d97f7 100644
-> --- a/block/monitor/block-hmp-cmds.c
-> +++ b/block/monitor/block-hmp-cmds.c
-> @@ -37,10 +37,12 @@
->  #include "qapi/qapi-commands-block.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/error.h"
-> +#include "qapi/qmp/qerror.h"
->  #include "qemu/config-file.h"
->  #include "qemu/option.h"
->  #include "sysemu/sysemu.h"
->  #include "monitor/monitor.h"
-> +#include "monitor/hmp.h"
->  #include "block/block_int.h"
->  #include "block/block-hmp-cmds.h"
->  
-> @@ -187,3 +189,61 @@ void hmp_commit(Monitor *mon, const QDict *qdict)
->          error_report("'commit' error for '%s': %s", device, strerror(-ret));
->      }
->  }
-> +
-> +void hmp_drive_mirror(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *filename = qdict_get_str(qdict, "target");
-> +    const char *format = qdict_get_try_str(qdict, "format");
-> +    bool reuse = qdict_get_try_bool(qdict, "reuse", false);
-> +    bool full = qdict_get_try_bool(qdict, "full", false);
-> +    Error *err = NULL;
-> +    DriveMirror mirror = {
-> +        .device = (char *)qdict_get_str(qdict, "device"),
-> +        .target = (char *)filename,
-> +        .has_format = !!format,
-> +        .format = (char *)format,
-> +        .sync = full ? MIRROR_SYNC_MODE_FULL : MIRROR_SYNC_MODE_TOP,
-> +        .has_mode = true,
-> +        .mode = reuse ? NEW_IMAGE_MODE_EXISTING : NEW_IMAGE_MODE_ABSOLUTE_PATHS,
-> +        .unmap = true,
-> +    };
-> +
-> +    if (!filename) {
-> +        error_setg(&err, QERR_MISSING_PARAMETER, "target");
-> +        hmp_handle_error(mon, err);
-> +        return;
-> +    }
-> +    qmp_drive_mirror(&mirror, &err);
-> +    hmp_handle_error(mon, err);
-> +}
-> +
-> +void hmp_drive_backup(Monitor *mon, const QDict *qdict)
-> +{
-> +    const char *device = qdict_get_str(qdict, "device");
-> +    const char *filename = qdict_get_str(qdict, "target");
-> +    const char *format = qdict_get_try_str(qdict, "format");
-> +    bool reuse = qdict_get_try_bool(qdict, "reuse", false);
-> +    bool full = qdict_get_try_bool(qdict, "full", false);
-> +    bool compress = qdict_get_try_bool(qdict, "compress", false);
-> +    Error *err = NULL;
-> +    DriveBackup backup = {
-> +        .device = (char *)device,
-> +        .target = (char *)filename,
-> +        .has_format = !!format,
-> +        .format = (char *)format,
-> +        .sync = full ? MIRROR_SYNC_MODE_FULL : MIRROR_SYNC_MODE_TOP,
-> +        .has_mode = true,
-> +        .mode = reuse ? NEW_IMAGE_MODE_EXISTING : NEW_IMAGE_MODE_ABSOLUTE_PATHS,
-> +        .has_compress = !!compress,
-> +        .compress = compress,
-> +    };
-> +
-> +    if (!filename) {
-> +        error_setg(&err, QERR_MISSING_PARAMETER, "target");
-> +        hmp_handle_error(mon, err);
-> +        return;
-> +    }
-> +
-> +    qmp_drive_backup(&backup, &err);
-> +    hmp_handle_error(mon, err);
-> +}
-> diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.h
-> index 30b0f56415..a64b737b3a 100644
-> --- a/include/block/block-hmp-cmds.h
-> +++ b/include/block/block-hmp-cmds.h
-> @@ -3,10 +3,13 @@
->   *
->   * Copyright (c) 2003-2008 Fabrice Bellard
->   * Copyright (c) 2020 Red Hat, Inc.
-> + * Copyright IBM, Corp. 2011
->   *
-> - * This work is licensed under the terms of the GNU GPL, version 2.
-> - * or (at your option) any later version.
-> - * See the COPYING file in the top-level directory.
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
->   */
->  
->  #ifndef BLOCK_HMP_COMMANDS_H
-> @@ -17,4 +20,7 @@ void hmp_drive_add(Monitor *mon, const QDict *qdict);
->  void hmp_commit(Monitor *mon, const QDict *qdict);
->  void hmp_drive_del(Monitor *mon, const QDict *qdict);
->  
-> +void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
-> +void hmp_drive_backup(Monitor *mon, const QDict *qdict);
-> +
->  #endif
-> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-> index 3d329853b2..c1b363ee57 100644
-> --- a/include/monitor/hmp.h
-> +++ b/include/monitor/hmp.h
-> @@ -64,8 +64,6 @@ void hmp_block_resize(Monitor *mon, const QDict *qdict);
->  void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict);
->  void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
->  void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict);
-> -void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
-> -void hmp_drive_backup(Monitor *mon, const QDict *qdict);
->  void hmp_loadvm(Monitor *mon, const QDict *qdict);
->  void hmp_savevm(Monitor *mon, const QDict *qdict);
->  void hmp_delvm(Monitor *mon, const QDict *qdict);
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index fb4c2fd2a8..06f0cb4bb9 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -1342,64 +1342,6 @@ void hmp_block_resize(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, err);
->  }
->  
-> -void hmp_drive_mirror(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *filename = qdict_get_str(qdict, "target");
-> -    const char *format = qdict_get_try_str(qdict, "format");
-> -    bool reuse = qdict_get_try_bool(qdict, "reuse", false);
-> -    bool full = qdict_get_try_bool(qdict, "full", false);
-> -    Error *err = NULL;
-> -    DriveMirror mirror = {
-> -        .device = (char *)qdict_get_str(qdict, "device"),
-> -        .target = (char *)filename,
-> -        .has_format = !!format,
-> -        .format = (char *)format,
-> -        .sync = full ? MIRROR_SYNC_MODE_FULL : MIRROR_SYNC_MODE_TOP,
-> -        .has_mode = true,
-> -        .mode = reuse ? NEW_IMAGE_MODE_EXISTING : NEW_IMAGE_MODE_ABSOLUTE_PATHS,
-> -        .unmap = true,
-> -    };
-> -
-> -    if (!filename) {
-> -        error_setg(&err, QERR_MISSING_PARAMETER, "target");
-> -        hmp_handle_error(mon, err);
-> -        return;
-> -    }
-> -    qmp_drive_mirror(&mirror, &err);
-> -    hmp_handle_error(mon, err);
-> -}
-> -
-> -void hmp_drive_backup(Monitor *mon, const QDict *qdict)
-> -{
-> -    const char *device = qdict_get_str(qdict, "device");
-> -    const char *filename = qdict_get_str(qdict, "target");
-> -    const char *format = qdict_get_try_str(qdict, "format");
-> -    bool reuse = qdict_get_try_bool(qdict, "reuse", false);
-> -    bool full = qdict_get_try_bool(qdict, "full", false);
-> -    bool compress = qdict_get_try_bool(qdict, "compress", false);
-> -    Error *err = NULL;
-> -    DriveBackup backup = {
-> -        .device = (char *)device,
-> -        .target = (char *)filename,
-> -        .has_format = !!format,
-> -        .format = (char *)format,
-> -        .sync = full ? MIRROR_SYNC_MODE_FULL : MIRROR_SYNC_MODE_TOP,
-> -        .has_mode = true,
-> -        .mode = reuse ? NEW_IMAGE_MODE_EXISTING : NEW_IMAGE_MODE_ABSOLUTE_PATHS,
-> -        .has_compress = !!compress,
-> -        .compress = compress,
-> -    };
-> -
-> -    if (!filename) {
-> -        error_setg(&err, QERR_MISSING_PARAMETER, "target");
-> -        hmp_handle_error(mon, err);
-> -        return;
-> -    }
-> -
-> -    qmp_drive_backup(&backup, &err);
-> -    hmp_handle_error(mon, err);
-> -}
-> -
->  void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict)
->  {
->      const char *device = qdict_get_str(qdict, "device");
+> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+> ---
+>  hw/net/dp8393x.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> index 8a3504d962..81fc13ee9f 100644
+> --- a/hw/net/dp8393x.c
+> +++ b/hw/net/dp8393x.c
+> @@ -525,8 +525,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+>                                   * (4 + 3 * s->regs[SONIC_TFC]),
+>                                 MEMTXATTRS_UNSPECIFIED, s->data,
+>                                 size);
+> -            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
+> -            if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
+> +            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0);
+> +            if (s->regs[SONIC_CTDA] & SONIC_DESC_EOL) {
+>                  /* EOL detected */
+>                  break;
+>              }
+> 
 
+Jason,
 
+as it's a trivial bug fixes (only a diff between the commit and the
+patch), will you merge it via the network queue or do you want I take it
+via trivial queue?
+
+Thanks,
+Laurent
 
