@@ -2,86 +2,56 @@ Return-Path: <SRS0=qQQb=4Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C06A7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 12:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B51CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 13:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8595920828
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 12:46:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="AQuKr93z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8595920828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01370206D7
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Mar 2020 13:07:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01370206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jAvKC-0004qb-5b
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 08:46:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47860)
+	id 1jAveh-0008Dv-24
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 09:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jAvIv-0004KJ-GD
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:45:14 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jAvdq-0007pG-0s
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jAvIt-0008PE-Vq
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:45:13 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:45651)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jAvIt-0008NS-Fo
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 08:45:11 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id d206so7190664ywa.12
- for <qemu-devel@nongnu.org>; Sun, 08 Mar 2020 05:45:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+VtdiC8Gz5Ney2aPSyk1ppvtnz2b+scipmsXzrQKb/s=;
- b=AQuKr93zJwd8Ua6GjAHCK+QIQjrlpzuDOZjD4OIgq5MKaan10FU+1SYqvFLTFPLWWN
- 3jiBS1qOGg8kuE2xJcFEXHtnpLCv1hTLJR7zlhRw2BIyrUwLU5TSqz5tKN7V5qystpKG
- 601VEGB9uwwyyjE7zKGYOGF/5XEVNowGCwvM1wFbjUi6uMFJnEHT+8Zdya7xkKDJ0cPq
- Phc6qs2IB3fXssHyzc/z9gQuQ+Ko3ZCi+8ag8AuyADhB9ByB0zb4Q6TgZW6FGlyzQcui
- CWchl4PbXKfw898rmvChlRVg9W+iPgLseA+X5o1ekjCSaz3PDB8ixAj+WKSZS2HXClwT
- UUwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+VtdiC8Gz5Ney2aPSyk1ppvtnz2b+scipmsXzrQKb/s=;
- b=pDVnKze1oVXhfZTBvF0EOpwdFASQjig8RH5oX8SH8ENPzvcJEim6beRaRPFMWQEWO2
- IKBHlr9WxeGn9lKOBhN+G368HnMVZyhigc78NXob8r45kHGGYdqqqxr5EyVFyoU/Bj82
- dUHN9Ya170Wo2YvXKgOWVsrAtgMqACpBmsxLhstdIecwnQ0holorHgkAlQilxJ/aSjgG
- hELrqkNsMTZbN5iH9TE9WYHoLXZFgYYLGkcBkfHEE8trThL4QeshSzl5z1r1X7GKxo58
- 46D3OHqDX97zjbzd3XAnT6T5DXtsZWilXVT5zuvWsxs4SxregpNLUu+kq1aS5K3zCRuh
- Kjjw==
-X-Gm-Message-State: ANhLgQ0+U7y+J5XojOf7TgswmqMpUs8orXQD62njp4H4bKqphrTiL1d1
- GsN/IatrZSfzwpFSyJ0gU574iB1PiosIhvIOxjAU6g==
-X-Google-Smtp-Source: ADFU+vstPV5nSYYxXF8E2OFed7gcblb+owOclW5IY0UrcgWV1/+byhmJHLmaf3WOhmnyFwg0tNckAWaUEcp+Yeh1wSE=
-X-Received: by 2002:a25:ba89:: with SMTP id s9mr12560556ybg.265.1583671510240; 
- Sun, 08 Mar 2020 05:45:10 -0700 (PDT)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jAvdp-0004Bp-02
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:06:49 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:45168)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jAvdo-0004Am-O5
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 09:06:48 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id E8A80E328E;
+ Sun,  8 Mar 2020 22:06:44 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by sakura.ysato.name (Postfix) with ESMTPSA id 6781F1C0DBF;
+ Sun,  8 Mar 2020 22:06:44 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org,
+	philmd@redhat.com
+Subject: [PATCH] docs: Add RX target.
+Date: Sun,  8 Mar 2020 22:06:37 +0900
+Message-Id: <20200308130637.37651-1-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200226174809.9675-1-yuri.benditovich@daynix.com>
- <87242152-5823-59a0-b0ce-2aa555559391@redhat.com>
- <CAOEp5OfPkQsWs=kYzwxHA0t_gv0iFb4OD6Wppde+qo42wr-eGg@mail.gmail.com>
- <20200308040540-mutt-send-email-mst@kernel.org>
- <CAOEp5OewvnX9zxidQ2Tp1FTH+V7HYhoCUrJ4hY3U6obSwnOysg@mail.gmail.com>
- <20200308081509-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200308081509-mutt-send-email-mst@kernel.org>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Sun, 8 Mar 2020 14:44:59 +0200
-Message-ID: <CAOEp5Oc1FPPcryoQZXso9_MEOSkfSrrguatEhL7AKk+WLvdWfg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] reference implementation of RSS
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,103 +63,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 8, 2020 at 2:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Sun, Mar 08, 2020 at 11:56:38AM +0200, Yuri Benditovich wrote:
-> > On Sun, Mar 8, 2020 at 10:06 AM Michael S. Tsirkin <mst@redhat.com> wro=
-te:
-> > >
-> > > On Fri, Mar 06, 2020 at 11:50:30AM +0200, Yuri Benditovich wrote:
-> > > >
-> > > >
-> > > > On Fri, Mar 6, 2020 at 11:27 AM Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > >
-> > > >
-> > > >     On 2020/2/27 =E4=B8=8A=E5=8D=881:48, Yuri Benditovich wrote:
-> > > >     > Support for VIRTIO_NET_F_RSS feature in QEMU for reference
-> > > >     > purpose. Implements Toeplitz hash calculation for incoming
-> > > >     > packets according to configuration provided by driver.
-> > > >     >
-> > > >     > This series requires previously submitted and accepted
-> > > >     > patch to be applied:
-> > > >     > https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg0644=
-8.html
-> > > >     >
-> > > >     > Yuri Benditovich (3):
-> > > >     >    virtio-net: introduce RSS RX steering feature
-> > > >     >    virtio-net: implement RSS configuration command
-> > > >     >    virtio-net: implement RX RSS processing
-> > > >     >
-> > > >     >   hw/net/trace-events                         |   3 +
-> > > >     >   hw/net/virtio-net.c                         | 234
-> > > >     +++++++++++++++++++-VIRTIO_NET_F_RSS
-> > > >     >   include/hw/virtio/virtio-net.h              |  12 +
-> > > >     >   include/standard-headers/linux/virtio_net.h |  37 +++-
-> > > >     >   4 files changed, 273 insertions(+), 13 deletions(-)
-> > > >     >
-> > > >
-> > > >     One question before the reviewing.
-> > > >
-> > > >     Do we need to deal with migration (which I think yes)?
-> > > >
-> > > >
-> > > > I think we don't (yet) as this is a reference implementation and th=
-e main goal
-> > > > is to provide the functional reference for hardware solution.
-> > >
-> > >
-> > > That's fine, but then we must block migration, and add appropriate co=
-de
-> > > comments. Just silently losing data isn't a good idea.
-> >
-> > Note that there is no data lost, just the configuration of RSS is not m=
-igrating.
-> > So, qemu just will not redirect the data to different queues after migr=
-ation.
->
-> Right. Unlike auto-mq, the spec doesn't say the direction is best effort =
-though,
-> so that would be a spec violation.
->
-> > I would add the migration prevention in the next series with
-> > implementation of hash delivery to prevent different packet sizes in
-> > driver and qemu.
->
-> And hopefully full migration support will follow.
->
-> One other thing to check is vhost - I didn't check
-> what happens with this patchset but
-> I think at a minimum we need to fail vhost init,
-> until the backend implements the feature biit.
+Add rx-virt target specificaion document.
 
-RSS feature currently is not indicated in case vhost is on.
-The same will be with hash report.
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ docs/system/target-rx.rst | 35 +++++++++++++++++++++++++++++++++++
+ docs/system/targets.rst   |  1 +
+ 2 files changed, 36 insertions(+)
+ create mode 100644 docs/system/target-rx.rst
 
->
->
-> > >
-> > > > I agree with the general direction that for complete support of RSS=
- and hash
-> > > > delivery the best way is to do that in kernel using bpf.
-> > > > For that, IMO, the bpf should be a part of the kernel (it uses skb =
-fields) and
-> > > > the tap should receive just RSS parameters for it.
-> > > > At this stage we definitely will need to add migration support and =
-propagation
-> > > > of RSS parameters.
-> > > >
-> > > >
-> > > >
-> > > >     Thanks
-> > > >
-> > > >
-> > >
->
+diff --git a/docs/system/target-rx.rst b/docs/system/target-rx.rst
+new file mode 100644
+index 0000000000..8540fd5218
+--- /dev/null
++++ b/docs/system/target-rx.rst
+@@ -0,0 +1,35 @@
++.. _RX-System-emulator:
++
++RX System emulator
++--------------------
++
++Use the executable ``qemu-system-rx`` to simulate a Virtual RX target.
++This target emulated following devices.
++
++-  R5F562N8 MCU
++
++   -  On-chip memory (ROM 512KB, RAM 96KB)
++   -  Interrupt Control Unit (ICUa)
++   -  8Bit Timer x 1CH (TMR0,1)
++   -  Compare Match Timer x 2CH (CMT0,1)
++   -  Serial Communication Interface x 1CH (SCI0)
++
++-  External memory 16MByte
++
++Example of ``qemu-system-rx`` usage for RX is shown below:
++
++Download ``<u-boot_image_file>`` from
++https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
++
++Start emulation of rx-virt::
++  qemu-system-rx -bios <u-boot_image_file>
++
++Download ``kernel_image_file`` from
++https://osdn.net/users/ysato/pf/qemu/dl/zImage
++
++Download ``device_tree_blob`` from
++https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb
++
++Start emulation of rx-virt::
++  qemu-system-rx -kernel <kernel_image_file> -dtb <device_tree_blob> \
++      -append "earlycon"
+diff --git a/docs/system/targets.rst b/docs/system/targets.rst
+index eba3111247..946f513daa 100644
+--- a/docs/system/targets.rst
++++ b/docs/system/targets.rst
+@@ -17,3 +17,4 @@ Contents:
+    target-arm
+    target-m68k
+    target-xtensa
++   target-rx
+--=20
+2.20.1
+
 
