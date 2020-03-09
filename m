@@ -2,78 +2,82 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A62C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE33C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 582DA20674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:53:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C43820674
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3BVKzg5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 582DA20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrJOCP27"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C43820674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBF6S-0003bh-HG
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:53:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60574)
+	id 1jBF6j-00040M-RS
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:53:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBF4o-0002Aw-2h
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:51:59 -0400
+ (envelope-from <berrange@redhat.com>) id 1jBF5z-0003AX-4t
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBF4m-0002gk-B6
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:51:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24469
+ (envelope-from <berrange@redhat.com>) id 1jBF5y-0003E0-2x
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:53:11 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59926
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBF4m-0002gX-28
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:51:56 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jBF5x-0003Cr-VF
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:53:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583747515;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1583747589;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3pCo7KP1UN4FlxVwL/NiMJs2s+2Ata9IZ1GgtvV+pcs=;
- b=R3BVKzg5f4ev4YvXoD8f1QAC9infsu2UzKxgE/3pv1tOOfgM3/TYc4bnFFm5HJqVETjow2
- cpDsLJiGqNXTK9UQtSd12zLmSmt1LRjew7wjQY9SK1MNpkFsSTfLT5aOC9nHBBVbFzgzJE
- jnwwQxo/TPp5rxVj2ddCkdO9RjNOLpw=
+ bh=kaceeGKnPnTPYN0N7hO6mHuC7f/lCUwl/ClY8BFJ/wQ=;
+ b=PrJOCP279Pey8FpWE+htYoGVjD3yAy0U7uozA3FolL17nYnDV5foNpgeG+wJqcW7AfxIYA
+ LVuexyLGmsHrmMSU923EKe3MP8GilLx5y74rkQMBIC6RTOJuEhKRqaCnmsrQ3C8cVUgJUw
+ bZjObB9ovRyeWuXTEkV9z+2qC+meIC8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-3KvAD0nIMKiTx_KtjxOgCg-1; Mon, 09 Mar 2020 05:51:51 -0400
-X-MC-Unique: 3KvAD0nIMKiTx_KtjxOgCg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-358-aIy12YF0P9qHe2-1Vb3jMA-1; Mon, 09 Mar 2020 05:53:01 -0400
+X-MC-Unique: aIy12YF0P9qHe2-1Vb3jMA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4486A14E6;
- Mon,  9 Mar 2020 09:51:49 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CEF329051C;
- Mon,  9 Mar 2020 09:51:47 +0000 (UTC)
-Date: Mon, 9 Mar 2020 10:51:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Subject: Re: [PATCH] qom-qmp-cmds: fix two memleaks in qmp_object_add
-Message-ID: <20200309105145.2f3f6a81@redhat.com>
-In-Reply-To: <20200309092212.3249-1-pannengyuan@huawei.com>
-References: <20200309092212.3249-1-pannengyuan@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D0A58010C7;
+ Mon,  9 Mar 2020 09:53:00 +0000 (UTC)
+Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B48F1000325;
+ Mon,  9 Mar 2020 09:52:57 +0000 (UTC)
+Date: Mon, 9 Mar 2020 09:52:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 3/3] tests/docker: Install SASL library to extend code
+ coverage on amd64
+Message-ID: <20200309095254.GA3033513@redhat.com>
+References: <20200307172222.14764-1-philmd@redhat.com>
+ <20200307172222.14764-4-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200307172222.14764-4-philmd@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,68 +89,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com, pbonzini@redhat.com, zhang.zhanghailiang@huawei.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?utf-8?B?0JDQu9C10LrRgdC10Lkg0J/QsNCy0LvQvtCy?= <alexey.pawlow@gmail.com>,
+ qemu-devel@nongnu.org,
+ =?utf-8?B?0JzQtdGC0LvQuNGG0LrQuNC5INCu0YDQuNC5INCS0LjQutGC0L7RgNC+0LI=?=
+ =?utf-8?B?0LjRhw==?= <winaes@narod.ru>, Biswapriyo Nath <nathbappai@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 17:22:12 +0800
-Pan Nengyuan <pannengyuan@huawei.com> wrote:
-
-> 'type/id' forgot to free in qmp_object_add, this patch fix that.
-> 
-> The leak stack:
-> Direct leak of 84 byte(s) in 6 object(s) allocated from:
->     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef768)
->     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
->     #3 0x56344954e692 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/qom/qom-qmp-cmds.c:258
->     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qapi/qmp-dispatch.c:132
->     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qapi/qmp-dispatch.c:175
->     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/monitor/qmp.c:145
->     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu_test/qemu/monitor/qmp.c:234
->     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/util/async.c:136
-> 
-> Direct leak of 54 byte(s) in 6 object(s) allocated from:
->     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef768)
->     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
->     #3 0x56344954e6c4 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/qom/qom-qmp-cmds.c:267
->     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qapi/qmp-dispatch.c:132
->     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qapi/qmp-dispatch.c:175
->     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/monitor/qmp.c:145
->     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu_test/qemu/monitor/qmp.c:234
->     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/util/async.c:136
-> 
-> Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+On Sat, Mar 07, 2020 at 06:22:22PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> Install the SASL library to build the VNC SASL auth protocol code.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  qom/qom-qmp-cmds.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-> index 49db926fcc..ac59ba1aa8 100644
-> --- a/qom/qom-qmp-cmds.c
-> +++ b/qom/qom-qmp-cmds.c
-> @@ -247,8 +247,8 @@ void qmp_object_add(QDict *qdict, QObject **ret_data, Error **errp)
->      QDict *pdict;
->      Visitor *v;
->      Object *obj;
-> -    const char *type;
-> -    const char *id;
-> +    g_autofree const char *type = NULL;
-> +    g_autofree const char *id = NULL;
+>  tests/docker/dockerfiles/debian-amd64.docker | 1 +
+>  1 file changed, 1 insertion(+)
 
-not sure that's it's correct
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-qdict_get_try_str() returns the reference to a string within
-the QDict, so caller who provided qdict should take care of
-freeing it.
 
->  
->      type = qdict_get_try_str(qdict, "qom-type");
->      if (!type) {
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
