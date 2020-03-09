@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED772C10F29
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B2CC10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:48:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF86924679
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:48:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6380720828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:48:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTw3bma9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF86924679
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kgk/lqYd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6380720828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBOOE-0007Pm-Vh
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54382)
+	id 1jBOOV-0007pr-Hh
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:48:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jBOMg-0005kY-0P
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:03 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMp-00064e-Dp
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jBOMe-0008SD-LS
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46062
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMo-00006d-0I
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:11 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26418
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBOMe-0008Rq-Hp
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:00 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBOMn-00006A-SW
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583783219;
+ s=mimecast20190719; t=1583783229;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=D6H//buN/u7YpyAtpuDfT41O48RFvrxgHMUqUZmK0yM=;
- b=VTw3bma9M7niICn/rutb8hpBueHzvY5J1cRCvhI0fzk4n4Zfn8RtqW5PVGrUkC0yeD6IT9
- e27GRl9xv71XUXO8xEPNNDN7sI4debO31wF7nTasFIPAwQ3E8blgXldD+zm0neshjVw3B0
- OEekB8udp+NDUxO5AHspAiaqwcmpacE=
+ bh=hQ/C5H9ZHWd9e0vRA66ucApVN2X1FNblsT0bMCZhQkA=;
+ b=Kgk/lqYdfL+BdlH991XD2wdMeTBhOmAnfWA7nDGZDQYjJe9HNWnbiG2q98/Ih2mjCjhRbU
+ lk9PJo5LcrLHpsUUM1hJoq3z8IMFH33i6sECZf748zhO2qY9OsvQwUgx/ukLQEHCSLB1qu
+ w9OxAhzYKsovP8EVauKjHOgXuQ5v47Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-Tvqgt2CuPuea1LMsnsL0qg-1; Mon, 09 Mar 2020 15:46:58 -0400
-X-MC-Unique: Tvqgt2CuPuea1LMsnsL0qg-1
+ us-mta-87-USczxk7DO9G3SmkTGRRJ0Q-1; Mon, 09 Mar 2020 15:47:07 -0400
+X-MC-Unique: USczxk7DO9G3SmkTGRRJ0Q-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 311BC801E6C
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:46:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C70E51005509
+ for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:47:06 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57A735C54A;
- Mon,  9 Mar 2020 19:46:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E82BE5C28D;
+ Mon,  9 Mar 2020 19:47:05 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	mlevitsk@redhat.com,
 	thuth@redhat.com
-Subject: [PULL 03/12] monitor/hmp: rename device-hotplug.c to
- block/monitor/block-hmp-cmds.c
-Date: Mon,  9 Mar 2020 19:46:41 +0000
-Message-Id: <20200309194650.160552-4-dgilbert@redhat.com>
+Subject: [PULL 11/12] monitor/hmp: Move hmp_drive_add_node to block-hmp-cmds.c
+Date: Mon,  9 Mar 2020 19:46:49 +0000
+Message-Id: <20200309194650.160552-12-dgilbert@redhat.com>
 In-Reply-To: <20200309194650.160552-1-dgilbert@redhat.com>
 References: <20200309194650.160552-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -76,7 +75,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,150 +94,159 @@ Sender: "Qemu-devel"
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
-These days device-hotplug.c only contains the hmp_drive_add
-In the next patch, rest of hmp_drive* functions will be moved
-there.
-
-Also add block-hmp-cmds.h to contain prototypes of these
-functions
-
-License for block-hmp-cmds.h since it contains the code
-moved from sysemu.h which lacks license and thus according
-to LICENSE is under GPLv2+
-
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200308092440.23564-4-mlevitsk@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20200308092440.23564-12-mlevitsk@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- MAINTAINERS                                      |  1 +
- Makefile.objs                                    |  2 +-
- block/Makefile.objs                              |  1 +
- block/monitor/Makefile.objs                      |  1 +
- .../monitor/block-hmp-cmds.c                     |  3 ++-
- include/block/block-hmp-cmds.h                   | 16 ++++++++++++++++
- include/sysemu/sysemu.h                          |  3 ---
- monitor/misc.c                                   |  1 +
- 8 files changed, 23 insertions(+), 5 deletions(-)
- create mode 100644 block/monitor/Makefile.objs
- rename device-hotplug.c =3D> block/monitor/block-hmp-cmds.c (97%)
- create mode 100644 include/block/block-hmp-cmds.h
+ block/monitor/block-hmp-cmds.c | 30 ++++++++++++++++++++++++
+ blockdev.c                     | 43 +++++++---------------------------
+ include/block/block_int.h      |  5 ++--
+ 3 files changed, 41 insertions(+), 37 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36d0c6887a..d881ba7d9c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1920,6 +1920,7 @@ Block QAPI, monitor, command line
- M: Markus Armbruster <armbru@redhat.com>
- S: Supported
- F: blockdev.c
-+F: blockdev-hmp-cmds.c
- F: block/qapi.c
- F: qapi/block*.json
- F: qapi/transaction.json
-diff --git a/Makefile.objs b/Makefile.objs
-index e288663d89..40d3a1696c 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -48,7 +48,7 @@ common-obj-y +=3D dump/
- common-obj-y +=3D job-qmp.o
- common-obj-y +=3D monitor/
- common-obj-y +=3D net/
--common-obj-y +=3D qdev-monitor.o device-hotplug.o
-+common-obj-y +=3D qdev-monitor.o
- common-obj-$(CONFIG_WIN32) +=3D os-win32.o
- common-obj-$(CONFIG_POSIX) +=3D os-posix.o
-=20
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index cb36ae2503..3635b6b4c1 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -45,6 +45,7 @@ block-obj-y +=3D crypto.o
- block-obj-y +=3D aio_task.o
- block-obj-y +=3D backup-top.o
- block-obj-y +=3D filter-compress.o
-+common-obj-y +=3D monitor/
-=20
- block-obj-y +=3D stream.o
-=20
-diff --git a/block/monitor/Makefile.objs b/block/monitor/Makefile.objs
-new file mode 100644
-index 0000000000..0a74f9a8b5
---- /dev/null
-+++ b/block/monitor/Makefile.objs
-@@ -0,0 +1 @@
-+common-obj-y +=3D block-hmp-cmds.o
-diff --git a/device-hotplug.c b/block/monitor/block-hmp-cmds.c
-similarity index 97%
-rename from device-hotplug.c
-rename to block/monitor/block-hmp-cmds.c
-index 554e4d98db..bcf35b4b44 100644
---- a/device-hotplug.c
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
+c
+index aebf1dce0d..c3a6368dfc 100644
+--- a/block/monitor/block-hmp-cmds.c
 +++ b/block/monitor/block-hmp-cmds.c
-@@ -1,5 +1,5 @@
- /*
-- * QEMU device hotplug helpers
-+ * Blockdev HMP commands
-  *
-  * Copyright (c) 2004 Fabrice Bellard
-  *
-@@ -33,6 +33,7 @@
- #include "sysemu/sysemu.h"
- #include "monitor/monitor.h"
- #include "block/block_int.h"
-+#include "block/block-hmp-cmds.h"
+@@ -56,6 +56,36 @@
+ #include "block/block-hmp-cmds.h"
+ #include "qemu-io.h"
 =20
-=20
++static void hmp_drive_add_node(Monitor *mon, const char *optstr)
++{
++    QemuOpts *opts;
++    QDict *qdict;
++    Error *local_err =3D NULL;
++
++    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
++    if (!opts) {
++        return;
++    }
++
++    qdict =3D qemu_opts_to_qdict(opts, NULL);
++
++    if (!qdict_get_try_str(qdict, "node-name")) {
++        qobject_unref(qdict);
++        error_report("'node-name' needs to be specified");
++        goto out;
++    }
++
++    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
++    if (!bs) {
++        error_report_err(local_err);
++        goto out;
++    }
++
++    bdrv_set_monitor_owned(bs);
++out:
++    qemu_opts_del(opts);
++}
++
  void hmp_drive_add(Monitor *mon, const QDict *qdict)
-diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.=
-h
-new file mode 100644
-index 0000000000..0db8a889a1
---- /dev/null
-+++ b/include/block/block-hmp-cmds.h
-@@ -0,0 +1,16 @@
-+/*
-+ * HMP commands related to the block layer
-+ *
-+ * Copyright (c) 2020 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * or (at your option) any later version.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef BLOCK_HMP_COMMANDS_H
-+#define BLOCK_HMP_COMMANDS_H
-+
-+void hmp_drive_add(Monitor *mon, const QDict *qdict);
-+
-+#endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 479d90bcea..ef81302e1a 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -63,9 +63,6 @@ extern int nb_option_roms;
- extern const char *prom_envs[MAX_PROM_ENVS];
- extern unsigned int nb_prom_envs;
+ {
+     Error *err =3D NULL;
+diff --git a/blockdev.c b/blockdev.c
+index b38c247cdc..257cb37682 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -64,9 +64,14 @@
+ #include "qemu/main-loop.h"
+ #include "qemu/throttle-options.h"
 =20
--/* generic hotplug */
--void hmp_drive_add(Monitor *mon, const QDict *qdict);
+-static QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
++QTAILQ_HEAD(, BlockDriverState) monitor_bdrv_states =3D
+     QTAILQ_HEAD_INITIALIZER(monitor_bdrv_states);
+=20
++void bdrv_set_monitor_owned(BlockDriverState *bs)
++{
++    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
++}
++
+ static const char *const if_name[IF_COUNT] =3D {
+     [IF_NONE] =3D "none",
+     [IF_IDE] =3D "ide",
+@@ -640,7 +645,7 @@ err_no_opts:
+ }
+=20
+ /* Takes the ownership of bs_opts */
+-static BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
++BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp)
+ {
+     int bdrv_flags =3D 0;
+=20
+@@ -3719,38 +3724,6 @@ out:
+     aio_context_release(aio_context);
+ }
+=20
 -
- /* pcie aer error injection */
- void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
+-void hmp_drive_add_node(Monitor *mon, const char *optstr)
+-{
+-    QemuOpts *opts;
+-    QDict *qdict;
+-    Error *local_err =3D NULL;
+-
+-    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, optstr, false);
+-    if (!opts) {
+-        return;
+-    }
+-
+-    qdict =3D qemu_opts_to_qdict(opts, NULL);
+-
+-    if (!qdict_get_try_str(qdict, "node-name")) {
+-        qobject_unref(qdict);
+-        error_report("'node-name' needs to be specified");
+-        goto out;
+-    }
+-
+-    BlockDriverState *bs =3D bds_tree_init(qdict, &local_err);
+-    if (!bs) {
+-        error_report_err(local_err);
+-        goto out;
+-    }
+-
+-    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
+-
+-out:
+-    qemu_opts_del(opts);
+-}
+-
+ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+ {
+     BlockDriverState *bs;
+@@ -3780,7 +3753,7 @@ void qmp_blockdev_add(BlockdevOptions *options, Error=
+ **errp)
+         goto fail;
+     }
 =20
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 1748ab3911..c3bc34c099 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -66,6 +66,7 @@
- #include "qemu/option.h"
- #include "qemu/thread.h"
- #include "block/qapi.h"
-+#include "block/block-hmp-cmds.h"
- #include "qapi/qapi-commands-char.h"
- #include "qapi/qapi-commands-control.h"
- #include "qapi/qapi-commands-migration.h"
+-    QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
++    bdrv_set_monitor_owned(bs);
+=20
+ fail:
+     visit_free(v);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index f422c0bff0..3f70a98b2d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1216,8 +1216,6 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+                             BlockCompletionFunc *cb, void *opaque,
+                             JobTxn *txn, Error **errp);
+=20
+-void hmp_drive_add_node(Monitor *mon, const char *optstr);
+-
+ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   const char *child_name,
+                                   const BdrvChildRole *child_role,
+@@ -1322,4 +1320,7 @@ int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src=
+, uint64_t src_offset,
+=20
+ int refresh_total_sectors(BlockDriverState *bs, int64_t hint);
+=20
++void bdrv_set_monitor_owned(BlockDriverState *bs);
++BlockDriverState *bds_tree_init(QDict *bs_opts, Error **errp);
++
+ #endif /* BLOCK_INT_H */
 --=20
 2.24.1
 
