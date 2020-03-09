@@ -2,116 +2,83 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98C5C10F29
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B81C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8456220675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:45:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8456220675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 7960F20409
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:46:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q4oZFdRW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7960F20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGqN-00018J-MD
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:45:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51139)
+	id 1jBGrm-0002el-Nd
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBGpd-0008ON-GW
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:44:26 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jBGqv-00024k-4Z
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBGpc-00054e-96
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:44:25 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:37193)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBGpc-00054Q-0Q; Mon, 09 Mar 2020 07:44:24 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MLhwM-1itjyk1Sim-00HfzE; Mon, 09 Mar 2020 12:44:18 +0100
-Subject: Re: [PATCH 0/3] hw/net,virtfs-proxy-helper: Reduce .data footprint
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200305010446.17029-1-philmd@redhat.com>
- <92a0e3c4-2d50-49a6-f794-c5df57e1b3fc@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <3613c1f0-eda8-0385-4e38-a90c69777a57@vivier.eu>
-Date: Mon, 9 Mar 2020 12:44:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <eric.auger@redhat.com>) id 1jBGqt-00065b-Jp
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:45:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44388
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jBGqt-00065X-G6
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:45:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583754343;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tIDOhNR1n/Jjj7VdQOykGxSlbDIJ9/Eu0kKVh5KzuUo=;
+ b=Q4oZFdRWVuQK9n6dg9DCilLh+8tLgzdXJn+qSlo643S/fO7JnEuh3J6EKPu8AvswjFEJq0
+ bALTxf+zZMcjqWHj1s97KsxvUnoj1kBr7W6gwEQtvgZzKi5gauB6KgR5MGaUd5R8PcIteq
+ 9TyODrFT5fKlCOaourxzjWfmqFANuNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-n4TlV1EjMN2wFt_5dFApBg-1; Mon, 09 Mar 2020 07:45:41 -0400
+X-MC-Unique: n4TlV1EjMN2wFt_5dFApBg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68F67107B278;
+ Mon,  9 Mar 2020 11:45:39 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 09BFC272C4;
+ Mon,  9 Mar 2020 11:45:35 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 07/13] arm/arm64: ITS:
+ its_enable_defaults
+To: Andrew Jones <drjones@redhat.com>
+References: <20200309102420.24498-1-eric.auger@redhat.com>
+ <20200309102420.24498-8-eric.auger@redhat.com>
+ <20200309113914.pg5522tvwazgrfec@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <73691fc7-45f3-6274-019f-aa5b0d2a0c1b@redhat.com>
+Date: Mon, 9 Mar 2020 12:45:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <92a0e3c4-2d50-49a6-f794-c5df57e1b3fc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LS6KDhhXc/vQ7XHTjveDL1AOYOmdaJbiLJvO23CwysCdn2TdRJx
- w+JKpTjzV/wsrcfUcP/LCRmfOfG2Kppsc17XIXGVJxZcFyvjGPcmUAlRRFx06+O32Qwcuq9
- C2g00UXpj7y5W/tZrHeyiVTDpyGOD+5lsp4+GMXWrJCLLY2G90PnUS9h3WSwGFQzmgWxynU
- KKS6nh3jb1XKLuXdWqIjg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:84EivtRHnHI=:RVe5C8cmuoo5Y5QW2WjJLP
- eJqwKoNm/lM4s7Yfc7GfHns7xHNO6knekftLz6xVV9IdJyyN+GucB6o62lbMF+Je9GVQGj91+
- IRCZnRk4byFsTRkYczBW9nW8oW0iY352UwoGziOiqdVATAKY5RZCkOH9vKITHu0BkovpmYLRT
- ZHh+gAu2X3xbozLwbY34Jk8Krw1Q4HWfYibi9jLbsW/Mt+AUiiaFDbdBiFv22nSC6cLYQtBe1
- PfxLAGT3SUkP6U0785x6cYrSbVgdjG+sEEKY/02rih3Q7tvFPnRN2eRUOn2Q1Vx1o5yuvc8bo
- jmEyzGFEHQQnHQVqlV4CM21tv2s1OET8Hn468/48yx4/7KnZPu5Lu03aOA+EJpWe6v5TpTCpw
- FIgZR/ADVzr1wfog0LqlVuMPQ00EKRqKJUxXIlISz/etMnbskQcQeE180JFL3dlOln35h+jMz
- eW7G84AzTz/pbmNE1YwqbSQyzX6CQDTicl7aLB7TIB5jOaJlAns0iXXPN1WYRW7/rEbYosz5w
- iqSNmOxrqcnGN60W81h9dEb6EUUPpzWQCWDhKD/xeAEUa2gbIMZEeyvBz5vF/zU3LXCtQSF75
- 4QyHhbuo8ESHuff59itGUJuuSYRM6ESFF3yRV7tbDtEWWLZ+vswGQEHOvNs/p6NdtQ8HWpkLK
- Y+Tt46JBPjK/XpubQN0JRDLa3bx/kAEJITsD8ugB9/CVbdKb0ZaNDJIoc/79DLTxarUaimcEq
- HYpWbqCrmMtes8ZHsHmgVeVWTjy6m1pEgtnxnTrRnDzNWRd8+u6CdkLFV91Zk7I9fz2hv3l2W
- E4YrSaOTN9Gaq8NGmwaqpaYC0zAY9RSPfynzLpmNldDxLaSoTZghxW77DskTiTkbMjxeH6A
+In-Reply-To: <20200309113914.pg5522tvwazgrfec@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,40 +90,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 06/03/2020 à 10:25, Paolo Bonzini a écrit :
-> On 05/03/20 02:04, Philippe Mathieu-Daudé wrote:
->> More memory footprint reduction, similar to:
->> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00984.html
+Hi Drew,
+
+On 3/9/20 12:39 PM, Andrew Jones wrote:
+> On Mon, Mar 09, 2020 at 11:24:14AM +0100, Eric Auger wrote:
+>> its_enable_defaults() enable LPIs at distributor level
+>> and ITS level.
 >>
->> The elf-dissector tool [1] [2] helped to notice the big array.
+>> gicv3_enable_defaults must be called before.
 >>
->> [1] https://phabricator.kde.org/source/elf-dissector/
->> [2] https://www.volkerkrause.eu/2019/06/22/elf-dissector-aarch64-support.html
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
->> Philippe Mathieu-Daudé (3):
->>   hw/net/e1000: Add readops/writeops typedefs
->>   hw/net/e1000: Move macreg[] arrays to .rodata to save 1MiB of .data
->>   virtfs-proxy-helper: Make the helper_opts[] array const
+>> ---
+>> v3 -> v4:
+>> - use GITS_BASER_INDIRECT & GITS_BASER_VALID in its_setup_baser()
+>> - don't parse BASERs again in its_enable_defaults
+>> - rename its_setup_baser into its_baser_alloc_table
+>> - All allocations moved to the init function
+>> - squashed "arm/arm64: gicv3: Enable/Disable LPIs at re-distributor level"
+>>   into this patch
+>> - introduce gicv3_lpi_rdist_enable and gicv3_lpi_rdist_disable
+>> - pend and prop table bases stored as virt addresses
+>> - move some init functions from enable() to its_init
+>> - removed GICR_PROPBASER_IDBITS_MASK
+>> - introduced LPI_OFFSET
+>> - lpi_prop becomes u8 *
+>> - gicv3_lpi_set_config/get_config became macro
+>> - renamed gicv3_lpi_set_pending_table_bit into gicv3_lpi_set_clr_pending
 >>
->>  fsdev/virtfs-proxy-helper.c | 2 +-
->>  hw/net/e1000.c              | 6 ++++--
->>  hw/net/e1000e_core.c        | 6 ++++--
->>  3 files changed, 9 insertions(+), 5 deletions(-)
+>> v2 -> v3:
+>> - introduce its_setup_baser in this patch
+>> - squash "arm/arm64: ITS: Init the command queue" in this patch.
+>> ---
+>>  lib/arm/asm/gic-v3.h       | 28 +++++++++++------
+>>  lib/arm/gic-v3.c           | 64 ++++++++++++++++++++++----------------
+>>  lib/arm64/asm/gic-v3-its.h |  1 +
+>>  lib/arm64/gic-v3-its.c     | 16 ++++++++--
+>>  4 files changed, 71 insertions(+), 38 deletions(-)
+>>
+>> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+>> index 12134ef..ea9ae8e 100644
+>> --- a/lib/arm/asm/gic-v3.h
+>> +++ b/lib/arm/asm/gic-v3.h
+>> @@ -50,15 +50,16 @@
+>>  #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+>>  	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+>>  
+>> -#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
+>> +#define GICR_PENDBASER_PTZ		BIT_ULL(62)
+>>  
+>> -#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
+>> +#define LPI_PROP_GROUP1			(1 << 1)
+>> +#define LPI_PROP_ENABLED		(1 << 0)
+>> +#define LPI_PROP_DEFAULT_PRIO		0xa0
+>> +#define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
+>>  
+>> -#define LPI_PROP_GROUP1		(1 << 1)
+>> -#define LPI_PROP_ENABLED	(1 << 0)
+>> -#define LPI_PROP_DEFAULT_PRIO   0xa0
+>> -#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
+>> -				 LPI_PROP_ENABLED)
+>> +#define LPI_ID_BASE			8192
+>> +#define LPI(lpi)			((lpi) + LPI_ID_BASE)
+>> +#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
+>>  
+>>  #include <asm/arch_gicv3.h>
+>>  
+>> @@ -76,7 +77,7 @@ struct gicv3_data {
+>>  	void *dist_base;
+>>  	void *redist_bases[GICV3_NR_REDISTS];
+>>  	void *redist_base[NR_CPUS];
+>> -	void *lpi_prop;
+>> +	u8 *lpi_prop;
+>>  	void *lpi_pend[NR_CPUS];
+>>  	unsigned int irq_nr;
+>>  };
+>> @@ -96,8 +97,10 @@ extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
+>>  extern void gicv3_set_redist_base(size_t stride);
+>>  extern void gicv3_lpi_set_config(int n, u8 val);
+>>  extern u8 gicv3_lpi_get_config(int n);
+>> -extern void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set);
+>> +extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
+>>  extern void gicv3_lpi_alloc_tables(void);
+>> +extern void gicv3_lpi_rdist_enable(int redist);
+>> +extern void gicv3_lpi_rdist_disable(int redist);
+>>  
+>>  static inline void gicv3_do_wait_for_rwp(void *base)
+>>  {
+>> @@ -143,5 +146,12 @@ static inline u64 mpidr_uncompress(u32 compressed)
+>>  	return mpidr;
+>>  }
+>>  
+>> +#define gicv3_lpi_set_config(intid, value) ({		\
+>> +	gicv3_data.lpi_prop[LPI_OFFSET(intid)] = value; \
+>> +})
+>> +
+>> +#define gicv3_lpi_get_config(intid) (gicv3_data.lpi_prop[LPI_OFFSET(intid)])
+>> +
+>> +
+>>  #endif /* !__ASSEMBLY__ */
+>>  #endif /* _ASMARM_GIC_V3_H_ */
+>> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
+>> index 949a986..a3b55b2 100644
+>> --- a/lib/arm/gic-v3.c
+>> +++ b/lib/arm/gic-v3.c
+>> @@ -150,7 +150,14 @@ void gicv3_ipi_send_single(int irq, int cpu)
+>>  }
+>>  
+>>  #if defined(__aarch64__)
+>> -/* alloc_lpi_tables: Allocate LPI config and pending tables */
+>> +
+>> +/**
+>> + * alloc_lpi_tables - Allocate LPI config and pending tables
+>> + * and set PROPBASER (shared by all rdistributors) and per
+>> + * redistributor PENDBASER.
+>> + *
+>> + * gicv3_set_redist_base() must be called before
+>> + */
+>>  void gicv3_lpi_alloc_tables(void)
+>>  {
+>>  	unsigned long n = SZ_64K >> PAGE_SHIFT;
+>> @@ -161,13 +168,9 @@ void gicv3_lpi_alloc_tables(void)
+>>  	gicv3_data.lpi_prop = alloc_pages(order);
+>>  
+>>  	/* ID bits = 13, ie. up to 14b LPI INTID */
+>> -	prop_val = (u64)virt_to_phys(gicv3_data.lpi_prop) | 13;
+>> +	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
+>>  
+>> -	/*
+>> -	 * Allocate pending tables for each redistributor
+>> -	 * and set PROPBASER and PENDBASER
+>> -	 */
+>> -	for_each_present_cpu(cpu) {
+>> +	for (cpu = 0; cpu < nr_cpus; cpu++) {
+> 
+> You don't mention this change in the changelog.
+Hey, you can see the changelog is pretty long already & accurate. But
+you're right I missed that one and listing those changes too would have
+avoided me to put those changes in that patch.
+
+ What's wrong with
+> using for_each_present_cpu() here?
+As you encouraged me to move the alloc into the it, I tried to do so but
+then discovered this was feasible for such kind of issue. At init time,
+CPUs have nott booted yet.
+> 
+>>  		u64 pend_val;
+>>  		void *ptr;
+>>  
+>> @@ -176,30 +179,14 @@ void gicv3_lpi_alloc_tables(void)
+>>  		writeq(prop_val, ptr + GICR_PROPBASER);
+>>  
+>>  		gicv3_data.lpi_pend[cpu] = alloc_pages(order);
+>> -
+>> -		pend_val = (u64)virt_to_phys(gicv3_data.lpi_pend[cpu]);
+>> -
+>> +		pend_val = (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
+>>  		writeq(pend_val, ptr + GICR_PENDBASER);
+>>  	}
+>>  }
+>>  
+>> -void gicv3_lpi_set_config(int n, u8 value)
+>> +void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
+>>  {
+>> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+>> -
+>> -	*entry = value;
+>> -}
+>> -
+>> -u8 gicv3_lpi_get_config(int n)
+>> -{
+>> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+>> -
+>> -	return *entry;
+>> -}
+>> -
+>> -void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
+>> -{
+>> -	u8 *ptr = phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
+>> +	u8 *ptr = gicv3_data.lpi_pend[rdist];
+> 
+> Alot of the changes above and in this patch in general look like cleanups
+> that should have been squashed into the patches that introduced the lines
+> in the first place.
+Yes you're right. I forgot to move those changes back to previous patch.
+I will do
+
+Thanks
+
+Eric
+> 
+>>  	u8 mask = 1 << (n % 8), byte;
+>>  
+>>  	ptr += (n / 8);
+>> @@ -210,4 +197,29 @@ void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
+>>  		byte &= ~mask;
+>>  	*ptr = byte;
+>>  }
+>> +
+>> +static void gicv3_lpi_rdist_ctrl(u32 redist, bool set)
+>> +{
+>> +	void *ptr;
+>> +	u64 val;
+>> +
+>> +	assert(redist < nr_cpus);
+>> +
+>> +	ptr = gicv3_data.redist_base[redist];
+>> +	val = readl(ptr + GICR_CTLR);
+>> +	if (set)
+>> +		val |= GICR_CTLR_ENABLE_LPIS;
+>> +	else
+>> +		val &= ~GICR_CTLR_ENABLE_LPIS;
+>> +	writel(val,  ptr + GICR_CTLR);
+>> +}
+>> +
+>> +void gicv3_lpi_rdist_enable(int redist)
+>> +{
+>> +	gicv3_lpi_rdist_ctrl(redist, true);
+>> +}
+>> +void gicv3_lpi_rdist_disable(int redist)
+>> +{
+>> +	gicv3_lpi_rdist_ctrl(redist, false);
+>> +}
+>>  #endif /* __aarch64__ */
+>> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+>> index 331ba0e..1e95977 100644
+>> --- a/lib/arm64/asm/gic-v3-its.h
+>> +++ b/lib/arm64/asm/gic-v3-its.h
+>> @@ -88,5 +88,6 @@ extern struct its_data its_data;
+>>  extern void its_parse_typer(void);
+>>  extern void its_init(void);
+>>  extern int its_baser_lookup(int i, struct its_baser *baser);
+>> +extern void its_enable_defaults(void);
+>>  
+>>  #endif /* _ASMARM64_GIC_V3_ITS_H_ */
+>> diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+>> index 23b0d06..2f480ae 100644
+>> --- a/lib/arm64/gic-v3-its.c
+>> +++ b/lib/arm64/gic-v3-its.c
+>> @@ -94,9 +94,19 @@ void its_init(void)
+>>  	its_baser_alloc_table(&its_data.device_baser, SZ_64K);
+>>  	its_baser_alloc_table(&its_data.coll_baser, SZ_64K);
+>>  
+>> -	/* Allocate LPI config and pending tables */
+>> -	gicv3_lpi_alloc_tables();
+>> -
+>>  	its_cmd_queue_init();
+>>  }
+>>  
+>> +/* must be called after gicv3_enable_defaults */
+>> +void its_enable_defaults(void)
+>> +{
+>> +	int i;
+>> +
+>> +	/* Allocate LPI config and pending tables */
+>> +	gicv3_lpi_alloc_tables();
+>> +
+>> +	for (i = 0; i < nr_cpus; i++)
+>> +		gicv3_lpi_rdist_enable(i);
+>> +
+>> +	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+>> +}
+>> -- 
+>> 2.20.1
 >>
 > 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Thanks,
+> drew 
 > 
-> These can certainly go through qemu-trivial.
+> 
 
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
 
