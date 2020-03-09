@@ -1,133 +1,119 @@
 Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A287FC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 260FAC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70DCB20866
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:45:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD53E20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:51:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ne8imSap";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="WOwwjQYt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70DCB20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="zzU8mCmK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD53E20828
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBMTR-0007L2-D7
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 13:45:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33904)
+	id 1jBMYQ-0001Jt-0T
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 13:51:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1jBMSS-0006J4-15
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:44:53 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jBMXm-0000qF-FH
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1jBMSQ-0006KZ-Uj
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:44:51 -0400
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:47328)
+ (envelope-from <Babu.Moger@amd.com>) id 1jBMXk-0003nU-N2
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:50:22 -0400
+Received: from mail-mw2nam12on2045.outbound.protection.outlook.com
+ ([40.107.244.45]:6227 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1jBMSQ-0006Gx-I7; Mon, 09 Mar 2020 13:44:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1583775890; x=1615311890;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=n97lkZ4O6znlL04vfcYVK6YyVu+bEX4cYbJwSXgbGhY=;
- b=ne8imSapCJC3a+Y5d3+Zl0NcdnMydrHDjpKZP4cIfmDsFDJVFrAqV8l3
- Qzw0nRgr14VszukgQ9VQIwFUcOnrbbqvvMgHAPVHUANhkNGe0DT35F4aV
- 5M0IwgE0FPqBGlR5ZvsM5Sss5Ol3axhT8cfXNAJhjUPyADTolJMZlyC/k s=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Mar 2020 10:44:47 -0700
-Received: from nasanexm03a.na.qualcomm.com ([10.85.0.103])
- by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 09 Mar 2020 10:44:47 -0700
-Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
- nasanexm03a.na.qualcomm.com (10.85.0.103) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 9 Mar 2020 10:44:46 -0700
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Mon, 9 Mar 2020 10:44:46 -0700
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
- by BYAPR02MB4118.namprd02.prod.outlook.com (2603:10b6:a02:fb::23)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Mon, 9 Mar
- 2020 17:44:45 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2793.013; Mon, 9 Mar 2020
- 17:44:45 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 3/5] hw/core/loader: Provide rom_add_file() a 'max_size'
- argument
-Thread-Topic: [PATCH 3/5] hw/core/loader: Provide rom_add_file() a 'max_size'
- argument
-Thread-Index: AQHV9iH8pgFp7kypFky4sl4Jo472YqhAhf8Q
-Date: Mon, 9 Mar 2020 17:44:45 +0000
-Message-ID: <BYAPR02MB4886288D59FF7AFAF5D6329EDEFE0@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <20200309144353.26457-1-philmd@redhat.com>
- <20200309144353.26457-4-philmd@redhat.com>
-In-Reply-To: <20200309144353.26457-4-philmd@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [199.106.103.54]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a74bd74c-7eb0-462f-5609-08d7c4518e74
-x-ms-traffictypediagnostic: BYAPR02MB4118:
-x-microsoft-antispam-prvs: <BYAPR02MB4118D2A78856589A793F5C53DEFE0@BYAPR02MB4118.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:196;
-x-forefront-prvs: 0337AFFE9A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39860400002)(366004)(396003)(346002)(136003)(376002)(199004)(189003)(33656002)(71200400001)(7416002)(55016002)(316002)(110136005)(81156014)(76116006)(8936002)(5660300002)(86362001)(54906003)(53546011)(6506007)(8676002)(81166006)(7696005)(66446008)(66556008)(66946007)(9686003)(64756008)(66476007)(186003)(26005)(2906002)(478600001)(4326008)(52536014);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4118;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PbRgBsMKNfm/2fgcCP94aYQ8YFHp/GiA9bCMlJ0R6EfqhcWDGKtfvaQqIi63KDoiDBf2079J6LZpxCm0+ONHkN4FU3Oq3e78j9rjy1+TjpJZjNtBqjpZsGFvCm18NWzSAWIUwvMxaTXa946VW+dzbc9+AVlnCH34RnA6gAec/fkKOBdpi2K/lzTppCx4eVFW1I2fPIGlAo27I+ZKs2iq4R4bzs70tZsZqYUTsjiRYkVsE1rjSuHZ6UdMY55oupFCB2Fa6pm1hyUoXGofVGtnp4FS+v5H/fDUE6gLsqre9EJBSGedvVeoLHgDcIgOg1BQePy4ltSYa0cOB/xzi3fFub+A3wJMreTcpGyJFtd/etegn4mn4OsQaKuJjIvGQ70Fh6F3ZxLCoKZRaWDJvWOIfwKh8fHsdZ7OY0EJ0VsFzHv/30RVR/pWBi7V9cK62vc9
-x-ms-exchange-antispam-messagedata: WnPnBKv7Y1gAGfQ3KsZvF7TMHTa7x23b8ELNfBk+wEmGSq/VOlPRBAcVNEOeoHjlnv8TT20BxvgXTPaG4mlBN5WwNDgc1ta/OWXnHDu5n/acSzY62mwVbS+QY5e02uT9g8ZWKjPB6jsYLyJKbHm/zA==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TbfTPkA5GChLGMK4ZsWatWGi0Ok15bGb5A0k/GWVFwTHAsHxmx3fIEpvxIp4HCqOm42yI9kmLlRX8Xr2mM1cY4ywwiHAnakU3ifXTSZYJ/0fZ8s5MvZWks8hBpL0sYwsr718FGAqNSxxReIZjVqN8JMn1dSwj7Mb8lZXjOULbNr7CzUVCbaby+boUw3pVb8sYJIgJl4K/szLCYnuv+0JEUqmyQewpH6LsmH+tWbYeDXpWewoV9WqkwECFpDjqUp0DqIOQAGc+YT11kBtean0rubiXMwJprZm2Kpkubr81O1Dk0QEqYISZH51+wk7tLBNvVTJKfz9fTtlbmjU2W802A==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jBMXk-0003ld-CW
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:50:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SRT6qk61KBztDLCkenWKXuGOGhAwbgHSDqbQ7JUY29KveJOyEojFd96Ai9Hat1BZ1tp11u8WUkw7OhZmNJauIyFto0b7/Lnl9uu5gwSIr+rpEZC5dnaqBWjRqJbDYT4zfs7+/kdNCfOQ0afuQ3CvF9IIIZQwuPeSUjWKawJ+XTj+c2WFWKpAF1JxRAnwADzF0CpAgJGhWVwm5Ko5S3K/5QoQNvpVmpJ9G8MahzbiNL524+Mu8OWjOuEYCumzcjosW+PRHtpoyJf3papkzN4N1LEZK8IONkNFsJDIGHd0R7PkkZXjxEg/4AspbmksSdOMu7jg0xbe63qylgMsMtg0Gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BDGmjJ7oJigtM8im+91EK5C1ybZ1TNsVRknqZCbMG3c=;
- b=NVQ4OjLowCeU5VUnJcnLiWsJt6WaR19hVkR/+Nbcomr7PynGlxt8/bvoOVikz0PrfF9oedoormF8LhGEIUx4ovud4FBuc8YMytM7VQCa7Zs0uX5lK1+iYq3OhCJ38RFgmHFdDjQsIol1L6nRy8jPfMatjmLypGJt0r3RKOZEsFhSer3Qy7NL3GJ3R7548k+j9ENgWLVw2ZKd4jy3COPuLcqD8nTpJKFHpQqfvBSm5SG1gIdINv/Oq54/ManYNxwnuPVWCZQ0KGEKz+jbttOxhIR35ZTq+F3ZbO8eLn/4gLz3OuESgNR6DUxgW2Eo2U2mFlLVtxdPobLgJRpmAOliBQ==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ bh=Zjy4D//uyfzCzdZ2TxRUM2oW4Qpb0n/VBZKlbPGMJTw=;
+ b=cYZF0FsfPAClzS63+1iKcQJJdK4kCk9+oClWG9P879Rz4DKnfSzyauW8sMdm6SFIyY1JWDd7Qod2dmcSyrhEAKoBUDtNdG1BKZEi1eoNU4+Dgp+28XY+gQKTQB6M54I4oPWbsCmlPZj1vyJq63cd1syEmnS7uUaGV/eXvniYru3WdLe88g4cS9YlZfj+XhbuqcpxRos/z9hlEzu8gXKYYTMy2ZfIOXlpy7kZQW8GRmg7h1aA2XuYb5BR/dvQ72MUnYOO8zRW6F9DiMbNgGFgedXEOY5rdfYaYZFnrcvBoYKf++zcqybLyYJUuva4lQkrVJl+G7awRfHhAAQ5mtJvOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BDGmjJ7oJigtM8im+91EK5C1ybZ1TNsVRknqZCbMG3c=;
- b=WOwwjQYtpycHLz3EcmVsfE6Nk5HuK2ret29qnSieF+9eEywmiQp5eqmn6jvimlrzgQcxc4QOkjTFEKl8kreZRjxi4D3AlObdmqIjMmP8tpgth4yKpJs4x+MCvdcp4c9e0Bdu/a56Vsi+9ENIL2loqJ/T8cq2z2YzXBp3OA6kJ0I=
-x-ms-exchange-crosstenant-network-message-id: a74bd74c-7eb0-462f-5609-08d7c4518e74
-x-ms-exchange-crosstenant-originalarrivaltime: 09 Mar 2020 17:44:45.6858 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: +0GS1BnFkciFlgoGNwRLvRzkIJZ9YXc+Gi528XXGC1aAohuMCw6E8U+BZoksYfI2qTupypi7Uz5pzpZ+SqNuUQ==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4118
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ bh=Zjy4D//uyfzCzdZ2TxRUM2oW4Qpb0n/VBZKlbPGMJTw=;
+ b=zzU8mCmKKsqn8HEvq+9mp/jcHBGyXUzinIKOGE6p2EYQeJl0vPnosmzJ80L0hdEh4NlH4pbqoeD7xmExHREBGGXNKhsErwfLauzCi1oBbPnTX/RUYR/b/lONlCfkkIxB0hT35IqfDTG2fchUH6WyMuaJrtbuD6YQwKZPHhcTopo=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2446.namprd12.prod.outlook.com (2603:10b6:802:26::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.17; Mon, 9 Mar
+ 2020 17:50:18 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Mon, 9 Mar 2020
+ 17:50:17 +0000
+Subject: Re: [PATCH v5 00/16] APIC ID fixes for AMD EPYC CPU model
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
+ <20200308092458-mutt-send-email-mst@kernel.org>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <2f50e705-eb89-05ac-f8e6-4d8f69372627@amd.com>
+Date: Mon, 9 Mar 2020 12:50:15 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200308092458-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: DM5PR13CA0058.namprd13.prod.outlook.com
+ (2603:10b6:3:117::20) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.39
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ DM5PR13CA0058.namprd13.prod.outlook.com (2603:10b6:3:117::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.7 via Frontend Transport; Mon, 9 Mar 2020 17:50:16 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: b470edf1-6194-4024-e3d2-08d7c4525422
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2446:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2446F5073D840E427D96880A95FE0@SN1PR12MB2446.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0337AFFE9A
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(346002)(366004)(39860400002)(376002)(136003)(396003)(199004)(189003)(52116002)(31696002)(66556008)(66946007)(2906002)(66476007)(53546011)(86362001)(45080400002)(4326008)(966005)(8676002)(8936002)(81156014)(478600001)(81166006)(5660300002)(31686004)(6916009)(16576012)(316002)(6486002)(186003)(16526019)(26005)(44832011)(2616005)(956004)(36756003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2446;
+ H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: U+UnqNCvqhZ7QS4Iwh1Kzh2H4TP39ubSBwthdbEFmNNalljUul5SpYZiw+6h/i31s5TMAhx2vUDxeGybRCNlCz8ShrDuVf6cRwfK5IfGlinfmVRPBewg/1UFX4XglrxrdS1kwK6swIvHQ0AGHdyHo+cISianrIiz5dQ9fmFDN871x8TZiYENHbGkJsyksFz5KH+AHOCdPuoZK28Dowo2/YP6f6TAEwLu4pL5QCVwCSCuqiJ5obAB0Zamfb6XKuwniXhkJtpp0c73jwsbstzfJH6BK9cH2VNqO024lSEWgsmVBmqNKIDUJHQPLe1EL2K66CHivrGjAe5QqhzdfhfWT3L0O5EMjVQk0aobtVXfcOAGuCdfLQ6nUTiOYchM32GWRS5S3HE/4brOk9o6bWSnDwV5FC4atQ6dbs5rmGGIoC3+P5SQ2YHM2yrWb0kVgv5NgNMybvD3br8mCmdMyeQJuUAW6bcusmcLDqtTS+H1yPe6rM2iDaQgthsn24g1CuVzmutke/XVcCB6UmzEyo5SeQ==
+X-MS-Exchange-AntiSpam-MessageData: 8B+6Sv+6LJNpUrQWBMtjCM2RonQtgfGlkS05UThPCZa0RE3cl6RQk2OP+Dt2KqGFjsWhQHWHZCKwXKapem6D0AUcCqOzgXZmPFDjgDY9FjyCJ8p15A/AUEVfKxw8uG06U6ivQ460Fgrc0VJK3+L/Ww==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b470edf1-6194-4024-e3d2-08d7c4525422
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2020 17:50:17.7987 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RhIvzTS70067FmMmFD5Pgd4/t/vJrtwX0Cxfr/ZU/Hoi2clPOviX/v7B01Bf5+Cy
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2446
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.244.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,52 +125,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1kZXZlbCA8cWVt
-dS1kZXZlbC0NCj4gYm91bmNlcyt0c2ltcHNvbj1xdWljaW5jLmNvbUBub25nbnUub3JnPiBPbiBC
-ZWhhbGYgT2YgUGhpbGlwcGUNCj4gTWF0aGlldS1EYXVkw6kNCj4gU2VudDogTW9uZGF5LCBNYXJj
-aCA5LCAyMDIwIDk6NDQgQU0NCj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogRWR1
-YXJkbyBIYWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPjsgTWljaGFlbCBTLiBUc2lya2luDQo+
-IDxtc3RAcmVkaGF0LmNvbT47IEFsaXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlyQGFsaXN0YWlyMjMu
-bWU+OyBNYXJrIENhdmUtDQo+IEF5bGFuZCA8bWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWs+
-OyBxZW11LXBwY0Bub25nbnUub3JnOyBHZXJkDQo+IEhvZmZtYW5uIDxrcmF4ZWxAcmVkaGF0LmNv
-bT47IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+Ow0KPiBEYXZpZCBHaWJzb24g
-PGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT47IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpDQo+
-IDxwaGlsbWRAcmVkaGF0LmNvbT47IEFydHlvbSBUYXJhc2Vua28gPGF0YXI0cWVtdUBnbWFpbC5j
-b20+Ow0KPiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPiBTdWJqZWN0OiBb
-UEFUQ0ggMy81XSBody9jb3JlL2xvYWRlcjogUHJvdmlkZSByb21fYWRkX2ZpbGUoKSBhICdtYXhf
-c2l6ZScNCj4gYXJndW1lbnQNCj4NCj4NCj4gLSNkZWZpbmUgcm9tX2FkZF9maWxlX2ZpeGVkKF9m
-LCBfYSwgX2kpICAgICAgICAgIFwNCj4gLSAgICByb21fYWRkX2ZpbGUoX2YsIE5VTEwsIF9hLCBf
-aSwgZmFsc2UsIE5VTEwsIE5VTEwpDQo+ICsjZGVmaW5lIHJvbV9hZGRfZmlsZV9maXhlZChfZiwg
-X2EsIF9pKSBcDQo+ICsgICAgcm9tX2FkZF9maWxlKF9mLCBOVUxMLCBfYSwgLTEsIF9pLCBmYWxz
-ZSwgTlVMTCwgTlVMTCkNCj4gICNkZWZpbmUgcm9tX2FkZF9ibG9iX2ZpeGVkKF9mLCBfYiwgX2ws
-IF9hKSAgICAgIFwNCj4gICAgICByb21fYWRkX2Jsb2IoX2YsIF9iLCBfbCwgX2wsIF9hLCBOVUxM
-LCBOVUxMLCBOVUxMLCBOVUxMLCB0cnVlKQ0KPiAgI2RlZmluZSByb21fYWRkX2ZpbGVfbXIoX2Ys
-IF9tciwgX2kpICAgICAgICAgICAgXA0KPiAtICAgIHJvbV9hZGRfZmlsZShfZiwgTlVMTCwgMCwg
-X2ksIGZhbHNlLCBfbXIsIE5VTEwpDQo+ICsgICAgcm9tX2FkZF9maWxlKF9mLCBOVUxMLCAwLCAt
-MSwgX2ksIGZhbHNlLCBfbXIsIE5VTEwpDQo+ICAjZGVmaW5lIHJvbV9hZGRfZmlsZV9hcyhfZiwg
-X2FzLCBfaSkgICAgICAgICAgICBcDQo+IC0gICAgcm9tX2FkZF9maWxlKF9mLCBOVUxMLCAwLCBf
-aSwgZmFsc2UsIE5VTEwsIF9hcykNCj4gKyAgICByb21fYWRkX2ZpbGUoX2YsIE5VTEwsIDAsIC0x
-LCBfaSwgZmFsc2UsIE5VTEwsIF9hcykNCj4gICNkZWZpbmUgcm9tX2FkZF9maWxlX2ZpeGVkX2Fz
-KF9mLCBfYSwgX2ksIF9hcykgICAgICAgICAgXA0KPiAtICAgIHJvbV9hZGRfZmlsZShfZiwgTlVM
-TCwgX2EsIF9pLCBmYWxzZSwgTlVMTCwgX2FzKQ0KPiArICAgIHJvbV9hZGRfZmlsZShfZiwgTlVM
-TCwgX2EsIC0xLCBfaSwgZmFsc2UsIE5VTEwsIF9hcykNCj4gICNkZWZpbmUgcm9tX2FkZF9ibG9i
-X2ZpeGVkX2FzKF9mLCBfYiwgX2wsIF9hLCBfYXMpICAgICAgXA0KPiAgICAgIHJvbV9hZGRfYmxv
-YihfZiwgX2IsIF9sLCBfbCwgX2EsIE5VTEwsIE5VTEwsIE5VTEwsIF9hcywgdHJ1ZSkNCg0KVGhl
-IGFib3ZlIGxvb2tzIGxpa2UgLTEgcmVwcmVzZW50cyBhbiB1bmtub3duIG1heF9sZW4uDQoNCj4g
-KyAgICByb20tPnJvbXNpemUgPSBtYXhfbGVuID8gbWF4X2xlbiA6IHJvbS0+ZGF0YXNpemU7DQoN
-ClNvLCBzaG91bGRuJ3QgdGhpcyBjaGVjayBtYXhfbGVuID09IC0xPyAgSW4gZ2VuZXJhbCwgd291
-bGRuJ3QgaXQgYmUgYmV0dGVyIHRvICNkZWZpbmUgVU5LTk9XTl9NQVhfTEVOIHRvIG1ha2UgaXQg
-bW9yZSBjbGVhciB3aGF0IHRoZSB2YWx1ZSBpcyB1c2VkIGZvcj8NCg==
+
+
+On 3/8/20 8:25 AM, Michael S. Tsirkin wrote:
+> On Tue, Mar 03, 2020 at 01:56:51PM -0600, Babu Moger wrote:
+>> This series fixes APIC ID encoding problem reported on AMD EPYC cpu mode=
+ls.
+>> https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fbugz=
+illa.redhat.com%2Fshow_bug.cgi%3Fid%3D1728166&amp;data=3D02%7C01%7Cbabu.mog=
+er%40amd.com%7C9176c1cef91b4ece2b5e08d7c3643a0a%7C3dd8961fe4884e608e11a82d9=
+94e183d%7C0%7C0%7C637192707563033288&amp;sdata=3Dr%2Frpma42Ms356HFtNthqJNI3=
+CiQBEfI%2BNWsWCr%2BabV0%3D&amp;reserved=3D0
+>>
+>> Currently, the APIC ID is decoded based on the sequence
+>> sockets->dies->cores->threads. This works for most standard AMD and othe=
+r
+>> vendors' configurations, but this decoding sequence does not follow that=
+ of
+>> AMD's APIC ID enumeration strictly. In some cases this can cause CPU top=
+ology
+>> inconsistency.  When booting a guest VM, the kernel tries to validate th=
+e
+>> topology, and finds it inconsistent with the enumeration of EPYC cpu mod=
+els.
+>>
+>> To fix the problem we need to build the topology as per the Processor
+>> Programming Reference (PPR) for AMD Family 17h Model 01h, Revision B1
+>> Processors. The documentation is available from the bugzilla Link below.
+>>
+>> Link: https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%=
+2Fbugzilla.kernel.org%2Fshow_bug.cgi%3Fid%3D206537&amp;data=3D02%7C01%7Cbab=
+u.moger%40amd.com%7C9176c1cef91b4ece2b5e08d7c3643a0a%7C3dd8961fe4884e608e11=
+a82d994e183d%7C0%7C0%7C637192707563033288&amp;sdata=3DPWj8%2FEcBYPmcJVg4qgb=
+f%2BPZ1VbLzqXgAiQ7ujtfFp90%3D&amp;reserved=3D0
+>>
+>> Here is the text from the PPR.
+>> Operating systems are expected to use Core::X86::Cpuid::SizeId[ApicIdSiz=
+e], the
+>> number of least significant bits in the Initial APIC ID that indicate co=
+re ID
+>> within a processor, in constructing per-core CPUID masks.
+>> Core::X86::Cpuid::SizeId[ApicIdSize] determines the maximum number of co=
+res
+>> (MNC) that the processor could theoretically support, not the actual num=
+ber of
+>> cores that are actually implemented or enabled on the processor, as indi=
+cated
+>> by Core::X86::Cpuid::SizeId[NC].
+>> Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
+>> =E2=80=A2 ApicId[6] =3D Socket ID.
+>> =E2=80=A2 ApicId[5:4] =3D Node ID.
+>> =E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
+>> =E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} : {1'b0,L=
+ogicalCoreID[1:0]}
+>=20
+>=20
+> Looks reasonable:
+>=20
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+Michael.Thanks
+>=20
+> belongs in Eduardo's tree I guess.
+>=20
+>> v5:
+>>  Generated the patches on top of git://github.com/ehabkost/qemu.git (x86=
+-next).
+>>  Changes from v4.
+>>  1. Re-arranged the patches 2 and 4 as suggested by Igor.
+>>  2. Kept the apicid handler functions inside X86MachineState as discusse=
+d.
+>>     These handlers are loaded from X86CPUDefinitions.
+>>  3. Removed unnecessary X86CPUstate initialization from x86_cpu_new. Sug=
+gested
+>>     by Igor.
+>>  4. And other minor changes related to patch format.
+>>
+>> v4:
+>>  https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flor=
+e.kernel.org%2Fqemu-devel%2F158161767653.48948.10578064482878399556.stgit%4=
+0naples-babu.amd.com%2F&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7C9176c1c=
+ef91b4ece2b5e08d7c3643a0a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C6371=
+92707563033288&amp;sdata=3DbKJ2d%2Blhxm%2Bht7hZBsQpHtFOaee3FHwA0ploz%2BNpPu=
+w%3D&amp;reserved=3D0
+>>  Changes from v3.
+>>  1. Moved the arch_id calculation inside the function x86_cpus_init. Wit=
+h this change,
+>>     we dont need to change common numa code.(suggested by Igor)
+>>  2. Introduced the model specific handlers inside X86CPUDefinitions.
+>>     These handlers are loaded into X86MachineState during the init.
+>>  3. Removed llc_id from x86CPU.
+>>  4. Removed init_apicid_fn hanlder from MachineClass. Kept all the code =
+changes
+>>     inside the x86.
+>>  5. Added new handler function apicid_pkg_offset for pkg_offset calculat=
+ion.
+>>  6. And some Other minor changes.
+>>
+>> v3:
+>>   https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flo=
+re.kernel.org%2Fqemu-devel%2F157541968844.46157.17994918142533791313.stgit%=
+40naples-babu.amd.com%2F&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7C9176c1=
+cef91b4ece2b5e08d7c3643a0a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637=
+192707563043283&amp;sdata=3D90dNqhJMpQiyv4KdBfuf9hxX8EHFesJUT5jxSnuU84E%3D&=
+amp;reserved=3D0=20
+>>   1. Consolidated the topology information in structure X86CPUTopoInfo.
+>>   2. Changed the ccx_id to llc_id as commented by upstream.
+>>   3. Generalized the apic id decoding. It is mostly similar to current a=
+pic id
+>>      except that it adds new field llc_id when numa configured. Removes =
+all the
+>>      hardcoded values.
+>>   4. Removed the earlier parse_numa split. And moved the numa node initi=
+alization
+>>      inside the numa_complete_configuration. This is bit cleaner as comm=
+ented by=20
+>>      Eduardo.
+>>   5. Added new function init_apicid_fn inside machine_class structure. T=
+his
+>>      will be used to update the apic id handler specific to cpu model.
+>>   6. Updated the cpuid unit tests.
+>>   7. TODO : Need to figure out how to dynamically update the handlers us=
+ing cpu models.
+>>      I might some guidance on that.
+>>
+>> v2:
+>>   https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flo=
+re.kernel.org%2Fqemu-devel%2F156779689013.21957.1631551572950676212.stgit%4=
+0localhost.localdomain%2F&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7C9176c=
+1cef91b4ece2b5e08d7c3643a0a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C63=
+7192707563043283&amp;sdata=3DtKtt4Kz599IkFhyObyg9%2FVC3BEKPjo4KAGi%2BsdVe9z=
+M%3D&amp;reserved=3D0
+>>   1. Introduced the new property epyc to enable new epyc mode.
+>>   2. Separated the epyc mode and non epyc mode function.
+>>   3. Introduced function pointers in PCMachineState to handle the
+>>      differences.
+>>   4. Mildly tested different combinations to make things are working as =
+expected.
+>>   5. TODO : Setting the epyc feature bit needs to be worked out. This fe=
+ature is
+>>      supported only on AMD EPYC models. I may need some guidance on that=
+.
+>>
+>> v1:
+>>   https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Flo=
+re.kernel.org%2Fqemu-devel%2F20190731232032.51786-1-babu.moger%40amd.com%2F=
+&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7C9176c1cef91b4ece2b5e08d7c3643a=
+0a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637192707563043283&amp;sdat=
+a=3Dbiydl3JXU0YGLK%2FY7sXtSbdCcb7P4Qjl40Kr0Fp5CEc%3D&amp;reserved=3D0
+>>
+>> ---
+>>
+>> Babu Moger (16):
+>>       hw/i386: Rename X86CPUTopoInfo structure to X86CPUTopoIDs
+>>       hw/i386: Introduce X86CPUTopoInfo to contain topology info
+>>       hw/i386: Consolidate topology functions
+>>       machine: Add SMP Sockets in CpuTopology
+>>       hw/i386: Remove unnecessary initialization in x86_cpu_new
+>>       hw/i386: Update structures to save the number of nodes per package
+>>       hw/i386: Rename apicid_from_topo_ids to x86_apicid_from_topo_ids
+>>       hw/386: Add EPYC mode topology decoding functions
+>>       target/i386: Cleanup and use the EPYC mode topology functions
+>>       hw/i386: Introduce apicid functions inside X86MachineState
+>>       target/i386: Load apicid model specific handlers from X86CPUDefini=
+tion
+>>       hw/i386: Use the apicid handlers from X86MachineState
+>>       target/i386: Add EPYC model specific handlers
+>>       hw/i386: Move arch_id decode inside x86_cpus_init
+>>       i386: Fix pkg_id offset for EPYC cpu models
+>>       tests: Update the Unit tests
+>>
+>>
+>>  hw/core/machine.c          |    1=20
+>>  hw/i386/pc.c               |   54 ++++++-----
+>>  hw/i386/x86.c              |   72 ++++++++++----
+>>  include/hw/boards.h        |    2=20
+>>  include/hw/i386/topology.h |  215 ++++++++++++++++++++++++++++++-------=
+-----
+>>  include/hw/i386/x86.h      |   12 ++
+>>  target/i386/cpu.c          |  224 +++++++++++++++++--------------------=
+-------
+>>  target/i386/cpu.h          |    3 +
+>>  tests/test-x86-cpuid.c     |  115 +++++++++++++----------
+>>  vl.c                       |    1=20
+>>  10 files changed, 403 insertions(+), 296 deletions(-)
+>>
+>> --
+>> Signature
+>=20
 
