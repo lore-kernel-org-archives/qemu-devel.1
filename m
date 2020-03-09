@@ -2,88 +2,83 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F9DC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7BBC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E10F20727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:33:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E10F20727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B03B120727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:36:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dnXua6EZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B03B120727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBIXL-0000gI-Hd
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:33:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41360)
+	id 1jBIZx-0001yy-QG
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:36:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41623)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1jBIWT-0000E1-26
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:32:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBIZ7-0001CL-T0
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1jBIWS-0003lb-1G
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:32:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12239)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1jBIWR-0003l0-QS
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:32:43 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 029DOONe051076
- for <qemu-devel@nongnu.org>; Mon, 9 Mar 2020 09:32:42 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym6tmsku9-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 09:32:42 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Mon, 9 Mar 2020 13:32:40 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 9 Mar 2020 13:32:36 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 029DWY3P53936364
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 9 Mar 2020 13:32:35 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D541752059;
- Mon,  9 Mar 2020 13:32:34 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7804852054;
- Mon,  9 Mar 2020 13:32:34 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-Subject: [PATCH v2 1/1] s390/ipl: sync back loadparm
-Date: Mon,  9 Mar 2020 14:32:23 +0100
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-x-cbid: 20030913-0016-0000-0000-000002EE9EA4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030913-0017-0000-0000-00003351FE64
-Message-Id: <20200309133223.100491-1-pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-09_04:2020-03-09,
- 2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- spamscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
- suspectscore=0 adultscore=0 impostorscore=0 mlxlogscore=999 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090092
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+ (envelope-from <peter.maydell@linaro.org>) id 1jBIZ6-0004qe-Ny
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:29 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38049)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBIZ6-0004qR-Hr
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:28 -0400
+Received: by mail-oi1-x244.google.com with SMTP id k21so3221961oij.5
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 06:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=oBD6zMZ3/A1XQ82CnQ5bJnjoI9sExy80KKinIwyaFIo=;
+ b=dnXua6EZQUkka6qnXpu8wPecyLUdA5wnP+riA9D9HryWi1EOXZwIMIrRSjMxZ1RRkj
+ SqIfxJAllVVA7tvEAcEIhmd7UNXjCgYnvY1f4yRimFDA+6rS+jGDoBt4qQbg8cF3EuEd
+ ugqKv5xFkNEIL6CJWpz85HjCajKDP9x2w48IGl7h3SbROUBX/nwOrQ0syJMagMmgGkyB
+ QAPWp945ZIzpj6oJ6vlNADELBwvlIZZQ2gKlUoDZ0fJ2XhAYrkl5PpMAQLk+4TdBbC92
+ haY0af+lq5VtOzzbg92ie2knVwZvhf0Vcu1IT6YJjU3znPoMDHJ/tburljiZpKv+b3Ml
+ wAag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=oBD6zMZ3/A1XQ82CnQ5bJnjoI9sExy80KKinIwyaFIo=;
+ b=kWIZtSSc5GRN7MOL5HdAUR0iZ8Sy1FiwpIEbNN6qRZpJR+sGpBWubEvUIW+om1uSdU
+ gx4jfiPZouYnyfy/t3YsOREYM0N5BBdASIWGJ5ReQGhHOPjwrHHZA0eo6jFw/S4bWhuW
+ lo1uRAXFpLVKtKAQgTm2D0+Nh1ctPRdGBrz1++cVIusbYEFMqsHGubFGGbqTTFnIYdRJ
+ LbtAIQoIYF9Gdc3+JhE3eZsbHQMVKS+4+4zA9lBSCCogUGawoDohy+c3nclZ2ktqhpCD
+ SSn4jA6CzDaqArNWE2W1F8f9cd3vS0Sh0St6jpMqIUNGm1mzx9Vu+J7vgh2FTl1fNL9L
+ ajug==
+X-Gm-Message-State: ANhLgQ0Gu745OCPQaRrfxKZIvz0F8/zLgkq5mJaZIvwJcvOaVer87ch6
+ NeIHIp8gR7B51qoqzHMU36VDCSqD8RXA9/y7MZeqZQ==
+X-Google-Smtp-Source: ADFU+vvgw5WiaGCYjO7uHgENNgLcNIp414nUloULJ/W54crrItR62BqSHrZDfpgVpyA/ctj8zUUpLuiFT7oojQDgtw4=
+X-Received: by 2002:aca:c695:: with SMTP id w143mr1183737oif.98.1583760927046; 
+ Mon, 09 Mar 2020 06:35:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200305154142.63070-1-jingqi.liu@intel.com>
+ <20200305161047.GB3627464@lpt>
+ <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+ <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
+In-Reply-To: <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 13:35:15 +0000
+Message-ID: <CAFEAcA8HMSg8nS27YGPEQsPeGW2UicWRxeJDQf3oKbyHH2TY6Q@mail.gmail.com>
+Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
+To: "Liu, Jingqi" <jingqi.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,92 +90,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Michael Mueller <mimu@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We expose loadparm as a r/w machine property, but if loadparm is set by
-the guest via DIAG 308, we don't update the property. Having a
-disconnect between the guest view and the QEMU property is not nice in
-itself, but things get even worse for SCSI, where under certain
-circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-expected" for details) we call s390_gen_initial_iplb() on resets
-effectively overwriting the guest/user supplied loadparm with the stale
-value.
+On Mon, 9 Mar 2020 at 13:23, Liu, Jingqi <jingqi.liu@intel.com> wrote:
+>
+> On 3/6/2020 12:40 AM, Peter Maydell wrote:
+> > On Thu, 5 Mar 2020 at 16:11, J=C3=A1n Tomko <jtomko@redhat.com> wrote:
+> >> On a Thursday in 2020, Jingqi Liu wrote:
+> >>> The CONFIG_LINUX symbol is always not defined in this file.
+> >>> This fixes that "config-host.h" header file is not included
+> >>> for getting macros.
+> >>>
+> >>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> >>> ---
+> >>> util/mmap-alloc.c | 2 ++
+> >>> 1 file changed, 2 insertions(+)
+> >>>
+> >>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> >>> index 27dcccd8ec..24c0e380f3 100644
+> >>> --- a/util/mmap-alloc.c
+> >>> +++ b/util/mmap-alloc.c
+> >>> @@ -10,6 +10,8 @@
+> >>>   * later.  See the COPYING file in the top-level directory.
+> >>>   */
+> >>>
+> >>> +#include "config-host.h"
+> >>> +
+> >> According to CODING_STYLE.rst, qemu/osdep.h is the header file
+> >> that should be included first, before all the other includes.
+> >>
+> >> So the minimal fix would be moving qemu/osdep.h up here.
+> > Yes, osdep must always be first.
+> >
+> >>> #ifdef CONFIG_LINUX
+> >>> #include <linux/mman.h>
+> >>> #else  /* !CONFIG_LINUX */
+> > Do we really need this? osdep.h will pull in sys/mman.h
+> > for you, which should define the MAP_* constants.
+> >
+> > Also, you have no fallbmack for "I'm on Linux but the
+> > system headers don't define MAP_SHARED_VALIDATE or
+> > MAP_SYNC". Wouldn't it be better to just have
+> > #ifndef MAP_SYNC
+> > #define MAP_SYNC 0
+> > #endif
+> >
+> > etc ?
+> osdep.h pulls in sys/mman.h, which defines the MAP_* constants
+>
+> except for MAP_SYNC and MAP_SHARED_VALIDATE on Linux.
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
-v1 --> v2:
-* tweaked the Fixes tag (Connie)
-* s/mo/machine/ (David)
-* We decided to not abort if the setter fails. It is not clear where
-  do the validation logic come from in the first place. For now lets put
-  out a warning if things go wrong.
-  The warning we get looks something like:
-  qemu-system-s390x: warning: LOADPARM: invalid character '?' (ASCII 0x3f)
-* I keept the r-b's and the tested-by as the changes are minor. Please
-  shout at me if you object.
----
- hw/s390x/ipl.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Why not? Is this just "not yet in the version of glibc
+we're using", or is it a bug/missed feature in glibc
+that needs to be addressed there ?
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 9c1ecd423c..8bd50de44c 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -538,6 +538,30 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
-     return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
- }
- 
-+static void update_machine_ipl_properties(IplParameterBlock *iplb)
-+{
-+    Object *machine = qdev_get_machine();
-+    Error *err = NULL;
-+
-+    /* Sync loadparm */
-+    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-+        char ascii_loadparm[8];
-+        int i;
-+        uint8_t *ebcdic_loadparm = iplb->loadparm;
-+
-+        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
-+            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
-+        }
-+        ascii_loadparm[i] = 0;
-+        object_property_set_str(machine, ascii_loadparm, "loadparm", &err);
-+    } else {
-+        object_property_set_str(machine, "", "loadparm", &err);
-+    }
-+    if (err) {
-+        warn_report_err(err);
-+    }
-+}
-+
- void s390_ipl_update_diag308(IplParameterBlock *iplb)
- {
-     S390IPLState *ipl = get_ipl_device();
-@@ -545,6 +569,7 @@ void s390_ipl_update_diag308(IplParameterBlock *iplb)
-     ipl->iplb = *iplb;
-     ipl->iplb_valid = true;
-     ipl->netboot = is_virtio_net_device(iplb);
-+    update_machine_ipl_properties(iplb);
- }
- 
- IplParameterBlock *s390_ipl_get_iplb(void)
+> How about just adding the following code in util/mmap-alloc.c ?
 
-base-commit: 67f17e23baca5dd545fe98b01169cc351a70fe35
--- 
-2.17.1
+> #ifndef MAP_SYNC
+> #define MAP_SYNC 0x80000
+> #endif
+>
+> #ifndef MAP_SHARED_VALIDATE
+> #define MAP_SHARED_VALIDATE 0x03
+> #endif
 
+You don't want to do that for non-Linux systems, so there
+you need to fall back to defining them to be 0.
+
+Are there any systems (distros) where the standard system
+sys/mman.h does not define these new MAP_* constants but we
+still really really need to use them? If not, then we
+could just have the fallback-to-0 fallback everywhere.
+
+thanks
+-- PMM
 
