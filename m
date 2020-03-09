@@ -6,76 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED08C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB6CC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D65A82067C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:50:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D922D2067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:51:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pgbuy4Tb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D65A82067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l2mpiECX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D922D2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBJjq-00067Y-10
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:50:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57332)
+	id 1jBJkZ-00078O-2b
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBJip-0004mk-Cw
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:49:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBJhm-0003NN-De
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBJio-0000WR-83
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:49:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24195
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBJin-0000Vx-Oe
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:49:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583765372;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Coag7loe7MKyu/U1oRnqX/i2YbWQ7DqPnQrk8TDAXmg=;
- b=Pgbuy4Tb5Mo/zXz8HrvxC2SBAdKj52nE1FF1n/gveUJgQCDZpRiM706CIMPulFKL8yE3Lt
- Yj3H01vj8FYCGEMHi6QiWtTTQBtn+1a1bo+Q3f75g9GLZJDVchb/WUIn7KS6KxvnY8Js4E
- 7Spu9sVMyWoQxD0QIbS25KWfaSSVzeI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-J0zVGTsUOmu1pEZ0SASOSA-1; Mon, 09 Mar 2020 10:49:31 -0400
-X-MC-Unique: J0zVGTsUOmu1pEZ0SASOSA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D843F10509AB;
- Mon,  9 Mar 2020 14:49:29 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6112C271A1;
- Mon,  9 Mar 2020 14:49:25 +0000 (UTC)
-Date: Mon, 9 Mar 2020 15:49:22 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v5 11/16] target/i386: Load apicid model specific
- handlers from X86CPUDefinition
-Message-ID: <20200309154922.6a523245@Igors-MacBook-Pro>
-In-Reply-To: <158326548299.40452.4030040738160407065.stgit@naples-babu.amd.com>
-References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
- <158326548299.40452.4030040738160407065.stgit@naples-babu.amd.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBJhj-0008Sk-9M
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:30 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33399)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBJhj-0008SA-2e
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:27 -0400
+Received: by mail-ot1-x341.google.com with SMTP id g15so3685798otr.0
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 07:48:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=vl3ODH/+9cQlurQMjvMak6d1qO2peD3ZSVEKtUKOC/4=;
+ b=l2mpiECXtvERk3d4kfZp8+e8wjepzK52nSmaEuY3R38pRch5TpUb3W2azKJ7yMhv1J
+ uutDXaJJlmUhFXxPAuu1G6HXiv9f8mwVktZI13BeiBqeP9/2otMPKNRhws94EnEJonTW
+ NekH5SQtqjsC2zPN32h27NLseQ4ip9bakSfvLUa2MshZ4Ty7q9w0aLZb8GTTKWxBk94g
+ Vhl2JybeBn6TGQofXRWJNzJBcbjYOKbgaZ9MWcvg7bv8EeL97T5d6Ry1NoJk04HzUOyt
+ wPNo75cNOELH95/aYrnNkbDmAYOF5LXUqbZTX/O1i/HrUUAtYR0gv7RsRXRG1RiKN8mQ
+ 7dkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vl3ODH/+9cQlurQMjvMak6d1qO2peD3ZSVEKtUKOC/4=;
+ b=U+UZHk3lk7vLTRN6b3Tdal0w4oRCAVFKDv1ZuCN/vwGLtKEuq/1KYwnjsrHvau/zXX
+ LAJDL01Cu+PlTyMUeVhoF7SlQ7v6Il7CDtFrD5PlMWFFNtVYU80cV/+tqwd/3EzbAg4U
+ rsUw9U7rX7f2IVGjVkBc7HiqVx16PwDjrdYNKcSSKYpHe4WsXoC5tWiXAZIO3T5d/SAo
+ s4vTw0RnI/c2GEKRFkIU5EtbD2nzUClDDIG8hBfjdBPj/7zk8BNAjPId8JeuAtlzJE6Z
+ IbQI83T5h9MaqbPoA8UtXS+kIyLjYmIQ3DpJDdaXGbCD7PpAYwlH7WObgaTzG8w8cPwg
+ XLyQ==
+X-Gm-Message-State: ANhLgQ2lDTjMYz3Jj+PqDPlt5Ol776nhVZ8eyi1sE6WdbY4lm+oer3qq
+ A3bCm9fmJcNu07dMwfhdyLbO1CtXqITZkxVlBWYzvA==
+X-Google-Smtp-Source: ADFU+vsrD5dQcey+NfLehLrTza6l1K6UF2qmk3HqY5VZroSH31EXZE/PgLK6sePkMVCVI9XkiAgZop8bwtdQuaiu9eI=
+X-Received: by 2002:a9d:76c9:: with SMTP id p9mr13269048otl.135.1583765306061; 
+ Mon, 09 Mar 2020 07:48:26 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200309144353.26457-1-philmd@redhat.com>
+ <20200309144353.26457-3-philmd@redhat.com>
+In-Reply-To: <20200309144353.26457-3-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 14:48:14 +0000
+Message-ID: <CAFEAcA-4BmEvo73a-1pvQx5r+T0gXRa2GcqAmAdYxZBsfAJqFw@mail.gmail.com>
+Subject: Re: [PATCH 2/5] hw/core/loader: Prohibit loading ROMs bigger than
+ memory region
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,92 +89,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 03 Mar 2020 13:58:03 -0600
-Babu Moger <babu.moger@amd.com> wrote:
-
-> Load the model specific handlers if available or else default handlers
-> will be loaded. Add the model specific handlers if apicid decoding
-> differs from the standard sequential numbering.
-> 
-
-this is still the old version of the patch and hadn't addressed feedback from v4
-
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+On Mon, 9 Mar 2020 at 14:45, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+>
+> We must not write more data than the memory region size.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  target/i386/cpu.c |   34 ++++++++++++++++++++++++++++++++++
->  target/i386/cpu.h |    1 +
->  2 files changed, 35 insertions(+)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index c75cf744ab..f33d8b77f5 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -51,6 +51,7 @@
->  #include "sysemu/sysemu.h"
->  #include "sysemu/tcg.h"
->  #include "hw/qdev-properties.h"
-> +#include "hw/i386/x86.h"
-this dependency shouldn't be here, see below
-
->  #include "hw/i386/topology.h"
->  #ifndef CONFIG_USER_ONLY
->  #include "exec/address-spaces.h"
-[...]
-> +void cpu_x86_init_apicid_fns(MachineState *machine)
-it should be something like:
-  x86_use_epyc_apic_id_encoding(char *cpu_type)
-try to avoid pulling in unnecessary dependency on Machine into cpu.c
-
-> +{
-> +    X86CPUClass *xcc = X86_CPU_CLASS(object_class_by_name(machine->cpu_type));
-> +    X86CPUModel *model = xcc->model;
-> +    X86CPUDefinition *def = model->cpudef;
-> +    X86MachineState *x86ms = X86_MACHINE(machine);
+>  hw/core/loader.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index d1b78f60cd..c67c483936 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -1136,7 +1136,10 @@ static void rom_reset(void *unused)
+>              continue;
+>          }
+>          if (rom->mr) {
+> -            void *host =3D memory_region_get_ram_ptr(rom->mr);
+> +            void *host;
 > +
-> +    if (def) {
-> +        if (def->apicid_from_cpu_idx) {
-> +            x86ms->apicid_from_cpu_idx = def->apicid_from_cpu_idx;
-> +        }
-> +        if (def->topo_ids_from_apicid) {
-> +            x86ms->topo_ids_from_apicid = def->topo_ids_from_apicid;
-> +        }
-> +        if (def->apicid_from_topo_ids) {
-> +            x86ms->apicid_from_topo_ids = def->apicid_from_topo_ids;
-> +        }
-> +        if (def->apicid_pkg_offset) {
-> +            x86ms->apicid_pkg_offset = def->apicid_pkg_offset;
-> +        }
-> +    }
-> +}
+> +            assert(memory_region_size(rom->mr) >=3D rom->datasize);
+> +            host =3D memory_region_get_ram_ptr(rom->mr);
+>              memcpy(host, rom->data, rom->datasize);
 
-It was suggested to move defaults initialization to x86_machine_class_init()
+Does this really only happen if there's a QEMU bug,
+or could a user trigger this assert by accidentally
+passing an oversize file on the command line?
 
-as was suggested at 
-[PATCH v4 12/16] hw/i386: Use the apicid handlers from X86MachineState
-and acked by Eduardo
-
-> +
->  static CPUCaches epyc_cache_info = {
->      .l1d_cache = &(CPUCacheInfo) {
->          .type = DATA_CACHE,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 20abbda647..34f0d994ef 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1895,6 +1895,7 @@ void cpu_clear_apic_feature(CPUX86State *env);
->  void host_cpuid(uint32_t function, uint32_t count,
->                  uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
->  void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
-> +void cpu_x86_init_apicid_fns(MachineState *machine);
->  
->  /* helper.c */
->  bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> 
-
+thanks
+-- PMM
 
