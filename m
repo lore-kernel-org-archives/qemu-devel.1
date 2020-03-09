@@ -2,83 +2,65 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FAEC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 083B3C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:24:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16A3E22525
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:20:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKRzF7LF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A3E22525
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D278520727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:24:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D278520727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBIKF-0002vS-A4
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:20:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39606)
+	id 1jBIOd-0004lW-3b
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:24:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40228)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBIJZ-0002Me-NZ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:26 -0400
+ (envelope-from <jingqi.liu@intel.com>) id 1jBIO4-0004LU-Lq
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:24:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBIJY-0004z4-Pr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43297
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jingqi.liu@intel.com>) id 1jBIO2-0008Uz-QM
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:24:03 -0400
+Received: from mga03.intel.com ([134.134.136.65]:7711)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBIJY-0004ym-NA
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583759964;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=24e40OWtoXL19M1KR38kXSnQakErSNYqXxfOktpXQA8=;
- b=CKRzF7LFlFAj9AF0QU+BUdCt3lI5mNjHM2d+Cb1VfdK+wtrU2be/SlCTWorEo8o0Wn812L
- KJljLyZS2aE6v0wAgkYwKipLVjJAcWxP0NnRPaL8RsLMpUqOPVIPL65aA6X1YthLbO1xl9
- fpRMncHOCkxYVvhylv7bppQTfrKLIP0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-RAFLMdiAOvq6ei8v5-yfrw-1; Mon, 09 Mar 2020 09:19:20 -0400
-X-MC-Unique: RAFLMdiAOvq6ei8v5-yfrw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D74969FA;
- Mon,  9 Mar 2020 13:19:19 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 111051001DD8;
- Mon,  9 Mar 2020 13:19:17 +0000 (UTC)
-Date: Mon, 9 Mar 2020 14:19:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: "=?UTF-8?Q?bauerchen?=(=?UTF-8?Q?=E9=99=88=E8=92=99=E8=92=99?=)"
- <bauerchen@tencent.com>
-Subject: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet mail)
-Message-ID: <20200309141914.0b9ad42f@Igors-MacBook-Pro>
-In-Reply-To: <4976eaee60934e458e105bebe20d4d18@tencent.com>
-References: <20200306085014.120669-1-borntraeger@de.ibm.com>
- <20200309110331.3ef650a9@redhat.com>
- <13a05c3e-e374-8411-952d-05f4312ad6c0@redhat.com>
- <d37b122a-1980-32f3-6c06-89e5ef2a4807@de.ibm.com>
- <4976eaee60934e458e105bebe20d4d18@tencent.com>
+ (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+ id 1jBIO2-0008Ry-IP
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:24:02 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 09 Mar 2020 06:23:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,533,1574150400"; d="scan'208";a="245341927"
+Received: from jingqili-mobl.ccr.corp.intel.com (HELO [10.254.215.94])
+ ([10.254.215.94])
+ by orsmga006.jf.intel.com with ESMTP; 09 Mar 2020 06:23:53 -0700
+Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?J=c3=a1n_Tomko?=
+ <jtomko@redhat.com>
+References: <20200305154142.63070-1-jingqi.liu@intel.com>
+ <20200305161047.GB3627464@lpt>
+ <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Message-ID: <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
+Date: Mon, 9 Mar 2020 21:23:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,24 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- mhartmay <mhartmay@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- pbonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 11:16:10 +0000
-bauerchen(=E9=99=88=E8=92=99=E8=92=99) <bauerchen@tencent.com> wrote:
+On 3/6/2020 12:40 AM, Peter Maydell wrote:
+> On Thu, 5 Mar 2020 at 16:11, Ján Tomko <jtomko@redhat.com> wrote:
+>> On a Thursday in 2020, Jingqi Liu wrote:
+>>> The CONFIG_LINUX symbol is always not defined in this file.
+>>> This fixes that "config-host.h" header file is not included
+>>> for getting macros.
+>>>
+>>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+>>> ---
+>>> util/mmap-alloc.c | 2 ++
+>>> 1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>>> index 27dcccd8ec..24c0e380f3 100644
+>>> --- a/util/mmap-alloc.c
+>>> +++ b/util/mmap-alloc.c
+>>> @@ -10,6 +10,8 @@
+>>>   * later.  See the COPYING file in the top-level directory.
+>>>   */
+>>>
+>>> +#include "config-host.h"
+>>> +
+>> According to CODING_STYLE.rst, qemu/osdep.h is the header file
+>> that should be included first, before all the other includes.
+>>
+>> So the minimal fix would be moving qemu/osdep.h up here.
+> Yes, osdep must always be first.
+>
+>>> #ifdef CONFIG_LINUX
+>>> #include <linux/mman.h>
+>>> #else  /* !CONFIG_LINUX */
+> Do we really need this? osdep.h will pull in sys/mman.h
+> for you, which should define the MAP_* constants.
+>
+> Also, you have no fallbmack for "I'm on Linux but the
+> system headers don't define MAP_SHARED_VALIDATE or
+> MAP_SYNC". Wouldn't it be better to just have
+> #ifndef MAP_SYNC
+> #define MAP_SYNC 0
+> #endif
+>
+> etc ?
+osdep.h pulls in sys/mman.h, which defines the MAP_* constants
 
-> Thanks, =C2=A0in fact,do_touch_pages is called just when vm starts up, bu=
-t using init flag and Gonce maybe more elegant !
-> if needed,I can submit a new patch !=20
-> thanks very much!
+except for MAP_SYNC and MAP_SHARED_VALIDATE on Linux.
 
-it's called from os_mem_prealloc() -> touch_all_pages() which is called
-at least once per an instance of hotsmem backend. So if several backends
-are used then it should be called several times.
-The same applies when a hostmem backend is added during runtime (hotplug)
+How about just adding the following code in util/mmap-alloc.c ?
 
+#ifndef MAP_SYNC
+#define MAP_SYNC 0x80000
+#endif
+#ifndef MAP_SYNC
+#define MAP_SYNC 0x80000
+#endif
+
+#ifndef MAP_SHARED_VALIDATE
+#define MAP_SHARED_VALIDATE 0x03
+#endif
+
+Thanks,
+Jingqi
+
+>
+> thanks
+> -- PMM
 
