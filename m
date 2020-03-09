@@ -2,59 +2,116 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A293CC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E26DC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:38:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7985920674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:37:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7985920674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 234E220674
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:38:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234E220674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42421 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHeb-00080R-L8
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:37:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56575)
+	id 1jBHfg-0001HP-9C
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:38:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJx-0002KZ-VI
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:49 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBHdl-0006uF-2k
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJu-00033a-8Z
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:44 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43456)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jBHJt-0002c3-E9; Mon, 09 Mar 2020 08:15:42 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436515|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.335301-0.0134057-0.651294;
- FP=1080717375579948838|1|1|7|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com;
- NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GyaeXy8_1583756101; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GyaeXy8_1583756101)
- by smtp.aliyun-inc.com(10.147.41.199);
- Mon, 09 Mar 2020 20:15:11 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v3 17/60] target/riscv: vector single-width integer multiply
- instructions
-Date: Mon,  9 Mar 2020 20:14:14 +0800
-Message-Id: <20200309121457.13719-18-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
-References: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
+ (envelope-from <laurent@vivier.eu>) id 1jBHdk-00022t-03
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:36:13 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:53317)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jBHdj-0001xK-MM; Mon, 09 Mar 2020 08:36:11 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N79ly-1jPjXs1R2S-017ZJT; Mon, 09 Mar 2020 13:35:56 +0100
+Subject: Re: [PATCH v3 07/12] display/exynos4210_fimd: Remove redundant
+ statement in exynos4210_fimd_update()
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
+ <20200302130715.29440-9-kuhn.chenqun@huawei.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <9ff0b76f-a316-505a-852d-15790c4e1e6f@vivier.eu>
+Date: Mon, 9 Mar 2020 13:35:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <20200302130715.29440-9-kuhn.chenqun@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-Provags-ID: V03:K1:SeAvPVup5wS5LFL7xFTfTQcfW7xVfP1S7aZICbv6ZLY5UvDLZi6
+ /yJeP4r8tOwQmtrD+q3yDpBs7W1MyQqT4DL8a2DvFcmmLABJHKbTa0Xh2O5tXO/mmYlsUzT
+ vvtzxpsna6H0yEZi4WuaNv9lKgQnUZKzLbb/0ed9+yH1AmhjuK5NypyHxlo7DMcvX195L7A
+ zt3EDlq9HDRf0B02aeGSQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iy17NU6q1BM=:ibdU/N8ginG99LjwWepUxB
+ PMtC2KnIC6eWv7rW/zxZ4pHSkrHGNZsZ5q5iWqU7uIlqYg8/aQs/iWV6pAjB11wlFt7ZvnDXi
+ 0Os3a1vzWtL8PsVHeIgTiqLX/L2ojd899FDQPqzOemV+/cNJE4vxN3N5KNGX0/Fw4Xi10NCgh
+ 5DIbh96/PGoVRQGbkLpG1yxXJ9S90qlakZhV08Fv9+cEegcL8Ac7J3y0fxDLQPWFd90sVl+Ha
+ FUt00kDamldbw8fNrlWInLmRouHQBgRAf/yF5ptiM0+ZV6VeLdro+rMJHG/18FnBuUfMaUpJi
+ r2+g9hkAL3cTjeFbuLEgCwtMCkxW6mgE6lvpOp8cRwRmJCcc96NnC1hQI+3sVfuOU12JOs+fm
+ VY0rBjMoUa0J6cCfxCzWdNm1iOd0h24NNsuzdZqv/QxGjWKWvw22NkKaL23v+433Z/WfXZuyT
+ 1h8K5jAtK4CkMEXYXm9ds1iU4e7SFesBA7n6btjNut/ni3E93hl8RRHCEr+Hqfadx+JKIuIQW
+ SrRJ4xOX9fp/h/SWzk1zLkQlNlRVf2tU5pp6dppX7JVjS5ujNJSFDdc0vRdaCLXLep+9L8ibE
+ fwHrJSmkdLoJIag+nJXJ63f4wdK4w09DZMuSKy7RmR/T+dwDGNDQ5tzybHt4UZBqdnTA8dndp
+ t6ACf0x+IHpVtO8elUKmbFED8Xc6E0whUUj17gguo6Yym8nxWihEWxiSXXkboCA+09Aw/HQX6
+ a9PTSqXOpQ8zEI3XNVYpJOQZ0XBo+xyjyKtdv9KRNdOMxeE3BDk2Xy/7pkrUM/g8pIwvBRFMU
+ G5EDBhqS3GVW7sFpsZX5BzNu+p2L/FCO/vagPISf2rH3Hw9uQhYHcWAEA9J8lrqVZZrUHmo
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,262 +123,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, peter.maydell@linaro.org,
+ zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  33 ++++++
- target/riscv/insn32.decode              |   8 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
- target/riscv/vector_helper.c            | 147 ++++++++++++++++++++++++
- 4 files changed, 198 insertions(+)
+Le 02/03/2020 à 14:07, Chen Qun a écrit :
+> Clang static code analyzer show warning:
+> hw/display/exynos4210_fimd.c:1313:17: warning: Value stored to 'is_dirty' is never read
+>                 is_dirty = false;
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/display/exynos4210_fimd.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
+> index c1071ecd46..05d3265b76 100644
+> --- a/hw/display/exynos4210_fimd.c
+> +++ b/hw/display/exynos4210_fimd.c
+> @@ -1310,7 +1310,6 @@ static void exynos4210_fimd_update(void *opaque)
+>                  }
+>                  host_fb_addr += inc_size;
+>                  fb_line_addr += inc_size;
+> -                is_dirty = false;
+>              }
+>              g_free(snap);
+>              blend = true;
+> 
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c7d4ff185a..f42a12eef3 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -525,3 +525,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index a7619f4e3d..a8ac4e9e9d 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -362,6 +362,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
- vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
- vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
- vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
-+vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
-+vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 4437a77878..a1ecc9f52d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1434,3 +1434,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
- GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
-+GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
-+GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
-+GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 03e001262f..93daafd5bd 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -853,6 +853,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
- #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
- #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-+#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
-+#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
-+#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
-+#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
- 
- /* operation of two vector elements */
- #define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
-@@ -1550,3 +1554,146 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+#define DO_MUL(N, M) (N * M)
-+RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
-+GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
-+
-+static int8_t do_mulh_b(int8_t s2, int8_t s1)
-+{
-+    return (int16_t)s2 * (int16_t)s1 >> 8;
-+}
-+static int16_t do_mulh_h(int16_t s2, int16_t s1)
-+{
-+    return (int32_t)s2 * (int32_t)s1 >> 16;
-+}
-+static int32_t do_mulh_w(int32_t s2, int32_t s1)
-+{
-+    return (int64_t)s2 * (int64_t)s1 >> 32;
-+}
-+static int64_t do_mulh_d(int64_t s2, int64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    muls64(&lo_64, &hi_64, s1, s2);
-+    return hi_64;
-+}
-+
-+static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
-+{
-+    return (uint16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
-+{
-+    return (uint32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
-+{
-+    return (uint64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    mulu64(&lo_64, &hi_64, s2, s1);
-+    return hi_64;
-+}
-+
-+static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
-+{
-+    return (int16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
-+{
-+    return (int32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
-+{
-+    return (int64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64, abs_s2 = s2;
-+
-+    if (s2 < 0) {
-+        abs_s2 = -s2;
-+    }
-+    mulu64(&lo_64, &hi_64, abs_s2, s1);
-+    if ((int64_t)(s2 ^ s1) < 0) {
-+        lo_64 = ~lo_64;
-+        hi_64 = ~hi_64;
-+        if (lo_64 == UINT64_MAX) {
-+            lo_64 = 0;
-+            hi_64 += 1;
-+        } else {
-+            lo_64 += 1;
-+        }
-+    }
-+
-+    return hi_64;
-+}
-+
-+RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
-+RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
-+RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
-+RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
-+RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
-+RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
-+RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
-+RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
-+RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
-+RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
--- 
-2.23.0
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
