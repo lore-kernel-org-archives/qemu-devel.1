@@ -2,78 +2,79 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BDDC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F98C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:45:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3C132067C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:41:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E32AF222C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpFDwzyS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3C132067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A2tRITAH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E32AF222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBLSi-0002k7-RX
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:41:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51712)
+	id 1jBLX0-0004qt-4E
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:45:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jBLRx-0002F4-Oe
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:40:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBLVv-00049R-9z
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jBLRw-0004UU-NP
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:40:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45303
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jBLRw-0004UG-JG
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:40:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583772016;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vthUwcoR83pkJX6727uEbcs9bqc6PktRpq7keoSX31I=;
- b=GpFDwzyS73KNG1XzbI42FlMcia+hfT/UqW5S/KvRZm9fz1jE1wzh2lQ4tFHncRqH0abRQ0
- KgTHcJsffGkbbOTbrGyUO+d1swBUqsWfQVrcI6Z6sfg0Bsz0Mo2OQYWdVtbkcM7QQL6dJt
- FuR0+FbRwCX2vqjIjh00/1S9AEmEPAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-klQ2cae4OyG441xOcCY0YQ-1; Mon, 09 Mar 2020 12:40:13 -0400
-X-MC-Unique: klQ2cae4OyG441xOcCY0YQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66DAF107ACC4;
- Mon,  9 Mar 2020 16:40:12 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F00BE19C58;
- Mon,  9 Mar 2020 16:40:11 +0000 (UTC)
-Date: Mon, 9 Mar 2020 16:40:10 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 0/2] qemu/queue.h: clear linked list pointers on remove
-Message-ID: <20200309164010.GD46227@stefanha-x1.localdomain>
-References: <20200224103406.1894923-1-stefanha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBLVu-0007MW-4v
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:44:23 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBLVt-0007Lk-U7
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:44:22 -0400
+Received: by mail-oi1-x241.google.com with SMTP id g6so10837035oiy.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 09:44:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vsbxzOYE0aVq29heeEadFUFvp2hO7sl6c9V+gJlGK1U=;
+ b=A2tRITAHhIIEJ4IpYm3rHTDk46dcAlRMUAh1jEsr3/QcrxEZbZj1e5sn/6ZIoe4G/C
+ XY3DrCvI2YIj+6LJmnT9bSnA408qHbihPrTxanf19ACGXs7I8iwdm8rUBC7ZB4kze54m
+ Ifm8n73lUQRXaVv4gpUpBdm5qARMi8XmPle0XGthAIYBGsZQpkIxHxO4RGeMtmZsLcc1
+ I0zppwHe+RNe/ZimUcOObMQLkpxUL+kDSM6Zlef7JedrRpkWA9A3B5cKEB0N/OGOFbu0
+ zvjwzVntIRaWXIx+iLgQ0h7NooK7RzB5LA7tEIog7tyKluuHDMcvTrilgQ2uojXA7AR8
+ 1mZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vsbxzOYE0aVq29heeEadFUFvp2hO7sl6c9V+gJlGK1U=;
+ b=Fv09Pz6xmy+xubj044Z2Uuwv8xG0UtAeSMzlF1JzrGidShQzQeW5SYv2f/q/nwxFOO
+ hDvcPdK4FxdkhmDkwl/6T2i4VWu6AJ/VwWI3QvB7H3MiIqiFqE3yZMnO/85JCGhoppY1
+ vyZl69Yrutfqm3tO0gJ6HTWD1ffeuOAk3CC7opgq56nnZ9uk2y5j4OZKOBoOq+Er+TF7
+ CBWxAd6Evv3MMlxQutuAzCxXYi6mKaLvgAHHODi7jvw9MDmR2ceEKxQroHxk+o0MM/Aw
+ YiPY9aU0ymZyDB0J8Um7CeBVPTIs0Kj0CkQfHBgLd+1eP0GGg74LZAJX9USAFhOB1OHo
+ FXUg==
+X-Gm-Message-State: ANhLgQ1ePQhv40UN52/Rqosciu21uAF6MV4QQSzn5wpeVxX0UxFW70QF
+ Jyt38+VtAnMXFf3jN0BYcUvY9wAcJQBtpbiN+6aBxQ==
+X-Google-Smtp-Source: ADFU+vvBQPDKSS6q7Z59q1no5LH02dLE+Qs5gB3uirpjuOFNbpElnEaPnhpWHWYCYvHBdGBLHxeGHkO6PulyNTSlsfg=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr149238oiy.170.1583772260918; 
+ Mon, 09 Mar 2020 09:44:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200224103406.1894923-1-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TybLhxa8M7aNoW+V"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200309150837.3193387-1-laurent@vivier.eu>
+In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 16:44:08 +0000
+Message-ID: <CAFEAcA_ZjyuCb3gZUXe1MN9PkN5D8hD7SLPoX0-sp231hVQV2g@mail.gmail.com>
+Subject: Re: [PULL 00/33] Trivial branch patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,59 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Helge Deller <deller@gmx.de>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Max Reitz <mreitz@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---TybLhxa8M7aNoW+V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 9 Mar 2020 at 15:09, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 7a5853cec479a448edae0fb2aaf4e2f78c9c774d:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-03-09 10:32:53 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+>
+> for you to fetch changes up to 916c92503bd5348a33e561db600d8894bde636bb:
+>
+>   monitor/hmp-cmds: Remove redundant statement in hmp_rocker_of_dpa_groups() (2020-03-09 15:59:31 +0100)
+>
+> ----------------------------------------------------------------
+> - includes cleanup
+> - reduce .data footprint
+> - fix warnings reported by Clang static code analyzer
+> - fix dp8393x part lost in merge
+> - update git.orderfile and rules.mak
+>
+> ----------------------------------------------------------------
 
-On Mon, Feb 24, 2020 at 10:34:04AM +0000, Stefan Hajnoczi wrote:
-> QLIST_REMOVE() and friends leave dangling linked list pointers in the nod=
-e that
-> was removed.  This makes it impossible to decide whether a node is curren=
-tly in
-> a list or not.  It also makes debugging harder.
->=20
-> Based-on: 20200222085030.1760640-1-stefanha@redhat.com
->           ("[PULL 00/31] Block patches")
->=20
-> Stefan Hajnoczi (2):
->   qemu/queue.h: clear linked list pointers on remove
->   aio-posix: remove confusing QLIST_SAFE_REMOVE()
->=20
->  include/qemu/queue.h | 19 +++++++++++++++----
->  util/aio-posix.c     |  2 +-
->  2 files changed, 16 insertions(+), 5 deletions(-)
->=20
-> --=20
-> 2.24.1
->=20
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Applied, thanks.
 
-Stefan
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
---TybLhxa8M7aNoW+V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5mcWoACgkQnKSrs4Gr
-c8jsvQgAr4mX4XmwyL/Gcpvp/KLHpflsCue4DKTmNqY+Sc+tLrQDjbR5thYdl9js
-rKFUaH1Sv9/h5m4b0AompqrEotPfJEIbpP5gNNbBtehU9PCdzespKp0dKeXLNeLI
-tqz4zwMIeTuZpQ1kk3VAXPubvxbdYxajnv/EN7rA4bmLx5I5UaGP8Lf7ZogoF5pt
-C/TDjo8oLq3338mrMm17m4KFs4rhPVJr0wBm9CFY1ysVTqMUEJdPkng40plKZsqC
-Iab5MrWaud/MNGzZ8+ChHcsF0LewqXRmxKC5Px8DmBHkOUxV0ym723BGV7I5RvAs
-DBTKJHEuxi/dVCAucQ8LxBZs6d14QQ==
-=20Qh
------END PGP SIGNATURE-----
-
---TybLhxa8M7aNoW+V--
-
+-- PMM
 
