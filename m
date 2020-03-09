@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF76C18E5A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9FAC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33EF42067C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:21:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33EF42067C
+	by mail.kernel.org (Postfix) with ESMTPS id 964FA2067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:23:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964FA2067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKEA-0000KI-9P
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34269)
+	id 1jBKFz-0002Kn-LO
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:23:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK3D-0000pN-BH
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:40 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK35-0000Ti-1q
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK3C-0008Hk-3A
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:39 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:54773)
+ (envelope-from <laurent@vivier.eu>) id 1jBK30-00087I-6s
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:30 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:43071)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2w-00082l-PU; Mon, 09 Mar 2020 11:10:23 -0400
+ id 1jBK2w-00080q-Qu; Mon, 09 Mar 2020 11:10:23 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MUokB-1ilAKi13Dt-00Qh5L; Mon, 09 Mar 2020 16:09:41 +0100
+ id 1Mz9d7-1jX6La2m0Z-00wCPd; Mon, 09 Mar 2020 16:09:29 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/33] hw/i386/pc: Clean up includes
-Date: Mon,  9 Mar 2020 16:08:29 +0100
-Message-Id: <20200309150837.3193387-26-laurent@vivier.eu>
+Subject: [PULL 20/33] hw/i2c/smbus_ich9: Include "qemu/range.h"
+Date: Mon,  9 Mar 2020 16:08:24 +0100
+Message-Id: <20200309150837.3193387-21-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ELlgxbZLN6XY/sIJ9/sOXL2kw+iCrvUYX26HkdzVN63MSnFG9dR
- kiTBIj9Bjznl24O5TFF6LYx1MZpMEU4Ih6wjOLhMT5LS3ct6v+gkHtLTVMl91+SwWBtqVDq
- ypom+FRfLReSdff6zlQveYXzTENnRdqgqPC/RE7gbQJ7tk+UVrcuNNEydN/+FZpJPADbgba
- 88q6b5JHmtcBgXA58rpBA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Kjo3KdQiq3M=:Lwea4OC/jBe3UKpAowpHwt
- sDVUaek9ZRP0mJkBlumXRKRQbNh9H3uKoc+kbKxOHLrHbASGhK1v7Q4jgPbftwc9esKJm5zsc
- G//XouxcRWMi0tYLPWXI7QQP8gKASbM4nejI9YAuViiZose+ijYyTb2Rg9Z8mNhdqQbl3ZXi4
- rRcaTm2ZjfilEsIYFFQfhIAC+Rw8PftbYAqpLEMeEcpgomIu8J/zaSQhZR2jpUi/yFd0cZmiU
- hlHXY6UmKkWURFiOLDqGwcE9c6nDerJSU8VKesepaSu22wQ6XdKOis6XuHna8skb/dZ8CDsNl
- VNQZSn1GnQK2MGsoSETnqPLXjKHSYzZYX/bjo2/YGBL7MV/AY+vuC1Bo4U66OGq44AZNSE64M
- weRR1JnWjF+U6BnUxWcPbvTRZVy6nNqofHwVxH3ekbbcFf9EGAL1YHA0qfbOZE8mtYZQ60NAJ
- iK6BZsDfIYbP/kWu8adnYMRJvpp0TUuMdBimW1RSzmOFaQB9kTgluPhEXry/rgQiTx3HyZGWv
- IkKuLV181txzhPNOajpPkGgWGz5aMXbCbaqdS1uhXI7uZzigCS92gRo1vz8W6y9wt0CnJSiy1
- CJJFoJqICNRlkm+yv1w1lwrOQK1dQRUJQMTwah9jud0rGW4ZHW/vPbx1E1r9vPcXlTD3QEo6G
- 4xtu7GaImOxz905M6XX4xmcqj8K1R37bin0OTOUvxDNkyVrg4MXYuKmQlOofOY5btjbJKcVf3
- 6kjtmC/jAW70gNmruYZ/8a38bn8pmA++gCb3HAGK1L5E/33PQQfQzp2XTiiAJGf5VGAU0YH2T
- JZosvmCkAiFqs6DHJoH5hJjP75Y3keszRJKUxvULoPnfBjsCg1W9d1CB/8LK5+z9swLMkfy
+X-Provags-ID: V03:K1:Alwa6Yq6anJ25qqFb2ZJCqayl5qxuKrCwWQL2K641TjDVv8DxnD
+ UJkIGN3SM0DllsWqOE1Q2KYBM0cIesPhI79sdPoQyBdoLbAXe9AJLhVRYpKiLGQqpDKHzDt
+ GrC7m/3NQDbiIJRmlWUBWUgCziy5lGGkrNjNN5Bor9wIBQ+JOLewBBQgn8yVC1/vrTmv4rS
+ cz4gI88sb4xqWMZZ0aC6g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PuxzSjGLkMI=:rKTJ09YAr7MO8ckm3p+HHB
+ nTQRRCXJ2wnTUopWfg0flpXTcAvErHxm0yhofCwSwtfMkxvZYCUmlww4Rr5KjT0ebccRMoJV2
+ sWbXdgymVKmJsuUnJr+Cx3Hrfxtu8O5zCnWsUbaWn3q5bz3cpKQ7AFEuNccDI/kWt89TzCgxf
+ 14BUy+Ay1kIj9ZaMtJYQWkKTJMVYIad5jHYJyijOYkHy9wlg1roIGHDgjzhYhqCMKd/4KxyjC
+ QYfsJJahDeu4o5Jx0bH100FvOCImi3vF2X5QFtpvbsEKl78DbmlwBrmvvX/ZBTlXdF3wvi7Dw
+ 7E5sDlMt/RZwc53y3kx013vZYz5VD4iTrqw62D0G+TTC9ksGNQdPHstZlbD+yZCFbjr6f6nMP
+ crFuMsqjos+n2Owy5H7y2BG4Pb+CLIpqTIN+9F39PDSyzueQLuf7wsZAIkKtUG4iXKoFaXmgi
+ NSZuZjsb55f+8Of5wjTfQiQRjYVhhpHwVUcJwxC5ds1BsS3KBRzjMkkc82LjYhFhw0Sh/TfJ/
+ fanwylNwK4bbIVBb/KWeEi7y6sN7tZUB4G+BIC8K5VFzT7UzCpe2SlDwLtFdYLXCA2guwGhR6
+ +h/TEbmQW9cdtfZsX4k7pRZx1LetraWGqUN3LYaHVxFjsjaolT86SQzPcTTQ+HoMq9NFGgdL6
+ kn0Ex0zP1qvLA70+6i6VN7G6jmr2AmIIFy4G/54vkqR9vfTeA+VOdst7ntoZYCXzBTXrCX4BU
+ /2Fe/dAkdmLwyTtmNHgzhmdpqnl/W4JpieDDgL0jufxp1kxgvtl21OjePQTmKSMttB/8r/0jO
+ H5ORpJRfTO/RZIbCVT6OUbbg3Nv2pQRAUAqN529o4yy+sHk2WHfvJGvZm7JQ6rmv22X+T4T
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,70 +100,36 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Various headers are not required by hw/i386/pc.h:
+hw/i2c/smbus_ich9.c calls range_covers_byte(). Include "qemu/range.h"
+which declares it.
 
- - "qemu/range.h"
- - "qemu/bitmap.h"
- - "qemu/module.h"
- - "exec/memory.h"
- - "hw/pci/pci.h"
- - "hw/mem/pc-dimm.h"
- - "hw/mem/nvdimm.h"
- - "net/net.h"
+This fixes (when modifying unrelated headers):
 
-Remove them.
-
-Add 3 headers that were missing:
-
- - "hw/hotplug.h"
-
-   PCMachineState::acpi_dev is of type HotplugHandler
-
- - "qemu/notify.h"
-
-   PCMachineState::machine_done is of type Notifier
-
- - "qapi/qapi-types-common.h"
-
-   PCMachineState::vmport/smm is of type OnOffAuto
+  hw/i2c/smbus_ich9.c:66:9: error: implicit declaration of function 'range_covers_byte' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+      if (range_covers_byte(address, len, ICH9_SMB_HOSTC)) {
+          ^
 
 Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-19-philmd@redhat.com>
+Message-Id: <20200228114649.12818-14-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/hw/i386/pc.h | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ hw/i2c/smbus_ich9.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index d5ac76d54e1f..6ab6eda046fd 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -1,20 +1,15 @@
- #ifndef HW_PC_H
- #define HW_PC_H
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index fd50fb851af4..48f1ff419174 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -21,6 +21,7 @@
+  */
  
--#include "exec/memory.h"
-+#include "qemu/notify.h"
-+#include "qapi/qapi-types-common.h"
- #include "hw/boards.h"
- #include "hw/block/fdc.h"
- #include "hw/block/flash.h"
--#include "net/net.h"
- #include "hw/i386/x86.h"
- 
--#include "qemu/range.h"
--#include "qemu/bitmap.h"
--#include "qemu/module.h"
--#include "hw/pci/pci.h"
--#include "hw/mem/pc-dimm.h"
--#include "hw/mem/nvdimm.h"
- #include "hw/acpi/acpi_dev_interface.h"
-+#include "hw/hotplug.h"
- 
- #define HPET_INTCAP "hpet-intcap"
- 
+ #include "qemu/osdep.h"
++#include "qemu/range.h"
+ #include "hw/i2c/pm_smbus.h"
+ #include "hw/pci/pci.h"
+ #include "migration/vmstate.h"
 -- 
 2.24.1
 
