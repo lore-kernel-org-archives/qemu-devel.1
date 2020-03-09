@@ -2,143 +2,83 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F7CC10F29
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CD7C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CE302072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:03:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE302072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 679112051A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:17:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=tencent.com header.i=@tencent.com header.b="bz9Oyk0J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 679112051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tencent.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGBv-0002C4-Hu
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:03:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44556)
+	id 1jBGPS-0004QX-I7
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:17:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBGBI-0001kU-Ll
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:02:45 -0400
+ (envelope-from <bauerchen@tencent.com>) id 1jBGOW-00040E-IA
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:16:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBGBH-0003Bw-Go
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:02:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39622
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jBGBH-0003BZ-BH
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:02:43 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 029AsApP081790
- for <qemu-devel@nongnu.org>; Mon, 9 Mar 2020 07:02:42 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8g32jff-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 07:02:42 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 9 Mar 2020 11:02:40 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 9 Mar 2020 11:02:32 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 029B1W8x36176214
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 9 Mar 2020 11:01:32 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 82C7DA405B;
- Mon,  9 Mar 2020 11:02:31 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A8CFDA4069;
- Mon,  9 Mar 2020 11:02:30 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  9 Mar 2020 11:02:30 +0000 (GMT)
-Subject: Re: [PATCH] cpu: Use DeviceClass reset instead of a special CPUClass
- reset
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200303100511.5498-1-peter.maydell@linaro.org>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 9 Mar 2020 12:02:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bauerchen@tencent.com>) id 1jBGOT-00069R-Qb
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:16:22 -0400
+Received: from mail6.tencent.com ([220.249.245.26]:54041)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bauerchen@tencent.com>)
+ id 1jBGOS-00061Q-O0; Mon, 09 Mar 2020 07:16:21 -0400
+Received: from EX-SZ022.tencent.com (unknown [10.28.6.88])
+ by mail6.tencent.com (Postfix) with ESMTP id EB027CC647;
+ Mon,  9 Mar 2020 19:16:43 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tencent.com;
+ s=s202002; t=1583752604;
+ bh=dVgQ/jHXCdjVfxBStMRyUUIRUvam3nKJ39G7POagSCU=;
+ h=From:To:CC:Subject:Date:References;
+ b=bz9Oyk0J2n2g0jKvjXZoTXxALy4QRwmDWQRswd0DzfIvrRHWohEU4NqSsArkDLtrT
+ QGtm/sei8GUXdx9F8XlwVwWuUwTAfWFbU2guADGTrMC0Lsr3HXzOCorm0sSRcLd+9w
+ bHK/jbAKgDvjocPxBQUnEM6QJxGg1REBWZOqbGI4=
+Received: from EX-SZ013.tencent.com (10.28.6.37) by EX-SZ022.tencent.com
+ (10.28.6.88) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Mon, 9 Mar 2020
+ 19:16:12 +0800
+Received: from EX-SZ005.tencent.com (10.28.6.29) by EX-SZ013.tencent.com
+ (10.28.6.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Mon, 9 Mar 2020
+ 19:16:10 +0800
+Received: from EX-SZ005.tencent.com ([fe80::a42c:28db:54ef:6adf]) by
+ EX-SZ005.tencent.com ([fe80::a42c:28db:54ef:6adf%4]) with mapi id
+ 15.01.1847.007; Mon, 9 Mar 2020 19:16:10 +0800
+From: =?utf-8?B?YmF1ZXJjaGVuKOmZiOiSmeiSmSk=?= <bauerchen@tencent.com>
+To: borntraeger <borntraeger@de.ibm.com>, pbonzini <pbonzini@redhat.com>, Igor
+ Mammedov <imammedo@redhat.com>
+Subject: Re: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet mail)
+Thread-Topic: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet
+ mail)
+Thread-Index: AQHV85RZkOhBH6vxAEysUkxz/tkQww==
+Date: Mon, 9 Mar 2020 11:16:10 +0000
+Message-ID: <4976eaee60934e458e105bebe20d4d18@tencent.com>
+References: <20200306085014.120669-1-borntraeger@de.ibm.com>,
+ <20200309110331.3ef650a9@redhat.com>,
+ <13a05c3e-e374-8411-952d-05f4312ad6c0@redhat.com>,
+ <d37b122a-1980-32f3-6c06-89e5ef2a4807@de.ibm.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [10.28.2.14]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20200303100511.5498-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20030911-0020-0000-0000-000003B1DDBA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030911-0021-0000-0000-0000220A2486
-Message-Id: <27475af3-2cc5-40bf-d469-f1ca6195e1ce@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-09_02:2020-03-08,
- 2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 mlxscore=0
- suspectscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090077
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.249.245.26
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,76 +90,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-riscv@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, mhartmay <mhartmay@linux.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 03.03.20 11:05, Peter Maydell wrote:
-> The CPUClass has a 'reset' method.  This is a legacy from when
-> TYPE_CPU used not to inherit from TYPE_DEVICE.  We don't need it any
-> more, as we can simply use the TYPE_DEVICE reset.  The 'cpu_reset()'
-> function is kept as the API which most places use to reset a CPU; it
-> is now a wrapper which calls device_cold_reset() and then the
-> tracepoint function.
-> 
-> This change should not cause CPU objects to be reset more often
-> than they are at the moment, because:
->  * nobody is directly calling device_cold_reset() or
->    qdev_reset_all() on CPU objects
->  * no CPU object is on a qbus, so they will not be reset either
->    by somebody calling qbus_reset_all()/bus_cold_reset(), or
->    by the main "reset sysbus and everything in the qbus tree"
->    reset that most devices are reset by
-> 
-> Note that this does not change the need for each machine or whatever
-> to use qemu_register_reset() to arrange to call cpu_reset() -- that
-> is necessary because CPU objects are not on any qbus, so they don't
-> get reset when the qbus tree rooted at the sysbus bus is reset, and
-> this isn't being changed here.
-> 
-> All the changes to the files under target/ were made using the
-> included Coccinelle script, except:
-> 
-> (1) the deletion of the now-inaccurate and not terribly useful
-> "CPUClass::reset" comments was done with a perl one-liner afterwards:
->   perl -n -i -e '/ CPUClass::reset/ or print' target/*/*.c
-> 
-> (2) this bit of the s390 change was done by hand, because the
-> Coccinelle script is not sophisticated enough to handle the
-> parent_reset call being inside another function:
-> 
-> | @@ -96,8 +96,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
-> |     S390CPU *cpu = S390_CPU(s);
-> |     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
-> |     CPUS390XState *env = &cpu->env;
-> |+    DeviceState *dev = DEVICE(s);
-> |
-> |-    scc->parent_reset(s);
-> |+    scc->parent_reset(dev);
-> |     cpu->env.sigp_order = 0;
-> |     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-> 
-
-s390 parts look sane.
-
-
+VGhhbmtzLCDCoGluIGZhY3QsZG9fdG91Y2hfcGFnZXMgaXMgY2FsbGVkIGp1c3Qgd2hlbiB2bSBz
+dGFydHMgdXAsIGJ1dCB1c2luZyBpbml0IGZsYWcgYW5kIEdvbmNlIG1heWJlIG1vcmUgZWxlZ2Fu
+dCAhCmlmIG5lZWRlZCxJIGNhbiBzdWJtaXQgYSBuZXcgcGF0Y2ggISAKdGhhbmtzIHZlcnkgbXVj
+aCEKCmJhdWVyY2hlbgrCoApGcm9tOsKgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyCkRhdGU6wqAyMDIw
+LTAzLTA5wqAxOTowMQpUbzrCoFBhb2xvIEJvbnppbmk7IElnb3IgTWFtbWVkb3YKQ0M6wqBxZW11
+LWRldmVsOyBxZW11LXMzOTB4OyBNYXJjIEhhcnRtYXllcjsgYmF1ZXJjaGVuKOmZiOiSmeiSmSkK
+U3ViamVjdDrCoFJlOiBbUEFUQ0hdIG1lbS1wcmVhbGxvYzogaW5pdGlhbGl6ZSBjb25kIGFuZCBt
+dXRleChJbnRlcm5ldCBtYWlsKQrCoArCoApPbiAwOS4wMy4yMCAxMTowNSwgUGFvbG8gQm9uemlu
+aSB3cm90ZToKPiBPbiAwOS8wMy8yMCAxMTowMywgSWdvciBNYW1tZWRvdiB3cm90ZToKPj4+ICvC
+oMKgwqAgcWVtdV9jb25kX2luaXQoJnBhZ2VfY29uZCk7Cj4+PiArwqDCoMKgIHFlbXVfbXV0ZXhf
+aW5pdCgmcGFnZV9tdXRleCk7Cj4+IElzIGl0IHBvc3NpYmxlIGZvciB0b3VjaF9hbGxfcGFnZXMg
+dG8gYmUgY2FsbGVkIHNldmVyYWwgdGltZXM/Cj4+IElmIGl0J3MgdGhlbiBpdCBwcm9iYWJseSBu
+ZWVkcyBhIGd1YXJkIGFnYWluc3QgdGhhdCB0byBtYWtlCj4+IHN1cmUgaXQgd29uJ3QgZXhwbG9k
+ZSwgc29tZXRoaW5nIGxpa2U6Cj4+Cj4+IHN0YXRpYyBib29sIHBhZ2VfbXV0ZXhfaW5pdGVkOwo+
+Pgo+PiBpZihwYWdlX211dGV4X2luaXRlZCkKPj7CoMKgIHBhZ2VfbXV0ZXhfaW5pdGVkID0gdHJ1
+ZQo+PsKgwqAgcWVtdV9tdXRleF9pbml0KCZwYWdlX211dGV4KQo+PsKgwqAgLi4uCj4+Cj4KPiBI
+bW0sIGdvb2QgaWRlYSwgaXQgc2hvdWxkIGFsc28gdXNlIEdPbmNlLgrCoApNYXliZSBzdGFydCB3
+aXRoIGEgcmV2ZXJ0IGFuZCBsZXQgdGhlIG9yaWdpbmFsIHN1Ym1pdHRlciBzZW5kCmEgZml4ZWQg
+dXAgcGF0Y2g/CsKgCsKg
 
