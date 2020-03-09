@@ -2,116 +2,59 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E26DC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C65C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 234E220674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:38:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234E220674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 1D19A20674
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:39:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D19A20674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42421 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHfg-0001HP-9C
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:38:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60617)
+	id 1jBHga-0002nf-9L
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:39:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHdl-0006uF-2k
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:36:14 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHK7-0002Zf-Uo
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHdk-00022t-03
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:36:13 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:53317)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHdj-0001xK-MM; Mon, 09 Mar 2020 08:36:11 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N79ly-1jPjXs1R2S-017ZJT; Mon, 09 Mar 2020 13:35:56 +0100
-Subject: Re: [PATCH v3 07/12] display/exynos4210_fimd: Remove redundant
- statement in exynos4210_fimd_update()
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-9-kuhn.chenqun@huawei.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9ff0b76f-a316-505a-852d-15790c4e1e6f@vivier.eu>
-Date: Mon, 9 Mar 2020 13:35:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHK3-0003HQ-Iv
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:55 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:38189)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jBHK2-0002bz-S8; Mon, 09 Mar 2020 08:15:51 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608247|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.595792-0.000141828-0.404066;
+ FP=1657305062827449346|1|1|7|0|-1|-1|-1; HT=e02c03311; MF=zhiwei_liu@c-sky.com;
+ NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GyaeXy8_1583756101; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GyaeXy8_1583756101)
+ by smtp.aliyun-inc.com(10.147.41.199);
+ Mon, 09 Mar 2020 20:15:07 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v3 11/60] target/riscv: vector integer add-with-carry /
+ subtract-with-borrow instructions
+Date: Mon,  9 Mar 2020 20:14:08 +0800
+Message-Id: <20200309121457.13719-12-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
+References: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200302130715.29440-9-kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SeAvPVup5wS5LFL7xFTfTQcfW7xVfP1S7aZICbv6ZLY5UvDLZi6
- /yJeP4r8tOwQmtrD+q3yDpBs7W1MyQqT4DL8a2DvFcmmLABJHKbTa0Xh2O5tXO/mmYlsUzT
- vvtzxpsna6H0yEZi4WuaNv9lKgQnUZKzLbb/0ed9+yH1AmhjuK5NypyHxlo7DMcvX195L7A
- zt3EDlq9HDRf0B02aeGSQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:iy17NU6q1BM=:ibdU/N8ginG99LjwWepUxB
- PMtC2KnIC6eWv7rW/zxZ4pHSkrHGNZsZ5q5iWqU7uIlqYg8/aQs/iWV6pAjB11wlFt7ZvnDXi
- 0Os3a1vzWtL8PsVHeIgTiqLX/L2ojd899FDQPqzOemV+/cNJE4vxN3N5KNGX0/Fw4Xi10NCgh
- 5DIbh96/PGoVRQGbkLpG1yxXJ9S90qlakZhV08Fv9+cEegcL8Ac7J3y0fxDLQPWFd90sVl+Ha
- FUt00kDamldbw8fNrlWInLmRouHQBgRAf/yF5ptiM0+ZV6VeLdro+rMJHG/18FnBuUfMaUpJi
- r2+g9hkAL3cTjeFbuLEgCwtMCkxW6mgE6lvpOp8cRwRmJCcc96NnC1hQI+3sVfuOU12JOs+fm
- VY0rBjMoUa0J6cCfxCzWdNm1iOd0h24NNsuzdZqv/QxGjWKWvw22NkKaL23v+433Z/WfXZuyT
- 1h8K5jAtK4CkMEXYXm9ds1iU4e7SFesBA7n6btjNut/ni3E93hl8RRHCEr+Hqfadx+JKIuIQW
- SrRJ4xOX9fp/h/SWzk1zLkQlNlRVf2tU5pp6dppX7JVjS5ujNJSFDdc0vRdaCLXLep+9L8ibE
- fwHrJSmkdLoJIag+nJXJ63f4wdK4w09DZMuSKy7RmR/T+dwDGNDQ5tzybHt4UZBqdnTA8dndp
- t6ACf0x+IHpVtO8elUKmbFED8Xc6E0whUUj17gguo6Yym8nxWihEWxiSXXkboCA+09Aw/HQX6
- a9PTSqXOpQ8zEI3XNVYpJOQZ0XBo+xyjyKtdv9KRNdOMxeE3BDk2Xy/7pkrUM/g8pIwvBRFMU
- G5EDBhqS3GVW7sFpsZX5BzNu+p2L/FCO/vagPISf2rH3Hw9uQhYHcWAEA9J8lrqVZZrUHmo
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,39 +66,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, peter.maydell@linaro.org,
- zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/03/2020 à 14:07, Chen Qun a écrit :
-> Clang static code analyzer show warning:
-> hw/display/exynos4210_fimd.c:1313:17: warning: Value stored to 'is_dirty' is never read
->                 is_dirty = false;
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
-> Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/display/exynos4210_fimd.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/display/exynos4210_fimd.c b/hw/display/exynos4210_fimd.c
-> index c1071ecd46..05d3265b76 100644
-> --- a/hw/display/exynos4210_fimd.c
-> +++ b/hw/display/exynos4210_fimd.c
-> @@ -1310,7 +1310,6 @@ static void exynos4210_fimd_update(void *opaque)
->                  }
->                  host_fb_addr += inc_size;
->                  fb_line_addr += inc_size;
-> -                is_dirty = false;
->              }
->              g_free(snap);
->              blend = true;
-> 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   |  33 ++++++
+ target/riscv/insn32.decode              |  10 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 108 ++++++++++++++++++
+ target/riscv/vector_helper.c            | 140 ++++++++++++++++++++++++
+ 4 files changed, 291 insertions(+)
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 1256defb6c..72c733bf49 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -339,3 +339,36 @@ DEF_HELPER_6(vwadd_wx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsub_wx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsub_wx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsub_wx_w, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmadc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vvm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vvm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vvm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vvm_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmadc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vxm_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vxm_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vxm_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmsbc_vxm_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 4bdbfd16fa..e8ddf95d3d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -300,6 +300,16 @@ vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
+ vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
+ vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
+ vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
++vadc_vvm        010000 1 ..... ..... 000 ..... 1010111 @r
++vadc_vxm        010000 1 ..... ..... 100 ..... 1010111 @r
++vadc_vim        010000 1 ..... ..... 011 ..... 1010111 @r
++vmadc_vvm       010001 1 ..... ..... 000 ..... 1010111 @r
++vmadc_vxm       010001 1 ..... ..... 100 ..... 1010111 @r
++vmadc_vim       010001 1 ..... ..... 011 ..... 1010111 @r
++vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r
++vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r
++vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r
++vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 7f6fe82fb3..a1f2e84eb8 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1104,3 +1104,111 @@ GEN_OPIWX_WIDEN_TRANS(vwaddu_wx)
+ GEN_OPIWX_WIDEN_TRANS(vwadd_wx)
+ GEN_OPIWX_WIDEN_TRANS(vwsubu_wx)
+ GEN_OPIWX_WIDEN_TRANS(vwsub_wx)
++
++/* OPIVV with UNMASKED */
++#define GEN_OPIVV_R_TRANS(NAME, CHECK)                             \
++static bool trans_##NAME(DisasContext *s, arg_r *a)                \
++{                                                                  \
++    if (CHECK(s, a)) {                                             \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_4_ptr * const fns[4] = {            \
++            gen_helper_##NAME##_b, gen_helper_##NAME##_h,          \
++            gen_helper_##NAME##_w, gen_helper_##NAME##_d,          \
++        };                                                         \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++            vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),              \
++            cpu_env, 0, s->vlen / 8, data, fns[s->sew]);           \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++/*
++ * For vadc and vsbc, an illegal instruction exception is raised if the
++ * destination vector register is v0 and LMUL > 1. (Section 12.3)
++ */
++static bool opivv_vadc_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            ((a->rd != 0) || (s->lmul == 0)));
++}
++GEN_OPIVV_R_TRANS(vadc_vvm, opivv_vadc_check)
++GEN_OPIVV_R_TRANS(vsbc_vvm, opivv_vadc_check)
++
++/*
++ * For vmadc and vmsbc, an illegal instruction exception is raised if the
++ * destination vector register overlaps a source vector register group.
++ */
++static bool opivv_vmadc_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
++            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
++}
++GEN_OPIVV_R_TRANS(vmadc_vvm, opivv_vmadc_check)
++GEN_OPIVV_R_TRANS(vmsbc_vvm, opivv_vmadc_check)
++
++/* OPIVX with UNMASKED */
++#define GEN_OPIVX_R_TRANS(NAME, CHECK)                                   \
++static bool trans_##NAME(DisasContext *s, arg_r *a)                      \
++{                                                                        \
++    if (CHECK(s, a)) {                                                   \
++        uint32_t data = 0;                                               \
++        static gen_helper_opivx const fns[4] = {                         \
++            gen_helper_##NAME##_b, gen_helper_##NAME##_h,                \
++            gen_helper_##NAME##_w, gen_helper_##NAME##_d,                \
++        };                                                               \
++                                                                         \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);                   \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                   \
++        return opivx_trans(a->rd, a->rs1, a->rs2, data, fns[s->sew], s); \
++    }                                                                    \
++    return false;                                                        \
++}
++
++static bool opivx_vadc_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            ((a->rd != 0) || (s->lmul == 0)));
++}
++GEN_OPIVX_R_TRANS(vadc_vxm, opivx_vadc_check)
++GEN_OPIVX_R_TRANS(vsbc_vxm, opivx_vadc_check)
++
++static bool opivx_vmadc_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul));
++}
++GEN_OPIVX_R_TRANS(vmadc_vxm, opivx_vmadc_check)
++GEN_OPIVX_R_TRANS(vmsbc_vxm, opivx_vmadc_check)
++
++/* OPIVI without GVEC IR */
++#define GEN_OPIVI_R_TRANS(NAME, ZX, OPIVX, CHECK)                        \
++static bool trans_##NAME(DisasContext *s, arg_r *a)                      \
++{                                                                        \
++    if (CHECK(s, a)) {                                                   \
++        uint32_t data = 0;                                               \
++        static gen_helper_opivx const fns[4] = {                         \
++            gen_helper_##OPIVX##_b, gen_helper_##OPIVX##_h,              \
++            gen_helper_##OPIVX##_w, gen_helper_##OPIVX##_d,              \
++        };                                                               \
++                                                                         \
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);                   \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                   \
++        return opivi_trans(a->rd, a->rs1, a->rs2, data,                  \
++                fns[s->sew], s, ZX);                                     \
++    }                                                                    \
++    return false;                                                        \
++}
++GEN_OPIVI_R_TRANS(vadc_vim, 0, vadc_vxm, opivx_vadc_check)
++GEN_OPIVI_R_TRANS(vmadc_vim, 0, vmadc_vxm, opivx_vmadc_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 00eaebee9f..dd85b94fe7 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -185,6 +185,14 @@ static void clearq(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
+     vext_clear(cur, cnt, tot);
+ }
+ 
++static inline void vext_set_elem_mask(void *v0, int mlen, int index,
++        uint8_t value)
++{
++    int idx = (index * mlen) / 64;
++    int pos = (index * mlen) % 64;
++    uint64_t old = ((uint64_t *)v0)[idx];
++    ((uint64_t *)v0)[idx] = deposit64(old, pos, mlen, value);
++}
+ 
+ static inline int vext_elem_mask(void *v0, int mlen, int index)
+ {
+@@ -1062,3 +1070,135 @@ GEN_VEXT_VX(vwsub_wx_b, 1, 2, clearh)
+ GEN_VEXT_VX(vwsub_wx_h, 2, 4, clearl)
+ GEN_VEXT_VX(vwsub_wx_w, 4, 8, clearq)
+ 
++#define DO_VADC(N, M, C) (N + M + C)
++#define DO_VSBC(N, M, C) (N - M - C)
++
++#define GEN_VEXT_VADC_VVM(NAME, ETYPE, H, DO_OP, CLEAR_FN)    \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
++        CPURISCVState *env, uint32_t desc)                    \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vl = env->vl;                                    \
++    uint32_t esz = sizeof(ETYPE);                             \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                  \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
++                                                              \
++        *((ETYPE *)vd + H(i)) = DO_OP(s2, s1, carry);         \
++    }                                                         \
++    if (i != 0) {                                             \
++        CLEAR_FN(vd, vl, vl * esz, vlmax * esz);              \
++    }                                                         \
++}
++GEN_VEXT_VADC_VVM(vadc_vvm_b, uint8_t,  H1, DO_VADC, clearb)
++GEN_VEXT_VADC_VVM(vadc_vvm_h, uint16_t, H2, DO_VADC, clearh)
++GEN_VEXT_VADC_VVM(vadc_vvm_w, uint32_t, H4, DO_VADC, clearl)
++GEN_VEXT_VADC_VVM(vadc_vvm_d, uint64_t, H8, DO_VADC, clearq)
++
++GEN_VEXT_VADC_VVM(vsbc_vvm_b, uint8_t,  H1, DO_VSBC, clearb)
++GEN_VEXT_VADC_VVM(vsbc_vvm_h, uint16_t, H2, DO_VSBC, clearh)
++GEN_VEXT_VADC_VVM(vsbc_vvm_w, uint32_t, H4, DO_VSBC, clearl)
++GEN_VEXT_VADC_VVM(vsbc_vvm_d, uint64_t, H8, DO_VSBC, clearq)
++
++#define GEN_VEXT_VADC_VXM(NAME, ETYPE, H, DO_OP, CLEAR_FN)               \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,        \
++        CPURISCVState *env, uint32_t desc)                               \
++{                                                                        \
++    uint32_t mlen = vext_mlen(desc);                                     \
++    uint32_t vl = env->vl;                                               \
++    uint32_t esz = sizeof(ETYPE);                                        \
++    uint32_t vlmax = vext_maxsz(desc) / esz;                             \
++    uint32_t i;                                                          \
++                                                                         \
++    for (i = 0; i < vl; i++) {                                           \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                               \
++        uint8_t carry = vext_elem_mask(v0, mlen, i);                     \
++                                                                         \
++        *((ETYPE *)vd + H(i)) = DO_OP(s2, (ETYPE)(target_long)s1, carry);\
++    }                                                                    \
++    if (i != 0) {                                                        \
++        CLEAR_FN(vd, vl, vl * esz, vlmax * esz);                         \
++    }                                                                    \
++}
++GEN_VEXT_VADC_VXM(vadc_vxm_b, uint8_t,  H1, DO_VADC, clearb)
++GEN_VEXT_VADC_VXM(vadc_vxm_h, uint16_t, H2, DO_VADC, clearh)
++GEN_VEXT_VADC_VXM(vadc_vxm_w, uint32_t, H4, DO_VADC, clearl)
++GEN_VEXT_VADC_VXM(vadc_vxm_d, uint64_t, H8, DO_VADC, clearq)
++
++GEN_VEXT_VADC_VXM(vsbc_vxm_b, uint8_t,  H1, DO_VSBC, clearb)
++GEN_VEXT_VADC_VXM(vsbc_vxm_h, uint16_t, H2, DO_VSBC, clearh)
++GEN_VEXT_VADC_VXM(vsbc_vxm_w, uint32_t, H4, DO_VSBC, clearl)
++GEN_VEXT_VADC_VXM(vsbc_vxm_d, uint64_t, H8, DO_VSBC, clearq)
++
++#define DO_MADC(N, M, C) ((__typeof(N))(N + M + C) < N ? 1 : 0)
++#define DO_MSBC(N, M, C) ((__typeof(N))(N - M - C) > N ? 1 : 0)
++
++#define GEN_VEXT_VMADC_VVM(NAME, ETYPE, H, DO_OP)             \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
++        CPURISCVState *env, uint32_t desc)                    \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vl = env->vl;                                    \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
++                                                              \
++        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1, carry));\
++    }                                                         \
++    if (i == 0) {                                             \
++        return;                                               \
++    }                                                         \
++    for (; i < vlmax; i++) {                                  \
++        vext_set_elem_mask(vd, mlen, i, 0);                   \
++    }                                                         \
++}
++GEN_VEXT_VMADC_VVM(vmadc_vvm_b, uint8_t,  H1, DO_MADC)
++GEN_VEXT_VMADC_VVM(vmadc_vvm_h, uint16_t, H2, DO_MADC)
++GEN_VEXT_VMADC_VVM(vmadc_vvm_w, uint32_t, H4, DO_MADC)
++GEN_VEXT_VMADC_VVM(vmadc_vvm_d, uint64_t, H8, DO_MADC)
++
++GEN_VEXT_VMADC_VVM(vmsbc_vvm_b, uint8_t,  H1, DO_MSBC)
++GEN_VEXT_VMADC_VVM(vmsbc_vvm_h, uint16_t, H2, DO_MSBC)
++GEN_VEXT_VMADC_VVM(vmsbc_vvm_w, uint32_t, H4, DO_MSBC)
++GEN_VEXT_VMADC_VVM(vmsbc_vvm_d, uint64_t, H8, DO_MSBC)
++
++#define GEN_VEXT_VMADC_VXM(NAME, ETYPE, H, DO_OP)             \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1,        \
++        void *vs2, CPURISCVState *env, uint32_t desc)         \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vl = env->vl;                                    \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        uint8_t carry = vext_elem_mask(v0, mlen, i);          \
++                                                              \
++        vext_set_elem_mask(vd, mlen, i,                       \
++                DO_OP(s2, (ETYPE)(target_long)s1, carry));    \
++    }                                                         \
++    if (i == 0) {                                             \
++        return;                                               \
++    }                                                         \
++    for (; i < vlmax; i++) {                                  \
++        vext_set_elem_mask(vd, mlen, i, 0);                   \
++    }                                                         \
++}
++GEN_VEXT_VMADC_VXM(vmadc_vxm_b, uint8_t,  H1, DO_MADC)
++GEN_VEXT_VMADC_VXM(vmadc_vxm_h, uint16_t, H2, DO_MADC)
++GEN_VEXT_VMADC_VXM(vmadc_vxm_w, uint32_t, H4, DO_MADC)
++GEN_VEXT_VMADC_VXM(vmadc_vxm_d, uint64_t, H8, DO_MADC)
++
++GEN_VEXT_VMADC_VXM(vmsbc_vxm_b, uint8_t,  H1, DO_MSBC)
++GEN_VEXT_VMADC_VXM(vmsbc_vxm_h, uint16_t, H2, DO_MSBC)
++GEN_VEXT_VMADC_VXM(vmsbc_vxm_w, uint32_t, H4, DO_MSBC)
++GEN_VEXT_VMADC_VXM(vmsbc_vxm_d, uint64_t, H8, DO_MSBC)
+-- 
+2.23.0
+
 
