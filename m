@@ -6,41 +6,40 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B93C1C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867B3C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:09:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FCF220675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:59:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCF220675
+	by mail.kernel.org (Postfix) with ESMTPS id 5A1AE2072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:09:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1AE2072A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBI0V-0002j0-PK
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36186)
+	id 1jBIAN-0005t5-II
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:09:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHzV-0001qe-04
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:58:41 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBI9h-0005Ss-KA
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHzU-0003DE-1o
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:58:40 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:57871)
+ (envelope-from <laurent@vivier.eu>) id 1jBI9g-0001Ip-89
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:09:13 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:52215)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHzR-0002se-Nj; Mon, 09 Mar 2020 08:58:37 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jBI9f-0001Fk-Vf
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:09:12 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MaIKJ-1ioTdZ13pN-00WBoM; Mon, 09 Mar 2020 13:58:20 +0100
-Subject: Re: [PATCH v3 12/12] monitor/hmp-cmds: Remove redundant statement in
- hmp_rocker_of_dpa_groups()
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-14-kuhn.chenqun@huawei.com>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M1IRY-1jCvm42NFS-002kki; Mon, 09 Mar 2020 14:08:34 +0100
+Subject: Re: [PATCH 1/2] cpu: Do not reset a vCPU before it is created
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200309121103.20234-1-philmd@redhat.com>
+ <20200309121103.20234-2-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,34 +83,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <fe2b84b3-93ff-a6df-9388-719803c954b7@vivier.eu>
-Date: Mon, 9 Mar 2020 13:58:17 +0100
+Message-ID: <50859eef-ba76-40f1-0f21-7738219d7a9a@vivier.eu>
+Date: Mon, 9 Mar 2020 14:08:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200302130715.29440-14-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200309121103.20234-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:E32NhFaeTPHpiVQ1ZBd/5wiod/tKjk1YAlRMzcjfSVkd4WT7y8e
- nEDi6Vxw9JAQPp1Am+IdFkSASD6QqOA3mdvlUfmFJkzQJIoYlG6jyfteSdeoYi7Bzah8iHn
- D5bY5cyd0e5+Bg93xIKrP4lsIa32Wq7H87gjVtE8nxuOTdtttaO7iaH7PWRFc5aMPehtwNv
- Rh2g/Q+vV43AlC4dYp+XA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WZw401g3j08=:EnPEtUuHREm4uYj4WPJAAs
- /HsUQdu2QcxOmGxQKwyhIkIDnn1jX86tnahGMTABH1aFBzwVc8erlau6FSHTbW1rx5WNwF4F3
- MEupfxg/BlGJXlpm9NtBrSr+c8MkhluYBmNfiM08Gac8sabMUgC4spkuyAy81u8YThgoG4pn9
- plcykjX6OkK3AMVZoLhzGMDRgWqFYz3B2B4Qjx3lkxuyFxVzMS4Vf0hmpYh0OCJCSQN4zFcWR
- TEVceNDgILa2oL4zkeQBvoIjoH8WLf6/7vnGInURZNx4yL8acbIIkB3zAzEDbz0PUHNAI9FSX
- msr/fgBClUwPUFcBStBH6hLahvjD2voJWj0BYJe9lW9q5e//Xxt1fqMBA73CWXtzuhCwXxJkT
- NhgqYEJVdZe/6YYAuOUlrVKERQIIbtWMdOcLnGjHZomAOjQuz4b0ISrIwExXWv1B1dW6ge+HJ
- N6F692tIvk0nk/BMVuPuWCKAx7cBAsvX0lw4+T/23wfNK0bTlek9tzh78zk1RW8kT6FDuRSVO
- HK+rfGQbpdvPS9szIbSUHDGKoNF0Snd66OIghnh1XT+TiQh9vadxbOULz42HVx89E2dIAmlPD
- VrpvFbKvQkYvESsXrm8CYrOBLpFXA7Cgq7PcsWnqgage/wM747miTmWiLZlkxZsrq43UoNzkw
- bUDaoxmieF2RmDDbEe9PDlPk6Er6JBjATZr6oZtwYrdtWDDlYazMB3pV40g9CRHd3Gps2DxUa
- kLA+LA4iqnBoHcQxmEyLP8Er4/nMSmoRnm9LaO/ppy1V8k5eX6T4T9hbAfEQAJhdW/ZuBEJx7
- eiBSFBikBKuHkRUtIy2VPI1/4rbTPifKAlXNHczlAlDhrUmt9NsKOnKL9CVxyeXznXTlr+h
+X-Provags-ID: V03:K1:FCfRZqqNFgrspElZJJ/JqH7asw0mQCh+m8agYT61lUu6IS3TW6E
+ 9Dl3RQZ2Rcm62oauoS7o/hDAHlvuEPYMS8a6ckhp7yEQwMu7QlTS5jxYIqz7gX3kMt2zFGG
+ cS2tS+mxEqDH52iuTx+QIYvs1l+246Hi6cFuV3vzu7koXc5kT3nw3wPyszPiFNpwpQzUT/J
+ IaqVJiJEkLnie2wTNh1xQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qzhWhxRzmGo=:lG6qmr6v2y4YBe20mjsh9R
+ 0jjh73yR/b9xYyJxlt+3dxrIDMt3JJgDBTzadwDOGlLjB3KTfXHoJgMBRQg/FhWAplmZnbOVL
+ DkxSOdgc73D5RLLxvtYao6GHZA1zrqd/R9OF7I58lIaj7T8nJkPbCCN0VI39TZuxM7vkI8nss
+ bAYpPp075vB3RAwXk5WhIv9eLvf0f0ePj+l1lqILjp00jdoMBtVIvOXDZW6fTlHtesyf9kTLu
+ rgkv+3YUdNuFw/8V/FojPT7NNCCIqlFGMdKXnVuYslNDKcVQQN3HBLpQb/hKR+jlMmUsheijj
+ W2pZ2Oea2puziy2nviDD69wPm0amZ9kR6E47Aims6XwPqcrbvrSkGij0HuDdraMqDfI3Fx5hW
+ Xf08mzwMbDMN11nz5z7/oGxlwHCvFnJF1ecfEBBF/3UCzyfbIT+pmzrUxhoXwanUxoVDEK9PA
+ N4PnmLYuCNiQatkwCP6z8FHMJIkB7Wh+olR9Ixq4SpOm66FfhrOx1RtM05CJu/t5Cdrvzo5ei
+ zC5Ae/XN+t2bi81cKiXUJJSJbtTufh3IsAJIOIPFYfOu/xRAN+Q//7grfi07czJ8ZdE3Ip4Co
+ cCYJ6X7cDtSmicqbYGgXaxS8QWwI7lb8r+zlRlWHJaywAujeZUTDLoVQ+l6fptU/F6+SVVHG+
+ 6U1dxcrpZoVu2zxJQ/RtpY7R50nV+dpNPBfRdKOag7avdZiwsYvsk/5uVApIYAHEt4KcBFRnZ
+ zOblcx+/j1U/exuCWkitrpn0YTj+/l+vrEt3ULEj/r6FtNCrlNJOmfmZ+A3Mz/By+cKv1uI7X
+ tWHagXPa7zD+ZzjrMY1xpeY6ugyrL647Xh1sVMASkhSwR12m4Xq//eQLOURLTSEvkCo5iyJ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,71 +122,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Euler Robot <euler.robot@huawei.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- zhang.zhanghailiang@huawei.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Michael Walle <michael@walle.cc>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/03/2020 à 14:07, Chen Qun a écrit :
-> Clang static code analyzer show warning:
-> monitor/hmp-cmds.c:2867:17: warning: Value stored to 'set' is never read
->                 set = true;
->                 ^     ~~~~
+Le 09/03/2020 à 13:11, Philippe Mathieu-Daudé a écrit :
+> cpu_reset() might modify architecture-specific fields allocated
+> by qemu_init_vcpu(). To avoid bugs similar to the one fixed in
+> commit 00d0f7cb66 when introducing new architectures, move the
+> cpu_reset() calls after qemu_init_vcpu().
 > 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+>  target/cris/cpu.c    | 2 +-
+>  target/lm32/cpu.c    | 3 +--
+>  target/m68k/cpu.c    | 2 +-
+>  target/mips/cpu.c    | 2 +-
+>  target/sh4/cpu.c     | 2 +-
+>  target/tilegx/cpu.c  | 2 +-
+>  target/tricore/cpu.c | 2 +-
+>  7 files changed, 7 insertions(+), 8 deletions(-)
 > 
-> v1->v2: move the 'set' declaration to the for() statement(Base on Philippe's suggestion).
-> ---
->  monitor/hmp-cmds.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 53bc3f76c4..c6b0495822 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -2808,7 +2808,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
->      const char *name = qdict_get_str(qdict, "name");
->      uint8_t type = qdict_get_try_int(qdict, "type", 9);
->      Error *err = NULL;
-> -    bool set = false;
+> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> index 17c6712e29..9b8b99840d 100644
+> --- a/target/cris/cpu.c
+> +++ b/target/cris/cpu.c
+> @@ -134,8 +134,8 @@ static void cris_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
+>      }
 >  
->      list = qmp_query_rocker_of_dpa_groups(name, type != 9, type, &err);
->      if (err != NULL) {
-> @@ -2820,6 +2819,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
 >  
->      for (g = list; g; g = g->next) {
->          RockerOfDpaGroup *group = g->value;
-> +        bool set = false;
+>      ccc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+> index 687bf35e65..56f7b97c8f 100644
+> --- a/target/lm32/cpu.c
+> +++ b/target/lm32/cpu.c
+> @@ -132,9 +132,8 @@ static void lm32_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
+>      }
 >  
->          monitor_printf(mon, "0x%08x", group->id);
->  
-> @@ -2864,14 +2864,11 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
->  
->          if (group->has_set_eth_dst) {
->              if (!set) {
-> -                set = true;
->                  monitor_printf(mon, " set");
->              }
->              monitor_printf(mon, " dst %s", group->set_eth_dst);
->          }
->  
-> -        set = false;
+> -    cpu_reset(cs);
 > -
->          if (group->has_ttl_check && group->ttl_check) {
->              monitor_printf(mon, " check TTL");
->          }
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      lcc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+> index f0653cda2f..51ca62694e 100644
+> --- a/target/m68k/cpu.c
+> +++ b/target/m68k/cpu.c
+> @@ -247,8 +247,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
+>  
+>      m68k_cpu_init_gdb(cpu);
+>  
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      mcc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> index 6cd6b9650b..553945005f 100644
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -149,8 +149,8 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+>  
+>      cpu_mips_realize_env(&cpu->env);
+>  
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      mcc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+> index 70c8d8170f..2564436719 100644
+> --- a/target/sh4/cpu.c
+> +++ b/target/sh4/cpu.c
+> @@ -184,8 +184,8 @@ static void superh_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      scc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+> index cd422a0467..7e9982197f 100644
+> --- a/target/tilegx/cpu.c
+> +++ b/target/tilegx/cpu.c
+> @@ -91,8 +91,8 @@ static void tilegx_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      tcc->parent_realize(dev, errp);
+>  }
+> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+> index 85bc9f03a1..c5a5d54569 100644
+> --- a/target/tricore/cpu.c
+> +++ b/target/tricore/cpu.c
+> @@ -94,8 +94,8 @@ static void tricore_cpu_realizefn(DeviceState *dev, Error **errp)
+>      if (tricore_feature(env, TRICORE_FEATURE_131)) {
+>          set_feature(env, TRICORE_FEATURE_13);
+>      }
+> -    cpu_reset(cs);
+>      qemu_init_vcpu(cs);
+> +    cpu_reset(cs);
+>  
+>      tcc->parent_realize(dev, errp);
+>  }
 > 
 
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
