@@ -2,77 +2,51 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B41C9C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74A0C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:44:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B59E20675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:40:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWIhsca3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B59E20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7712D20675
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:44:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7712D20675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sysgo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGlg-0006oF-Lk
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:40:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50421)
+	id 1jBGpZ-00083U-MP
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:44:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1jBGkr-0006Hr-ND
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:39:31 -0400
+ (envelope-from <roman.kapl@sysgo.com>) id 1jBGou-0007f1-DY
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1jBGkp-0002zw-Q7
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:39:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29881
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1jBGko-0002xt-S0
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:39:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583753965;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vzdnHWsQf6HWX3tws9aR3pcgbPwXvsackPOxGGljIdY=;
- b=dWIhsca3pbxwksppUxePU8Sx1wO7nwHXybsdyXbvNaOzddUbek5WgJ/KqxjNDFgwAeKjWn
- bTN/3gFZ0kQiBjN+otkFON62iPY+yQN+t9K9N7xJTb90MdpbH0M0Cipe7YbGtfmwQ0JW9d
- GFtLlaR3MBTEtIOM0EMdP3QqIHxxTfg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-7SuXIaPwOC6bzdu1ewkhPw-1; Mon, 09 Mar 2020 07:39:24 -0400
-X-MC-Unique: 7SuXIaPwOC6bzdu1ewkhPw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51A2A107ACC4;
- Mon,  9 Mar 2020 11:39:22 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5AC560BE2;
- Mon,  9 Mar 2020 11:39:16 +0000 (UTC)
-Date: Mon, 9 Mar 2020 12:39:14 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v4 07/13] arm/arm64: ITS:
- its_enable_defaults
-Message-ID: <20200309113914.pg5522tvwazgrfec@kamzik.brq.redhat.com>
-References: <20200309102420.24498-1-eric.auger@redhat.com>
- <20200309102420.24498-8-eric.auger@redhat.com>
+ (envelope-from <roman.kapl@sysgo.com>) id 1jBGoq-0004uP-Gp
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:39 -0400
+Received: from mail.sysgo.com ([176.9.12.79]:57720)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <roman.kapl@sysgo.com>) id 1jBGop-0004uE-Va
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:36 -0400
+Subject: Re: [PATCH] vfio: avoid SET_ACTION_TRIGGER ioctls
+To: qemu-devel@nongnu.org
+References: <20200228120800.5979-1-rka@sysgo.com>
+ <20200305153735.238a9ddd@w520.home>
+From: Roman Kapl <roman.kapl@sysgo.com>
+Message-ID: <734a8a2f-4659-c0e3-8c6f-8df8a3b6a75a@sysgo.com>
+Date: Mon, 9 Mar 2020 12:43:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200309102420.24498-8-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200305153735.238a9ddd@w520.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 176.9.12.79
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,263 +58,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 09, 2020 at 11:24:14AM +0100, Eric Auger wrote:
-> its_enable_defaults() enable LPIs at distributor level
-> and ITS level.
+On 3/5/20 11:37 PM, Alex Williamson wrote:
+> On Fri, 28 Feb 2020 13:08:00 +0100
+> Roman Kapl <rka@sysgo.com> wrote:
 > 
-> gicv3_enable_defaults must be called before.
+>> For MSI-X interrupts, remember what the last used eventfd was (KVM
+>> bypass vs QEMU) and only call vfio_set_irq_signaling if it has changed.
+>>
+>> This not only helps with performance, but it seems that interrupts can
+>> be lost during VFIO_IRQ_SET_ACTION_TRIGGER. With the 'x-no-kvm-msix'
+>> switch and this patch, SET_ACTION_TRIGGER is not called during
+>> mask/unmask. This really only affects guests that actively use MSI-X masking.
+>>
+>> Signed-off-by: Roman Kapl <rka@sysgo.com>
+>> ---
+>>
+>> This patch scratches my particular itch. I am able to get our guest (which masks
+>> MSI on each interrupt) running, without getting randomly stuck on waiting for
+>> interrupt. However, the solution is far from perfect (x-no-kvm-msix is required)
+>> and pretty slow. I would be interested in hearing any ideas how to improve this.
+>> Some ideas:
+>>
+>> 1) Fix the kernel so that SET_ACTION_TRIGGER does not loose interrupts (I think
+>> the problem is there, but not 100% sure). I've tested on 5.3.0-40-generic
+>> #32~18.04.1-Ubuntu SMP.
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> I'd be curious if this (yet unmerged) series resolve this:
 > 
-> ---
-> v3 -> v4:
-> - use GITS_BASER_INDIRECT & GITS_BASER_VALID in its_setup_baser()
-> - don't parse BASERs again in its_enable_defaults
-> - rename its_setup_baser into its_baser_alloc_table
-> - All allocations moved to the init function
-> - squashed "arm/arm64: gicv3: Enable/Disable LPIs at re-distributor level"
->   into this patch
-> - introduce gicv3_lpi_rdist_enable and gicv3_lpi_rdist_disable
-> - pend and prop table bases stored as virt addresses
-> - move some init functions from enable() to its_init
-> - removed GICR_PROPBASER_IDBITS_MASK
-> - introduced LPI_OFFSET
-> - lpi_prop becomes u8 *
-> - gicv3_lpi_set_config/get_config became macro
-> - renamed gicv3_lpi_set_pending_table_bit into gicv3_lpi_set_clr_pending
+> https://lore.kernel.org/lkml/cover.1567394624.git.luoben@linux.alibaba.com/
+
+Indeed it does. Thanks for pointing out this patch. This seems to nicely 
+fix the underlying issue and thus QEMU now work both with and without 
+KVM bypass.
+
+>   
+>> 2) Add support for MASK/UNMASK for MSI-X in kernel and use that. But I don't
+>> know how to do PBA in that case. Another IOCTL? We could look at the real PBA
+>> array, if mapping is supported, but that seems hacky.
 > 
-> v2 -> v3:
-> - introduce its_setup_baser in this patch
-> - squash "arm/arm64: ITS: Init the command queue" in this patch.
-> ---
->  lib/arm/asm/gic-v3.h       | 28 +++++++++++------
->  lib/arm/gic-v3.c           | 64 ++++++++++++++++++++++----------------
->  lib/arm64/asm/gic-v3-its.h |  1 +
->  lib/arm64/gic-v3-its.c     | 16 ++++++++--
->  4 files changed, 71 insertions(+), 38 deletions(-)
+> That lack of a masking API in the host kernel is part of the reason we
+> take the hacky approach of emulating the PBA in QEMU.  We could have
+> the PBA MemoryRegion do a pread() from the device, but if we're doing
+> some ioctls on every un/mask, we're probably already digging ourselves
+> out of a hole.
 > 
-> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-> index 12134ef..ea9ae8e 100644
-> --- a/lib/arm/asm/gic-v3.h
-> +++ b/lib/arm/asm/gic-v3.h
-> @@ -50,15 +50,16 @@
->  #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
->  	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
->  
-> -#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
-> +#define GICR_PENDBASER_PTZ		BIT_ULL(62)
->  
-> -#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
-> +#define LPI_PROP_GROUP1			(1 << 1)
-> +#define LPI_PROP_ENABLED		(1 << 0)
-> +#define LPI_PROP_DEFAULT_PRIO		0xa0
-> +#define LPI_PROP_DEFAULT		(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
->  
-> -#define LPI_PROP_GROUP1		(1 << 1)
-> -#define LPI_PROP_ENABLED	(1 << 0)
-> -#define LPI_PROP_DEFAULT_PRIO   0xa0
-> -#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
-> -				 LPI_PROP_ENABLED)
-> +#define LPI_ID_BASE			8192
-> +#define LPI(lpi)			((lpi) + LPI_ID_BASE)
-> +#define LPI_OFFSET(intid)		((intid) - LPI_ID_BASE)
->  
->  #include <asm/arch_gicv3.h>
->  
-> @@ -76,7 +77,7 @@ struct gicv3_data {
->  	void *dist_base;
->  	void *redist_bases[GICV3_NR_REDISTS];
->  	void *redist_base[NR_CPUS];
-> -	void *lpi_prop;
-> +	u8 *lpi_prop;
->  	void *lpi_pend[NR_CPUS];
->  	unsigned int irq_nr;
->  };
-> @@ -96,8 +97,10 @@ extern void gicv3_ipi_send_mask(int irq, const cpumask_t *dest);
->  extern void gicv3_set_redist_base(size_t stride);
->  extern void gicv3_lpi_set_config(int n, u8 val);
->  extern u8 gicv3_lpi_get_config(int n);
-> -extern void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set);
-> +extern void gicv3_lpi_set_clr_pending(int rdist, int n, bool set);
->  extern void gicv3_lpi_alloc_tables(void);
-> +extern void gicv3_lpi_rdist_enable(int redist);
-> +extern void gicv3_lpi_rdist_disable(int redist);
->  
->  static inline void gicv3_do_wait_for_rwp(void *base)
->  {
-> @@ -143,5 +146,12 @@ static inline u64 mpidr_uncompress(u32 compressed)
->  	return mpidr;
->  }
->  
-> +#define gicv3_lpi_set_config(intid, value) ({		\
-> +	gicv3_data.lpi_prop[LPI_OFFSET(intid)] = value; \
-> +})
-> +
-> +#define gicv3_lpi_get_config(intid) (gicv3_data.lpi_prop[LPI_OFFSET(intid)])
-> +
-> +
->  #endif /* !__ASSEMBLY__ */
->  #endif /* _ASMARM_GIC_V3_H_ */
-> diff --git a/lib/arm/gic-v3.c b/lib/arm/gic-v3.c
-> index 949a986..a3b55b2 100644
-> --- a/lib/arm/gic-v3.c
-> +++ b/lib/arm/gic-v3.c
-> @@ -150,7 +150,14 @@ void gicv3_ipi_send_single(int irq, int cpu)
->  }
->  
->  #if defined(__aarch64__)
-> -/* alloc_lpi_tables: Allocate LPI config and pending tables */
-> +
-> +/**
-> + * alloc_lpi_tables - Allocate LPI config and pending tables
-> + * and set PROPBASER (shared by all rdistributors) and per
-> + * redistributor PENDBASER.
-> + *
-> + * gicv3_set_redist_base() must be called before
-> + */
->  void gicv3_lpi_alloc_tables(void)
->  {
->  	unsigned long n = SZ_64K >> PAGE_SHIFT;
-> @@ -161,13 +168,9 @@ void gicv3_lpi_alloc_tables(void)
->  	gicv3_data.lpi_prop = alloc_pages(order);
->  
->  	/* ID bits = 13, ie. up to 14b LPI INTID */
-> -	prop_val = (u64)virt_to_phys(gicv3_data.lpi_prop) | 13;
-> +	prop_val = (u64)(virt_to_phys(gicv3_data.lpi_prop)) | 13;
->  
-> -	/*
-> -	 * Allocate pending tables for each redistributor
-> -	 * and set PROPBASER and PENDBASER
-> -	 */
-> -	for_each_present_cpu(cpu) {
-> +	for (cpu = 0; cpu < nr_cpus; cpu++) {
+> It would be interesting to see if the series above prevents dropping
+> interrupts, how it compares with the reduced ioctls + QEMU handling you
+> have here.
 
-You don't mention this change in the changelog. What's wrong with
-using for_each_present_cpu() here?
+Unfortunately I was not able to get any reasonable performance data 
+here, because in the interrupt latency seems to be pretty bad (cca 1.5ms 
+- 2ms) in all three options I've tried: no-KVM-bypass, KVM-bypass, 
+no-KVM-bypass + my patch). So saving one IOCTL does not really make a 
+dent in that.
 
->  		u64 pend_val;
->  		void *ptr;
->  
-> @@ -176,30 +179,14 @@ void gicv3_lpi_alloc_tables(void)
->  		writeq(prop_val, ptr + GICR_PROPBASER);
->  
->  		gicv3_data.lpi_pend[cpu] = alloc_pages(order);
-> -
-> -		pend_val = (u64)virt_to_phys(gicv3_data.lpi_pend[cpu]);
-> -
-> +		pend_val = (u64)(virt_to_phys(gicv3_data.lpi_pend[cpu]));
->  		writeq(pend_val, ptr + GICR_PENDBASER);
->  	}
->  }
->  
-> -void gicv3_lpi_set_config(int n, u8 value)
-> +void gicv3_lpi_set_clr_pending(int rdist, int n, bool set)
->  {
-> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-> -
-> -	*entry = value;
-> -}
-> -
-> -u8 gicv3_lpi_get_config(int n)
-> -{
-> -	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-> -
-> -	return *entry;
-> -}
-> -
-> -void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
-> -{
-> -	u8 *ptr = phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
-> +	u8 *ptr = gicv3_data.lpi_pend[rdist];
+If I will be able to find out why the latency is so bad, or reduce it, I 
+will get back.
 
-Alot of the changes above and in this patch in general look like cleanups
-that should have been squashed into the patches that introduced the lines
-in the first place.
+> 
+>> 3) Twiddle the bits behing kernel's back, if it can be mapped?
+> 
+> I'm not sure what you're thinking here, you mean mask vectors directly
+> on the device w/o a host kernel masking API and then read the PBA
+> directly from the device, mapping it directly to the guest if possible?
+> The MSI-X MMIO space can be mmapped by QEMU, we rely on interrupt
+> remmappers to protect us from malicious users.  QEMU certainly
+> shouldn't touch the vector or data fields, but masking might be
+> reasonably safe, then we could leave the KVM route in place.  I'm
+> afraid it might be difficult to integrate with QEMU MSI-X support
+> though.
 
->  	u8 mask = 1 << (n % 8), byte;
->  
->  	ptr += (n / 8);
-> @@ -210,4 +197,29 @@ void gicv3_lpi_set_pending_table_bit(int rdist, int n, bool set)
->  		byte &= ~mask;
->  	*ptr = byte;
->  }
-> +
-> +static void gicv3_lpi_rdist_ctrl(u32 redist, bool set)
-> +{
-> +	void *ptr;
-> +	u64 val;
-> +
-> +	assert(redist < nr_cpus);
-> +
-> +	ptr = gicv3_data.redist_base[redist];
-> +	val = readl(ptr + GICR_CTLR);
-> +	if (set)
-> +		val |= GICR_CTLR_ENABLE_LPIS;
-> +	else
-> +		val &= ~GICR_CTLR_ENABLE_LPIS;
-> +	writel(val,  ptr + GICR_CTLR);
-> +}
-> +
-> +void gicv3_lpi_rdist_enable(int redist)
-> +{
-> +	gicv3_lpi_rdist_ctrl(redist, true);
-> +}
-> +void gicv3_lpi_rdist_disable(int redist)
-> +{
-> +	gicv3_lpi_rdist_ctrl(redist, false);
-> +}
->  #endif /* __aarch64__ */
-> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> index 331ba0e..1e95977 100644
-> --- a/lib/arm64/asm/gic-v3-its.h
-> +++ b/lib/arm64/asm/gic-v3-its.h
-> @@ -88,5 +88,6 @@ extern struct its_data its_data;
->  extern void its_parse_typer(void);
->  extern void its_init(void);
->  extern int its_baser_lookup(int i, struct its_baser *baser);
-> +extern void its_enable_defaults(void);
->  
->  #endif /* _ASMARM64_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
-> index 23b0d06..2f480ae 100644
-> --- a/lib/arm64/gic-v3-its.c
-> +++ b/lib/arm64/gic-v3-its.c
-> @@ -94,9 +94,19 @@ void its_init(void)
->  	its_baser_alloc_table(&its_data.device_baser, SZ_64K);
->  	its_baser_alloc_table(&its_data.coll_baser, SZ_64K);
->  
-> -	/* Allocate LPI config and pending tables */
-> -	gicv3_lpi_alloc_tables();
-> -
->  	its_cmd_queue_init();
->  }
->  
-> +/* must be called after gicv3_enable_defaults */
-> +void its_enable_defaults(void)
-> +{
-> +	int i;
-> +
-> +	/* Allocate LPI config and pending tables */
-> +	gicv3_lpi_alloc_tables();
-> +
-> +	for (i = 0; i < nr_cpus; i++)
-> +		gicv3_lpi_rdist_enable(i);
-> +
-> +	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
-> +}
-> -- 
-> 2.20.1
->
+Yes, that's what I was thinking. But that's just an idea.
 
-Thanks,
-drew 
+> 
+>> Still, I think this patch does not hurt anything and could be applied if no-one
+>> can think of a better way.
+>>
+>> ---
+>>
+>>   hw/vfio/pci.c | 32 ++++++++++++++++++++++----------
+>>   hw/vfio/pci.h |  2 ++
+>>   2 files changed, 24 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index e6569a7968..5f7ce91519 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -390,12 +390,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
+>>            * MSI-X mask and pending bits are emulated, so we want to use the
+>>            * KVM signaling path only when configured and unmasked.
+>>            */
+>> -        if (vdev->msi_vectors[i].use) {
+>> -            if (vdev->msi_vectors[i].virq < 0 ||
+>> -                (msix && msix_is_masked(&vdev->pdev, i))) {
+>> -                fd = event_notifier_get_fd(&vdev->msi_vectors[i].interrupt);
+>> +        VFIOMSIVector *vector = &vdev->msi_vectors[i];
+>> +        if (vector->use) {
+>> +            if (vector->virq < 0 ||
+>> +                (msix && msix_is_masked(&vdev->pdev, i)))
+>> +            {
+>> +                vector->kvm_path_active = false;
+>> +                fd = event_notifier_get_fd(&vector->interrupt);
+>>               } else {
+>> -                fd = event_notifier_get_fd(&vdev->msi_vectors[i].kvm_interrupt);
+>> +                vector->kvm_path_active = true;
+>> +                fd = event_notifier_get_fd(&vector->kvm_interrupt);
+>>               }
+>>           }
+>>   
+>> @@ -509,17 +513,23 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
+>>       } else {
+>>           Error *err = NULL;
+>>           int32_t fd;
+>> +        bool kvm_path;
+>>   
+>>           if (vector->virq >= 0) {
+>>               fd = event_notifier_get_fd(&vector->kvm_interrupt);
+>> +            kvm_path = true;
+>>           } else {
+>>               fd = event_notifier_get_fd(&vector->interrupt);
+>> +            kvm_path = false;
+>>           }
+>>   
+>> -        if (vfio_set_irq_signaling(&vdev->vbasedev,
+>> -                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
+>> -                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+>> -            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        if (vector->kvm_path_active != kvm_path) {
+>> +            if (vfio_set_irq_signaling(&vdev->vbasedev,
+>> +                                       VFIO_PCI_MSIX_IRQ_INDEX, nr,
+>> +                                       VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+>> +                error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +            }
+>> +            vector->kvm_path_active = kvm_path;
+> 
+> 
+> Wouldn't this be more intuitive if we just cached the current fd on the
+> VFIOMSIVector object and created a vfio_set_irq_signaling() wrapper for
+> vectors that only calls through when the fd changes, updating the fd on
+> successful return otherwise?  AIUI, you're only trying to prevent
+> gratuitous calls to vfio_set_irq_signaling() when the eventfd remains
+> unchanged, which is the common case for your configuration of running
+> in QEMU interrupt mode.  Thanks,
 
+I am not against that. If we decide to apply the patch, I can replace 
+the two call sites with the wrapper. It's not applicable in 
+vfio_enable_vectors.
+
+> 
+> Alex
+
+Thanks for comments, Roman Kapl
+
+> 
+>>           }
+>>       }
+>>   
+>> @@ -555,13 +565,15 @@ static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
+>>        * core will mask the interrupt and set pending bits, allowing it to
+>>        * be re-asserted on unmask.  Nothing to do if already using QEMU mode.
+>>        */
+>> -    if (vector->virq >= 0) {
+>> +    if (vector->virq >= 0 && vector->kvm_path_active) {
+>>           int32_t fd = event_notifier_get_fd(&vector->interrupt);
+>>           Error *err = NULL;
+>>   
+>>           if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX, nr,
+>>                                      VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+>>               error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>> +        } else {
+>> +            vector->kvm_path_active = false;
+>>           }
+>>       }
+>>   }
+>> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+>> index b329d50338..b01d2676cf 100644
+>> --- a/hw/vfio/pci.h
+>> +++ b/hw/vfio/pci.h
+>> @@ -91,6 +91,8 @@ typedef struct VFIOMSIVector {
+>>        */
+>>       EventNotifier interrupt;
+>>       EventNotifier kvm_interrupt;
+>> +    /* Set when the trigger action is set to the KVM bypass FD */
+>> +    bool kvm_path_active;
+>>       struct VFIOPCIDevice *vdev; /* back pointer to device */
+>>       int virq;
+>>       bool use;
+> 
+> 
 
