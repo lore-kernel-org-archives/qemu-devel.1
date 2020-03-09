@@ -2,52 +2,54 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825C8C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCDAC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:23:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55AA8208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55AA8208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 7242C20848
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:23:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7242C20848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBDgp-00086Z-Ga
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:23:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44138)
+	id 1jBDgq-00088T-KL
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:23:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDfe-00063e-7P
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:21:55 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDff-00063s-BD
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDfc-0007PH-J9
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:21:54 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:55115)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDfe-0007QY-0x
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:21:55 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:46470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jBDfc-0007Ko-2U; Mon, 09 Mar 2020 04:21:52 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07495327|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.03378-0.000359326-0.965861;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ id 1jBDfd-0007LB-Jq; Mon, 09 Mar 2020 04:21:53 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436283|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.284299-0.00020209-0.715499;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
  RN=10; RT=10; SR=0; TI=SMTPD_---.GyTxIXp_1583742101; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.GyTxIXp_1583742101)
  by smtp.aliyun-inc.com(10.147.41.137);
- Mon, 09 Mar 2020 16:21:41 +0800
+ Mon, 09 Mar 2020 16:21:43 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: richard.henderson@linaro.org, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v3 00/60] target/riscv: support vector extension v0.7.1
-Date: Mon,  9 Mar 2020 16:19:42 +0800
-Message-Id: <20200309082042.12967-1-zhiwei_liu@c-sky.com>
+Subject: [PATCH v3 03/60] target/riscv: support vector extension csr
+Date: Mon,  9 Mar 2020 16:19:45 +0800
+Message-Id: <20200309082042.12967-4-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200309082042.12967-1-zhiwei_liu@c-sky.com>
+References: <20200309082042.12967-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
@@ -70,129 +72,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset implements the vector extension for RISC-V on QEMU.
+The v0.7.1 specification does not define vector status within mstatus.
+A future revision will define the privileged portion of the vector status.
 
-You can also find the patchset and all *test cases* in
-my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v3).
-All the test cases are in the directory qemu/tests/riscv/vector/. They are
-riscv64 linux user mode programs.
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/cpu_bits.h | 15 +++++++++
+ target/riscv/csr.c      | 75 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
-
-Features:
-  * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
-  * support basic vector extension.
-  * support Zvlsseg.
-  * support Zvamo.
-  * not support Zvediv as it is changing.
-  * SLEN always equals VLEN.
-  * element width support 8bit, 16bit, 32bit, 64bit.
-
-Changelog:
-v3
-  * move check code from execution-time to translation-time
-  * use a continous memory block for vector register description.
-  * vector registers as direct fields in RISCVCPUState.
-  * support VLEN configure from qemu command line.
-  * support ELEN configure from qemu command line.
-  * support vector specification version configure from qemu command line.
-  * probe pages before real load or store access.
-  * use probe_page_check for no-fault operations in linux user mode.
-  * generation atomic exit exception when in parallel environment.
-  * fixup a lot of concrete bugs.
-
-V2
-  * use float16_compare{_quiet}
-  * only use GETPC() in outer most helper
-  * add ctx.ext_v Property
-
-
-LIU Zhiwei (60):
-  target/riscv: add vector extension field in CPURISCVState
-  target/riscv: implementation-defined constant parameters
-  target/riscv: support vector extension csr
-  target/riscv: add vector configure instruction
-  target/riscv: add vector stride load and store instructions
-  target/riscv: add vector index load and store instructions
-  target/riscv: add fault-only-first unit stride load
-  target/riscv: add vector amo operations
-  target/riscv: vector single-width integer add and subtract
-  target/riscv: vector widening integer add and subtract
-  target/riscv: vector integer add-with-carry / subtract-with-borrow
-    instructions
-  target/riscv: vector bitwise logical instructions
-  target/riscv: vector single-width bit shift instructions
-  target/riscv: vector narrowing integer right shift instructions
-  target/riscv: vector integer comparison instructions
-  target/riscv: vector integer min/max instructions
-  target/riscv: vector single-width integer multiply instructions
-  target/riscv: vector integer divide instructions
-  target/riscv: vector widening integer multiply instructions
-  target/riscv: vector single-width integer multiply-add instructions
-  target/riscv: vector widening integer multiply-add instructions
-  target/riscv: vector integer merge and move instructions
-  target/riscv: vector single-width saturating add and subtract
-  target/riscv: vector single-width averaging add and subtract
-  target/riscv: vector single-width fractional multiply with rounding
-    and saturation
-  target/riscv: vector widening saturating scaled multiply-add
-  target/riscv: vector single-width scaling shift instructions
-  target/riscv: vector narrowing fixed-point clip instructions
-  target/riscv: vector single-width floating-point add/subtract
-    instructions
-  target/riscv: vector widening floating-point add/subtract instructions
-  target/riscv: vector single-width floating-point multiply/divide
-    instructions
-  target/riscv: vector widening floating-point multiply
-  target/riscv: vector single-width floating-point fused multiply-add
-    instructions
-  target/riscv: vector widening floating-point fused multiply-add
-    instructions
-  target/riscv: vector floating-point square-root instruction
-  target/riscv: vector floating-point min/max instructions
-  target/riscv: vector floating-point sign-injection instructions
-  target/riscv: vector floating-point compare instructions
-  target/riscv: vector floating-point classify instructions
-  target/riscv: vector floating-point merge instructions
-  target/riscv: vector floating-point/integer type-convert instructions
-  target/riscv: widening floating-point/integer type-convert
-    instructions
-  target/riscv: narrowing floating-point/integer type-convert
-    instructions
-  target/riscv: vector single-width integer reduction instructions
-  target/riscv: vector wideing integer reduction instructions
-  target/riscv: vector single-width floating-point reduction
-    instructions
-  target/riscv: vector widening floating-point reduction instructions
-  target/riscv: vector mask-register logical instructions
-  target/riscv: vector mask population count vmpopc
-  target/riscv: vmfirst find-first-set mask bit
-  target/riscv: set-X-first mask bit
-  target/riscv: vector iota instruction
-  target/riscv: vector element index instruction
-  target/riscv: integer extract instruction
-  target/riscv: integer scalar move instruction
-  target/riscv: floating-point scalar move instructions
-  target/riscv: vector slide instructions
-  target/riscv: vector register gather instruction
-  target/riscv: vector compress instruction
-  target/riscv: configure and turn on vector extension from command line
-
- target/riscv/Makefile.objs              |    2 +-
- target/riscv/cpu.c                      |   49 +
- target/riscv/cpu.h                      |   89 +-
- target/riscv/cpu_bits.h                 |   15 +
- target/riscv/csr.c                      |   75 +-
- target/riscv/helper.h                   | 1075 +++++
- target/riscv/insn32-64.decode           |   11 +
- target/riscv/insn32.decode              |  366 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 2386 ++++++++++++
- target/riscv/translate.c                |   24 +-
- target/riscv/vector_helper.c            | 4745 +++++++++++++++++++++++
- 11 files changed, 8824 insertions(+), 13 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
- create mode 100644 target/riscv/vector_helper.c
-
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 7f64ee1174..8117e8b5a7 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -29,6 +29,14 @@
+ #define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
+ #define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
+ 
++/* Vector Fixed-Point round model */
++#define FSR_VXRM_SHIFT      9
++#define FSR_VXRM            (0x3 << FSR_VXRM_SHIFT)
++
++/* Vector Fixed-Point saturation flag */
++#define FSR_VXSAT_SHIFT     8
++#define FSR_VXSAT           (0x1 << FSR_VXSAT_SHIFT)
++
+ /* Control and Status Registers */
+ 
+ /* User Trap Setup */
+@@ -48,6 +56,13 @@
+ #define CSR_FRM             0x002
+ #define CSR_FCSR            0x003
+ 
++/* User Vector CSRs */
++#define CSR_VSTART          0x008
++#define CSR_VXSAT           0x009
++#define CSR_VXRM            0x00a
++#define CSR_VL              0xc20
++#define CSR_VTYPE           0xc21
++
+ /* User Timers and Counters */
+ #define CSR_CYCLE           0xc00
+ #define CSR_TIME            0xc01
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 11d184cd16..d71c49dfff 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -46,6 +46,10 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
+ static int fs(CPURISCVState *env, int csrno)
+ {
+ #if !defined(CONFIG_USER_ONLY)
++    /* loose check condition for fcsr in vector extension */
++    if ((csrno == CSR_FCSR) && (env->misa & RVV)) {
++        return 0;
++    }
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+         return -1;
+     }
+@@ -53,6 +57,14 @@ static int fs(CPURISCVState *env, int csrno)
+     return 0;
+ }
+ 
++static int vs(CPURISCVState *env, int csrno)
++{
++    if (env->misa & RVV) {
++        return 0;
++    }
++    return -1;
++}
++
+ static int ctr(CPURISCVState *env, int csrno)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+@@ -174,6 +186,10 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+ #endif
+     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
+         | (env->frm << FSR_RD_SHIFT);
++    if (vs(env, csrno) >= 0) {
++        *val |= (env->vxrm << FSR_VXRM_SHIFT)
++                | (env->vxsat << FSR_VXSAT_SHIFT);
++    }
+     return 0;
+ }
+ 
+@@ -186,10 +202,62 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+     env->mstatus |= MSTATUS_FS;
+ #endif
+     env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
++    if (vs(env, csrno) >= 0) {
++        env->vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
++        env->vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
++    }
+     riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
+     return 0;
+ }
+ 
++static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vtype;
++    return 0;
++}
++
++static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vl;
++    return 0;
++}
++
++static int read_vxrm(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vxrm;
++    return 0;
++}
++
++static int write_vxrm(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vxrm = val;
++    return 0;
++}
++
++static int read_vxsat(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vxsat;
++    return 0;
++}
++
++static int write_vxsat(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vxsat = val;
++    return 0;
++}
++
++static int read_vstart(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vstart;
++    return 0;
++}
++
++static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vstart = val;
++    return 0;
++}
++
+ /* User Timers and Counters */
+ static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -1269,7 +1337,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_FFLAGS] =              { fs,   read_fflags,      write_fflags      },
+     [CSR_FRM] =                 { fs,   read_frm,         write_frm         },
+     [CSR_FCSR] =                { fs,   read_fcsr,        write_fcsr        },
+-
++    /* Vector CSRs */
++    [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
++    [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
++    [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
++    [CSR_VL] =                  { vs,   read_vl                             },
++    [CSR_VTYPE] =               { vs,   read_vtype                          },
+     /* User Timers and Counters */
+     [CSR_CYCLE] =               { ctr,  read_instret                        },
+     [CSR_INSTRET] =             { ctr,  read_instret                        },
 -- 
 2.23.0
 
