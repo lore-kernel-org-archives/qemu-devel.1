@@ -2,85 +2,98 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878AAC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4FEC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53ECF2464B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:14:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dD2zWXli"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53ECF2464B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9772A2464B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:18:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9772A2464B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBL37-0002L4-Eo
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:14:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42837)
+	id 1jBL6a-0005I3-Hv
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jBKmW-0006Dk-Dr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:57:29 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jBL5R-0004R4-OI
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jBKmV-0000h9-AB
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:57:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23500
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jBKmV-0000gB-3D
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:57:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583769446;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sM6wzIxkfI44re0KY8Dat2S2LMsIRmYZXOzMvLj+MvU=;
- b=dD2zWXliKcdCZJxDGgES+d3WfWOL+bXyg/HuNXvNHI89cjiIov5F9KTjW4Je5hrDn0dZfe
- VTmBtq2ISMmhaGfp88ZOHOWQhThRu1KDXlB7lLSiLyB7Ivwy2CvmMazL8A+jHY69uPy7cz
- 9weDFfvVhyfDIkCpJwTq/yYy+QqEnnw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-F7tyqmS2M5-8vcEfcsYSRA-1; Mon, 09 Mar 2020 11:57:22 -0400
-X-MC-Unique: F7tyqmS2M5-8vcEfcsYSRA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7645D18C35B2;
- Mon,  9 Mar 2020 15:57:20 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-162.ams2.redhat.com [10.36.116.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 244205C557;
- Mon,  9 Mar 2020 15:57:14 +0000 (UTC)
-Date: Mon, 9 Mar 2020 16:57:13 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v3 1/4] block: Add trivial backing_fmt support to qcow,
- sheepdog, vmdk
-Message-ID: <20200309155713.GE6478@linux.fritz.box>
-References: <20200306225121.3199279-1-eblake@redhat.com>
- <20200306225121.3199279-2-eblake@redhat.com>
- <20200309152112.GC6478@linux.fritz.box>
- <7b7f12f8-ca03-12d4-b93d-2edefb51cb42@redhat.com>
- <20200309154412.GL3033513@redhat.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jBL5Q-0002TN-9H
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:17:01 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:42130
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jBL5Q-0002Sx-1P
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:17:00 -0400
+Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jBL5f-0006se-Rm; Mon, 09 Mar 2020 16:17:21 +0000
+To: Markus Armbruster <armbru@redhat.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+ <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+ <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
+ <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
+ <87a74pso48.fsf@dusky.pond.sub.org>
+ <2ff8e8e8-a281-1d50-417d-96383240c2df@huawei.com>
+ <87ftehd39i.fsf@dusky.pond.sub.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <4fe9c8c9-7dd4-0a6e-15f5-9006ea27744a@ilande.co.uk>
+Date: Mon, 9 Mar 2020 16:16:49 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200309154412.GL3033513@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <87ftehd39i.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,45 +105,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, pkrempa@redhat.com,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- libvir-list@redhat.com, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- "open list:Trivial patches" <qemu-trivial@nongnu.org>,
- Liu Yuan <namei.unix@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Euler Robot <euler.robot@huawei.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 09.03.2020 um 16:44 hat Daniel P. Berrang=E9 geschrieben:
-> We could support "-F ..." and validate any non-raw formats, while raising=
- a
-> runtime error in the case of "-F raw", as only the "raw" backing format h=
-as
-> the probing security risk.
->=20
-> Users who need  to use qcow, with a backing file, without a format can
-> just not pass "-F" and in doing so will be insecure.
+On 09/03/2020 14:14, Markus Armbruster wrote:
 
-Hm, this is actually an interesting option. We wouldn't lose features
-compared to today without -F, but we would allow -F when we can verify
-that the operation is safe (the image is already non-raw).
+> Pan Nengyuan <pannengyuan@huawei.com> writes:
+> 
+>> On 3/9/2020 8:34 PM, Markus Armbruster wrote:
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>>> On Mon, 9 Mar 2020 at 10:02, Pan Nengyuan <pannengyuan@huawei.com> wrote:
+>>>>> On 3/9/2020 5:21 PM, Peter Maydell wrote:
+>>>>>> Could you explain more? My thought is that we should be using
+>>>>>> sysbus_init_child_obj() and we should be doing it in the init method.
+>>>>>> Why does that break the tests ? It's the same thing various other
+>>>>>> devices do.
+>>>>>
+>>>>> device-introspect-test do the follow check for each device type:
+>>>>>
+>>>>>     qtree_start = qtest_hmp(qts, "info qtree");
+>>>>>     ...
+>>>>>     qtest_qmp(qts, "{'execute': 'device-list-properties','arguments': {'typename': %s}}", type);
+>>>>>     ...
+>>>>>     qtree_end = qtest_hmp(qts, "info qtree");
+>>>>>     g_assert_cmpstr(qtree_start, ==, qtree_end);
+>>>>>
+>>>>> If we do qdev_set_parent_bus in init, it will check fail when type = 'mac_via'.
+>>>>> mac_via_init() is called by q800_init(). But it will not be called in qtest(-machine none) in the step qtree_start.
+>>>>> And after we call 'device-list-properties', mac_via_init() was called and set dev parent bus. We can find these
+>>>>> devices in the qtree_end. So it break the test on the assert.
+>>>>
+>>>> Markus, do you know what's happening here? Why is
+>>>> trying to use sysbus_init_child_obj() breaking the
+>>>> device-introspect-test for this particular device,
+>>>> but fine for the other places where we use it?
+>>>> (Maybe we're accidentally leaking a reference to
+>>>> something so the sub-device stays on the sysbus
+>>>> when it should have removed itself when the
+>>>> device was deinited ?)
+>>>
+>>> Pan Nengyuan, please provide the exact patch that fails for you.
+>>
+>> As the follow patch:
+>>
+>> >From 9b4f35e294597410cc03b967c127242ce099692e Mon Sep 17 00:00:00 2001
+>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>> Date: Wed, 4 Mar 2020 11:29:28 +0800
+>> Subject: [PATCH] mac_via: fix incorrect creation of mos6522 device in mac_via
+>>
+>> This patch fix a bug in mac_via where it failed to actually realize devices it was using.
+>> And move the init codes which inits the mos6522 objects and properties on them from realize()
+>> into init(). However, we keep qdev_set_parent_bus in realize(), otherwise it will cause
+>> device-introspect-test test fail. Then do the realize mos6522 device in the mac_vir_realize.
+>>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>>  hw/misc/mac_via.c | 40 ++++++++++++++++++++++++++--------------
+>>  1 file changed, 26 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+>> index b7d0012794..4c5c432140 100644
+>> --- a/hw/misc/mac_via.c
+>> +++ b/hw/misc/mac_via.c
+>> @@ -868,24 +868,21 @@ static void mac_via_reset(DeviceState *dev)
+>>  static void mac_via_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      MacVIAState *m = MAC_VIA(dev);
+>> -    MOS6522State *ms;
+>>      struct tm tm;
+>>      int ret;
+>> +    Error *err = NULL;
+>>
+>> -    /* Init VIAs 1 and 2 */
+>> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
+>> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
+>> -
+>> -    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+>> -                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
+>> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
+>> +    if (err != NULL) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>>
+>> -    /* Pass through mos6522 output IRQs */
+>> -    ms = MOS6522(&m->mos6522_via1);
+>> -    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
+>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>> -    ms = MOS6522(&m->mos6522_via2);
+>> -    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized", &err);
+>> +    if (err != NULL) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>>
+>>      /* Pass through mos6522 input IRQs */
+>>      qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+>> @@ -932,6 +929,7 @@ static void mac_via_init(Object *obj)
+>>  {
+>>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>>      MacVIAState *m = MAC_VIA(obj);
+>> +    MOS6522State *ms;
+>>
+>>      /* MMIO */
+>>      memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
+>> @@ -948,6 +946,20 @@ static void mac_via_init(Object *obj)
+>>      /* ADB */
+>>      qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>>                          TYPE_ADB_BUS, DEVICE(obj), "adb.0");
+>> +
+>> +    /* Init VIAs 1 and 2 */
+>> +    sysbus_init_child_obj(OBJECT(m), "via1", &m->mos6522_via1,
+>> +                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
+>> +    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+>> +                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
+>> +
+>> +    /* Pass through mos6522 output IRQs */
+>> +    ms = MOS6522(&m->mos6522_via1);
+>> +    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
+>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>> +    ms = MOS6522(&m->mos6522_via2);
+>> +    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
+>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>>  }
+>>
+>>  static void postload_update_cb(void *opaque, int running, RunState state)
+>> --
+>> 2.18.2
+> 
+> In file included from /work/armbru/qemu/include/hw/vmstate-if.h:12,
+>                  from /work/armbru/qemu/include/migration/vmstate.h:30,
+>                  from /work/armbru/qemu/hw/misc/mac_via.c:20:
+> /work/armbru/qemu/hw/misc/mac_via.c: In function ‘mac_via_init’:
+> /work/armbru/qemu/hw/misc/mac_via.c:953:34: error: ‘dev’ undeclared (first use in this function); did you mean ‘div’?
+>   953 |     sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+>       |                                  ^~~
+> 
+> Try again?
 
-> We could take this opportunity to deprecate 'qcow' perhaps, declare it
-> a read-only format, restricted to qemu-img/qemu-io for purpose of data
-> liberation ?
+Looks like a simple copy/paste error: I think that line should read OBJECT(m) like
+the one above it?
 
-I'm against making any format read-only because that immediately means
-that it becomes untestable.
 
-> For sheepdog, if it is something we genuinely still care about, then
-> adding a backing file format record seems neccessary, unless we either
-> forbid use of raw backing files, or forbid use of non-raw backing files,
-> either way would be safe.
+ATB,
 
-In case of doubt, we can use the same logic as you suggested for qcow
-(accept only non-raw with -F, but no restrictions without -F).
-
-Kevin
-
+Mark.
 
