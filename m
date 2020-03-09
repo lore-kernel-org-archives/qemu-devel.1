@@ -2,83 +2,83 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145FAC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FAEC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D57B221D7E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16A3E22525
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:20:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ssNXrWdx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57B221D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKRzF7LF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A3E22525
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBIJF-0001kD-2o
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39462)
+	id 1jBIKF-0002vS-A4
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:20:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBIIh-0001LS-Ey
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:18:32 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jBIJZ-0002Me-NZ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBIIg-0004Ea-6s
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:18:31 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33572)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBIIg-0004EJ-1L
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:18:30 -0400
-Received: by mail-ot1-x342.google.com with SMTP id g15so3374727otr.0
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 06:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=nx9lYHBwS5N43uajqNSbFD7clsNkZVpLoF7YxBQlceU=;
- b=ssNXrWdxDZdIMisxS7xlJ2S0YdlSpcEq3/vts+mqhWmrXTlWMAbnJ8Zr9cJ6rpG1jm
- rTe+MJt5rUTe0WKS3gYhucrPESdUBhr6seSYmSeojAmiL7I5+FaFpBgcHdaLjoIbETJK
- 7d8iuC2MoFIWa2jmB3mDOBLLQKV0ZH83vBthf+qThDxcq+lL1VLj9DPliZGP160fouFn
- 5WSW+kz672J+LTkhExEJgjSrjkYIX/UeifnTPInHUeZLQ3q40xpTS706asBigfvjDR4M
- rKeMvvmiMArqSTf730mIo+LxcAVGWqVEQM+aDbEJzTFezFSWIsPmXyAAipAw5lGUGer8
- 9bDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=nx9lYHBwS5N43uajqNSbFD7clsNkZVpLoF7YxBQlceU=;
- b=J2OWBP7wKWHdTTcJFLIUF4KX60G09WpsfNiARNoRZqqQZsscVkde78l318KHNbEzYD
- ViZvUdn5Z8xvAXZgCYigoNiMNZQlDhTgaSq+G78OeQscL3G0mMONsjovCo4v+7qcIIBz
- bDccQUVWr9zE+NG14BhpmrFf7o9u3iNlF/32tm95jr1U0buHFO+ESTr68pAogIx7/Tg6
- MinHSJyz9bSJ75wDTf65OluggKAWGzo4b5XCYG41labKekZhX3YvAMsm+X+fmQ2bCXBE
- iP85mXaYtSNUDhyq+t1VnFzWQHl8U6e6/ZqSYLi2ObdXuqZbx6GAqkt1KBRj1SumIA/S
- n9zA==
-X-Gm-Message-State: ANhLgQ0ichjGLgveHUVymc0jveynOJsKqjjkqkCLUd804PHslhvv6rMN
- 9CgvIZwC/8TybK3rn5N6ugxUXjZiU2Sl9oUzwqw6Jw==
-X-Google-Smtp-Source: ADFU+vuaWbEaCHPioeUAsud3T6Glso5500OKWjvQthpQ49pt7WByJk6F1kT8xBfboR2FkW+4t/gIG4e0LFil/UpK9Vo=
-X-Received: by 2002:a9d:76c9:: with SMTP id p9mr12939784otl.135.1583759909215; 
- Mon, 09 Mar 2020 06:18:29 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1jBIJY-0004z4-Pr
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43297
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBIJY-0004ym-NA
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:19:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583759964;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=24e40OWtoXL19M1KR38kXSnQakErSNYqXxfOktpXQA8=;
+ b=CKRzF7LFlFAj9AF0QU+BUdCt3lI5mNjHM2d+Cb1VfdK+wtrU2be/SlCTWorEo8o0Wn812L
+ KJljLyZS2aE6v0wAgkYwKipLVjJAcWxP0NnRPaL8RsLMpUqOPVIPL65aA6X1YthLbO1xl9
+ fpRMncHOCkxYVvhylv7bppQTfrKLIP0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-RAFLMdiAOvq6ei8v5-yfrw-1; Mon, 09 Mar 2020 09:19:20 -0400
+X-MC-Unique: RAFLMdiAOvq6ei8v5-yfrw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D74969FA;
+ Mon,  9 Mar 2020 13:19:19 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 111051001DD8;
+ Mon,  9 Mar 2020 13:19:17 +0000 (UTC)
+Date: Mon, 9 Mar 2020 14:19:14 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "=?UTF-8?Q?bauerchen?=(=?UTF-8?Q?=E9=99=88=E8=92=99=E8=92=99?=)"
+ <bauerchen@tencent.com>
+Subject: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet mail)
+Message-ID: <20200309141914.0b9ad42f@Igors-MacBook-Pro>
+In-Reply-To: <4976eaee60934e458e105bebe20d4d18@tencent.com>
+References: <20200306085014.120669-1-borntraeger@de.ibm.com>
+ <20200309110331.3ef650a9@redhat.com>
+ <13a05c3e-e374-8411-952d-05f4312ad6c0@redhat.com>
+ <d37b122a-1980-32f3-6c06-89e5ef2a4807@de.ibm.com>
+ <4976eaee60934e458e105bebe20d4d18@tencent.com>
 MIME-Version: 1.0
-References: <20200309121103.20234-1-philmd@redhat.com>
- <20200309121103.20234-2-philmd@redhat.com>
- <CAFEAcA_OHcfsYueYRpXjihgwEDericqkzGqB1EBqaSULAC1YDw@mail.gmail.com>
- <8e996314-695f-a742-b318-9df5a4f2be1b@vivier.eu>
-In-Reply-To: <8e996314-695f-a742-b318-9df5a4f2be1b@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 13:18:18 +0000
-Message-ID: <CAFEAcA-sb5hFBuY1U=KrbsZdhNwQq3H__XBDK1nxmYB4hSGz0w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cpu: Do not reset a vCPU before it is created
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +90,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Michael Walle <michael@walle.cc>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ mhartmay <mhartmay@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+ pbonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 at 13:13, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 09/03/2020 =C3=A0 14:09, Peter Maydell a =C3=A9crit :
-> > On Mon, 9 Mar 2020 at 12:11, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com> wrote:
-> >>
-> >> cpu_reset() might modify architecture-specific fields allocated
-> >> by qemu_init_vcpu(). To avoid bugs similar to the one fixed in
-> >> commit 00d0f7cb66 when introducing new architectures, move the
-> >> cpu_reset() calls after qemu_init_vcpu().
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> > Why do we need to call cpu_reset() from realize anyway?
-> > Generally for devices this is incorrect as they should be
-> > being reset by some other mechanism.
->
-> I have this same change in my branch for q800 to set the initial PC and
-> stack pointer read from memory on cold boot.
->
-> Do we have another way to do that?
+On Mon, 9 Mar 2020 11:16:10 +0000
+bauerchen(=E9=99=88=E8=92=99=E8=92=99) <bauerchen@tencent.com> wrote:
 
-The expectation at the moment is that the board code should
-register a reset function with qemu_register_reset() which
-calls cpu_reset(). Relying on doing a reset in realize won't
-work for the case where there's a QEMU system reset, because
-we don't re-init/realize everything, we just call all the
-reset hooks.
+> Thanks, =C2=A0in fact,do_touch_pages is called just when vm starts up, bu=
+t using init flag and Gonce maybe more elegant !
+> if needed,I can submit a new patch !=20
+> thanks very much!
 
-If m68k reads pc/sp from memory on reset you'll probably run
-into the same reset-ordering vs hw/cpu/loader.c that Arm M-profile
-has; we currently work around that in the arm reset function.
-I had hoped that 3-phase reset would resolve this reset order
-issue, but it has not turned out to be so easy.
+it's called from os_mem_prealloc() -> touch_all_pages() which is called
+at least once per an instance of hotsmem backend. So if several backends
+are used then it should be called several times.
+The same applies when a hostmem backend is added during runtime (hotplug)
 
-thanks
--- PMM
 
