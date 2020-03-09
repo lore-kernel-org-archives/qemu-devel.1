@@ -2,95 +2,81 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37373C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DF3C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AA6920675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:31:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA6920675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70D2420848
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:36:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Og1BL3ce"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D2420848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGcu-0000Dq-8Z
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:31:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48112)
+	id 1jBGhv-0003pr-IR
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jBGUm-00016y-UZ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:53 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBGhF-0002wS-6s
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jBGUm-0005BA-0b
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17064)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jBGUl-0004sa-Rb
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:51 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 029BLJYD024679
- for <qemu-devel@nongnu.org>; Mon, 9 Mar 2020 07:22:41 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym7aak28p-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 07:22:39 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Mon, 9 Mar 2020 11:22:31 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 9 Mar 2020 11:22:29 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 029BMSxK58720492
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 9 Mar 2020 11:22:28 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7937B4C04E;
- Mon,  9 Mar 2020 11:22:28 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BA9534C044;
- Mon,  9 Mar 2020 11:22:27 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.87])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  9 Mar 2020 11:22:27 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 13/15] s390x: protvirt: Handle SIGP store status correctly
-Date: Mon,  9 Mar 2020 07:22:04 -0400
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200309112206.20261-1-frankja@linux.ibm.com>
-References: <20200309112206.20261-1-frankja@linux.ibm.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBGhD-0001b8-VJ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:35:44 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36626)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBGhD-0001aZ-Oa
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:35:43 -0400
+Received: by mail-oi1-x244.google.com with SMTP id t24so9809658oij.3
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 04:35:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=bTtip2cL91MGIrg0Mc4JsWOrVFkqocrQtKDXBnTyWsk=;
+ b=Og1BL3cenMD7H+Yljomz3Y6K9fOixWW0CJudQSIqkUiBjALZt1/45/b1dNqIHKk7IQ
+ arZmwyINy5wpe4rrIznToh18Rid+sAy4+9UyEIoywdkIAN/Rwi7i3PJ1sdUXAD7b6IKb
+ I/Z0q4EV/eLI/KEDl1eZkujkB4NfXeX/Ta1yb/WDHWMVN2QOQpJzfpUE2x+Mro2j2MPn
+ Hn5Ywp6lBSs4jtdTgRnRky466VKYZuB23lYbQv0XhYbv5Av5gtiU7GZqzEH91dPuW9wK
+ j55tobReXgC8BnVecDMM9PbMHVczgTFCxddv2LlWlrKpJcMdHDP8fe1ZSxfAGlCWMD1c
+ 3QJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=bTtip2cL91MGIrg0Mc4JsWOrVFkqocrQtKDXBnTyWsk=;
+ b=e4pxQeUiBN+WFmzdJ0xaAcA8+E3I6g6/fQ4RBW2Z2yu9E2Bs/Obi0/uzw0Uqqnp1B3
+ KsWlvqxUJTyN/i4j4vjUNSv7QyVi9zwkIQXauPe60oUjJqckBJNOTSgvSiu6VKyuMLAn
+ Svxwu3IErEVWMqsIkBgg616HqHhBzbqfq1BTwMQjryMEtH7aY0lw/WrPYe1C87B6LNbh
+ HrZe2wPfewy1XN9g+agrIz5RFa+gVSmTqDNnigtDTwO8gNbpVIvcs0oVUnVbTjc49p0L
+ tmm3pq4QyiaUxibEbNr4nOVfRp9qIqINIBKuXjUDk7GZabeQW/hPtmQ1/rUANekhghvu
+ +VAg==
+X-Gm-Message-State: ANhLgQ1cbTA/IVvIjjm7WcqnvzEHlOqpPjCy31ZGeCGdLKCNGE5a18kp
+ X5ukIYY3MFrAZnKk8rgiB5Bd0lgwY+73R4vyLTwUfQ==
+X-Google-Smtp-Source: ADFU+vvWHQqzhx2R6F2IIi+norYmw7s4QmIxkdYXVvvd/sOCIWwq2Bq4wQ2BZ+IoWfCYpqOf0rXOWlhO3JdKHjdBlDQ=
+X-Received: by 2002:a54:478b:: with SMTP id o11mr10542380oic.146.1583753742834; 
+ Mon, 09 Mar 2020 04:35:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20030911-4275-0000-0000-000003A9C403
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030911-4276-0000-0000-000038BEDA31
-Message-Id: <20200309112206.20261-14-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-09_02:2020-03-08,
- 2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- mlxlogscore=707 malwarescore=0 bulkscore=0 spamscore=0 suspectscore=1
- adultscore=0 impostorscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090079
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+References: <20200305105325.31264-1-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200305105325.31264-1-kuhn.chenqun@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 11:35:31 +0000
+Message-ID: <CAFEAcA8fnz2oaa-CO-EEK_vQTWfPih4PrAB3i4UUgQpv9Y_4mg@mail.gmail.com>
+Subject: Re: [PATCH v2] hw/net/imx_fec: write TGSR and TCSR3 in
+ imx_enet_write()
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,38 +88,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For protected VMs status storing is not done by QEMU anymore.
+On Thu, 5 Mar 2020 at 10:53, Chen Qun <kuhn.chenqun@huawei.com> wrote:
+>
+> The current code causes clang static code analyzer generate warning:
+> hw/net/imx_fec.c:858:9: warning: Value stored to 'value' is never read
+>         value =3D value & 0x0000000f;
+>         ^       ~~~~~~~~~~~~~~~~~~
+> hw/net/imx_fec.c:864:9: warning: Value stored to 'value' is never read
+>         value =3D value & 0x000000fd;
+>         ^       ~~~~~~~~~~~~~~~~~~
+>
+> According to the definition of the function, the two =E2=80=9Cvalue=E2=80=
+=9D assignments
+>  should be written to registers.
+>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> v1->v2:
+>   The register 'ENET_TGSR' write-1-to-clear timer flag.
+>   The register 'ENET_TCSRn' 7bit(TF) write-1-to-clear timer flag.
+> ---
+>  hw/net/imx_fec.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index 6a124a154a..322cbdcc17 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -855,13 +855,15 @@ static void imx_enet_write(IMXFECState *s, uint32_t=
+ index, uint32_t value)
+>          break;
+>      case ENET_TGSR:
+>          /* implement clear timer flag */
+> -        value =3D value & 0x0000000f;
+> +        s->regs[index] ^=3D s->regs[index] & value;
+> +        s->regs[index] &=3D 0x0000000f;
+>          break;
+>      case ENET_TCSR0:
+>      case ENET_TCSR1:
+>      case ENET_TCSR2:
+>      case ENET_TCSR3:
+> -        value =3D value & 0x000000fd;
+> +        s->regs[index] =3D (value & 0x00000080) ? (0x0000007d & value) :
+> +                         (value & 0x000000fd);
+>          break;
+>      case ENET_TCCR0:
+>      case ENET_TCCR1:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This isn't the usual way to write W1C behaviour.
+If all the relevant bits are W1C, as for TGSR:
 
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index ed72684911..4851452439 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -246,6 +246,11 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
-     hwaddr len = sizeof(*sa);
-     int i;
- 
-+    /* Storing will occur on next SIE entry for protected VMs */
-+    if (cpu->env.pv) {
-+        return 0;
-+    }
-+
-     sa = cpu_physical_memory_map(addr, &len, true);
-     if (!sa) {
-         return -EFAULT;
--- 
-2.20.1
+   s->regs[index] &=3D ~(value & 0xf); /* all bits W1C */
 
+If some but not all bits are W1C, as for TCSR*:
+
+   s->regs[index] &=3D ~(value & 0x80); /* W1C bits */
+   s->regs[index] &=3D ~0x7d; /* writable fields */
+   s->regs[index] |=3D (value & 0x7d);
+
+thanks
+-- PMM
 
