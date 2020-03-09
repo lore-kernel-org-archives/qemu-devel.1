@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CEFC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E37AEC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:35:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76DE72072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:34:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76DE72072A
+	by mail.kernel.org (Postfix) with ESMTPS id B8B592072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B592072A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHcU-0003vc-KN
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:34:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56584)
+	id 1jBHcj-0004Iw-QH
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:35:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56586)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJy-0002Kj-15
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:48 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJy-0002Kl-0j
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJu-00034W-Hm
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJu-00034O-I0
  for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:45 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:55582)
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:50084)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jBHJu-0002eF-3W; Mon, 09 Mar 2020 08:15:42 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.09450246|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_regular_dialog|0.019835-0.000127594-0.980037;
- FP=3380345947195641450|1|1|7|0|-1|-1|-1; HT=e02c03311; MF=zhiwei_liu@c-sky.com;
- NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GyaeXy8_1583756101; 
+ id 1jBHJt-0002bm-Qw; Mon, 09 Mar 2020 08:15:42 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.074415|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.687276-0.000105434-0.312618;
+ FP=10292831519337153542|1|1|7|0|-1|-1|-1; HT=e02c03295;
+ MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=10; RT=10; SR=0;
+ TI=SMTPD_---.GyaeXy8_1583756101; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.GyaeXy8_1583756101)
  by smtp.aliyun-inc.com(10.147.41.199);
- Mon, 09 Mar 2020 20:15:18 +0800
+ Mon, 09 Mar 2020 20:15:12 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: richard.henderson@linaro.org, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v3 31/60] target/riscv: vector single-width floating-point
- multiply/divide instructions
-Date: Mon,  9 Mar 2020 20:14:28 +0800
-Message-Id: <20200309121457.13719-32-zhiwei_liu@c-sky.com>
+Subject: [PATCH v3 19/60] target/riscv: vector widening integer multiply
+ instructions
+Date: Mon,  9 Mar 2020 20:14:16 +0800
+Message-Id: <20200309121457.13719-20-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
 References: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
@@ -75,123 +76,138 @@ Sender: "Qemu-devel"
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- target/riscv/helper.h                   | 16 +++++++++
- target/riscv/insn32.decode              |  5 +++
- target/riscv/insn_trans/trans_rvv.inc.c |  7 ++++
- target/riscv/vector_helper.c            | 48 +++++++++++++++++++++++++
- 4 files changed, 76 insertions(+)
+ target/riscv/helper.h                   | 19 +++++++++
+ target/riscv/insn32.decode              |  6 +++
+ target/riscv/insn_trans/trans_rvv.inc.c |  8 ++++
+ target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++++
+ 4 files changed, 84 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index f242fa4e4b..a2d7ed19a8 100644
+index 357f149198..1704b8c512 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -818,3 +818,19 @@ DEF_HELPER_6(vfwadd_wf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwadd_wf_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwsub_wf_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfwsub_wf_w, void, ptr, ptr, i64, ptr, env, i32)
+@@ -591,3 +591,22 @@ DEF_HELPER_6(vrem_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrem_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 +
-+DEF_HELPER_6(vfmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfmul_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_h, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_w, void, ptr, ptr, i64, ptr, env, i32)
-+DEF_HELPER_6(vfrdiv_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vwmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vwmulsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 5ec95541c6..050b2fd467 100644
+index 2afe24dd34..ceddfe4b6c 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -451,6 +451,11 @@ vfwsub_vv       110010 . ..... ..... 001 ..... 1010111 @r_vm
- vfwsub_vf       110010 . ..... ..... 101 ..... 1010111 @r_vm
- vfwsub_wv       110110 . ..... ..... 001 ..... 1010111 @r_vm
- vfwsub_wf       110110 . ..... ..... 101 ..... 1010111 @r_vm
-+vfmul_vv        100100 . ..... ..... 001 ..... 1010111 @r_vm
-+vfmul_vf        100100 . ..... ..... 101 ..... 1010111 @r_vm
-+vfdiv_vv        100000 . ..... ..... 001 ..... 1010111 @r_vm
-+vfdiv_vf        100000 . ..... ..... 101 ..... 1010111 @r_vm
-+vfrdiv_vf       100001 . ..... ..... 101 ..... 1010111 @r_vm
+@@ -378,6 +378,12 @@ vremu_vv        100010 . ..... ..... 010 ..... 1010111 @r_vm
+ vremu_vx        100010 . ..... ..... 110 ..... 1010111 @r_vm
+ vrem_vv         100011 . ..... ..... 010 ..... 1010111 @r_vm
+ vrem_vx         100011 . ..... ..... 110 ..... 1010111 @r_vm
++vwmulu_vv       111000 . ..... ..... 010 ..... 1010111 @r_vm
++vwmulu_vx       111000 . ..... ..... 110 ..... 1010111 @r_vm
++vwmulsu_vv      111010 . ..... ..... 010 ..... 1010111 @r_vm
++vwmulsu_vx      111010 . ..... ..... 110 ..... 1010111 @r_vm
++vwmul_vv        111011 . ..... ..... 010 ..... 1010111 @r_vm
++vwmul_vx        111011 . ..... ..... 110 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index ab04f469af..8dcbff6c64 100644
+index 9f0645a92b..990433f866 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1795,3 +1795,10 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
- }
- GEN_OPFWF_WIDEN_TRANS(vfwadd_wf)
- GEN_OPFWF_WIDEN_TRANS(vfwsub_wf)
+@@ -1454,3 +1454,11 @@ GEN_OPIVX_TRANS(vdivu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vdiv_vx, opivx_check)
+ GEN_OPIVX_TRANS(vremu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vrem_vx, opivx_check)
 +
-+/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
-+GEN_OPFVV_TRANS(vfmul_vv, opfvv_check)
-+GEN_OPFVV_TRANS(vfdiv_vv, opfvv_check)
-+GEN_OPFVF_TRANS(vfmul_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfdiv_vf,  opfvf_check)
-+GEN_OPFVF_TRANS(vfrdiv_vf,  opfvf_check)
++/* Vector Widening Integer Multiply Instructions */
++GEN_OPIVV_WIDEN_TRANS(vwmul_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmulu_vv, opivv_widen_check)
++GEN_OPIVV_WIDEN_TRANS(vwmulsu_vv, opivv_widen_check)
++GEN_OPIVX_WIDEN_TRANS(vwmul_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmulu_vx)
++GEN_OPIVX_WIDEN_TRANS(vwmulsu_vx)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 0840c5d662..bd7ee4de18 100644
+index 6330f5882f..beb84f9674 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -3106,3 +3106,51 @@ RVVCALL(OPFVF2, vfwsub_wf_h, WOP_WUUU_H, H4, H2, vfwsubw16)
- RVVCALL(OPFVF2, vfwsub_wf_w, WOP_WUUU_W, H8, H4, vfwsubw32)
- GEN_VEXT_VF(vfwsub_wf_h, 2, 4, clearl)
- GEN_VEXT_VF(vfwsub_wf_w, 4, 8, clearq)
+@@ -857,6 +857,18 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
+ #define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
+ #define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
++#define WOP_UUU_B uint16_t, uint8_t, uint8_t, uint16_t, uint16_t
++#define WOP_UUU_H uint32_t, uint16_t, uint16_t, uint32_t, uint32_t
++#define WOP_UUU_W uint64_t, uint32_t, uint32_t, uint64_t, uint64_t
++#define WOP_SSS_B int16_t, int8_t, int8_t, int16_t, int16_t
++#define WOP_SSS_H int32_t, int16_t, int16_t, int32_t, int32_t
++#define WOP_SSS_W int64_t, int32_t, int32_t, int64_t, int64_t
++#define WOP_SUS_B int16_t, uint8_t, int8_t, uint16_t, int16_t
++#define WOP_SUS_H int32_t, uint16_t, int16_t, uint32_t, int32_t
++#define WOP_SUS_W int64_t, uint32_t, int32_t, uint64_t, int64_t
++#define WOP_SSU_B int16_t, int8_t, uint8_t, int16_t, uint16_t
++#define WOP_SSU_H int32_t, int16_t, uint16_t, int32_t, uint32_t
++#define WOP_SSU_W int64_t, int32_t, uint32_t, int64_t, uint64_t
+ 
+ /* operation of two vector elements */
+ #define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
+@@ -1771,3 +1783,42 @@ GEN_VEXT_VX(vrem_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vrem_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vrem_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vrem_vx_d, 8, 8, clearq)
 +
-+/* Vector Single-Width Floating-Point Multiply/Divide Instructions */
-+RVVCALL(OPFVV2, vfmul_vv_h, OP_UUU_H, H2, H2, H2, float16_mul)
-+RVVCALL(OPFVV2, vfmul_vv_w, OP_UUU_W, H4, H4, H4, float32_mul)
-+RVVCALL(OPFVV2, vfmul_vv_d, OP_UUU_D, H8, H8, H8, float64_mul)
-+GEN_VEXT_VV_ENV(vfmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfmul_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfmul_vf_h, OP_UUU_H, H2, H2, float16_mul)
-+RVVCALL(OPFVF2, vfmul_vf_w, OP_UUU_W, H4, H4, float32_mul)
-+RVVCALL(OPFVF2, vfmul_vf_d, OP_UUU_D, H8, H8, float64_mul)
-+GEN_VEXT_VF(vfmul_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfmul_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfmul_vf_d, 8, 8, clearq)
++/* Vector Widening Integer Multiply Instructions */
++RVVCALL(OPIVV2, vwmul_vv_b, WOP_SSS_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmul_vv_h, WOP_SSS_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmul_vv_w, WOP_SSS_W, H8, H4, H4, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_b, WOP_UUU_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_h, WOP_UUU_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmulu_vv_w, WOP_UUU_W, H8, H4, H4, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_b, WOP_SUS_B, H2, H1, H1, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_h, WOP_SUS_H, H4, H2, H2, DO_MUL)
++RVVCALL(OPIVV2, vwmulsu_vv_w, WOP_SUS_W, H8, H4, H4, DO_MUL)
++GEN_VEXT_VV(vwmul_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmul_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmul_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmulu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmulu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmulu_vv_w, 4, 8, clearq)
++GEN_VEXT_VV(vwmulsu_vv_b, 1, 2, clearh)
++GEN_VEXT_VV(vwmulsu_vv_h, 2, 4, clearl)
++GEN_VEXT_VV(vwmulsu_vv_w, 4, 8, clearq)
 +
-+RVVCALL(OPFVV2, vfdiv_vv_h, OP_UUU_H, H2, H2, H2, float16_div)
-+RVVCALL(OPFVV2, vfdiv_vv_w, OP_UUU_W, H4, H4, H4, float32_div)
-+RVVCALL(OPFVV2, vfdiv_vv_d, OP_UUU_D, H8, H8, H8, float64_div)
-+GEN_VEXT_VV_ENV(vfdiv_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV_ENV(vfdiv_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV_ENV(vfdiv_vv_d, 8, 8, clearq)
-+RVVCALL(OPFVF2, vfdiv_vf_h, OP_UUU_H, H2, H2, float16_div)
-+RVVCALL(OPFVF2, vfdiv_vf_w, OP_UUU_W, H4, H4, float32_div)
-+RVVCALL(OPFVF2, vfdiv_vf_d, OP_UUU_D, H8, H8, float64_div)
-+GEN_VEXT_VF(vfdiv_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfdiv_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfdiv_vf_d, 8, 8, clearq)
-+
-+static uint16_t float16_rdiv(uint16_t a, uint16_t b, float_status *s)
-+{
-+    return float16_div(b, a, s);
-+}
-+
-+static uint32_t float32_rdiv(uint32_t a, uint32_t b, float_status *s)
-+{
-+    return float32_div(b, a, s);
-+}
-+
-+static uint64_t float64_rdiv(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return float64_div(b, a, s);
-+}
-+RVVCALL(OPFVF2, vfrdiv_vf_h, OP_UUU_H, H2, H2, float16_rdiv)
-+RVVCALL(OPFVF2, vfrdiv_vf_w, OP_UUU_W, H4, H4, float32_rdiv)
-+RVVCALL(OPFVF2, vfrdiv_vf_d, OP_UUU_D, H8, H8, float64_rdiv)
-+GEN_VEXT_VF(vfrdiv_vf_h, 2, 2, clearh)
-+GEN_VEXT_VF(vfrdiv_vf_w, 4, 4, clearl)
-+GEN_VEXT_VF(vfrdiv_vf_d, 8, 8, clearq)
++RVVCALL(OPIVX2, vwmul_vx_b, WOP_SSS_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmul_vx_h, WOP_SSS_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmul_vx_w, WOP_SSS_W, H8, H4, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_b, WOP_UUU_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_h, WOP_UUU_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmulu_vx_w, WOP_UUU_W, H8, H4, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_b, WOP_SUS_B, H2, H1, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_h, WOP_SUS_H, H4, H2, DO_MUL)
++RVVCALL(OPIVX2, vwmulsu_vx_w, WOP_SUS_W, H8, H4, DO_MUL)
++GEN_VEXT_VX(vwmul_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmul_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmul_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmulu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmulu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmulu_vx_w, 4, 8, clearq)
++GEN_VEXT_VX(vwmulsu_vx_b, 1, 2, clearh)
++GEN_VEXT_VX(vwmulsu_vx_h, 2, 4, clearl)
++GEN_VEXT_VX(vwmulsu_vx_w, 4, 8, clearq)
 -- 
 2.23.0
 
