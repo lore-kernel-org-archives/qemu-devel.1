@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0445C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 723F3C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 962D320578
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:18:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 962D320578
+	by mail.kernel.org (Postfix) with ESMTPS id 43A1020578
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A1020578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKAw-00059u-NP
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:18:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33653)
+	id 1jBKCt-0007Bx-Bo
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:20:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2h-0008NY-5m
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:08 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK2j-0008Si-6s
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2c-0007rB-4p
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:07 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:39435)
+ (envelope-from <laurent@vivier.eu>) id 1jBK2i-0007vp-2S
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:09 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:35461)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2X-0007ju-1I; Mon, 09 Mar 2020 11:09:57 -0400
+ id 1jBK2d-0007rk-IW; Mon, 09 Mar 2020 11:10:03 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N3Kc8-1jJg4w01ac-010J9Q; Mon, 09 Mar 2020 16:09:04 +0100
+ id 1MEFnP-1j1jFw47PR-00AGA7; Mon, 09 Mar 2020 16:09:18 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/33] hw/southbridge/ich9: Removed unused headers
-Date: Mon,  9 Mar 2020 16:08:13 +0100
-Message-Id: <20200309150837.3193387-10-laurent@vivier.eu>
+Subject: [PULL 15/33] hw/alpha/dp264: Include "net/net.h"
+Date: Mon,  9 Mar 2020 16:08:19 +0100
+Message-Id: <20200309150837.3193387-16-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:He56TwfhJa52GOGz0EJqZEjoGZlFdNLZsoH3h/kooJRBmO3UGxH
- tKyYkftvnQTlB+T1skORNFDy8AzTmEPvISinUrtkUNnNj45ZqRv2R7bSrs3ee3Cnx5cT0WI
- YGYoZAhBpGPOwmc5FGBsBGyk8uJKJc2HOrkXlVlO1n3vR1bcnjFftYXy63DXylETT2vk1EQ
- kj11Rtk709JH9zDXwjusA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:nkohTncFmnU=:X8IHw1mNLvGEWBqMFnaX5Y
- Q1CvPz3i/rGpm7UY2HJlWtdWiMMccEFNdmxNyYsPtBR10fUnC7QXg+IykaTAjlJDO85a0+YLm
- PTJS8WiCnIvMT8h9rbKLZEyMvkwRaBmLzDHgfRFKjFKEef/UawYHvuIs9zLbao7gHResGUcof
- HSySVUlY1rFX7pm/BQ9rdcpW40AVPRKalvEETCU3m4zJbWj0xEkD/dKMpL7ZXaNwtRE15npsy
- itvmFfF+OVpVcj6Zs9m0LuHyTGnmnnhY6PVVpKdHIrXpODm06dPYsGUC5BN6fiHvfDkJKbSAU
- TElOp5Vds0k4cM8ol6aK8XeJQe/dIuzHoWaJQgJ7SBzcb+oOI0HK2KtfVOBlgoCWx33LdAM7O
- sYQCHNCezbeOxlNJNnA5FzPZQZmXiJkNbH5b5vDygWhiBRG9fKSsYkUwR6VmxSsmdrsxd5kaK
- ZWJvUpwycNp5tALkXiCsJX/IUbER+DasVzZ0tjAL0wqHYfB84yPxugjH0uC+eP61dFPw2Kax7
- tHHptPy+nUmKyEXSqbXgIPtcGs9oP8fPRtQqEe+L/+wN1j7bDNoP/4ukKPMSfmrJRBHGRFRyC
- /JEqkc2ZmCL3YmhWRCR+OhTXgIIYuNHVAXICwJh3Eq/2HwlXRzeTwBvMOgR//tZ2Fnvn3agLY
- sQ99S4XvwSGTtuZ8ayxyU3xKe2dR9VkPC13yTHJcjxB7HBqTWP/MRNRdyTOWftguhMfrADiDl
- FaVzu0JsLwDDI6hqXjJCMndVvdz/LKv3DgHT+GWGExDbi870hyEq2orl/FdIsykPpbGbKE8ut
- ADNHx6UurIWeSmhdi9OEDkFr9wyZ67jsbaAJ8V9UJZq6Cg5GDV+wFqy9eikoKHPLHnfQg/P
+X-Provags-ID: V03:K1:Qy8dcMwwtUXzYmqFBfNdLJNJpn0fDJ0i7xEZv3GBUnpNHUQO6fa
+ 52H+Kjx0NGVYL1LrxPuw7Z5hA1A4vUqDTOc8MVi4WFiIs0chg9vgc8ZM04ZggWXzkxZyKoT
+ ZSBVIKWfxb/6sKLoHQ5scQRqLEK7TH/BlY8NiwF/f8RNdMMd/ocTwmfGbMkfsr1dKcVGZiN
+ 06JcC2P8NG+T7P4USm3GA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:B9T+aPOVI74=:0WogXzCK4G497PiKiGrCRN
+ eK6zINIoGXrHkpUejdK1lvJdYmRVhyeqUw38ZtjviqOln/BG8o1aNTSHW982N7KMmhYyln7RP
+ 4EEhZ1RUBgitaA4AA5QE2YzCJSuKzR2zonqwNF4KNE2s5rGh+gGglL1ixI5egPSwSNa1a0wNF
+ l9Ohoiofm5ocW+JQVTCIVl6wUkUa1lickWvQC1UofTZ258ztoHxNBDfb8TYnn/s34gtHXOmhv
+ vq9l9p8c+MLVvVZO0jkh/SXMByg0xjc/rpUl/Z2xE2DFM5i3/TJe5pNSi795Jj773nNwvBER7
+ X3dZAQm4l1ZAOprBZCe0BwoE6NpaxCOkgU0jLYRFrosrUlmHSdS7fFUnGJ8EQidk6rMa3jybx
+ 5AtFUlx6V1I1YrX2qzyzoIx74DM4EVljseBbvL7eu6ZFe4hFXc6KExpZRiUQzC5w1RvV7Ovwi
+ 2SiLmcLiCP6c3ZpKUZKRVNv6j+Kf687cqaSsbTXfn1tWWHKBOSExIAG8tgNm95ET1DeZDd1QP
+ 0z6SR+MxMaTmL9yMmbgfwtJ1UgJX4kijPsxnx7LSFb89+m7sQ2bjBkuZiyyH8Mues9lGQQ3GQ
+ /rqJ/hdTwjNsa1O5O69DYgmzQhfHmec9ESY2JB2/53ITstzV8OOO4sg4EA3e/WchLYNYSqW4f
+ dNiw9Z3a8tSYOfXGMV9cPvvlfYvwlbQEapZvVRXH/nCnbhqmO3sA7IoZCPM6O2Gjwde3ffTsl
+ 9k0yTak3+CSf5n9SFZ05/4izd9io8oMbLkGLC5ofmZWUGmLbsMnnuWFpSbaUwddekPLNj8aMW
+ YSTgqnIKx/avQUacpsZ1A/HdXbvtKtY+ANLmvxm2gXazbd9KdYJFkvgebJgowZDkg+cG141
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,58 +100,39 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The ICH9 chipset is not X86/PC specific.
+hw/alpha/dp264.c uses NICInfo variables which are declared in
+"net/net.h". Include it.
 
-These files don't use anything declared by the "hw/i386/pc.h"
-or "hw/i386/ioapic.h" headers. Remove them.
+This fixes (when modifying unrelated headers):
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+  hw/alpha/dp264.c:89:21: error: use of undeclared identifier 'nb_nics'
+      for (i = 0; i < nb_nics; i++) {
+                      ^
+  hw/alpha/dp264.c:90:30: error: use of undeclared identifier 'nd_table'
+          pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
+                               ^
+
+Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-3-philmd@redhat.com>
+Message-Id: <20200228114649.12818-9-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/acpi/ich9.c         | 1 -
- hw/isa/lpc_ich9.c      | 1 -
- include/hw/i386/ich9.h | 1 -
- 3 files changed, 3 deletions(-)
+ hw/alpha/dp264.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 2034dd749edc..fdd0a6c79e11 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
--#include "hw/i386/pc.h"
- #include "hw/pci/pci.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index f85b484eac63..cb79616cede8 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -37,7 +37,6 @@
- #include "migration/vmstate.h"
- #include "hw/irq.h"
- #include "hw/isa/apm.h"
--#include "hw/i386/ioapic.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/i386/ich9.h"
-diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-index 72e803f6e2e0..a98d10b252df 100644
---- a/include/hw/i386/ich9.h
-+++ b/include/hw/i386/ich9.h
-@@ -5,7 +5,6 @@
- #include "hw/sysbus.h"
- #include "hw/i386/pc.h"
- #include "hw/isa/apm.h"
--#include "hw/i386/ioapic.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci_bridge.h"
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index d28f57199fa1..e5350a287f73 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -21,6 +21,7 @@
+ #include "hw/dma/i8257.h"
+ #include "net/net.h"
+ #include "qemu/cutils.h"
++#include "net/net.h"
+ 
+ #define MAX_IDE_BUS 2
+ 
 -- 
 2.24.1
 
