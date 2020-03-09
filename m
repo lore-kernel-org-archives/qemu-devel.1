@@ -2,86 +2,59 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E731C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEB4C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B09A2072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:38:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="cOiMMd/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B09A2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9D542072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:38:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9D542072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBDvL-0006Bg-IA
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47253)
+	id 1jBDva-0006sB-1u
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:38:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsC-0007Zn-VK
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:54 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDgM-0007XS-9y
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsB-0007Jf-K3
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:52 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46630)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jBDsB-0007Ib-Dh
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:51 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n15so9834985wrw.13
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 01:34:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=MD48WZYaJiiFtb9BWvJPqIeuYzfyj+64eoP1t2H2QsM=;
- b=cOiMMd/fFhW+XVawA2sXDUUPZiw7x2HFB7voEIJqUQIe6fpLtX64cUq4rwJdrHuuj4
- lAafYGrCVF2WUbrJ3QV4ltf4goi+Q2VeuII2oUerejOBeadRjSZJS2M/AsAi1j8eEs2c
- ahBP0obtlrZ89agupANcru8baXLqViRwAIOipocfQQahIibWoFwv1YrSpx+aNa5oKEZp
- P4zKJ4BmGeR8lQfXa67DIi47wdV4Z1QLnccc/0nlppEyTWZUElcW0yiNLZbi2eSFqrCl
- dPoKP0W50n5fvt/gm0Q86r1vxzQjaCxSasYEfHXuq8ZZv1HOrK0Poh7P/hv5IgS9S2eH
- 6WqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=MD48WZYaJiiFtb9BWvJPqIeuYzfyj+64eoP1t2H2QsM=;
- b=GlTu1P0Pm5PrAkJGnZjat/e4FLYMR1S3OhYIqcPNXabWK8cgcK/hd/YjeLOid9lUUl
- QCZePo9zjkQJffNYOcyLEtUYgVy4y1kUfUQ9SgVyrE+ILraROJu6MbRLtezjeS9uH48s
- oPri6XgwqzLDZ26liKBwuK11MGVFUpz6SLUJQVxJBhf238ZDwhKxnmnnR5Oi2oKm7zFe
- 3el6iYe10N/e0yTDvY6byq+1ZCea349mesawlk1wgjGTeXmEmXdPFrc6zyMsUDDbxHik
- zhQd+WjcDu6ap1tp4VHKSSS94T1g9SeYrPoZgGR7kRsxL2faaM/S+rcNKahd/vkirgPJ
- 4XRg==
-X-Gm-Message-State: ANhLgQ2EDSv0/6E4tgPV/KNOn4iL48vS3vAmEdQsGvllcI/MSR0/jeXA
- C0K1QIK2pEohB432k0ZPkeYYMSJ+oA4sCQ==
-X-Google-Smtp-Source: ADFU+vtRGnbbMYemX9B1Gp/bPQ2JHkdwh+fltXhVAzgewEbbHYwtwtnhwq3Mgd91fB567vU2/kHBvA==
-X-Received: by 2002:a5d:65c5:: with SMTP id e5mr3545340wrw.161.1583742889160; 
- Mon, 09 Mar 2020 01:34:49 -0700 (PDT)
-Received: from f2.redhat.com (bzq-79-177-42-131.red.bezeqint.net.
- [79.177.42.131])
- by smtp.gmail.com with ESMTPSA id h3sm63749726wrb.23.2020.03.09.01.34.48
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 09 Mar 2020 01:34:48 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH v2 1/4] virtio-net: introduce RSS and hash report features
-Date: Mon,  9 Mar 2020 10:34:35 +0200
-Message-Id: <20200309083438.2389-2-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200309083438.2389-1-yuri.benditovich@daynix.com>
-References: <20200309083438.2389-1-yuri.benditovich@daynix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBDgJ-000822-2t
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:22:38 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45666)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jBDgI-0007bl-AU; Mon, 09 Mar 2020 04:22:34 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_regular_dialog|0.0468137-8.89349e-05-0.953097;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.GyTxIXp_1583742101; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GyTxIXp_1583742101)
+ by smtp.aliyun-inc.com(10.147.41.137);
+ Mon, 09 Mar 2020 16:22:02 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v3 38/60] target/riscv: vector floating-point compare
+ instructions
+Date: Mon,  9 Mar 2020 16:20:20 +0800
+Message-Id: <20200309082042.12967-39-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200309082042.12967-1-zhiwei_liu@c-sky.com>
+References: <20200309082042.12967-1-zhiwei_liu@c-sky.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,123 +66,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- hw/net/virtio-net.c | 95 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ target/riscv/helper.h                   |  37 ++++
+ target/riscv/insn32.decode              |  12 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |  33 ++++
+ target/riscv/vector_helper.c            | 221 ++++++++++++++++++++++++
+ 4 files changed, 303 insertions(+)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 3627bb1717..9545b0e84f 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -71,6 +71,101 @@
- #define VIRTIO_NET_IP6_ADDR_SIZE   32      /* ipv6 saddr + daddr */
- #define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index efbd5d306d..323bed038e 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -941,3 +941,40 @@ DEF_HELPER_6(vfsgnjn_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_h, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_w, void, ptr, ptr, i64, ptr, env, i32)
+ DEF_HELPER_6(vfsgnjx_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++
++DEF_HELPER_6(vmfeq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfne_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmflt_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfle_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfeq_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfne_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmflt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfle_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfgt_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmfge_vf_d, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_h, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_w, void, ptr, ptr, i64, ptr, env, i32)
++DEF_HELPER_6(vmford_vf_d, void, ptr, ptr, i64, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index d149eccd5c..2d61256981 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -495,6 +495,18 @@ vfsgnjn_vv      001001 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjn_vf      001001 . ..... ..... 101 ..... 1010111 @r_vm
+ vfsgnjx_vv      001010 . ..... ..... 001 ..... 1010111 @r_vm
+ vfsgnjx_vf      001010 . ..... ..... 101 ..... 1010111 @r_vm
++vmfeq_vv        011000 . ..... ..... 001 ..... 1010111 @r_vm
++vmfeq_vf        011000 . ..... ..... 101 ..... 1010111 @r_vm
++vmfne_vv        011100 . ..... ..... 001 ..... 1010111 @r_vm
++vmfne_vf        011100 . ..... ..... 101 ..... 1010111 @r_vm
++vmflt_vv        011011 . ..... ..... 001 ..... 1010111 @r_vm
++vmflt_vf        011011 . ..... ..... 101 ..... 1010111 @r_vm
++vmfle_vv        011001 . ..... ..... 001 ..... 1010111 @r_vm
++vmfle_vf        011001 . ..... ..... 101 ..... 1010111 @r_vm
++vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
++vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
++vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
++vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
  
-+/* TODO: remove after virtio-net header update */
-+#if !defined(VIRTIO_NET_RSS_HASH_TYPE_IPv4)
-+#define VIRTIO_NET_F_HASH_REPORT    57  /* Supports hash report */
-+#define VIRTIO_NET_F_RSS            60  /* Supports RSS RX steering */
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index ff4ebd3f8c..9d9653e605 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1885,3 +1885,36 @@ GEN_OPFVV_TRANS(vfsgnjx_vv, opfvv_check)
+ GEN_OPFVF_TRANS(vfsgnj_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjn_vf, opfvf_check)
+ GEN_OPFVF_TRANS(vfsgnjx_vf, opfvf_check)
 +
-+/* supported/enabled hash types */
-+#define VIRTIO_NET_RSS_HASH_TYPE_IPv4          (1 << 0)
-+#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4         (1 << 1)
-+#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4         (1 << 2)
-+#define VIRTIO_NET_RSS_HASH_TYPE_IPv6          (1 << 3)
-+#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6         (1 << 4)
-+#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6         (1 << 5)
-+#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX         (1 << 6)
-+#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX        (1 << 7)
-+#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX        (1 << 8)
++/* Vector Floating-Point Compare Instructions */
++static bool opfvv_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            (s->sew != 0) &&
++            ((vext_check_overlap_group(a->rd, 1, a->rs1, 1 << s->lmul) &&
++            vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul)) ||
++            (s->lmul == 0)));
++}
++GEN_OPFVV_TRANS(vmfeq_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfne_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmflt_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmfle_vv, opfvv_cmp_check)
++GEN_OPFVV_TRANS(vmford_vv, opfvv_cmp_check)
 +
-+#define __le16 uint16_t
-+#define __le32 uint32_t
-+#define __u8   uint8_t
-+#define __u16  uint16_t
-+#define __u32  uint32_t
++static bool opfvf_cmp_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (s->sew != 0) &&
++            (vext_check_overlap_group(a->rd, 1, a->rs2, 1 << s->lmul) ||
++            (s->lmul == 0)));
++}
++GEN_OPFVF_TRANS(vmfeq_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfne_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmflt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfle_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfgt_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmfge_vf, opfvf_cmp_check)
++GEN_OPFVF_TRANS(vmford_vf, opfvf_cmp_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 79e261ff1a..dd44cc57a3 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -3631,3 +3631,224 @@ RVVCALL(OPFVF2, vfsgnjx_vf_d, OP_UUU_D, H8, H8, fsgnjx64)
+ GEN_VEXT_VF(vfsgnjx_vf_h, 2, 2, clearh)
+ GEN_VEXT_VF(vfsgnjx_vf_w, 4, 4, clearl)
+ GEN_VEXT_VF(vfsgnjx_vf_d, 8, 8, clearq)
 +
-+struct virtio_net_config_with_rss {
-+    /* The config defining mac address (if VIRTIO_NET_F_MAC) */
-+    __u8 mac[ETH_ALEN];
-+    /* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
-+    __u16 status;
-+    /*
-+     * Maximum number of each of transmit and receive queues;
-+     * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
-+     * Legal values are between 1 and 0x8000
-+     */
-+    __u16 max_virtqueue_pairs;
-+    /* Default maximum transmit unit advice */
-+    __u16 mtu;
-+    /*
-+     * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
-+     * Any other value stands for unknown.
-+     */
-+    __u32 speed;
-+    /*
-+     * 0x00 - half duplex
-+     * 0x01 - full duplex
-+     * Any other value stands for unknown.
-+     */
-+    __u8 duplex;
-+    /* maximum size of RSS key */
-+    __u8 rss_max_key_size;
-+    /* maximum number of indirection table entries */
-+    __le16 rss_max_indirection_table_length;
-+    /* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
-+    __le32 supported_hash_types;
-+} __attribute__((packed));
++/* Vector Floating-Point Compare Instructions */
++#define GEN_VEXT_CMP_VV_ENV(NAME, ETYPE, H, DO_OP)            \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
++        CPURISCVState *env, uint32_t desc)                    \
++{                                                             \
++    uint32_t mlen = vext_mlen(desc);                          \
++    uint32_t vm = vext_vm(desc);                              \
++    uint32_t vl = env->vl;                                    \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
++    uint32_t i;                                               \
++                                                              \
++    for (i = 0; i < vl; i++) {                                \
++        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {            \
++            continue;                                         \
++        }                                                     \
++        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, s1,         \
++            &env->fp_status));                                \
++    }                                                         \
++    if (i == 0) {                                             \
++        return;                                               \
++    }                                                         \
++    for (; i < vlmax; i++) {                                  \
++        vext_set_elem_mask(vd, mlen, i, 0);                   \
++    }                                                         \
++}
 +
-+#define virtio_net_config virtio_net_config_with_rss
++static uint8_t float16_eq_quiet(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare_quiet(a, b, s);
++    if (compare == float_relation_equal) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VV_ENV(vmfeq_vv_d, uint64_t, H8, float64_eq_quiet)
 +
-+struct virtio_net_hdr_v1_hash {
-+    struct virtio_net_hdr_v1 hdr;
-+    __le32 hash_value;
-+#define VIRTIO_NET_HASH_REPORT_NONE            0
-+#define VIRTIO_NET_HASH_REPORT_IPv4            1
-+#define VIRTIO_NET_HASH_REPORT_TCPv4           2
-+#define VIRTIO_NET_HASH_REPORT_UDPv4           3
-+#define VIRTIO_NET_HASH_REPORT_IPv6            4
-+#define VIRTIO_NET_HASH_REPORT_TCPv6           5
-+#define VIRTIO_NET_HASH_REPORT_UDPv6           6
-+#define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
-+#define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
-+#define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
-+    __le16 hash_report;
-+    __le16 padding;
-+};
++#define GEN_VEXT_CMP_VF(NAME, ETYPE, H, DO_OP)                      \
++void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
++        CPURISCVState *env, uint32_t desc)                          \
++{                                                                   \
++    uint32_t mlen = vext_mlen(desc);                                \
++    uint32_t vm = vext_vm(desc);                                    \
++    uint32_t vl = env->vl;                                          \
++    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);              \
++    uint32_t i;                                                     \
++                                                                    \
++    for (i = 0; i < vl; i++) {                                      \
++        ETYPE s2 = *((ETYPE *)vs2 + H(i));                          \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                  \
++            continue;                                               \
++        }                                                           \
++        vext_set_elem_mask(vd, mlen, i, DO_OP(s2, (ETYPE)s1,        \
++                &env->fp_status));                                  \
++    }                                                               \
++    if (i == 0) {                                                   \
++        return;                                                     \
++    }                                                               \
++    for (; i < vlmax; i++) {                                        \
++        vext_set_elem_mask(vd, mlen, i, 0);                         \
++    }                                                               \
++}
++GEN_VEXT_CMP_VF(vmfeq_vf_h, uint16_t, H2, float16_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_w, uint32_t, H4, float32_eq_quiet)
++GEN_VEXT_CMP_VF(vmfeq_vf_d, uint64_t, H8, float64_eq_quiet)
 +
-+/*
-+ * The command VIRTIO_NET_CTRL_MQ_RSS_CONFIG has the same effect as
-+ * VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET does and additionally configures
-+ * the receive steering to use a hash calculated for incoming packet
-+ * to decide on receive virtqueue to place the packet. The command
-+ * also provides parameters to calculate a hash and receive virtqueue.
-+ */
-+struct virtio_net_rss_config {
-+    __le32 hash_types;
-+    __le16 indirection_table_mask;
-+    __le16 unclassified_queue;
-+    __le16 indirection_table[1/* + indirection_table_mask */];
-+    __le16 max_tx_vq;
-+    __u8 hash_key_length;
-+    __u8 hash_key_data[/* hash_key_length */];
-+};
++static uint8_t vmfne16(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare_quiet(a, b, s);
++    if (compare != float_relation_equal &&
++            compare != float_relation_unordered) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfne32(uint32_t a, uint32_t b, float_status *s)
++{
++    int compare = float32_compare_quiet(a, b, s);
++    if (compare != float_relation_equal &&
++            compare != float_relation_unordered) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfne64(uint64_t a, uint64_t b, float_status *s)
++{
++    int compare = float64_compare_quiet(a, b, s);
++    if (compare != float_relation_equal &&
++            compare != float_relation_unordered) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VV_ENV(vmfne_vv_d, uint64_t, H8, vmfne64)
++GEN_VEXT_CMP_VF(vmfne_vf_h, uint16_t, H2, vmfne16)
++GEN_VEXT_CMP_VF(vmfne_vf_w, uint32_t, H4, vmfne32)
++GEN_VEXT_CMP_VF(vmfne_vf_d, uint64_t, H8, vmfne64)
 +
-+#define VIRTIO_NET_CTRL_MQ_RSS_CONFIG          1
-+#define VIRTIO_NET_CTRL_MQ_HASH_CONFIG         2
++static uint8_t float16_lt(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare(a, b, s);
++    if (compare == float_relation_less) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VV_ENV(vmflt_vv_d, uint64_t, H8, float64_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_h, uint16_t, H2, float16_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_w, uint32_t, H4, float32_lt)
++GEN_VEXT_CMP_VF(vmflt_vf_d, uint64_t, H8, float64_lt)
 +
-+#endif
++static uint8_t float16_le(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare(a, b, s);
++    if (compare == float_relation_less ||
++            compare == float_relation_equal) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VV_ENV(vmfle_vv_d, uint64_t, H8, float64_le)
++GEN_VEXT_CMP_VF(vmfle_vf_h, uint16_t, H2, float16_le)
++GEN_VEXT_CMP_VF(vmfle_vf_w, uint32_t, H4, float32_le)
++GEN_VEXT_CMP_VF(vmfle_vf_d, uint64_t, H8, float64_le)
 +
- /* Purge coalesced packets timer interval, This value affects the performance
-    a lot, and should be tuned carefully, '300000'(300us) is the recommended
-    value to pass the WHQL test, '50000' can gain 2x netperf throughput with
++static uint8_t vmfgt16(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare(a, b, s);
++    if (compare == float_relation_greater) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfgt32(uint32_t a, uint32_t b, float_status *s)
++{
++    int compare = float32_compare(a, b, s);
++    if (compare == float_relation_greater) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfgt64(uint64_t a, uint64_t b, float_status *s)
++{
++    int compare = float64_compare(a, b, s);
++    if (compare == float_relation_greater) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VF(vmfgt_vf_h, uint16_t, H2, vmfgt16)
++GEN_VEXT_CMP_VF(vmfgt_vf_w, uint32_t, H4, vmfgt32)
++GEN_VEXT_CMP_VF(vmfgt_vf_d, uint64_t, H8, vmfgt64)
++
++static uint8_t vmfge16(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare(a, b, s);
++    if (compare == float_relation_greater ||
++            compare == float_relation_equal) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfge32(uint32_t a, uint32_t b, float_status *s)
++{
++    int compare = float32_compare(a, b, s);
++    if (compare == float_relation_greater ||
++            compare == float_relation_equal) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++static uint8_t vmfge64(uint64_t a, uint64_t b, float_status *s)
++{
++    int compare = float64_compare(a, b, s);
++    if (compare == float_relation_greater ||
++            compare == float_relation_equal) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VF(vmfge_vf_h, uint16_t, H2, vmfge16)
++GEN_VEXT_CMP_VF(vmfge_vf_w, uint32_t, H4, vmfge32)
++GEN_VEXT_CMP_VF(vmfge_vf_d, uint64_t, H8, vmfge64)
++
++static uint8_t float16_unordered_quiet(uint16_t a, uint16_t b, float_status *s)
++{
++    int compare = float16_compare_quiet(a, b, s);
++    if (compare == float_relation_unordered) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++GEN_VEXT_CMP_VV_ENV(vmford_vv_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VV_ENV(vmford_vv_d, uint64_t, H8, !float64_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_h, uint16_t, H2, !float16_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_w, uint32_t, H4, !float32_unordered_quiet)
++GEN_VEXT_CMP_VF(vmford_vf_d, uint64_t, H8, !float64_unordered_quiet)
 -- 
-2.17.1
+2.23.0
 
 
