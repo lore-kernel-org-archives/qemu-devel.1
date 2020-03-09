@@ -1,92 +1,81 @@
 Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F33C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C953DC18E5A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D843920828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:22:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D843920828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9DF21927
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:31:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AU8G4izQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9DF21927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBN2e-0004uR-00
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 14:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39699)
+	id 1jBNBL-0007Xm-Le
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 14:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBN1g-0003hA-Cl
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:21:18 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jBNAh-000718-6O
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:30:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBN1d-0003CQ-E0
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:21:14 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:51583 helo=smtp.ehu.eus)
+ (envelope-from <dgilbert@redhat.com>) id 1jBNAe-0008M4-Vo
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:30:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49119
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
- id 1jBN1c-00038e-Tu
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:21:13 -0400
-Received: from imsva1.lgp.ehu.es (imsva1.lgp.ehu.es [10.0.3.245])
- by postfix.smtp1.imsva1 (Postfix) with ESMTPS id 28AE134DE6
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:21:02 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C537811004A
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:21:01 +0100 (CET)
-Received: from imsva1.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B943B110045
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:21:01 +0100 (CET)
-Received: from smtp.ehu.eus (unknown [10.0.100.73])
- by imsva1.lgp.ehu.es (Postfix) with ESMTPS
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:21:01 +0100 (CET)
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com
- [209.85.166.52]) by smtp1 (Postfix) with ESMTPSA id 62D3A34622
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:21:01 +0100 (CET)
-Received: by mail-io1-f52.google.com with SMTP id t26so2376559ios.11
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 11:21:00 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ3fMIo3FoM1DEkF5zUsbdMl5V5BIkQjlzggMpxeoWurHLsiddVG
- bEhQR5fERpM7/vrmtqYI1Ke87E+dBS9VMJfxJw==
-X-Google-Smtp-Source: ADFU+vtXur5gbWXSiDiGhwFdscxuUO/Uo3ZyyjpBrtD3Hwimyi/LVICT2i4F4Jvlc4Bs6uXFte7A2eCn46lWG9Ob/18=
-X-Received: by 2002:a02:c942:: with SMTP id u2mr16697427jao.49.1583778059809; 
- Mon, 09 Mar 2020 11:20:59 -0700 (PDT)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBNAe-0008Lc-Rp
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:30:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583778632;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=igACWjazqX9irLtEfSplsA0NnMXOOdu73gE6bMOer/g=;
+ b=AU8G4izQ8UGez8fU8YeSKF8YY8j6Eoiw4gh34aDfhtVXB4SYKugWppoY4dqyngy0yLWHPE
+ Uzp1gY8u7C6h4X21p965De6zijS17OQEOgnE+zaWqhDX/biUq2Y7c6MXDYgGROgIW2qrAY
+ N3DkXokjgFAJgONTZKgIt4QKWxQp67w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-VstHnXBdNe6HcpHu_LGiBg-1; Mon, 09 Mar 2020 14:30:28 -0400
+X-MC-Unique: VstHnXBdNe6HcpHu_LGiBg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9743DBA7;
+ Mon,  9 Mar 2020 18:30:27 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 802845D9CA;
+ Mon,  9 Mar 2020 18:30:23 +0000 (UTC)
+Date: Mon, 9 Mar 2020 18:30:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v5 00/11] HMP monitor handlers refactoring
+Message-ID: <20200309183021.GA20693@work-vm>
+References: <20200308092440.23564-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20200307172248.GA9@afee69d503a7>
- <1ba522c6-cae8-9e1f-ebf4-696076d2ca45@redhat.com>
-In-Reply-To: <1ba522c6-cae8-9e1f-ebf4-696076d2ca45@redhat.com>
-From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
-Date: Mon, 9 Mar 2020 19:20:48 +0100
-X-Gmail-Original-Message-ID: <CAGZZdDEqW4wkqsrYHYPy5ex1jqn5AAdbb4S0uzjfegMvwDUXmA@mail.gmail.com>
-Message-ID: <CAGZZdDEqW4wkqsrYHYPy5ex1jqn5AAdbb4S0uzjfegMvwDUXmA@mail.gmail.com>
-Subject: Re: [PATCH v8 1/9] qemu-binfmt-conf.sh: enforce safe style consistency
-To: Eric Blake <eblake@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000a8783e05a07010b8"
-X-Greylist: ACL 188 matched, not delayed by milter-greylist-4.6.2 (smtp1
- [10.0.100.73]); Mon, 09 Mar 2020 19:21:01 +0100 (CET)
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25280.001
-X-TM-AS-Result: No--7.637-7.0-31-10
-X-imss-scan-details: No--7.637-7.0-31-10
-X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25280.001
-X-TMASE-Result: 10--7.636800-10.000000
-X-TMASE-MatchedRID: Dd3I5NVGlbWgBUTSh64wSUKGB4JJ2ELXO4rmf5nWGLaqvcIF1TcLYKDC
- wNPUO2EFuTy74kQkEIJOHJZtIbb+sqdEjxbnR+wFgRTWSf0X8xkA+JHhu0IR5vBvPrJMSOFHNli
- ywith3TToEU9QFg66iGELR5bg5nwH5Ev91/MDgla/Jrpc+Y//jwZyESFXAljfnF+Nm+WXvuIzy+
- CKVy54Htzaad7ROSD8pmqRctPy1oeOdk16g9Qx2WhQCsqhuTNiJd2n2XoSRFlpPI6NmimM1BtgC
- xIlF6QYYYS/vMwAxmuAMuqetGVettLvsKjhs0ldcJktTZ6qE7icfuxsiY4QFO5Fu38LTWqA6Y1H
- CEbiifr/EAux5zou/JRn2d38wHu5HWvlw73WvTyl63Pi+ahzVRBJqJQjOUquqbb+CmAcounJjoQ
- vRfijnsC+ksT6a9fy
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
-X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
- milter-greylist-4.6.2 (postfix.smtp1.imsva1 [10.0.100.73]);
- Mon, 09 Mar 2020 19:21:02 +0100 (CET)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 158.227.0.66
+In-Reply-To: <20200308092440.23564-1-mlevitsk@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,90 +87,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: unai.martinezcorral@ehu.eus
-Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, riku.voipio@iki.fi,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000a8783e05a07010b8
-Content-Type: text/plain; charset="UTF-8"
+* Maxim Levitsky (mlevitsk@redhat.com) wrote:
+> This patch series is bunch of cleanups to the hmp monitor code.
+> It mostly moves the blockdev related hmp handlers to its own file,
+> and does some minor refactoring.
+>=20
+> No functional changes expected.
 
- 2020/03/09 16:01, Eric Blake:
+Queued for HMP, with the commit message fix up in 05.
 
-> On 3/7/20 11:22 AM, Unai Martinez-Corral wrote:
-> > Spaces are added before '; then', for consistency.
->
-> For consistency with what?  This is not our prevailing style; as
-> evidenced by this pre-patch search:
->
-> $ git grep 'if \[.*\];' | wc
->      274    2186   18170
-> $ git grep 'if \[.*\] ;' | wc
->       25     256    1573
->
-> and you are diverging from the dominant pattern.
->
+Dave
 
-For consistency within the script that is being modified. I'm not trying to
-diverge, neither do I prefer any specific style.
-Although the style in the current master is not consistent, ' ; ' is
-significantly more frequent. When I was told to keep consistency in v2, I
-picked that because it was the most common.
-Anyway, I will push a new version where all these are changed to the
-dominant pattern outside of this script.
-
-
-> This part, however, is good.  Since one part is controversial, you may
-> want to split this into two patches, or even drop the reformatting part.
->
-
-Since the current master is neither consistent nor coherent with the
-dominant pattern, I don't think I can drop the reformatting as long as I
-want to fulfill your requirements.
-
---000000000000a8783e05a07010b8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">
-<div dir=3D"ltr" class=3D"gmail_attr">2020/03/09 16:01, Eric Blake:<br></di=
-v><span class=3D"gmail-im"><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">On 3/7/20 11:22 AM, Unai Martinez-Corral wrote:<br>
-&gt; Spaces are added before &#39;; then&#39;, for consistency.<br>
-<br>
-For consistency with what?=C2=A0 This is not our prevailing style; as <br>
-evidenced by this pre-patch search:<br>
-<br>
-$ git grep &#39;if \[.*\];&#39; | wc<br>
-=C2=A0 =C2=A0 =C2=A0274=C2=A0 =C2=A0 2186=C2=A0 =C2=A018170<br>
-$ git grep &#39;if \[.*\] ;&#39; | wc<br>
-=C2=A0 =C2=A0 =C2=A0 25=C2=A0 =C2=A0 =C2=A0256=C2=A0 =C2=A0 1573<br>
-<br>
-and you are diverging from the dominant pattern.<br>
-</blockquote><div><br></div></span><div>For consistency within the script t=
-hat is being modified. I&#39;m not trying to diverge, neither do I prefer a=
-ny specific style.<br></div><div>Although
- the style in the current master is not consistent, &#39; ; &#39; is=20
-significantly more frequent. When I was told to keep consistency in v2, I
- picked that because it was the most common.<br></div><div>Anyway, I will p=
-ush a new version where all these are changed to the dominant pattern outsi=
-de of this script.<br></div><span class=3D"gmail-im"><div>=C2=A0</div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex">
-This part, however, is good.=C2=A0 Since one part is controversial, you may=
- <br>
-want to split this into two patches, or even drop the reformatting part.<br=
-></blockquote><div><br></div></span><div>Since
- the current master is neither consistent nor coherent with the dominant
- pattern, I don&#39;t think I can drop the reformatting as long as I want t=
-o
- fulfill your requirements.</div>
-
-</div>
-
---000000000000a8783e05a07010b8--
+> Changes from V1:
+>    * move the handlers to block/monitor/block-hmp-cmds.c
+>    * tiny cleanup for the commit messages
+>=20
+> Changes from V2:
+>    * Moved all the function prototypes to new header (blockdev-hmp-cmds.h=
+)
+>    * Set the license of blockdev-hmp-cmds.c to GPLv2+
+>    * Moved hmp_snapshot_* functions to blockdev-hmp-cmds.c
+>    * Moved hmp_drive_add_node to blockdev-hmp-cmds.c
+>      (this change needed some new exports, thus in separate new patch)
+>    * Moved hmp_qemu_io and hmp_eject to blockdev-hmp-cmds.c
+>    * Added 'error:' prefix to vreport, and updated the iotests
+>      This is invasive change, but really feels like the right one
+>    * Added minor refactoring patch that drops an unused #include
+>=20
+> Changes from V3:
+>    * Dropped the error prefix patches for now due to fact that it seems
+>      that libvirt doesn't need that after all. Oh well...
+>      I'll send them in a separate series.
+>=20
+>    * Hopefully correctly merged the copyright info the new files
+>      Both files are GPLv2 now (due to code from hmp.h/hmp-cmds.c)
+>=20
+>    * Addressed review feedback
+>    * Renamed the added header to block-hmp-cmds.h
+>=20
+>    * Got rid of checkpatch.pl warnings in the moved code
+>      (cosmetic code changes only)
+>=20
+>    * I kept the reviewed-by tags, since the changes I did are minor.
+>      I hope that this is right thing to do.
+>=20
+> Changes from V4:
+>    * Rebase with recent changes
+>    * Fixed review feedback
+>=20
+> Best regards,
+> =09Maxim Levitsky
+>=20
+> Maxim Levitsky (11):
+>   usb/dev-storage: remove unused include
+>   monitor/hmp: inline add_init_drive
+>   monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c
+>   monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c
+>   monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to
+>     block-hmp-cmds.c Moved code was added after 2012-01-13, thus under
+>     GPLv2+
+>   monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
+>   monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c
+>   monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
+>   monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c
+>   monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
+>   monitor/hmp: Move hmp_drive_add_node to block-hmp-cmds.c
+>=20
+>  MAINTAINERS                    |    1 +
+>  Makefile.objs                  |    2 +-
+>  block/Makefile.objs            |    1 +
+>  block/monitor/Makefile.objs    |    1 +
+>  block/monitor/block-hmp-cmds.c | 1015 ++++++++++++++++++++++++++++++++
+>  blockdev.c                     |  137 +----
+>  device-hotplug.c               |   91 ---
+>  hw/usb/dev-storage.c           |    1 -
+>  include/block/block-hmp-cmds.h |   54 ++
+>  include/block/block_int.h      |    5 +-
+>  include/monitor/hmp.h          |   24 -
+>  include/sysemu/blockdev.h      |    4 -
+>  include/sysemu/sysemu.h        |    3 -
+>  monitor/hmp-cmds.c             |  782 ------------------------
+>  monitor/misc.c                 |    1 +
+>  15 files changed, 1085 insertions(+), 1037 deletions(-)
+>  create mode 100644 block/monitor/Makefile.objs
+>  create mode 100644 block/monitor/block-hmp-cmds.c
+>  delete mode 100644 device-hotplug.c
+>  create mode 100644 include/block/block-hmp-cmds.h
+>=20
+> --=20
+> 2.17.2
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
