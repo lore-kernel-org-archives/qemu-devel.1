@@ -2,81 +2,69 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D01C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C7CC10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4361520663
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 18:51:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWW1L91F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4361520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 543DA20866
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:01:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543DA20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBNV9-0002iz-91
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 14:51:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44347)
+	id 1jBNet-00079w-Il
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:01:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jBNUM-0002DS-SV
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:50:56 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jBNeA-0006RL-8n
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jBNUK-00034D-9S
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:50:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37179
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBNUK-00032d-1d
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 14:50:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583779851;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/ZM40ghvh2zt4A2aPhfkeOzoesLPNOGh0c1rZYAyxyc=;
- b=gWW1L91FNfHMb9yL6FJdCSLO0Nuk5ITGhYW7qiRayo2YMIDMdy/ZB1lVjToSzQNgsWY01R
- NCmdjqKS6dixtB8l8KuUyvYaQaSvIIOzUsXFy3ubS2+CGYe04lhM5ORYOvZObYkzxkLrw2
- D7dOdIjYko35V2ucS9UCjrcEHxsk/Wg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-uExUZ74MMfOBubuE04P13Q-1; Mon, 09 Mar 2020 14:50:47 -0400
-X-MC-Unique: uExUZ74MMfOBubuE04P13Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85CA7A0CC3;
- Mon,  9 Mar 2020 18:50:46 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 772F660304;
- Mon,  9 Mar 2020 18:50:42 +0000 (UTC)
-Date: Mon, 9 Mar 2020 18:50:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] net: Remove deprecated [hub_id name] tuple of
- 'hostfwd_add' / 'hostfwd_remove'
-Message-ID: <20200309185039.GB20693@work-vm>
-References: <20191205104109.18680-1-thuth@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1jBNe8-0003CL-AM
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:01 -0400
+Resent-Date: Mon, 09 Mar 2020 15:01:01 -0400
+Resent-Message-Id: <E1jBNe8-0003CL-AM@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21194)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jBNe8-0003Az-1V
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:00 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1583780454; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=eIrBSIxLNkQ+j1k+sPIJk4og1NxEHqfss8c0hkoRLRXruChIhqxZ4QTfJEpIKiX2jEfX573/x88ylEYDTg/YBs8KJGOzAL4/DrRLj6lfslMozetKSdOO0dXrdMSUptj71sjn95oGoNyAwp6e7k1j9E1x2gixIQ2HzibFdCqtpIw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583780454;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=kMYgnH2VNHnPoECh2+MIi69Jk3n0V3oT0dBCiZLXsQY=; 
+ b=VciBBP+A8k6BHBU4T/Gea5qra06JI5dxTaOxfE+k6DPC2WevyR/y/Q5yFhbg7OffCelVkU7S6/vQqONxZIBM3mkPeLnkSQ0VKTc+lizsxT/oqjuT2NLqicvraGs46atqoPKFfZ5sIjCPgMNRTQn+W5dz6iOhrGb4nmlq1uZd8k4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583780452981873.0242393712098;
+ Mon, 9 Mar 2020 12:00:52 -0700 (PDT)
+In-Reply-To: <20200309183521.GA9@669c1c222ef4>
+Subject: Re: [PATCH v9 0/9] qemu-binfmt-conf.sh
+Message-ID: <158378045193.20878.13506707686933683163@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20191205104109.18680-1-thuth@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: unai.martinezcorral@ehu.eus
+Date: Mon, 9 Mar 2020 12:00:52 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,232 +76,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> It's been deprecated since QEMU v3.1.0. Time to finally remove it now.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Queued, via HMP, I've reworked the qemu-deprecated into the new rst
-world.
-
-> ---
->  hmp-commands.hx      |  8 ++++----
->  net/hub.c            | 23 -----------------------
->  net/hub.h            |  2 --
->  net/slirp.c          | 44 ++++++++++++--------------------------------
->  qemu-deprecated.texi | 13 ++++++++-----
->  5 files changed, 24 insertions(+), 66 deletions(-)
->=20
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index cfcc044ce4..14ccc685d7 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1463,8 +1463,8 @@ ETEXI
->  #ifdef CONFIG_SLIRP
->      {
->          .name       =3D "hostfwd_add",
-> -        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
-> -        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr]:=
-hostport-[guestaddr]:guestport",
-> +        .args_type  =3D "arg1:s,arg2:s?",
-> +        .params     =3D "[netdev_id] [tcp|udp]:[hostaddr]:hostport-[gues=
-taddr]:guestport",
->          .help       =3D "redirect TCP or UDP connections from host to gu=
-est (requires -net user)",
->          .cmd        =3D hmp_hostfwd_add,
->      },
-> @@ -1478,8 +1478,8 @@ ETEXI
->  #ifdef CONFIG_SLIRP
->      {
->          .name       =3D "hostfwd_remove",
-> -        .args_type  =3D "arg1:s,arg2:s?,arg3:s?",
-> -        .params     =3D "[hub_id name]|[netdev_id] [tcp|udp]:[hostaddr]:=
-hostport",
-> +        .args_type  =3D "arg1:s,arg2:s?",
-> +        .params     =3D "[netdev_id] [tcp|udp]:[hostaddr]:hostport",
->          .help       =3D "remove host-to-guest TCP or UDP redirection",
->          .cmd        =3D hmp_hostfwd_remove,
->      },
-> diff --git a/net/hub.c b/net/hub.c
-> index 5795a678ed..88cfb876f3 100644
-> --- a/net/hub.c
-> +++ b/net/hub.c
-> @@ -193,29 +193,6 @@ NetClientState *net_hub_add_port(int hub_id, const c=
-har *name,
->      return &port->nc;
->  }
-> =20
-> -/**
-> - * Find a specific client on a hub
-> - */
-> -NetClientState *net_hub_find_client_by_name(int hub_id, const char *name=
-)
-> -{
-> -    NetHub *hub;
-> -    NetHubPort *port;
-> -    NetClientState *peer;
-> -
-> -    QLIST_FOREACH(hub, &hubs, next) {
-> -        if (hub->id =3D=3D hub_id) {
-> -            QLIST_FOREACH(port, &hub->ports, next) {
-> -                peer =3D port->nc.peer;
-> -
-> -                if (peer && strcmp(peer->name, name) =3D=3D 0) {
-> -                    return peer;
-> -                }
-> -            }
-> -        }
-> -    }
-> -    return NULL;
-> -}
-> -
->  /**
->   * Find a available port on a hub; otherwise create one new port
->   */
-> diff --git a/net/hub.h b/net/hub.h
-> index 66d3322fac..ce45f7b399 100644
-> --- a/net/hub.h
-> +++ b/net/hub.h
-> @@ -15,10 +15,8 @@
->  #ifndef NET_HUB_H
->  #define NET_HUB_H
-> =20
-> -
->  NetClientState *net_hub_add_port(int hub_id, const char *name,
->                                   NetClientState *hubpeer);
-> -NetClientState *net_hub_find_client_by_name(int hub_id, const char *name=
-);
->  void net_hub_info(Monitor *mon);
->  void net_hub_check_clients(void);
->  bool net_hub_flush(NetClientState *nc);
-> diff --git a/net/slirp.c b/net/slirp.c
-> index c4334ee876..77042e6df7 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -610,25 +610,13 @@ error:
->      return -1;
->  }
-> =20
-> -static SlirpState *slirp_lookup(Monitor *mon, const char *hub_id,
-> -                                const char *name)
-> +static SlirpState *slirp_lookup(Monitor *mon, const char *id)
->  {
-> -    if (name) {
-> -        NetClientState *nc;
-> -        if (hub_id) {
-> -            nc =3D net_hub_find_client_by_name(strtol(hub_id, NULL, 0), =
-name);
-> -            if (!nc) {
-> -                monitor_printf(mon, "unrecognized (hub-id, stackname) pa=
-ir\n");
-> -                return NULL;
-> -            }
-> -            warn_report("Using 'hub-id' is deprecated, specify the netde=
-v id "
-> -                        "directly instead");
-> -        } else {
-> -            nc =3D qemu_find_netdev(name);
-> -            if (!nc) {
-> -                monitor_printf(mon, "unrecognized netdev id '%s'\n", nam=
-e);
-> -                return NULL;
-> -            }
-> +    if (id) {
-> +        NetClientState *nc =3D qemu_find_netdev(id);
-> +        if (!nc) {
-> +            monitor_printf(mon, "unrecognized netdev id '%s'\n", id);
-> +            return NULL;
->          }
->          if (strcmp(nc->model, "user")) {
->              monitor_printf(mon, "invalid device specified\n");
-> @@ -655,16 +643,12 @@ void hmp_hostfwd_remove(Monitor *mon, const QDict *=
-qdict)
->      int err;
->      const char *arg1 =3D qdict_get_str(qdict, "arg1");
->      const char *arg2 =3D qdict_get_try_str(qdict, "arg2");
-> -    const char *arg3 =3D qdict_get_try_str(qdict, "arg3");
-> =20
-> -    if (arg3) {
-> -        s =3D slirp_lookup(mon, arg1, arg2);
-> -        src_str =3D arg3;
-> -    } else if (arg2) {
-> -        s =3D slirp_lookup(mon, NULL, arg1);
-> +    if (arg2) {
-> +        s =3D slirp_lookup(mon, arg1);
->          src_str =3D arg2;
->      } else {
-> -        s =3D slirp_lookup(mon, NULL, NULL);
-> +        s =3D slirp_lookup(mon, NULL);
->          src_str =3D arg1;
->      }
->      if (!s) {
-> @@ -784,16 +768,12 @@ void hmp_hostfwd_add(Monitor *mon, const QDict *qdi=
-ct)
->      SlirpState *s;
->      const char *arg1 =3D qdict_get_str(qdict, "arg1");
->      const char *arg2 =3D qdict_get_try_str(qdict, "arg2");
-> -    const char *arg3 =3D qdict_get_try_str(qdict, "arg3");
-> =20
-> -    if (arg3) {
-> -        s =3D slirp_lookup(mon, arg1, arg2);
-> -        redir_str =3D arg3;
-> -    } else if (arg2) {
-> -        s =3D slirp_lookup(mon, NULL, arg1);
-> +    if (arg2) {
-> +        s =3D slirp_lookup(mon, arg1);
->          redir_str =3D arg2;
->      } else {
-> -        s =3D slirp_lookup(mon, NULL, NULL);
-> +        s =3D slirp_lookup(mon, NULL);
->          redir_str =3D arg1;
->      }
->      if (s) {
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 66d2b22a94..e407cc085e 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -206,11 +206,6 @@ the 'wait' field, which is only applicable to socket=
-s in server mode
-> =20
->  @section Human Monitor Protocol (HMP) commands
-> =20
-> -@subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (si=
-nce 3.1)
-> -
-> -The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
-> -'hostfwd_remove' HMP commands has been replaced by @option{netdev_id}.
-> -
->  @subsection cpu-add (since 4.0)
-> =20
->  Use ``device_add'' for hotplugging vCPUs instead of ``cpu-add''.  See
-> @@ -376,6 +371,14 @@ What follows is a record of recently removed, former=
-ly deprecated
->  features that serves as a record for users who have encountered
->  trouble after a recent upgrade.
-> =20
-> +@section Human Monitor Protocol (HMP) commands
-> +
-> +@subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (re=
-moved in 5.0)
-> +
-> +The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
-> +'hostfwd_remove' HMP commands has been replaced by the single option
-> +@option{netdev_id}.
-> +
->  @section QEMU Machine Protocol (QMP) commands
-> =20
->  @subsection block-dirty-bitmap-add "autoload" parameter (since 4.2.0)
-> --=20
-> 2.18.1
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwOTE4MzUyMS5HQTlA
+NjY5YzFjMjIyZWY0LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rp
+bmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246
+CgpTdWJqZWN0OiBbUEFUQ0ggdjkgMC85XSBxZW11LWJpbmZtdC1jb25mLnNoCk1lc3NhZ2UtaWQ6
+IDIwMjAwMzA5MTgzNTIxLkdBOUA2NjljMWMyMjJlZjQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY1MGY1
+NzUgcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIC0tdGVzdAphOWVjOTE4IHFlbXUtYmluZm10LWNv
+bmYuc2g6IGFkZCBvcHRpb24gLS1jbGVhcgphMmQxMTJmIHFlbXUtYmluZm10LWNvbmYuc2g6IGdl
+bmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCBbVEFSR0VUU10KZTcxYWEwZCBxZW11LWJpbmZt
+dC1jb25mLnNoOiBob25vdXIgUUVNVV9QQVRIIGFuZC9vciBRRU1VX1NVRkZJWAowZGFkOWZkIHFl
+bXUtYmluZm10LWNvbmYuc2g6IHJlbW92ZSAncWVtdScgcHJlZml4IGZyb20gY2xpIG9wdGlvbnMK
+OGRkM2IxZCBxZW11LWJpbmZtdC1jb25mLnNoOiB1c2UgdGhlIHNhbWUgcHJlc2VudGF0aW9uIGZv
+cm1hdCBhcyBmb3IgcWVtdS0qCmNhNWIyNjkgcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIFFFTVVf
+Q1JFREVOVElBTCBhbmQgUUVNVV9QRVJTSVNURU5UCjczN2Y5NTkgcWVtdS1iaW5mbXQtY29uZi5z
+aDogbWFrZSBvcHRzIC1wIGFuZCAtYyBib29sZWFuCmViYTA3ZDMgcWVtdS1iaW5mbXQtY29uZi5z
+aDogZW5mb3JjZSBzYWZlIHN0eWxlIGNvbnNpc3RlbmN5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQox
+LzkgQ2hlY2tpbmcgY29tbWl0IGViYTA3ZDNiMGMxYyAocWVtdS1iaW5mbXQtY29uZi5zaDogZW5m
+b3JjZSBzYWZlIHN0eWxlIGNvbnNpc3RlbmN5KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojODg6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMDM6CisgICAgICAg
+IGlmIFsgIngkbWFnaWMiID0gIngiIF0gfHwgWyAieCRtYXNrIiA9ICJ4IiBdIHx8IFsgIngkZmFt
+aWx5IiA9ICJ4IiBdOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNiBsaW5l
+cyBjaGVja2VkCgpQYXRjaCAxLzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi85IENoZWNr
+aW5nIGNvbW1pdCA3MzdmOTU5NGUxN2MgKHFlbXUtYmluZm10LWNvbmYuc2g6IG1ha2Ugb3B0cyAt
+cCBhbmQgLWMgYm9vbGVhbikKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MTogRklM
+RTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjMzMToKK29wdGlvbnM9JChnZXRvcHQgLW8g
+ZHM6UTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kOixxZW11LXBhdGg6LHFlbXUtc3VmZml4Oixl
+eHBvcnRkaXI6LGhlbHAsY3JlZGVudGlhbCxwZXJzaXN0ZW50IC0tICIkQCIpCgp0b3RhbDogMSBl
+cnJvcnMsIDAgd2FybmluZ3MsIDQzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvOSBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKMy85IENoZWNraW5nIGNvbW1pdCBjYTViMjY5MzkxNTkgKHFlbXUt
+YmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFFTVVfUEVSU0lTVEVOVCkK
+NC85IENoZWNraW5nIGNvbW1pdCA4ZGQzYjFkZGMwODYgKHFlbXUtYmluZm10LWNvbmYuc2g6IHVz
+ZSB0aGUgc2FtZSBwcmVzZW50YXRpb24gZm9ybWF0IGFzIGZvciBxZW11LSopCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25m
+LnNoOjE4MzoKKy1GfC0tcWVtdS1zdWZmaXggU1VGRklYICAgICAgICAgICAgICAgYWRkIGEgc3Vm
+Zml4IHRvIHRoZSBkZWZhdWx0IGludGVycHJldGVyIG5hbWUKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
+Y2hhcmFjdGVycwojNTI6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODQ6Cist
+cHwtLXBlcnNpc3RlbnQgICAgICBRRU1VX1BFUlNJU1RFTlQgICh5ZXMpIGxvYWQgdGhlIGludGVy
+cHJldGVyIGFuZCBrZWVwIGl0IGluIG1lbW9yeTsgYWxsIGZ1dHVyZQoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiM1NDogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4
+NjoKKy1jfC0tY3JlZGVudGlhbCAgICAgIFFFTVVfQ1JFREVOVElBTCAgKHllcykgY3JlZGVudGlh
+bCBhbmQgc2VjdXJpdHkgdG9rZW5zIGFyZSBjYWxjdWxhdGVkIGFjY29yZGluZwoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1OTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25m
+LnNoOjE5MToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3lzdGVtZC1i
+aW5mbXQuc2VydmljZSBmb3IgdGhlIGdpdmVuIENQVTsgaWYgQ1BVIGlzICJBTEwiLAoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1j
+b25mLnNoOjE5MzoKKy1kfC0tZGViaWFuICAgICAgICAgICAgICAgICAgICAgICAgICAgZG9uJ3Qg
+d3JpdGUgaW50byAvcHJvYywgZ2VuZXJhdGUgdXBkYXRlLWJpbmZtdHMgdGVtcGxhdGVzCgpFUlJP
+UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg2OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
+LWNvbmYuc2g6MjEwOgorVGhlIGVudmlyb25tZW50IHZhcmlhYmxlIEhPU1RfQVJDSCBhbGxvd3Mg
+dG8gb3ZlcnJpZGUgJ3VuYW1lJyB0byBnZW5lcmF0ZSBjb25maWd1cmF0aW9uIGZpbGVzIGZvciBh
+Cgp0b3RhbDogNSBlcnJvcnMsIDEgd2FybmluZ3MsIDc5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQv
+OSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS85IENoZWNraW5nIGNvbW1pdCAwZGFkOWZk
+MDYxOWUgKHFlbXUtYmluZm10LWNvbmYuc2g6IHJlbW92ZSAncWVtdScgcHJlZml4IGZyb20gY2xp
+IG9wdGlvbnMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogc2Ny
+aXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4NDoKKy1GfC0tc3VmZml4IFNVRkZJWCAgICAgICAg
+ICAgICAgICAgICAgYWRkIGEgc3VmZml4IHRvIHRoZSBkZWZhdWx0IGludGVycHJldGVyIG5hbWUK
+CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDU6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
+aW5mbXQtY29uZi5zaDozMzc6CitvcHRpb25zPSQoZ2V0b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBk
+ZWJpYW4sc3lzdGVtZDoscGF0aDosc3VmZml4OixleHBvcnRkaXI6LGhlbHAsY3JlZGVudGlhbCxw
+ZXJzaXN0ZW50IC0tICIkQCIpCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDM4IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDUvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi85IENoZWNr
+aW5nIGNvbW1pdCBlNzFhYTBkNDA2ZTEgKHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1V
+X1BBVEggYW5kL29yIFFFTVVfU1VGRklYKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMjM6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODQ6CistRnwtLXN1ZmZp
+eCBTVUZGSVggICBRRU1VX1NVRkZJWCAgICAgIGFkZCBhIHN1ZmZpeCB0byB0aGUgZGVmYXVsdCBp
+bnRlcnByZXRlciBuYW1lCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwIGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDYvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzkgQ2hlY2tpbmcg
+Y29tbWl0IGEyZDExMmZlZDE3YSAocWVtdS1iaW5mbXQtY29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BV
+PiB0byBwb3NpdGlvbmFsIFtUQVJHRVRTXSkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiM3ODogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjIwMzoKK1RBUkdFVFMgICAg
+ICAgICAgICAgIFFFTVVfVEFSR0VUUyAgICAgQSBzaW5nbGUgYXJjaCBuYW1lIG9yIGEgbGlzdCBv
+ZiB0aGVtIChzZWUgYWxsIG5hbWVzIGJlbG93KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiM5MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjIxNToKKy1zfC0t
+c3lzdGVtZCAgICAgICAgICAgICAgICAgICAgICAgICAgZG9uJ3Qgd3JpdGUgaW50byAvcHJvYywg
+Z2VuZXJhdGUgZmlsZShzKSBmb3IKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA1
+OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjM0OgorVGhlIGVudmlyb25tZW50
+IHZhcmlhYmxlIEhPU1RfQVJDSCBhbGxvd3MgdG8gb3ZlcnJpZGUgJ3VuYW1lJyB0byBnZW5lcmF0
+ZSBjb25maWd1cmF0aW9uIGZpbGVzIGZvcgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiMxNDc6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozNjM6CitvcHRpb25zPSQo
+Z2V0b3B0IC1vIGRzUTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1ZmZpeDosZXhw
+b3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90YWw6IDMgZXJy
+b3JzLCAxIHdhcm5pbmdzLCAxNDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy85IGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgo4LzkgQ2hlY2tpbmcgY29tbWl0IGE5ZWM5MThiYTllYyAocWVtdS1i
+aW5mbXQtY29uZi5zaDogYWRkIG9wdGlvbiAtLWNsZWFyKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDQ6Cisg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIGVtcHR5LCBjb25maWd1cmUv
+Y2xlYXIgYWxsIGtub3duIHRhcmdldHM7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
+IzQyOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjEzOgorLXJ8LS1jbGVhciAg
+ICAgICAgICAgUUVNVV9DTEVBUiAgICAgICAoeWVzKSByZW1vdmUgcmVnaXN0ZXJlZCBpbnRlcnBy
+ZXRlcnMgZm9yIHRhcmdldCBUQVJHRVRTOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiM4NTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjM4MToKK29wdGlvbnM9JChn
+ZXRvcHQgLW8gcmRzUTpTOmU6aGNwIC1sIGNsZWFyLGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1ZmZp
+eDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90YWw6
+IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA4NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzkgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvOSBDaGVja2luZyBjb21taXQgZjUwZjU3NTYxNmE4IChx
+ZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgLS10ZXN0KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMjE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDQ6CisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIGVtcHR5LCBjb25maWd1cmUvY2xl
+YXIgYWxsIGtub3duIHRhcmdldHMuCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI5
+OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjE0OgorLXR8LS10ZXN0ICAgICAg
+ICAgICAgUUVNVV9URVNUICAgICAgICAoeWVzKSB0ZXN0IHRoZSBzZXR1cCB3aXRoIHRoZSBwcm92
+aWRlZCBhcmd1bWVudHMsIGJ1dCBkbyBub3QKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
+cwojNTk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozODE6CitvcHRpb25zPSQo
+Z2V0b3B0IC1vIHRyZHNROlM6ZTpoY3AgLWwgdGVzdCxjbGVhcixkZWJpYW4sc3lzdGVtZCxwYXRo
+OixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFsLHBlcnNpc3RlbnQgLS0gIiRAIikK
+CnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS85
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
+bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMwOTE4MzUyMS5HQTlANjY5YzFjMjIyZWY0L3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
