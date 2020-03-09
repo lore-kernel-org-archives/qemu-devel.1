@@ -2,86 +2,115 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7417C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDB1C10F29
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E7F62083E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:46:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="qnltBC7y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F62083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1FEF120637
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:49:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEF120637
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBE3j-0002ek-JO
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47285)
+	id 1jBE5z-0003h8-7o
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50117)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsF-0007fo-6b
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:56 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBE59-0003Hl-Mj
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:48:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsE-0007Ol-3X
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:55 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39817)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jBDsD-0007NG-SL
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:54 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f7so4204401wml.4
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 01:34:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=qwff9geVcA9Ofl81vgC89M4fcI3BmCYQGSyZyytOdBU=;
- b=qnltBC7yVakg4nqdoErtT2D3DClG3hrzoJeqQTbHxsSu6xjOcKmoRlZoyUPJ/FuZqC
- NtkbhXIliOaIO0fHOMAus7ReOo5jdLrtZVUlnxgwGzfB6dRiz3QJfYDHqfvnLwOWnK6V
- 4M+SEu2cj9x5ywQOJYGMVxXWJ798wxHglx8kfpioHz5LDSktiS1abDLX4N1fgXCKDT8a
- kfPEYmQKllM5e5FoQGGPyPEX9sN1v95+olwZRd5jN8Zx4dTijR3iwhzQATOX0SAvzY/F
- 0X0u84WfK5QF6vLkKBJaUHBQgCPbrautaeppeblHpvnKxu6P1DLgkN+d3MnzbAqjTdda
- mfGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=qwff9geVcA9Ofl81vgC89M4fcI3BmCYQGSyZyytOdBU=;
- b=M56f2I0/15gOD1pmyIVc+Rmf2r+ho6V8nPfegzEQXC7zqIkM07ZGjKsu78dFIXYfqz
- dgd+mb74VC5xMmIohllLQnrYhKsDPItnbRQr6sp+Zxhywjv9NhmaYDtgSevD81Ms9IH+
- 3r6jaRwbD6YPvW4pczwtSx7jdirIDqmBBPpDjbW+tRm9aYKReHzJG0Fob/OgO1dpMM5z
- Fsfz27HjYIO9diiiNPVIrlll7C/R+uYRfnmXpHkvI0ghFXiwbls25z8DRX+pT2mtDVrU
- 7FQodxTMq5iXfBNHHh0h03FeXYKCvKISklMNnDQWRPhD6nlScyZIWE7vNwOSlyZdVAXp
- PqAA==
-X-Gm-Message-State: ANhLgQ08XUKM5YOxIhOl6S7UuJ4e9fvlev2C0Nk2EU19HL/zrlgV3ZVP
- 6/FpoJ85liwRcfs/dvBJ8L6Jgp4wbUVi7w==
-X-Google-Smtp-Source: ADFU+vsWax8EvBxUUSu4b017CHsX2Y62Vq1glMujvpYYGxwHtHTxCn7b1dX/DC4aO8gS4rHq52CESQ==
-X-Received: by 2002:a1c:e341:: with SMTP id a62mr7003260wmh.121.1583742892693; 
- Mon, 09 Mar 2020 01:34:52 -0700 (PDT)
-Received: from f2.redhat.com (bzq-79-177-42-131.red.bezeqint.net.
- [79.177.42.131])
- by smtp.gmail.com with ESMTPSA id h3sm63749726wrb.23.2020.03.09.01.34.51
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 09 Mar 2020 01:34:52 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH v2 4/4] virtio-net: block migration if RSS feature negotiated
-Date: Mon,  9 Mar 2020 10:34:38 +0200
-Message-Id: <20200309083438.2389-5-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200309083438.2389-1-yuri.benditovich@daynix.com>
-References: <20200309083438.2389-1-yuri.benditovich@daynix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+ (envelope-from <laurent@vivier.eu>) id 1jBE58-0007UU-6D
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:48:15 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:52305)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jBE57-0007Ta-Tv; Mon, 09 Mar 2020 04:48:14 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MxmJs-1jY0Yz1oL8-00zH2V; Mon, 09 Mar 2020 09:48:07 +0100
+Subject: Re: [PATCH] dp8393x: Mask EOL bit from descriptor addresses, take 2
+To: Jason Wang <jasowang@redhat.com>
+References: <alpine.LNX.2.22.394.2003041421280.12@nippy.intranet>
+ <2116e607-52c8-7e7d-8ac1-c80d4628b2de@vivier.eu>
+ <d2e80d5b-3c7a-92ad-7371-1cd0800195ca@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <23179263-a8fb-57cc-e98a-bfe9a2ee9037@vivier.eu>
+Date: Mon, 9 Mar 2020 09:48:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <d2e80d5b-3c7a-92ad-7371-1cd0800195ca@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:nW5+porYYJUczELFs0G+M24y9dQ7Sw8MfpqGS4LjlN1vtGXxboE
+ QGgEuVM22bcDOkhI+pI4+8X1TN4aSz9r5FgI9wiytV+9q6TtORZ1TKula/IT4etkpoKlRHL
+ g/yMLcOewZnvbTref+ABj2vVb74HyuX++Cvu77WENqflxOXZj1R8Qrpeca+RvK4KhcgG4lF
+ qqTU9mjjpr6B5DVp5r/LQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:juIUUIMqmv4=:dI/auL1JLYxesFklA6hCiI
+ L5Wy9crXLPEMkTCpjMGRtzBTOrazxs+ex/ETWxqZK7SVzJRpiPLA2YmGqoF6GSMwt21idYhHq
+ ILgHbNehwIWuMHH6Xdr3AczMZYNf56rSyZseSYO6COi3LC73MzhYdOMnHyOzz9u0CurK4Byag
+ H/XRJo04vyPXAfh5u+4xc8ZjqBUKhyIr/uUNKTZgEa9og7z46V0IfDrRTez3bfaBoNSXXRfOw
+ HSlDcllP59upK17ZSJH7XUf4lDhwZwQvHuJ+1vWBPEjTVwI/bYV7beK3oeXhmvQGeAddqAUOz
+ ZP/bhxBBMH0/cpGGaXkb0mgcnZzWPCYzOH8/ozpJEIbBEq/4GpaQJM32do8bBOw7Qy5/NHIdr
+ zSuetgp+YadIG7dQBBBGdWduqa9/Rsmu/ijDF88mDxTbOQOYcp6Oq7zf4zW3dai2AZISbsn+4
+ /4crSMDFW11wa582SZRNarkIZb1Wf25Gh1b5LduCZZOxTLTDCYoWO1xiUAhGVhrmGpsjuAuy7
+ 82+7Fd2ngYpSe385QSkK67DsAIuZLBjLMk3H/fAsPN2i/5b5tbuV55p56LasYKr4RGCTljESI
+ Myb7bpKZicb26NKZVEP5VvpsK8u56bNmOnGFan/MbX7XtGmP41nC8rjuO14/p4EGeS411xZyI
+ QPkZ7zEjjXxP8NrJrhQh0Ijhxw5zvrGp3IGbIV1wATUliSdvYnyoWYcwBi2nJ1vLREtCoi0Kp
+ Q2IsEQkA8AeWEOvMe2l3jInWvQ6pdg6uXlPHc8V5XpJtpVB5gC04lrf3Nvexd/9DLRjbKcus1
+ EN+fL3wL16SgMHBmWEEncwVlevOsLj9tDT1dH8pHsdqtbce4Etqsa2wgOaPDO1FXl5B75i5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,78 +122,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ Finn Thain <fthain@telegraphics.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Block migration for reference implementation of
-RSS feature in QEMU. When we add support for RSS
-on backend side, we'll implement migration of
-current RSS settings.
+Le 09/03/2020 à 03:51, Jason Wang a écrit :
+> 
+> On 2020/3/8 下午5:52, Laurent Vivier wrote:
+>> Le 04/03/2020 à 04:23, Finn Thain a écrit :
+>>> A portion of a recent patch got lost due to a merge snafu. That patch is
+>>> now commit 88f632fbb1 ("dp8393x: Mask EOL bit from descriptor
+>>> addresses").
+>>> This patch restores the portion that got lost.
+>>>
+>>> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+>>> ---
+>>>   hw/net/dp8393x.c | 4 ++--
+>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+>>> index 8a3504d962..81fc13ee9f 100644
+>>> --- a/hw/net/dp8393x.c
+>>> +++ b/hw/net/dp8393x.c
+>>> @@ -525,8 +525,8 @@ static void
+>>> dp8393x_do_transmit_packets(dp8393xState *s)
+>>>                                    * (4 + 3 * s->regs[SONIC_TFC]),
+>>>                                  MEMTXATTRS_UNSPECIFIED, s->data,
+>>>                                  size);
+>>> -            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
+>>> -            if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
+>>> +            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0);
+>>> +            if (s->regs[SONIC_CTDA] & SONIC_DESC_EOL) {
+>>>                   /* EOL detected */
+>>>                   break;
+>>>               }
+>>>
+>> Jason,
+>>
+>> as it's a trivial bug fixes (only a diff between the commit and the
+>> patch), will you merge it via the network queue or do you want I take it
+>> via trivial queue?
+> 
+> 
+> Hi Laurent:
+> 
+> Please merge it.
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c            | 18 ++++++++++++++++++
- include/hw/virtio/virtio-net.h |  1 +
- 2 files changed, 19 insertions(+)
+Applied to my trivial-patch branch.
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index abc41fdb16..943d1931a2 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -37,6 +37,7 @@
- #include "qapi/qapi-events-migration.h"
- #include "hw/virtio/virtio-access.h"
- #include "migration/misc.h"
-+#include "migration/blocker.h"
- #include "standard-headers/linux/ethtool.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
-@@ -627,6 +628,12 @@ static void virtio_net_reset(VirtIODevice *vdev)
-     n->announce_timer.round = 0;
-     n->status &= ~VIRTIO_NET_S_ANNOUNCE;
- 
-+    if (n->migration_blocker) {
-+        migrate_del_blocker(n->migration_blocker);
-+        error_free(n->migration_blocker);
-+        n->migration_blocker = NULL;
-+    }
-+
-     /* Flush any MAC and VLAN filter table state */
-     n->mac_table.in_use = 0;
-     n->mac_table.first_multi = 0;
-@@ -1003,6 +1010,17 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-         vhost_net_ack_features(get_vhost_net(nc->peer), features);
-     }
- 
-+    if (virtio_has_feature(features, VIRTIO_NET_F_RSS)) {
-+        if (!n->migration_blocker) {
-+            error_setg(&n->migration_blocker, "virtio-net: RSS negotiated");
-+            migrate_add_blocker(n->migration_blocker, &err);
-+            if (err) {
-+                error_report_err(err);
-+                err = NULL;
-+            }
-+        }
-+    }
-+
-     if (virtio_has_feature(features, VIRTIO_NET_F_CTRL_VLAN)) {
-         memset(n->vlans, 0, MAX_VLAN >> 3);
-     } else {
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 45670dd054..fba768ba9b 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -180,6 +180,7 @@ struct VirtIONet {
-     virtio_net_conf net_conf;
-     NICConf nic_conf;
-     DeviceState *qdev;
-+    Error *migration_blocker;
-     int multiqueue;
-     uint16_t max_queues;
-     uint16_t curr_queues;
--- 
-2.17.1
-
+Thanks,
+Laurent
 
