@@ -2,97 +2,125 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC26C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E22CC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:49:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B37D2067C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:49:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A6E72067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:49:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPMn3PE/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B37D2067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UfMFZufr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6E72067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBJig-0004Jk-GT
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:49:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56131)
+	id 1jBJiz-0004Ze-Dw
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:49:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jBJdi-0005uf-Pa
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:44:20 -0400
+ (envelope-from <david@redhat.com>) id 1jBJhj-0003Lc-7d
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jBJdh-0005fo-Ia
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:44:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25571
+ (envelope-from <david@redhat.com>) id 1jBJhi-0008Rq-3z
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49792
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jBJdh-0005fg-EB
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:44:17 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBJhh-0008RC-Up
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:48:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583765057;
+ s=mimecast20190719; t=1583765305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=s5wMMOV9j8GXgLN/f8OZXnk4tnLPp7frltBDKpvp80Y=;
- b=IPMn3PE/wQ9g6rI21ZtskYTB57LGtF2kiY+QyfKJ0sfrBHa+L77gBT4uSiahG4xe4pdNhO
- hURAidbdjncWe9oraVJonkhielJufsdFwTvjpKCfqzdR57f76xs5AItvHmTo2qgLjVevzn
- 9GLMOUajRDa1d5pg2pnHmpBrp+9QLp8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-3ANlaMNCMs6BJ7GVr7JQlQ-1; Mon, 09 Mar 2020 10:44:15 -0400
-X-MC-Unique: 3ANlaMNCMs6BJ7GVr7JQlQ-1
-Received: by mail-wm1-f71.google.com with SMTP id y7so2594637wmd.4
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 07:44:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=YrE/gfNOEXj7sn4Or3GrKnxgngUq3VZvk0bAiaEuFtE=;
- b=qcl/tTOLtAgyB1mx+8/In1PSFQek4G8d49eA5J3PgCLaG4/GfSudBYwx2eZijHQbr3
- HQgnz7xV3Xtw02YzJWngXWSzfH/8z+ERZgbhH5blodE3KyQ8PE5oNxK4peSPDKeGCDw4
- CCOTzVSCnUAx2kn3fj66gro2Ikx124AZ25yBGfiT11F5H+l8Gkq/6edYHoUjR8EqJEh5
- Q+6NGX/J6LoKgsnu4fn3p+50MyPDYSHoLbsHVkAiD5oqYMnQ5UvU3omL+2i3MN9L0b4W
- PMF6HlIDQv8ov25i2h1/5FRBwlXbWlAFlg96X4EhMTZezTqGgRpw5aiIv9lNRvGGQi0b
- RRBg==
-X-Gm-Message-State: ANhLgQ2SCKED+9aF8ZmZ9jdGtRFfM4yfMmczBAS7NtXSxMs+yrsvR/xX
- G/c2dDE+nt8pA4HMoAiLl9c0GnoCCw+668xgS7Y0Fi/bzk20SFI5uoo2/bpqVnFg8mciFNhV937
- ZRITwDbTQFzMkXDU=
-X-Received: by 2002:a05:600c:2951:: with SMTP id
- n17mr19634498wmd.97.1583765053986; 
- Mon, 09 Mar 2020 07:44:13 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuZBW8hCI+4IFfxi9ZxxNSc+YYdvSo6iVO8aMLSLBaA1jhIR6uhTfEeLBgS/Bhey2ybV/cfyQ==
-X-Received: by 2002:a05:600c:2951:: with SMTP id
- n17mr19634472wmd.97.1583765053777; 
- Mon, 09 Mar 2020 07:44:13 -0700 (PDT)
-Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id a1sm1980854wro.72.2020.03.09.07.44.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 07:44:13 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/5] hw/core/loader: Provide rom_add_file() a 'max_size'
- argument
-Date: Mon,  9 Mar 2020 15:43:51 +0100
-Message-Id: <20200309144353.26457-4-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200309144353.26457-1-philmd@redhat.com>
-References: <20200309144353.26457-1-philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=FYsAn+bSRY5x758s3yxLaYWalCKYGKwuNuS/klbCK4o=;
+ b=UfMFZufrQoHRmWtCXdC3PprOvg+3qcZYZF/+kNKjDBZ4tJi6LxoLb4Hn6pBze72+s4Hna1
+ e+Oz6/3dsCMshTSCueHjM0202q9u3+hUeCxw0Bu4wmmm9pTcrwIOw4S3Dy091Wfp7utX6y
+ LIAjBbeoSlF7+mJJQiHoT+qRm3uhwTg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-syj78aE_N7q1Fny0xbobNw-1; Mon, 09 Mar 2020 10:48:21 -0400
+X-MC-Unique: syj78aE_N7q1Fny0xbobNw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08A4A107ACC7;
+ Mon,  9 Mar 2020 14:48:20 +0000 (UTC)
+Received: from [10.36.118.226] (unknown [10.36.118.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F421E7389B;
+ Mon,  9 Mar 2020 14:48:15 +0000 (UTC)
+Subject: Re: [PATCH v2 1/1] s390/ipl: sync back loadparm
+To: Halil Pasic <pasic@linux.ibm.com>
+References: <20200309133223.100491-1-pasic@linux.ibm.com>
+ <c35e5027-1682-2a40-1db3-301be2b2d248@redhat.com>
+ <20200309152751.5f0cd2f8.pasic@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <e54b50fb-4d03-44be-0a83-7614955809e8@redhat.com>
+Date: Mon, 9 Mar 2020 15:48:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200309152751.5f0cd2f8.pasic@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,125 +134,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Marc Hartmayer <mhartmay@linux.ibm.com>, Michael Mueller <mimu@linux.ibm.com>,
+ Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit d60fa42e8b we cared about loading ROMs smaller than
-the underlying memory region (by zeroing the missing area) but
-we forgot the case where a ROM file is bigger than the underlying
-region.
-Provide rom_add_file() a 'max_size' argument, and refuse loading
-ROM files bigger than it.
+On 09.03.20 15:27, Halil Pasic wrote:
+> On Mon, 9 Mar 2020 14:44:20 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 09.03.20 14:32, Halil Pasic wrote:
+>>> We expose loadparm as a r/w machine property, but if loadparm is set by
+>>> the guest via DIAG 308, we don't update the property. Having a
+>>> disconnect between the guest view and the QEMU property is not nice in
+>>> itself, but things get even worse for SCSI, where under certain
+>>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
+>>> expected" for details) we call s390_gen_initial_iplb() on resets
+>>> effectively overwriting the guest/user supplied loadparm with the stale
+>>> value.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>>> Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
+>>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
+>>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>>> ---
+>>> v1 --> v2:
+>>> * tweaked the Fixes tag (Connie)
+>>> * s/mo/machine/ (David)
+>>> * We decided to not abort if the setter fails. It is not clear where
+>>>   do the validation logic come from in the first place. For now lets put
+>>>   out a warning if things go wrong.
+>>>   The warning we get looks something like:
+>>>   qemu-system-s390x: warning: LOADPARM: invalid character '?' (ASCII 0x3f)
+>>> * I keept the r-b's and the tested-by as the changes are minor. Please
+>>>   shout at me if you object.
+>>> ---
+>>>  hw/s390x/ipl.c | 25 +++++++++++++++++++++++++
+>>>  1 file changed, 25 insertions(+)
+>>>
+>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>>> index 9c1ecd423c..8bd50de44c 100644
+>>> --- a/hw/s390x/ipl.c
+>>> +++ b/hw/s390x/ipl.c
+>>> @@ -538,6 +538,30 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
+>>>      return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
+>>>  }
+>>>  
+>>> +static void update_machine_ipl_properties(IplParameterBlock *iplb)
+>>> +{
+>>> +    Object *machine = qdev_get_machine();
+>>> +    Error *err = NULL;
+>>> +
+>>> +    /* Sync loadparm */
+>>> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
+>>> +        char ascii_loadparm[8];
+>>> +        int i;
+>>> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
+>>
+>> Nit: move this to the top
+> 
+> Do you mean (reverse xmass tree)
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- include/hw/loader.h | 12 ++++++------
- hw/core/loader.c    | 19 +++++++++++++------
- 2 files changed, 19 insertions(+), 12 deletions(-)
+Yep :)
 
-diff --git a/include/hw/loader.h b/include/hw/loader.h
-index a9eeea3952..99d690a628 100644
---- a/include/hw/loader.h
-+++ b/include/hw/loader.h
-@@ -254,7 +254,7 @@ extern bool option_rom_has_mr;
- extern bool rom_file_has_mr;
-=20
- int rom_add_file(const char *file, const char *fw_dir,
--                 hwaddr addr, int32_t bootindex,
-+                 hwaddr addr, uint64_t max_len, int32_t bootindex,
-                  bool option_rom, MemoryRegion *mr, AddressSpace *as);
- MemoryRegion *rom_add_blob(const char *name, const void *blob, size_t len,
-                            size_t max_len, hwaddr addr,
-@@ -292,16 +292,16 @@ int rom_copy(uint8_t *dest, hwaddr addr, size_t size)=
-;
- void *rom_ptr(hwaddr addr, size_t size);
- void hmp_info_roms(Monitor *mon, const QDict *qdict);
-=20
--#define rom_add_file_fixed(_f, _a, _i)          \
--    rom_add_file(_f, NULL, _a, _i, false, NULL, NULL)
-+#define rom_add_file_fixed(_f, _a, _i) \
-+    rom_add_file(_f, NULL, _a, -1, _i, false, NULL, NULL)
- #define rom_add_blob_fixed(_f, _b, _l, _a)      \
-     rom_add_blob(_f, _b, _l, _l, _a, NULL, NULL, NULL, NULL, true)
- #define rom_add_file_mr(_f, _mr, _i)            \
--    rom_add_file(_f, NULL, 0, _i, false, _mr, NULL)
-+    rom_add_file(_f, NULL, 0, -1, _i, false, _mr, NULL)
- #define rom_add_file_as(_f, _as, _i)            \
--    rom_add_file(_f, NULL, 0, _i, false, NULL, _as)
-+    rom_add_file(_f, NULL, 0, -1, _i, false, NULL, _as)
- #define rom_add_file_fixed_as(_f, _a, _i, _as)          \
--    rom_add_file(_f, NULL, _a, _i, false, NULL, _as)
-+    rom_add_file(_f, NULL, _a, -1, _i, false, NULL, _as)
- #define rom_add_blob_fixed_as(_f, _b, _l, _a, _as)      \
-     rom_add_blob(_f, _b, _l, _l, _a, NULL, NULL, NULL, _as, true)
-=20
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index c67c483936..00436f1524 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -938,7 +938,7 @@ static void *rom_set_mr(Rom *rom, Object *owner, const =
-char *name, bool ro)
- }
-=20
- int rom_add_file(const char *file, const char *fw_dir,
--                 hwaddr addr, int32_t bootindex,
-+                 hwaddr addr, uint64_t max_len, int32_t bootindex,
-                  bool option_rom, MemoryRegion *mr,
-                  AddressSpace *as)
- {
-@@ -974,14 +974,21 @@ int rom_add_file(const char *file, const char *fw_dir=
-,
-         rom->fw_file =3D g_strdup(file);
-     }
-     rom->addr     =3D addr;
--    rom->romsize  =3D lseek(fd, 0, SEEK_END);
--    if (rom->romsize =3D=3D -1) {
-+    rom->datasize =3D lseek(fd, 0, SEEK_END);
-+    if (rom->datasize =3D=3D -1) {
-         fprintf(stderr, "rom: file %-20s: get size error: %s\n",
-                 rom->name, strerror(errno));
-         goto err;
-     }
-=20
--    rom->datasize =3D rom->romsize;
-+    rom->romsize =3D max_len ? max_len : rom->datasize;
-+    if (rom->romsize < rom->datasize) {
-+        fprintf(stderr,
-+                "rom: file '%-20s' size too big: %zu (available: %zu)\n",
-+                rom->name, rom->datasize, rom->romsize);
-+        goto err;
-+    }
-+
-     rom->data     =3D g_malloc0(rom->datasize);
-     lseek(fd, 0, SEEK_SET);
-     rc =3D read(fd, rom->data, rom->datasize);
-@@ -1107,12 +1114,12 @@ int rom_add_elf_program(const char *name, GMappedFi=
-le *mapped_file, void *data,
-=20
- int rom_add_vga(const char *file)
- {
--    return rom_add_file(file, "vgaroms", 0, -1, true, NULL, NULL);
-+    return rom_add_file(file, "vgaroms", 0, -1, -1, true, NULL, NULL);
- }
-=20
- int rom_add_option(const char *file, int32_t bootindex)
- {
--    return rom_add_file(file, "genroms", 0, bootindex, true, NULL, NULL);
-+    return rom_add_file(file, "genroms", 0, -1, bootindex, true, NULL, NUL=
-L);
- }
-=20
- static void rom_reset(void *unused)
---=20
-2.21.1
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
