@@ -2,83 +2,63 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7BBC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBDCC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B03B120727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:36:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dnXua6EZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B03B120727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3FA220675
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 13:37:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3FA220675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBIZx-0001yy-QG
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:36:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41623)
+	id 1jBIb0-0002tp-St
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 09:37:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBIZ7-0001CL-T0
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:30 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBIaO-0002Tt-MN
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBIZ6-0004qe-Ny
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38049)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBIZ6-0004qR-Hr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:35:28 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k21so3221961oij.5
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 06:35:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=oBD6zMZ3/A1XQ82CnQ5bJnjoI9sExy80KKinIwyaFIo=;
- b=dnXua6EZQUkka6qnXpu8wPecyLUdA5wnP+riA9D9HryWi1EOXZwIMIrRSjMxZ1RRkj
- SqIfxJAllVVA7tvEAcEIhmd7UNXjCgYnvY1f4yRimFDA+6rS+jGDoBt4qQbg8cF3EuEd
- ugqKv5xFkNEIL6CJWpz85HjCajKDP9x2w48IGl7h3SbROUBX/nwOrQ0syJMagMmgGkyB
- QAPWp945ZIzpj6oJ6vlNADELBwvlIZZQ2gKlUoDZ0fJ2XhAYrkl5PpMAQLk+4TdBbC92
- haY0af+lq5VtOzzbg92ie2knVwZvhf0Vcu1IT6YJjU3znPoMDHJ/tburljiZpKv+b3Ml
- wAag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=oBD6zMZ3/A1XQ82CnQ5bJnjoI9sExy80KKinIwyaFIo=;
- b=kWIZtSSc5GRN7MOL5HdAUR0iZ8Sy1FiwpIEbNN6qRZpJR+sGpBWubEvUIW+om1uSdU
- gx4jfiPZouYnyfy/t3YsOREYM0N5BBdASIWGJ5ReQGhHOPjwrHHZA0eo6jFw/S4bWhuW
- lo1uRAXFpLVKtKAQgTm2D0+Nh1ctPRdGBrz1++cVIusbYEFMqsHGubFGGbqTTFnIYdRJ
- LbtAIQoIYF9Gdc3+JhE3eZsbHQMVKS+4+4zA9lBSCCogUGawoDohy+c3nclZ2ktqhpCD
- SSn4jA6CzDaqArNWE2W1F8f9cd3vS0Sh0St6jpMqIUNGm1mzx9Vu+J7vgh2FTl1fNL9L
- ajug==
-X-Gm-Message-State: ANhLgQ0Gu745OCPQaRrfxKZIvz0F8/zLgkq5mJaZIvwJcvOaVer87ch6
- NeIHIp8gR7B51qoqzHMU36VDCSqD8RXA9/y7MZeqZQ==
-X-Google-Smtp-Source: ADFU+vvgw5WiaGCYjO7uHgENNgLcNIp414nUloULJ/W54crrItR62BqSHrZDfpgVpyA/ctj8zUUpLuiFT7oojQDgtw4=
-X-Received: by 2002:aca:c695:: with SMTP id w143mr1183737oif.98.1583760927046; 
- Mon, 09 Mar 2020 06:35:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200305154142.63070-1-jingqi.liu@intel.com>
- <20200305161047.GB3627464@lpt>
- <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
- <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
-In-Reply-To: <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 13:35:15 +0000
-Message-ID: <CAFEAcA8HMSg8nS27YGPEQsPeGW2UicWRxeJDQf3oKbyHH2TY6Q@mail.gmail.com>
-Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
-To: "Liu, Jingqi" <jingqi.liu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBIaN-0005NH-6e
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:36:48 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:36891)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBIaM-0005Mb-Uo
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 09:36:47 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 402E9E5BEE;
+ Mon,  9 Mar 2020 22:36:44 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by sakura.ysato.name (Postfix) with ESMTPSA id B39841C07F7;
+ Mon,  9 Mar 2020 22:36:43 +0900 (JST)
+Date: Mon, 09 Mar 2020 22:36:42 +0900
+Message-ID: <87imjdabv9.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v32 21/22] BootLinuxConsoleTest: Test the RX-Virt machine
+In-Reply-To: <0ead8621-e590-d81c-c71a-9213108fa13f@redhat.com>
+References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
+ <20200224141923.82118-22-ysato@users.sourceforge.jp>
+ <2c26a629-59d4-f6d5-d06d-cf3d1cf65f4c@redhat.com>
+ <87k13u9h0p.wl-ysato@users.sourceforge.jp>
+ <0ead8621-e590-d81c-c71a-9213108fa13f@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,83 +70,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 at 13:23, Liu, Jingqi <jingqi.liu@intel.com> wrote:
->
-> On 3/6/2020 12:40 AM, Peter Maydell wrote:
-> > On Thu, 5 Mar 2020 at 16:11, J=C3=A1n Tomko <jtomko@redhat.com> wrote:
-> >> On a Thursday in 2020, Jingqi Liu wrote:
-> >>> The CONFIG_LINUX symbol is always not defined in this file.
-> >>> This fixes that "config-host.h" header file is not included
-> >>> for getting macros.
-> >>>
-> >>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+On Mon, 09 Mar 2020 19:54:20 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> On 3/9/20 7:30 AM, Yoshinori Sato wrote:
+> > On Mon, 09 Mar 2020 01:20:05 +0900,
+> > Philippe Mathieu-Daud=E9 wrote:
+> >>=20
+> >> On 2/24/20 3:19 PM, Yoshinori Sato wrote:
+> >>> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> >>>=20
+> >>> Add two tests for the rx-virt machine, based on the recommended test
+> >>> setup from Yoshinori Sato:
+> >>> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
+> >>>=20
+> >>> - U-Boot prompt
+> >>> - Linux kernel with Sash shell
+> >>>=20
+> >>> These are very quick tests:
+> >>>=20
+> >>>     $ avocado run -t arch:rx tests/acceptance/boot_linux_console.py
+> >>>     JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+> >>>     JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-=
+84a6ef0/job.log
+> >>>      (1/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.te=
+st_rx_uboot: PASS (0.11 s)
+> >>>      (2/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.te=
+st_rx_linux: PASS (0.45 s)
+> >>>     RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERR=
+UPT 0 | CANCEL 0
+> >>>=20
+> >>> Tests can also be run with:
+> >>>=20
+> >>>     $ avocado --show=3Dconsole run -t arch:rx tests/acceptance/boot_l=
+inux_console.py
+> >>>     console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 =
+- 21:56:06 +0900)
+> >>>     console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc ve=
+rsion 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+> >>>     console: Built 1 zonelists, mobility grouping on.  Total pages: 8=
+128
+> >>>     ...
+> >>>     console: SuperH (H)SCI(F) driver initialized
+> >>>     console: 88240.serial: ttySC0 at MMIO 0x88240 (irq =3D 215, base_=
+baud =3D 0) is a sci
+> >>>     console: console [ttySC0] enabled
+> >>>     console: 88248.serial: ttySC1 at MMIO 0x88248 (irq =3D 219, base_=
+baud =3D 0) is a sci
+> >>>=20
+> >>> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> >>> Based-on: 20190517045136.3509-1-richard.henderson@linaro.org
+> >>> "RX architecture support"
+> >>> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > >>> ---
-> >>> util/mmap-alloc.c | 2 ++
-> >>> 1 file changed, 2 insertions(+)
-> >>>
-> >>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> >>> index 27dcccd8ec..24c0e380f3 100644
-> >>> --- a/util/mmap-alloc.c
-> >>> +++ b/util/mmap-alloc.c
-> >>> @@ -10,6 +10,8 @@
-> >>>   * later.  See the COPYING file in the top-level directory.
-> >>>   */
-> >>>
-> >>> +#include "config-host.h"
+> >>>    tests/acceptance/boot_linux_console.py | 46 ++++++++++++++++++++++=
+++++
+> >>>    1 file changed, 46 insertions(+)
+> >>>=20
+> >>> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptanc=
+e/boot_linux_console.py
+> >>> index 34d37eba3b..367cf480a5 100644
+> >>> --- a/tests/acceptance/boot_linux_console.py
+> >>> +++ b/tests/acceptance/boot_linux_console.py
+> >>> @@ -686,3 +686,49 @@ class BootLinuxConsole(Test):
+> >>>            tar_hash =3D '49e88d9933742f0164b60839886c9739cb7a0d34'
+> >>>            self.vm.add_args('-cpu', 'dc233c')
+> >>>            self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ri=
+de.elf')
 > >>> +
-> >> According to CODING_STYLE.rst, qemu/osdep.h is the header file
-> >> that should be included first, before all the other includes.
-> >>
-> >> So the minimal fix would be moving qemu/osdep.h up here.
-> > Yes, osdep must always be first.
-> >
-> >>> #ifdef CONFIG_LINUX
-> >>> #include <linux/mman.h>
-> >>> #else  /* !CONFIG_LINUX */
-> > Do we really need this? osdep.h will pull in sys/mman.h
-> > for you, which should define the MAP_* constants.
-> >
-> > Also, you have no fallbmack for "I'm on Linux but the
-> > system headers don't define MAP_SHARED_VALIDATE or
-> > MAP_SYNC". Wouldn't it be better to just have
-> > #ifndef MAP_SYNC
-> > #define MAP_SYNC 0
-> > #endif
-> >
-> > etc ?
-> osdep.h pulls in sys/mman.h, which defines the MAP_* constants
->
-> except for MAP_SYNC and MAP_SHARED_VALIDATE on Linux.
+> >>> +    def test_rx_uboot(self):
+> >>> +        """
+> >>> +        :avocado: tags=3Darch:rx
+> >>> +        :avocado: tags=3Dmachine:rx-virt
+> >>> +        :avocado: tags=3Dendian:little
+> >>> +        """
+> >>> +        uboot_url =3D ('https://acc.dl.osdn.jp/users/23/23888/u-boot=
+.bin.gz')
+> >>> +        uboot_hash =3D '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
+> >>> +        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboo=
+t_hash)
+> >>> +        uboot_path =3D archive.uncompress(uboot_path, self.workdir)
+> >>> +
+> >>> +        self.vm.set_machine('rx-virt')
+> >>> +        self.vm.set_console()
+> >>> +        self.vm.add_args('-bios', uboot_path,
+> >>> +                         '-no-reboot')
+> >>> +        self.vm.launch()
+> >>> +        uboot_version =3D 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirt=
+y'
+> >>> +        self.wait_for_console_pattern(uboot_version)
+> >>> +        gcc_version =3D 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (=
+experimental)'
+> >>> +        # FIXME limit baudrate on chardev, else we type too fast
+> >>> +        #self.exec_command_and_wait_for_pattern('version', gcc_versi=
+on)
+> >>> +
+> >>> +    def test_rx_linux(self):
+> >>> +        """
+> >>> +        :avocado: tags=3Darch:rx
+> >>> +        :avocado: tags=3Dmachine:rx-virt
+> >>> +        :avocado: tags=3Dendian:little
+> >>> +        """
+> >>> +        dtb_url =3D ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.=
+dtb')
+> >>=20
+> >> Sourceforge URL are not very stable, I'm now getting:
+> >>=20
+> >> HTTP request sent, awaiting response... 302 Found
+> >> Location: https://osdn.dl.osdn.net/users/23/23887/rx-qemu.dtb [followi=
+ng]
+> >> --2020-03-08 17:17:31--  https://osdn.dl.osdn.net/users/23/23887/rx-qe=
+mu.dtb
+> >> Resolving osdn.dl.osdn.net (osdn.dl.osdn.net)... 202.221.179.23
+> >> Connecting to osdn.dl.osdn.net
+> >> (osdn.dl.osdn.net)|202.221.179.23|:443... connected.
+> >> HTTP request sent, awaiting response... 404 Not Found
+> >> 2020-03-08 17:17:32 ERROR 404: Not Found.
+> >=20
+> > Permernet link is bellow.
+> > https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> > https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb
+> > https://osdn.net/users/ysato/pf/qemu/dl/zImage
+>=20
+> Acceptance tests assert that "something that used to work in the past
+> is still working today". The artifact hash is here to verify the file
+> has not been modified (for security reasons or replaced by something
+> else) so we keep testing the same.
+>=20
+> If you upgrade these files, we should keep testing the older version,
+> and eventually add a new test (or entry in the same test) to test the
+> new files.
 
-Why not? Is this just "not yet in the version of glibc
-we're using", or is it a bug/missed feature in glibc
-that needs to be addressed there ?
+OK.
+The binary was prepared for qemu testing, so keep it as it is.
 
-> How about just adding the following code in util/mmap-alloc.c ?
+> >=20
+> > I was misunderstanding. sorry.
+> >=20
+> >>> +        dtb_hash =3D '7b4e4e2c71905da44e86ce47adee2210b026ac18'
+> >>> +        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
+> >>> +        kernel_url =3D ('http://acc.dl.osdn.jp/users/23/23845/zImage=
+')
+> >>> +        kernel_hash =3D '39a81067f8d72faad90866ddfefa19165d68fc99'
+> >>> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dke=
+rnel_hash)
+> >>> +
+> >>> +        self.vm.set_machine('rx-virt')
+> >>> +        self.vm.set_console()
+> >>> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'e=
+arlycon'
+> >>> +        self.vm.add_args('-kernel', kernel_path,
+> >>> +                         '-dtb', dtb_path,
+> >>> +                         '-no-reboot')
+> >>> +        self.vm.launch()
+> >>> +        self.wait_for_console_pattern('Sash command shell (version 1=
+.1.1)')
+> >>> +        self.exec_command_and_wait_for_pattern('printenv',
+> >>> +                                               'TERM=3Dlinux')
+> >>>=20
+> >>=20
+> >>=20
+> >=20
+>=20
 
-> #ifndef MAP_SYNC
-> #define MAP_SYNC 0x80000
-> #endif
->
-> #ifndef MAP_SHARED_VALIDATE
-> #define MAP_SHARED_VALIDATE 0x03
-> #endif
-
-You don't want to do that for non-Linux systems, so there
-you need to fall back to defining them to be 0.
-
-Are there any systems (distros) where the standard system
-sys/mman.h does not define these new MAP_* constants but we
-still really really need to use them? If not, then we
-could just have the fallback-to-0 fallback everywhere.
-
-thanks
--- PMM
+--=20
+Yosinori Sato
 
