@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCE0C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 533DFC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16426208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:24:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16426208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 26B162067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:24:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B162067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKGC-0002sw-5G
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33424)
+	id 1jBKGZ-0003bL-88
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2X-000800-44
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:58 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK31-0000Sn-Kj
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2V-0007jZ-TS
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:56 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:37415)
+ (envelope-from <laurent@vivier.eu>) id 1jBK2z-00086c-Bg
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:27 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:45891)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2R-0007fp-AF; Mon, 09 Mar 2020 11:09:51 -0400
+ id 1jBK2j-0007wA-AA; Mon, 09 Mar 2020 11:10:09 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mw9Lu-1jRt0S2TYa-00s5PG; Mon, 09 Mar 2020 16:09:08 +0100
+ id 1MA7Su-1j4CU42fhi-00BePM; Mon, 09 Mar 2020 16:09:22 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/33] hw/timer: Remove unused "ui/console.h" header
-Date: Mon,  9 Mar 2020 16:08:15 +0100
-Message-Id: <20200309150837.3193387-12-laurent@vivier.eu>
+Subject: [PULL 17/33] hw/acpi/cpu_hotplug: Include "hw/pci/pci.h"
+Date: Mon,  9 Mar 2020 16:08:21 +0100
+Message-Id: <20200309150837.3193387-18-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tM2YDmot9ihGaPhyf6qhTyarNgEYi/pV4Q4kB4JhgYFNz9yEN62
- 6m9K4srE81GDTMvq6HW+nrSU05dgDqxVxoc6T1JP8ZoPzReEsm9oCFmiYrW7TFq6QNQ9Ivb
- QL8ROcBTlwseBc7uI2EEjChxJ4a5Yi/bNPj9QgQihMxcuhPos3qlUU4111hzZvhfx/icFOB
- qfLvLwApS1ROlZFps2Qmg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BIzu0BJEkmM=:abdPkxT3jKmvPh6xvVPRht
- tK6BS77CiBwZeTxvxE/HDiQIU3QjYLrT8MuFRRjUjleEfVxDtRCC84+xETfRuzkLYUlhk3Xiv
- uuN/i6cvXRag8xpnAUFbHxMX0/AVjBbSh3BfmOMlu4AOqoqTZzh1F8Uojf3TZhCs3FSlw5A05
- 9RE4fRJrhC9j11rZ4zTwvhxyTT/pS2H+dkT9cPkeg01384pxU+lTXSIsXeXcHWARfu5HwJ5uW
- L4hxSdHjOWHAG5j5PPHs19o5Cgt5QttzkQo31YNsfu9ONMnRHnwZpyRdYzPNmTyn1ScPwXOX3
- pyXw9qmMrBoqsdM4/1kShYW75XxpQknfOzqXB7FTeVWHe/k09aqNjRGPsZ/b98+rD2qYJz3nY
- G7AC5aaz8+k596vl/EKgMCVMhY3GcCVzKBa74hJxWwXxhp7eMmNuyjVg5E7C1SUx0GVaa9+wM
- 8zt8mkwLe+ac4sBLiqCs6++21kVyZ+FIA1MzLWx6YWEwkkFkOAWmEOoRvbHipb464ftaOcwOT
- ThR5B95U/L6ubo6ecMzlppO5VGa8OtcbsbqiVmA3Pt7g2zBgZmEcCjzi6qZV2qkVDxifen7/K
- OUMaNmIQYSHKU+WBFIVc+WfLeex+9V9bijKEimyn1ZBRGROGfbuLaRXY5GavIS0mNVdUrZPRi
- Xm9DJPcAWhNoFJXi2WB1aSo8uYOOxEnWHbevGVcXXK0BRNc5lSEQ/DVH3mow1nH3P5PnF0QyB
- 9hvSfqmF8cQyM6aquaQRP/JrvCL0/yhDrtg6J16ZSIK0q3Y6ZRq7HcazP8E87BrUpdyore2xK
- uUIag31ivesa3qSz6jlHiV7PLLFVTcHV5aZjyP+G5JW0W/V/MAXyzUmGqscHZfp1ui1rVQy
+X-Provags-ID: V03:K1:S3Pxp97NJqxzqXNktaGYJQ8nZy3lTVUpo6FHg9n/lfsaCvu/jCM
+ RKXtM+9/sl1lC2UU6z7Enz4ywq6EsJjd8jmR99TVnhXddFlNXJAfZ4rY8qlWfkvFQEKXdRg
+ c7cUkeAM5h7ge/pao0QIN67+RJChKjZud8czO47cpDyjw3l3mCHTLkZROLm8cPqoP7SiOci
+ rc5taa+9BnG+goLi7rNZw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kUTho+sfP00=:/RR78Ov2r4fg9Mqs6/P7t4
+ QgRnn/05kM+qVunwSFPMYuoO5Br0L0OTVPvk1DS676JqeEV56ko4pVlxa1kvlYpLNvDqPEZnJ
+ EODUyOZ0j+XugzoxYTuWhM/rSTm4gf0BIyDTaQ0AHRxpvt8Zc0wObIL5maaRB8bRN5ZQ5vS5A
+ FThsEhNNb17Jbm7slqX9UcIgU+Cwkl96gUY/fdObfmxgpfIf4D1GEQN0EqGJbr9qTPCtIj5WB
+ CtiioVkafDYGjbZF0cmKKn7ofELdaMPv5UvesCCkCbV3R3CTaLqWIJhCCYqOKlQwnpn44Ah7y
+ PM8W0pnKFKHCqwBVmObIaXLjatJPiF9Om2kqBDWtBPeE1JbJ2fmyyPtrhZ/lXdhiqECEMi6PN
+ vCjR/VkUlgIIdI6eFw/dMWGCS76yRPRvbr5FsoCrYRzysysWyugFKiiG2zDIaaTSbsz02kt1I
+ kIYiHF/Oy1Zh8ZCXs3FiDTiRRoI3BGPZ5MJFeYGJle33GiiiV1zOtOspmbZ5eJXlXjyjxxs1z
+ +9KU9V4FXQZe7WLyT3WDbbzZVa+/ucWq7eLub7mlARtam/W1qxY/A7ba1zELPDxlSCoHwiDGJ
+ N74YEd4habXjkT7oN8S1PndzYEQd5LUsAVn1vVBiKy43OGA/Qe9ofUsXDYi3KOau1H552s72j
+ UEQFI8vq603b0sgjyoJjYVsdKzT6cd9t89f0pzhWTt3kNZgjf13BF3GP1GwKUvv1MbsSJtMsW
+ CTfGXauFq86rDTjUyWZ6Le1A7oTqq9ssGDrTLFmn5Gnkmo+JOc6ea5S6vc1t8205n1gq9YUoK
+ D4Stg6L6QqvSDiFVeQWV6BKsghc9C+sMS/0o+ndV7aa5OcaH6acMjEgSon+7ZKpowbkUo/l
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,43 +100,36 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The timer models don't need anything from "ui/console.h".
-Remove it.
+hw/acpi/cpu_hotplug.c calls pci_address_space_io(). Include
+"hw/pci/pci.h" which declares it.
+
+This fixes (when modifying unrelated headers):
+
+  hw/acpi/cpu_hotplug.c:103:28: error: implicit declaration of function 'pci_address_space_io' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+      MemoryRegion *parent = pci_address_space_io(PCI_DEVICE(gpe_cpu->device));
+                             ^
 
 Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-5-philmd@redhat.com>
+Message-Id: <20200228114649.12818-11-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/rtc/twl92230.c | 1 -
- hw/timer/hpet.c   | 1 -
- 2 files changed, 2 deletions(-)
+ hw/acpi/cpu_hotplug.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/rtc/twl92230.c b/hw/rtc/twl92230.c
-index 63bd13d2caa4..d0011be89eef 100644
---- a/hw/rtc/twl92230.c
-+++ b/hw/rtc/twl92230.c
-@@ -27,7 +27,6 @@
- #include "migration/qemu-file-types.h"
- #include "migration/vmstate.h"
- #include "sysemu/sysemu.h"
--#include "ui/console.h"
- #include "qemu/bcd.h"
- #include "qemu/module.h"
- 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 8dbcbdca16a6..4f30dd50a40a 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "hw/i386/pc.h"
- #include "hw/irq.h"
--#include "ui/console.h"
+diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
+index 9c3bcc84de56..3e687d227a65 100644
+--- a/hw/acpi/cpu_hotplug.c
++++ b/hw/acpi/cpu_hotplug.c
+@@ -14,6 +14,7 @@
  #include "qapi/error.h"
+ #include "hw/core/cpu.h"
+ #include "hw/i386/pc.h"
++#include "hw/pci/pci.h"
  #include "qemu/error-report.h"
- #include "qemu/timer.h"
+ 
+ #define CPU_EJECT_METHOD "CPEJ"
 -- 
 2.24.1
 
