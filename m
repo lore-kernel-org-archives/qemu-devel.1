@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5442CC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C754C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:36:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2791520637
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:35:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2791520637
+	by mail.kernel.org (Postfix) with ESMTPS id 2164420637
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:36:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2164420637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHdO-0005kn-BQ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:35:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60048)
+	id 1jBHdj-0006JY-9W
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:36:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHaW-0001uR-2U
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:32:52 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBHQ8-0004KL-Us
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHaU-0001XG-VM
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:32:52 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:52227)
+ (envelope-from <laurent@vivier.eu>) id 1jBHQ6-0001A4-O7
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:22:08 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:32787)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHaU-0001Q9-Lx; Mon, 09 Mar 2020 08:32:50 -0400
+ id 1jBHQ6-00017k-EA; Mon, 09 Mar 2020 08:22:06 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M8QFi-1jFfJ32tPs-004QUO; Mon, 09 Mar 2020 13:32:41 +0100
-Subject: Re: [PATCH v3 06/12] display/pxa2xx_lcd: Remove redundant statement
- in pxa2xx_palette_parse()
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MuDTn-1jUSrZ1urV-00uaMh; Mon, 09 Mar 2020 13:21:56 +0100
+Subject: Re: [PATCH v3 04/12] scsi/esp-pci: Remove redundant statement in
+ esp_pci_io_write()
 To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
  qemu-trivial@nongnu.org
 References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-8-kuhn.chenqun@huawei.com>
+ <20200302130715.29440-6-kuhn.chenqun@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,34 +84,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <4788a9e2-795e-9ee8-ba3f-5a1f7e5d5cf4@vivier.eu>
-Date: Mon, 9 Mar 2020 13:32:40 +0100
+Message-ID: <111d4416-2281-6f8d-9b1d-66e60a05e02a@vivier.eu>
+Date: Mon, 9 Mar 2020 13:21:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200302130715.29440-8-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200302130715.29440-6-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:vXXS9Qb5ZN7fYZNot1QYMJazqZjcpugT9a6q3UglUx0HGpgqTF8
- qyjipVLZj47WRakLaYZAOgdHUhgzyD9+4XcPF1nnKMTrkG1NiYxX8cxz8yresfaHuaN3FSE
- EEFut2YajfQOuNOatOuF26K3MvNv5YHKcY9BDIt1/hosbBJ8/T0F3Ezpmg7+SKW7SHhIc5W
- 8IEnEDeWA57t+mNG6xVzg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3EjPF7mpZgs=:JWXBdpAErOKb5Nspd6k5Xn
- zseUYkynOOw0w5Eynu9ZlQrkk8APtw337imOkS97xS2dJRKo4HWIyDS1vNg7hMEfSmv0dr259
- GRa4fMu7n+K0ycbdNKAFfmBqoLTYr8aU4yO6MVZMHXalIfoiVF18/ShEUgqClv+qnIIGA2REO
- vzqwIHotmERyKaM96P7ulacn/J8hXhE58D6s2kmY5qAxHvq599dAqjkjodOgSedhjZLFcdpwx
- MGX9ZYKSg6MXpNkpElKUS6RiWR/nVXqXcLWr0gH0mBEdvNu/WYq3wLSPbVWDabZAubgpsEm2u
- Kt23t2xyur7d+j8/y+QBqCQf/plGOEJF+A/giqD/+fAcl2FKaLhnijfJ+kRpz45fevBNhivIx
- FKlGYRZhbrGVeLG0ErQmi3+EGcUD+LfnX4SWlqSjC90bEQod4gk2rLK7uwROcwEEyXLCLw9R9
- bUsXfdOlWPA66Ya6Z0AXIRpm2ZYokKOpY9sUR6GIfUcq5IwWTlJacsFnbfizR9HmJIDsCHscX
- OFuWOmZ2bCalF+GT8KWPi2XKuNGnRPrOQMTDacSX6pzLSJh7d07X7jPbzHDJQdjQKB4eMNwC4
- s62nFUUYmjWOa2sSixPOKOSsURb3xNf/e612XJZgu4aCc2HK0KjPQ82ooCO/hhO0xP4j2OgJZ
- g5mmSafUhTyxBdJKdeX924IiPRjqIoHYx+Y4QxD0lSS0ej7V0nmFumaevAwc5aBeNgDPkzcq/
- aTtt9tv/p1EebGzoa0Gyukq6A9CbQrEiaho2wmxRJTDmEt/YVAwIIUI+dQHPYoY0T41gMsQSx
- ii+i3BHGz7TMAjTzl9IkNrrAlLDrml3uyqaKu7C7U66xrxcAb4uMxIPkPvOhTrHgLyGvRVK
+X-Provags-ID: V03:K1:N7nZ+yRlmt+ldpJyL0zhhKdixUDNFobjmk2n2+0g0k72SaZRgn7
+ V644D96QsN44GDbOqRqd2yOAbiwPBDspgRYGMVeUSeCZAiU8wskq+bYnpS00/Bnbcom+usR
+ slRupE1QocsPBNEMczkQtt5eRGfbOCiqOFjya2mbZjTR24G+BmuaYAarYkjeq0nHAdkQchl
+ u/vy1pZ4rGhLfCp5557xA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lxVcRoxmxj0=:dEiBv5UT0dpoKvJ0iGtaPR
+ mj6sr8lKEcFW+MCHSAy1GD6+bAYlDjd3i/6BCq2qM0jQMqtjRgfesGi5bt9Cyzg8H440ymrZy
+ S1F3369LW7595frNqAHJOgzHGod80154RXivMueS42dPLxglMrgnS2TbFpOfP5ggrYZG155j6
+ vPF6aO/iUw/O7th5GE2D87tNQBRBi0CV7TdqKow1Ynw7DxPJxFyncb/tprYXmpv3vCXXfwi92
+ ieLC84hMFQLSMhW10IZJIOcqT6lbm74N7OqpQ/CsXchfh/BoJM9TzTMn7dtBOcPRgw5UFvyrz
+ yBsoheltMRSWjIsxhDAclkI5dGMqYcukohwTNiIPkOUKHnJDMKux6uMR/Dx6ydqcs+hE8ULMC
+ 3fQ49iHnzV4NxFDZ1H6TkZ89D57KLv2NDdEZUZzIr0/HRJC8zFut2qaytdbhfhHuU6MC9fc4C
+ iMEZLDV51NPjoei3Ps3MlMO6LME6egZBKGjYy4DczLCcjsp3ez8GmDErFGW7MJGKx9UpI+RFC
+ DrRVuSgwLusx/LXYwzLew45tyFfeFBeZ1QGNz17RA+jCOcNDmSc3HzeARKBPpv4LAHPRIXJ/v
+ X6TQNv1kCKy8uvZSijTptTLLPk4r7f5akAap0aCDAvVNvaFYnR3YRqsji3uZevTDAZULmYOrd
+ AgpMih3JE4yj/Pz2t6SUK1iBjJuwfUfT2sknn46gyCl5Iqfqeqk0F93kN5E6Gzj34rKrLqgIM
+ K9t69fUtLOSvUS8e5BNf2HbsBmaC/guXIFfzFec8TgmWDQbX+GfOthmfTknwPHzenqG9uqhta
+ AUQ4JwHX37SMZjFtCyIxJRC37/XhLpeVN4rIY7bLeWgGDacly/rwduhBUXfed3NJBoNls55
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,40 +123,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- Euler Robot <euler.robot@huawei.com>
+Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 02/03/2020 à 14:07, Chen Qun a écrit :
 > Clang static code analyzer show warning:
-> hw/display/pxa2xx_lcd.c:596:9: warning: Value stored to 'format' is never read
->         format = 0;
->         ^        ~
+>   hw/scsi/esp-pci.c:198:9: warning: Value stored to 'size' is never read
+>         size = 4;
+>         ^      ~
 > 
 > Reported-by: Euler Robot <euler.robot@huawei.com>
 > Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 > ---
-> Cc: Andrzej Zaborowski <balrogg@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc:Fam Zheng <fam@euphon.net>
 > ---
->  hw/display/pxa2xx_lcd.c | 1 -
+>  hw/scsi/esp-pci.c | 1 -
 >  1 file changed, 1 deletion(-)
 > 
-> diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
-> index 05f5f84671..464e93161a 100644
-> --- a/hw/display/pxa2xx_lcd.c
-> +++ b/hw/display/pxa2xx_lcd.c
-> @@ -593,7 +593,6 @@ static void pxa2xx_palette_parse(PXA2xxLCDState *s, int ch, int bpp)
->          n = 256;
->          break;
->      default:
-> -        format = 0;
->          return;
+> diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
+> index d5a1f9e017..2e6cc07d4e 100644
+> --- a/hw/scsi/esp-pci.c
+> +++ b/hw/scsi/esp-pci.c
+> @@ -195,7 +195,6 @@ static void esp_pci_io_write(void *opaque, hwaddr addr,
+>          val <<= shift;
+>          val |= current & ~(mask << shift);
+>          addr &= ~3;
+> -        size = 4;
 >      }
->  
-> 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+perhaps a "g_assert(size >= 4)" instead would be cleaner to mute the
+warning?
+
+I think it's a good point to update the size if in the future the code
+below is modified to use size.
+
+Thanks,
+Laurent
+
+
 
