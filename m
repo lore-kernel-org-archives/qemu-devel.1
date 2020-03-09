@@ -2,82 +2,74 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E04EC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0427C10F28
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 494F320727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:23:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ccjbiq+L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 494F320727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 89B7B20727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:33:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B7B20727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBEdI-0002mO-E5
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:23:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56177)
+	id 1jBEn1-0006ys-EX
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBEbY-0000RC-8N
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:45 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1jBEls-0006aA-5L
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBEbX-0002Ga-2B
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:43 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38586)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBEbW-0002GH-RQ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:43 -0400
-Received: by mail-ot1-x344.google.com with SMTP id i14so8863331otp.5
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 02:21:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AHAHIhwFKs2k8PQfvg9sekLc+EdY0MRJArKE4TiyhMk=;
- b=ccjbiq+L6VUbhQPKNgIh3Dg2VtniXMnxS2HZVafcLPfQ/ztgcqlBCkLN/Jb/GewEB5
- 1vRtrWGCSz+IJjm0WbjF+iLtl7LKQr8A0Fesc5QjAzROhhoxJEbNYwOtWpC/WH85P25H
- qL9Voa+K4NjS8RntX9Vh6dMl5Qw0Ias7y3m8aJVqsyepfVpqiH5wRJCDWXtN6ISvRiB/
- N6Mb172vTz5QsgfPwbJ7ZNXoSStJfyt2B9nDSmf41z9fqBJXGCTEVqOcUH4m+OwNB+t2
- yLXanybggdzECxrjB+ODch+MlIt+bmO8glZJBC9f8bs6tfChml9zc9ThI4UvmU45/fgD
- U7vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AHAHIhwFKs2k8PQfvg9sekLc+EdY0MRJArKE4TiyhMk=;
- b=ZL1jSDLCUcigDVyNJ8/wqbL1m6kkYicJFilxBlH45f0NFq0/+jPPHEIKs75VM0kS3T
- EXLVFlXQbUWwNS7L1DWkYEWk2Aukq6DafMvLNFcCpLFMSfTtwourSZjxgv4OUMjaLu/1
- s8vwyTsQan2tuDJFiGFSfixZDXD4bKCHIXXx198D93MfrvgOy7OMztJ80NODNRjy93pf
- NtW/czddpz9c7+oZc224CkNo+BXRv8SJTiE/1t5eaD4N/rGz3ExjywFSW7KsQ3ZCyeFN
- ldnC8PYkrPb59R+R5pb4XGnb+j8sNVJgfmrHJXkcx1FzCAARdavfBBAxsrzEy4MytuYI
- MzHg==
-X-Gm-Message-State: ANhLgQ1ZE+tPY/goiLVwjoSpck09/xd/ltQX4fVrpLaKdlhvturAtTTh
- s5HFwQC89MOhT7ha3BoswnUbUlBGZsy+3VlLdOvWGw==
-X-Google-Smtp-Source: ADFU+vso+6lDlFwhsMcwMjSQc8EZY/JEfefYfwNk9Lz6HyEpUXtUZB9r3EabCofvyoBclHw3FryNZmzpESCUyUNArTg=
-X-Received: by 2002:a9d:76c9:: with SMTP id p9mr12300099otl.135.1583745701474; 
- Mon, 09 Mar 2020 02:21:41 -0700 (PDT)
+ (envelope-from <chen.zhang@intel.com>) id 1jBElq-0006Gy-3P
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:32:23 -0400
+Received: from mga18.intel.com ([134.134.136.126]:63219)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1jBElp-0006CM-RS
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:32:22 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 09 Mar 2020 02:32:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,532,1574150400"; d="scan'208";a="276446858"
+Received: from chenzh5-mobl2.ccr.corp.intel.com (HELO [10.255.29.176])
+ ([10.255.29.176])
+ by fmsmga002.fm.intel.com with ESMTP; 09 Mar 2020 02:32:12 -0700
+Subject: Re: [PATCH V4 0/5] Introduce Advanced Watch Dog module
+To: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-dev <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>
+References: <20191217124554.30818-1-chen.zhang@intel.com>
+ <fa1ed6cb-63d7-ee83-a5a0-b099b662fef2@intel.com>
+ <0502a0db0a17484c9220b3a63c40b397@intel.com>
+ <08a1a225-52c1-4e6c-85f7-fcf6612b5383@redhat.com>
+ <3049425105b94f6cb9cd846c84c95a84@intel.com>
+ <783bac16-0e4d-f027-3e4a-b6fff500c244@redhat.com>
+ <c6564993-ec06-7fe1-137d-956f3d554e74@intel.com>
+ <679426098de74479a19c2287c68785c4@intel.com>
+ <029efd6f-f461-da09-c6b6-1acf67818b64@redhat.com>
+From: "Zhang, Chen" <chen.zhang@intel.com>
+Message-ID: <c16e2cda-a498-4913-2811-6c6ea6b0b0df@intel.com>
+Date: Mon, 9 Mar 2020 17:32:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <20200305065422.12707-3-pannengyuan@huawei.com>
- <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
- <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
-In-Reply-To: <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 09:21:30 +0000
-Message-ID: <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
- in mac_via
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <029efd6f-f461-da09-c6b6-1acf67818b64@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,40 +81,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Euler Robot <euler.robot@huawei.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 at 00:56, Pan Nengyuan <pannengyuan@huawei.com> wrote:
->
->
->
-> On 3/8/2020 9:29 PM, Peter Maydell wrote:
-> > On Thu, 5 Mar 2020 at 06:39, Pan Nengyuan <pannengyuan@huawei.com> wrote:
-> >> -    /* Init VIAs 1 and 2 */
-> >> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
-> >> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
-> >> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
-> >> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
-> >
-> > Rather than manually setting the parent bus, you can use
-> > sysbus_init_child_obj() instead of object_initialize_child() --
-> > it is a convenience function that does both object_initialize_child()
-> > and qdev_set_parent_bus() for you.
->
-> Actually I used sysbus_init_child_obj() first, but it will fail to run device-introspect-test.
-> Because qdev_set_parent_bus() will change 'info qtree' after we call 'device-list-properties'.
-> Thus, I do it in the realize.
 
-Could you explain more? My thought is that we should be using
-sysbus_init_child_obj() and we should be doing it in the init method.
-Why does that break the tests ? It's the same thing various other
-devices do.
+On 3/4/2020 9:37 PM, Paolo Bonzini wrote:
+> On 04/03/20 09:06, Zhang, Chen wrote:
+>>> Hi Eric and Paolo, Can you give some comments about this series?
+>>>
+>>>
+>> No news for a while...
+>> We already have some users(Cloud Service Provider) try to use is module in their product.
+>> But they also need to follow the Qemu upstream code.
+> My main comment about this series is that it's not clear why it is
+> needed and how to use it.  The documentation includes a demo, but no
+> description of what is an awd_node, a notification_node and an
+> opt_script.  I can more or less understand the notification_node and
+> opt_script role from the documentation, but not entirely because, for
+> example, the two-host demo has hardcoded IP addresses without saying
+> which host is which IP address.
 
-thanks
--- PMM
+Hi Paolo,
+
+Sorry for slow reply and thank you for your comments.
+
+Let me summarize your main opinions and methods:
+
+1. Why AWD is needed.
+
+Advanced Watch Dog is an universal monitoring module on VMM side, it can 
+be used to detect network down(VMM to guest, VMM to VMM, VMM to another 
+remote server) and do previously set operation. Current AWD patch just 
+accept any input as the signal to refresh the watchdog timer, and we can 
+also make a certain interactive protocol here. For the outputs, user can 
+pre-write some command or some messages in the AWD opt-script. We 
+noticed that there is no way for VMM communicate directly, maybe some 
+people think we don't need such things(up layer software like openstack 
+can handle it). so we engaged with real customer found that they need a 
+lightweight and efficient mechanism to solve some practical problems,
+
+For example Edge Computing cases(they think high level software is too 
+heavy to use in Edge or it is hard to manage and combine with VM instance).
+It make user have basic VM/Host network monitoring tools and basic false 
+tolerance and recovery solution.
+
+For COLO FT/HA solution, we already have some CSPs try to use AWD with COLO.
+
+2. Documentation issues, include how to use it.
+
+I will address all your comments and complete details about documentation.
+
+3. Communication protocol issue.
+
+Current AWD without any protocol, any data it gets will be considered a 
+heartbeat signal.
+
+I think use QMP format is good for me.
+
+4. Implementation issue.
+
+The AWD script as an optional feature is OK for me.
+
+And report the triggering of the watchdog via QMP events is enough for 
+current usage.
+
+But it looks have limitation to notify outside Qemu. I don't know which 
+is better choice.
+
+If the QMP events solution is better, I will fix it in next version.
+
+
+I don't know if I understand your means correctly.
+
+Please give me more guidance on this series.  :-)
+
+Thanks
+
+Zhang Chen
+
+
+>
+> The documentation does not describe the protocol, which is absolutely
+> necessary, and does not describe _why_ the protocol was designed like
+> that.  Without such documentation it's not clear if, for example, the
+> watchdog protocol could be implemented as QMP commands (e.g.
+> start-watchdog, stop-watchdog, notify-watchdog).  Another possibility
+> could be to use the systemd watchdog protocol, which consists of
+> essentially three commands (WATCHDOG=1, WATCHDOG=trigger,
+> WATCHDOG_USEC=...) which are transmitted as datagrams.  Documentation is
+> important for reviewers to judge the merits of the protocol without (or
+> before) diving into the code.
+>
+> In the demo, the opt_script mechanism is currently using the "human"
+> monitor as opposed to QMP.  The human monitor interface is not stable
+> and not meant for consumption by management interface.  It is not clear
+> if this is just a sample usage, and in practice the notification_node
+> would be outside of QEMU, or not.  In general I would prefer to have the
+> script as an optional feature, and report the triggering of the watchdog
+> via QMP events.
+>
+> Paolo
+>
 
