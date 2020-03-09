@@ -2,51 +2,77 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74A0C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC79C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:45:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7712D20675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:44:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7712D20675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sysgo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D082820675
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:45:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXL+7CfT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D082820675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGpZ-00083U-MP
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:44:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51041)
+	id 1jBGqB-0000m0-P7
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:44:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <roman.kapl@sysgo.com>) id 1jBGou-0007f1-DY
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:42 -0400
+ (envelope-from <drjones@redhat.com>) id 1jBGpQ-000854-VM
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <roman.kapl@sysgo.com>) id 1jBGoq-0004uP-Gp
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:39 -0400
-Received: from mail.sysgo.com ([176.9.12.79]:57720)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <roman.kapl@sysgo.com>) id 1jBGop-0004uE-Va
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:43:36 -0400
-Subject: Re: [PATCH] vfio: avoid SET_ACTION_TRIGGER ioctls
-To: qemu-devel@nongnu.org
-References: <20200228120800.5979-1-rka@sysgo.com>
- <20200305153735.238a9ddd@w520.home>
-From: Roman Kapl <roman.kapl@sysgo.com>
-Message-ID: <734a8a2f-4659-c0e3-8c6f-8df8a3b6a75a@sysgo.com>
-Date: Mon, 9 Mar 2020 12:43:32 +0100
+ (envelope-from <drjones@redhat.com>) id 1jBGpQ-0004yn-1b
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:44:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32768
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1jBGpP-0004ya-TS
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:44:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583754251;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=78I5LVGNS/WghemDDn/hYLUYD1AftfK/zET4ULXdDjQ=;
+ b=CXL+7CfTKfQhdcu9RbMCDrOGjnOSbNvqRysfmHIGcY1i1wa4SqbP27R+qD2QMrxj38e4yV
+ HpWPvhmi218R/qobEtpzSKZKbrSqaBkOujV5twDA+xmza+BQ+vwssMFsSPpazJao88WuE9
+ +xfIwTAc7yNdRfY3bu4OBDYNLeTF4aM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-145ePac0Mx-b9s86tx_zLg-1; Mon, 09 Mar 2020 07:44:07 -0400
+X-MC-Unique: 145ePac0Mx-b9s86tx_zLg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D5AF107B116;
+ Mon,  9 Mar 2020 11:44:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BE2960C05;
+ Mon,  9 Mar 2020 11:44:00 +0000 (UTC)
+Date: Mon, 9 Mar 2020 12:43:58 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v4 10/13] arm/arm64: ITS: INT functional
+ tests
+Message-ID: <20200309114358.aaf5dyglehby4pup@kamzik.brq.redhat.com>
+References: <20200309102420.24498-1-eric.auger@redhat.com>
+ <20200309102420.24498-11-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200305153735.238a9ddd@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200309102420.24498-11-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 176.9.12.79
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,197 +84,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/5/20 11:37 PM, Alex Williamson wrote:
-> On Fri, 28 Feb 2020 13:08:00 +0100
-> Roman Kapl <rka@sysgo.com> wrote:
-> 
->> For MSI-X interrupts, remember what the last used eventfd was (KVM
->> bypass vs QEMU) and only call vfio_set_irq_signaling if it has changed.
->>
->> This not only helps with performance, but it seems that interrupts can
->> be lost during VFIO_IRQ_SET_ACTION_TRIGGER. With the 'x-no-kvm-msix'
->> switch and this patch, SET_ACTION_TRIGGER is not called during
->> mask/unmask. This really only affects guests that actively use MSI-X masking.
->>
->> Signed-off-by: Roman Kapl <rka@sysgo.com>
->> ---
->>
->> This patch scratches my particular itch. I am able to get our guest (which masks
->> MSI on each interrupt) running, without getting randomly stuck on waiting for
->> interrupt. However, the solution is far from perfect (x-no-kvm-msix is required)
->> and pretty slow. I would be interested in hearing any ideas how to improve this.
->> Some ideas:
->>
->> 1) Fix the kernel so that SET_ACTION_TRIGGER does not loose interrupts (I think
->> the problem is there, but not 100% sure). I've tested on 5.3.0-40-generic
->> #32~18.04.1-Ubuntu SMP.
-> 
-> I'd be curious if this (yet unmerged) series resolve this:
-> 
-> https://lore.kernel.org/lkml/cover.1567394624.git.luoben@linux.alibaba.com/
+On Mon, Mar 09, 2020 at 11:24:17AM +0100, Eric Auger wrote:
+...
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 0096de6..956d7b8 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -5,9 +5,8 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> -
+> -#ifndef _ASMARM_GICv3_ITS
+> -#define _ASMARM_GICv3_ITS
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
 
-Indeed it does. Thanks for pointing out this patch. This seems to nicely 
-fix the underlying issue and thus QEMU now work both with and without 
-KVM bypass.
+Another fix to squash into the patch where the lines are introduced.
 
->   
->> 2) Add support for MASK/UNMASK for MSI-X in kernel and use that. But I don't
->> know how to do PBA in that case. Another IOCTL? We could look at the real PBA
->> array, if mapping is supported, but that seems hacky.
-> 
-> That lack of a masking API in the host kernel is part of the reason we
-> take the hacky approach of emulating the PBA in QEMU.  We could have
-> the PBA MemoryRegion do a pread() from the device, but if we're doing
-> some ioctls on every un/mask, we're probably already digging ourselves
-> out of a hole.
-> 
-> It would be interesting to see if the series above prevents dropping
-> interrupts, how it compares with the reduced ioctls + QEMU handling you
-> have here.
+>  
+>  /* dummy its_data struct to allow gic_get_dt_bases() call */
+>  struct its_data {
+> @@ -19,5 +18,9 @@ static inline void test_its_introspection(void)
+>  {
+>  	report_abort("not supported on 32-bit");
+>  }
+> +static inline void test_its_trigger(void)
+> +{
+> +	report_abort("not supported on 32-bit");
 
-Unfortunately I was not able to get any reasonable performance data 
-here, because in the interrupt latency seems to be pretty bad (cca 1.5ms 
-- 2ms) in all three options I've tried: no-KVM-bypass, KVM-bypass, 
-no-KVM-bypass + my patch). So saving one IOCTL does not really make a 
-dent in that.
+As mentioned before, we don't want test_* and report_* functions in the
+library code.
 
-If I will be able to find out why the latency is so bad, or reduce it, I 
-will get back.
+> +}
+>  
+>  #endif /* _ASMARM_GICv3_ITS */
 
-> 
->> 3) Twiddle the bits behing kernel's back, if it can be mapped?
-> 
-> I'm not sure what you're thinking here, you mean mask vectors directly
-> on the device w/o a host kernel masking API and then read the PBA
-> directly from the device, mapping it directly to the guest if possible?
-> The MSI-X MMIO space can be mmapped by QEMU, we rely on interrupt
-> remmappers to protect us from malicious users.  QEMU certainly
-> shouldn't touch the vector or data fields, but masking might be
-> reasonably safe, then we could leave the KVM route in place.  I'm
-> afraid it might be difficult to integrate with QEMU MSI-X support
-> though.
+Forgot to change _ASMARM_GICv3_ITS here.
 
-Yes, that's what I was thinking. But that's just an idea.
+> -- 
+> 2.20.1
+>
 
-> 
->> Still, I think this patch does not hurt anything and could be applied if no-one
->> can think of a better way.
->>
->> ---
->>
->>   hw/vfio/pci.c | 32 ++++++++++++++++++++++----------
->>   hw/vfio/pci.h |  2 ++
->>   2 files changed, 24 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> index e6569a7968..5f7ce91519 100644
->> --- a/hw/vfio/pci.c
->> +++ b/hw/vfio/pci.c
->> @@ -390,12 +390,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
->>            * MSI-X mask and pending bits are emulated, so we want to use the
->>            * KVM signaling path only when configured and unmasked.
->>            */
->> -        if (vdev->msi_vectors[i].use) {
->> -            if (vdev->msi_vectors[i].virq < 0 ||
->> -                (msix && msix_is_masked(&vdev->pdev, i))) {
->> -                fd = event_notifier_get_fd(&vdev->msi_vectors[i].interrupt);
->> +        VFIOMSIVector *vector = &vdev->msi_vectors[i];
->> +        if (vector->use) {
->> +            if (vector->virq < 0 ||
->> +                (msix && msix_is_masked(&vdev->pdev, i)))
->> +            {
->> +                vector->kvm_path_active = false;
->> +                fd = event_notifier_get_fd(&vector->interrupt);
->>               } else {
->> -                fd = event_notifier_get_fd(&vdev->msi_vectors[i].kvm_interrupt);
->> +                vector->kvm_path_active = true;
->> +                fd = event_notifier_get_fd(&vector->kvm_interrupt);
->>               }
->>           }
->>   
->> @@ -509,17 +513,23 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
->>       } else {
->>           Error *err = NULL;
->>           int32_t fd;
->> +        bool kvm_path;
->>   
->>           if (vector->virq >= 0) {
->>               fd = event_notifier_get_fd(&vector->kvm_interrupt);
->> +            kvm_path = true;
->>           } else {
->>               fd = event_notifier_get_fd(&vector->interrupt);
->> +            kvm_path = false;
->>           }
->>   
->> -        if (vfio_set_irq_signaling(&vdev->vbasedev,
->> -                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
->> -                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
->> -            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        if (vector->kvm_path_active != kvm_path) {
->> +            if (vfio_set_irq_signaling(&vdev->vbasedev,
->> +                                       VFIO_PCI_MSIX_IRQ_INDEX, nr,
->> +                                       VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
->> +                error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +            }
->> +            vector->kvm_path_active = kvm_path;
-> 
-> 
-> Wouldn't this be more intuitive if we just cached the current fd on the
-> VFIOMSIVector object and created a vfio_set_irq_signaling() wrapper for
-> vectors that only calls through when the fd changes, updating the fd on
-> successful return otherwise?  AIUI, you're only trying to prevent
-> gratuitous calls to vfio_set_irq_signaling() when the eventfd remains
-> unchanged, which is the common case for your configuration of running
-> in QEMU interrupt mode.  Thanks,
+Thanks,
+drew
 
-I am not against that. If we decide to apply the patch, I can replace 
-the two call sites with the wrapper. It's not applicable in 
-vfio_enable_vectors.
-
-> 
-> Alex
-
-Thanks for comments, Roman Kapl
-
-> 
->>           }
->>       }
->>   
->> @@ -555,13 +565,15 @@ static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
->>        * core will mask the interrupt and set pending bits, allowing it to
->>        * be re-asserted on unmask.  Nothing to do if already using QEMU mode.
->>        */
->> -    if (vector->virq >= 0) {
->> +    if (vector->virq >= 0 && vector->kvm_path_active) {
->>           int32_t fd = event_notifier_get_fd(&vector->interrupt);
->>           Error *err = NULL;
->>   
->>           if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX, nr,
->>                                      VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
->>               error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->> +        } else {
->> +            vector->kvm_path_active = false;
->>           }
->>       }
->>   }
->> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
->> index b329d50338..b01d2676cf 100644
->> --- a/hw/vfio/pci.h
->> +++ b/hw/vfio/pci.h
->> @@ -91,6 +91,8 @@ typedef struct VFIOMSIVector {
->>        */
->>       EventNotifier interrupt;
->>       EventNotifier kvm_interrupt;
->> +    /* Set when the trigger action is set to the KVM bypass FD */
->> +    bool kvm_path_active;
->>       struct VFIOPCIDevice *vdev; /* back pointer to device */
->>       int virq;
->>       bool use;
-> 
-> 
 
