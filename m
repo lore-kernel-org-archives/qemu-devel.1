@@ -2,85 +2,79 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD386C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 22:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAE7C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 22:12:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 963C22253D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 22:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 265A024654
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 22:12:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ry/FyWth"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963C22253D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUfye7sK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 265A024654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBQVH-0001hk-R7
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 18:04:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47828)
+	id 1jBQds-0004yQ-9K
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 18:12:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51695)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBQT9-0007jW-0M
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:01:51 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jBQcG-0003g8-4N
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBQT7-0007XH-QN
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:01:50 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBQT7-0007Wn-M0
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:01:49 -0400
-Received: by mail-ot1-x343.google.com with SMTP id s15so2988059otq.8
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 15:01:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3D5R0ByUMwnpIn847TV33cL0I9HbhgiAN2Aan/suScM=;
- b=ry/FyWthWse39bybxdnEG99rkuMhdOLa5GMlrOblPoLE9hjofdNwoLojVN6/T3xg2D
- DWx3ssd2rjPJ10A5dVGQszGfoXTbsuyNC4tPxEQtcYwUvsmBJ8E18CZ8ntaJdNNBOZ5s
- rwVN6tu71h4xyR0LtRPO78mL1cjmaBWTNqHypIZIiIK+AOEWA6DSThT+bU87QmjdvZMn
- jttkiDvSczzmWEoWGS5/F0KFPwSCFC7MlBoPi6AVxnexcs5jcjX5ldsSb4qcY8vJxnYG
- 5g8t1el57eJUu5ZWfSq4HdSGP3fMnXDINDVFqxtIqLV81q5JvuptiHO3feHlRlgrR2TX
- 0p4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3D5R0ByUMwnpIn847TV33cL0I9HbhgiAN2Aan/suScM=;
- b=qs/S7ZG7MymAiMApO/NxwW/2hLDaS6mTfMXrVqOu2qlmQmr3hsP2t68rDGD8pz2PXW
- tUePMhr9gr+fYxjwTGBZhpGA4mNQEvUiMKQRYbDmJlMrMQkShf7VCznSxmzDug90kzE3
- 1GL1Q/SL17dX9WO1iHqmQ/lb1XOUrqfTjFRv0L/E7OQaRm/Og0XulVrA/e4O+Ci1oGlB
- 7FwLVznI1IXuepEFj1lfHDJHAc6qH4ZZxFa/LJihTOfKj9u4499ZGPzqgB5Tg9oIn+nw
- dsHuPmV1GTYbmpHbd0SQ9ULYiwJ68rJmibPOswPKk/D18fXIVKv0KYOkBluwzBkemmIp
- GuTQ==
-X-Gm-Message-State: ANhLgQ0qxwcPFKw+4Vb8ZQ7VRtkP6+pgMqFErfiW0hTuanK17NGOG4WX
- ShvrisAzr/zo/2VCdFDw1n5ZnVjGEJazr7BsiH/jcw==
-X-Google-Smtp-Source: ADFU+vsOPsYBcEuBVILDzLeVArfQdLdefbUjXFSF0jilPRltyA4UBnMuIW45MdPVbg4LnuXXVSWM4s00rfXvCCOvqjo=
-X-Received: by 2002:a9d:1920:: with SMTP id j32mr5938639ota.221.1583791308605; 
- Mon, 09 Mar 2020 15:01:48 -0700 (PDT)
+ (envelope-from <alex.williamson@redhat.com>) id 1jBQcE-000692-0b
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:11:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46121
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jBQcD-00068P-SO
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 18:11:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583791872;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vUDbQQ+O5V1qIpV6Jt8YTlr+PjTOYrH4ypGOvGl4ftQ=;
+ b=BUfye7sKyvJN6uo9WFYHJmWdFxRjiSEDZO6nPNK/Dnk9FxajNafbYIIIXyw6WLd7rPiYli
+ Dd7+2HpYTxKY1U+nyBXzy7997SfxtwoIsfOg+l7c+9m26Ymvx+Dk9VM7UhgAZ3/KVKlfIM
+ VCXxrIeVG9GM5dru05QvrcxQE/Ki8Dg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-nI4Ov686MIueZDetMhedxw-1; Mon, 09 Mar 2020 18:11:09 -0400
+X-MC-Unique: nI4Ov686MIueZDetMhedxw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10914107ACC9
+ for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 22:11:08 +0000 (UTC)
+Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4C5D5C1C3;
+ Mon,  9 Mar 2020 22:11:02 +0000 (UTC)
+Date: Mon, 9 Mar 2020 16:10:59 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v2 4/5] KVM: Kick resamplefd for split kernel irqchip
+Message-ID: <20200309161059.7c1cc49e@w520.home>
+In-Reply-To: <20200228161503.382656-5-peterx@redhat.com>
+References: <20200228161503.382656-1-peterx@redhat.com>
+ <20200228161503.382656-5-peterx@redhat.com>
 MIME-Version: 1.0
-References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
- <20200301215029.15196-19-nieklinnenbank@gmail.com> <871rq876h3.fsf@linaro.org>
- <CAPan3WrNnrnngwE4pGeYpR9HS7Vr936-ojPZZovNo8ZdoAA0sg@mail.gmail.com>
- <CAFEAcA_6Lm-JwbXFLWeetc7+fhnrc5m2+YU28ymFw0MSoKOhwg@mail.gmail.com>
- <CAPan3Wo2Nf_d4AxsV5=sfOxv66rmQNfN==rpMn9=FtM5cZG9rw@mail.gmail.com>
- <CAFEAcA-2-tz7F1vmbggpLnc1SSX+_W5pij-w8Vgjx+vqr-LRUA@mail.gmail.com>
- <CAPan3Wr-oS-QRxmCDPXLRBG81yqjnp56B2WNuxtBMOxr2b9D6A@mail.gmail.com>
- <CAFEAcA_rY1hXNbzsj6EJvKzODX_EWdTOK1Gfxi2Jbv+UsYxRtQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA_rY1hXNbzsj6EJvKzODX_EWdTOK1Gfxi2Jbv+UsYxRtQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 22:01:37 +0000
-Message-ID: <CAFEAcA-m2GJ01=-aEW0VLrY-nJgOpAMFOBF8+0jXeW+H7wkM-A@mail.gmail.com>
-Subject: Re: [PATCH v6 18/18] docs: add Orange Pi PC document
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,32 +86,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 at 20:12, Peter Maydell <peter.maydell@linaro.org> wrote:
-> If you're ready to send out the next version before that,
-> then leave it with the include:: directive and we can
-> fix it up to the new structure later.
+On Fri, 28 Feb 2020 11:15:02 -0500
+Peter Xu <peterx@redhat.com> wrote:
 
-PS: in case you weren't aware, softfreeze for the 5.0 release
-is 17th March, so if this series is going to go in for 5.0
-then (a) people interested in reviewing it should hurry up
-and review patches 9..18 and (b) the final version would
-need to be on the list sometime this week so it can go into
-a pull request by the 17th.
+> This is majorly only for X86 because that's the only one that supports
+> split irqchip for now.
+> 
+> When the irqchip is split, we face a dilemma that KVM irqfd will be
+> enabled, however the slow irqchip is still running in the userspace.
+> It means that the resamplefd in the kernel irqfds won't take any
+> effect and it will miss to ack INTx interrupts on EOIs.
+> 
+> One example is split irqchip with VFIO INTx, which will break if we
+> use the VFIO INTx fast path.
+> 
+> This patch can potentially supports the VFIO fast path again for INTx,
+> that the IRQ delivery will still use the fast path, while we don't
+> need to trap MMIOs in QEMU for the device to emulate the EIOs (see the
+> callers of vfio_eoi() hook).  However the EOI of the INTx will still
+> need to be done from the userspace by caching all the resamplefds in
+> QEMU and kick properly for IOAPIC EOI broadcast.
+> 
+> This is tricky because in this case the userspace ioapic irr &
+> remote-irr will be bypassed.  However such a change will greatly boost
+> performance for assigned devices using INTx irqs (TCP_RR boosts 46%
+> after this patch applied).
+> 
+> When the userspace is responsible for the resamplefd kickup, don't
+> register it on the kvm_irqfd anymore, because on newer kernels (after
+> commit 654f1f13ea56, 5.2+) the KVM_IRQFD will fail if with both split
+> irqchip and resamplefd.  This will make sure that the fast path will
+> work for all supported kernels.
+> 
+> https://patchwork.kernel.org/patch/10738541/#22609933
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c    | 85 +++++++++++++++++++++++++++++++++++++++++-
+>  accel/kvm/trace-events |  1 +
+>  hw/intc/ioapic.c       | 23 +++++++++++-
+>  include/sysemu/kvm.h   |  7 ++++
+>  4 files changed, 112 insertions(+), 4 deletions(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index d49b74512a..89771ea114 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -159,9 +159,65 @@ static const KVMCapabilityInfo kvm_required_capabilites[] = {
+>  static NotifierList kvm_irqchip_change_notifiers =
+>      NOTIFIER_LIST_INITIALIZER(kvm_irqchip_change_notifiers);
+>  
+> +struct KVMResampleFd {
+> +    int gsi;
+> +    EventNotifier *resample_event;
+> +    QLIST_ENTRY(KVMResampleFd) node;
+> +};
+> +typedef struct KVMResampleFd KVMResampleFd;
+> +
+> +/*
+> + * Only used with split irqchip where we need to do the resample fd
+> + * kick for the kernel from userspace.
+> + */
+> +static QLIST_HEAD(, KVMResampleFd) kvm_resample_fd_list =
+> +    QLIST_HEAD_INITIALIZER(kvm_resample_fd_list);
+> +
+>  #define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
+>  #define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
+>  
+> +static inline void kvm_resample_fd_remove(int gsi)
+> +{
+> +    KVMResampleFd *rfd;
+> +
+> +    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
+> +        if (rfd->gsi == gsi) {
+> +            QLIST_REMOVE(rfd, node);
+> +            g_free(rfd);
+> +            break;
+> +        }
+> +    }
+> +}
+> +
+> +static inline void kvm_resample_fd_insert(int gsi, EventNotifier *event)
+> +{
+> +    KVMResampleFd *rfd = g_new0(KVMResampleFd, 1);
+> +
+> +    rfd->gsi = gsi;
+> +    rfd->resample_event = event;
+> +
+> +    QLIST_INSERT_HEAD(&kvm_resample_fd_list, rfd, node);
+> +}
+> +
+> +bool kvm_resample_fd_notify(int gsi)
+> +{
+> +    KVMResampleFd *rfd;
+> +
+> +    if (!kvm_irqchip_is_split()) {
+> +        return false;
+> +    }
+> +
+> +    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
+> +        if (rfd->gsi == gsi) {
+> +            event_notifier_set(rfd->resample_event);
+> +            trace_kvm_resample_fd_notify(gsi);
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> +
+>  int kvm_get_max_memslots(void)
+>  {
+>      KVMState *s = KVM_STATE(current_accel());
+[snip]  
+> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+> index 15747fe2c2..13921b333d 100644
+> --- a/hw/intc/ioapic.c
+> +++ b/hw/intc/ioapic.c
+> @@ -236,8 +236,27 @@ void ioapic_eoi_broadcast(int vector)
+>          for (n = 0; n < IOAPIC_NUM_PINS; n++) {
+>              entry = s->ioredtbl[n];
+>  
+> -            if ((entry & IOAPIC_VECTOR_MASK) != vector ||
+> -                ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) != IOAPIC_TRIGGER_LEVEL) {
+> +            if ((entry & IOAPIC_VECTOR_MASK) != vector) {
+> +                continue;
+> +            }
+> +
+> +            /*
+> +             * When IOAPIC is in the userspace while APIC is still in
+> +             * the kernel (i.e., split irqchip), we have a trick to
+> +             * kick the resamplefd logic for registered irqfds from
+> +             * userspace to deactivate the IRQ.  When that happens, it
+> +             * means the irq bypassed userspace IOAPIC (so the irr and
+> +             * remote-irr of the table entry should be bypassed too
+> +             * even if interrupt come), then we don't need to clear
+> +             * the remote-IRR and check irr again because they'll
+> +             * always be zeros.
+> +             */
+> +            if (kvm_resample_fd_notify(n)) {
+> +                continue;
+> +            }
 
-It's no big deal if it goes into 5.1 instead I guess,
-but it feels like the series is nearly ready so I figured
-I'd set out the timeline if people want to push to get it
-into 5.0.
+It seems the problem I reported is here.  In my configuration virtio-blk
+and an assigned e1000e share an interrupt.  virtio-blk is initializing
+and apparently triggers an interrupt.  The vfio-pci device is
+configured for INTx though not active yet, but kvm_resample_fd_notify()
+kicks the fd here, so we continue.  If I remove the continue here both
+devices seem to work, but I don't claim to understand the condition
+we're trying to continue for here yet.  This series needs more testing
+with shared interrupts.  Thanks,
 
-thanks
--- PMM
+Alex
+
 
