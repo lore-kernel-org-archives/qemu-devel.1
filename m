@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78526C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97881C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D60F20873
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D60F20873
+	by mail.kernel.org (Postfix) with ESMTPS id 6E6E020873
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6E020873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBK7Z-00087x-E7
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:15:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33836)
+	id 1jBK8B-0000gs-Go
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:15:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2x-0000HV-WE
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:31 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK2Y-000834-BT
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2v-00083a-Pg
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:23 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:34875)
+ (envelope-from <laurent@vivier.eu>) id 1jBK2X-0007kn-6w
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:58 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:37407)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2j-0007w1-29; Mon, 09 Mar 2020 11:10:09 -0400
+ id 1jBK2W-0007jm-SS; Mon, 09 Mar 2020 11:09:57 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N79q6-1jPh9b2kkm-017RUo; Mon, 09 Mar 2020 16:09:15 +0100
+ id 1McH1O-1jlkF31NLY-00clTu; Mon, 09 Mar 2020 16:09:13 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/33] hw/alpha/alpha_sys: Remove unused "hw/ide.h" header
-Date: Mon,  9 Mar 2020 16:08:18 +0100
-Message-Id: <20200309150837.3193387-15-laurent@vivier.eu>
+Subject: [PULL 13/33] hw/i386/intel_iommu: Remove unused includes
+Date: Mon,  9 Mar 2020 16:08:17 +0100
+Message-Id: <20200309150837.3193387-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:uccyuDrkFn+a+xEWYIJHFbgT2Icbc+Sj4ndp1MFnVVx0HLwwqeP
- la9vjsB5CnghR36yGzsOk/Y3AFTd4A0nSrBItsgyjXayc5Kqho29niLo2I0mAGJg3DhS8n4
- Q+3IuMpRobwcsbq5qzU/QqonQVILD/6FaMWYTVqJEpWXowNdJ1ZUhQA2ZDAduZJi2q1l5io
- 80LRGFOeaxEqdTTN6oYpw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:H0CLhIOz0Nk=:xUwZiqy5V4yKaT2+xD0mEx
- /i05Kz0KbWFGvNO6EQDyHLnZvGTxMZbWdKSphC0934APVF+KRPVIyI0ToU8H6ALe1xdrQKmn2
- ItJVtcaCBUsbs7XLOgAVnAVs6lcdmnpUZ6wHqI/rFPxFfrbmbzvOyKKZzmaWkVwGJsbeur35f
- QA3kABJFi4PhJpQddnWHmol8Uzi+cVrNUdpQkXTa/S9XJtoh9J4ZBwSd92z8vdall+pML6dZv
- d+08yl1DWjlS2w5fQmPFm1PSOiHgVKW17rfdhWpi6TXAz3Y38lS+OJzsl1plEMWX77xK4/Jq3
- t6fB+rNYyNnnsiONlu9IKLcoqJJHwvgfPak47GlGgGraEhdD7iymLqoJhytytlK4Ypk55siFW
- CKxAKmGFadVrlBvCZ6coVyKytOO011kzqYu0u0DqUpfwLqFEF9sXdz0N/KTG4o+lM4cGELBM6
- 9kY79RvfPTbupLP0xtPHIa0VSaFy+/sa88FUbYoJcv2gu7GA1bmuzYsn1985HiZV8yD22EdnB
- 8ozbw/JtcwZMW9ek2V3m5W0OLFfTkmd5t+VMSQegKihM0pdXFDmSv53mZQg0AxGJYSd8SEXMX
- 3m6/HwKKNwPzDuvSp0aBw/8EQNNUymE+j61ExzGWzW6rGa9ZqwuTBso/wTlLBYoXeUJemOXgG
- zUyzobqsrXJkNWwC2w+vHlmKMhOwbXvLBcVpK+hIH3tAiSAHRgSk/FlpkXUxhmNGqe8eBeG43
- Hi8/6/onj+SjANFK6AP1ok+Gog3VT2uWKnDvYP2p6+kwxMIw2lNj77X2I+Rav4+xG+/PyH/x4
- I4Ezc4WUJoxXiE60qdBr1b0BDrgzq6n8LqgX447FRAQ+g7L4Ef6xAFHK18Q6OOFc+NCtuSa
+X-Provags-ID: V03:K1:hUNOQQrwqIsLR/pdizzKGBHcH3bkdrISqVe8Mw7EHPQIxgV+Aim
+ DbHw3T2O7tbiVWMBey5GeCJKbut/UJAlziDIRecGpxRzQBMrFA3E9e1zKyLI+scUOkr55hL
+ o/phW9FOnB/RwrQLHhMj9TAl38RfV9YGJpzZBqHLPP+Mt58PrNKsW+8GzcSVHrw83R5dikh
+ EB+MWnisgL5Wde/ZRujIg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pdg3X9/wsbQ=:5cLZxw/XnD0ZGQtnIzD3y6
+ PwhEQ01lY8lffq8X8YSHEp0Gj3kSF+lldTXTlqePUQSY4Lc7oNmKB78jrc9xNI5Yhq5YCYLrX
+ ghz/xwFqbCZ6M2l8Qp4xP/sjLOtO/c6vKVP28MIZoWMuDkLhX8NXtmB9b+9W4Z9V2h7FdhuOd
+ xbRlfZavaYjlaUhADICdBGDuQS2Kmx9ptR+/GUI6Q4xMqSSiKPt+3eFJbjGv9cY1C2RHH6g9D
+ 1kPyPU2dQsOtcFlKE4NfhNCkLvYY00fKIWicRBNGJDWGAcIFypEeFwHd67ijN7j82pXUJ+I2Y
+ stVTi4aZDq1isRIIxQ3WApPrGVvsRAzOLratOfB/LsoDavZGrffZfeksfwQDzqYHw4Mk09utw
+ MGo97jUiEJtpzwZCQEUdydAt2JZ4kCksRsXVMYPy1HnR5nEhWQ5NBZUOR/2/M4dUpGcIMp/cW
+ kqWieiTutEZ8Ygnq/ruH44AiaDi5d3OO8yxsPEnCqGKAiKrTD3HoPeKXcm+J3Ifjkiiw8NADu
+ 65FsvRTR1xv0LUHTHxwC5ZiGifaWhlkJk0VAkSpK1yRPBhAQHW2y9sChZmTKJ85HPM3sWEBPJ
+ vNDXfWMohz4aUhI/DGmqrdot228lK8EnB1yO/58XPrPKEhgJWDKabx/VuWgAgFVHkiIpfk6LZ
+ Tm2VqmTRcSN2nbUjNv5M03nozAKKp4VoeoUe8ASJ0zsiNoDxtnEusaEXoqowUQcyvx9UVopPP
+ QJkfY1BU9TqmyBvqZq0FtgAML1FwfFPnGlu8swnAROzqCWg1IDxdieCo9+XrDjUSyp7299f89
+ lgh9Az1KsvdnEG/+jaLD/kQb8UbeJYVRZk7XfdcVqSp8dcvPwELQM9tZ0RtPq6x1n8E+7qU
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,30 +100,33 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-alpha_sys.h does not use anything from the "hw/ide.h" header.
-Remove it.
+intel_iommu.h does not use any of these includes, remove them.
 
 Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-8-philmd@redhat.com>
+Message-Id: <20200228114649.12818-7-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/alpha/alpha_sys.h | 1 -
- 1 file changed, 1 deletion(-)
+ include/hw/i386/intel_iommu.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index bc0a286226f1..e2c02e2bbe1d 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -6,7 +6,6 @@
- #include "target/alpha/cpu-qom.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
--#include "hw/ide.h"
- #include "hw/boards.h"
- #include "hw/intc/i8259.h"
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 66b931e52628..a1c4afcda5c9 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -22,11 +22,7 @@
+ #ifndef INTEL_IOMMU_H
+ #define INTEL_IOMMU_H
  
+-#include "sysemu/dma.h"
+ #include "hw/i386/x86-iommu.h"
+-#include "hw/i386/ioapic.h"
+-#include "hw/pci/msi.h"
+-#include "hw/sysbus.h"
+ #include "qemu/iova-tree.h"
+ 
+ #define TYPE_INTEL_IOMMU_DEVICE "intel-iommu"
 -- 
 2.24.1
 
