@@ -2,69 +2,121 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C7CC10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F48C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 543DA20866
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:01:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543DA20866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB40724658
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:05:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="rPnR135M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB40724658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBNet-00079w-Il
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:01:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46193)
+	id 1jBNiQ-0008Q9-5K
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:05:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jBNeA-0006RL-8n
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:04 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jBNhl-0007zw-BN
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:04:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jBNe8-0003CL-AM
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:01 -0400
-Resent-Date: Mon, 09 Mar 2020 15:01:01 -0400
-Resent-Message-Id: <E1jBNe8-0003CL-AM@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21194)
+ (envelope-from <Babu.Moger@amd.com>) id 1jBNhk-0005cM-3W
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:04:45 -0400
+Received: from mail-dm6nam12on2077.outbound.protection.outlook.com
+ ([40.107.243.77]:4960 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jBNe8-0003Az-1V
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:01:00 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1583780454; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=eIrBSIxLNkQ+j1k+sPIJk4og1NxEHqfss8c0hkoRLRXruChIhqxZ4QTfJEpIKiX2jEfX573/x88ylEYDTg/YBs8KJGOzAL4/DrRLj6lfslMozetKSdOO0dXrdMSUptj71sjn95oGoNyAwp6e7k1j9E1x2gixIQ2HzibFdCqtpIw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583780454;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=kMYgnH2VNHnPoECh2+MIi69Jk3n0V3oT0dBCiZLXsQY=; 
- b=VciBBP+A8k6BHBU4T/Gea5qra06JI5dxTaOxfE+k6DPC2WevyR/y/Q5yFhbg7OffCelVkU7S6/vQqONxZIBM3mkPeLnkSQ0VKTc+lizsxT/oqjuT2NLqicvraGs46atqoPKFfZ5sIjCPgMNRTQn+W5dz6iOhrGb4nmlq1uZd8k4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583780452981873.0242393712098;
- Mon, 9 Mar 2020 12:00:52 -0700 (PDT)
-In-Reply-To: <20200309183521.GA9@669c1c222ef4>
-Subject: Re: [PATCH v9 0/9] qemu-binfmt-conf.sh
-Message-ID: <158378045193.20878.13506707686933683163@39012742ff91>
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jBNhj-0005ba-QG
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:04:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rzy/4F+52VKOH29GIbSDPjBAfmBbLilXc6fCyzTPE/XC1V/fLgQdXan/VvINpc5yW+ZA70NXmQCxbYlXxrOl7Y9J7gAxI9am9kVWhN2Xc+fCtk9WDq8d+4Sf0A7uPryVakELi/S09lZmZsf0zzHm2T/SU1eEwX4zF3QHEWAXfC9rK+rELcUF6dXZiSLbZ3iDfZ0xDxwrbuAsE6jVFywjf9SDcP3UsR+fh7/hLML9aDqh8smqa8el7X3sIzy1WGtuQZzu/ZhOupolVe5P1eqPitvlpZYI/jYp+ahWvvaN0JXNO06cmAd5j+rZWhnpp4ubYl7BBKRplY0Alt420U3cNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UijQsqKHlk1lMK/hv2BvNHpclsRbznfA1RFZdPLHQBM=;
+ b=cXJgsgsNJ5dMyJQAupPyB86Qdtw9Wcad6To3Dm0ylnuZSGYCPpeA+i3Aphga4IfIamP/srlBAcWmgXC6KnMYLmKA9m7wFeW4tFxIk1qGkTrw6jLDzFD3IyU8QtuwehAUx3xgPI9ccGsldJOvzpBiJkj1Cnqw8Thrn1dV1z/7S3DkgvCUyhdm2l+o9BCjdCQjb1qDqUQ9UmsU3r1t6sWA190p0cqhZbYkfU/e2YJ4NLa88S2z49bHSG0XCxuZMJ84wVral6/ebte0vo096Qu158sQsSuz6C9LXIfg7jYfOfqULpSmkSIZk4oIY4NDGbYco/0ns16+e54pbmVSfxd43g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UijQsqKHlk1lMK/hv2BvNHpclsRbznfA1RFZdPLHQBM=;
+ b=rPnR135M8k2GWgBi1JOM0qOqKep8bd/dajZ5w6i+7DMjvV7TZSaENZEkwfTY7ZHCTkkdbMTanbeVvArdNZD8U8frsuLPAdjn8tQUgCb8NyFog9Uojqvo81porYDy1g4DBnxcQeGgx9SVyhwHGpxWoIHR9xVYhiBVqgODnFIXevA=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2544.namprd12.prod.outlook.com (2603:10b6:802:2b::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Mon, 9 Mar
+ 2020 19:04:42 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Mon, 9 Mar 2020
+ 19:04:41 +0000
+Subject: Re: [PATCH v5 11/16] target/i386: Load apicid model specific handlers
+ from X86CPUDefinition
+To: Igor Mammedov <imammedo@redhat.com>
+References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
+ <158326548299.40452.4030040738160407065.stgit@naples-babu.amd.com>
+ <20200309154922.6a523245@Igors-MacBook-Pro>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <f6fa5e13-3680-930f-2e0e-7651125ea309@amd.com>
+Date: Mon, 9 Mar 2020 14:04:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200309154922.6a523245@Igors-MacBook-Pro>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0401CA0007.namprd04.prod.outlook.com
+ (2603:10b6:803:21::17) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: unai.martinezcorral@ehu.eus
-Date: Mon, 9 Mar 2020 12:00:52 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ SN4PR0401CA0007.namprd04.prod.outlook.com (2603:10b6:803:21::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.15 via Frontend
+ Transport; Mon, 9 Mar 2020 19:04:40 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 131e6ad7-8728-4e07-917f-08d7c45cb8f9
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2544:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB254490AA241441FB225A851D95FE0@SN1PR12MB2544.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 0337AFFE9A
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(136003)(366004)(396003)(376002)(39860400002)(346002)(199004)(189003)(316002)(52116002)(26005)(31696002)(4326008)(36756003)(6486002)(16576012)(6916009)(44832011)(186003)(956004)(81156014)(2616005)(81166006)(8676002)(8936002)(16526019)(478600001)(53546011)(2906002)(66556008)(31686004)(5660300002)(66476007)(66946007)(86362001);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2544;
+ H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3wKIDd8w5dZ7YmXak8y86VRLNXbAcf1KJrDUO+ngQ6C0x/dhzlDynPibqSg73hDFVbPzUWZtGUqNEO1L5qk/rFbVyrhTvYt7lcqqKVQ6L0p30hNe8qQN3Qbk9/DVtZRMPmWYwK4gxdMb11ZGGoKGgypUkjGkTPdWSX4gJQG5bNxuhjLuBAIKuZiK+joLE7qEQJPI8726RrakEqAWCB4byUml3lH6BuwEgVijQ85vN8K9r0u+hWByCv3QvDPk5daqNqBmSv7MOvGk8NA8Z0MHDWLkjfWMBw1h7oQCoxzcwiyGjjvDO9hymKMYXZKgQ5QcrO/K/TRcLnz0C5WtO6ylJMagRx2/QjTKceISc82qYwmtrVLZV8qs/NSPzN6pc9ilwDHuJID8FKFFr5Iu+NCrkGyr7qzqmt4Y4q2KsXatYLRZfCY5Ccbefg5a3bSZ5Ico
+X-MS-Exchange-AntiSpam-MessageData: KIdHPBK2gQMXhKJastbVan4sS2jfPl+kEQpOiAkiv8cgARu37NxnZv7v7xBzQl1HHcmLZNOLmg9fKOBoj733ujGs2hnhLf36Qc8QvqQ0Sa+cccdkUY7/jxtsyy093cDoU8nqOl3VyvuMpqLzEtRzvg==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 131e6ad7-8728-4e07-917f-08d7c45cb8f9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2020 19:04:41.7502 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AY8WmRWEl/4vHyksHAXbVN1EGfadunUThKMM2/33YPTWEsZq7kc0fgnWKQ2ErJ03
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2544
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 40.107.243.77
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,143 +128,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwOTE4MzUyMS5HQTlA
-NjY5YzFjMjIyZWY0LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rp
-bmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246
-CgpTdWJqZWN0OiBbUEFUQ0ggdjkgMC85XSBxZW11LWJpbmZtdC1jb25mLnNoCk1lc3NhZ2UtaWQ6
-IDIwMjAwMzA5MTgzNTIxLkdBOUA2NjljMWMyMjJlZjQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY1MGY1
-NzUgcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIC0tdGVzdAphOWVjOTE4IHFlbXUtYmluZm10LWNv
-bmYuc2g6IGFkZCBvcHRpb24gLS1jbGVhcgphMmQxMTJmIHFlbXUtYmluZm10LWNvbmYuc2g6IGdl
-bmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCBbVEFSR0VUU10KZTcxYWEwZCBxZW11LWJpbmZt
-dC1jb25mLnNoOiBob25vdXIgUUVNVV9QQVRIIGFuZC9vciBRRU1VX1NVRkZJWAowZGFkOWZkIHFl
-bXUtYmluZm10LWNvbmYuc2g6IHJlbW92ZSAncWVtdScgcHJlZml4IGZyb20gY2xpIG9wdGlvbnMK
-OGRkM2IxZCBxZW11LWJpbmZtdC1jb25mLnNoOiB1c2UgdGhlIHNhbWUgcHJlc2VudGF0aW9uIGZv
-cm1hdCBhcyBmb3IgcWVtdS0qCmNhNWIyNjkgcWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIFFFTVVf
-Q1JFREVOVElBTCBhbmQgUUVNVV9QRVJTSVNURU5UCjczN2Y5NTkgcWVtdS1iaW5mbXQtY29uZi5z
-aDogbWFrZSBvcHRzIC1wIGFuZCAtYyBib29sZWFuCmViYTA3ZDMgcWVtdS1iaW5mbXQtY29uZi5z
-aDogZW5mb3JjZSBzYWZlIHN0eWxlIGNvbnNpc3RlbmN5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQox
-LzkgQ2hlY2tpbmcgY29tbWl0IGViYTA3ZDNiMGMxYyAocWVtdS1iaW5mbXQtY29uZi5zaDogZW5m
-b3JjZSBzYWZlIHN0eWxlIGNvbnNpc3RlbmN5KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojODg6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMDM6CisgICAgICAg
-IGlmIFsgIngkbWFnaWMiID0gIngiIF0gfHwgWyAieCRtYXNrIiA9ICJ4IiBdIHx8IFsgIngkZmFt
-aWx5IiA9ICJ4IiBdOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNiBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAxLzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi85IENoZWNr
-aW5nIGNvbW1pdCA3MzdmOTU5NGUxN2MgKHFlbXUtYmluZm10LWNvbmYuc2g6IG1ha2Ugb3B0cyAt
-cCBhbmQgLWMgYm9vbGVhbikKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MTogRklM
-RTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjMzMToKK29wdGlvbnM9JChnZXRvcHQgLW8g
-ZHM6UTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kOixxZW11LXBhdGg6LHFlbXUtc3VmZml4Oixl
-eHBvcnRkaXI6LGhlbHAsY3JlZGVudGlhbCxwZXJzaXN0ZW50IC0tICIkQCIpCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDQzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvOSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKMy85IENoZWNraW5nIGNvbW1pdCBjYTViMjY5MzkxNTkgKHFlbXUt
-YmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFFTVVfUEVSU0lTVEVOVCkK
-NC85IENoZWNraW5nIGNvbW1pdCA4ZGQzYjFkZGMwODYgKHFlbXUtYmluZm10LWNvbmYuc2g6IHVz
-ZSB0aGUgc2FtZSBwcmVzZW50YXRpb24gZm9ybWF0IGFzIGZvciBxZW11LSopCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25m
-LnNoOjE4MzoKKy1GfC0tcWVtdS1zdWZmaXggU1VGRklYICAgICAgICAgICAgICAgYWRkIGEgc3Vm
-Zml4IHRvIHRoZSBkZWZhdWx0IGludGVycHJldGVyIG5hbWUKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojNTI6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODQ6Cist
-cHwtLXBlcnNpc3RlbnQgICAgICBRRU1VX1BFUlNJU1RFTlQgICh5ZXMpIGxvYWQgdGhlIGludGVy
-cHJldGVyIGFuZCBrZWVwIGl0IGluIG1lbW9yeTsgYWxsIGZ1dHVyZQoKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiM1NDogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4
-NjoKKy1jfC0tY3JlZGVudGlhbCAgICAgIFFFTVVfQ1JFREVOVElBTCAgKHllcykgY3JlZGVudGlh
-bCBhbmQgc2VjdXJpdHkgdG9rZW5zIGFyZSBjYWxjdWxhdGVkIGFjY29yZGluZwoKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1OTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25m
-LnNoOjE5MToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3lzdGVtZC1i
-aW5mbXQuc2VydmljZSBmb3IgdGhlIGdpdmVuIENQVTsgaWYgQ1BVIGlzICJBTEwiLAoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1j
-b25mLnNoOjE5MzoKKy1kfC0tZGViaWFuICAgICAgICAgICAgICAgICAgICAgICAgICAgZG9uJ3Qg
-d3JpdGUgaW50byAvcHJvYywgZ2VuZXJhdGUgdXBkYXRlLWJpbmZtdHMgdGVtcGxhdGVzCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg2OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
-LWNvbmYuc2g6MjEwOgorVGhlIGVudmlyb25tZW50IHZhcmlhYmxlIEhPU1RfQVJDSCBhbGxvd3Mg
-dG8gb3ZlcnJpZGUgJ3VuYW1lJyB0byBnZW5lcmF0ZSBjb25maWd1cmF0aW9uIGZpbGVzIGZvciBh
-Cgp0b3RhbDogNSBlcnJvcnMsIDEgd2FybmluZ3MsIDc5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQv
-OSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS85IENoZWNraW5nIGNvbW1pdCAwZGFkOWZk
-MDYxOWUgKHFlbXUtYmluZm10LWNvbmYuc2g6IHJlbW92ZSAncWVtdScgcHJlZml4IGZyb20gY2xp
-IG9wdGlvbnMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogc2Ny
-aXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4NDoKKy1GfC0tc3VmZml4IFNVRkZJWCAgICAgICAg
-ICAgICAgICAgICAgYWRkIGEgc3VmZml4IHRvIHRoZSBkZWZhdWx0IGludGVycHJldGVyIG5hbWUK
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDU6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
-aW5mbXQtY29uZi5zaDozMzc6CitvcHRpb25zPSQoZ2V0b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBk
-ZWJpYW4sc3lzdGVtZDoscGF0aDosc3VmZml4OixleHBvcnRkaXI6LGhlbHAsY3JlZGVudGlhbCxw
-ZXJzaXN0ZW50IC0tICIkQCIpCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDM4IGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDUvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNi85IENoZWNr
-aW5nIGNvbW1pdCBlNzFhYTBkNDA2ZTEgKHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1V
-X1BBVEggYW5kL29yIFFFTVVfU1VGRklYKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMjM6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODQ6CistRnwtLXN1ZmZp
-eCBTVUZGSVggICBRRU1VX1NVRkZJWCAgICAgIGFkZCBhIHN1ZmZpeCB0byB0aGUgZGVmYXVsdCBp
-bnRlcnByZXRlciBuYW1lCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwIGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDYvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzkgQ2hlY2tpbmcg
-Y29tbWl0IGEyZDExMmZlZDE3YSAocWVtdS1iaW5mbXQtY29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BV
-PiB0byBwb3NpdGlvbmFsIFtUQVJHRVRTXSkKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiM3ODogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjIwMzoKK1RBUkdFVFMgICAg
-ICAgICAgICAgIFFFTVVfVEFSR0VUUyAgICAgQSBzaW5nbGUgYXJjaCBuYW1lIG9yIGEgbGlzdCBv
-ZiB0aGVtIChzZWUgYWxsIG5hbWVzIGJlbG93KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiM5MTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjIxNToKKy1zfC0t
-c3lzdGVtZCAgICAgICAgICAgICAgICAgICAgICAgICAgZG9uJ3Qgd3JpdGUgaW50byAvcHJvYywg
-Z2VuZXJhdGUgZmlsZShzKSBmb3IKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTA1
-OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjM0OgorVGhlIGVudmlyb25tZW50
-IHZhcmlhYmxlIEhPU1RfQVJDSCBhbGxvd3MgdG8gb3ZlcnJpZGUgJ3VuYW1lJyB0byBnZW5lcmF0
-ZSBjb25maWd1cmF0aW9uIGZpbGVzIGZvcgoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiMxNDc6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozNjM6CitvcHRpb25zPSQo
-Z2V0b3B0IC1vIGRzUTpTOmU6aGNwIC1sIGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1ZmZpeDosZXhw
-b3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90YWw6IDMgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAxNDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy85IGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgo4LzkgQ2hlY2tpbmcgY29tbWl0IGE5ZWM5MThiYTllYyAocWVtdS1i
-aW5mbXQtY29uZi5zaDogYWRkIG9wdGlvbiAtLWNsZWFyKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDQ6Cisg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIGVtcHR5LCBjb25maWd1cmUv
-Y2xlYXIgYWxsIGtub3duIHRhcmdldHM7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzQyOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjEzOgorLXJ8LS1jbGVhciAg
-ICAgICAgICAgUUVNVV9DTEVBUiAgICAgICAoeWVzKSByZW1vdmUgcmVnaXN0ZXJlZCBpbnRlcnBy
-ZXRlcnMgZm9yIHRhcmdldCBUQVJHRVRTOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiM4NTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjM4MToKK29wdGlvbnM9JChn
-ZXRvcHQgLW8gcmRzUTpTOmU6aGNwIC1sIGNsZWFyLGRlYmlhbixzeXN0ZW1kLHBhdGg6LHN1ZmZp
-eDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAiKQoKdG90YWw6
-IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA4NSBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzkgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvOSBDaGVja2luZyBjb21taXQgZjUwZjU3NTYxNmE4IChx
-ZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgLS10ZXN0KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMjE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoyMDQ6CisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIGVtcHR5LCBjb25maWd1cmUvY2xl
-YXIgYWxsIGtub3duIHRhcmdldHMuCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI5
-OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MjE0OgorLXR8LS10ZXN0ICAgICAg
-ICAgICAgUUVNVV9URVNUICAgICAgICAoeWVzKSB0ZXN0IHRoZSBzZXR1cCB3aXRoIHRoZSBwcm92
-aWRlZCBhcmd1bWVudHMsIGJ1dCBkbyBub3QKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVy
-cwojNTk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozODE6CitvcHRpb25zPSQo
-Z2V0b3B0IC1vIHRyZHNROlM6ZTpoY3AgLWwgdGVzdCxjbGVhcixkZWJpYW4sc3lzdGVtZCxwYXRo
-OixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFsLHBlcnNpc3RlbnQgLS0gIiRAIikK
-CnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgNjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS85
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMwOTE4MzUyMS5HQTlANjY5YzFjMjIyZWY0L3Rl
-c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+On 3/9/20 9:49 AM, Igor Mammedov wrote:
+> On Tue, 03 Mar 2020 13:58:03 -0600
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+>> Load the model specific handlers if available or else default handlers
+>> will be loaded. Add the model specific handlers if apicid decoding
+>> differs from the standard sequential numbering.
+>>
+> 
+> this is still the old version of the patch and hadn't addressed feedback from v4
+
+Yes. I was confused little bit about it. Will fix it.
+
+> 
+>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>> ---
+>>  target/i386/cpu.c |   34 ++++++++++++++++++++++++++++++++++
+>>  target/i386/cpu.h |    1 +
+>>  2 files changed, 35 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index c75cf744ab..f33d8b77f5 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -51,6 +51,7 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "sysemu/tcg.h"
+>>  #include "hw/qdev-properties.h"
+>> +#include "hw/i386/x86.h"
+> this dependency shouldn't be here, see below
+
+ok.
+
+> 
+>>  #include "hw/i386/topology.h"
+>>  #ifndef CONFIG_USER_ONLY
+>>  #include "exec/address-spaces.h"
+> [...]
+>> +void cpu_x86_init_apicid_fns(MachineState *machine)
+> it should be something like:
+>   x86_use_epyc_apic_id_encoding(char *cpu_type)
+> try to avoid pulling in unnecessary dependency on Machine into cpu.c
+
+Ok.
+
+> 
+>> +{
+>> +    X86CPUClass *xcc = X86_CPU_CLASS(object_class_by_name(machine->cpu_type));
+>> +    X86CPUModel *model = xcc->model;
+>> +    X86CPUDefinition *def = model->cpudef;
+>> +    X86MachineState *x86ms = X86_MACHINE(machine);
+>> +
+>> +    if (def) {
+>> +        if (def->apicid_from_cpu_idx) {
+>> +            x86ms->apicid_from_cpu_idx = def->apicid_from_cpu_idx;
+>> +        }
+>> +        if (def->topo_ids_from_apicid) {
+>> +            x86ms->topo_ids_from_apicid = def->topo_ids_from_apicid;
+>> +        }
+>> +        if (def->apicid_from_topo_ids) {
+>> +            x86ms->apicid_from_topo_ids = def->apicid_from_topo_ids;
+>> +        }
+>> +        if (def->apicid_pkg_offset) {
+>> +            x86ms->apicid_pkg_offset = def->apicid_pkg_offset;
+>> +        }
+>> +    }
+>> +}
+> 
+> It was suggested to move defaults initialization to x86_machine_class_init()
+
+ok.  We don't need the above changes. I will use the boolean as you
+suggested and call this function in x86_cpus_init() to initialize the EPYC
+specific handler. Something similar like this below..
+
+x86_use_epyc_apic_id_encoding(char *cpu_type)
+{
+      X86CPUClass *xcc = ... cpu_type ...
+      return xcc->model->cpudef->use_epyc_apic_id_encoding
+}
+
+x86_cpus_init()
+{
+ if (x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
+            x86ms->apicid_from_cpu_idx = ...epyc...
+            x86ms->topo_ids_from_apicid = ...epyc...
+            x86ms->apicid_from_topo_ids = ...epyc...
+            x86ms->apicid_pkg_offset = ...epyc...
+    }
+}
+
+Sounds right?
+
+> 
+> as was suggested at 
+> [PATCH v4 12/16] hw/i386: Use the apicid handlers from X86MachineState
+> and acked by Eduardo
+> 
+>> +
+>>  static CPUCaches epyc_cache_info = {
+>>      .l1d_cache = &(CPUCacheInfo) {
+>>          .type = DATA_CACHE,
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 20abbda647..34f0d994ef 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1895,6 +1895,7 @@ void cpu_clear_apic_feature(CPUX86State *env);
+>>  void host_cpuid(uint32_t function, uint32_t count,
+>>                  uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
+>>  void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
+>> +void cpu_x86_init_apicid_fns(MachineState *machine);
+>>  
+>>  /* helper.c */
+>>  bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>>
+> 
 
