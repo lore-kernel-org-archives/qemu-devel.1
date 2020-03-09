@@ -2,80 +2,60 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9638CC10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 21:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1BD9C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 21:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65F6C2464B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 21:05:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGQmdJKS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F6C2464B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 83AB42146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 21:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83AB42146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBPaa-0005pd-KX
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 17:05:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39235)
+	id 1jBPcp-0007Rr-Oj
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 17:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39653)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jBPZq-0005NH-Nr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 17:04:43 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jBPc2-0006XC-Th
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 17:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jBPZo-0000Lq-RQ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 17:04:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28475
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1jBPc1-00021E-GS
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 17:06:58 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jBPZo-0000JT-Lb
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 17:04:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583787876;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fbC3+SCZRcbY25ZcwpCM3r5UPj8OcIpA81tZN1IWAv8=;
- b=dGQmdJKS/WS1UeGSIC7XWjLmDZInkrfUDwwfE3rBlG6TVSrobe5FtZ+WWf9oRR5YwXem9K
- MgelAgQmFPnIsLyavocDEKx3G1HJrYzJDhoFYvMlnO6ECyJVcqw3Wsos8COe2soiZrtJ1h
- Aa22op7VO4tt3h2LS/CvptHgdEO/j/Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-4lT2vwygMEGGbOw8952zxA-1; Mon, 09 Mar 2020 17:04:35 -0400
-X-MC-Unique: 4lT2vwygMEGGbOw8952zxA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9770B1937FC0
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 21:04:34 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B92861000325;
- Mon,  9 Mar 2020 21:04:29 +0000 (UTC)
-Date: Mon, 9 Mar 2020 15:04:28 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v2 4/5] KVM: Kick resamplefd for split kernel irqchip
-Message-ID: <20200309150428.1eb36e78@w520.home>
-In-Reply-To: <20200306004324.GG7146@xz-x1>
-References: <20200228161503.382656-1-peterx@redhat.com>
- <20200228161503.382656-5-peterx@redhat.com>
- <20200305165857.6a3ec29f@w520.home> <20200306004324.GG7146@xz-x1>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jBPbx-0001x4-W8; Mon, 09 Mar 2020 17:06:54 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id ABF6D747DFD;
+ Mon,  9 Mar 2020 22:06:51 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 7E552747DFA; Mon,  9 Mar 2020 22:06:51 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 7CB9A747DCF;
+ Mon,  9 Mar 2020 22:06:51 +0100 (CET)
+Date: Mon, 9 Mar 2020 22:06:51 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v3 3/3] via-ide: Also emulate non 100% native mode
+In-Reply-To: <alpine.BSF.2.22.395.2003092148350.94024@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.22.395.2003092201120.94024@zero.eik.bme.hu>
+References: <cover.1583781493.git.balaton@eik.bme.hu>
+ <ac37e5f5b86a3b2680c01d7b0d027dafd27a3ac7.1583781494.git.balaton@eik.bme.hu>
+ <20200309163537-mutt-send-email-mst@kernel.org>
+ <alpine.BSF.2.22.395.2003092148350.94024@zero.eik.bme.hu>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,82 +67,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>
+Cc: qemu-block@nongnu.org, philmd@redhat.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 19:43:24 -0500
-Peter Xu <peterx@redhat.com> wrote:
+On Mon, 9 Mar 2020, BALATON Zoltan wrote:
+> On Mon, 9 Mar 2020, Michael S. Tsirkin wrote:
+>> On Mon, Mar 09, 2020 at 08:18:13PM +0100, BALATON Zoltan wrote:
+>>> Some machines operate in "non 100% native mode" where interrupts are
+>>> fixed at legacy IDE interrupts and some guests expect this behaviour
+>>> without checking based on knowledge about hardware. Even Linux has
+>>> arch specific workarounds for this that are activated on such boards
+>>> so this needs to be emulated as well.
+>>> 
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> ---
+>>> v2: Don't use PCI_INTERRUPT_LINE in via_ide_set_irq()
+>>> v3: Patch pci.c instead of local workaround for PCI reset clearing
+>>>     PCI_INTERRUPT_PIN config reg
+>>>
+>>>  hw/ide/via.c            | 37 +++++++++++++++++++++++++++++--------
+>>>  hw/mips/mips_fulong2e.c |  2 +-
+>>>  include/hw/ide.h        |  3 ++-
+>>>  3 files changed, 32 insertions(+), 10 deletions(-)
+>>> 
+>>> diff --git a/hw/ide/via.c b/hw/ide/via.c
+>>> index 096de8dba0..02d29809f2 100644
+>>> --- a/hw/ide/via.c
+>>> +++ b/hw/ide/via.c
+>>> @@ -1,9 +1,10 @@
+>>>  /*
+>>> - * QEMU IDE Emulation: PCI VIA82C686B support.
+>>> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
+>>>   *
+>>>   * Copyright (c) 2003 Fabrice Bellard
+>>>   * Copyright (c) 2006 Openedhand Ltd.
+>>>   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
+>>> + * Copyright (c) 2019-2020 BALATON Zoltan
+>>>   *
+>>>   * Permission is hereby granted, free of charge, to any person obtaining 
+>>> a copy
+>>>   * of this software and associated documentation files (the "Software"), 
+>>> to deal
+>>> @@ -25,6 +26,8 @@
+>>>   */
+>>>
+>>>  #include "qemu/osdep.h"
+>>> +#include "qemu/range.h"
+>>> +#include "hw/qdev-properties.h"
+>>>  #include "hw/pci/pci.h"
+>>>  #include "migration/vmstate.h"
+>>>  #include "qemu/module.h"
+>>> @@ -111,11 +114,18 @@ static void via_ide_set_irq(void *opaque, int n, int 
+>>> level)
+>>>      } else {
+>>>          d->config[0x70 + n * 8] &= ~0x80;
+>>>      }
+>>> -
+>>>      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
+>>> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
+>>> -    if (n) {
+>>> -        qemu_set_irq(isa_get_irq(NULL, n), level);
+>>> +
+>>> +    /*
+>>> +     * Some machines operate in "non 100% native mode" where 
+>>> PCI_INTERRUPT_LINE
+>>> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native 
+>>> mode.
+>>> +     * Some guest drivers expect this, often without checking.
+>>> +     */
+>>> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
+>>> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
+>>> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
+>>> +    } else {
+>>> +        qemu_set_irq(isa_get_irq(NULL, 14), level);
+>>>      }
+>>>  }
+>>> 
+>>> @@ -169,7 +179,8 @@ static void via_ide_realize(PCIDevice *dev, Error 
+>>> **errp)
+>>>
+>>>      pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode 
+>>> */
+>>>      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
+>>> -    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
+>>> +    dev->wmask[PCI_CLASS_PROG] = 5;
+>> 
+>> What's the story here? Why is class suddenly writeable?
+>
+> The via-ide (function 1 of some VIA southbridge chips) use bits in this reg 
+> to set legacy compatibility mode as described in VT82C686B and VT8231 
+> datasheets and Linux writes this on pegasos2 board I'm emulating. See longer 
+> description in this message:
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg00019.html
 
-> On Thu, Mar 05, 2020 at 04:58:57PM -0700, Alex Williamson wrote:
-> 
-> Hi, Alex,
-> 
-> [...]
-> 
-> > > +bool kvm_resample_fd_notify(int gsi)
-> > > +{
-> > > +    KVMResampleFd *rfd;
-> > > +
-> > > +    if (!kvm_irqchip_is_split()) {
-> > > +        return false;
-> > > +    }  
-> > 
-> > Nit, checking split irqchip here seems unnecessary.  We're only adding
-> > and removing list entries based on split irqchip below, so the list
-> > would be empty anyway, unless another user comes along that might have
-> > a reason for this functionality that isn't as tied to split irqchip.  
-> 
-> Right, now it's more or less a hint to readers, and we can remove it.
-> I'll see whether I'll repost a new version, and I'll drop it if so.
-> 
-> > 
-> > Overall the series looks like a big improvement versus falling back to
-> > our crappy generic EOI hackery with split irqchip.  Thanks,  
-> 
-> Yes I was pretty happy to see the numbers too when I first tested the
-> series, after all I was still uncertain about how much overhead the
-> userspace EOI would take on the irq return path.  It turns out that
-> the injection seems to be more important.
-> 
-> In all cases, major credits go to Paolo for the idea. :)
+And before we go through all previous discussions again I'd like to add 
+that the comment in Linux fixup function saying that firmware sets 
+conroller in legacy mode is wrong it does actually set it in native mode 
+but on this hardware IRQs are hardcoded to legacy interrupts for some 
+reason even in native mode. Most guest OSes just know this and expect that 
+without looking at config regs but Linux uses this reg to force its driver 
+to legacy mode despite using io addresses from PCI BARs which Linux calls 
+non-100% native mode. This probably happens on some platforms but looks 
+like pegasos2 will be the first in QEMU.
 
-Hey Peter, I'm trying to test this myself and my VM just hangs as soon
-as I enable split irqchip.  It boots up to discovering the virtio
-disks, then nothing more.  My host kernel is 5.3.7-301.fc31.x86_64,
-QEMU is 373c7068dd61 + this patch series.  VM script is:
-
-/usr/local/bin/qemu-system-x86_64 \
--S \
--machine pc-q35-5.0,accel=kvm,usb=off,vmport=off,dump-guest-core=off,kernel-irqchip=split \
--cpu host \
--m 2048 \
--smp 2,sockets=2,cores=1,threads=1 \
--no-user-config \
--nodefaults \
--monitor stdio \
--serial none \
--parallel none \
--no-hpet \
--device pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2 \
--device pcie-root-port,port=0x11,chassis=2,id=pci.2,bus=pcie.0,addr=0x2.0x1 \
--device pcie-root-port,port=0x12,chassis=3,id=pci.3,bus=pcie.0,addr=0x2.0x2 \
--device pcie-root-port,port=0x13,chassis=4,id=pci.4,bus=pcie.0,addr=0x2.0x3 \
--device pcie-root-port,port=0x14,chassis=5,id=pci.5,bus=pcie.0,addr=0x2.0x4 \
--device pcie-root-port,port=0x15,chassis=6,id=pci.6,bus=pcie.0,addr=0x2.0x5 \
--drive file=/var/lib/libvirt/images/fedora31-1.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 \
--device virtio-blk-pci,scsi=off,bus=pci.3,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
--vnc :0 \
--device VGA,id=video0,vgamem_mb=16,bus=pcie.0,addr=0x1 \
--device vfio-pci,host=02:00.0,id=e1000e,bus=pci.2,addr=0x0
-
-Guest has pci=nomsi on the kernel command line.  It boots with
-irqchip=on, also boots with x-no-kvm-intx=on as an arg to the vfio-pci
-device.  I'm afraid there's a regression here unless I'm failing to add
-something necessary for split irqchip.  Thanks,
-
-Alex
-
+Regards,
+BALATON Zoltan
 
