@@ -2,67 +2,62 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA169C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 04:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5752EC10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF1A920674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 04:26:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1A920674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C01220665
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:26:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C01220665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBA04-0004dX-Rr
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 00:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42333)
+	id 1jBBs2-0006xS-BX
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 02:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <longpeng2@huawei.com>) id 1jB9zO-0004DN-FE
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 00:26:03 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrR-0006Uq-IE
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <longpeng2@huawei.com>) id 1jB9zN-0005j6-Ed
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 00:26:02 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2076 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
- id 1jB9zN-0005is-3B
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 00:26:01 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id EEEFA67530A6CB7968FC;
- Mon,  9 Mar 2020 12:25:50 +0800 (CST)
-Received: from dggeme712-chm.china.huawei.com (10.1.199.108) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 9 Mar 2020 12:25:50 +0800
-Received: from [10.173.228.124] (10.173.228.124) by
- dggeme712-chm.china.huawei.com (10.1.199.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 9 Mar 2020 12:25:50 +0800
-From: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
- <longpeng2@huawei.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: [Question] An issue when repeat reboot in guest during migration
-Message-ID: <64a64b63-a270-cb72-cc9a-e447cbe516cd@huawei.com>
-Date: Mon, 9 Mar 2020 12:25:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.228.124]
-X-ClientProxiedBy: dggeme713-chm.china.huawei.com (10.1.199.109) To
- dggeme712-chm.china.huawei.com (10.1.199.108)
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.189
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrQ-0004TM-0H
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:57 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:34851)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrP-0004RA-Ns
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:55 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id BF55956FC0;
+ Mon,  9 Mar 2020 15:25:47 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by sakura.ysato.name (Postfix) with ESMTPSA id 32B791C07F7;
+ Mon,  9 Mar 2020 15:25:47 +0900 (JST)
+Date: Mon, 09 Mar 2020 15:25:46 +0900
+Message-ID: <87lfoa9h91.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v32 16/22] hw/char: RX62N serial communication interface
+ (SCI)
+In-Reply-To: <9a20c7bc-6d32-7384-c8a6-7ff8c852e08b@redhat.com>
+References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
+ <20200224141923.82118-17-ysato@users.sourceforge.jp>
+ <9a20c7bc-6d32-7384-c8a6-7ff8c852e08b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,65 +69,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, huangzhichao@huawei.com,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: richard.henderson@linaro.org,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi guys,
+On Mon, 09 Mar 2020 00:41:45 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> Hi Yoshinori,
+>=20
+> On 2/24/20 3:19 PM, Yoshinori Sato wrote:
+> > This module supported only non FIFO type.
+> > Hardware manual.
+> > https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh00=
+33ej0140_rx62n.pdf
+> >=20
+> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
+> > Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > ---
+> >   include/hw/char/renesas_sci.h |  45 +++++
+> >   hw/char/renesas_sci.c         | 342 ++++++++++++++++++++++++++++++++++
+> >   hw/char/Kconfig               |   3 +
+> >   hw/char/Makefile.objs         |   1 +
+> >   4 files changed, 391 insertions(+)
+> >   create mode 100644 include/hw/char/renesas_sci.h
+> >   create mode 100644 hw/char/renesas_sci.c
+> >=20
+> > diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sc=
+i.h
+> > new file mode 100644
+> > index 0000000000..50d1336944
+> > --- /dev/null
+> > +++ b/include/hw/char/renesas_sci.h
+> > @@ -0,0 +1,45 @@
+> > +/*
+> > + * Renesas Serial Communication Interface
+> > + *
+> > + * Copyright (c) 2018 Yoshinori Sato
+> > + *
+> > + * This code is licensed under the GPL version 2 or later.
+> > + *
+> > + */
+> > +
+> > +#include "chardev/char-fe.h"
+> > +#include "qemu/timer.h"
+> > +#include "hw/sysbus.h"
+> > +
+> > +#define TYPE_RENESAS_SCI "renesas-sci"
+> > +#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
+> > +
+> > +enum {
+> > +    ERI =3D 0,
+> > +    RXI =3D 1,
+> > +    TXI =3D 2,
+> > +    TEI =3D 3,
+> > +    SCI_NR_IRQ =3D 4,
+> > +};
+> > +
+> > +typedef struct {
+> > +    SysBusDevice parent_obj;
+> > +    MemoryRegion memory;
+> > +
+> > +    uint8_t smr;
+> > +    uint8_t brr;
+> > +    uint8_t scr;
+> > +    uint8_t tdr;
+> > +    uint8_t ssr;
+> > +    uint8_t rdr;
+> > +    uint8_t scmr;
+> > +    uint8_t semr;
+> > +
+> > +    uint8_t read_ssr;
+> > +    int64_t trtime;
+> > +    int64_t rx_next;
+> > +    QEMUTimer *timer;
+> > +    CharBackend chr;
+> > +    uint64_t input_freq;
+> > +    qemu_irq irq[SCI_NR_IRQ];
+> > +} RSCIState;
+> > diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+> > new file mode 100644
+> > index 0000000000..0760a51f43
+> > --- /dev/null
+> > +++ b/hw/char/renesas_sci.c
+> > @@ -0,0 +1,342 @@
+> > +/*
+> > + * Renesas Serial Communication Interface
+>=20
+> Looking at this again, have you looked at the SH model
+> (hw/char/sh_serial.c)? This seems the same.
+> (Similarly your timer model with hw/timer/sh_timer.c).
+>
 
-We find an issue when repeat reboot in guest during migration, it cause the
-migration thread never be waken up again.
+sh_serial has FIFO.
+renesas_sci has no FIFO.
+These are relationships like 8250 and 16550.
+sh_serial is old,so I think it's better to implement
+and integrate FIFO into renesas_sci.
 
-<main loop>                        |<migration_thread>
-                                   |
-main_loop_should_exit [BQL LOCK]   |
- pause_all_vcpus                   |
-  1. set all cpus ->stop=true      |
-     and then kick                 |
-  2. return if all cpus is paused  |
-     (by '->stopped == true'), else|
-  3. qemu_cond_wait [BQL UNLOCK]   |
-                                   |LOCK BQL
-                                   |...
-                                   |do_vm_stop
-                                   | pause_all_vcpus
-                                   |  (A)set all cpus ->stop=true
-                                   |     and then kick
-                                   |  (B)return if all cpus is paused
-                                   |     (by '->stopped == true'), else
-                                   |  (C)qemu_cond_wait [BQL UNLOCK]
-  4. be waken up and LOCK BQL      |  (D)be waken up BUT wait for  BQL
-  5. goto 2.                       |
- (BQL is still LOCKed)             |
- resume_all_vcpus                  |
-  1. set all cpus ->stop=false     |
-     and ->stopped=false           |
-...                                |
-BQL UNLOCK                         |  (E)LOCK BQL
-                                   |  (F)goto B. [but stopped is false now!]
-                                   |Finally, sleep at step 3 forever.
+> > + *
+> > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > + * (Rev.1.40 R01UH0033EJ0140)
+> > + *
+> > + * Copyright (c) 2019 Yoshinori Sato
+> > + *
+> > + * This program is free software; you can redistribute it and/or modif=
+y it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but WITH=
+OUT
+> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
+or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
+se for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License a=
+long with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/log.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu-common.h"
+> > +#include "hw/hw.h"
+> > +#include "hw/irq.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/registerfields.h"
+> > +#include "hw/qdev-properties.h"
+> > +#include "hw/char/renesas_sci.h"
+> > +#include "migration/vmstate.h"
+> > +#include "qemu/error-report.h"
+> > +
+> > +/* SCI register map */
+> > +REG8(SMR, 0)
+> > +  FIELD(SMR, CKS,  0, 2)
+> > +  FIELD(SMR, MP,   2, 1)
+> > +  FIELD(SMR, STOP, 3, 1)
+> > +  FIELD(SMR, PM,   4, 1)
+> > +  FIELD(SMR, PE,   5, 1)
+> > +  FIELD(SMR, CHR,  6, 1)
+> > +  FIELD(SMR, CM,   7, 1)
+> > +REG8(BRR, 1)
+> > +REG8(SCR, 2)
+> > +  FIELD(SCR, CKE, 0, 2)
+> > +  FIELD(SCR, TEIE, 2, 1)
+> > +  FIELD(SCR, MPIE, 3, 1)
+> > +  FIELD(SCR, RE,   4, 1)
+> > +  FIELD(SCR, TE,   5, 1)
+> > +  FIELD(SCR, RIE,  6, 1)
+> > +  FIELD(SCR, TIE,  7, 1)
+> > +REG8(TDR, 3)
+> > +REG8(SSR, 4)
+> > +  FIELD(SSR, MPBT, 0, 1)
+> > +  FIELD(SSR, MPB,  1, 1)
+> > +  FIELD(SSR, TEND, 2, 1)
+> > +  FIELD(SSR, ERR, 3, 3)
+> > +    FIELD(SSR, PER,  3, 1)
+> > +    FIELD(SSR, FER,  4, 1)
+> > +    FIELD(SSR, ORER, 5, 1)
+> > +  FIELD(SSR, RDRF, 6, 1)
+> > +  FIELD(SSR, TDRE, 7, 1)
+> > +REG8(RDR, 5)
+> > +REG8(SCMR, 6)
+> > +  FIELD(SCMR, SMIF, 0, 1)
+> > +  FIELD(SCMR, SINV, 2, 1)
+> > +  FIELD(SCMR, SDIR, 3, 1)
+> > +  FIELD(SCMR, BCP2, 7, 1)
+> > +REG8(SEMR, 7)
+> > +  FIELD(SEMR, ACS0, 0, 1)
+> > +  FIELD(SEMR, ABCS, 4, 1)
+> > +
+> > +static int can_receive(void *opaque)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
+> > +        return 0;
+> > +    } else {
+> > +        return FIELD_EX8(sci->scr, SCR, RE);
+> > +    }
+> > +}
+> > +
+> > +static void receive(void *opaque, const uint8_t *buf, int size)
+> > +{
+> > +    RSCIState *sci =3D RSCI(opaque);
+> > +    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trti=
+me;
+> > +    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_set_irq(sci->irq[ERI], 1);
+> > +        }
+> > +    } else {
+> > +        sci->rdr =3D buf[0];
+> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
+> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> > +            qemu_irq_pulse(sci->irq[RXI]);
+> > +        }
+> > +    }
+> > +}
+> [...]
+>=20
+>=20
 
-I've not test the latest QEMU yet, but after take a quick look at codes, it
-seems also has this issue.
-
-Currently I just find two potential approaches to fix it:
-
-1. Just retry. Check if all vcpus are paused before (F), if not then goto (A) to
-send the stop request again. It's very simple and safe but it just reduce the
-probability.
-
-2. To support nest pause. Use a refcount to instead of the 'bool stop', switch
-the 'stopped' to false only when the refcount reduce to zero. Maybe this can
-completely solve the problem but it seems easy to introduce other bugs if
-imprudence.
-
-Any suggestions ?
-
-Thanks.
-
----
-Regards,
-Longpeng(Mike)
+--=20
+Yosinori Sato
 
