@@ -2,85 +2,82 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 958A4C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30731C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62CDF21D56
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:54:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1E81208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jNOlks/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CDF21D56
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jASexXBz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E81208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKjt-0000yO-Fz
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:54:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40567)
+	id 1jBKk3-0001P2-24
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:54:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKa5-0002T9-RB
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:38 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKRk-0003og-P0
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKa4-0001c7-R3
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:37 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:40071)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKRj-0004mp-9T
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:36:00 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46182)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBKa4-0001ba-Kb
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:36 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id e26so10089917wme.5
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:36 -0700 (PDT)
+ id 1jBKRg-0004du-CG
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:35:57 -0400
+Received: by mail-oi1-x242.google.com with SMTP id a22so10496507oid.13
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:35:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=qaePRTDVUqiKI0GPXX/XP44aWtRXgQAztnFoJ62x+fU=;
- b=jNOlks/Dgt/ock/7nTRQTj3mYYaXzwoe2DVSy/WXPPqdE55coeVguewIDqq9lT/8+N
- O5fUE1UhBe1BL2VOGQl0IUMgMxxmazm0pSheH3bz6QHdko8PAv9aFlSHS0NuptuXDLND
- 597nv1wX8QPJCoWqvMzK0oq48k+fYxUGxKq4wVhEbx9rQ+rzLfOvXWR+PDlJnA2sDg0m
- BR7raLn3X30LQUFNO+10+r0nx0I3+U1lEq0RdPv2AArr0kWWH4uSNmaa16S2dZ8hifsx
- pB1Tu5lKbFnWrRvNgQeUpIkOqXVyckfM+/Q8TbSDGo8s/Ou+dVQ1eYBwN4G7TEarHIjz
- S33g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ep6lW2rq7ba/KDxruX7fkj679vDAB2jJplMhvhhSdt8=;
+ b=jASexXBzX37rW2uEU6NJ6qczEBEKmCkp5OtQh7Xm+z5DH71elvpQqlOt5hNIGxPsh9
+ kabFTSE5U6/MNn8nA6pRT7y4ChesRRzQDjV1vU+ri3VPZOGafu6DltUAm/a9A8f0JJR1
+ UqAtmim9xH+h1YpPEOYbcDK6zZGff7kN58WsdB3GdF/K+YG74yY8V+5DmiYdJx2EcwhY
+ 5MBVxaM4Hg0mQqdOu2OAnDLLeH23Y0FTV9LCtAtO5cIXJBbjwvEDM1uZyb5lXEqClKIT
+ RecwRAk+a/LRzmP8iKSfATpR7z5zemBaCH63dOGJ09OxgiItjINhXMXh9HSDVn1EF24y
+ 3BbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=qaePRTDVUqiKI0GPXX/XP44aWtRXgQAztnFoJ62x+fU=;
- b=kad2NcLuGOV2KllZ0Er/3UNaUvRBHGnGyqItAf2QkBrKeMeoXSlJ8IY302xfs4XCRt
- oQsoGk0gOJM5OPaCOByT4NLtURvkFriJsiCUPCn5s13UD7XUXw3TM4HuumMSIJWtH8J4
- LVWsCYwYTC2dwjMXL9wz195jjnIoVfJqPkceddvqrEo2sR9jUgPWBqkuRmOkQMjK8aRP
- ljmwRGdi3VvsMFHX73e7DG3JjagKnupJLKr3rxBkiRyeHanjfQnnmYjxx4C30m0Bpw8D
- 8lJzlklDQiqZlBQuzsK04+B8wvrvBASc8RRjjny15/hBT+CnwwIThdUTsbGIVrs3/sJ8
- 9oKw==
-X-Gm-Message-State: ANhLgQ2gV5pPMGmuFbBq/862XkCZEwaEowJ77LVJQiUttY1zRkPvsCIo
- pIfw30mfbBoU0TIllBRGwxLVejQRdMpoRQ==
-X-Google-Smtp-Source: ADFU+vuH4twHShWG6tz19R0ZEBxWgCrcJDHcDZfiq9V1T0wTloArYlWNdmw9ChwsIzQzIj4UdHcybQ==
-X-Received: by 2002:a1c:a384:: with SMTP id m126mr20634123wme.84.1583768675315; 
- Mon, 09 Mar 2020 08:44:35 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 08:44:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 17/18] configure: Drop texinfo requirement
-Date: Mon,  9 Mar 2020 15:44:04 +0000
-Message-Id: <20200309154405.13548-18-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
-References: <20200309154405.13548-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ep6lW2rq7ba/KDxruX7fkj679vDAB2jJplMhvhhSdt8=;
+ b=UigYJRbt6Pr0VNtW5dHAzVPJ66ZM/kC7Dz2K6ywFztGmP5BSY4vNvNwazzmJkuV/ll
+ gmi7MkeQaeNL/81uWr4JAMLQysWtQztI4lyp7E/uf8O4J0z+kV6Q3/ar4O1VdaVe/swo
+ jTV1VmRkai0PcuR56Y+TRVH+i1NIdaa6YYJB1RRuXbk+w0bYuhk7nyg4OLN/+3ulAIO1
+ MOKmUyVkozrj6wi5GI+Z4bqhMlr06Dv16vu4cYUR7r/p8E0suIS4Zb/L3rw2diP5qMu6
+ HxJX2yw3wserA0zMJdM08vQhGPLiPZS0kcBZuD0+E7g63R1yvJ/McFoIgL6WMqt4lQEU
+ WKKQ==
+X-Gm-Message-State: ANhLgQ2r9cCSDdN0t+L6oU+AIvLiP42eH38ylJ6EYgMkK8wmlxB2Jpwr
+ uukEIinlGN4T0fRwzbApixVbavz/1kaWdV5qkshCzkAZACc=
+X-Google-Smtp-Source: ADFU+vvE8ZEiFMfyT6oTu/JdlCJDUNYRVsFbhOrb0Cg5ylfQW7HOd4xGlFoZH6oTdEEzpBYIb7fMjsnxPsB2Ggcm044=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr11253511oic.48.1583768151567; 
+ Mon, 09 Mar 2020 08:35:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200309124616.4372-1-armbru@redhat.com>
+In-Reply-To: <20200309124616.4372-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 15:35:40 +0000
+Message-ID: <CAFEAcA_sNu2vFhio+zXaHMNCLaO4XcaGqgDvCpLpD6xtEhps4A@mail.gmail.com>
+Subject: Re: [PULL 0/4] Error reporting patches for 2020-03-09
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,66 +89,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need the texinfo and pod2man programs to build our documentation
-any more, so remove them from configure's tests.
+On Mon, 9 Mar 2020 at 12:51, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 67f17e23baca5dd545fe98b01169cc351a70fe=
+35:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into sta=
+ging (2020-03-06 17:15:36 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2020-03-09
+>
+> for you to fetch changes up to d1eddab86f92e7e060c8a473695c7f24ec00c9ab:
+>
+>   qga: Fix a memory leak (2020-03-09 13:36:15 +0100)
+>
+> ----------------------------------------------------------------
+> Error reporting patches for 2020-03-09
+>
+> * Improve error reporting on Windows
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (4):
+>       chardev: Improve error report by calling error_setg_win32()
+>       util/osdep: Improve error report by calling error_setg_win32()
+>       qga: Improve error report by calling error_setg_win32()
+>       qga: Fix a memory leak
+>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- configure | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+Applied, thanks.
 
-diff --git a/configure b/configure
-index fab6281eb70..3b642136211 100755
---- a/configure
-+++ b/configure
-@@ -4888,14 +4888,14 @@ if test "$docs" != "no" ; then
-   else
-     sphinx_ok=no
-   fi
--  if has makeinfo && has pod2man && test "$sphinx_ok" = "yes"; then
-+  if test "$sphinx_ok" = "yes"; then
-     docs=yes
-   else
-     if test "$docs" = "yes" ; then
-       if has $sphinx_build && test "$sphinx_ok" != "yes"; then
-         echo "Warning: $sphinx_build exists but it is either too old or uses too old a Python version" >&2
-       fi
--      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and a Python 3 version of python-sphinx"
-+      feature_not_found "docs" "Install a Python 3 version of python-sphinx"
-     fi
-     docs=no
-   fi
-@@ -6273,13 +6273,6 @@ if test "$solaris" = "no" ; then
-     fi
- fi
- 
--# test if pod2man has --utf8 option
--if pod2man --help | grep -q utf8; then
--    POD2MAN="pod2man --utf8"
--else
--    POD2MAN="pod2man"
--fi
--
- # Use ASLR, no-SEH and DEP if available
- if test "$mingw32" = "yes" ; then
-     for flag in --dynamicbase --no-seh --nxcompat; do
-@@ -7672,7 +7665,6 @@ echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
- echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
- echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
- echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
--echo "POD2MAN=$POD2MAN" >> $config_host_mak
- if test "$gcov" = "yes" ; then
-   echo "CONFIG_GCOV=y" >> $config_host_mak
-   echo "GCOV=$gcov_tool" >> $config_host_mak
--- 
-2.20.1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
+-- PMM
 
