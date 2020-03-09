@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A86C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0925C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:22:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C9F208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:22:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C9F208C3
+	by mail.kernel.org (Postfix) with ESMTPS id BB096208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:22:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB096208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBNyT-000282-MI
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:22:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49592)
+	id 1jBNz5-0003KP-VF
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:22:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNwv-0007QZ-Sk
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:20:26 -0400
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNxU-00008h-MY
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNwu-0008En-NR
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:20:25 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:2743 helo=smtp.ehu.eus)
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNxT-0000JM-5o
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:21:00 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:38067 helo=smtp.ehu.eus)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
- id 1jBNwu-0008C8-BL
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:20:24 -0400
+ id 1jBNxS-0000GX-Pu
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:20:59 -0400
 Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
- by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 213616311;
- Mon,  9 Mar 2020 20:20:23 +0100 (CET)
+ by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 3C7365F6F;
+ Mon,  9 Mar 2020 20:20:56 +0100 (CET)
 Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EED655A04F;
- Mon,  9 Mar 2020 20:20:22 +0100 (CET)
+ by IMSVA (Postfix) with ESMTP id 09BBA5A04F;
+ Mon,  9 Mar 2020 20:20:56 +0100 (CET)
 Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E35975A045;
- Mon,  9 Mar 2020 20:20:22 +0100 (CET)
+ by IMSVA (Postfix) with ESMTP id F2EF85A045;
+ Mon,  9 Mar 2020 20:20:55 +0100 (CET)
 Received: from smtp.ehu.eus (unknown [10.0.100.76])
  by imsva2.lgp.ehu.es (Postfix) with ESMTPS;
- Mon,  9 Mar 2020 20:20:22 +0100 (CET)
+ Mon,  9 Mar 2020 20:20:55 +0100 (CET)
 Received: from 669c1c222ef4 (static.187.0.0.81.ibercom.com [81.0.0.187])
- by smtp2 (Postfix) with ESMTPSA id A1CD96311;
- Mon,  9 Mar 2020 20:20:22 +0100 (CET)
-Date: Mon, 9 Mar 2020 19:20:21 +0000
+ by smtp2 (Postfix) with ESMTPSA id B01F05F6F;
+ Mon,  9 Mar 2020 20:20:55 +0100 (CET)
+Date: Mon, 9 Mar 2020 19:20:54 +0000
 From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 04/10] qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and
- QEMU_PERSISTENT
-Message-ID: <20200309192021.GD65@669c1c222ef4>
+Subject: [PATCH v10 05/10] qemu-binfmt-conf.sh: use the same presentation
+ format as for qemu-*
+Message-ID: <20200309192054.GE65@669c1c222ef4>
 References: <20200309191200.GA60@669c1c222ef4>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200309191200.GA60@669c1c222ef4>
 X-Greylist: ACL 191 matched, not delayed by milter-greylist-4.6.2 (smtp2
- [10.0.100.76]); Mon, 09 Mar 2020 20:20:22 +0100 (CET)
+ [10.0.100.76]); Mon, 09 Mar 2020 20:20:55 +0100 (CET)
 X-TM-AS-GCONF: 00
 X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25280.002
-X-TM-AS-Result: No-1.919-7.0-31-10
-X-imss-scan-details: No-1.919-7.0-31-10
+X-TM-AS-Result: No--0.153-7.0-31-10
+X-imss-scan-details: No--0.153-7.0-31-10
 X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25280.002
-X-TMASE-Result: 10-1.919100-10.000000
-X-TMASE-MatchedRID: /rjjNR0fZCoNdWPTMyGlNn41AgV24XnfVFeUPAjsd8bhmYLRM9m2iEhq
- QpzXZe40YNA0HZI8EiGPQi9XuOWoOIG9V0kqQ2uQitvkWeP31kk/GTuOFUz5s2mycYYiBYyZ1AP
- JYMpZ2b45ekiuCWp2reHQaFidrFj3/N0WsxWI4QdDbiUnjRcCmJnaxzJFBx6vrP7fIroeSfN6Ho
- OzBHN0E+LzNWBegCW2OubYLCVnBVEqyYS0oyUVZvame15MIThR+8CwdiPq88eRQ5ABDkG7qjGgT
- lf1BRgl1GRbd+6gQEN33qXzE9EBM7W6kOI3g9aLFqondSz7+RyJKj2R/IENdRuJyuskHg4AzM2F
- BO7i4hJRYW5hfzhEW0CLmZDDvMfd0hli/KDwoy2eqD9WtJkSIw==
+X-TMASE-Result: 10--0.153400-10.000000
+X-TMASE-MatchedRID: 8TN2djYOGuT9T2Lkmecl6ZJsWTCuaRDiS1zwNuiBtITfUZT83lbkENcP
+ Az195hI2GSFUsm29mSFhPO8j3auvUoG9V0kqQ2uQbWsCUkrA4Em7xmCZDXruteZYcdJgScjxdg1
+ +34sLG7ZQY4w7oxnsdyNhKgIJyVjTKkPeqGW0ZSPZulfZck3CoStTx/ehjzxgrSZr8U2Z6jx576
+ my5IxjuqzXIr1dtYg7fyYDewMOrQDkwjHXXC/4I66NVEWSRWybPDNGqiCm2depzO1rJRmINronB
+ TkneCw+XnK1+k57X2j79zN+rtvs6w4+DiJ5y9a7bqYGLiu0geRtqpQlGh0RSqqrtktnamGIUPCI
+ 8n2+0dTWkennr0izCN/kn5PmG7MEf1zYTr68FgO5XBEMs6Idug==
 X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
 X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
  milter-greylist-4.6.2 (postfix.smtp2.imsva2 [10.0.100.76]);
- Mon, 09 Mar 2020 20:20:23 +0100 (CET)
+ Mon, 09 Mar 2020 20:20:56 +0100 (CET)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 158.227.0.66
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,80 +95,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow to set options '--persistent' and/or '--credential' through
-environment variables. If not defined, defaults are used ('no').
-Anyway, command-line arguments have priority over environment variables.
-
 Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ scripts/qemu-binfmt-conf.sh | 63 +++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
 
 diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 285ce528d1..0c28db5ca4 100755
+index 0c28db5ca4..870815fb22 100755
 --- a/scripts/qemu-binfmt-conf.sh
 +++ b/scripts/qemu-binfmt-conf.sh
-@@ -190,9 +190,11 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
-                       (default: $SYSTEMDDIR or $DEBIANDIR)
-        --credential:  if present, credential and security tokens are
-                       calculated according to the binary to interpret
-+                      (QEMU_CREDENTIAL=yes)
-        --persistent:  if present, the interpreter is loaded when binfmt is
-                       configured and remains in memory. All future uses
-                       are cloned from the open file.
-+                      (QEMU_PERSISTENT=yes)
+@@ -171,47 +171,48 @@ qemu_get_family() {
  
-     To import templates with update-binfmts, use :
+ usage() {
+     cat <<EOF
+-Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential][--exportdir PATH]
+-                           [--persistent][--qemu-suffix SUFFIX]
++Usage: qemu-binfmt-conf.sh [options]
  
-@@ -259,10 +261,10 @@ qemu_check_systemd() {
+-       Configure binfmt_misc to use qemu interpreter
++Configure binfmt_misc to use qemu interpreter
  
- qemu_generate_register() {
-     flags=""
--    if [ "x$CREDENTIAL" = "xyes" ]; then
-+    if [ "x$QEMU_CREDENTIAL" = "xyes" ]; then
-         flags="OC"
-     fi
--    if [ "x$PERSISTENT" = "xyes" ]; then
-+    if [ "x$QEMU_PERSISTENT" = "xyes" ]; then
-         flags="${flags}F"
-     fi
+-       --help:        display this usage
+-       --qemu-path:   set path to qemu interpreter ($QEMU_PATH)
+-       --qemu-suffix: add a suffix to the default interpreter name
+-       --debian:      don't write into /proc,
+-                      instead generate update-binfmts templates
+-       --systemd:     don't write into /proc,
+-                      instead generate file for systemd-binfmt.service
+-                      for the given CPU. If CPU is "ALL", generate a
+-                      file for all known cpus
+-       --exportdir:   define where to write configuration files
+-                      (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if present, credential and security tokens are
+-                      calculated according to the binary to interpret
+-                      (QEMU_CREDENTIAL=yes)
+-       --persistent:  if present, the interpreter is loaded when binfmt is
+-                      configured and remains in memory. All future uses
+-                      are cloned from the open file.
+-                      (QEMU_PERSISTENT=yes)
++Options and associated environment variables:
  
-@@ -285,7 +287,7 @@ package qemu-$cpu
- interpreter $qemu
- magic $magic
- mask $mask
--credential $CREDENTIAL
-+credential $QEMU_CREDENTIAL
+-    To import templates with update-binfmts, use :
++Argument             Env-variable     Description
++-h|--help                             display this usage
++-Q|--qemu-path PATH  QEMU_PATH        set path to qemu interpreter
++-F|--qemu-suffix SUFFIX               add a suffix to the default interpreter name
++-p|--persistent      QEMU_PERSISTENT  (yes) load the interpreter and keep it in memory; all future
++                                      uses are cloned from the open file.
++-c|--credential      QEMU_CREDENTIAL  (yes) credential and security tokens are calculated according
++                                      to the binary to interpret
++-e|--exportdir PATH                   define where to write configuration files
++                                      (default: $SYSTEMDDIR or $DEBIANDIR)
++-s|--systemd CPU                      don't write into /proc, generate file for
++                                      systemd-binfmt.service for the given CPU; if CPU is "ALL",
++                                      generate a file for all known cpus.
++-d|--debian                           don't write into /proc, generate update-binfmts templates
+ 
+-        sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
++Defaults:
++QEMU_PATH=$QEMU_PATH
++QEMU_PERSISTENT=$QEMU_PERSISTENT
++QEMU_CREDENTIAL=$QEMU_CREDENTIAL
+ 
+-    To remove interpreter, use :
++To import templates with update-binfmts, use :
+ 
+-        sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
++    sudo update-binfmts --importdir ${EXPORTDIR:-$DEBIANDIR} --import qemu-CPU
+ 
+-    With systemd, binfmt files are loaded by systemd-binfmt.service
++To remove interpreter, use :
+ 
+-    The environment variable HOST_ARCH allows to override 'uname' to generate
+-    configuration files for a different architecture than the current one.
++    sudo update-binfmts --package qemu-CPU --remove qemu-CPU $QEMU_PATH
+ 
+-    where CPU is one of:
++With systemd, binfmt files are loaded by systemd-binfmt.service
+ 
+-        $qemu_target_list
++The environment variable HOST_ARCH allows to override 'uname' to generate configuration files for a
++different architecture than the current one.
++
++where CPU is one of:
++
++    $qemu_target_list
+ 
  EOF
  }
- 
-@@ -324,8 +326,10 @@ SYSTEMDDIR="/etc/binfmt.d"
- DEBIANDIR="/usr/share/binfmts"
- 
- QEMU_PATH=/usr/local/bin
--CREDENTIAL=no
--PERSISTENT=no
-+
-+QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
-+QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
-+
- QEMU_SUFFIX=""
- 
- options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
-@@ -377,10 +381,10 @@ while true; do
-         exit 1
-         ;;
-     -c|--credential)
--        CREDENTIAL="yes"
-+        QEMU_CREDENTIAL="yes"
-         ;;
-     -p|--persistent)
--        PERSISTENT="yes"
-+        QEMU_PERSISTENT="yes"
-         ;;
-     *)
-         break
 -- 
 2.25.1
 
