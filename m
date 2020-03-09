@@ -6,73 +6,85 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8592FC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04AF0C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41D5020727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70B7C20727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:15:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3APvewB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D5020727
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZnRV0V5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B7C20727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBJ8a-0008BO-BQ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:12:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48077)
+	id 1jBJBR-0000iZ-J2
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:15:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBJ7M-0006w0-TI
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1jBJAn-0000J2-Hd
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBJ7K-0001FR-DZ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56727
+ (envelope-from <armbru@redhat.com>) id 1jBJAm-0003I2-2X
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:14:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51969
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBJ7K-0001Eq-62
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:50 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBJAl-0003Ha-V9
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:14:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583763049;
+ s=mimecast20190719; t=1583763263;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fs8eF/9dh0mwPhDSWKfItuHZLRJUeh4QJntnDmxJHhs=;
- b=a3APvewBvU5IigpZWCnRjcm32t4cC1rYnBWA8qhcFPM8gtm0PBnCNS2828VcaO2bubQyAt
- KvNm4hSXGs0EqKRYQ22lUtcfnkM1jop44qC+16vMxErdU+dk7o77W1ngixtmKV8xEdSMs6
- 8GJGXvcksNgToAGTnm5HaFedBs77VDo=
+ bh=QNX4Im+hC3TemmHzBLATMy28GrMBg17xD63JDhgrKzk=;
+ b=IZnRV0V5PyMSE4FpYMw5QFplIz7OyAUQCgS6eCGvb6mXQnimd1mIlemBkJfAGR3MGHD5KV
+ TXlBnBD8ozatRe6h7AGWjx3uCjGpCnyUFOu0jrt56r4XcGSo4TXHBwnw20xY7Qn+pc+Zob
+ nbpNKEWAJjzKerRKDDPMi1pD1hpO+ws=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-3wQf3JSrPNu6vBYl0KI1Aw-1; Mon, 09 Mar 2020 10:10:47 -0400
-X-MC-Unique: 3wQf3JSrPNu6vBYl0KI1Aw-1
+ us-mta-303-j6CuuNmdPYOkRzDyZ0KjXQ-1; Mon, 09 Mar 2020 10:14:21 -0400
+X-MC-Unique: j6CuuNmdPYOkRzDyZ0KjXQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09E9E10883A6;
- Mon,  9 Mar 2020 14:10:46 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DB4B5C3FD;
- Mon,  9 Mar 2020 14:10:41 +0000 (UTC)
-Date: Mon, 9 Mar 2020 15:10:38 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v5 02/16] hw/i386: Introduce X86CPUTopoInfo to contain
- topology info
-Message-ID: <20200309151038.0ee0c288@Igors-MacBook-Pro>
-In-Reply-To: <158326542572.40452.15331466265190906874.stgit@naples-babu.amd.com>
-References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
- <158326542572.40452.15331466265190906874.stgit@naples-babu.amd.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C86C218A5515;
+ Mon,  9 Mar 2020 14:14:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E15295C1C3;
+ Mon,  9 Mar 2020 14:14:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 40A5311386A6; Mon,  9 Mar 2020 15:14:17 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+ <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+ <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
+ <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
+ <87a74pso48.fsf@dusky.pond.sub.org>
+ <2ff8e8e8-a281-1d50-417d-96383240c2df@huawei.com>
+Date: Mon, 09 Mar 2020 15:14:17 +0100
+In-Reply-To: <2ff8e8e8-a281-1d50-417d-96383240c2df@huawei.com> (Pan Nengyuan's
+ message of "Mon, 9 Mar 2020 20:51:53 +0800")
+Message-ID: <87ftehd39i.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -87,278 +99,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 03 Mar 2020 13:57:05 -0600
-Babu Moger <babu.moger@amd.com> wrote:
+Pan Nengyuan <pannengyuan@huawei.com> writes:
 
-> This is an effort to re-arrange few data structure for better readability.
-> 
-> 1. Add X86CPUTopoInfo which will have all the topology informations
->    required to build the cpu topology. There is no functional changes.
-> 2. Introduce init_topo_info to initialize X86CPUTopoInfo members from
->    X86MachineState.
-> 
-> There is no functional changes.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> On 3/9/2020 8:34 PM, Markus Armbruster wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>=20
+>>> On Mon, 9 Mar 2020 at 10:02, Pan Nengyuan <pannengyuan@huawei.com> wrot=
+e:
+>>>> On 3/9/2020 5:21 PM, Peter Maydell wrote:
+>>>>> Could you explain more? My thought is that we should be using
+>>>>> sysbus_init_child_obj() and we should be doing it in the init method.
+>>>>> Why does that break the tests ? It's the same thing various other
+>>>>> devices do.
+>>>>
+>>>> device-introspect-test do the follow check for each device type:
+>>>>
+>>>>     qtree_start =3D qtest_hmp(qts, "info qtree");
+>>>>     ...
+>>>>     qtest_qmp(qts, "{'execute': 'device-list-properties','arguments': =
+{'typename': %s}}", type);
+>>>>     ...
+>>>>     qtree_end =3D qtest_hmp(qts, "info qtree");
+>>>>     g_assert_cmpstr(qtree_start, =3D=3D, qtree_end);
+>>>>
+>>>> If we do qdev_set_parent_bus in init, it will check fail when type =3D=
+ 'mac_via'.
+>>>> mac_via_init() is called by q800_init(). But it will not be called in =
+qtest(-machine none) in the step qtree_start.
+>>>> And after we call 'device-list-properties', mac_via_init() was called =
+and set dev parent bus. We can find these
+>>>> devices in the qtree_end. So it break the test on the assert.
+>>>
+>>> Markus, do you know what's happening here? Why is
+>>> trying to use sysbus_init_child_obj() breaking the
+>>> device-introspect-test for this particular device,
+>>> but fine for the other places where we use it?
+>>> (Maybe we're accidentally leaking a reference to
+>>> something so the sub-device stays on the sysbus
+>>> when it should have removed itself when the
+>>> device was deinited ?)
+>>=20
+>> Pan Nengyuan, please provide the exact patch that fails for you.
+>
+> As the follow patch:
+>
+>>From 9b4f35e294597410cc03b967c127242ce099692e Mon Sep 17 00:00:00 2001
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+> Date: Wed, 4 Mar 2020 11:29:28 +0800
+> Subject: [PATCH] mac_via: fix incorrect creation of mos6522 device in mac=
+_via
+>
+> This patch fix a bug in mac_via where it failed to actually realize devic=
+es it was using.
+> And move the init codes which inits the mos6522 objects and properties on=
+ them from realize()
+> into init(). However, we keep qdev_set_parent_bus in realize(), otherwise=
+ it will cause
+> device-introspect-test test fail. Then do the realize mos6522 device in t=
+he mac_vir_realize.
+>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 > ---
->  hw/i386/pc.c               |   12 ++++++------
->  hw/i386/x86.c              |   32 ++++++++++++++++++++++++--------
->  include/hw/i386/topology.h |   38 ++++++++++++++++++++++++--------------
->  include/hw/i386/x86.h      |    3 +++
->  4 files changed, 57 insertions(+), 28 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 715f79f58c..ef23ae2af5 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1514,6 +1514,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->      X86MachineState *x86ms = X86_MACHINE(pcms);
->      unsigned int smp_cores = ms->smp.cores;
->      unsigned int smp_threads = ms->smp.threads;
-> +    X86CPUTopoInfo topo_info;
->  
->      if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
->          error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
-> @@ -1521,6 +1522,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          return;
->      }
->  
-> +    init_topo_info(&topo_info, x86ms);
-> +
->      env->nr_dies = x86ms->smp_dies;
->  
->      /*
-> @@ -1576,16 +1579,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          topo_ids.die_id = cpu->die_id;
->          topo_ids.core_id = cpu->core_id;
->          topo_ids.smt_id = cpu->thread_id;
-> -        cpu->apic_id = apicid_from_topo_ids(x86ms->smp_dies, smp_cores,
-> -                                            smp_threads, &topo_ids);
-> +        cpu->apic_id = apicid_from_topo_ids(&topo_info, &topo_ids);
->      }
->  
->      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
->      if (!cpu_slot) {
->          MachineState *ms = MACHINE(pcms);
->  
-> -        x86_topo_ids_from_apicid(cpu->apic_id, x86ms->smp_dies,
-> -                                 smp_cores, smp_threads, &topo_ids);
-> +        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
->          error_setg(errp,
->              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
->              " APIC ID %" PRIu32 ", valid index range 0:%d",
-> @@ -1606,8 +1607,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
->       * once -smp refactoring is complete and there will be CPU private
->       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
-> -    x86_topo_ids_from_apicid(cpu->apic_id, x86ms->smp_dies,
-> -                             smp_cores, smp_threads, &topo_ids);
-> +    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
->      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
->          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
->              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 322fb6abbc..03b8962c98 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -57,6 +57,16 @@
->  /* Physical Address of PVH entry point read from kernel ELF NOTE */
->  static size_t pvh_start_addr;
->  
-> +inline void init_topo_info(X86CPUTopoInfo *topo_info,
-> +                                  const X86MachineState *x86ms)
-> +{
-> +    MachineState *ms = MACHINE(x86ms);
-> +
-> +    topo_info->dies_per_pkg = x86ms->smp_dies;
-> +    topo_info->cores_per_die = ms->smp.cores;
-> +    topo_info->threads_per_core = ms->smp.threads;
-> +}
-> +
->  /*
->   * Calculates initial APIC ID for a specific CPU index
->   *
-> @@ -68,13 +78,14 @@ static size_t pvh_start_addr;
->  uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
->                                      unsigned int cpu_index)
+>  hw/misc/mac_via.c | 40 ++++++++++++++++++++++++++--------------
+>  1 file changed, 26 insertions(+), 14 deletions(-)
+>
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index b7d0012794..4c5c432140 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -868,24 +868,21 @@ static void mac_via_reset(DeviceState *dev)
+>  static void mac_via_realize(DeviceState *dev, Error **errp)
 >  {
-> -    MachineState *ms = MACHINE(x86ms);
->      X86MachineClass *x86mc = X86_MACHINE_GET_CLASS(x86ms);
-> +    X86CPUTopoInfo topo_info;
->      uint32_t correct_id;
->      static bool warned;
->  
-> -    correct_id = x86_apicid_from_cpu_idx(x86ms->smp_dies, ms->smp.cores,
-> -                                         ms->smp.threads, cpu_index);
-> +    init_topo_info(&topo_info, x86ms);
-> +
-> +    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
->      if (x86mc->compat_apic_id_mode) {
->          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
->              error_report("APIC IDs set in compatibility mode, "
-> @@ -145,19 +156,22 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>      MacVIAState *m =3D MAC_VIA(dev);
+> -    MOS6522State *ms;
+>      struct tm tm;
+>      int ret;
+> +    Error *err =3D NULL;
+>
+> -    /* Init VIAs 1 and 2 */
+> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
+> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA=
+1);
+> -
+> -    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+> -                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA=
+2);
+> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized",=
+ &err);
+> +    if (err !=3D NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+>
+> -    /* Pass through mos6522 output IRQs */
+> -    ms =3D MOS6522(&m->mos6522_via1);
+> -    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
+> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort=
+);
+> -    ms =3D MOS6522(&m->mos6522_via2);
+> -    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort=
+);
+> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized",=
+ &err);
+> +    if (err !=3D NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+>
+>      /* Pass through mos6522 input IRQs */
+>      qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+> @@ -932,6 +929,7 @@ static void mac_via_init(Object *obj)
 >  {
->     X86CPUTopoIDs topo_ids;
->     X86MachineState *x86ms = X86_MACHINE(ms);
-> +   X86CPUTopoInfo topo_info;
+>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+>      MacVIAState *m =3D MAC_VIA(obj);
+> +    MOS6522State *ms;
+>
+>      /* MMIO */
+>      memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
+> @@ -948,6 +946,20 @@ static void mac_via_init(Object *obj)
+>      /* ADB */
+>      qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>                          TYPE_ADB_BUS, DEVICE(obj), "adb.0");
 > +
-> +   init_topo_info(&topo_info, x86ms);
->  
->     assert(idx < ms->possible_cpus->len);
->     x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
-> -                            x86ms->smp_dies, ms->smp.cores,
-> -                            ms->smp.threads, &topo_ids);
-> +                            &topo_info, &topo_ids);
->     return topo_ids.pkg_id % ms->numa_state->num_nodes;
+> +    /* Init VIAs 1 and 2 */
+> +    sysbus_init_child_obj(OBJECT(m), "via1", &m->mos6522_via1,
+> +                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA=
+1);
+> +    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+> +                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA=
+2);
+> +
+> +    /* Pass through mos6522 output IRQs */
+> +    ms =3D MOS6522(&m->mos6522_via1);
+> +    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
+> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort=
+);
+> +    ms =3D MOS6522(&m->mos6522_via2);
+> +    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
+> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort=
+);
 >  }
->  
->  const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->  {
->      X86MachineState *x86ms = X86_MACHINE(ms);
-> -    int i;
->      unsigned int max_cpus = ms->smp.max_cpus;
-> +    X86CPUTopoInfo topo_info;
-> +    int i;
->  
->      if (ms->possible_cpus) {
->          /*
-> @@ -171,6 +185,9 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
->                                    sizeof(CPUArchId) * max_cpus);
->      ms->possible_cpus->len = max_cpus;
-> +
-> +    init_topo_info(&topo_info, x86ms);
-> +
->      for (i = 0; i < ms->possible_cpus->len; i++) {
->          X86CPUTopoIDs topo_ids;
->  
-> @@ -179,8 +196,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->          ms->possible_cpus->cpus[i].arch_id =
->              x86_cpu_apic_id_from_index(x86ms, i);
->          x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-> -                                 x86ms->smp_dies, ms->smp.cores,
-> -                                 ms->smp.threads, &topo_ids);
-> +                                 &topo_info, &topo_ids);
->          ms->possible_cpus->cpus[i].props.has_socket_id = true;
->          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
->          if (x86ms->smp_dies > 1) {
-> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-> index 52def68610..7ea507f376 100644
-> --- a/include/hw/i386/topology.h
-> +++ b/include/hw/i386/topology.h
-> @@ -52,6 +52,12 @@ typedef struct X86CPUTopoIDs {
->      unsigned smt_id;
->  } X86CPUTopoIDs;
->  
-> +typedef struct X86CPUTopoInfo {
-> +    unsigned dies_per_pkg;
-> +    unsigned cores_per_die;
-> +    unsigned threads_per_core;
-> +} X86CPUTopoInfo;
-> +
->  /* Return the bit width needed for 'count' IDs
->   */
->  static unsigned apicid_bitwidth_for_count(unsigned count)
-> @@ -119,11 +125,13 @@ static inline unsigned apicid_pkg_offset(unsigned nr_dies,
->   *
->   * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
->   */
-> -static inline apic_id_t apicid_from_topo_ids(unsigned nr_dies,
-> -                                             unsigned nr_cores,
-> -                                             unsigned nr_threads,
-> +static inline apic_id_t apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
->                                               const X86CPUTopoIDs *topo_ids)
->  {
-> +    unsigned nr_dies = topo_info->dies_per_pkg;
-> +    unsigned nr_cores = topo_info->cores_per_die;
-> +    unsigned nr_threads = topo_info->threads_per_core;
-> +
->      return (topo_ids->pkg_id  <<
->                 apicid_pkg_offset(nr_dies, nr_cores, nr_threads)) |
->             (topo_ids->die_id  <<
-> @@ -136,12 +144,14 @@ static inline apic_id_t apicid_from_topo_ids(unsigned nr_dies,
->  /* Calculate thread/core/package IDs for a specific topology,
->   * based on (contiguous) CPU index
->   */
-> -static inline void x86_topo_ids_from_idx(unsigned nr_dies,
-> -                                         unsigned nr_cores,
-> -                                         unsigned nr_threads,
-> +static inline void x86_topo_ids_from_idx(X86CPUTopoInfo *topo_info,
->                                           unsigned cpu_index,
->                                           X86CPUTopoIDs *topo_ids)
->  {
-> +    unsigned nr_dies = topo_info->dies_per_pkg;
-> +    unsigned nr_cores = topo_info->cores_per_die;
-> +    unsigned nr_threads = topo_info->threads_per_core;
-> +
->      topo_ids->pkg_id = cpu_index / (nr_dies * nr_cores * nr_threads);
->      topo_ids->die_id = cpu_index / (nr_cores * nr_threads) % nr_dies;
->      topo_ids->core_id = cpu_index / nr_threads % nr_cores;
-> @@ -152,11 +162,13 @@ static inline void x86_topo_ids_from_idx(unsigned nr_dies,
->   * based on APIC ID
->   */
->  static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
-> -                                            unsigned nr_dies,
-> -                                            unsigned nr_cores,
-> -                                            unsigned nr_threads,
-> +                                            X86CPUTopoInfo *topo_info,
->                                              X86CPUTopoIDs *topo_ids)
->  {
-> +    unsigned nr_dies = topo_info->dies_per_pkg;
-> +    unsigned nr_cores = topo_info->cores_per_die;
-> +    unsigned nr_threads = topo_info->threads_per_core;
-> +
->      topo_ids->smt_id = apicid &
->              ~(0xFFFFFFFFUL << apicid_smt_width(nr_dies, nr_cores, nr_threads));
->      topo_ids->core_id =
-> @@ -173,14 +185,12 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
->   *
->   * 'cpu_index' is a sequential, contiguous ID for the CPU.
->   */
-> -static inline apic_id_t x86_apicid_from_cpu_idx(unsigned nr_dies,
-> -                                                unsigned nr_cores,
-> -                                                unsigned nr_threads,
-> +static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
->                                                  unsigned cpu_index)
->  {
->      X86CPUTopoIDs topo_ids;
-> -    x86_topo_ids_from_idx(nr_dies, nr_cores, nr_threads, cpu_index, &topo_ids);
-> -    return apicid_from_topo_ids(nr_dies, nr_cores, nr_threads, &topo_ids);
-> +    x86_topo_ids_from_idx(topo_info, cpu_index, &topo_ids);
-> +    return apicid_from_topo_ids(topo_info, &topo_ids);
->  }
->  
->  #endif /* HW_I386_TOPOLOGY_H */
-> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-> index 41fe37b8a3..22babcb3bb 100644
-> --- a/include/hw/i386/x86.h
-> +++ b/include/hw/i386/x86.h
-> @@ -21,6 +21,7 @@
->  #include "exec/hwaddr.h"
->  #include "qemu/notify.h"
->  
-> +#include "hw/i386/topology.h"
->  #include "hw/boards.h"
->  #include "hw/nmi.h"
->  #include "hw/isa/isa.h"
-> @@ -82,6 +83,8 @@ typedef struct {
->  #define X86_MACHINE_CLASS(class) \
->      OBJECT_CLASS_CHECK(X86MachineClass, class, TYPE_X86_MACHINE)
->  
-> +void init_topo_info(X86CPUTopoInfo *topo_info, const X86MachineState *x86ms);
-> +
->  uint32_t x86_cpu_apic_id_from_index(X86MachineState *pcms,
->                                      unsigned int cpu_index);
->  
-> 
+>
+>  static void postload_update_cb(void *opaque, int running, RunState state=
+)
+> --
+> 2.18.2
+
+In file included from /work/armbru/qemu/include/hw/vmstate-if.h:12,
+                 from /work/armbru/qemu/include/migration/vmstate.h:30,
+                 from /work/armbru/qemu/hw/misc/mac_via.c:20:
+/work/armbru/qemu/hw/misc/mac_via.c: In function =E2=80=98mac_via_init=E2=
+=80=99:
+/work/armbru/qemu/hw/misc/mac_via.c:953:34: error: =E2=80=98dev=E2=80=99 un=
+declared (first use in this function); did you mean =E2=80=98div=E2=80=99?
+  953 |     sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+      |                                  ^~~
+
+Try again?
 
 
