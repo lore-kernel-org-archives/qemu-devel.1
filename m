@@ -2,84 +2,86 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 603F1C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71A2C10F29
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1547120866
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A159120866
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 17:28:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OdgGlY6Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1547120866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKS2M+gW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A159120866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBMBS-0007F7-Ac
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 13:27:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59457)
+	id 1jBMCJ-0008DC-TU
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 13:28:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBMAp-0006pf-Da
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:26:44 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jBMBf-0007c8-72
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:27:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBMAo-0002NS-97
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:26:39 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43755)
+ (envelope-from <groeck7@gmail.com>) id 1jBMBe-0002oT-8p
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:27:31 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39318)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBMAo-0002NK-3e
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 13:26:38 -0400
-Received: by mail-ot1-x343.google.com with SMTP id a6so2463771otb.10
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 10:26:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=AEb3busSxAVllEZyGA9W7FuRu3xQjAX1PcyIxALwIoU=;
- b=OdgGlY6ZdbeJQpCqqGEDjh/e0HuYZPaYe+qDeLQZh07KgO1B51QR5iH2ixjG7xs5bg
- RdLisrwYs2CYBCNCpiQsYl47KLi/YUHZnOisxtBgakiYt2BvRRL929Sk92A9yINTUXUQ
- MYXRG16WR0Z7wnODy1J9+g1eYDsvs+2m/FSGDoUuZoV7KikiPBsjWhgKM7Y8lps5geXt
- QI8S97Vb4/RMGxYI4T/jg2xZ+Bsq9Fdg0yd/UAM/qCutrII4fiePPYtOtzNiZatz8MOF
- LCMWhLYqeZgKrtL7DHjI2nZN4c6wpAfjGXBSTdCO1CScm7/eOVMQ+1y/+afzhQPS+eOG
- W41A==
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1jBMBc-0002nG-1g; Mon, 09 Mar 2020 13:27:28 -0400
+Received: by mail-pl1-x642.google.com with SMTP id j20so4254802pll.6;
+ Mon, 09 Mar 2020 10:27:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=BZngQXGMUcd9HSfvr8IOy8qIk/2ixiIy5QrDgre2vx0=;
+ b=AKS2M+gWUJ28ir7RFBtbVPchPt7iyBv4j4AtB6Vlroyn2fO9vFg+4QJ5jpqdwxm97Z
+ T5lxsD6QneeIiSC1mrQa2a6A8ARkBbHs7ZNwKBpabErQ2zzyBJ1v30SoTkzPpuEqvHlR
+ QBHNIv1rblMiWOzAUDuy/Hyak7rN9u288iGgzgn3Tv4pQmS4flu69M8phfPT8JjkkiUa
+ Rucv1WfFOQ6uraScFo7ySNDUcMxhAWbvJAotYbD3uZSNqH8L6ags23wGiil3HleUgG/d
+ DlRpI/0GGNfhx/nnVPL0MhP+Q6QoeKUs4oyDC7PD/qL6PIzjzPaRB37MpfdI9sF4Zuuv
+ 6pzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=AEb3busSxAVllEZyGA9W7FuRu3xQjAX1PcyIxALwIoU=;
- b=c2T3DY9KYxdf3ouPe4MMIvVpwhWk7E9iR/l9fb06Q68VFFIHOnd/Ee7OeTAr87BQ3C
- TuqMWdz57eFYKqcya5Q2fJrg1UwALiO5360Fs7kE3o6PqUqsGtCIswxj5n67TIECLZt2
- 8lCy+rKv/NAGGNN31qGzv463ebsu27l0fCpAsYIC/BW1/HET9R5QU+Ff6WcTKLP9EsUf
- 4ADOscyLLC1UDKFNPdQ5+2uCO3B/q2UFJyqOqSTK4YE4Og03+cvX5OeMqAsJb/mUIqcq
- 7yk1GH7m2AEUJwYU0k/k+UqEvCJiKww6MFd7fwDSWciIMCgbek3wP+YI4HaxCa6mJ1ci
- ZVZQ==
-X-Gm-Message-State: ANhLgQ2Ii6ofRooVxA3Qxg1EDUe3Fz0CxLOGCsndY4pt6EoPPdMpP7Ns
- CwE882AAGj9I/5NQduWTML9iacvLvMMGMHkYsnYX8A==
-X-Google-Smtp-Source: ADFU+vt5OT5nmVZEwODfKvFr/PjFFizSeiwTr8y7zdoLWN7wpdl2rNMSey2zlgOQ6VdHbolEJJGlGvyIi0jcIKfT/zs=
-X-Received: by 2002:a05:6830:19e2:: with SMTP id
- t2mr6261209ott.97.1583774797080; 
- Mon, 09 Mar 2020 10:26:37 -0700 (PDT)
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=BZngQXGMUcd9HSfvr8IOy8qIk/2ixiIy5QrDgre2vx0=;
+ b=U6zgqC67zE494zfbOeRsAzH2Gq6QAMQdrGD6B05bbXxakih5OEq8/Gh5ukQlQnd3AC
+ NIP5D9sktRO2OlKwpNg1FqNiEgz0F5Y0a5uzagqzP4tUUuwKTChzyZSmyyi5Q3eApJT7
+ D0bBdCtiftHtbTSvm1w9bpsXidrMkstSgWPlNMIozrZwAWhpDM2zrg29Ai3aDr0ixxL+
+ dBqCm2JfTVenZci9iSJix9QWarkaLhYKRZawaDtdfutlhppCQFRfhI6dIim9QoxYBvam
+ TzFqzRb7F1YMIqdyk+DcxCsAAJODGoa2M/If/8ewWvanlTGCe+FQBOUhfSjS1P3m3+UI
+ c9xA==
+X-Gm-Message-State: ANhLgQ2Hqx5AMt3OibBC1i3mV9snw8gOI1OEAeZDN4i4lOR3C7RXTo8J
+ Y6UqmqIKUeJ7TcpIrjAf3AY=
+X-Google-Smtp-Source: ADFU+vusNBNI0NtDRVj9D2+taP4aOBrImsyA2PSc1FGnpquKhGTEUsJh9uMLPyASpHKszjmjMMmlrQ==
+X-Received: by 2002:a17:902:8b8a:: with SMTP id
+ ay10mr17112803plb.288.1583774846907; 
+ Mon, 09 Mar 2020 10:27:26 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id k9sm147850pjo.19.2020.03.09.10.27.25
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 09 Mar 2020 10:27:26 -0700 (PDT)
+Date: Mon, 9 Mar 2020 10:27:24 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/3] Wire up USB controllers on fsl-imx6 and fsl-imx6ul
+Message-ID: <20200309172724.GA25106@roeck-us.net>
+References: <20200301170443.12904-1-linux@roeck-us.net>
+ <CAFEAcA_VuY+1egn8B6=Tk8PKGuhAPuP4-=pwuWHQGQsfdXB=dw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200306134751.2572-1-peter.maydell@linaro.org>
- <70e18816-1d16-93a1-5e49-2f54132602fb@redhat.com>
- <CAFEAcA_wowY8fhsLXGZeHbdRP+1G58KmDUsLbB5WYw91KoF8+w@mail.gmail.com>
- <5d9f2189-fa75-32ab-2042-14eeab92fbf7@redhat.com>
-In-Reply-To: <5d9f2189-fa75-32ab-2042-14eeab92fbf7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 17:26:25 +0000
-Message-ID: <CAFEAcA_-sUFHBnZPTKkveZasWvavf8EyLHc1TGeuGksqetfbQg@mail.gmail.com>
-Subject: Re: [PATCH] qemu.nsi: Install Sphinx documentation
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_VuY+1egn8B6=Tk8PKGuhAPuP4-=pwuWHQGQsfdXB=dw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,36 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Mar 2020 at 15:02, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> On 3/6/20 3:54 PM, Peter Maydell wrote:
-> > On Fri, 6 Mar 2020 at 14:32, Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com> wrote:
-> >>
-> >> On 3/6/20 2:47 PM, Peter Maydell wrote:
-> >>> The old qemu-doc.html is no longer built, so update the Windows
-> >>> installer to install the new Sphinx manual sets.
-> >>>
-> >>> We install all five of the manuals, even though some of them
-> >>> (notably the user-mode manual) will not be very useful to Windows
-> >>> users, because skipping some of them would mean broken links
-> >>> in the top level 'index.html' page.
-> >>>
-> >>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Mon, Mar 09, 2020 at 05:09:21PM +0000, Peter Maydell wrote:
+> On Sun, 1 Mar 2020 at 17:04, Guenter Roeck <linux@roeck-us.net> wrote:
+> >
+> > This patch series wires up the USB controllers on fsl-imx6 and fsl-imx6ul
+> > emulations.
+> >
+> > The first patch is a prerequisite for the following patches. It provides
+> > a dummy implementation of a register widely used on i.MX systems, and
+> > specifically the reset behavior of this register. This is needed to make
+> > the USB ports operational without full implementation of an emulation
+> > of its PHY controller.
+> >
+> > ----------------------------------------------------------------
+> > Guenter Roeck (3):
+> >       Add dummy i.MXS STMP register support
+> >       arm: fsl-imx6ul: Wire up USB controllers
+> >       hw/arm/fsl-imx6: Wire up USB controllers
+> 
+> I'm not a huge fan of the "dummy device that's really just
+> implementing 4 registers from the middle of some other
+> device" approach. Unless you think we're strongly likely
+> to want to use it in other places, I think I'd prefer
+> to just implement a (minimal/no-functionality) model of
+> the PHY register block.
+> 
 
-> As this patch unbreaks patchew:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Sure, no problem; I don't really have a preference. What would be
+the best place for such a dummy phy ?
 
-Thanks. Stefan, I've applied this to master as it unbreaks
-one of the patchew configs, but feel free to let me know if
-there are changes you'd like me to make and I'll send a
-followup patch.
-
--- PMM
+Thanks,
+Guenter
 
