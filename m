@@ -2,64 +2,63 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB03C10DCE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 01:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9954CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 01:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 688ED205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 01:37:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688ED205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 698DD205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 01:44:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 698DD205ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jB7MI-0004lH-CA
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 21:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47542)
+	id 1jB7Su-00077k-L0
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 21:44:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jB7LW-0004L8-5b
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:36:43 -0400
+ (envelope-from <pannengyuan@huawei.com>) id 1jB7SE-0006hW-1q
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jB7LU-0003DS-R5
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:36:41 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3190 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1jB7SC-0008Mr-IX
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:43:37 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3265 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jB7LU-0003A2-Fh
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:36:40 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 72F593B11861BF67967C;
- Mon,  9 Mar 2020 08:49:38 +0800 (CST)
+ id 1jB7SC-0008Kr-7t
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 21:43:36 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 25816637F888A8F93429;
+ Mon,  9 Mar 2020 08:56:58 +0800 (CST)
 Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.204) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 9 Mar 2020
- 08:49:30 +0800
-Subject: Re: [PATCH v4 0/3] delay timer_new from init to realize to fix
- memleaks.
-To: Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland
- <mark.cave-ayland@ilande.co.uk>
+ (10.3.19.205) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 9 Mar 2020
+ 08:56:49 +0800
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <8af2cdaa-7e3e-409f-5351-7fc54e00aab5@ilande.co.uk>
- <CAFEAcA_8SWR6MrNL98GFNASs0_qE_U4pgiw_LyiydKVaSb7C8A@mail.gmail.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
 From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <f354213e-9878-76f7-e628-85e6f963c4a6@huawei.com>
-Date: Mon, 9 Mar 2020 08:49:25 +0800
+Message-ID: <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+Date: Mon, 9 Mar 2020 08:56:42 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_8SWR6MrNL98GFNASs0_qE_U4pgiw_LyiydKVaSb7C8A@mail.gmail.com>
+In-Reply-To: <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.184.39.213]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,7 +70,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Euler Robot <euler.robot@huawei.com>,
+Cc: Laurent Vivier <laurent@vivier.eu>, Euler Robot <euler.robot@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  QEMU Developers <qemu-devel@nongnu.org>,
  zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -80,46 +80,113 @@ Sender: "Qemu-devel"
 
 
 
-On 3/8/2020 9:39 PM, Peter Maydell wrote:
-> On Sun, 8 Mar 2020 at 11:58, Mark Cave-Ayland
-> <mark.cave-ayland@ilande.co.uk> wrote:
->> I just tried this patchset applied on top of git master and it causes qemu-system-ppc
->> to segfault on startup:
+On 3/8/2020 9:29 PM, Peter Maydell wrote:
+> On Thu, 5 Mar 2020 at 06:39, Pan Nengyuan <pannengyuan@huawei.com> wrote:
 >>
->> $ gdb --args ./qemu-system-ppc
->> ...
->> ...
->> Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
->> 0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
->> 429         QEMUTimerList *timer_list = ts->timer_list;
->> (gdb) bt
->> #0  0x0000555555e7e38c in timer_del (ts=0x0) at util/qemu-timer.c:429
->> #1  0x0000555555b5d2c1 in mos6522_reset (dev=0x555556e0ac50) at hw/misc/mos6522.c:468
->> #2  0x0000555555b63570 in mos6522_cuda_reset (dev=0x555556e0ac50) at
->> hw/misc/macio/cuda.c:599
+>> This patch fix a bug in mac_via where it failed to actually realize devices it was using.
+>> And move the init codes which inits the mos6522 objects and properties on them from realize()
+>> into init(). However, we keep qdev_set_parent_bus in realize(), otherwise it will cause
+>> device-introspect-test test fail. Then do the realize mos6522 device in the mac_vir_realize.
+>>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
 > 
-> It looks like we haven't caught all the cases of "somebody created a
-> MOS6522 (or one of its subclasses) but forgot to realize it". This
-> particular one I think is the s->cuda which is inited in macio_oldworld_init()
-> but not realized in macio_oldworld_realize(). I think that pmu_init() in
-> hw/misc/macio/pmu.c also has this bug. We need to go through and
-> audit all the places where we create TYPE_MOS6522 or any of its
-> subclasses and make sure they are also realizing the devices they create.
-> (The presence of the new 3-phase reset infrastructure in the backtrace
-> is a red herring here -- this would have crashed the same way with the
-> old code too.)
+>> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+>> index b7d0012794..4c5ad08805 100644
+>> --- a/hw/misc/mac_via.c
+>> +++ b/hw/misc/mac_via.c
+>> @@ -868,24 +868,24 @@ static void mac_via_reset(DeviceState *dev)
+>>  static void mac_via_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      MacVIAState *m = MAC_VIA(dev);
+>> -    MOS6522State *ms;
+>>      struct tm tm;
+>>      int ret;
+>> +    Error *err = NULL;
+>>
+>> -    /* Init VIAs 1 and 2 */
+>> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
+>> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
+>> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
+>> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
 > 
+> Rather than manually setting the parent bus, you can use
+> sysbus_init_child_obj() instead of object_initialize_child() --
+> it is a convenience function that does both object_initialize_child()
+> and qdev_set_parent_bus() for you.
 
-Yes, that's right, this series miss other cases, I will search and fix all
-the cases about MOS6522 device.
+Actually I used sysbus_init_child_obj() first, but it will fail to run device-introspect-test.
+Because qdev_set_parent_bus() will change 'info qtree' after we call 'device-list-properties'.
+Thus, I do it in the realize.
+
+> 
+>> -    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+>> -                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
+>> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
+>> +    if (err != NULL) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>>
+>> -    /* Pass through mos6522 output IRQs */
+>> -    ms = MOS6522(&m->mos6522_via1);
+>> -    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
+>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>> -    ms = MOS6522(&m->mos6522_via2);
+>> -    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized", &err);
+>> +    if (err != NULL) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    }
+>>
+>>      /* Pass through mos6522 input IRQs */
+>>      qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+>> @@ -932,6 +932,7 @@ static void mac_via_init(Object *obj)
+>>  {
+>>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>>      MacVIAState *m = MAC_VIA(obj);
+>> +    MOS6522State *ms;
+>>
+>>      /* MMIO */
+>>      memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
+>> @@ -948,6 +949,22 @@ static void mac_via_init(Object *obj)
+>>      /* ADB */
+>>      qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>>                          TYPE_ADB_BUS, DEVICE(obj), "adb.0");
+>> +
+>> +    /* Init VIAs 1 and 2 */
+>> +    object_initialize_child(OBJECT(m), "via1", &m->mos6522_via1,
+>> +                            sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1,
+>> +                            &error_abort, NULL);
+>> +    object_initialize_child(OBJECT(m), "via2", &m->mos6522_via2,
+>> +                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2,
+>> +                            &error_abort, NULL);
+>> +
+>> +    /* Pass through mos6522 output IRQs */
+>> +    ms = MOS6522(&m->mos6522_via1);
+>> +    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
+>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+> 
+> There's no point in using the MOS6522() cast to get a MOS6522*,
+> because the only thing you do with it is immediately cast it
+> to an Object* with the OBJECT() cast. Just use the OBJECT cast directly.
+
+Ok, will do it.
 
 Thanks.
 
-> We should probably find some generic place in Device code where we
-> can stick an assert "are we trying to reset an unrealized device?"
-> because I bet we have other instances of this bug which we haven't
-> noticed because the reset function happens to not misbehave on
-> an inited-but-not-realized device...
+> 
+>> +    ms = MOS6522(&m->mos6522_via2);
+>> +    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
+>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+>>  }
+>>
+>>  static void postload_update_cb(void *opaque, int running, RunState state)
 > 
 > thanks
 > -- PMM
