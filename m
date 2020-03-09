@@ -2,96 +2,58 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1996DC18E5A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB86C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC4DE205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9NbdP7l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC4DE205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56BAA205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:16:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56BAA205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHJ8-0000Kj-3w
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:14:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55660)
+	id 1jBHKp-0003Az-EC
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:16:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jBHFj-0003kS-HZ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:28 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJO-00015l-Hg
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jBHFi-0008SC-Jt
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54428
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHJN-0002RE-6p
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:15:10 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:36888)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jBHFi-0008Rp-GO
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583755882;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LM9DMNWiI760NtiO1+iofmugtapmqUkn1Z+NOomLjok=;
- b=Q9NbdP7lUHkwQ/7xCDLlnetDoqwR8I/cxiQO44MetNKzKoB42D/BMKWJUMenIWMFZ9smGl
- RhJltkW7Oji5C1bkoxV4ZRJfigDUGS3c1zUBHwzxiieqg8uGdLJxgpHYecfBslI79+XLtJ
- wQxrCpl5iueKE4MfRlz9523kZ/aQtzA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-mjFoLki7OkWkxLck-tHGvQ-1; Mon, 09 Mar 2020 08:11:20 -0400
-X-MC-Unique: mjFoLki7OkWkxLck-tHGvQ-1
-Received: by mail-ed1-f69.google.com with SMTP id y4so7822697edm.0
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 05:11:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=WfHxGWmhrgeXSkoiuMTUncVrwHERBg1P30j9pqJHkrE=;
- b=dIYqt3PMg6rnhIa11JuvpNl+cIzTpK5GRFZUhDE9jm9N5a+ey12VOg26qub5jvNweS
- kMEvAst7v4s9GFZmdbFvh3qVx0Gjo5JdEmy57D2qVLYr0eoBHwolNa58XYcB6yknCtf7
- yVLJV2zdKTrZ0jQs8TH67iIII9WC+C2FAWMA13l5DQRhYPmNt4UklHK8S1/kpdoF+CvR
- T1fimSAWgXsHWulVjz5Mz36MXCpyn9u318TKlgYineLk5DJraB9aKXQJAxbDm+nwMfcE
- NE5zed+464w0VSExG92UhPi/y9al/M5CC4gTWD4cTo5z5g4q1CjDC88O0q1XJ0Hlb2iO
- JvJw==
-X-Gm-Message-State: ANhLgQ0CSMDlpsm4ZaiiNfMYIo6Vh/j/uv/LpXPKoRZ2yBssTHiPO7a/
- j94QV4nJoiJJoW4JN+cfKR4KRi88W0DRFTmOicVXHMxaHBfMbUB/wxmXEUr4+ZVUMv5+qv23F/Q
- lGn3ojSS1XwKf25Q=
-X-Received: by 2002:aa7:d689:: with SMTP id d9mr16927240edr.228.1583755879001; 
- Mon, 09 Mar 2020 05:11:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs6xnGbBLi2ziq5PuHRL2x6ef9phKTCiI0J3KHZiX1lNv19kEQVD0jVzxfGnTPw7HyF6lJ8Tw==
-X-Received: by 2002:aa7:d689:: with SMTP id d9mr16927219edr.228.1583755878859; 
- Mon, 09 Mar 2020 05:11:18 -0700 (PDT)
-Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id c13sm953733edf.36.2020.03.09.05.11.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 05:11:18 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] cpu: Assert a vCPU is created before resetting it
-Date: Mon,  9 Mar 2020 13:11:03 +0100
-Message-Id: <20200309121103.20234-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200309121103.20234-1-philmd@redhat.com>
-References: <20200309121103.20234-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jBHJM-0002N2-Io; Mon, 09 Mar 2020 08:15:09 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436283|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.284299-0.00020209-0.715499;
+ FP=9121874194399893506|2|1|7|0|-1|-1|-1; HT=e02c03307; MF=zhiwei_liu@c-sky.com;
+ NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GyaeXy8_1583756101; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GyaeXy8_1583756101)
+ by smtp.aliyun-inc.com(10.147.41.199);
+ Mon, 09 Mar 2020 20:15:03 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v3 03/60] target/riscv: support vector extension csr
+Date: Mon,  9 Mar 2020 20:14:00 +0800
+Message-Id: <20200309121457.13719-4-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
+References: <20200309121457.13719-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,44 +65,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, Michael Walle <michael@walle.cc>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cpu_reset() might modify architecture-specific fields allocated
-by qemu_init_vcpu(). To avoid bugs similar to the one fixed in
-commit 00d0f7cb66 when introducing new architectures, assert a
-vCPU is created before resetting it.
+The v0.7.1 specification does not define vector status within mstatus.
+A future revision will define the privileged portion of the vector status.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- hw/core/cpu.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/riscv/cpu_bits.h | 15 +++++++++
+ target/riscv/csr.c      | 75 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index fe65ca62ac..09e49f8d6a 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -251,6 +251,7 @@ void cpu_reset(CPUState *cpu)
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 7f64ee1174..8117e8b5a7 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -29,6 +29,14 @@
+ #define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
+ #define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
+ 
++/* Vector Fixed-Point round model */
++#define FSR_VXRM_SHIFT      9
++#define FSR_VXRM            (0x3 << FSR_VXRM_SHIFT)
++
++/* Vector Fixed-Point saturation flag */
++#define FSR_VXSAT_SHIFT     8
++#define FSR_VXSAT           (0x1 << FSR_VXSAT_SHIFT)
++
+ /* Control and Status Registers */
+ 
+ /* User Trap Setup */
+@@ -48,6 +56,13 @@
+ #define CSR_FRM             0x002
+ #define CSR_FCSR            0x003
+ 
++/* User Vector CSRs */
++#define CSR_VSTART          0x008
++#define CSR_VXSAT           0x009
++#define CSR_VXRM            0x00a
++#define CSR_VL              0xc20
++#define CSR_VTYPE           0xc21
++
+ /* User Timers and Counters */
+ #define CSR_CYCLE           0xc00
+ #define CSR_TIME            0xc01
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 11d184cd16..d71c49dfff 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -46,6 +46,10 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
+ static int fs(CPURISCVState *env, int csrno)
  {
-     CPUClass *klass =3D CPU_GET_CLASS(cpu);
-=20
-+    assert(cpu->created);
-     if (klass->reset !=3D NULL) {
-         (*klass->reset)(cpu);
+ #if !defined(CONFIG_USER_ONLY)
++    /* loose check condition for fcsr in vector extension */
++    if ((csrno == CSR_FCSR) && (env->misa & RVV)) {
++        return 0;
++    }
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+         return -1;
      }
---=20
-2.21.1
+@@ -53,6 +57,14 @@ static int fs(CPURISCVState *env, int csrno)
+     return 0;
+ }
+ 
++static int vs(CPURISCVState *env, int csrno)
++{
++    if (env->misa & RVV) {
++        return 0;
++    }
++    return -1;
++}
++
+ static int ctr(CPURISCVState *env, int csrno)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+@@ -174,6 +186,10 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+ #endif
+     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
+         | (env->frm << FSR_RD_SHIFT);
++    if (vs(env, csrno) >= 0) {
++        *val |= (env->vxrm << FSR_VXRM_SHIFT)
++                | (env->vxsat << FSR_VXSAT_SHIFT);
++    }
+     return 0;
+ }
+ 
+@@ -186,10 +202,62 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+     env->mstatus |= MSTATUS_FS;
+ #endif
+     env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
++    if (vs(env, csrno) >= 0) {
++        env->vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
++        env->vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
++    }
+     riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
+     return 0;
+ }
+ 
++static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vtype;
++    return 0;
++}
++
++static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vl;
++    return 0;
++}
++
++static int read_vxrm(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vxrm;
++    return 0;
++}
++
++static int write_vxrm(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vxrm = val;
++    return 0;
++}
++
++static int read_vxsat(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vxsat;
++    return 0;
++}
++
++static int write_vxsat(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vxsat = val;
++    return 0;
++}
++
++static int read_vstart(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->vstart;
++    return 0;
++}
++
++static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->vstart = val;
++    return 0;
++}
++
+ /* User Timers and Counters */
+ static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -1269,7 +1337,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_FFLAGS] =              { fs,   read_fflags,      write_fflags      },
+     [CSR_FRM] =                 { fs,   read_frm,         write_frm         },
+     [CSR_FCSR] =                { fs,   read_fcsr,        write_fcsr        },
+-
++    /* Vector CSRs */
++    [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
++    [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
++    [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
++    [CSR_VL] =                  { vs,   read_vl                             },
++    [CSR_VTYPE] =               { vs,   read_vtype                          },
+     /* User Timers and Counters */
+     [CSR_CYCLE] =               { ctr,  read_instret                        },
+     [CSR_INSTRET] =             { ctr,  read_instret                        },
+-- 
+2.23.0
 
 
