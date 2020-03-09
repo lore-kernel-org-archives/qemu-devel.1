@@ -2,78 +2,78 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C88C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1372DC10F29
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:14:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A67102072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:11:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6C502072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:14:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITy1N5M0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A67102072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VucVpPdG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6C502072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBFNk-0002mA-QN
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 06:11:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35588)
+	id 1jBFQL-00045H-Uf
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 06:14:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jBFKm-0007q5-6q
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:08:29 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jBFPi-0003Zu-Pm
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jBFKl-0001Tu-Bn
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:08:28 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53667
+ (envelope-from <kraxel@redhat.com>) id 1jBFPh-00032a-T8
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:13:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59008
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jBFKl-0001Tp-7z
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:08:27 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jBFPh-00032P-Pe
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:13:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583748506;
+ s=mimecast20190719; t=1583748813;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NTHpBV488e5aZnDPw7jU4Q8YTFTJdQkjmSE3RhUCd7Q=;
- b=ITy1N5M0cqSyVspeRUtbSPmyRq70kkOmPYEQLImWaZxZq9v4Dv1YozmZ/nR5JkXOfg/j08
- 2c8x37G/XZ6V00AN90tgFvNfVZYEtdAllS+erhirA/+v73JXQ+siJ6bpXkJnFFU7di+05D
- jO5FgAFKudo2D9xwtB7cUliV/QZyTuw=
+ bh=aAKOGH/KUbB4026TG+is9BMIjscEbXjSnMP3ULLdV2c=;
+ b=VucVpPdGnk7GMmOOj8BcPG/8SKGACciHNLuxHPGSLeX8BeGo4ZBFzEh0KyKIVXrVx9qhFj
+ QdJ2ZXRhuNRng1hec5a7p+a6Qwmys3NsbZaFJ/ECq2NWx3GY15/FuJkB8t0hoGPRJIopfE
+ dQ1BZwxRg/i9ixqj9f00U881RMH2pdQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-0cR0bNcePi2uOTgfhmQ_RA-1; Mon, 09 Mar 2020 06:08:24 -0400
-X-MC-Unique: 0cR0bNcePi2uOTgfhmQ_RA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-278-xs3-jlGQP_6xIl7j5gC71Q-1; Mon, 09 Mar 2020 06:13:31 -0400
+X-MC-Unique: xs3-jlGQP_6xIl7j5gC71Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1DD919251A6;
- Mon,  9 Mar 2020 10:08:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E6E91137843;
+ Mon,  9 Mar 2020 10:13:30 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-117.ams2.redhat.com
  [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 77FB95C545;
- Mon,  9 Mar 2020 10:08:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0DDF85D9CA;
+ Mon,  9 Mar 2020 10:13:30 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 849769D43; Mon,  9 Mar 2020 11:08:22 +0100 (CET)
-Date: Mon, 9 Mar 2020 11:08:22 +0100
+ id 334F39D43; Mon,  9 Mar 2020 11:13:29 +0100 (CET)
+Date: Mon, 9 Mar 2020 11:13:29 +0100
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: Jason Andryuk <jandryuk@gmail.com>
-Subject: Re: [PATCH] usb-serial: wakeup device on input
-Message-ID: <20200309100822.kf3hftjdnkmbl5vx@sirius.home.kraxel.org>
-References: <20200306140917.26726-1-jandryuk@gmail.com>
+To: kuhn.chenqun@huawei.com
+Subject: Re: [PATCH v2 12/13] usb/hcd-ehci: Remove redundant statements
+Message-ID: <20200309101329.bwdkyqa6z4lazlkn@sirius.home.kraxel.org>
+References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
+ <20200226084647.20636-13-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200306140917.26726-1-jandryuk@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200226084647.20636-13-kuhn.chenqun@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -89,26 +89,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ Euler Robot <euler.robot@huawei.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 06, 2020 at 09:09:17AM -0500, Jason Andryuk wrote:
-> Currently usb-serial devices are unable to send data into guests with
-> the xhci controller.  Data is copied into the usb-serial's buffer, but
-> it is not sent into the guest.  Data coming out of the guest works
-> properly.  usb-serial devices work properly with ehci.
+On Wed, Feb 26, 2020 at 04:46:46PM +0800, kuhn.chenqun@huawei.com wrote:
+> From: Chen Qun <kuhn.chenqun@huawei.com>
 >=20
-> Have usb-serial call usb_wakeup() when receiving data from the chardev.
-> This seems to notify the xhci controller and fix inbound data flow.
+> The "again" assignment is meaningless before g_assert_not_reached.
+> In addition, the break statements no longer needs to be after
+> g_assert_not_reached.
 >=20
-> Also add USB_CFG_ATT_WAKEUP to the device's bmAttributes.  This matches
-> a real FTDI serial adapter's bmAttributes.
+> Clang static code analyzer show warning:
+> hw/usb/hcd-ehci.c:2108:13: warning: Value stored to 'again' is never read
+>             again =3D -1;
+>             ^       ~~
 >=20
-> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Added to usb patch queue.
+Patch added to usb queue.
 
 thanks,
   Gerd
