@@ -2,120 +2,82 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 231A5C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3172BC10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E780521D56
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:09:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="upJUvEJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E780521D56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id 037E8222D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037E8222D9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBNmg-00018f-4P
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:09:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
+	id 1jBNpw-0002WM-6R
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:13:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1jBNlv-0000ib-BL
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:09:06 -0400
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNoy-0001iK-MS
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1jBNlq-0008QJ-8t
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:09:03 -0400
-Received: from mail-dm6nam12on2082.outbound.protection.outlook.com
- ([40.107.243.82]:6152 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jBNlq-0008PV-2i
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:08:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z7ML5bXOZkWyJuXkxxo6lOMks57mA23nCXbO9E4+SFYOf5+yyfDPB9RI6uk0xxWlePp2H6aa3hd1WnAsZNUWQWTYL4i02FHhRzxiTenXfeektcda5kfyrN8w9DbblAKk7wSlcdYdTzpxe/sHnSiWHf2WUf8AWxqMBDRkPQYZynyLnlhDadf7tfobnmpeus7B4+FgikwCDxGhbQj00VBZ1ESGwHUvxX1Y5Djd/sAmHxxaWB/qYqyql8OgPac91wCJ11ruAx3bQqnlY+XYmcQ0e6aRNGVyKfSLoKmoLEwmc7pAbIPAkOEgNyaAeK6tpmDw+X2GaT7DcaE4KkyftFd4wg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fGvA3ltQ99Rjh+ry9ismNYbkxVXAvDgmTRcC/1zMysw=;
- b=OidTtiwgQwqnmv3HNOWYhzc7OlWxPYMv+eRZAFVOjVQuTcSbm9MbcrWN3Xnl10RWQ8K2Z49iPS7RGkbVuWxXEwiE5Kw0i69GS2mYZnhNtJ8lK881nuXOWe5CtrJ55dlvP2CNNCFKhG30bGjsLoi1pqcrVDFNvc0C5yKxiYtBvdF98I0qmaPny2fKaqjLE8z1ucF/LO7qoYIUWBVq+GJxe/3J7fG3SAXVS0M1WhsIdpUG6AY7YU6BpAjm/HXA2B4hK1n+IJOHfrFIhcF5RDf+d7+dyWdGi39Ftcxpsg7/7FOFQgEPkopUEpBatKFFmjE63dY+RDQp+IjFTCACHXRs2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fGvA3ltQ99Rjh+ry9ismNYbkxVXAvDgmTRcC/1zMysw=;
- b=upJUvEJLKov3/Ybyh4nnWbMGZkdlO/Hwf0JvY32HOGHDFeRUUYKujElH5Q+MTisFhinNBEqs/9HWcsX599+jdzJ3daLwzVSIeV6x4oOvHn8eHbIbKiffFJrK5Vv86Yai2tw0KGysn3Y3YC85z9w3xgd7WJlKey3yuzg8dZXoYX0=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2544.namprd12.prod.outlook.com (2603:10b6:802:2b::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Mon, 9 Mar
- 2020 19:08:55 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Mon, 9 Mar 2020
- 19:08:55 +0000
-Subject: Re: [PATCH v5 12/16] hw/i386: Use the apicid handlers from
- X86MachineState
-To: Igor Mammedov <imammedo@redhat.com>
-References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
- <158326548999.40452.9247570542382737462.stgit@naples-babu.amd.com>
- <20200309160157.0509fa8d@Igors-MacBook-Pro>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <a7c44aaa-cc0f-68be-6183-5f6bfb6a3ec3@amd.com>
-Date: Mon, 9 Mar 2020 14:08:53 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200309160157.0509fa8d@Igors-MacBook-Pro>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR05CA0007.namprd05.prod.outlook.com
- (2603:10b6:805:de::20) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNov-0002UT-E7
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:12:10 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:34952 helo=smtp.ehu.eus)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+ id 1jBNov-0002SW-2u
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:12:09 -0400
+Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
+ by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 3A4476761;
+ Mon,  9 Mar 2020 20:12:06 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EC1025A0A5;
+ Mon,  9 Mar 2020 20:12:05 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E0B505A0A4;
+ Mon,  9 Mar 2020 20:12:05 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.76])
+ by imsva2.lgp.ehu.es (Postfix) with ESMTPS;
+ Mon,  9 Mar 2020 20:12:05 +0100 (CET)
+Received: from 669c1c222ef4 (static.187.0.0.81.ibercom.com [81.0.0.187])
+ by smtp2 (Postfix) with ESMTPSA id 936B36CAE;
+ Mon,  9 Mar 2020 20:12:05 +0100 (CET)
+Date: Mon, 9 Mar 2020 19:12:00 +0000
+From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 0/10] qemu-binfmt-conf.sh
+Message-ID: <20200309191200.GA60@669c1c222ef4>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.87] (165.204.77.1) by
- SN6PR05CA0007.namprd05.prod.outlook.com (2603:10b6:805:de::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.6 via Frontend Transport; Mon, 9 Mar 2020 19:08:54 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 69d8b21e-ce28-4382-16c9-08d7c45d5020
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2544:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB25442C2042421D1E771514A495FE0@SN1PR12MB2544.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:324;
-X-Forefront-PRVS: 0337AFFE9A
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(39860400002)(376002)(396003)(136003)(366004)(199004)(189003)(2906002)(66556008)(66476007)(31686004)(5660300002)(16526019)(53546011)(478600001)(86362001)(66946007)(6486002)(36756003)(16576012)(316002)(52116002)(26005)(31696002)(4326008)(956004)(8676002)(81156014)(81166006)(2616005)(8936002)(44832011)(6916009)(186003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2544;
- H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 93csmDgYZIAp5gg3DSUz8g6vyScfXNNa3vMk0h4MWFsrH3rNAGBPgeEyEX+lrso1gCQ0Qh7+IBYj/0WmhIjYJmcpvnJIa7q2AOHrMYTjqlIfDj3b0hfWVg6YsfOaWey0D9+fbgyAGa0TezC4WdNaOxFjLaUVPvVjTI/CqI6pPSuczegPrd/j1cF63CRVe3+JqXA/eZrjlcgr/AZcJJPnTxWc0zKcIBi5BRI1OzzCgVHc7L7zFWU8zSiP6xjUJgSwW0+7sjVsyowjbmtE7jgM8SvB2kUo3rVqJY5hOVNgiYqzUlk0nxFagBMnlP97I15R780yq1DVQo11HQoVaV52xZzjFb7zRPbXYs3ZYwImWiXNAFrVSHqtciA90VuvHeQoJafhVCwHgpMFXR4TTj46UqYCDQLGjPr0Kv11l89R4/jcYA3ZC4t9xpw1KGzwSIhM
-X-MS-Exchange-AntiSpam-MessageData: R388zAfgzaVdBgTvwC0/QVkJuOL1K2Pj0QAQnYhgZvwg2B+RZn+wkleRIw53i55YkVDN18DbioruhgDFm0dSbZw1jXAGd1crZq4a4nf4Gko2yvTDnaIIRGXmYZHPFb1yO4Sdn+s7yFbewDX8WIJqxQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 69d8b21e-ce28-4382-16c9-08d7c45d5020
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2020 19:08:55.2736 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mLB+Ge/n0CGwY+usSEBlliDrmAe5lySYxrJYj1uDorG3xsn3gqHvKyufDAZXafEb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2544
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.243.82
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Greylist: ACL 191 matched, not delayed by milter-greylist-4.6.2 (smtp2
+ [10.0.100.76]); Mon, 09 Mar 2020 20:12:05 +0100 (CET)
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25280.002
+X-TM-AS-Result: No--2.406-7.0-31-10
+X-imss-scan-details: No--2.406-7.0-31-10
+X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25280.002
+X-TMASE-Result: 10--2.405600-10.000000
+X-TMASE-MatchedRID: VEAyyTkk0UXr0qGBvdXjxLmQWToO0X1/V0QSZ/pNFUFV1lQ/Hn0TOiiq
+ snPUKvF6alU0i33F6RBSCsh9ot3/DqVIsznpoCaYEhGH3CRdKUWpZoxavGZhjoASWMYnDi+T8xf
+ 51HO7e/Wd4idtc2EO8iGbZZp+472ZbI6WQV23HWr4GlcsEXGVMHEONw67gSVcdzLikT92GFEfKF
+ 3OCkQ3ow10tp2psQ1EEvsg7x5dWvFis7UoQ0MxblD5LQ3Tl9H7ZB/U2HvdblH5+tteD5RzhYmUy
+ BBpbWbNmfJeSkrv0+ptu21XpQLmylUOzfoovIJKdfk9ZxDdshYXaMhZSeVFDDs61woVLQQEofEK
+ OpOUPKni8zVgXoAltjrm2CwlZwVRJ0RPnyOnrZJojjqxwnvCbp8yDDBH+rskutb3s21IB6Qm1lL
+ Fq6i0douL4jNVcVaRzEzjGbc6fBAllxM1N+Ws+lkWFfShbAzAb2RJ9GzmHbIbicrrJB4OAMzNhQ
+ Tu4uISUWFuYX84RFtAi5mQw7zH3ap25+1U9AW2
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
+X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
+ milter-greylist-4.6.2 (postfix.smtp2.imsva2 [10.0.100.76]);
+ Mon, 09 Mar 2020 20:12:06 +0100 (CET)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 158.227.0.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,110 +89,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: riku.voipio@iki.fi, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
+This series reworks qemu-binfmt-conf.sh:
 
-On 3/9/20 10:01 AM, Igor Mammedov wrote:
-> On Tue, 03 Mar 2020 13:58:10 -0600
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
->> Check and Load the apicid handlers from X86CPUDefinition if available.
->> Update the calling convention for the apicid handlers.
->>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> 
-> 
->> ---
->>  hw/i386/pc.c  |    6 +++---
->>  hw/i386/x86.c |   11 +++++++----
->>  2 files changed, 10 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 17cce3f074..c600ba0432 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1581,14 +1581,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->>          topo_ids.die_id = cpu->die_id;
->>          topo_ids.core_id = cpu->core_id;
->>          topo_ids.smt_id = cpu->thread_id;
->> -        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
->> +        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
->>      }
->>  
->>      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
->>      if (!cpu_slot) {
->>          MachineState *ms = MACHINE(pcms);
->>  
->> -        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
->> +        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
-> this (including other similar) change(s) to callbacks should go to 11/16
+* Argument <CPU> from option '--systemd' is generalized to <TARGETS>, and it is
+  accepted for any mode (default, debian or systemd). It can be a single target
+  arch or a list of them.
+* Option '-r|--clear' is added, which allows to remove an already registered
+  target interpreter or a list of them. The implementation is functional but
+  partial. Please, see the corresponding commit.
+* Option '-t|--test' is added, which allows to execute the CHECK according
+  to the provided arguments, but no interpreter is configured.
+* Support to set options through environment variables: QEMU_TARGETS, QEMU_PATH,
+  QEMU_SUFFIX, QEMU_PERSISTENT, QEMU_CREDENTIAL, QEMU_CLEAR and QEMU_TEST.
 
-So, you mean patch #11 and #12 should be squashed together. Is that right?
+The following changes are not backward compatible:
 
-> 
->>          error_setg(errp,
->>              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
->>              " APIC ID %" PRIu32 ", valid index range 0:%d",
->> @@ -1609,7 +1609,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->>      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
->>       * once -smp refactoring is complete and there will be CPU private
->>       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
->> -    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
->> +    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
->>      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
->>          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
->>              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
->> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
->> index 15b7815bb0..d46dd4ad9e 100644
->> --- a/hw/i386/x86.c
->> +++ b/hw/i386/x86.c
->> @@ -86,7 +86,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
->>  
->>      init_topo_info(&topo_info, x86ms);
->>  
->> -    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
->> +    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
->>      if (x86mc->compat_apic_id_mode) {
->>          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
->>              error_report("APIC IDs set in compatibility mode, "
->> @@ -158,8 +158,8 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
->>     init_topo_info(&topo_info, x86ms);
->>  
->>     assert(idx < ms->possible_cpus->len);
->> -   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
->> -                            &topo_info, &topo_ids);
->> +   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
->> +                               &topo_info, &topo_ids);
->>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
->>  }
->>  
->> @@ -179,6 +179,9 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->>          return ms->possible_cpus;
->>      }
->>  
->> +    /* Initialize apicid handlers */
->> +    cpu_x86_init_apicid_fns(ms);
->> +
->>      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
->>                                    sizeof(CPUArchId) * max_cpus);
->>      ms->possible_cpus->len = max_cpus;
->> @@ -192,7 +195,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->>          ms->possible_cpus->cpus[i].vcpus_count = 1;
->>          ms->possible_cpus->cpus[i].arch_id =
->>              x86_cpu_apic_id_from_index(x86ms, i);
->> -        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
->> +        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
->>                                   &topo_info, &topo_ids);
-> 
-> not aligned properly
-> 
->>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
->>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
->>
-> 
+* Option '--persistent' no longer requires/accepts an argument.
+* Option '--credential' no longer requires/accepts an argument.
+* Option '--systemd' no longer requires/accepts an argument.
+* Option '--qemu-path' is renamed to '--path'.
+* Option '--qemu-suffix' is renamed to '--suffix'.
+
+The functionality of all of them is untouched. Changes are related to syntax only.
+
+v10
+
+* Split style related commit
+
+v9
+
+* Make style coherent with the dominant pattern
+
+v8:
+
+* Fix typos and address review comments
+
+v7:
+
+* Check that a interpreter exists before trying to remove it.
+
+v6:
+
+* Don't need to use "find".
+* Put the ";;" at the same position.
+* Set BINFMT_CLEAR to ':', to allow --test to work with --clear.
+* Do not show DEBIANDIR and SYSTEMDDIR in the Env-variable column.
+
+Based on:
+
+* [PATCH v5 0/10] qemu-binfmt-conf.sh
+   * should have been [PATCH v5 0/9] qemu-binfmt-conf.sh
+* [PATCH v4 0/10] qemu-binfmt-conf.sh
+* [PATCH v3 0/10] qemu-binfmt-conf.sh
+* [PATCH v2] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boolean (no arg)
+* [PATCH] qemu-binfmt-conf.sh: add CPUS, add --reset, make -p and -c boolean (no arg)
+* scripts/qemu-binfmt-conf.sh: allow clearing of entries
+
+Regards
+
+Unai Martinez-Corral (10):
+      qemu-binfmt-conf.sh: enforce style consistency
+      qemu-binfmt-conf.sh: enforce safe tests
+      qemu-binfmt-conf.sh: make opts -p and -c boolean
+      qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and QEMU_PERSISTENT
+      qemu-binfmt-conf.sh: use the same presentation format as for qemu-*
+      qemu-binfmt-conf.sh: remove 'qemu' prefix from cli options
+      qemu-binfmt-conf.sh: honour QEMU_PATH and/or QEMU_SUFFIX
+      qemu-binfmt-conf.sh: generalize <CPU> to positional TARGETS
+      qemu-binfmt-conf.sh: add option --clear
+      qemu-binfmt-conf.sh: add --test
+
+scripts/qemu-binfmt-conf.sh | 221
+1 file changed, 138 insertions(+), 83 deletions(-i)
 
