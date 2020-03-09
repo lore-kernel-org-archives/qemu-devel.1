@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE44CC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DE4C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB1F5208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BDE8208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TGoLeNuE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1F5208C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZUTzOf8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BDE8208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKh9-0004SP-Pc
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40454)
+	id 1jBKhS-0004kD-5u
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:52:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZw-00025V-Ov
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:30 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZt-0001v3-38
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZv-0001Ts-3b
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:28 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35210)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZp-0001R3-Ua
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:24 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36925)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBKZu-0001T5-Sl
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:27 -0400
-Received: by mail-wm1-x341.google.com with SMTP id m3so18490wmi.0
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:26 -0700 (PDT)
+ id 1jBKZp-0001Qc-M2
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:21 -0400
+Received: by mail-wr1-x436.google.com with SMTP id 6so11824491wre.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AtxEKrKRqNjfOrT9JbNHlMjgTudjr9VoMdnqfaiOYHo=;
- b=TGoLeNuEJ/TkzEEkucpSjmr87po1trVzN4R2j50DSb4Hru8kMGvalx697qakamPQd2
- 5FXyUw8LXPqyjzsOMN+bpgQFLz5X4Shs+OXR5h/d4ORCyw3m5OJnSb/20blOUZGg+OAd
- J4EYKcgkjP69lvVpZbYGy77oKP1PZFv8Twroi8q8E/iK3KY90ND1PsSq1DQu1ih0Khv2
- 6rNW5xpmyrOg9trLjm2fQBJKc25b5ZZ4QcE8NtB2C17KrIcn4mvxZ/ANb/44mlJZptx6
- 2Xq9S22CuvZjQQQzekwsF7bIAc4oZjGfhwQKZblYsQIZqHd+mQG9NoTuTPxIJMeqnOE4
- bGPw==
+ bh=E/C3ETynTNluvhCBM4gicRKFu80GsFl4sti73t961ws=;
+ b=rZUTzOf8jSUjlLqYMgZ7Ywsb5zA6vtHfxdbEbSbyBtTqIuHTnbvwdWKbS3DMgxBUYw
+ shXGLV7wFrWeW2jkRt7BG2mWoVmWsqiLEvw+eJlU+A5FFTIuxvqJXJ2pSsMWd/9Ks5nj
+ 15zt9YVWn7ccxQ4+64v/uVrvTPHi61Dn31r0Z/v5kFAyrQHNm0kdV8BySHPbOQWd+b0t
+ pCdPO2C60uLboTUsx86zyPjFYcdKGEMczgbgvtgqhqiTZdBFaTTpiGV/h3kI9GY8/aje
+ ZzNVLn8AAX5DWYB93bat8zIaJu3KSZrrI4gbauQtLmhk2+1g125fGAEmdibMzDXJVUV5
+ dmlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AtxEKrKRqNjfOrT9JbNHlMjgTudjr9VoMdnqfaiOYHo=;
- b=ZtDEbGqrXB6il6Gz5N2NOKUByxOv24I/42t4c5VGWMVnq754zOQItcWtEvTgJSw52S
- KKfWEVp82B0lUP6pNRyF6WQerlNQ0gZC2/JH0jXDG79ba02iRNMmH7ctyJAk/oJS2XJV
- ZxdBaNi3R/GgpF/8Hq/k+HnRw6njRoeSv0lt3vLMxiTxOAZCbXnLwQ760D7aB0XkKxns
- APAKI8y1hLevssUfQiLEIHP5WczW8ezTih5OobL1tnOg2zWh33yYIOswVZPyFRen2mwv
- nIv74wz5oSi4YD6bFAN6XmOqKDgepKIbvxsV1cAfiSqDC3fCsy+EZVi23AEa7eZsLy2t
- BAQA==
-X-Gm-Message-State: ANhLgQ1FPEl+AWhTDBYwMo/Nb98rMw63HQ3yaWSF/c1PVgAtgYJU1Uuu
- obbkWqRSmi0TnqGf8akIZXZPTN39gOQ4dg==
-X-Google-Smtp-Source: ADFU+vuGhX+RwyBU5IWua38XiGPf4N2victvAnVK+6ufOjq79v0h38BjQfQ0PIHfc32OgHXXDRsZsw==
-X-Received: by 2002:a05:600c:22cd:: with SMTP id
- 13mr13157162wmg.186.1583768665188; 
- Mon, 09 Mar 2020 08:44:25 -0700 (PDT)
+ bh=E/C3ETynTNluvhCBM4gicRKFu80GsFl4sti73t961ws=;
+ b=Yvk00+BDmfOsQcKJ9fbHMJWzGe273lEBNowgxYzFzVa+sjBRhMYj2L+8D7ApmgwwwF
+ qb1N7Ib8u8eo4UpebNJTMwUSkSY0N3lz40akbPJOjbA3vOToxJeQd1C85u6eegyUhAz/
+ yPC+iOLxEOFQi2+OI5wRAeeYuGo9NtnTWtNPiKslOvnaysQ5zwgp2mGEMaEJbUab6lGi
+ m9jO/GPZnDMgAnsbeqdpAiCfmZVXMKbaFUkdq8vtXY185O1zoSrK6q06UOS+TfL4v6Qu
+ N8YViqUUXJzVWUjHt3Kw0/HaoDlKS8Xnuom5/LntTaSmBMzIcsJDtVJc9wdZNOaiLUJs
+ F9KA==
+X-Gm-Message-State: ANhLgQ3AzRY1IjHKicspkp5oQlSWgtxsWYe410TO2m+Uj+jP8buV0HOE
+ kGXCTQIfPaKU2N4GFZpQaRJcy2Osz6x9ZA==
+X-Google-Smtp-Source: ADFU+vv+KgM0RObT801fxNHKmb2YnGmEXRVoL+FLq7ihp653yMR+oqoHcyuCgn2duc5tv32gWa/JKg==
+X-Received: by 2002:a05:6000:185:: with SMTP id
+ p5mr4832401wrx.155.1583768659994; 
+ Mon, 09 Mar 2020 08:44:19 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.23
+ by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 08:44:24 -0700 (PDT)
+ Mon, 09 Mar 2020 08:44:19 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/18] docs/devel/qapi-code-gen.txt: Update to new rST
- backend conventions
-Date: Mon,  9 Mar 2020 15:44:00 +0000
-Message-Id: <20200309154405.13548-14-peter.maydell@linaro.org>
+Subject: [PATCH v4 09/18] docs/interop: Convert qemu-qmp-ref to rST
+Date: Mon,  9 Mar 2020 15:43:56 +0000
+Message-Id: <20200309154405.13548-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,171 +101,283 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the documentation of QAPI document comment syntax to match
-the new rST backend requirements. The principal changes are:
- * whitespace is now significant, and multiline definitions
-   must have their second and subsequent lines indented to
-   match the first line
- * general rST format markup is permitted, not just the small
-   set of markup the old texinfo generator handled. For most
-   things (notably bulleted and itemized lists) the old format
-   is the same as rST was.
- * Specific things that might trip people up:
-   - instead of *bold* and _italic_ rST has **bold** and *italic*
-   - lists need a preceding and following blank line
-   - a lone literal '*' will need to be backslash-escaped to
-     avoid a rST syntax error
- * the old leading '|' for example (literal text) blocks is
-   replaced by the standard rST '::' literal block.
- * headings and subheadings must now be in a freeform
-   documentation comment of their own
- * we support arbitrary levels of sub- and sub-sub-heading, not
-   just a main and sub-heading like the old texinfo generator
+Convert qemu-qmp-ref to rST format. This includes dropping
+the plain-text, pdf and info format outputs for this document;
+as with all our other Sphinx-based documentation, we provide
+HTML and manpage only.
+
+The qemu-qmp-ref.rst is somewhat more stripped down than
+the .texi was, because we do not (currently) attempt to
+generate indexes for the commands, events and data types
+being documented.
+
+Again, we drop the direct link from index.html.in now that
+the QMP ref is part of the interop manual.
+
+This commit removes the 'info', 'txt' and 'pdf' Makefile
+targets, because we no longer generate any documentation
+except for the Sphinx HTML manuals and the manpages.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/devel/qapi-code-gen.txt | 90 ++++++++++++++++++++++++------------
- 1 file changed, 61 insertions(+), 29 deletions(-)
+ Makefile                       | 39 ++++-------------
+ docs/index.html.in             |  1 -
+ docs/interop/conf.py           |  2 +
+ docs/interop/index.rst         |  1 +
+ docs/interop/qemu-qmp-ref.rst  |  4 ++
+ docs/interop/qemu-qmp-ref.texi | 80 ----------------------------------
+ 6 files changed, 16 insertions(+), 111 deletions(-)
+ create mode 100644 docs/interop/qemu-qmp-ref.rst
+ delete mode 100644 docs/interop/qemu-qmp-ref.texi
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 59d6973e1ec..688eb2a0237 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -795,21 +795,39 @@ See below for more on definition documentation.
- Free-form documentation may be used to provide additional text and
- structuring content.
+diff --git a/Makefile b/Makefile
+index 14780878fad..6dcc39efcee 100644
+--- a/Makefile
++++ b/Makefile
+@@ -126,7 +126,6 @@ GENERATED_QAPI_FILES += qapi/qapi-events.h qapi/qapi-events.c
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-events-%.h)
+ GENERATED_QAPI_FILES += $(QAPI_MODULES:%=qapi/qapi-events-%.c)
+ GENERATED_QAPI_FILES += qapi/qapi-introspect.c qapi/qapi-introspect.h
+-GENERATED_QAPI_FILES += qapi/qapi-doc.texi
  
-+==== Headings and subheadings ====
-+
-+A free-form documentation comment containing a single line
-+which starts with some '=' symbols and then a space defines
-+a section heading:
-+
-+    ##
-+    # = This is a top level heading
-+    ##
-+
-+    ##
-+    # This is a free-form comment which will go under the
-+    # top level heading.
-+    ##
-+
-+    ##
-+    # == This is a second level heading
-+    ##
-+
-+Section headings must always be correctly nested, so you can only
-+define a third-level heading inside a second-level heading, and so
-+on. The documentation generator will catch nesting mistakes and report
-+a syntax error.
+ generated-files-y += $(GENERATED_QAPI_FILES)
  
- ==== Documentation markup ====
+@@ -352,7 +351,6 @@ ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+ DOCS+=$(MANUAL_BUILDDIR)/tools/virtiofsd.1
+ endif
+ DOCS+=$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+-DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=$(MANUAL_BUILDDIR)/interop/qemu-ga-ref.7
+ DOCS+=$(MANUAL_BUILDDIR)/system/qemu-cpu-models.7
+ DOCS+=$(MANUAL_BUILDDIR)/index.html
+@@ -628,8 +626,7 @@ $(SRC_PATH)/scripts/qapi-gen.py
+ qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+ qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
+ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
+-qga/qapi-generated/qga-qapi-init-commands.h qga/qapi-generated/qga-qapi-init-commands.c \
+-qga/qapi-generated/qga-qapi-doc.texi: \
++qga/qapi-generated/qga-qapi-init-commands.h qga/qapi-generated/qga-qapi-init-commands.c: \
+ qga/qapi-generated/qapi-gen-timestamp ;
+ qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+ 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+@@ -771,11 +768,6 @@ distclean: clean
+ 	rm -f config.log
+ 	rm -f linux-headers/asm
+ 	rm -f docs/version.texi
+-	rm -f docs/interop/qemu-qmp-qapi.texi
+-	rm -f docs/interop/qemu-qmp-ref.7
+-	rm -f docs/interop/qemu-qmp-ref.txt
+-	rm -f docs/interop/qemu-qmp-ref.pdf
+-	rm -f docs/interop/qemu-qmp-ref.html
+ 	rm -rf .doctrees
+ 	$(call clean-manual,devel)
+ 	$(call clean-manual,interop)
+@@ -830,7 +822,7 @@ endif
+ # and also any sphinx-built manpages.
+ define install-manual =
+ for d in $$(cd $(MANUAL_BUILDDIR) && find $1 -type d); do $(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/$$d"; done
+-for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' '(' -name '*.[0-9]' -o -name 'qemu-*-qapi.*' -o -name 'qemu-qmp-ref.*' ')' ); do $(INSTALL_DATA) "$(MANUAL_BUILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
++for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' -name '*.[0-9]'); do $(INSTALL_DATA) "$(MANUAL_BUILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
+ endef
  
--Comment text starting with '=' is a section title:
-+Documentation comments can use most rST markup. In particular,
-+a '::' literal block can be used for examples:
+ # Note that we deliberately do not install the "devel" manual: it is
+@@ -846,13 +838,11 @@ install-sphinxdocs: sphinxdocs
+ install-doc: $(DOCS) install-sphinxdocs
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.txt "$(DESTDIR)$(qemu_docdir)"
+ ifdef CONFIG_POSIX
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu.1 "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
+-	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
++	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
+ ifeq ($(CONFIG_TOOLS),y)
+@@ -1058,7 +1048,7 @@ endef
+ $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+ 	$(call build-manual,devel,html)
  
--    # = Section title
+-$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop) $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
++$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop) $(SRC_PATH)/qga/qapi-schema.json $(qapi-modules) $(qapi-py)
+ 	$(call build-manual,interop,html)
+ 
+ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+@@ -1074,9 +1064,9 @@ $(MANUAL_BUILDDIR)/user/index.html: $(call manual-deps,user)
+ 	$(call build-manual,user,html)
+ 
+ $(call define-manpage-rule,interop,\
+-       qemu-ga.8 qemu-ga-ref.7,\
++       qemu-ga.8 qemu-ga-ref.7 qemu-qmp-ref.7,\
+        $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/qga/qapi-schema.json \
+-       $(qapi-py))
++       $(qapi-modules) $(qapi-py))
+ 
+ $(call define-manpage-rule,system,qemu.1 qemu-block-drivers.7 qemu-cpu-models.7)
+ 
+@@ -1090,18 +1080,7 @@ $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+ 	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+              "GEN","$@")
+ 
+-docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
+-	@cp -p $< $@
 -
--Double the '=' for a subsection title:
+-html: docs/interop/qemu-qmp-ref.html sphinxdocs
+-info: docs/interop/qemu-qmp-ref.info
+-pdf: docs/interop/qemu-qmp-ref.pdf
+-txt: docs/interop/qemu-qmp-ref.txt
 -
--    # == Subsection title
--
--'|' denotes examples:
--
--    # | Text of the example, may span
--    # | multiple lines
-+    # ::
-+    #
-+    #   Text of the example, may span
-+    #   multiple lines
+-docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
+-    docs/interop/qemu-qmp-ref.info docs/interop/qemu-qmp-ref.pdf \
+-    docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7: \
+-	docs/interop/qemu-qmp-ref.texi docs/interop/qemu-qmp-qapi.texi
++html: sphinxdocs
  
- '*' starts an itemized list:
+ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
  
-@@ -825,37 +843,35 @@ A decimal number followed by '.' starts a numbered list:
-     #    multiple lines
-     # 2. Second item
- 
--The actual number doesn't matter.  You could even use '*' instead of
--'2.' for the second item.
-+The actual number doesn't matter.
- 
--Lists can't be nested.  Blank lines are currently not supported within
--lists.
-+Lists of either kind must be preceded and followed by a blank line.
-+If a list item's text spans multiple lines, then the second and
-+subsequent lines must be correctly indented to line up with the
-+first character of the first line.
- 
--Additional whitespace between the initial '#' and the comment text is
--permitted.
--
--*foo* and _foo_ are for strong and emphasis styles respectively (they
--do not work over multiple lines).  @foo is used to reference a name in
--the schema.
-+The usual '**strong**', '*emphasised*' and '``literal``' markup should
-+be used. If you need a single literal '*' you will need to backslash-escape it.
-+As an extension beyond the usual rST syntax, you can also
-+use '@foo' to reference a name in the schema; this is rendered
-+the same way as '``foo``'.
- 
- Example:
- 
- ##
--# = Section
--# == Subsection
--#
--# Some text foo with *strong* and _emphasis_
-+# Some text foo with **bol** and *emphasis*
- # 1. with a list
- # 2. like that
- #
- # And some code:
--# | $ echo foo
--# | -> do this
--# | <- get that
- #
-+# ::
-+#
-+#   $ echo foo
-+#   -> do this
-+#   <- get that
- ##
- 
--
- ==== Definition documentation ====
- 
- Definition documentation, if present, must immediately precede the
-@@ -870,6 +886,12 @@ commands and events), member (for structs and unions), branch (for
- alternates), or value (for enums), and finally optional tagged
- sections.
- 
-+Descriptions of arguments can span multiple lines; if they
-+do then the second and subsequent lines must be indented
-+to line up with the first character of the first line of the
-+description. The parser will report a syntax error if there
-+is insufficient indentation.
+@@ -1225,8 +1204,8 @@ endif
+ 	@echo  '  vm-help         - Help about targets running tests inside VM'
+ 	@echo  ''
+ 	@echo  'Documentation targets:'
+-	@echo  '  html info pdf txt'
+-	@echo  '                  - Build documentation in specified format'
++	@echo  '  html'
++	@echo  '                  - Build HTML documentation'
+ ifdef CONFIG_GCOV
+ 	@echo  '  coverage-report - Create code coverage report'
+ endif
+diff --git a/docs/index.html.in b/docs/index.html.in
+index f180770b052..b3dfb7a4611 100644
+--- a/docs/index.html.in
++++ b/docs/index.html.in
+@@ -12,7 +12,6 @@
+             <li><a href="tools/index.html">Tools Guide</a></li>
+             <li><a href="interop/index.html">System Emulation Management and Interoperability Guide</a></li>
+             <li><a href="specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+-            <li><a href="qemu-qmp-ref.html">QMP Reference Manual</a></li>
+         </ul>
+     </body>
+ </html>
+diff --git a/docs/interop/conf.py b/docs/interop/conf.py
+index e83632e0108..43de386d33d 100644
+--- a/docs/interop/conf.py
++++ b/docs/interop/conf.py
+@@ -21,4 +21,6 @@ man_pages = [
+      ['Michael Roth <mdroth@linux.vnet.ibm.com>'], 8),
+     ('qemu-ga-ref', 'qemu-ga-ref', u'QEMU Guest Agent Protocol Reference',
+      [], 7),
++    ('qemu-qmp-ref', 'qemu-qmp-ref', u'QEMU QMP Reference Manual',
++     [], 7),
+ ]
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+index f3af38dce17..2cd97c6ff42 100644
+--- a/docs/interop/index.rst
++++ b/docs/interop/index.rst
+@@ -19,5 +19,6 @@ Contents:
+    pr-helper
+    qemu-ga
+    qemu-ga-ref
++   qemu-qmp-ref
+    vhost-user
+    vhost-user-gpu
+diff --git a/docs/interop/qemu-qmp-ref.rst b/docs/interop/qemu-qmp-ref.rst
+new file mode 100644
+index 00000000000..e640903abaf
+--- /dev/null
++++ b/docs/interop/qemu-qmp-ref.rst
+@@ -0,0 +1,4 @@
++QEMU QMP Reference Manual
++=========================
 +
- FIXME: the parser accepts these things in almost any order.
- FIXME: union branches should be described, too.
- 
-@@ -883,6 +905,16 @@ The section ends with the start of a new section.
- A 'Since: x.y.z' tagged section lists the release that introduced the
- definition.
- 
-+The text of a section can start on a new line, in
-+which case it must not be indented at all. It can also start
-+on the same line as the 'Note:', 'Returns:', etc tag. In this
-+case if it spans multiple lines then second and subsequent
-+lines must be indented to match the first.
-+
-+An 'Example' or 'Examples' section is automatically rendered
-+entirely as literal fixed-width text. In other sections,
-+the text is formatted, and rST markup can be used.
-+
- For example:
- 
- ##
++.. qapi-doc:: qapi/qapi-schema.json
+diff --git a/docs/interop/qemu-qmp-ref.texi b/docs/interop/qemu-qmp-ref.texi
+deleted file mode 100644
+index bb25758bd02..00000000000
+--- a/docs/interop/qemu-qmp-ref.texi
++++ /dev/null
+@@ -1,80 +0,0 @@
+-\input texinfo
+-@setfilename qemu-qmp-ref.info
+-
+-@include version.texi
+-
+-@exampleindent 0
+-@paragraphindent 0
+-
+-@settitle QEMU QMP Reference Manual
+-
+-@iftex
+-@center @image{docs/qemu_logo}
+-@end iftex
+-
+-@copying
+-This is the QEMU QMP reference manual.
+-
+-Copyright @copyright{} 2016 The QEMU Project developers
+-
+-@quotation
+-This manual is free documentation: you can redistribute it and/or
+-modify it under the terms of the GNU General Public License as
+-published by the Free Software Foundation, either version 2 of the
+-License, or (at your option) any later version.
+-
+-This manual is distributed in the hope that it will be useful, but
+-WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this manual.  If not, see http://www.gnu.org/licenses/.
+-@end quotation
+-@end copying
+-
+-@dircategory QEMU
+-@direntry
+-* QEMU-QMP-Ref: (qemu-qmp-ref). QEMU QMP Reference Manual
+-@end direntry
+-
+-@titlepage
+-@title QMP Reference Manual
+-@subtitle QEMU version @value{VERSION}
+-@page
+-@vskip 0pt plus 1filll
+-@insertcopying
+-@end titlepage
+-
+-@contents
+-
+-@ifnottex
+-@node Top
+-@top QEMU QMP reference
+-@end ifnottex
+-
+-@menu
+-* API Reference::
+-* Commands and Events Index::
+-* Data Types Index::
+-@end menu
+-
+-@node API Reference
+-@chapter API Reference
+-
+-@c for texi2pod:
+-@c man begin DESCRIPTION
+-
+-@include qemu-qmp-qapi.texi
+-
+-@c man end
+-
+-@node Commands and Events Index
+-@unnumbered Commands and Events Index
+-@printindex fn
+-
+-@node Data Types Index
+-@unnumbered Data Types Index
+-@printindex tp
+-
+-@bye
 -- 
 2.20.1
 
