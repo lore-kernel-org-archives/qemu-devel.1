@@ -2,60 +2,82 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F10ECC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E04EC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1B6820727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:22:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B6820727
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 494F320727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 09:23:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ccjbiq+L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 494F320727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBEcK-0001YJ-SY
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:22:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56067)
+	id 1jBEdI-0002mO-E5
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 05:23:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBEb8-0008Aq-Om
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBEbY-0000RC-8N
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBEb7-000270-NH
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:18 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:55211)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jBEb7-00025B-CO; Mon, 09 Mar 2020 05:21:17 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07504124|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_alarm|0.0122184-0.000164815-0.987617;
- FP=13170635624411961626|2|1|9|0|-1|-1|-1; HT=e01a16384;
- MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=11; RT=11; SR=0;
- TI=SMTPD_---.GyVpCil_1583745606; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GyVpCil_1583745606)
- by smtp.aliyun-inc.com(10.147.41.121);
- Mon, 09 Mar 2020 17:21:06 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v3 02/60] target/riscv: implementation-defined constant
- parameters
-Date: Mon,  9 Mar 2020 17:19:06 +0800
-Message-Id: <20200309092004.13335-3-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200309092004.13335-1-zhiwei_liu@c-sky.com>
-References: <20200309092004.13335-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBEbX-0002Ga-2B
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:43 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38586)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBEbW-0002GH-RQ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 05:21:43 -0400
+Received: by mail-ot1-x344.google.com with SMTP id i14so8863331otp.5
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 02:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=AHAHIhwFKs2k8PQfvg9sekLc+EdY0MRJArKE4TiyhMk=;
+ b=ccjbiq+L6VUbhQPKNgIh3Dg2VtniXMnxS2HZVafcLPfQ/ztgcqlBCkLN/Jb/GewEB5
+ 1vRtrWGCSz+IJjm0WbjF+iLtl7LKQr8A0Fesc5QjAzROhhoxJEbNYwOtWpC/WH85P25H
+ qL9Voa+K4NjS8RntX9Vh6dMl5Qw0Ias7y3m8aJVqsyepfVpqiH5wRJCDWXtN6ISvRiB/
+ N6Mb172vTz5QsgfPwbJ7ZNXoSStJfyt2B9nDSmf41z9fqBJXGCTEVqOcUH4m+OwNB+t2
+ yLXanybggdzECxrjB+ODch+MlIt+bmO8glZJBC9f8bs6tfChml9zc9ThI4UvmU45/fgD
+ U7vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AHAHIhwFKs2k8PQfvg9sekLc+EdY0MRJArKE4TiyhMk=;
+ b=ZL1jSDLCUcigDVyNJ8/wqbL1m6kkYicJFilxBlH45f0NFq0/+jPPHEIKs75VM0kS3T
+ EXLVFlXQbUWwNS7L1DWkYEWk2Aukq6DafMvLNFcCpLFMSfTtwourSZjxgv4OUMjaLu/1
+ s8vwyTsQan2tuDJFiGFSfixZDXD4bKCHIXXx198D93MfrvgOy7OMztJ80NODNRjy93pf
+ NtW/czddpz9c7+oZc224CkNo+BXRv8SJTiE/1t5eaD4N/rGz3ExjywFSW7KsQ3ZCyeFN
+ ldnC8PYkrPb59R+R5pb4XGnb+j8sNVJgfmrHJXkcx1FzCAARdavfBBAxsrzEy4MytuYI
+ MzHg==
+X-Gm-Message-State: ANhLgQ1ZE+tPY/goiLVwjoSpck09/xd/ltQX4fVrpLaKdlhvturAtTTh
+ s5HFwQC89MOhT7ha3BoswnUbUlBGZsy+3VlLdOvWGw==
+X-Google-Smtp-Source: ADFU+vso+6lDlFwhsMcwMjSQc8EZY/JEfefYfwNk9Lz6HyEpUXtUZB9r3EabCofvyoBclHw3FryNZmzpESCUyUNArTg=
+X-Received: by 2002:a9d:76c9:: with SMTP id p9mr12300099otl.135.1583745701474; 
+ Mon, 09 Mar 2020 02:21:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+In-Reply-To: <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 09:21:30 +0000
+Message-ID: <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,88 +89,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Euler Robot <euler.robot@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vlen is the vector register length in bits.
-elen is the max element size in bits.
-vext_spec is the vector specification version, default value is v0.7.1.
+On Mon, 9 Mar 2020 at 00:56, Pan Nengyuan <pannengyuan@huawei.com> wrote:
+>
+>
+>
+> On 3/8/2020 9:29 PM, Peter Maydell wrote:
+> > On Thu, 5 Mar 2020 at 06:39, Pan Nengyuan <pannengyuan@huawei.com> wrote:
+> >> -    /* Init VIAs 1 and 2 */
+> >> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
+> >> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
+> >> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
+> >> +    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
+> >
+> > Rather than manually setting the parent bus, you can use
+> > sysbus_init_child_obj() instead of object_initialize_child() --
+> > it is a convenience function that does both object_initialize_child()
+> > and qdev_set_parent_bus() for you.
+>
+> Actually I used sysbus_init_child_obj() first, but it will fail to run device-introspect-test.
+> Because qdev_set_parent_bus() will change 'info qtree' after we call 'device-list-properties'.
+> Thus, I do it in the realize.
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/cpu.c | 7 +++++++
- target/riscv/cpu.h | 5 +++++
- 2 files changed, 12 insertions(+)
+Could you explain more? My thought is that we should be using
+sysbus_init_child_obj() and we should be doing it in the init method.
+Why does that break the tests ? It's the same thing various other
+devices do.
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index c0b7023100..6e4135583d 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -106,6 +106,11 @@ static void set_priv_version(CPURISCVState *env, int priv_ver)
-     env->priv_ver = priv_ver;
- }
- 
-+static void set_vext_version(CPURISCVState *env, int vext_ver)
-+{
-+    env->vext_ver = vext_ver;
-+}
-+
- static void set_feature(CPURISCVState *env, int feature)
- {
-     env->features |= (1ULL << feature);
-@@ -364,6 +369,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     CPURISCVState *env = &cpu->env;
-     RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
-     int priv_version = PRIV_VERSION_1_11_0;
-+    int vext_version = VEXT_VERSION_0_07_1;
-     target_ulong target_misa = 0;
-     Error *local_err = NULL;
- 
-@@ -389,6 +395,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     }
- 
-     set_priv_version(env, priv_version);
-+    set_vext_version(env, vext_version);
-     set_resetvec(env, DEFAULT_RSTVEC);
- 
-     if (cpu->cfg.mmu) {
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 0c1f7bdd8b..603715f849 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -84,6 +84,8 @@ enum {
- #define PRIV_VERSION_1_10_0 0x00011000
- #define PRIV_VERSION_1_11_0 0x00011100
- 
-+#define VEXT_VERSION_0_07_1 0x00000701
-+
- #define TRANSLATE_PMP_FAIL 2
- #define TRANSLATE_FAIL 1
- #define TRANSLATE_SUCCESS 0
-@@ -119,6 +121,7 @@ struct CPURISCVState {
-     target_ulong guest_phys_fault_addr;
- 
-     target_ulong priv_ver;
-+    target_ulong vext_ver;
-     target_ulong misa;
-     target_ulong misa_mask;
- 
-@@ -281,6 +284,8 @@ typedef struct RISCVCPU {
- 
-         char *priv_spec;
-         char *user_spec;
-+        uint16_t vlen;
-+        uint16_t elen;
-         bool mmu;
-         bool pmp;
-     } cfg;
--- 
-2.23.0
-
+thanks
+-- PMM
 
