@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C01DC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 670CBC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 541482067C
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:26:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 541482067C
+	by mail.kernel.org (Postfix) with ESMTPS id 3F49C2067C
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:26:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F49C2067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44879 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKId-0006Vg-Ib
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:26:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33466)
+	id 1jBKIy-0007N3-CG
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:26:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2Y-00083g-KT
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:59 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK39-0000eZ-ML
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2X-0007lE-Hz
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:58 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:33815)
+ (envelope-from <laurent@vivier.eu>) id 1jBK38-0008EA-L9
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:35 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:47881)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2U-0007iF-TR; Mon, 09 Mar 2020 11:09:55 -0400
+ id 1jBK2m-0007yk-Pi; Mon, 09 Mar 2020 11:10:14 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N0X4c-1jWGih02Fg-00wT7y; Mon, 09 Mar 2020 16:09:11 +0100
+ id 1Mzhax-1jXeIs1XM1-00veBL; Mon, 09 Mar 2020 16:08:59 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/33] hw/usb/dev-storage: Remove unused "ui/console.h" header
-Date: Mon,  9 Mar 2020 16:08:16 +0100
-Message-Id: <20200309150837.3193387-13-laurent@vivier.eu>
+Subject: [PULL 07/33] virtfs-proxy-helper: Make the helper_opts[] array const
+Date: Mon,  9 Mar 2020 16:08:11 +0100
+Message-Id: <20200309150837.3193387-8-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:cx4oEENfxr2esELXcSzclJo1ER6icxlnYhY9ZGi8Hz1d0GQw3/J
- V3O8tJqht91pGcTQkOnoKk2gaJ3MEQhwcCuCxma5dLH2fGpYBzuiIjAkk2djRj8xuvgKUK5
- FEtpQUeaqrZP1Kilxgjn5td/+H4RHB1hM1EYmBjG20ped+UMXbcq8XRLava2nvAqORnu9qD
- tjzauQTLhL51KPtlXORug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:neaUZy5AqdU=:ZxWR/fHhRlXmI8Ju/HKRUJ
- /8aRdKLbKre+x7HHGW2sq4nuiF8rwxXP+iAeJqpG7MU/qFRae00K8wDu07lxyGY3RgwYkhj1A
- J+A5yzcc6+CM59lShCT7gzckvbSEClR4XEdj3sf6rRWMEffEvIzpSbDUyRmX8KpDgP0awjUxu
- W29kueU4rEWxv9ydm+Uh01fW+DOt5m6QMYT9QhbpbxbVgg03Qe/qMyRBnKAbLGcLbDjEQsgQf
- k+F8hPsFkWzPlCiTU7yQq8ofB9Y3Akwq8ftyEySGE2QmbJMtOjUwVtgBl3bKpvtIBNClo1t86
- pWvtdhg6rKRiT+AgNuWwZFarmgqyBrEr9AC/OmUhm742hJ/kRw8ZqJOm4lGRrdiNgXp+2EsaM
- Uu4IsQX9o6Ps15JHrx/oNwuLhH763tEg7+R7UXOLxRg6HtS25EyyA4RUEnfae4aaD3Q5sEibW
- Nyy4EyaXY3UCsH8uSGgKZ4IFrIfqr9gcPWtoq46/oGZwGOFa8C9562S+26fp8QwlV4SbedHAH
- jp2Mg6CSy5mC3CeXRu5Hv+1vdO2BjnqM3gNgXPZ0DDq9XlzPCCIyL3IgA3TsNekcOTbcv/+vS
- urwoKZ0YtKaRyhR97XE/zUJt+uVur/UxIYLEIgJgPGnL+/xdvrjmGZz9ne2kCJfGZgbbvgNcN
- bJGVk73Rk/Hg6Z+VpiqOICixyNG+vNkrUxoEhYRsw2vO7m6KSiYYpphSgAFxLBj4h+Ua3bOIw
- Me8CVhqYmc2c/vDYdTmL1kXNVxRg93J6Hr2M/ITzFGYiQXhdsJWcT6k0/P35AKjfq4TLjz/Bs
- FYZWfBsBPRX0ZX8fJxyD5X7Nn3KRa4SppXZz9DNFibkODng+z2nO5j+sS6RDFNSyBbAw0XL
+X-Provags-ID: V03:K1:J0ElaOma/BrvYx5wmtzVLW2iD0CdbHsBWhXdnly3lXC/+3tUaSh
+ PDNcOP401aIpi92ruYia3szL0I1ky8SlEY7+g6MyJYTtROe+iO+sr98eXL8jA7dIHcV/mZc
+ O/fK5VV3+4tMDbqK/IDi4pFehQv4HXNnWu8b8QaJLgX2f1J5WMOLWHXtAgHh5R0MwEJoYdU
+ /ml8kexxfQBFrDBK4H3ZQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WFSktFvnpCA=:UyCBB0Kfxm+Xa0FW34RDDR
+ FdPZbFMKs8DR2oIqBnrndUmSNhPSP1q34Wh1yB1rExeIMkHFGSEl+EycJqkQTwphfgugMwEwO
+ kIUFW4/7eiraRV8UpI7U82Tu1Z9O5/bHePpMpYfZRF1yBAYYZj28A1XI+oItd4qLTdTTXpq6D
+ YN7yNF6q2W1ZTgIOUUQEAk2bTkLPPA9b5UjdDcSJgcOJFIDsre/cu9FAOSUUfnf6brJaK4SLR
+ yu/Q6oxUEKuNrjg68ZWQKeTClHYX2+BbfZGqFUSdvlbTOWZbQw9s0jRF5ENckp1zwrqqiv9Tz
+ oqnrclWPcy1kNhBanue7hHzXs2gaJI8lUmPoczmRe81MNVei2GjWHr8F0eciXsQmKyN7eFRin
+ fioKWt/s4sAAl4qOzSbZtGCg987eaRqEbOnRefEo6jF4o0HfaU9knh6iBFng1r8WQ6bbGgKey
+ fbBombimekyD4cPef7xbAc4JWSEL9irKuzIhVQmG7meXd+/07Ib2nPmu1NXNsLkCovj3VxvhO
+ 408m1cekIFZ81ZjTrU00i5GTWhjpkIVrEHdf3G83uX582Q5y5f5yBNiFt04NWwv6yTR8NlbRZ
+ NaPOVp8P9NmjwZWx3Bj7sE4ejSEGsqRWKUHxVHgDnJSqpyKW+4vfe2UQ73+QWGMGOjr+rI5Re
+ 92xik3YYztKO8s1CqznYPwAfvscXA+25eekCi356utVnH18SoSAgsrkoS0LUu+BlMm+7x3r4Q
+ BHNAkq1AnrGaeqxpl6GTpZdTrCTr73e9nxG2xu5Qo2dVPzqSaKxNjG4kn8h3A9y6TuICgFtrU
+ Fs5RznH8eq/FTdtRLxcs6eKVbYYRgFM7rc+Bgvt7bvK/ahov7c9pac9XgCDg97hotz1mUVT
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,9 +84,9 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
  qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>, Greg Kurz <groug@kaod.org>,
+ Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
@@ -100,31 +100,32 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The USB models related to storage don't need anything from
-"ui/console.h". Remove it.
+Reduce a bit the memory footprint by making the helper_opts[]
+array const.
 
-Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-6-philmd@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20200305010446.17029-4-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/usb/dev-storage.c | 1 -
- 1 file changed, 1 deletion(-)
+ fsdev/virtfs-proxy-helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 90da008df18c..4883c1d89e0c 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -17,7 +17,6 @@
- #include "desc.h"
- #include "hw/qdev-properties.h"
- #include "hw/scsi/scsi.h"
--#include "ui/console.h"
- #include "migration/vmstate.h"
- #include "monitor/monitor.h"
- #include "sysemu/sysemu.h"
+diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+index aa1ab2590d42..de061a8a0eaa 100644
+--- a/fsdev/virtfs-proxy-helper.c
++++ b/fsdev/virtfs-proxy-helper.c
+@@ -43,7 +43,7 @@
+ #define BTRFS_SUPER_MAGIC 0x9123683E
+ #endif
+ 
+-static struct option helper_opts[] = {
++static const struct option helper_opts[] = {
+     {"fd", required_argument, NULL, 'f'},
+     {"path", required_argument, NULL, 'p'},
+     {"nodaemon", no_argument, NULL, 'n'},
 -- 
 2.24.1
 
