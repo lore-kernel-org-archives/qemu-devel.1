@@ -2,50 +2,52 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E382C10DCE
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 02:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A4AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 02:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8ED420665
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 02:07:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8ED420665
+	by mail.kernel.org (Postfix) with ESMTPS id 2C7C020665
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 02:07:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C7C020665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jB7ou-0000D8-1U
-	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 22:07:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55319)
+	id 1jB7p2-0000P9-9q
+	for qemu-devel@archiver.kernel.org; Sun, 08 Mar 2020 22:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jB7np-0006xc-Ph
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 22:05:58 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jB7nq-0006yg-Pp
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 22:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jB7no-0004M5-PO
- for qemu-devel@nongnu.org; Sun, 08 Mar 2020 22:05:57 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:31603)
+ (envelope-from <balaton@eik.bme.hu>) id 1jB7np-0004MW-Iu
+ for qemu-devel@nongnu.org; Sun, 08 Mar 2020 22:05:58 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:38989)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jB7nl-0004Hn-Q1; Sun, 08 Mar 2020 22:05:53 -0400
+ id 1jB7nk-0004Hq-Gt; Sun, 08 Mar 2020 22:05:55 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 0CA9B7476D5;
+ by localhost (Postfix) with SMTP id 1A1A7747871;
  Mon,  9 Mar 2020 01:49:29 +0100 (CET)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 823457461AE; Mon,  9 Mar 2020 01:49:28 +0100 (CET)
-Message-Id: <cover.1583714522.git.balaton@eik.bme.hu>
+ id 85787746381; Mon,  9 Mar 2020 01:49:28 +0100 (CET)
+Message-Id: <f6df1b4a368e9653eaa4d44f799c26869ae84703.1583714522.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1583714522.git.balaton@eik.bme.hu>
+References: <cover.1583714522.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v2 0/2] Implement "non 100% native mode" in via-ide
+Subject: [PATCH v2 1/2] ide: Make room for flags in PCIIDEState and add one
+ for legacy IRQ routing
 Date: Mon, 09 Mar 2020 01:42:02 +0100
 To: qemu-devel@nongnu.org,
     qemu-block@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,39 +67,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This small series implements the quirky mode of via-ide found at least
-on pegasos2 which is needed for guests that expect this and activate
-work arounds on that platform and don't work unless this is emulated.
-(Symptom is missing IDE interrupts.) We need a flag to turn this mode
-on or off so the first patch repurposes the last remaining CMD646
-specific field in PCIIDEState to allow more flags and make room for
-the new legacy-irq flag there. (The CMD646 may need similar mode or
-something else may need more flags in the future.) Boards using CMD646
-and VIA IDE are updated for the above changes.
+We'll need a flag for implementing some device specific behaviour in
+via-ide but we already have a currently CMD646 specific field that can
+be repurposed for this and leave room for furhter flags if needed in
+the future. This patch changes the "secondary" field to "flags" and
+define the flags for CMD646 and via-ide and change CMD646 and its
+users accordingly.
 
-Tested with Linux and MorphOS on pegasos2 and a Gentoo live CD kernel
-for mips_fulong2e that's the only one I could find but being beta not
-sure if that fully works on real hardware. (The mips_fulong2e also
-seems to have problems with pci devices so to boot Linux you need
--net none -vga none and use serial console otherwise the kernel panics.)
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/alpha/dp264.c     |  2 +-
+ hw/ide/cmd646.c      | 12 ++++++------
+ hw/sparc64/sun4u.c   |  9 ++-------
+ include/hw/ide.h     |  4 ++--
+ include/hw/ide/pci.h |  7 ++++++-
+ 5 files changed, 17 insertions(+), 17 deletions(-)
 
-Regards,
-BALATON Zoltan
-
-BALATON Zoltan (2):
-  ide: Make room for flags in PCIIDEState and add one for legacy IRQ
-    routing
-  via-ide: Also emulate non 100% native mode
-
- hw/alpha/dp264.c        |  2 +-
- hw/ide/cmd646.c         | 12 ++++-----
- hw/ide/via.c            | 57 +++++++++++++++++++++++++++++++++++------
- hw/mips/mips_fulong2e.c |  2 +-
- hw/sparc64/sun4u.c      |  9 ++-----
- include/hw/ide.h        |  7 ++---
- include/hw/ide/pci.h    |  7 ++++-
- 7 files changed, 69 insertions(+), 27 deletions(-)
-
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index d28f57199f..9c90b9355b 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -102,7 +102,7 @@ static void clipper_init(MachineState *machine)
+         DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+         ide_drive_get(hd, ARRAY_SIZE(hd));
+ 
+-        pci_cmd646_ide_init(pci_bus, hd, 0);
++        pci_cmd646_ide_init(pci_bus, hd, -1, false);
+     }
+ 
+     /* Load PALcode.  Given that this is not "real" cpu palcode,
+diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+index 335c060673..0be650791f 100644
+--- a/hw/ide/cmd646.c
++++ b/hw/ide/cmd646.c
+@@ -256,7 +256,7 @@ static void pci_cmd646_ide_realize(PCIDevice *dev, Error **errp)
+     pci_conf[PCI_CLASS_PROG] = 0x8f;
+ 
+     pci_conf[CNTRL] = CNTRL_EN_CH0; // enable IDE0
+-    if (d->secondary) {
++    if (d->flags & BIT(PCI_IDE_SECONDARY)) {
+         /* XXX: if not enabled, really disable the seconday IDE controller */
+         pci_conf[CNTRL] |= CNTRL_EN_CH1; /* enable IDE1 */
+     }
+@@ -317,20 +317,20 @@ static void pci_cmd646_ide_exitfn(PCIDevice *dev)
+     }
+ }
+ 
+-void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
+-                         int secondary_ide_enabled)
++void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
++                         bool secondary_ide_enabled)
+ {
+     PCIDevice *dev;
+ 
+-    dev = pci_create(bus, -1, "cmd646-ide");
+-    qdev_prop_set_uint32(&dev->qdev, "secondary", secondary_ide_enabled);
++    dev = pci_create(bus, devfn, "cmd646-ide");
++    qdev_prop_set_bit(&dev->qdev, "secondary", secondary_ide_enabled);
+     qdev_init_nofail(&dev->qdev);
+ 
+     pci_ide_create_devs(dev, hd_table);
+ }
+ 
+ static Property cmd646_ide_properties[] = {
+-    DEFINE_PROP_UINT32("secondary", PCIIDEState, secondary, 0),
++    DEFINE_PROP_BIT("secondary", PCIIDEState, flags, PCI_IDE_SECONDARY, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index d33e84f831..fbe6790847 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -50,8 +50,7 @@
+ #include "hw/sparc/sparc64.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/sysbus.h"
+-#include "hw/ide.h"
+-#include "hw/ide/pci.h"
++#include "hw/ide/internal.h"
+ #include "hw/loader.h"
+ #include "hw/fw-path-provider.h"
+ #include "elf.h"
+@@ -664,11 +663,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     }
+ 
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+-
+-    pci_dev = pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
+-    qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
+-    qdev_init_nofail(&pci_dev->qdev);
+-    pci_ide_create_devs(pci_dev, hd);
++    pci_cmd646_ide_init(pci_busA, hd, PCI_DEVFN(3, 0), true);
+ 
+     /* Map NVRAM into I/O (ebus) space */
+     nvram = m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
+diff --git a/include/hw/ide.h b/include/hw/ide.h
+index 28d8a06439..d88c5ee695 100644
+--- a/include/hw/ide.h
++++ b/include/hw/ide.h
+@@ -12,8 +12,8 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
+                         DriveInfo *hd0, DriveInfo *hd1);
+ 
+ /* ide-pci.c */
+-void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
+-                         int secondary_ide_enabled);
++void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
++                         bool secondary_ide_enabled);
+ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index a9f2c33e68..21075edf16 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -40,6 +40,11 @@ typedef struct BMDMAState {
+ #define TYPE_PCI_IDE "pci-ide"
+ #define PCI_IDE(obj) OBJECT_CHECK(PCIIDEState, (obj), TYPE_PCI_IDE)
+ 
++enum {
++    PCI_IDE_SECONDARY, /* used only for cmd646 */
++    PCI_IDE_LEGACY_IRQ
++};
++
+ typedef struct PCIIDEState {
+     /*< private >*/
+     PCIDevice parent_obj;
+@@ -47,7 +52,7 @@ typedef struct PCIIDEState {
+ 
+     IDEBus bus[2];
+     BMDMAState bmdma[2];
+-    uint32_t secondary; /* used only for cmd646 */
++    uint32_t flags;
+     MemoryRegion bmdma_bar;
+     MemoryRegion cmd_bar[2];
+     MemoryRegion data_bar[2];
 -- 
 2.21.1
 
