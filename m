@@ -6,75 +6,76 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B5A5C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D57C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74E920848
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:20:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74E920848
+	by mail.kernel.org (Postfix) with ESMTPS id 1DD3E21655
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:21:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DD3E21655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBNwx-00072O-36
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:20:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49392)
+	id 1jBNyH-0001dK-BC
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:21:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNw0-0005j2-Hl
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:19:29 -0400
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNwV-0006cm-Em
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNvz-0007P2-5f
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:19:28 -0400
-Received: from smtp.lg.ehu.es ([158.227.0.66]:51905 helo=smtp.ehu.eus)
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jBNwT-00080l-83
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:19:59 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:40114 helo=smtp.ehu.eus)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
- id 1jBNvy-0007O2-TV
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:19:27 -0400
+ id 1jBNwS-00080H-SY
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:19:57 -0400
 Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
- by postfix.smtp2.imsva2 (Postfix) with ESMTPS id CDCF35F6F;
- Mon,  9 Mar 2020 20:19:25 +0100 (CET)
+ by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 8B7A55F6F;
+ Mon,  9 Mar 2020 20:19:54 +0100 (CET)
 Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A734A5A04F;
- Mon,  9 Mar 2020 20:19:25 +0100 (CET)
+ by IMSVA (Postfix) with ESMTP id 58D8C5A04F;
+ Mon,  9 Mar 2020 20:19:54 +0100 (CET)
 Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9BA365A045;
- Mon,  9 Mar 2020 20:19:25 +0100 (CET)
+ by IMSVA (Postfix) with ESMTP id 4DC165A045;
+ Mon,  9 Mar 2020 20:19:54 +0100 (CET)
 Received: from smtp.ehu.eus (unknown [10.0.100.76])
  by imsva2.lgp.ehu.es (Postfix) with ESMTPS;
- Mon,  9 Mar 2020 20:19:25 +0100 (CET)
+ Mon,  9 Mar 2020 20:19:54 +0100 (CET)
 Received: from 669c1c222ef4 (static.187.0.0.81.ibercom.com [81.0.0.187])
- by smtp2 (Postfix) with ESMTPSA id 588325F6F;
- Mon,  9 Mar 2020 20:19:25 +0100 (CET)
-Date: Mon, 9 Mar 2020 19:19:24 +0000
+ by smtp2 (Postfix) with ESMTPSA id 0CC3E5F6F;
+ Mon,  9 Mar 2020 20:19:54 +0100 (CET)
+Date: Mon, 9 Mar 2020 19:19:52 +0000
 From: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 02/10] qemu-binfmt-conf.sh: enforce safe tests
-Message-ID: <20200309191924.GB65@669c1c222ef4>
+Subject: [PATCH v10 03/10] qemu-binfmt-conf.sh: make opts -p and -c boolean
+Message-ID: <20200309191952.GC65@669c1c222ef4>
 References: <20200309191200.GA60@669c1c222ef4>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20200309191200.GA60@669c1c222ef4>
 X-Greylist: ACL 191 matched, not delayed by milter-greylist-4.6.2 (smtp2
- [10.0.100.76]); Mon, 09 Mar 2020 20:19:25 +0100 (CET)
+ [10.0.100.76]); Mon, 09 Mar 2020 20:19:54 +0100 (CET)
 X-TM-AS-GCONF: 00
 X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25280.002
-X-TM-AS-Result: No-0.253-7.0-31-10
-X-imss-scan-details: No-0.253-7.0-31-10
+X-TM-AS-Result: No--0.283-7.0-31-10
+X-imss-scan-details: No--0.283-7.0-31-10
 X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25280.002
-X-TMASE-Result: 10-0.252900-10.000000
-X-TMASE-MatchedRID: SUQ+NPRnbh2U2+gk9zFq8Wj+pATS/uaDab+ZPXqZNQIRGC0rW8q1XUhq
- QpzXZe40YNA0HZI8EiGPQi9XuOWoOA719kpOO37PlchF+IvkllOZ2scyRQcer0p12IXZajx5l5E
- fwglrgibcDDiLNFW0338mA3sDDq0A5MIx11wv+COujVRFkkVsm0r0NWqXwFtCiB5O0Sfffperyi
- 6SZSetV8cZ0J7yLqpqnjfVSwVbRsuIqhk2ZZ/hxF3P+KLVI//s3dLftEkjrnEl2KDtHVTYMlDwi
- PJ9vtHU1pHp569Iswjf5J+T5huzBH9c2E6+vBYDhCWCIvLE6iA=
+X-TMASE-Result: 10--0.282600-10.000000
+X-TMASE-MatchedRID: 5MYN72agt7osSx1KHZomlKS9pC14MC3C6qG5M9QNAO1CannV/b7f2cEI
+ kNzFiDxLvdz+hjQlBqVqAxBaFFZ85HTKrg3nLjv1A9lly13c/gGOz/LLJUcaHoXfDl+KHKjY2NR
+ c0Z/xVW0vrwXOPzQMJ1WGfFaWlqBcrSKKfw/QqNWK2+RZ4/fWST8ZO44VTPmzabJxhiIFjJnUA8
+ lgylnZvvJAhJwgr+u9bOUsBbIsdlNDq2SVEk72KAtuKBGekqUpnH7sbImOEBTvbOtfMFISHEyhV
+ JJbcQD9rGssu6wFGXlfwkikVgb9JUKEnWIqoXRFRprNGNVrK9X+pmStTY4u3qozBIzI0vGSNm++
+ YGJlAxNKU2XuQZXDAUznMHeShSu0p/GSAIsG8Of0jt4HSLaYh18I4oUq5Vga
 X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
 X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
  milter-greylist-4.6.2 (postfix.smtp2.imsva2 [10.0.100.76]);
- Mon, 09 Mar 2020 20:19:25 +0100 (CET)
+ Mon, 09 Mar 2020 20:19:54 +0100 (CET)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 158.227.0.66
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,54 +94,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All the tests are prefixed with 'x', in order to avoid risky comparisons
-(i.e. a user deliberately trying to provoke a syntax error).
+This patch breaks backward compatibility.
+
+Both '--persistent' and '--credential' default to 'no'. Hence, '-p no'
+or '-c no' are redundant. Overall, accepting an argument might be
+misleading because options are, indeed, boolean. This patch makes both
+options boolean in getopt, so if any of them is provided the corresponding
+variable is set to true.
 
 Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- scripts/qemu-binfmt-conf.sh | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ scripts/qemu-binfmt-conf.sh | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index c728443ba2..98401f4e7c 100755
+index 98401f4e7c..285ce528d1 100755
 --- a/scripts/qemu-binfmt-conf.sh
 +++ b/scripts/qemu-binfmt-conf.sh
-@@ -259,10 +259,10 @@ qemu_check_systemd() {
+@@ -172,8 +172,8 @@ qemu_get_family() {
+ usage() {
+     cat <<EOF
+ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+-                           [--help][--credential yes|no][--exportdir PATH]
+-                           [--persistent yes|no][--qemu-suffix SUFFIX]
++                           [--help][--credential][--exportdir PATH]
++                           [--persistent][--qemu-suffix SUFFIX]
  
- qemu_generate_register() {
-     flags=""
--    if [ "$CREDENTIAL" = "yes" ]; then
-+    if [ "x$CREDENTIAL" = "xyes" ]; then
-         flags="OC"
-     fi
--    if [ "$PERSISTENT" = "yes" ]; then
-+    if [ "x$PERSISTENT" = "xyes" ]; then
-         flags="${flags}F"
-     fi
+        Configure binfmt_misc to use qemu interpreter
  
-@@ -300,18 +300,18 @@ qemu_set_binfmts() {
-         mask=$(eval echo \$${cpu}_mask)
-         family=$(eval echo \$${cpu}_family)
+@@ -188,9 +188,9 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
+                       file for all known cpus
+        --exportdir:   define where to write configuration files
+                       (default: $SYSTEMDDIR or $DEBIANDIR)
+-       --credential:  if yes, credential and security tokens are
++       --credential:  if present, credential and security tokens are
+                       calculated according to the binary to interpret
+-       --persistent:  if yes, the interpreter is loaded when binfmt is
++       --persistent:  if present, the interpreter is loaded when binfmt is
+                       configured and remains in memory. All future uses
+                       are cloned from the open file.
  
--        if [ "$magic" = "" ] || [ "$mask" = "" ] || [ "$family" = "" ]; then
-+        if [ "x$magic" = "x" ] || [ "x$mask" = "x" ] || [ "x$family" = "x" ]; then
-             echo "INTERNAL ERROR: unknown cpu $cpu" 1>&2
-             continue
-         fi
+@@ -328,7 +328,7 @@ CREDENTIAL=no
+ PERSISTENT=no
+ QEMU_SUFFIX=""
  
-         qemu="$QEMU_PATH/qemu-$cpu"
--        if [ "$cpu" = "i486" ]; then
-+        if [ "x$cpu" = "xi486" ]; then
-             qemu="$QEMU_PATH/qemu-i386"
-         fi
+-options=$(getopt -o ds:Q:S:e:hc:p: -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,persistent: -- "$@")
++options=$(getopt -o ds:Q:S:e:hcp -l debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential,persistent -- "$@")
+ eval set -- "$options"
  
-         qemu="$qemu$QEMU_SUFFIX"
--        if [ "$host_family" != "$family" ]; then
-+        if [ "x$host_family" != "x$family" ]; then
-             $BINFMT_SET
-         fi
-     done
+ while true; do
+@@ -377,12 +377,10 @@ while true; do
+         exit 1
+         ;;
+     -c|--credential)
+-        shift
+-        CREDENTIAL="$1"
++        CREDENTIAL="yes"
+         ;;
+     -p|--persistent)
+-        shift
+-        PERSISTENT="$1"
++        PERSISTENT="yes"
+         ;;
+     *)
+         break
 -- 
 2.25.1
 
