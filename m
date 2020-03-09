@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 723F3C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0585EC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A1020578
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A1020578
+	by mail.kernel.org (Postfix) with ESMTPS id D0F1E20578
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:20:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F1E20578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKCt-0007Bx-Bo
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:20:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33683)
+	id 1jBKD1-0007TX-DC
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:20:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2j-0008Si-6s
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:10 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK2Q-0007gf-CJ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2i-0007vp-2S
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:09 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:35461)
+ (envelope-from <laurent@vivier.eu>) id 1jBK2P-0007f9-C7
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:42163)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2d-0007rk-IW; Mon, 09 Mar 2020 11:10:03 -0400
+ id 1jBK2L-0007bH-3U; Mon, 09 Mar 2020 11:09:45 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MEFnP-1j1jFw47PR-00AGA7; Mon, 09 Mar 2020 16:09:18 +0100
+ id 1MLA6m-1it6gQ1PvO-00ICtI; Mon, 09 Mar 2020 16:08:52 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/33] hw/alpha/dp264: Include "net/net.h"
-Date: Mon,  9 Mar 2020 16:08:19 +0100
-Message-Id: <20200309150837.3193387-16-laurent@vivier.eu>
+Subject: [PULL 04/33] hw/audio/fmopl: Fix a typo twice
+Date: Mon,  9 Mar 2020 16:08:08 +0100
+Message-Id: <20200309150837.3193387-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Qy8dcMwwtUXzYmqFBfNdLJNJpn0fDJ0i7xEZv3GBUnpNHUQO6fa
- 52H+Kjx0NGVYL1LrxPuw7Z5hA1A4vUqDTOc8MVi4WFiIs0chg9vgc8ZM04ZggWXzkxZyKoT
- ZSBVIKWfxb/6sKLoHQ5scQRqLEK7TH/BlY8NiwF/f8RNdMMd/ocTwmfGbMkfsr1dKcVGZiN
- 06JcC2P8NG+T7P4USm3GA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:B9T+aPOVI74=:0WogXzCK4G497PiKiGrCRN
- eK6zINIoGXrHkpUejdK1lvJdYmRVhyeqUw38ZtjviqOln/BG8o1aNTSHW982N7KMmhYyln7RP
- 4EEhZ1RUBgitaA4AA5QE2YzCJSuKzR2zonqwNF4KNE2s5rGh+gGglL1ixI5egPSwSNa1a0wNF
- l9Ohoiofm5ocW+JQVTCIVl6wUkUa1lickWvQC1UofTZ258ztoHxNBDfb8TYnn/s34gtHXOmhv
- vq9l9p8c+MLVvVZO0jkh/SXMByg0xjc/rpUl/Z2xE2DFM5i3/TJe5pNSi795Jj773nNwvBER7
- X3dZAQm4l1ZAOprBZCe0BwoE6NpaxCOkgU0jLYRFrosrUlmHSdS7fFUnGJ8EQidk6rMa3jybx
- 5AtFUlx6V1I1YrX2qzyzoIx74DM4EVljseBbvL7eu6ZFe4hFXc6KExpZRiUQzC5w1RvV7Ovwi
- 2SiLmcLiCP6c3ZpKUZKRVNv6j+Kf687cqaSsbTXfn1tWWHKBOSExIAG8tgNm95ET1DeZDd1QP
- 0z6SR+MxMaTmL9yMmbgfwtJ1UgJX4kijPsxnx7LSFb89+m7sQ2bjBkuZiyyH8Mues9lGQQ3GQ
- /rqJ/hdTwjNsa1O5O69DYgmzQhfHmec9ESY2JB2/53ITstzV8OOO4sg4EA3e/WchLYNYSqW4f
- dNiw9Z3a8tSYOfXGMV9cPvvlfYvwlbQEapZvVRXH/nCnbhqmO3sA7IoZCPM6O2Gjwde3ffTsl
- 9k0yTak3+CSf5n9SFZ05/4izd9io8oMbLkGLC5ofmZWUGmLbsMnnuWFpSbaUwddekPLNj8aMW
- YSTgqnIKx/avQUacpsZ1A/HdXbvtKtY+ANLmvxm2gXazbd9KdYJFkvgebJgowZDkg+cG141
+X-Provags-ID: V03:K1:UW5nFl3f49l8EiqWcfH03Ht250um51CqWYk29wqkrHzC4CE9/8v
+ yvNVfXE6dwOJmOKLhm1rMwsd2FKEPF8KExXy1sjgLYb8o7YUNLn0xL5tObTiul3rg/iJ3R8
+ yZrQgO/JHzMPIznk/T8XviRYpr1UopbO4Ledubv6MxDlLgoeQ7EqB+GOtiu8WDJEMoEK1Tj
+ SM0ey6TJpqQa5oAMnGufQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PKcDQf/GEU0=:NYOCc4WQHMU5AT87QeR0WP
+ wgmyeLkw8DoGQnnPhw2UJ1tHCnK/DR2s34/VLUlp2KZE2Jd9IucAAAGCxqa516KS/qVEU0cXr
+ xcarRNVNjequblZzPzs3o5jsYpaU/W94DqzginImn1mWNpWBCVdi7RIG8nKdU8IghpEqPuh/1
+ XEskxxrrrcYX9w5kGqASWqlcIEW2Vq74d7ZXK6D6RUb4YyBkQGnBtZWVpgfQVy/XlNTimp+ni
+ ytabDwqgN5geI99zsa+YsOavglqs+Z+Cw1smyI4BoLfecKSj6BeReyUhlJxlD8T9ubQ1Yv3HS
+ EmTaAWH2SenB/Ngjv5OKdHj0YJMm15BLf9pCTavl6Gp21NR8uZZdfTnezukBkZ2nZu84f+IVK
+ wRfSsz8peXfxV5G3IXfB31zbE3FZ2LDrooOGw0xM5OITcpgD1tyvCb781RrpwFZ6wzK72XdHm
+ VzV9gEk1LUkENAPZIG6w8IfY/0BM32DJM/s7CyPOdfWiIrwdTipWIX7ME4IfubbFdBK7hrupn
+ Y+cVnFnrjMMNkgbrX7zTgF25xm853uDyTnkJY5tqoTxH8d0xJp5wkXVvTBVpm4RmwDUxblC7q
+ dvTxBCEykduxUMj440r1JOT4N1xYWJw6jgNZIQb1YUZFuAtM5tMONI9rjNa3E6cbgEGk14S4P
+ bZxXgBqPBcUG0DCbe4L3ofcvOA4ZFDEUJIOvDWlfWdYVV95ak68XJycOGzKystn6w1nDBmZsO
+ v40onrSU9yo6MMLktRWK7OU8ZAjFbu1RUVLeW+HiXCqw770JLYMynKpzfJCEOTJc4UUtD8BM4
+ Irr26i1hFfbJOI0z8ApQ3mU77QjcQbF44yrulu64Z8Iv6VMo84dhTUzucd/m3LeaH0WsZ2I
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,9 +84,9 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
  qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>, Greg Kurz <groug@kaod.org>,
+ Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
@@ -100,39 +100,37 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-hw/alpha/dp264.c uses NICInfo variables which are declared in
-"net/net.h". Include it.
-
-This fixes (when modifying unrelated headers):
-
-  hw/alpha/dp264.c:89:21: error: use of undeclared identifier 'nb_nics'
-      for (i = 0; i < nb_nics; i++) {
-                      ^
-  hw/alpha/dp264.c:90:30: error: use of undeclared identifier 'nd_table'
-          pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
-                               ^
-
-Acked-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200228114649.12818-9-philmd@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20200305124525.14555-2-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/alpha/dp264.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/audio/fmopl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index d28f57199fa1..e5350a287f73 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -21,6 +21,7 @@
- #include "hw/dma/i8257.h"
- #include "net/net.h"
- #include "qemu/cutils.h"
-+#include "net/net.h"
+diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+index 9f50a89b4a88..173a7521f2a7 100644
+--- a/hw/audio/fmopl.c
++++ b/hw/audio/fmopl.c
+@@ -1066,7 +1066,7 @@ static void OPLResetChip(FM_OPL *OPL)
+ 	}
+ }
  
- #define MAX_IDE_BUS 2
+-/* ----------  Create one of vietual YM3812 ----------       */
++/* ----------  Create one of virtual YM3812 ----------       */
+ /* 'rate'  is sampling rate and 'bufsiz' is the size of the  */
+ FM_OPL *OPLCreate(int clock, int rate)
+ {
+@@ -1115,7 +1115,7 @@ FM_OPL *OPLCreate(int clock, int rate)
+ 	return OPL;
+ }
  
+-/* ----------  Destroy one of vietual YM3812 ----------       */
++/* ----------  Destroy one of virtual YM3812 ----------       */
+ void OPLDestroy(FM_OPL *OPL)
+ {
+ #ifdef OPL_OUTPUT_LOG
 -- 
 2.24.1
 
