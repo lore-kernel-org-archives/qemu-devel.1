@@ -6,40 +6,38 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDB1C10F29
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC90C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FEF120637
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:49:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEF120637
+	by mail.kernel.org (Postfix) with ESMTPS id 3548620637
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:52:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3548620637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBE5z-0003h8-7o
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:49:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50117)
+	id 1jBE8u-000501-BP
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:52:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBE59-0003Hl-Mj
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:48:16 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBE8L-0004Td-Oj
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBE58-0007UU-6D
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:48:15 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:52305)
+ (envelope-from <laurent@vivier.eu>) id 1jBE8K-00029z-Rs
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:51:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:43449)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBE57-0007Ta-Tv; Mon, 09 Mar 2020 04:48:14 -0400
+ id 1jBE8I-00028A-L9; Mon, 09 Mar 2020 04:51:30 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MxmJs-1jY0Yz1oL8-00zH2V; Mon, 09 Mar 2020 09:48:07 +0100
-Subject: Re: [PATCH] dp8393x: Mask EOL bit from descriptor addresses, take 2
-To: Jason Wang <jasowang@redhat.com>
-References: <alpine.LNX.2.22.394.2003041421280.12@nippy.intranet>
- <2116e607-52c8-7e7d-8ac1-c80d4628b2de@vivier.eu>
- <d2e80d5b-3c7a-92ad-7371-1cd0800195ca@redhat.com>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MCbR7-1j2BSP2Fvf-009eqM; Mon, 09 Mar 2020 09:51:26 +0100
+Subject: Re: [PATCH] maint: Include top-level *.rst files early in git diff
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200220162214.3474280-1-eblake@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,34 +81,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <23179263-a8fb-57cc-e98a-bfe9a2ee9037@vivier.eu>
-Date: Mon, 9 Mar 2020 09:48:06 +0100
+Message-ID: <59b4ee3b-787d-a71c-e606-9f682188b302@vivier.eu>
+Date: Mon, 9 Mar 2020 09:51:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <d2e80d5b-3c7a-92ad-7371-1cd0800195ca@redhat.com>
+In-Reply-To: <20200220162214.3474280-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nW5+porYYJUczELFs0G+M24y9dQ7Sw8MfpqGS4LjlN1vtGXxboE
- QGgEuVM22bcDOkhI+pI4+8X1TN4aSz9r5FgI9wiytV+9q6TtORZ1TKula/IT4etkpoKlRHL
- g/yMLcOewZnvbTref+ABj2vVb74HyuX++Cvu77WENqflxOXZj1R8Qrpeca+RvK4KhcgG4lF
- qqTU9mjjpr6B5DVp5r/LQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:juIUUIMqmv4=:dI/auL1JLYxesFklA6hCiI
- L5Wy9crXLPEMkTCpjMGRtzBTOrazxs+ex/ETWxqZK7SVzJRpiPLA2YmGqoF6GSMwt21idYhHq
- ILgHbNehwIWuMHH6Xdr3AczMZYNf56rSyZseSYO6COi3LC73MzhYdOMnHyOzz9u0CurK4Byag
- H/XRJo04vyPXAfh5u+4xc8ZjqBUKhyIr/uUNKTZgEa9og7z46V0IfDrRTez3bfaBoNSXXRfOw
- HSlDcllP59upK17ZSJH7XUf4lDhwZwQvHuJ+1vWBPEjTVwI/bYV7beK3oeXhmvQGeAddqAUOz
- ZP/bhxBBMH0/cpGGaXkb0mgcnZzWPCYzOH8/ozpJEIbBEq/4GpaQJM32do8bBOw7Qy5/NHIdr
- zSuetgp+YadIG7dQBBBGdWduqa9/Rsmu/ijDF88mDxTbOQOYcp6Oq7zf4zW3dai2AZISbsn+4
- /4crSMDFW11wa582SZRNarkIZb1Wf25Gh1b5LduCZZOxTLTDCYoWO1xiUAhGVhrmGpsjuAuy7
- 82+7Fd2ngYpSe385QSkK67DsAIuZLBjLMk3H/fAsPN2i/5b5tbuV55p56LasYKr4RGCTljESI
- Myb7bpKZicb26NKZVEP5VvpsK8u56bNmOnGFan/MbX7XtGmP41nC8rjuO14/p4EGeS411xZyI
- QPkZ7zEjjXxP8NrJrhQh0Ijhxw5zvrGp3IGbIV1wATUliSdvYnyoWYcwBi2nJ1vLREtCoi0Kp
- Q2IsEQkA8AeWEOvMe2l3jInWvQ6pdg6uXlPHc8V5XpJtpVB5gC04lrf3Nvexd/9DLRjbKcus1
- EN+fL3wL16SgMHBmWEEncwVlevOsLj9tDT1dH8pHsdqtbce4Etqsa2wgOaPDO1FXl5B75i5
+X-Provags-ID: V03:K1:UtnjFEooBMlgwjorYzAkl4nNF+ZuYJIr/L9xEcY0Tyg3h4ecN2R
+ xlNQHIsDQ6iKWzXJk9sD1mqpJMKFph+8+bLUBr/0KL8mCiNVOupB28gYormCvS5cEpcvSrW
+ BUT4reX2SKelCo1aOWH4n5oQadh/Iil/OrEqmV859zuG0lOgsOWYnRPHKX1FyXhirtdDehq
+ eeXlu2A/ShpHm7/57/Q+w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qD7ukt6TIBk=:9fN0w+nPHy0IUfMr+vvcQo
+ SJzr+o85ixmOxmCX0713lO8rr2NKGWYOTn5yGI39TFJWgZzRG0a46LxPWVJSzkxQZ2njjUhoK
+ YV6IvHslZC/Yfl9s3wPl5bfQQAPYZOde1oujs6P1Nj5vHLg6ks2q7XqFk7jpsHf/ZbCD3RMn+
+ Z16tMxGYviLl+Emz5TTmXiZPEkxE+En7ANetkEEuGZZdZZnGCTj7YylAffLPx2VzX2l+7Ne46
+ FaaZHhDBqPRiMKpKMrT/L+qkSFRujd2fbih1azhGniYUdyl5zx00fZUAu3inUNol4xevirTBD
+ U26KCwdzePC71wOpHdKFO15quq8pRZyF4qRDXtivb4Ivgv8DHuWo7cIWL5GfmQUm56hnlAx+D
+ r/nZUh9wHp1UEDYykhtSI41IfnWeaMcH4k2Vqm6+ESG+0bP3ogW+WlHJ8b1Vck5kWGHxRxjnK
+ AnN4X7x3BS5Yj7CdmLFj1KyKPhDnXLlmVX8mSQeFlzBVWD1u3FN7kH9cEyJ1Fjm5PTz4e2UcG
+ ImRygzSGlHMd9JdoP33DSAYgVq4ZTND4nKiAXvdo1MWPXJxDQ3H3zM7hhkR/39/3SBt2MKkJc
+ l9y+WkddZU0CTszGNNANwWPzweeIh1K86GaMSNaErkz+LKmGi/VvydKoiZeGO3WDSgy0mHC3N
+ QnEZAxGGgqZMB/BBBR9SN4flkphZYueMw3MeuhsT/R3I+3nRQxZMGMmz+y+CwPnJ/LtbHs6Fi
+ SpLUSsa5Aq6+mwS1yC2hOUwfZjKBy1XH2AIVEwIC3ZZGTWJpjebaZbn0YyK0qU548VqQtvJnz
+ 9ntRBBoOuTm2IHacFzr3ZBUshPBvG828IRChrqytcSWeUsYbehY8rq9R9zNo8wZDxr5pBkA
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,57 +120,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- peter.maydell@linaro.org, qemu-devel@nongnu.org,
- Finn Thain <fthain@telegraphics.com.au>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/03/2020 à 03:51, Jason Wang a écrit :
+Le 20/02/2020 à 17:22, Eric Blake a écrit :
+> We are converting more doc files to *.rst rather than *.texi.  Most
+> doc files are already listed early in diffs due to our catchall
+> docs/*, but a few top-level files get missed by that glob.
 > 
-> On 2020/3/8 下午5:52, Laurent Vivier wrote:
->> Le 04/03/2020 à 04:23, Finn Thain a écrit :
->>> A portion of a recent patch got lost due to a merge snafu. That patch is
->>> now commit 88f632fbb1 ("dp8393x: Mask EOL bit from descriptor
->>> addresses").
->>> This patch restores the portion that got lost.
->>>
->>> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
->>> ---
->>>   hw/net/dp8393x.c | 4 ++--
->>>   1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->>> index 8a3504d962..81fc13ee9f 100644
->>> --- a/hw/net/dp8393x.c
->>> +++ b/hw/net/dp8393x.c
->>> @@ -525,8 +525,8 @@ static void
->>> dp8393x_do_transmit_packets(dp8393xState *s)
->>>                                    * (4 + 3 * s->regs[SONIC_TFC]),
->>>                                  MEMTXATTRS_UNSPECIFIED, s->data,
->>>                                  size);
->>> -            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
->>> -            if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
->>> +            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0);
->>> +            if (s->regs[SONIC_CTDA] & SONIC_DESC_EOL) {
->>>                   /* EOL detected */
->>>                   break;
->>>               }
->>>
->> Jason,
->>
->> as it's a trivial bug fixes (only a diff between the commit and the
->> patch), will you merge it via the network queue or do you want I take it
->> via trivial queue?
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
 > 
+> Both *.texi and *.rst entries make sense while we are still converting
+> things, but we'll need a followup to drop *.texi when the conversion
+> is complete...
 > 
-> Hi Laurent:
+>  scripts/git.orderfile | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> Please merge it.
+> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+> index 1f747b583a9e..abd8a67a2b4e 100644
+> --- a/scripts/git.orderfile
+> +++ b/scripts/git.orderfile
+> @@ -11,6 +11,7 @@
+> 
+>  # Documentation
+>  docs/*
+> +*.rst
+>  *.texi
+> 
+>  # build system
+> 
 
-Applied to my trivial-patch branch.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
 
