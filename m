@@ -2,52 +2,80 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE645C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C25D2C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:53:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C56F420866
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:52:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56F420866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 8D7FD2465A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:53:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMYIZuvk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7FD2465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBOS7-0007cX-T8
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:52:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54682)
+	id 1jBOSt-0000qx-OE
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:53:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jBONo-0007Gx-2i
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:48:13 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMm-0005xJ-7z
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jBONm-0000rc-JX
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:48:11 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:20819)
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMk-0008W1-Gw
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:08 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31575
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jBONh-0000jm-V2; Mon, 09 Mar 2020 15:48:06 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id AADC7747DCF;
- Mon,  9 Mar 2020 20:48:02 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 80A85747E04; Mon,  9 Mar 2020 20:48:02 +0100 (CET)
-Message-Id: <ac37e5f5b86a3b2680c01d7b0d027dafd27a3ac7.1583781494.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1583781493.git.balaton@eik.bme.hu>
-References: <cover.1583781493.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v3 3/3] via-ide: Also emulate non 100% native mode
-Date: Mon, 09 Mar 2020 20:18:13 +0100
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBOMk-0008Vg-Br
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583783226;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nFAs+OpKYRWhCwTaLheh2EhuVyZgT48DWrj/HJkwA10=;
+ b=GMYIZuvkNr6LGR4SYU34eWhkAI9UVqmrQ5nrt+qOApvA7Ug5tinsPAFrHy5CSy8gyJPFhw
+ Io3IEi4k606+uLGYkYLiHWy2WTo8WbxC3eafVVbl/MxQWoH63EHsImm3qkW+eXzjlhI18x
+ Peoj5Nc3+kgU6iDzBBmwwqmeY82/A+o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-HhWja8vINV-Wwww_w4miGQ-1; Mon, 09 Mar 2020 15:47:03 -0400
+X-MC-Unique: HhWja8vINV-Wwww_w4miGQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F393118C43C8
+ for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:47:02 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 219575C28D;
+ Mon,  9 Mar 2020 19:47:01 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
-    qemu-block@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+	mlevitsk@redhat.com,
+	thuth@redhat.com
+Subject: [PULL 08/12] monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
+Date: Mon,  9 Mar 2020 19:46:46 +0000
+Message-Id: <20200309194650.160552-9-dgilbert@redhat.com>
+In-Reply-To: <20200309194650.160552-1-dgilbert@redhat.com>
+References: <20200309194650.160552-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,151 +87,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, philmd@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some machines operate in "non 100% native mode" where interrupts are
-fixed at legacy IDE interrupts and some guests expect this behaviour
-without checking based on knowledge about hardware. Even Linux has
-arch specific workarounds for this that are activated on such boards
-so this needs to be emulated as well.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20200308092440.23564-9-mlevitsk@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
-v2: Don't use PCI_INTERRUPT_LINE in via_ide_set_irq()
-v3: Patch pci.c instead of local workaround for PCI reset clearing
-    PCI_INTERRUPT_PIN config reg
+ block/monitor/block-hmp-cmds.c | 101 +++++++++++++++++++++++++++++++++
+ include/block/block-hmp-cmds.h |   5 ++
+ include/monitor/hmp.h          |   4 --
+ monitor/hmp-cmds.c             | 100 --------------------------------
+ 4 files changed, 106 insertions(+), 104 deletions(-)
 
- hw/ide/via.c            | 37 +++++++++++++++++++++++++++++--------
- hw/mips/mips_fulong2e.c |  2 +-
- include/hw/ide.h        |  3 ++-
- 3 files changed, 32 insertions(+), 10 deletions(-)
-
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 096de8dba0..02d29809f2 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -1,9 +1,10 @@
- /*
-- * QEMU IDE Emulation: PCI VIA82C686B support.
-+ * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
-  *
-  * Copyright (c) 2003 Fabrice Bellard
-  * Copyright (c) 2006 Openedhand Ltd.
-  * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
-+ * Copyright (c) 2019-2020 BALATON Zoltan
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -25,6 +26,8 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/range.h"
-+#include "hw/qdev-properties.h"
- #include "hw/pci/pci.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
-@@ -111,11 +114,18 @@ static void via_ide_set_irq(void *opaque, int n, int level)
-     } else {
-         d->config[0x70 + n * 8] &= ~0x80;
-     }
--
-     level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
--    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
--    if (n) {
--        qemu_set_irq(isa_get_irq(NULL, n), level);
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
+c
+index 0131be8ecf..188374abbc 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -45,9 +45,11 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/config-file.h"
+ #include "qemu/option.h"
++#include "qemu/sockets.h"
+ #include "sysemu/sysemu.h"
+ #include "monitor/monitor.h"
+ #include "monitor/hmp.h"
++#include "block/nbd.h"
+ #include "block/block_int.h"
+ #include "block/block-hmp-cmds.h"
+=20
+@@ -353,3 +355,102 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon=
+, const QDict *qdict)
+                                                true, name, &err);
+     hmp_handle_error(mon, err);
+ }
 +
-+    /*
-+     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
-+     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
-+     * Some guest drivers expect this, often without checking.
++void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
++{
++    const char *uri =3D qdict_get_str(qdict, "uri");
++    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
++    bool all =3D qdict_get_try_bool(qdict, "all", false);
++    Error *local_err =3D NULL;
++    BlockInfoList *block_list, *info;
++    SocketAddress *addr;
++    BlockExportNbd export;
++
++    if (writable && !all) {
++        error_setg(&local_err, "-w only valid together with -a");
++        goto exit;
++    }
++
++    /* First check if the address is valid and start the server.  */
++    addr =3D socket_parse(uri, &local_err);
++    if (local_err !=3D NULL) {
++        goto exit;
++    }
++
++    nbd_server_start(addr, NULL, NULL, &local_err);
++    qapi_free_SocketAddress(addr);
++    if (local_err !=3D NULL) {
++        goto exit;
++    }
++
++    if (!all) {
++        return;
++    }
++
++    /* Then try adding all block devices.  If one fails, close all and
++     * exit.
 +     */
-+    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
-+        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
-+        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
-+    } else {
-+        qemu_set_irq(isa_get_irq(NULL, 14), level);
-     }
- }
- 
-@@ -169,7 +179,8 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
- 
-     pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
-     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
--    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
-+    dev->wmask[PCI_CLASS_PROG] = 5;
-+    dev->wmask[PCI_INTERRUPT_LINE] = 0;
- 
-     memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_ops,
-                           &d->bus[0], "via-ide0-data", 8);
-@@ -213,14 +224,23 @@ static void via_ide_exitfn(PCIDevice *dev)
-     }
- }
- 
--void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
-+void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-+                  bool legacy_irq)
- {
-     PCIDevice *dev;
- 
--    dev = pci_create_simple(bus, devfn, "via-ide");
-+    dev = pci_create(bus, devfn, "via-ide");
-+    qdev_prop_set_bit(&dev->qdev, "legacy-irq", legacy_irq);
-+    qdev_init_nofail(&dev->qdev);
-     pci_ide_create_devs(dev, hd_table);
- }
- 
-+static Property via_ide_properties[] = {
-+    DEFINE_PROP_BIT("legacy-irq", PCIIDEState, flags, PCI_IDE_LEGACY_IRQ,
-+                    false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
++    block_list =3D qmp_query_block(NULL);
 +
- static void via_ide_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -233,6 +253,7 @@ static void via_ide_class_init(ObjectClass *klass, void *data)
-     k->device_id = PCI_DEVICE_ID_VIA_IDE;
-     k->revision = 0x06;
-     k->class_id = PCI_CLASS_STORAGE_IDE;
-+    device_class_set_props(dc, via_ide_properties);
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    for (info =3D block_list; info; info =3D info->next) {
++        if (!info->value->has_inserted) {
++            continue;
++        }
++
++        export =3D (BlockExportNbd) {
++            .device         =3D info->value->device,
++            .has_writable   =3D true,
++            .writable       =3D writable,
++        };
++
++        qmp_nbd_server_add(&export, &local_err);
++
++        if (local_err !=3D NULL) {
++            qmp_nbd_server_stop(NULL);
++            break;
++        }
++    }
++
++    qapi_free_BlockInfoList(block_list);
++
++exit:
++    hmp_handle_error(mon, local_err);
++}
++
++void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
++{
++    const char *device =3D qdict_get_str(qdict, "device");
++    const char *name =3D qdict_get_try_str(qdict, "name");
++    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
++    Error *local_err =3D NULL;
++
++    BlockExportNbd export =3D {
++        .device         =3D (char *) device,
++        .has_name       =3D !!name,
++        .name           =3D (char *) name,
++        .has_writable   =3D true,
++        .writable       =3D writable,
++    };
++
++    qmp_nbd_server_add(&export, &local_err);
++    hmp_handle_error(mon, local_err);
++}
++
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
++{
++    const char *name =3D qdict_get_str(qdict, "name");
++    bool force =3D qdict_get_try_bool(qdict, "force", false);
++    Error *err =3D NULL;
++
++    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
++    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
++{
++    Error *err =3D NULL;
++
++    qmp_nbd_server_stop(&err);
++    hmp_handle_error(mon, err);
++}
+diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.=
+h
+index cc81779c7c..50ff802598 100644
+--- a/include/block/block-hmp-cmds.h
++++ b/include/block/block-hmp-cmds.h
+@@ -33,4 +33,9 @@ void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict=
+);
+ void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict);
+ void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict)=
+;
+=20
++void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
++void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
++
+ #endif
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 6d34e29bb6..736a969131 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -94,10 +94,6 @@ void hmp_getfd(Monitor *mon, const QDict *qdict);
+ void hmp_closefd(Monitor *mon, const QDict *qdict);
+ void hmp_sendkey(Monitor *mon, const QDict *qdict);
+ void hmp_screendump(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_start(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_add(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
+-void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 7b199794b0..573ddf473a 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -47,7 +47,6 @@
+ #include "qapi/string-output-visitor.h"
+ #include "qom/object_interfaces.h"
+ #include "ui/console.h"
+-#include "block/nbd.h"
+ #include "block/qapi.h"
+ #include "qemu-io.h"
+ #include "qemu/cutils.h"
+@@ -2176,105 +2175,6 @@ void hmp_screendump(Monitor *mon, const QDict *qdic=
+t)
+     hmp_handle_error(mon, err);
  }
- 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 4727b1d3a4..150182c62a 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -257,7 +257,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
-     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
- 
-     ide_drive_get(hd, ARRAY_SIZE(hd));
--    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
-+    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1), false);
- 
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci");
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci");
-diff --git a/include/hw/ide.h b/include/hw/ide.h
-index d88c5ee695..2a7001ccba 100644
---- a/include/hw/ide.h
-+++ b/include/hw/ide.h
-@@ -18,7 +18,8 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
--void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
-+void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-+                  bool legacy_irq);
- 
- /* ide-mmio.c */
- void mmio_ide_init_drives(DeviceState *dev, DriveInfo *hd0, DriveInfo *hd1);
--- 
-2.21.1
+=20
+-void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+-{
+-    const char *uri =3D qdict_get_str(qdict, "uri");
+-    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
+-    bool all =3D qdict_get_try_bool(qdict, "all", false);
+-    Error *local_err =3D NULL;
+-    BlockInfoList *block_list, *info;
+-    SocketAddress *addr;
+-    BlockExportNbd export;
+-
+-    if (writable && !all) {
+-        error_setg(&local_err, "-w only valid together with -a");
+-        goto exit;
+-    }
+-
+-    /* First check if the address is valid and start the server.  */
+-    addr =3D socket_parse(uri, &local_err);
+-    if (local_err !=3D NULL) {
+-        goto exit;
+-    }
+-
+-    nbd_server_start(addr, NULL, NULL, &local_err);
+-    qapi_free_SocketAddress(addr);
+-    if (local_err !=3D NULL) {
+-        goto exit;
+-    }
+-
+-    if (!all) {
+-        return;
+-    }
+-
+-    /* Then try adding all block devices.  If one fails, close all and
+-     * exit.
+-     */
+-    block_list =3D qmp_query_block(NULL);
+-
+-    for (info =3D block_list; info; info =3D info->next) {
+-        if (!info->value->has_inserted) {
+-            continue;
+-        }
+-
+-        export =3D (BlockExportNbd) {
+-            .device         =3D info->value->device,
+-            .has_writable   =3D true,
+-            .writable       =3D writable,
+-        };
+-
+-        qmp_nbd_server_add(&export, &local_err);
+-
+-        if (local_err !=3D NULL) {
+-            qmp_nbd_server_stop(NULL);
+-            break;
+-        }
+-    }
+-
+-    qapi_free_BlockInfoList(block_list);
+-
+-exit:
+-    hmp_handle_error(mon, local_err);
+-}
+-
+-void hmp_nbd_server_add(Monitor *mon, const QDict *qdict)
+-{
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    const char *name =3D qdict_get_try_str(qdict, "name");
+-    bool writable =3D qdict_get_try_bool(qdict, "writable", false);
+-    Error *local_err =3D NULL;
+-
+-    BlockExportNbd export =3D {
+-        .device         =3D (char *) device,
+-        .has_name       =3D !!name,
+-        .name           =3D (char *) name,
+-        .has_writable   =3D true,
+-        .writable       =3D writable,
+-    };
+-
+-    qmp_nbd_server_add(&export, &local_err);
+-    hmp_handle_error(mon, local_err);
+-}
+-
+-void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
+-{
+-    const char *name =3D qdict_get_str(qdict, "name");
+-    bool force =3D qdict_get_try_bool(qdict, "force", false);
+-    Error *err =3D NULL;
+-
+-    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
+-    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
+-    hmp_handle_error(mon, err);
+-}
+-
+-void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict)
+-{
+-    Error *err =3D NULL;
+-
+-    qmp_nbd_server_stop(&err);
+-    hmp_handle_error(mon, err);
+-}
+-
+ void hmp_chardev_add(Monitor *mon, const QDict *qdict)
+ {
+     const char *args =3D qdict_get_str(qdict, "args");
+--=20
+2.24.1
 
 
