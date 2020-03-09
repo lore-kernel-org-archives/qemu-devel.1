@@ -2,78 +2,76 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA070C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1ECC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:03:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A617021655
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:02:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A03221655
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:03:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K4nJM8hM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A617021655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+xkMY+W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A03221655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBJvV-0000jk-Pm
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:02:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59658)
+	id 1jBJvx-0001SF-OG
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:03:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jBJuE-00085o-JF
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:01:24 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jBJuz-0000Hg-Mx
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jBJuC-0001oP-9s
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:01:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38909
+ (envelope-from <imammedo@redhat.com>) id 1jBJuy-0002NH-Em
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:02:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50203
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jBJuA-0001lB-Lt
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:01:18 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBJuy-0002Mh-9S
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:02:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583766077;
+ s=mimecast20190719; t=1583766128;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7b272g9GVQ61MfTMLnehTAsHJkzwkwhOS2K38V+C1e0=;
- b=K4nJM8hMGWirGV7/6/K0PBjvcP+SalGBR+CO9YCcIAy9dr+HdzeAotofCJruZq/KP/0TFt
- f66mc1Az4rba2aclXpetRhdLtqoXn2LqeKWEVYfvi6bkyXolXByuv228xmcUVR0gJXr0vW
- ZMVNKnsspNQjR/WByuICPboeewMRwn8=
+ bh=4XZpVToFgqXpigakyZ/q6rzA3/XD8Po7eL31LUq4ndg=;
+ b=f+xkMY+WjJX8mHz8rE2solqQDK+LzrCu/IGuKtFn1rfIdNnHRY7sSZGQhYRYN0rydUOd4j
+ FyNkYi5Iu0I6OUgyxLYM5qIBHLVsmA8ws7ty/5SbidhfrKBPmQ6CEGV3oZK4srq+WewH9l
+ Unr2Em6HUVRPt81xHwf6TEcPXSBXw5M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-J4LJHbnMMhGR3cDjVxSwPA-1; Mon, 09 Mar 2020 11:01:13 -0400
-X-MC-Unique: J4LJHbnMMhGR3cDjVxSwPA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-401-i1QD9wH5NXiicmpWDaEdUg-1; Mon, 09 Mar 2020 11:02:05 -0400
+X-MC-Unique: i1QD9wH5NXiicmpWDaEdUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 569F4800D5A;
- Mon,  9 Mar 2020 15:01:12 +0000 (UTC)
-Received: from [10.3.116.177] (ovpn-116-177.phx2.redhat.com [10.3.116.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4F905C28E;
- Mon,  9 Mar 2020 15:01:11 +0000 (UTC)
-Subject: Re: [PATCH v8 1/9] qemu-binfmt-conf.sh: enforce safe style consistency
-To: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, qemu-devel@nongnu.org
-References: <20200307172248.GA9@afee69d503a7>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <1ba522c6-cae8-9e1f-ebf4-696076d2ca45@redhat.com>
-Date: Mon, 9 Mar 2020 10:01:10 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 732148017CC;
+ Mon,  9 Mar 2020 15:02:04 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3176C8D553;
+ Mon,  9 Mar 2020 15:01:59 +0000 (UTC)
+Date: Mon, 9 Mar 2020 16:01:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v5 12/16] hw/i386: Use the apicid handlers from
+ X86MachineState
+Message-ID: <20200309160157.0509fa8d@Igors-MacBook-Pro>
+In-Reply-To: <158326548999.40452.9247570542382737462.stgit@naples-babu.amd.com>
+References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
+ <158326548999.40452.9247570542382737462.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200307172248.GA9@afee69d503a7>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -89,34 +87,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/7/20 11:22 AM, Unai Martinez-Corral wrote:
-> Spaces are added before '; then', for consistency.
+On Tue, 03 Mar 2020 13:58:10 -0600
+Babu Moger <babu.moger@amd.com> wrote:
 
-For consistency with what?  This is not our prevailing style; as 
-evidenced by this pre-patch search:
-
-$ git grep 'if \[.*\];' | wc
-     274    2186   18170
-$ git grep 'if \[.*\] ;' | wc
-      25     256    1573
-
-and you are diverging from the dominant pattern.
-
+> Check and Load the apicid handlers from X86CPUDefinition if available.
+> Update the calling convention for the apicid handlers.
 > 
-> All the tests are prefixed with 'x', in order to avoid risky comparisons
-> (i.e. a user deliberately trying to provoke a syntax error).
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 
-This part, however, is good.  Since one part is controversial, you may 
-want to split this into two patches, or even drop the reformatting part.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> ---
+>  hw/i386/pc.c  |    6 +++---
+>  hw/i386/x86.c |   11 +++++++----
+>  2 files changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 17cce3f074..c600ba0432 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1581,14 +1581,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> -        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
+> +        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
+>  
+>      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+>      if (!cpu_slot) {
+>          MachineState *ms = MACHINE(pcms);
+>  
+> -        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+this (including other similar) change(s) to callbacks should go to 11/16
+
+>          error_setg(errp,
+>              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+>              " APIC ID %" PRIu32 ", valid index range 0:%d",
+> @@ -1609,7 +1609,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
+>       * once -smp refactoring is complete and there will be CPU private
+>       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
+> -    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+>          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+>              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 15b7815bb0..d46dd4ad9e 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -86,7 +86,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+>  
+>      init_topo_info(&topo_info, x86ms);
+>  
+> -    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
+> +    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
+>      if (x86mc->compat_apic_id_mode) {
+>          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+>              error_report("APIC IDs set in compatibility mode, "
+> @@ -158,8 +158,8 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>     init_topo_info(&topo_info, x86ms);
+>  
+>     assert(idx < ms->possible_cpus->len);
+> -   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> -                            &topo_info, &topo_ids);
+> +   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> +                               &topo_info, &topo_ids);
+>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
+>  }
+>  
+> @@ -179,6 +179,9 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>          return ms->possible_cpus;
+>      }
+>  
+> +    /* Initialize apicid handlers */
+> +    cpu_x86_init_apicid_fns(ms);
+> +
+>      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+>                                    sizeof(CPUArchId) * max_cpus);
+>      ms->possible_cpus->len = max_cpus;
+> @@ -192,7 +195,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>          ms->possible_cpus->cpus[i].vcpus_count = 1;
+>          ms->possible_cpus->cpus[i].arch_id =
+>              x86_cpu_apic_id_from_index(x86ms, i);
+> -        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> +        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+>                                   &topo_info, &topo_ids);
+
+not aligned properly
+
+>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+> 
 
 
