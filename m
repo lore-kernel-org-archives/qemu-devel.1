@@ -2,73 +2,118 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5D2C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08563C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:37:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BECDE2072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:36:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECDE2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D410A20675
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D410A20675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGi8-0004D9-Vd
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:36:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49757)
+	id 1jBGjB-0005jW-4N
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49876)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBGhT-0003Jr-2X
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:36:00 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBGiQ-0004xB-Lg
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBGhR-0001dd-IA
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:35:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBGhR-0001dL-C9
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:35:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBGhO-0001Er-R7
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 11:35:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C46372E80CF
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 11:35:54 +0000 (UTC)
+ (envelope-from <laurent@vivier.eu>) id 1jBGiP-00023C-Me
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:36:58 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:48385)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jBGiP-00022K-Dz; Mon, 09 Mar 2020 07:36:57 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mq2vU-1jfdSL1J1m-00nAG9; Mon, 09 Mar 2020 12:36:51 +0100
+Subject: Re: [PATCH v2 1/9] hw/audio/fmopl: Fix a typo twice
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+References: <20200305124525.14555-1-philmd@redhat.com>
+ <20200305124525.14555-2-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fe8114e8-b420-09b9-5c2d-4c63de10d0b2@vivier.eu>
+Date: Mon, 9 Mar 2020 12:36:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Mar 2020 11:25:56 -0000
-From: Vitaly Kuznetsov <1813165@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
- tstrike34 vkuznets
-X-Launchpad-Bug-Reporter: Thomas (himbeere)
-X-Launchpad-Bug-Modifier: Vitaly Kuznetsov (vkuznets)
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <158375315651.26324.13017604709996207170.malone@gac.canonical.com>
-Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f30443c9c1b610ff7163c492f6d3c1e4a77b75d6
+In-Reply-To: <20200305124525.14555-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:K7ibR9WJX6AvI52oFFTbmzzOrptX4RvagkdxPHRka0clhs1YO7H
+ S95MqKmt1ofD7pTrIDVAWH3+htNVZJdcg4/j6dPipnqqG88yuSXA7T/KMvCG4OJR08t54M+
+ afVX8Qw7FQ1eQLmMxBWES5um09YudQlxKa+prH25eyhcUDg28/vEDe21mK7FSg2daujfeix
+ Jkd+1sSfKOIRIsSFWYaPA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:T7XPaN8PCzM=:a2zQUexkN1LRxcxuJdFkxi
+ 2rmCvQ1D+RX1M/iYhpngqNH2y3s1ZtBKLixmfNjLFOpBUFjueQ41lFdPffMPfR5Lfi1bnz01D
+ J0YYifGXrPMSxeIsJENBEjz53C2rNKjsk39eXcIcd694Rlg/2Hhg1nHVXxatadDyLlHTlh/U/
+ F5DRRp/2X9mxkMsCnEHryNPf8Qm5SStsAAnBvaqEAirhFexgb9dQ6AWeeaNrqp2WvDOejJo/n
+ HuWs0iUnJjuBDQ2HyKBVuCYXdaJynf4egX4RLPqJCpphp5SEIv4WLJJpzlSupFsfZtTGRE2XH
+ Ksi6r4LbuQVYCvNSrsMmdoQmidNncbQuMp/fRM7zzCOkjDS6rVX5sqOUdSW9aj8q1hgYUZ9xB
+ Ga0G8/kogVlkhOgKJecagOm7z7VZTbR55K9Jnl+kAslUOE8fmWGym+btBr8ix6MWqINM2LJzF
+ WjCMXdzuhovJDtjYS3cIVBC/+qP1O7Ws6OhmPbP6vDJcgID6cuQC+4OOXoMkG1fb5OTzPOzHe
+ SnAPEJG9/SzpKWhP0zOaHbqtJoYBaLAwS3otlvwoGYXCElPPvfVSBkwo4bEUfkj1s+F2pOAIQ
+ kS737yZzKfdv7MP2g9QwiI4tHMWsNwb3MoezwTGyo0QvLVND1mrNc/0K9jh57EN8noGAjEtIn
+ 85pw/7Zacr99LyRUps6EGHOJwjFw7ygehrtEHRqABHTlc2BAikdNNZQAIGGyK82PBscXujP6B
+ BdZ9BNT4+9xlBrMiVr9/bcxrH7KjSbeVkC68XBrbLLoNFyI8sFzlqPwxBB+fh3tCoCYOH0mXJ
+ jEbT5IpgXv3ZROsEmIJ9xFEqxOadH2WarbjLcPIG8qtFWLEY7HqVVIQNWGDk8xqdxsU4EBz
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,104 +122,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'nested' parameter for kvm_intel module controls whether you're able to
-run nested configurations and it is enabled by default, it doesn't say
-anything about whether your configuration is nested or not.
+Le 05/03/2020 à 13:45, Philippe Mathieu-Daudé a écrit :
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/audio/fmopl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
+> index 9f50a89b4a..173a7521f2 100644
+> --- a/hw/audio/fmopl.c
+> +++ b/hw/audio/fmopl.c
+> @@ -1066,7 +1066,7 @@ static void OPLResetChip(FM_OPL *OPL)
+>  	}
+>  }
+>  
+> -/* ----------  Create one of vietual YM3812 ----------       */
+> +/* ----------  Create one of virtual YM3812 ----------       */
+>  /* 'rate'  is sampling rate and 'bufsiz' is the size of the  */
+>  FM_OPL *OPLCreate(int clock, int rate)
+>  {
+> @@ -1115,7 +1115,7 @@ FM_OPL *OPLCreate(int clock, int rate)
+>  	return OPL;
+>  }
+>  
+> -/* ----------  Destroy one of vietual YM3812 ----------       */
+> +/* ----------  Destroy one of virtual YM3812 ----------       */
+>  void OPLDestroy(FM_OPL *OPL)
+>  {
+>  #ifdef OPL_OUTPUT_LOG
+> 
 
-Could you please describe your environment? In case it is nested, it will l=
-ook like:
-L0(host) Linux 5.4.0 .... with KVM
-L1(guest) Linux xxxx with KVM
-L2(nested guest) Linux xxxx
+Applied to my trivial-patches branch.
 
-Note that L2 in this scenario is running "inside" L1 and that's why it
-is nested.
-
-Also, it is important to know if L1 or L2 in this configuration are UEFI
-booted, it is not very important how you boot the host (L0).
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
-
-Title:
-  KVM internal error. Suberror: 1 emulation failure
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello Devs.
-
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
-
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
-
-  Someone has an idea whats going wrong here?
-
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+Thanks,
+Laurent
 
