@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B33C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31914C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 229D020828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:50:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01ADD20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 19:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2kFomAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 229D020828
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/+3QqO5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01ADD20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBOPn-0002G2-9x
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:50:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54428)
+	id 1jBOPt-0002MT-69
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 15:50:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jBOMj-0005qz-Gf
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:06 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMh-0005nS-MT
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jBOMi-0008US-54
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26890
+ (envelope-from <dgilbert@redhat.com>) id 1jBOMg-0008TQ-LF
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:03 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51336
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBOMi-0008U7-0W
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:04 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jBOMg-0008TA-H3
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 15:47:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583783223;
+ s=mimecast20190719; t=1583783222;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HzdJIcSAlt55GQyVa7oRfwTxAgNZnAPE4Rs/+yLA3uo=;
- b=G2kFomAot86ozBtrjjxodlv6TH1J4Lc8b4b8d4EAYRP131U2VNRRHOwSbi+GKhIYOOKn+z
- 46NGfaWVDCZ49HKSJ/nn+1z+FEoooNzk6tLkCpQIe3V299YNxTT7Bdo99KXcIMDR/9YyIz
- qjJ3BIQ2zPHErKFZ1SE8JZHurNFPSAo=
+ bh=0J1BgM8G3GVqw+1UzdlGEgpXHPM12sB3GODgYTmeRtY=;
+ b=G/+3QqO5qMsEPzlRao6ENHTev4EPsd1DZlFDu5r6JvnC9kOjIKcgZxvhRgNQmopM3j/2/G
+ Lr7R9xsoxNwVsqZuEyCT4OMbTZ/p0uZ9b1XA6z4JoK6vNqAfP4dVUtfivKfxgonEQfV6Al
+ hKw2IUAR/Ey5S4NTS3ze2wQB7Qtvljs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-HI6r1ev7MYCTFrNxWhbVLA-1; Mon, 09 Mar 2020 15:47:01 -0400
-X-MC-Unique: HI6r1ev7MYCTFrNxWhbVLA-1
+ us-mta-266-qQRu-WNzOn6K60yJ-WFmCA-1; Mon, 09 Mar 2020 15:46:56 -0400
+X-MC-Unique: qQRu-WNzOn6K60yJ-WFmCA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3BA61005509
- for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:47:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D7A11005512
+ for <qemu-devel@nongnu.org>; Mon,  9 Mar 2020 19:46:56 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C90D65C28D;
- Mon,  9 Mar 2020 19:46:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 31CB85C28D;
+ Mon,  9 Mar 2020 19:46:55 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	mlevitsk@redhat.com,
 	thuth@redhat.com
-Subject: [PULL 06/12] monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
-Date: Mon,  9 Mar 2020 19:46:44 +0000
-Message-Id: <20200309194650.160552-7-dgilbert@redhat.com>
+Subject: [PULL 02/12] monitor/hmp: inline add_init_drive
+Date: Mon,  9 Mar 2020 19:46:40 +0000
+Message-Id: <20200309194650.160552-3-dgilbert@redhat.com>
 In-Reply-To: <20200309194650.160552-1-dgilbert@redhat.com>
 References: <20200309194650.160552-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -75,8 +75,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,175 +93,78 @@ Sender: "Qemu-devel"
 
 From: Maxim Levitsky <mlevitsk@redhat.com>
 
+This function is only used by hmp_drive_add.
+The code is just a bit shorter this way.
+
+No functional changes
+
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20200308092440.23564-7-mlevitsk@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200308092440.23564-3-mlevitsk@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- block/monitor/block-hmp-cmds.c | 52 ++++++++++++++++++++++++++++++++++
- include/block/block-hmp-cmds.h |  6 ++++
- include/monitor/hmp.h          |  5 ----
- monitor/hmp-cmds.c             | 52 ----------------------------------
- 4 files changed, 58 insertions(+), 57 deletions(-)
+ device-hotplug.c | 31 ++++++++++++-------------------
+ 1 file changed, 12 insertions(+), 19 deletions(-)
 
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
-c
-index d6dd5d97f7..8e8288c2f1 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -247,3 +247,55 @@ void hmp_drive_backup(Monitor *mon, const QDict *qdict=
-)
-     qmp_drive_backup(&backup, &err);
-     hmp_handle_error(mon, err);
- }
-+
-+void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict)
-+{
-+    Error *error =3D NULL;
-+    const char *device =3D qdict_get_str(qdict, "device");
-+    int64_t value =3D qdict_get_int(qdict, "speed");
-+
-+    qmp_block_job_set_speed(device, value, &error);
-+
-+    hmp_handle_error(mon, error);
-+}
-+
-+void hmp_block_job_cancel(Monitor *mon, const QDict *qdict)
-+{
-+    Error *error =3D NULL;
-+    const char *device =3D qdict_get_str(qdict, "device");
-+    bool force =3D qdict_get_try_bool(qdict, "force", false);
-+
-+    qmp_block_job_cancel(device, true, force, &error);
-+
-+    hmp_handle_error(mon, error);
-+}
-+
-+void hmp_block_job_pause(Monitor *mon, const QDict *qdict)
-+{
-+    Error *error =3D NULL;
-+    const char *device =3D qdict_get_str(qdict, "device");
-+
-+    qmp_block_job_pause(device, &error);
-+
-+    hmp_handle_error(mon, error);
-+}
-+
-+void hmp_block_job_resume(Monitor *mon, const QDict *qdict)
-+{
-+    Error *error =3D NULL;
-+    const char *device =3D qdict_get_str(qdict, "device");
-+
-+    qmp_block_job_resume(device, &error);
-+
-+    hmp_handle_error(mon, error);
-+}
-+
-+void hmp_block_job_complete(Monitor *mon, const QDict *qdict)
-+{
-+    Error *error =3D NULL;
-+    const char *device =3D qdict_get_str(qdict, "device");
-+
-+    qmp_block_job_complete(device, &error);
-+
-+    hmp_handle_error(mon, error);
-+}
-diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.=
-h
-index a64b737b3a..fcdf1eec48 100644
---- a/include/block/block-hmp-cmds.h
-+++ b/include/block/block-hmp-cmds.h
-@@ -23,4 +23,10 @@ void hmp_drive_del(Monitor *mon, const QDict *qdict);
- void hmp_drive_mirror(Monitor *mon, const QDict *qdict);
- void hmp_drive_backup(Monitor *mon, const QDict *qdict);
+diff --git a/device-hotplug.c b/device-hotplug.c
+index f01d53774b..554e4d98db 100644
+--- a/device-hotplug.c
++++ b/device-hotplug.c
+@@ -34,42 +34,35 @@
+ #include "monitor/monitor.h"
+ #include "block/block_int.h"
 =20
-+void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
-+void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
-+void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
-+void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
-+void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
+-static DriveInfo *add_init_drive(const char *optstr)
 +
- #endif
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index c1b363ee57..592ce0ccfe 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -87,11 +87,6 @@ void hmp_eject(Monitor *mon, const QDict *qdict);
- void hmp_change(Monitor *mon, const QDict *qdict);
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
- void hmp_block_stream(Monitor *mon, const QDict *qdict);
--void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
--void hmp_block_job_cancel(Monitor *mon, const QDict *qdict);
--void hmp_block_job_pause(Monitor *mon, const QDict *qdict);
--void hmp_block_job_resume(Monitor *mon, const QDict *qdict);
--void hmp_block_job_complete(Monitor *mon, const QDict *qdict);
- void hmp_migrate(Monitor *mon, const QDict *qdict);
- void hmp_device_add(Monitor *mon, const QDict *qdict);
- void hmp_device_del(Monitor *mon, const QDict *qdict);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 6254f19842..25d1c19a96 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1997,58 +1997,6 @@ void hmp_block_stream(Monitor *mon, const QDict *qdi=
-ct)
-     hmp_handle_error(mon, error);
- }
-=20
--void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict)
--{
--    Error *error =3D NULL;
--    const char *device =3D qdict_get_str(qdict, "device");
--    int64_t value =3D qdict_get_int(qdict, "speed");
--
--    qmp_block_job_set_speed(device, value, &error);
--
--    hmp_handle_error(mon, error);
--}
--
--void hmp_block_job_cancel(Monitor *mon, const QDict *qdict)
--{
--    Error *error =3D NULL;
--    const char *device =3D qdict_get_str(qdict, "device");
--    bool force =3D qdict_get_try_bool(qdict, "force", false);
--
--    qmp_block_job_cancel(device, true, force, &error);
--
--    hmp_handle_error(mon, error);
--}
--
--void hmp_block_job_pause(Monitor *mon, const QDict *qdict)
--{
--    Error *error =3D NULL;
--    const char *device =3D qdict_get_str(qdict, "device");
--
--    qmp_block_job_pause(device, &error);
--
--    hmp_handle_error(mon, error);
--}
--
--void hmp_block_job_resume(Monitor *mon, const QDict *qdict)
--{
--    Error *error =3D NULL;
--    const char *device =3D qdict_get_str(qdict, "device");
--
--    qmp_block_job_resume(device, &error);
--
--    hmp_handle_error(mon, error);
--}
--
--void hmp_block_job_complete(Monitor *mon, const QDict *qdict)
--{
--    Error *error =3D NULL;
--    const char *device =3D qdict_get_str(qdict, "device");
--
--    qmp_block_job_complete(device, &error);
--
--    hmp_handle_error(mon, error);
--}
--
- typedef struct HMPMigrationStatus
++void hmp_drive_add(Monitor *mon, const QDict *qdict)
  {
-     QEMUTimer *timer;
+     Error *err =3D NULL;
+     DriveInfo *dinfo;
+     QemuOpts *opts;
+     MachineClass *mc;
++    const char *optstr =3D qdict_get_str(qdict, "opts");
++    bool node =3D qdict_get_try_bool(qdict, "node", false);
++
++    if (node) {
++        hmp_drive_add_node(mon, optstr);
++        return;
++    }
+=20
+     opts =3D drive_def(optstr);
+     if (!opts)
+-        return NULL;
++        return;
+=20
+     mc =3D MACHINE_GET_CLASS(current_machine);
+     dinfo =3D drive_new(opts, mc->block_default_type, &err);
+     if (err) {
+         error_report_err(err);
+         qemu_opts_del(opts);
+-        return NULL;
+-    }
+-
+-    return dinfo;
+-}
+-
+-void hmp_drive_add(Monitor *mon, const QDict *qdict)
+-{
+-    DriveInfo *dinfo =3D NULL;
+-    const char *opts =3D qdict_get_str(qdict, "opts");
+-    bool node =3D qdict_get_try_bool(qdict, "node", false);
+-
+-    if (node) {
+-        hmp_drive_add_node(mon, opts);
+-        return;
++        goto err;
+     }
+=20
+-    dinfo =3D add_init_drive(opts);
+     if (!dinfo) {
+-        goto err;
++        return;
+     }
+=20
+     switch (dinfo->type) {
 --=20
 2.24.1
 
