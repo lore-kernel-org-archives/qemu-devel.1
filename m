@@ -2,83 +2,94 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE5BC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD688C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFEA020828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:22:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BPFzIMMy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFEA020828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A359D20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 11:23:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A359D20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBGUs-0000gp-Fa
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:22:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47684)
+	id 1jBGVV-0001h9-Ot
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 07:23:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBGU5-00083p-Jq
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:10 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jBGUL-0008OF-7v
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBGU4-0004BN-Lt
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:09 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44291)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBGU4-0004Av-Fu
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:08 -0400
-Received: by mail-ot1-x342.google.com with SMTP id v22so9110377otq.11
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 04:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=pOq5RnEKPS98y3EO2VedHaP73ZUs54LPZ/GTSOLQznI=;
- b=BPFzIMMyl6zSZ6JkANnmVsjjykfUlWd20NWVB9+72w/Zvg9SIq8uQ2uvNOhRWLYIvs
- WptO+qaLW51BHsuAIMFury8EdXuhunJzFC+gviEcE2ysqPLA8T7bbA30C88IHPAyFFmV
- nvgoR8gQ6M7bjnNaKL8b1a41SASUNQw7tLVlHO+J/cKvFKjl236kKAmAD2pkqQpr9x1Y
- gB9IYpxYndwIpQUzX0XzLdp/gELGRJLJYkc8tQLNRW/u/+bkW+/p7z87fPTU1D2T7XJa
- MrJH2BMiJkYD4mqBvnggfwI3O7YoENN6eRzqJO8V4W01mnUCgxJmfkL6i3KPDKjDs5tH
- VVfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=pOq5RnEKPS98y3EO2VedHaP73ZUs54LPZ/GTSOLQznI=;
- b=hFXyPavDiZGT0EE+Trb1ntirefLgv7jHe9VnvnPS28gW6/p6ZibyaQTkA3mzLCDGYS
- kbqkjlX2e8biYsIHAMh8+2/m3PhgBcZ2WC3zMEADFYav2MrYkVPrghgg1PqdgecOAUZy
- hSj250o91xHaLwW+qZUPJXA6K0vegFcI6pRAr8EWkBnEBwxfRZNTKQoqvNAK/cL3UOoJ
- S2z1wB6iYoxC1KrHGfiq8lunohUkEtksW231ctVDfOaGROA6Z73xbtI837V5dD1r+x71
- BznsJiub1gVE/d9XylgX6vg2BSE6N+UD5l5LVSBsue+EZ0j1ThDerTk65GRk0bl+CYOv
- yKcw==
-X-Gm-Message-State: ANhLgQ3w4msbr68j9P7lEVWruehXmKzbelbwtya5oiil9wBk+M+uJtWT
- OJ05ZboutZN+Cd1ud3EtMMz2vCV/8Sxf+FJjhrMWFg==
-X-Google-Smtp-Source: ADFU+vtGxC43jQXbkrSNvVXi+IQQwcCxTNAv1HFc9fqXbwVbQNfIdMB7omjfuCGa4ksDoYZ7OFKkQbXpfsVADIFX9Ds=
-X-Received: by 2002:a05:6830:19e2:: with SMTP id
- t2mr5130301ott.97.1583752927505; 
- Mon, 09 Mar 2020 04:22:07 -0700 (PDT)
+ (envelope-from <frankja@linux.ibm.com>) id 1jBGUJ-0004W5-TK
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31392
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jBGUJ-0004Vh-OI
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 07:22:23 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 029BKFHE062285
+ for <qemu-devel@nongnu.org>; Mon, 9 Mar 2020 07:22:23 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ym8g33ew6-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 07:22:22 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Mon, 9 Mar 2020 11:22:20 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 9 Mar 2020 11:22:16 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 029BMFXW37879976
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 9 Mar 2020 11:22:15 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6CAB44C046;
+ Mon,  9 Mar 2020 11:22:15 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 971204C040;
+ Mon,  9 Mar 2020 11:22:14 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.87])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  9 Mar 2020 11:22:14 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/15] s390x: Protected Virtualization support
+Date: Mon,  9 Mar 2020 07:21:51 -0400
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
- <20200301215029.15196-19-nieklinnenbank@gmail.com> <871rq876h3.fsf@linaro.org>
- <CAPan3WrNnrnngwE4pGeYpR9HS7Vr936-ojPZZovNo8ZdoAA0sg@mail.gmail.com>
-In-Reply-To: <CAPan3WrNnrnngwE4pGeYpR9HS7Vr936-ojPZZovNo8ZdoAA0sg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Mar 2020 11:21:56 +0000
-Message-ID: <CAFEAcA_6Lm-JwbXFLWeetc7+fhnrc5m2+YU28ymFw0MSoKOhwg@mail.gmail.com>
-Subject: Re: [PATCH v6 18/18] docs: add Orange Pi PC document
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20030911-0008-0000-0000-0000035AB789
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030911-0009-0000-0000-00004A7BF714
+Message-Id: <20200309112206.20261-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-09_02:2020-03-08,
+ 2020-03-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 mlxscore=0
+ suspectscore=1 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003090080
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +101,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Mar 2020 at 20:55, Niek Linnenbank <nieklinnenbank@gmail.com> wro=
-te:
->
-> Hello Alex,
->
-> On Wed, Mar 4, 2020 at 11:35 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->>
->>
->> Niek Linnenbank <nieklinnenbank@gmail.com> writes:
->> > ---
->> >  docs/orangepi.rst | 226
->> > ++++++++++++++++++++++++++++++++++++++++++++++
->>
->> I suspect there is a better place to put this is than the top level. I
->> wonder if it should be docs/specs?
->
->
-> Yeah I'm fine to move it to a different subdirectory if needed. Right now=
- its placed in docs,
-> as it seems that documents for machines are also placed there, for exampl=
-e docs/microvm.rst
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
 
-The only things in the top level docs/ are a handful of
-legacy-ish files that went there because we didn't yet have
-a better place to put them. We should avoid increasing the
-number of orphan files in the top level (and indeed should
-try to move the existing orphans elsewhere).
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
 
->> When Peter's document PR goes in later this week there will also be a:
->>
->>   docs/system/target-arm.rst
->>
->> which would benefit from a section for the Orange Pi in it.
+v7:
+	* Merged the diag 308 subcode patches and the unpack
+	* Moved the SIDA memops into the sync patch
+	* Bailout for the none machien and fencing of CONFIG_USER_ONLY
+	* Changes due to review
 
-Yes, this is now the right place to put arm board-specific
-documentation (the rearranging and conversion from texinfo
-is now in master). I should move microvm.rst's contents there
-I guess.
+v6:
+	* diag308 rc numbers were changed by architecture
+	* IPL pv block received one more reserved field by architecture
+	* Officially added the bios patch to the series
+	* Dropped picked constant rename patch
 
-thanks
--- PMM
+v5:
+	* Moved docs into docs/system
+	* Some more enable/disable changes
+	* Moved enablement/disablement of pv in separate functions
+	* Some review fixes
+
+v4:
+	* Sync with KVM changes
+	* Review changes
+
+V3:
+	* Use dedicated functions to access SIDA
+	* Smaller cleanups and segfault fixes
+	* Error reporting for Ultravisor calls
+	* Inject of RC of diag308 subcode 10 fails
+
+V2:
+	* Split out cleanups
+	* Internal PV state tracking
+	* Review feedback
+
+
+Christian Borntraeger (1):
+  s390x: Add unpack facility feature to GA1
+
+Janosch Frank (14):
+  Sync pv
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Add migration blocker
+  s390x: protvirt: Inhibit balloon when switching to protected mode
+  s390x: protvirt: KVM intercept changes
+  s390x: Add SIDA memory ops
+  s390x: protvirt: Move STSI data over SIDAD
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDA
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Move IO control structures over SIDA
+  s390x: protvirt: Handle SIGP store status correctly
+  docs: Add protvirt docs
+
+ docs/system/index.rst               |   1 +
+ docs/system/protvirt.rst            |  56 ++++++++++
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  59 ++++++++++-
+ hw/s390x/ipl.h                      |  72 +++++++++++--
+ hw/s390x/pv.c                       | 104 +++++++++++++++++++
+ hw/s390x/pv.h                       |  34 ++++++
+ hw/s390x/s390-virtio-ccw.c          | 154 +++++++++++++++++++++++++++-
+ hw/s390x/sclp.c                     |  28 +++++
+ include/hw/s390x/s390-virtio-ccw.h  |   1 +
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/linux/kvm.h           |  45 +++++++-
+ target/s390x/cpu.c                  |  40 ++++++--
+ target/s390x/cpu.h                  |   8 +-
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 |  64 ++++++++++--
+ target/s390x/gen-features.c         |   1 +
+ target/s390x/helper.c               |   5 +
+ target/s390x/ioinst.c               | 119 +++++++++++++++------
+ target/s390x/kvm.c                  |  66 ++++++++++--
+ target/s390x/kvm_s390x.h            |   2 +
+ target/s390x/mmu_helper.c           |  14 +++
+ 22 files changed, 803 insertions(+), 74 deletions(-)
+ create mode 100644 docs/system/protvirt.rst
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
+
+-- 
+2.20.1
+
 
