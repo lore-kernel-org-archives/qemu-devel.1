@@ -2,82 +2,100 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A9EC10F29
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF59C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:38:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 131D9208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17BA8208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:38:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZOjj4r/O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 131D9208C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLh2Acc+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17BA8208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBLPr-0000b3-8o
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51356)
+	id 1jBLQ4-0000wb-8r
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:38:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jBLP0-00087i-Fu
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:37:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1jBLOM-0007UH-3o
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jBLOz-0003WL-GW
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:37:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22953
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jBLOL-0003Dw-29
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:36:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35243
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jBLOz-0003W2-CO
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:37:13 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jBLOK-0003Dq-V5
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 12:36:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583771832;
+ s=mimecast20190719; t=1583771792;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mvjBMxUVEOtbEs9CFdXl72orXnBKwQ9Q4ke9ZDtmjB8=;
- b=ZOjj4r/OXb59UxddD6omjUJOVSA1WAlHFm7vwBEXAbsfrkFevf2E+lOeEN7fG4qUL98Ood
- 5Bl+eCGqHt/A4hlwliDCt1b7wiMVV8s9IhHoV+ShBWk54WKIRo9vIwU5iwdjjox5gycnkR
- VVXwD6XQKtfKLmnSEMdi7bUXro9MFXc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-Yp94qDBCOCGrA0pQYOfIEg-1; Mon, 09 Mar 2020 12:37:10 -0400
-X-MC-Unique: Yp94qDBCOCGrA0pQYOfIEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E13E8024DD;
- Mon,  9 Mar 2020 16:37:09 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A3F0C90A00;
- Mon,  9 Mar 2020 16:37:08 +0000 (UTC)
-Date: Mon, 9 Mar 2020 16:37:07 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 7/7] aio-posix: remove idle poll handlers to improve
- scalability
-Message-ID: <20200309163707.GC46227@stefanha-x1.localdomain>
-References: <20200305170806.1313245-1-stefanha@redhat.com>
- <20200305170806.1313245-8-stefanha@redhat.com>
- <58ce9251-77ba-9db2-b1c1-fd97cd175e9a@redhat.com>
- <20200306135036.GP1335569@stefanha-x1.localdomain>
- <56306d86-cd1b-07b6-f538-7cfbcb6b5ab1@redhat.com>
+ bh=CcAsGXiG2VF6QQr/mDlUnLtJ9aFGI4GNn9FNRHU9V5k=;
+ b=gLh2Acc+ss08Yjvlu8AGQV3CteB4CSECINeGsyDKMVFqG8V387IrsSI9Z1/hMBchrh10du
+ s/XSm15RJNdDwGFkQTiKZ7i2cVD4biF9LMuT8x4vzz5DZV3ZB4AI7lQGESJ/VpLbS6tgpz
+ eAn9e7+RlgpzjIY0XMcjy846PJRy3MI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-GPxexTMuN0qqHdXetiK7zQ-1; Mon, 09 Mar 2020 12:36:30 -0400
+X-MC-Unique: GPxexTMuN0qqHdXetiK7zQ-1
+Received: by mail-ed1-f69.google.com with SMTP id f13so8471188edy.21
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 09:36:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ss3xfdQgnPA3E1OJ1aBzz8H7ez/25Mo6ELaDcKhXc+k=;
+ b=mxHq2rF1j5qS2CxIR4TxJVPTnQlO9y5exUN9izxhsOsPihAsdYBobYvkxJxwv8cZi3
+ 7rfsfp/6nrei7BRVimWRwM3TgoY2VYjDs8WxTBnhVeffvmUjq3AXdHUtCcPY7BVA0HEF
+ SO+Jq7DCRYL9Z7fKyh9sy+j9W4d2yPlMyOW/qlOhsqGCLgHp+gjX7Kfpis/0apnH2P5C
+ Nh0We7DA+7SjOADw7xTcb3t0hfJ/JwIE6e8Hdrh9yxikr0O9TNQGJpOFTXb2hmz8zq3a
+ 28bTBaqw2b/vOYk0S7isfVBz/VFCqNNJ8Ro1nphw1j0l9/6/owBt2fOIV8ViMFPjsiQ/
+ X2EA==
+X-Gm-Message-State: ANhLgQ1aVGpMalLg43prCi36x0V4d+WCkXR82zOiQYqUVDdNh2jnTc6M
+ viChvJEa3uV6VrJaN1yKRLhtwhlLP+fyYUXAeWJpozfeIt4nl04v5k9qsnTCiw8iQWT1CC7VWsh
+ UqyhOLmsgx9MRscw=
+X-Received: by 2002:a50:f149:: with SMTP id z9mr18610386edl.246.1583771789778; 
+ Mon, 09 Mar 2020 09:36:29 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtLgeYqYsBVT/60/2YAsZb8q8UjPdTyHLQ97h15dkLThauXG2lZH8CUxut+EyzUJ8zbiE2nNw==
+X-Received: by 2002:a50:f149:: with SMTP id z9mr18610372edl.246.1583771789543; 
+ Mon, 09 Mar 2020 09:36:29 -0700 (PDT)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id p24sm349426edx.34.2020.03.09.09.36.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Mar 2020 09:36:29 -0700 (PDT)
+Subject: Re: [PATCH] softmmu: fix crash with invalid -M memory-backend=
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200309145155.168942-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <caa7121c-47ce-9003-7666-74f8b6f42704@redhat.com>
+Date: Mon, 9 Mar 2020 17:36:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <56306d86-cd1b-07b6-f538-7cfbcb6b5ab1@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200309145155.168942-1-marcandre.lureau@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UPT3ojh+0CqEDtpF"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,56 +107,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---UPT3ojh+0CqEDtpF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 3/9/20 3:51 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Fixes: fe64d06afc1c5d895f220c268cfe4d5f1e65d44e ("vl.c: ensure that
+> ram_size matches size of machine.memory-backend")
 
-On Fri, Mar 06, 2020 at 03:17:40PM +0100, Paolo Bonzini wrote:
-> On 06/03/20 14:50, Stefan Hajnoczi wrote:
-> >> Not sure I understand the "almost" part.  If it's accessed only from
-> >> aio_poll() it is protected via either AIO_WAIT_WHILE or the BQL, not b=
-y
-> >> ctx->list_lock; if it's protected by ctx->list_lock (using
-> >> qemu_lockcnt_inc in readers), it is an RCU list.
-> > aio_remove_fd_handler() removes nodes from the list during
-> > aio_set_fd_handler(), but only while holding ctx->list_lock and the
-> > count is zero (no readers).
-> >=20
-> > All other access is done from with ctx->list_lock incremented.  This
-> > code needs to be reentrant in case of nested aio_poll() but nothing els=
-e
-> > will access the list at the same time.
+<new line>
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> ---
+>   softmmu/vl.c | 5 +++++
+>   1 file changed, 5 insertions(+)
 >=20
-> Oh, I see, adds are only done under ctx->list_lock and those are the
-> part that need the write barriers in the RCU iterators.
-
-I'll update the comment when merging this series.
-
-Stefan
-
---UPT3ojh+0CqEDtpF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5mcLMACgkQnKSrs4Gr
-c8hJQQgAoF1g/XuS3re0q4P03VCE9cnGkQhH4PJKuD1smJ5aoO3F0WwSN9zUNHsY
-DNEFy1gvait8JUx0WQNWd1lUYDltQVNKbFz5QQGoS8Zsm0RduI0RqllYNGS+6imu
-b35nJT1YTHvEYY/NtP+Wj4vbW00QKl5Zaajh7lPwzmjmnbHJqgf/5+JD/OhnE6LM
-1FG32l6ZbnYa3VP2syJKBpJZeMGdz4el/foQeK6QVXz9vAse/ZZ9sNZDhiF29RId
-CkDTAGjodLvXu7pWqSkl5d9I3v2/OSCeFhEh2uVwYn5ATHy58VmSWqX6o3WMiOlb
-N2wwIiaycjwBQ5IN+8v3JVWLkOufRg==
-=55I2
------END PGP SIGNATURE-----
-
---UPT3ojh+0CqEDtpF--
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 5549f4b619..38e9c404f2 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -4287,6 +4287,11 @@ void qemu_init(int argc, char **argv, char **envp)
+>  =20
+>           backend =3D object_resolve_path_type(current_machine->ram_memde=
+v_id,
+>                                              TYPE_MEMORY_BACKEND, NULL);
+> +        if (!backend) {
+> +            error_report("Memory backend '%s' not found",
+> +                         current_machine->ram_memdev_id);
+> +            exit(EXIT_FAILURE);
+> +        }
+>           backend_size =3D object_property_get_uint(backend, "size",  &er=
+ror_abort);
+>           if (have_custom_ram_size && backend_size !=3D ram_size) {
+>                   error_report("Size specified by -m option must match si=
+ze of "
+>=20
 
 
