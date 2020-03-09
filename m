@@ -2,84 +2,86 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BA3C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49A0C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:03:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 252E8208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7596E208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:03:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jy44Wbgt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 252E8208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gCalxzOK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7596E208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKs1-00053k-BQ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:03:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41161)
+	id 1jBKs4-00058a-I8
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:03:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jBKeK-00087q-1P
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:49:03 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZj-0001oN-Ut
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jBKeG-00048A-Jr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:48:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42564
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jBKeE-00046N-Nr
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:48:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583768934;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QTzvaWYpXAmYgOGjTaIaGIZhtWr/UkZXteo1ZOWQ76M=;
- b=Jy44Wbgtd+m6xrVWB1tvMZ6LUzrPa8hc9tW9CzSQDdPXpw4F1XDJvZYHaNTnGg+54UcbdV
- d6654qVHWlq0cEXXdFVkoVVj8X70XvJZZHFOlGnG0axj6Ud5BKPRvna5m+BoLNNmNJklNZ
- sTGW/UkDQ8GCjEneYpeVvZyL3/RkiA0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-UtQq4H23O4SclwClJRtZ5A-1; Mon, 09 Mar 2020 11:48:49 -0400
-X-MC-Unique: UtQq4H23O4SclwClJRtZ5A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B64D3DBA7;
- Mon,  9 Mar 2020 15:48:47 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-162.ams2.redhat.com [10.36.116.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C104F7388F;
- Mon,  9 Mar 2020 15:48:42 +0000 (UTC)
-Date: Mon, 9 Mar 2020 16:48:41 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v3 1/4] block: Add trivial backing_fmt support to qcow,
- sheepdog, vmdk
-Message-ID: <20200309154841.GD6478@linux.fritz.box>
-References: <20200306225121.3199279-1-eblake@redhat.com>
- <20200306225121.3199279-2-eblake@redhat.com>
- <20200309152112.GC6478@linux.fritz.box>
- <7b7f12f8-ca03-12d4-b93d-2edefb51cb42@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZi-0001Lk-4o
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:15 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43263)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBKZh-0001L8-TM
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:14 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v9so11801686wrf.10
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rbxvM6zBsEyzHKe8nAvY0XhamX4FQe6hP23LCjFR3Y0=;
+ b=gCalxzOKcZIo2PLP2rf8J/e6wKLB/lOa9oJ9DT7ZR8GEnZs+lMBlStAVNRYoqApTSH
+ FJvsil4DjT6Aist5+MEhfm/n/eLthC7gTpgdvqvSdTnEGjcN0MNJh2sgBf0LLbwTi0nf
+ xnfyyT4w/iKmiRfx9PyRKFKvAR+efeX7q8CpDv57Vkcx8hRdFEGXqX+Cd4YO0iSAbvku
+ makHky/Wls/RZOjIe0mU9rnii4QiehXPbsMSZ92mzpIcHHOnE6Bf7sV4CzC9+5lLFB65
+ FTmQahM+biEuKPbBV5XvLqD4jKrq0Q9U9u30xm/k9HCYiv+G7stZ021kII/1pY7f/iMA
+ 6WJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rbxvM6zBsEyzHKe8nAvY0XhamX4FQe6hP23LCjFR3Y0=;
+ b=mkGDuwOLuSutxaUlrDFR9Nh8J0bI3lou7UuOUMEK9cbDCnM99Z5YOJU677DJpNmL5h
+ SwCIgWWjrVCKaeweMqcImwvoopObH+uv1+yNcADur37r8gHwonEPblDPZImMvvYfynlC
+ KjtW9KFhyycleMr5xfD3avO3dDcoONXGzQuD7yVGHdZEVt3zJdcH2eo6qs1Ih29wViab
+ krsZN+7IcQQXDvGwpIacmsgHDr0tozFFZEEy/ta4VdvIFvuviDMVGfIIpCjsQaE/G08v
+ lbj6B3OcjiNzNtsAxfCOU3dVS71em87Jy/VTwfU1T3JeEacjPm3x1A3eSnmDtC93SN/C
+ 80kg==
+X-Gm-Message-State: ANhLgQ0iyWa0ELStebY6CLbYkG5WLcdOMpoRsuDiFOY5146bZe18IttP
+ OPzec4qeWCVv1LkDLiLUU3K8ksYDnMDOLg==
+X-Google-Smtp-Source: ADFU+vuWR2DlNsyb6fh83RJXvzdWdFh7wN1LQPOWkroPFEuQyRtxQvzDJdBYzb75eWRNs58Khc3q1A==
+X-Received: by 2002:a5d:6141:: with SMTP id y1mr20572150wrt.146.1583768651950; 
+ Mon, 09 Mar 2020 08:44:11 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Mar 2020 08:44:11 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 03/18] qapi/machine.json: Escape a literal '*' in doc
+ comment
+Date: Mon,  9 Mar 2020 15:43:50 +0000
+Message-Id: <20200309154405.13548-4-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
+References: <20200309154405.13548-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <7b7f12f8-ca03-12d4-b93d-2edefb51cb42@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,86 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, pkrempa@redhat.com,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- libvir-list@redhat.com, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, mreitz@redhat.com,
- "open list:Trivial patches" <qemu-trivial@nongnu.org>,
- Liu Yuan <namei.unix@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 09.03.2020 um 16:32 hat Eric Blake geschrieben:
-> On 3/9/20 10:21 AM, Kevin Wolf wrote:
-> > Am 06.03.2020 um 23:51 hat Eric Blake geschrieben:
-> > > For qcow2 and qed, we want to encourage the use of -F always, as thes=
-e
-> > > formats can suffer from data corruption or security holes if backing
-> > > format is probed.  But for other formats, the backing format cannot b=
-e
-> > > recorded.  Making the user decide on a per-format basis whether to
-> > > supply a backing format string is awkward, better is to just blindly
-> > > accept a backing format argument even if it is ignored by the
-> > > contraints of the format at hand.
-> > >=20
-> > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> >=20
-> > I'm not sure if I agree with this reasoning. Accepting and silently
-> > ignoring -F could give users a false sense of security. If I specify a
-> > -F raw and QEMU later probes qcow2, that would be very surprising.
->=20
-> Do we know what formats qcow, sheepdog, and vmdk expect to probe?  I'm
-> wondering if we can compromise by checking that the requested backing ima=
-ge
-> has the specified format, and error if it is not, rather than completely
-> ignoring it - but at the same time, the image formats have no where to
-> record a backing format.
+For rST, '*' is a kind of inline markup (for emphasis), so
+"*-softmmu" is a syntax error because of the missing closing '*'.
+Escape the '*' with a '\'.
 
-The important distinction (and in fact the only one that qed makes) is
-raw and non-raw. Problems only arise if a guest can write an image
-header to a raw file and get it probed as non-raw when opening the
-image the next time. If you start with a non-raw format, at least the
-first 512 bytes (which are used for probing) are used for metadata and
-not accessible for the guest.
+The texinfo document generator will leave the '\' in the
+output, which is not ideal, but that generator is going to
+go away in a subsequent commit.
 
-> I'm guessing that qcow works with either raw or qcow as backing format (a=
-nd
-> anything else is odd - a qcow2 backing to a qcow is unusual, and would be
-> better to reject).  I'm not sure if sheepdog can be backed by anything bu=
-t
-> another sheepdog, similarly, I'm not sure if a vmdk can be backed by
-> anything but another vmdk.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ qapi/machine.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think vmdk only expects vmdk as backing files, even though QEMU
-supports everything else, too. However, this is a format for
-compatibility with another hypervisor and you're unlikely to find
-QEMU-only VMDK images, so requiring non-raw unconditionally might make
-sense.
-
-I have no idea about how backing files in Sheepdog are used in practice.
-However, QEMU is a primary target for Sheepdog. It wouldn't surprise me
-if it's used for both raw and non-raw.
-
-qcow is definitely used for both, as you already said. Allowing only raw
-and qcow and forbidding other formats doesn't improve the situation
-because the problem is with supporting raw and non-raw at the same time
-and you would still have this.
->
-> If so, it should be simple enough to do a v4 of
-> this patch which requires -F to be a known-acceptable probe type for thes=
-e
-> images.
->=20
-> Still, the point of this patch is that I want to add -F into all the
-> iotests, and without something along the lines of this patch, all of thos=
-e
-> iotests are broken for these image formats.  Patch 2 is a lot harder to
-> write if we have to make our use of -F conditional on the image format in
-> question.
-
-Hm... Maybe _make_test_img can insert/filter out -F depending on $IMGFMT?
-
-Kevin
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 6c11e3cf3a4..58580602524 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -12,7 +12,7 @@
+ #
+ # The comprehensive enumeration of QEMU system emulation ("softmmu")
+ # targets. Run "./configure --help" in the project root directory, and
+-# look for the *-softmmu targets near the "--target-list" option. The
++# look for the \*-softmmu targets near the "--target-list" option. The
+ # individual target constants are not documented here, for the time
+ # being.
+ #
+-- 
+2.20.1
 
 
