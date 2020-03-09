@@ -2,116 +2,96 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F270EC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1996DC18E5A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C56CC205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56CC205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id DC4DE205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:14:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9NbdP7l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC4DE205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHJ6-0000Ft-Vy
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55908)
+	id 1jBHJ8-0000Kj-3w
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHI3-0007CT-VR
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:13:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1jBHFj-0003kS-HZ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHI2-0001SN-WC
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:13:47 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:54311)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHI0-0001PU-Gj; Mon, 09 Mar 2020 08:13:44 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MmkfQ-1ja8Ap12uM-00jr7h; Mon, 09 Mar 2020 13:13:29 +0100
-Subject: Re: [PATCH v3 01/12] block/stream: Remove redundant statement in
- stream_run()
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-3-kuhn.chenqun@huawei.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <66182cbb-7492-dd16-4552-e4cf0f1911ab@vivier.eu>
-Date: Mon, 9 Mar 2020 13:13:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <philmd@redhat.com>) id 1jBHFi-0008SC-Jt
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:23 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54428
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jBHFi-0008Rp-GO
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:11:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583755882;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LM9DMNWiI760NtiO1+iofmugtapmqUkn1Z+NOomLjok=;
+ b=Q9NbdP7lUHkwQ/7xCDLlnetDoqwR8I/cxiQO44MetNKzKoB42D/BMKWJUMenIWMFZ9smGl
+ RhJltkW7Oji5C1bkoxV4ZRJfigDUGS3c1zUBHwzxiieqg8uGdLJxgpHYecfBslI79+XLtJ
+ wQxrCpl5iueKE4MfRlz9523kZ/aQtzA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-mjFoLki7OkWkxLck-tHGvQ-1; Mon, 09 Mar 2020 08:11:20 -0400
+X-MC-Unique: mjFoLki7OkWkxLck-tHGvQ-1
+Received: by mail-ed1-f69.google.com with SMTP id y4so7822697edm.0
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 05:11:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=WfHxGWmhrgeXSkoiuMTUncVrwHERBg1P30j9pqJHkrE=;
+ b=dIYqt3PMg6rnhIa11JuvpNl+cIzTpK5GRFZUhDE9jm9N5a+ey12VOg26qub5jvNweS
+ kMEvAst7v4s9GFZmdbFvh3qVx0Gjo5JdEmy57D2qVLYr0eoBHwolNa58XYcB6yknCtf7
+ yVLJV2zdKTrZ0jQs8TH67iIII9WC+C2FAWMA13l5DQRhYPmNt4UklHK8S1/kpdoF+CvR
+ T1fimSAWgXsHWulVjz5Mz36MXCpyn9u318TKlgYineLk5DJraB9aKXQJAxbDm+nwMfcE
+ NE5zed+464w0VSExG92UhPi/y9al/M5CC4gTWD4cTo5z5g4q1CjDC88O0q1XJ0Hlb2iO
+ JvJw==
+X-Gm-Message-State: ANhLgQ0CSMDlpsm4ZaiiNfMYIo6Vh/j/uv/LpXPKoRZ2yBssTHiPO7a/
+ j94QV4nJoiJJoW4JN+cfKR4KRi88W0DRFTmOicVXHMxaHBfMbUB/wxmXEUr4+ZVUMv5+qv23F/Q
+ lGn3ojSS1XwKf25Q=
+X-Received: by 2002:aa7:d689:: with SMTP id d9mr16927240edr.228.1583755879001; 
+ Mon, 09 Mar 2020 05:11:19 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs6xnGbBLi2ziq5PuHRL2x6ef9phKTCiI0J3KHZiX1lNv19kEQVD0jVzxfGnTPw7HyF6lJ8Tw==
+X-Received: by 2002:aa7:d689:: with SMTP id d9mr16927219edr.228.1583755878859; 
+ Mon, 09 Mar 2020 05:11:18 -0700 (PDT)
+Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id c13sm953733edf.36.2020.03.09.05.11.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Mar 2020 05:11:18 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/2] cpu: Assert a vCPU is created before resetting it
+Date: Mon,  9 Mar 2020 13:11:03 +0100
+Message-Id: <20200309121103.20234-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200309121103.20234-1-philmd@redhat.com>
+References: <20200309121103.20234-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200302130715.29440-3-kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:R0yNBrn9cVFozWcqfejX3Sim6HkSZMhIkY99/rb0SwJOL/Ujzwg
- mbjk+6v+q65A5b2lMMb26vbsjfrnAO1PLVqJSn1XC6ULvBw/b+B5iIwHUEu6s9hYejF9ymj
- x9hip6p1AX6yDLSvA7FtPk87BHTiW9PLKxBALE3+YqhDeIVp3J7x5CZUmHQVVapSmfTjLNo
- lEQzWqlDVmfcT0KSmvRZA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:GWOS/nlNgLM=:7dY99Ss43YOdEdiHoCVcGE
- WlYO/Ae/+/uV+PGNgj4LOILyDEf6cXjP4UvwZQ/Dx2dE/9+ABGMIYlIjkrHHJ/NANDGvxh0wp
- XKuXiqiRAMSa9gXOCuXAYJDsk+hXrwy4ldOBcEJXcm4ZNNz0ps96MLy0DzDhCGdK1aPuBwNrA
- MsdkYQr/+Bd2toR4hJV4YYhc/jslgYJkG0PtUp4g+8+6FibxzdCeLchOsf8kJY4y1mpaoa1tK
- r6tA3Xlf7pKY1mkw3OrYCYkzRnY76PgmiPSJGtcKm3PGMBtKU5Qu6yTmbeG7Dh8k9OBf+ySi1
- IbblUNGVYTZddEgaykLhTUXzH/X5NqGE8nI1m2Qw1hwPHs7OJoCu9OUzPAvxfZZFv+4gliFXR
- o+m5hoClDyJHP19uvBCO6Asy34ekl88YPJeM5c/o0TDEWyZLjmBkj9xo5PQ9AG6frs/wNs8XB
- aQlI5mBFumKTYzSoMXpFuPSam8tMX/mTWci1h1cKqCKHqj2DswvefR3BmOpu5ta00AYgR7bcJ
- RD8fS7sQeWAC/+lX4OJujGXQEed2vvxlnhv00sPFlurR3ydL+u8R8O38J4Q3fAA/YxeMkaveG
- 6rLIi+X1WGz40SOfDaiVlsIqswtikm1JLwkJ14oIG65rF7UC2T8JZJjEsIqdXh2PB+d08E/iq
- VcYoH394LGww1JPjCVTwEiH6HHbD2/BYYvkyDC4emKm+mC7wDFMqUOXPCXknHS2t7P7y3Q5hc
- a/bptzhH8Gdi1EvRejBYZJR6w33EWLunjH/YwiLwDp6pbxI+4GjKbIxtwScIG5hlTX0wJXWmg
- CQ36hVlA8sK/4FB+Ykw0bPhZ/xxFvchlv4bYnfkWqIFRNax47NoYKHkLkebq+n8N5GYrEvN
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,65 +103,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- zhang.zhanghailiang@huawei.com, Max Reitz <mreitz@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Michael Walle <michael@walle.cc>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/03/2020 à 14:07, Chen Qun a écrit :
-> Clang static code analyzer show warning:
->   block/stream.c:186:9: warning: Value stored to 'ret' is never read
->         ret = 0;
->         ^     ~
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> ---
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> 
-> v1->v2:move 'ret' declaration to the for() statement(Base on Kevin's comments).
-> ---
->  block/stream.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/stream.c b/block/stream.c
-> index 5562ccbf57..aa2e7af98e 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -114,7 +114,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
->      int64_t offset = 0;
->      uint64_t delay_ns = 0;
->      int error = 0;
-> -    int ret = 0;
->      int64_t n = 0; /* bytes */
->  
->      if (bs == s->bottom) {
-> @@ -139,6 +138,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
->  
->      for ( ; offset < len; offset += n) {
->          bool copy;
-> +        int ret;
->  
->          /* Note that even when no rate limit is applied we need to yield
->           * with no pending I/O here so that bdrv_drain_all() returns.
-> @@ -183,7 +183,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
->                  break;
->              }
->          }
-> -        ret = 0;
->  
->          /* Publish progress */
->          job_progress_update(&s->common.job, n);
-> 
+cpu_reset() might modify architecture-specific fields allocated
+by qemu_init_vcpu(). To avoid bugs similar to the one fixed in
+commit 00d0f7cb66 when introducing new architectures, assert a
+vCPU is created before resetting it.
 
-Applied to my trivial-patches branch.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/core/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Laurent
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index fe65ca62ac..09e49f8d6a 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -251,6 +251,7 @@ void cpu_reset(CPUState *cpu)
+ {
+     CPUClass *klass =3D CPU_GET_CLASS(cpu);
+=20
++    assert(cpu->created);
+     if (klass->reset !=3D NULL) {
+         (*klass->reset)(cpu);
+     }
+--=20
+2.21.1
 
 
