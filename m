@@ -2,84 +2,69 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E674BC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0625C10F29
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF66920873
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:07:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="az5XhZ+b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF66920873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAEB620873
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAEB620873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBK0b-0005sL-TD
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:07:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60934)
+	id 1jBK46-0001Fd-15
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jBJzx-0005J0-5H
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:07:18 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK2G-0007H5-8n
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jBJzw-0006fT-7l
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:07:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28162
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jBJzw-0006fI-3B
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:07:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583766435;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rCTQqPb0MqrRy0isFN56NKQxK9h/ZHsOznKh3+eYFh4=;
- b=az5XhZ+bWVIsn6HefTnzrPBBmqID7z0o2KjZ/51xZIjkLD9OUVMsFf5kzEQirxicZ47bkL
- okklzDmSqH4qgdHVQ2irCl6NyGji3oF0LMQfYbnCQ2xJO0Rg1vbaOnrXfIPN607O8dEI94
- kd62TXhkN1NDi4utSobM9UqMwqxnvzc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-AM1LnAZDODynjMvpyO0LEg-1; Mon, 09 Mar 2020 11:07:12 -0400
-X-MC-Unique: AM1LnAZDODynjMvpyO0LEg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA54785EE90;
- Mon,  9 Mar 2020 15:07:10 +0000 (UTC)
-Received: from [10.3.116.177] (ovpn-116-177.phx2.redhat.com [10.3.116.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CA0A7389B;
- Mon,  9 Mar 2020 15:07:10 +0000 (UTC)
-Subject: Re: [PATCH] docs: Add RX target.
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- philmd@redhat.com
-References: <20200308130637.37651-1-ysato@users.sourceforge.jp>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e6ccf136-cf93-865d-31bb-4463b65416a9@redhat.com>
-Date: Mon, 9 Mar 2020 10:07:09 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <laurent@vivier.eu>) id 1jBK2F-0007YP-7t
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:39165)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jBK29-0007U2-EG; Mon, 09 Mar 2020 11:09:33 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MJm8N-1iw7ce3yYr-00K8ZL; Mon, 09 Mar 2020 16:08:50 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 03/33] build-sys: Move the print-variable rule to rules.mak
+Date: Mon,  9 Mar 2020 16:08:07 +0100
+Message-Id: <20200309150837.3193387-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
+References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20200308130637.37651-1-ysato@users.sourceforge.jp>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Ai7ynpyxzGre05ka6l4GHxtd8qdyahqT071p9CAte9wTwaVdbM3
+ pHDOymBtC/BvQqlP10iUnTuKFyHWpDKASXeJ/bW6G0v0fVTGSF5Ljp4PCjGqP+TIJ9ZNDRF
+ K6HMcD16Vs7MQh6h8BIGO8yntewAIqBTOekGCjOlFf2vEJIEV7rOrXubkpjFZ57I8MB07eU
+ O+rjV/JwLevP1eAGA39mw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Sfa1dDNsXDU=:9u5wgKBUFXudeh8bQQnT2U
+ hdCTsT6kbqwpRz7WgE7IHH/m+OwP6e+qOyrrV37mgpctyPzGgwd4pVO4zhtJJZMGm3K9fmsmr
+ cfMDp+t3pwTTrcyCCsrlKo5ljsWP6qyu1dFFt4mtJKol1kOpoU7kudYcjRmR+yX9rT2sGvsuQ
+ k2wiNcXnuJzvUze1hfR6MS3HSLrjGRk3u1KHYBnA+JDnraMuhRnfSXbR/VBhAH/9WzGKiTQUf
+ c38sngokSEH+Kdx7DZs7U1rz70Ln/+5eDQmuUq0Snbclge1aZnKt8iEfaAQPh4pJh5BGJql7K
+ Xp6NryO9xJrV/V8ekAZwWB8Q6QY3LFDEFuxkWbSDFtsVOgY1Bhq6HjKQ1r/Iy9OUvhEXhYJab
+ ClcnAPME1ZKDIuLThJl0DHvkahAhJVFJhiz9yaQlGoJ5KSwFf12kc7VQy8ufGNcRfwMOUQ1iN
+ rPmNU4x5+VM5TaDJP1kTA4StxGQMQXFZAm5+9kk2PpSnIX9ct9DRK6O8X1G0IXeskjiR0Hsmx
+ D3gx/WAf4Fn17MUQvQE5txRg7MEE8LoBgwhiOazCpMzRHHRxZ1t0T15Rx30W9AIOLdc9r+iOl
+ n2diFPff6lpEso40mpvi/sUNl8N1qyFoWOYnDJEY99qXC8Pb0kMy2mduiT18q0k6ys18+HPIE
+ sAVLRQ8EoOLIL6P1b39TtKEdOmKHKj4VQzvuMpG1khli4vSfSgdyIA8LSnJqGeGDP9iHxhAXT
+ 8xdPd7qOaGHPh4ugoblbVTAM4oI+1I4vLASJXigLq2UzBmbJqxof15K69EzZKFp/ok+Zql7JY
+ ERfm375SNigSccT6w0HvKAEPc5CeXgtBPj5Oq4PwtCUb+YWjF1Sj2e3Vy2FNf5KHIewmKww
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,53 +76,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/8/20 8:06 AM, Yoshinori Sato wrote:
-> Add rx-virt target specificaion document.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-specification
+Currently the print-variable rule can only be used in the
+root directory:
 
-> 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->   docs/system/target-rx.rst | 35 +++++++++++++++++++++++++++++++++++
->   docs/system/targets.rst   |  1 +
->   2 files changed, 36 insertions(+)
->   create mode 100644 docs/system/target-rx.rst
-> 
-> diff --git a/docs/system/target-rx.rst b/docs/system/target-rx.rst
-> new file mode 100644
-> index 0000000000..8540fd5218
-> --- /dev/null
-> +++ b/docs/system/target-rx.rst
-> @@ -0,0 +1,35 @@
-> +.. _RX-System-emulator:
-> +
-> +RX System emulator
-> +--------------------
-> +
-> +Use the executable ``qemu-system-rx`` to simulate a Virtual RX target.
-> +This target emulated following devices.
+  $ make print-vhost-user-json-y
+  vhost-user-json-y= contrib/vhost-user-gpu/50-qemu-gpu.json tools/virtiofsd/50-qemu-virtiofsd.json
 
-s/emulated/emulates the/
+  $ make -C i386-softmmu print-obj-y
+  make: Entering directory 'build/i386-softmmu'
+  make: *** No rule to make target 'print-obj-y'.  Stop.
+  make: Leaving directory 'build/i386-softmmu'
 
+Move it to rules.mak so we can use it from other directories:
 
-> +++ b/docs/system/targets.rst
-> @@ -17,3 +17,4 @@ Contents:
->      target-arm
->      target-m68k
->      target-xtensa
-> +   target-rx
+  $ make -C i386-softmmu print-obj-y
+  make: Entering directory 'build/i386-softmmu'
+  obj-y=qapi-introspect.o qapi-types-machine-target.o qapi-types-misc-target.o qapi-types.o qapi-visit-machine-target.o qapi-visit-misc-target.o qapi-visit.o qapi-events-machine-target.o qapi-events-misc-target.o qapi-events.o qapi-commands-machine-target.o qapi-commands-misc-target.o qapi-commands.o qapi-init-commands.o
+  make: Leaving directory 'build/i386-softmmu'
 
-Is it worth keeping this list alphabetically sorted?
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200306170456.21977-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ Makefile  | 3 ---
+ rules.mak | 3 +++
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 2e930688942b..37aed4a24422 100644
+--- a/Makefile
++++ b/Makefile
+@@ -15,9 +15,6 @@ UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
+     help check-help print-% \
+     docker docker-% vm-help vm-test vm-build-%
+ 
+-print-%:
+-	@echo '$*=$($*)'
+-
+ # All following code might depend on configuration variables
+ ifneq ($(wildcard config-host.mak),)
+ # Put the all: rule here so that config-host.mak can contain dependencies.
+diff --git a/rules.mak b/rules.mak
+index e39b073d4648..694865b63ee8 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -435,3 +435,6 @@ sentinel = .$(subst $(SPACE),_,$(subst /,_,$1)).sentinel.
+ atomic = $(eval $1: $(call sentinel,$1) ; @:) \
+          $(call sentinel,$1) : $2 ; @touch $$@ \
+          $(foreach t,$1,$(if $(wildcard $t),,$(shell rm -f $(call sentinel,$1))))
++
++print-%:
++	@echo '$*=$($*)'
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.24.1
 
 
