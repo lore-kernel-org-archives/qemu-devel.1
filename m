@@ -2,127 +2,86 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 258B2C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BD3C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E593A21D56
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7268C20578
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:51:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fxbI7r+B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E593A21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fo7dRYZ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7268C20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKfa-000113-VS
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37239)
+	id 1jBKge-00034P-K3
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:51:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jBKK5-000215-Rq
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZp-0001ro-Cs
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jBKK3-0007Rh-0E
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44657
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBKK1-0007QX-A3
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583767681;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=82zrjJBhKppaWDktfeKrZYUBmctHGVdwgl2gVBqELh8=;
- b=fxbI7r+Bfa0Jl3/rAOeNLcte3sBdp9JhUCAyrF5BZmnJyMhWXSLIwsnKXqVYlxdCoYmBCt
- 16GGUfayqBEtLmYTTUhcNM1ExatTpRF4bD6rh03gyjejBb37k6+rWPGRBT6+kZDCxqKApr
- qMTP6c9WUutLvqlQSSaNwUc1q/oM3F4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-dLlKazW7PVyKyi5_5I2W7A-1; Mon, 09 Mar 2020 11:27:59 -0400
-X-MC-Unique: dLlKazW7PVyKyi5_5I2W7A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8EBD800D50;
- Mon,  9 Mar 2020 15:27:57 +0000 (UTC)
-Received: from [10.36.118.226] (unknown [10.36.118.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 06E985C3F8;
- Mon,  9 Mar 2020 15:27:53 +0000 (UTC)
-Subject: Re: [PATCH v7 08/15] s390x: protvirt: SCLP interpretation
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200309112206.20261-1-frankja@linux.ibm.com>
- <20200309112206.20261-9-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <6b57a6b8-f864-c5f6-f53f-1ac09e95e271@redhat.com>
-Date: Mon, 9 Mar 2020 16:27:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZl-0001Np-UD
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:21 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:36916)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBKZl-0001N4-4K
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:17 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id 6so11824123wre.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=N6mQu6BRQc+d3wvjojXxmiJN8RUreVO9yrOtythNod4=;
+ b=fo7dRYZ9os3+a3d0+hUGbteCDtdwlVeO8VRf6wKssNLPL9M60o7gOAiZMuVyO04s2Q
+ JVxlXF6+RhAZjaarSDTtSK4/j5kZ/2seQuwCe6vPRqRZCJLGS4Qbg4SUTdN5rcYFwD6k
+ DDB/w9U1sOaoGVitqg3PVr/+QiSSCa/ZvnXyOZXENCu2wiw8nD7YRGDOCL57bHBSadEf
+ EFK11rLwQzzgY8wVYNSFj1u+NO2Zf40xWyh18vz26ZkPk9FEwUeQbeqRafy6WXWW2nJc
+ 5lrwT9OW9DF0ZP4XeRtZ1r4FbW0c5Fu9Gw8TxmUCr+egV+1RMEbI++t85kilWy9efEZX
+ sYvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=N6mQu6BRQc+d3wvjojXxmiJN8RUreVO9yrOtythNod4=;
+ b=Y7SxmHx9mhr0jKJ6/Yka8/8fp0HsIAh71TXYPOhfoOxYjrVGHP0TOEMQZhfd9Lhxk4
+ r3/uqHeE+bs4rryt0ze2CtE2HZqe2enb4PM67wrD8ocQor/I4Lspp1pTqFETBwZD8r8a
+ SlNBVmW/q/UDnbIhGCBLrQp5yJxi2XRxqgI67bXY9yIBBrvrOO3edi2bUBi3Elywz1o5
+ Ffcw2NbE47aSPe6XTSX4xMZnUUOC5UrzgnyiXT9kgHA/zZ10Ya4SkyWNFFupA/quLLJE
+ hMurVi7vles1WO6oAUPyfuA6QTcXzMaMLcbsdJprb1Ze2Rlxg7WyrjNGk7r8wvALKBoH
+ OuEg==
+X-Gm-Message-State: ANhLgQ0xczdxB9NqPiEdDY+6gPhzxjqus4kRSZCTlRj/d7bktwWehQBh
+ Dh+CBfIGz3zPl9GC5gkFgu3MBU0jwZ6yZg==
+X-Google-Smtp-Source: ADFU+vsXGaUmFeqL/HdSTXNI5mI6FGVDRwdiAHsw8jH3cjccNy4hvbfBRJr31IWde338muOVT/exTA==
+X-Received: by 2002:adf:fd11:: with SMTP id e17mr20441757wrr.195.1583768655645; 
+ Mon, 09 Mar 2020 08:44:15 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Mar 2020 08:44:15 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 06/18] scripts/qapi/parser.py: improve doc comment indent
+ handling
+Date: Mon,  9 Mar 2020 15:43:53 +0000
+Message-Id: <20200309154405.13548-7-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
+References: <20200309154405.13548-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200309112206.20261-9-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,128 +93,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09.03.20 12:21, Janosch Frank wrote:
-> SCLP for a protected guest is done over the SIDAD, so we need to use
-> the s390_cpu_pv_mem_* functions to access the SIDAD instead of guest
-> memory when reading/writing SCBs.
-> 
-> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
-> since the function that injects the sclp external interrupt would
-> reject a zero sccb address.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  hw/s390x/sclp.c         | 28 ++++++++++++++++++++++++++++
->  include/hw/s390x/sclp.h |  2 ++
->  target/s390x/kvm.c      | 21 ++++++++++++++++-----
->  3 files changed, 46 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index af0bfbc2ec..b4bc2dd659 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -193,6 +193,34 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
->      }
->  }
->  
-> +/*
-> +* We only need the address to have something valid for the
-> +* service_interrupt call.
-> +*/
-> +#define SCLP_PV_DUMMY_ADDR 0x4000
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code)
-> +{
-> +    SCLPDevice *sclp = get_sclp_device();
-> +    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
-> +    SCCB work_sccb;
-> +    hwaddr sccb_len = sizeof(SCCB);
-> +
-> +    /*
-> +     * Only a very limited amount of calls is permitted by the
-> +     * Ultravisor and we support all of them, so we don't check for
-> +     * them. All other specification exceptions are also interpreted
-> +     * by the Ultravisor and hence never cause an exit we need to
-> +     * handle.
-> +     */
-> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-> +                          be16_to_cpu(work_sccb.h.length));
-> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
-> +    return 0;
-> +}
-> +
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->  {
->      SCLPDevice *sclp = get_sclp_device();
-> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> index c54413b78c..c0a3faa37d 100644
-> --- a/include/hw/s390x/sclp.h
-> +++ b/include/hw/s390x/sclp.h
-> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
->  void sclp_service_interrupt(uint32_t sccb);
->  void raise_irq_cpu_hotplug(void);
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code);
->  
->  #endif
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 295ed12a38..5c7757ac28 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1226,12 +1226,23 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
->      sccb = env->regs[ipbh0 & 0xf];
->      code = env->regs[(ipbh0 & 0xf0) >> 4];
->  
-> -    r = sclp_service_call(env, sccb, code);
-> -    if (r < 0) {
-> -        kvm_s390_program_interrupt(cpu, -r);
-> -        return;
-> +    switch (run->s390_sieic.icptcode) {
-> +    case ICPT_PV_INSTR_NOTIFICATION:
-> +        /* The notification intercepts are currently handled by KVM */
-> +        fprintf(stderr, "unexpected SCLP PV notification\n");
+Make the handling of indentation in doc comments more sophisticated,
+so that when we see a section like:
 
-Maybe g_assert(env->pv);
+Notes: some text
+       some more text
+          indented line 3
 
-error_report() ?
+we save it for the doc-comment processing code as:
 
-> +        exit(1);
-> +        break;
-> +    case ICPT_PV_INSTR:
-> +        sclp_service_call_protected(env, sccb, code);
-> +        break;
-> +    case ICPT_INSTRUCTION:
+some text
+some more text
+   indented line 3
 
-Maybe g_assert(!env->pv);
+and when we see a section with the heading on its own line:
 
-> +        r = sclp_service_call(env, sccb, code);
-> +        if (r < 0) {
-> +            kvm_s390_program_interrupt(cpu, -r);
-> +            return;
-> +        }
-> +        setcc(cpu, r);
->      }
-> -    setcc(cpu, r);
+Notes:
 
-What about the cc in case of ICPT_PV_INSTR?
+some text
+some more text
+   indented text
 
->  }
->  
->  static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
-> 
+we also accept that and save it in the same form.
 
+The exception is that we always retain indentation as-is for Examples
+sections, because these are literal text.
 
+If we detect that the comment document text is not indented as much
+as we expect it to be, we throw a parse error.  (We don't complain
+about over-indented sections, because for rST this can be legitimate
+markup.)
+
+The golden reference for the doc comment text is updated to remove
+the two 'wrong' indents; these now form a test case that we correctly
+stripped leading whitespace from an indented multi-line argument
+definition.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+v1->v2: Update doc-good.out as per final para.
+---
+ scripts/qapi/parser.py         | 81 +++++++++++++++++++++++++++-------
+ tests/qapi-schema/doc-good.out |  4 +-
+ 2 files changed, 67 insertions(+), 18 deletions(-)
+
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index 7fae4478d34..d9f11eadd96 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -308,18 +308,32 @@ class QAPIDoc:
+     """
+ 
+     class Section:
+-        def __init__(self, name=None):
++        def __init__(self, parser, name=None, indent=0):
++            # parser, for error messages about indentation
++            self._parser = parser
+             # optional section name (argument/member or section name)
+             self.name = name
+             # the list of lines for this section
+             self.text = ''
++            # the expected indent level of the text of this section
++            self._indent = indent
+ 
+         def append(self, line):
++            # Strip leading spaces corresponding to the expected indent level
++            # Blank lines are always OK.
++            if line:
++                spacecount = len(line) - len(line.lstrip(" "))
++                if spacecount > self._indent:
++                    spacecount = self._indent
++                if spacecount < self._indent:
++                    raise QAPIParseError(self._parser, "unexpected de-indent")
++                line = line[spacecount:]
++
+             self.text += line.rstrip() + '\n'
+ 
+     class ArgSection(Section):
+-        def __init__(self, name):
+-            super().__init__(name)
++        def __init__(self, parser, name, indent=0):
++            super().__init__(parser, name, indent)
+             self.member = None
+ 
+         def connect(self, member):
+@@ -333,7 +347,7 @@ class QAPIDoc:
+         self._parser = parser
+         self.info = info
+         self.symbol = None
+-        self.body = QAPIDoc.Section()
++        self.body = QAPIDoc.Section(parser)
+         # dict mapping parameter name to ArgSection
+         self.args = OrderedDict()
+         self.features = OrderedDict()
+@@ -438,7 +452,18 @@ class QAPIDoc:
+ 
+         if name.startswith('@') and name.endswith(':'):
+             line = line[len(name)+1:]
+-            self._start_args_section(name[1:-1])
++            if not line or line.isspace():
++                # Line was just the "@arg:" header; following lines
++                # are not indented
++                indent = 0
++                line = ''
++            else:
++                # Line is "@arg: first line of description"; following
++                # lines should be indented by len(name) + 1, and we
++                # pad out this first line so it is handled the same way
++                indent = len(name) + 1
++                line = ' ' * indent + line
++            self._start_args_section(name[1:-1], indent)
+         elif self._is_section_tag(name):
+             self._append_line = self._append_various_line
+             self._append_various_line(line)
+@@ -460,7 +485,17 @@ class QAPIDoc:
+ 
+         if name.startswith('@') and name.endswith(':'):
+             line = line[len(name)+1:]
+-            self._start_features_section(name[1:-1])
++            if not line or line.isspace():
++                # Line is just the "@name:" header, no ident for following lines
++                indent = 0
++                line = ''
++            else:
++                # Line is "@arg: first line of description"; following
++                # lines should be indented by len(name) + 3, and we
++                # pad out this first line so it is handled the same way
++                indent = len(name) + 1
++                line = ' ' * indent + line
++            self._start_features_section(name[1:-1], indent)
+         elif self._is_section_tag(name):
+             self._append_line = self._append_various_line
+             self._append_various_line(line)
+@@ -493,11 +528,23 @@ class QAPIDoc:
+                                  % (name, self.sections[0].name))
+         if self._is_section_tag(name):
+             line = line[len(name)+1:]
+-            self._start_section(name[:-1])
++            if not line or line.isspace():
++                # Line is just "SectionName:", no indent for following lines
++                indent = 0
++                line = ''
++            elif name.startswith("Example"):
++                # The "Examples" section is literal-text, so preserve
++                # all the indentation as-is
++                indent = 0
++            else:
++                # Line is "SectionName: some text", indent required
++                indent = len(name) + 1
++                line = ' ' * indent + line
++            self._start_section(name[:-1], indent)
+ 
+         self._append_freeform(line)
+ 
+-    def _start_symbol_section(self, symbols_dict, name):
++    def _start_symbol_section(self, symbols_dict, name, indent):
+         # FIXME invalid names other than the empty string aren't flagged
+         if not name:
+             raise QAPIParseError(self._parser, "invalid parameter name")
+@@ -506,21 +553,21 @@ class QAPIDoc:
+                                  "'%s' parameter name duplicated" % name)
+         assert not self.sections
+         self._end_section()
+-        self._section = QAPIDoc.ArgSection(name)
++        self._section = QAPIDoc.ArgSection(self._parser, name, indent)
+         symbols_dict[name] = self._section
+ 
+-    def _start_args_section(self, name):
+-        self._start_symbol_section(self.args, name)
++    def _start_args_section(self, name, indent):
++        self._start_symbol_section(self.args, name, indent)
+ 
+-    def _start_features_section(self, name):
+-        self._start_symbol_section(self.features, name)
++    def _start_features_section(self, name, indent):
++        self._start_symbol_section(self.features, name, indent)
+ 
+-    def _start_section(self, name=None):
++    def _start_section(self, name=None, indent=0):
+         if name in ('Returns', 'Since') and self.has_section(name):
+             raise QAPIParseError(self._parser,
+                                  "duplicated '%s' section" % name)
+         self._end_section()
+-        self._section = QAPIDoc.Section(name)
++        self._section = QAPIDoc.Section(self._parser, name, indent)
+         self.sections.append(self._section)
+ 
+     def _end_section(self):
+@@ -543,7 +590,7 @@ class QAPIDoc:
+     def connect_member(self, member):
+         if member.name not in self.args:
+             # Undocumented TODO outlaw
+-            self.args[member.name] = QAPIDoc.ArgSection(member.name)
++            self.args[member.name] = QAPIDoc.ArgSection(self._parser, member.name)
+         self.args[member.name].connect(member)
+ 
+     def connect_feature(self, feature):
+@@ -551,6 +598,8 @@ class QAPIDoc:
+             raise QAPISemError(feature.info,
+                                "feature '%s' lacks documentation"
+                                % feature.name)
++            self.features[feature.name] = QAPIDoc.ArgSection(self._parser,
++                                                             feature.name)
+         self.features[feature.name].connect(feature)
+ 
+     def check_expr(self, expr):
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index a65bce639ff..0302ce0bde1 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -144,7 +144,7 @@ doc symbol=Alternate
+ 
+     arg=i
+ an integer
+-    @b is undocumented
++@b is undocumented
+     arg=b
+ 
+ doc freeform
+@@ -157,7 +157,7 @@ doc symbol=cmd
+ the first argument
+     arg=arg2
+ the second
+-       argument
++argument
+     arg=arg3
+ 
+     feature=cmd-feat1
 -- 
-Thanks,
-
-David / dhildenb
+2.20.1
 
 
