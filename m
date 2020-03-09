@@ -2,143 +2,85 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F300FC18E5A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AA1C18E5A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCF7420848
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:01:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCF7420848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33B2220848
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:04:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ex1LOK10"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B2220848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBIyB-0002qS-UC
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:01:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46331)
+	id 1jBJ1e-0004Mn-Ec
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:04:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jBIxD-0002Gr-JJ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:00:24 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jBJ12-0003xs-8M
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jBIxC-0003uv-B0
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:00:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21068)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jBIxC-0003uL-24
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:00:22 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 029Dt4CF111214
- for <qemu-devel@nongnu.org>; Mon, 9 Mar 2020 10:00:20 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym91e0f4d-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 10:00:20 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Mon, 9 Mar 2020 14:00:18 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 9 Mar 2020 14:00:16 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 029DxFIR50463120
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 9 Mar 2020 13:59:15 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 149084C05E;
- Mon,  9 Mar 2020 14:00:15 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E297C4C05C;
- Mon,  9 Mar 2020 14:00:14 +0000 (GMT)
-Received: from dyn-9-152-224-87.boeblingen.de.ibm.com (unknown [9.152.224.87])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  9 Mar 2020 14:00:14 +0000 (GMT)
-Subject: Re: [PATCH v7 04/15] s390x: protvirt: Inhibit balloon when switching
- to protected mode
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200309112206.20261-1-frankja@linux.ibm.com>
- <20200309112206.20261-5-frankja@linux.ibm.com>
- <a606be61-71fb-a965-7daa-22a51dd340da@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Mon, 9 Mar 2020 15:00:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <eric.auger@redhat.com>) id 1jBJ10-0006L2-Lr
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:04:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47012
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jBJ10-0006KU-Gu
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:04:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583762657;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g8bRHChsUWbeNH+K4Sm+PqbuexS/PgwjtWJOgxupBRo=;
+ b=Ex1LOK10wyqfkso99j0VAhNk0l+pFgXrAr07Xqm3RY2uKUkywLK1+HXp58zPcXBtT1yQo/
+ PeEV8zSuwnU7N4eTg9AXYxZeceSWhYkDF9n/+fciuVzBApyYb6oA1LAtXeGAoCGOdaw5g9
+ 3I26jSgvVpMB+rrEMsVMqdS0Jgi12PI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-04HqLq1VPK6gT12MpXrf0g-1; Mon, 09 Mar 2020 10:04:16 -0400
+X-MC-Unique: 04HqLq1VPK6gT12MpXrf0g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 935241005509;
+ Mon,  9 Mar 2020 14:04:14 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 267F08B773;
+ Mon,  9 Mar 2020 14:04:12 +0000 (UTC)
+Subject: Re: [PATCH v3 5/6] hw/arm/virt: kvm: Check the chosen gic version is
+ supported by the host
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200302105516.5972-1-eric.auger@redhat.com>
+ <20200302105516.5972-6-eric.auger@redhat.com>
+ <CAFEAcA-XD9LiokquaHj+kCYWA3N=7k3V3R8r5gA1HZM9Adus1A@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <cb585c09-3400-dc1a-b79d-942eed0fdc49@redhat.com>
+Date: Mon, 9 Mar 2020 15:04:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <a606be61-71fb-a965-7daa-22a51dd340da@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="tOaT6z9MG6lUdEvzdhEJoRDQj2j3ZQPX3"
-X-TM-AS-GCONF: 00
-x-cbid: 20030914-0008-0000-0000-0000035AC83A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030914-0009-0000-0000-00004A7C0850
-Message-Id: <3a1ed55c-ce3b-eec5-d3b0-0065624d7006@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-09_04:2020-03-09,
- 2020-03-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0
- clxscore=1015 phishscore=0 mlxlogscore=999 mlxscore=0 suspectscore=3
- adultscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090096
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <CAFEAcA-XD9LiokquaHj+kCYWA3N=7k3V3R8r5gA1HZM9Adus1A@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,94 +92,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tOaT6z9MG6lUdEvzdhEJoRDQj2j3ZQPX3
-Content-Type: multipart/mixed; boundary="VjZLRbfPSdxMCBcWjxgkpUFv5FM4oOOqt"
+Hi Peter,
 
---VjZLRbfPSdxMCBcWjxgkpUFv5FM4oOOqt
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 3/9/20 2:42 PM, David Hildenbrand wrote:
-> On 09.03.20 12:21, Janosch Frank wrote:
->> Ballooning in protected VMs can only be done when the guest shares the=
-
->> pages it gives to the host. If pages are not shared, the integrity
->> checks will fail once those pages have been altered and are given back=
-
->> to the guest.
+On 3/9/20 2:28 PM, Peter Maydell wrote:
+> On Mon, 2 Mar 2020 at 10:55, Eric Auger <eric.auger@redhat.com> wrote:
 >>
->> Hence, until we have a solution for this in the guest kernel, we
->> inhibit ballooning when switching into protected mode and reverse that=
-
->> once we move out of it.
+>> Restructure the finalize_gic_version with switch cases and, in
+>> KVM mode, explictly check whether the chosen version is supported
+>> by the host.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
-> I think Christian requested to add the next steps.
+>> if the end-user explicitly sets v2/v3 and this is not supported by
+>> the host, then the user gets an explicit error message.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - explictly list V2 and V3 in the switch/case
+>> - fix indent
+>> ---
+>>  hw/arm/virt.c | 77 +++++++++++++++++++++++++++++++++++----------------
+>>  1 file changed, 53 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index eb8c57c85e..aeb6c45e51 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1542,33 +1542,62 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>   */
+>>  static void finalize_gic_version(VirtMachineState *vms)
+>>  {
+>> -    if (vms->gic_version == VIRT_GIC_VERSION_HOST ||
+>> -        vms->gic_version == VIRT_GIC_VERSION_MAX) {
+>> -        if (!kvm_enabled()) {
+>> -            if (vms->gic_version == VIRT_GIC_VERSION_HOST) {
+>> -                error_report("gic-version=host requires KVM");
+>> -                exit(1);
+>> -            } else {
+>> -                /* "max": currently means 3 for TCG */
+>> -                vms->gic_version = VIRT_GIC_VERSION_3;
+>> -            }
+>> -        } else {
+>> -            int probe_bitmap = kvm_arm_vgic_probe();
+>> +    if (kvm_enabled()) {
+>> +        int probe_bitmap = kvm_arm_vgic_probe();
+> 
+> Previously we would only do kvm_arm_vgic_probe() if the
+> user asked for 'host' or 'max'. Now we do it always,
+> which means that if the user is on a really old kernel
+> where the CREATE_DEVICE ioctl doesn't exist then we
+> will now fail if the user specifically asked for gicv2,
+> where previously we (probably) would have succeeded.
+> I don't think we should put too much weight on continuing
+> to theoretically support ancient kernels which we're not
+> actually testing against, but it does seem a bit odd to
+> probe even if we don't need to know the answer.
+> 
+> More relevant to actual plausible use cases, if
+> kvm_irqchip_in_kernel() == false, we shouldn't be
+> probing the kernel to ask what kind of GIC to use.
 
-Right, I lost that request somewhere.
-This is what I have now:
+OK I will fix that case. I understand that the former point is not critical.
 
+Thank you for the feedback.
 
-
-s390x: protvirt: Inhibit balloon when switching to protected mode
-
-Ballooning in protected VMs can only be done when the guest shares the
-pages it gives to the host. If pages are not shared, the integrity
-checks will fail once those pages have been altered and are given back
-to the guest.
-
-As we currently do not yet have a solution for this we will continue
-like this:
-
-1. We block ballooning now in QEMU (with this patch)
-
-2. Later we will provide a change to virtio that removes the blocker
-and adds VIRTIO_F_IOMMU_PLATFORM automatically by QEMU when doing the
-protvirt switch. This is ok as the guest balloon driver will reject to
-work with the IOMMU change
-
-3. later we can fix the guest balloon driver to accept the IOMMU feature
-bit and correctly exercise sharing and unsharing of balloon pages
-
-
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
---VjZLRbfPSdxMCBcWjxgkpUFv5FM4oOOqt--
-
---tOaT6z9MG6lUdEvzdhEJoRDQj2j3ZQPX3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5mS+4ACgkQ41TmuOI4
-ufjFNBAAnure0Mdxm7GQZZxWTT85Bg2c4t8UGBnxeJBnqbC+I8wj1PxgTUW3UdS0
-nI7BkTKQIszWLLQxJcX+C+xxxetKvAzzEhE2xKAn6VkN1uafgn2sWhh8XDu52nCl
-ryEsaa826y8ifNOHh5oUlymRCnD58B5PGxAaj7iXr127q97XiDiyne/o9403OCr7
-mb0Y6MU1KMqoDiXdv9W1BNCTwZLjoVHAW9fj71Di1mhoIdENSpXMapSbHdpycw5a
-b7tIvSJUEpyZk2tcPWkJimlXrE3/rSQ4AEhIzXBq1z/njkjX1DI9N3oU9ZnkKkZS
-lK76eaST9OFqXPUGALxPar01eraBi3Cr7c6IeYzzrTm8oeD8xW9TgLD9g0gsP8KP
-uQJnBjJMS78BAfM80s5nne884uPfzecpsLRJ9eGYpZLQbrDEstUX75ycqymgcQOc
-Re/aEEMSGsV5giVvHfYfY2gcE1PnfblJpkdYzSHqdKICFke8dRRuT4G9pAeQcUio
-KonbZWfUoPfBoSMwLLFukhEUhp6JaWw1zMbR0eipHuB9KPvWsqPjJf2mGyM2cuFD
-U5YNmUVx43x/rqGIvfS5dBOyQC3tGtu4MwUucZN+yTaS+lnNeqAlOmoHuZeGsJEC
-d1HYMBC8b/VA8hL69Do3jprfVOYwJZQcySh+UAkOpNsIgGJu2tw=
-=hDux
------END PGP SIGNATURE-----
-
---tOaT6z9MG6lUdEvzdhEJoRDQj2j3ZQPX3--
+Eric
+> 
+> thanks
+> -- PMM
+> 
 
 
