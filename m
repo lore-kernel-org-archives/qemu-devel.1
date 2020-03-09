@@ -2,62 +2,90 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AC2C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5045CC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D1F020674
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:42:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1F020674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C722222C2
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 10:44:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZd/QgM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C722222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBFrR-0007qa-NL
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 06:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40834)
+	id 1jBFtD-0000YF-Az
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 06:44:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jBFqZ-00076W-3U
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:41:20 -0400
+ (envelope-from <changbin.du@gmail.com>) id 1jBFse-00008p-Fw
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jBFqX-0005fF-Tx
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:41:18 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3266 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jBFqX-0005dp-J6; Mon, 09 Mar 2020 06:41:17 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id BD5C185AF02A3B0B19EC;
- Mon,  9 Mar 2020 18:41:12 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.211) with Microsoft SMTP Server (TLS) id 14.3.487.0; Mon, 9 Mar 2020
- 18:41:03 +0800
-Subject: Re: [PATCH] core/qdev: fix memleak in qdev_get_gpio_out_connector()
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@gmail.com>
-References: <20200307030756.5913-1-pannengyuan@huawei.com>
- <CAJ+F1C+6QSYBhO_M+Vqps4XvOujnV+Wbq6o9Q+qUmC5Z0dmxSQ@mail.gmail.com>
- <87b027ab-7bed-249a-08a2-2c27fdd05a31@vivier.eu>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <a69e324c-21c4-dcfd-516d-0515f86a2f28@huawei.com>
-Date: Mon, 9 Mar 2020 18:41:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <changbin.du@gmail.com>) id 1jBFsd-0006sp-G2
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:43:28 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43246)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <changbin.du@gmail.com>)
+ id 1jBFsd-0006sF-AF
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 06:43:27 -0400
+Received: by mail-pg1-x544.google.com with SMTP id u12so4523080pgb.10
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 03:43:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=NiiIlvZEViI54s3c/Vr0vMUjNjcfQX4XedOFLZ1LmPE=;
+ b=KZd/QgM/5c4fkK+0h3Ww+dHt02d3pgaTxevaW/lEOQHlzymUyVcnfl9kVJcwjotKrw
+ xuOuV4aMLp06PrTDVxt9qTAW9q+YNYk0tLgl7TG5MLy2ZlowTf26MiuOH+kIByiavjwV
+ j38NZrVijjKtVXywQWO65dKcrZXpJGybhmlj5C8BhaMiswuUAeTM07KyvOnwOD+XCc9n
+ Aw8W6WnvQeEec+uAsOMcKO9vxNP1ru6mS3vWyO0ZyYuKB2euiDgXDHrPk0jkk/IUhnua
+ hrEo9EPG6g7o2trPd795y+MdbsKBEnwr6209bQkZgChNvibQ7GFxKiZQchVi898B+yDt
+ TmiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=NiiIlvZEViI54s3c/Vr0vMUjNjcfQX4XedOFLZ1LmPE=;
+ b=LtI6Dt1IdfcvVZEGOuJ+MJoJMpXEngZxAYFbaUaQINtgVAvVPnoG9vPSoHogXh7yqN
+ 5FB+dWkCZVMbFI2wleDmFmGvqQ3jl4kldrBfOktflYIWoYVuSFB2kaB8Sm0zSkvtG6yv
+ LpzvEJI33m69MK+xaLXL3LV3v08tEqV7aNBUNUoXTSVnGXQE+0EYAEPAH2w4ME/l1QJj
+ HFSn+NCqjicd4aiRNwK8z/Iumui0oCm58i2tBdh/AxBF0PvLaKjItUdZ5F5zXYHHcynu
+ qYlkblXYVJBrJfsguC7uS186NCz9zQHlfmgXahVbOoVYHZyfsvU0c57x5oRM4oIir2m2
+ /weA==
+X-Gm-Message-State: ANhLgQ2GaVfcavFiQ7ivIzNYXU95yh3dPlq0AI3unikfh08P6ytk4y9q
+ mmlqmQcR/yRW6KW620utVMw=
+X-Google-Smtp-Source: ADFU+vvBlGcEzy8JIy92ga9xUZfZK+fIrT02y4f4ychmlxe3h8BoqYOGE3LGYIQ9qL9n1ZvHAuhDrQ==
+X-Received: by 2002:a65:53cc:: with SMTP id z12mr15125524pgr.399.1583750605834; 
+ Mon, 09 Mar 2020 03:43:25 -0700 (PDT)
+Received: from mail.google.com ([149.248.10.52])
+ by smtp.gmail.com with ESMTPSA id w2sm44193891pfw.43.2020.03.09.03.43.24
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 09 Mar 2020 03:43:25 -0700 (PDT)
+Date: Mon, 9 Mar 2020 10:43:23 +0000
+From: Changbin Du <changbin.du@gmail.com>
+To: Changbin Du <changbin.du@gmail.com>
+Subject: Re: [PATCH v2] gdbstub: Fix single-step issue by confirming
+ 'vContSupported+' feature to gdb
+Message-ID: <20200309104322.u6ktpdl5yjdfcvqa@mail.google.com>
+References: <20200221002559.6768-1-changbin.du@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87b027ab-7bed-249a-08a2-2c27fdd05a31@vivier.eu>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200221002559.6768-1-changbin.du@gmail.com>
+User-Agent: NeoMutt/20180716-508-7c9a6d
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,72 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu trival <qemu-trivial@nongnu.org>,
- QEMU <qemu-devel@nongnu.org>, Euler Robot <euler.robot@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: philmd@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+hello, is this patch ready to merge now? Thanks!
 
+On Fri, Feb 21, 2020 at 08:25:59AM +0800, Changbin Du wrote:
+> Recently when debugging an arm32 system on qemu, I found sometimes the
+> single-step command (stepi) is not working. This can be reproduced by
+> below steps:
+>  1) start qemu-system-arm -s -S .. and wait for gdb connection.
+>  2) start gdb and connect to qemu. In my case, gdb gets a wrong value
+>     (0x60) for PC, which is an another bug.
+>  3) After connected, type 'stepi' and expect it will stop at next ins.
+> 
+> But, it has never stopped. This because:
+>  1) We doesn't report ‘vContSupported’ feature to gdb explicitly and gdb
+>     think we do not support it. In this case, gdb use a software breakpoint
+>     to emulate single-step.
+>  2) Since gdb gets a wrong initial value of PC, then gdb inserts a
+>     breakpoint to wrong place (PC+4).
+> 
+> Not only for the arm target, Philippe has also encountered this on MIPS.
+> Probably gdb has different assumption for different architectures.
+> 
+> Since we do support ‘vContSupported’ query command, so let's tell gdb that
+> we support it.
+> 
+> Before this change, gdb send below 'Z0' packet to implement single-step:
+> gdb_handle_packet: Z0,4,4
+> 
+> After this change, gdb send "vCont;s.." which is expected:
+> gdb_handle_packet: vCont?
+> put_packet: vCont;c;C;s;S
+> gdb_handle_packet: vCont;s:p1.1;c:p1.-1
+> 
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> ---
+> v2: polish commit message.
+> ---
+>  gdbstub.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/gdbstub.c b/gdbstub.c
+> index ce304ff482..adccd938e2 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -2111,7 +2111,7 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+>          gdb_ctx->s->multiprocess = true;
+>      }
+>  
+> -    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess+");
+> +    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";vContSupported+;multiprocess+");
+>      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+>  }
+>  
+> -- 
+> 2.25.0
+> 
 
-On 3/9/2020 5:16 PM, Laurent Vivier wrote:
-> Le 07/03/2020 =C3=A0 11:39, Marc-Andr=C3=A9 Lureau a =C3=A9crit=C2=A0:
->> Hi
->>
->> On Sat, Mar 7, 2020 at 3:53 AM Pan Nengyuan <pannengyuan@huawei.com> w=
-rote:
->>>
->>> Fix a memory leak in qdev_get_gpio_out_connector().
->>>
->>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>
->> good catch,
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> trivial question:
->=20
-> Why do we prefer g_autofree() to the g_free() function?
-
-Honestly, it's no special reason in this case, just personal preference. =
-:)
-Both of them is ok.
-
-Thanks.
-
->=20
-> Thanks,
-> Laurent
->=20
->>> ---
->>>  hw/core/qdev.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->>> index 3937d1eb1a..85f062def7 100644
->>> --- a/hw/core/qdev.c
->>> +++ b/hw/core/qdev.c
->>> @@ -557,7 +557,7 @@ void qdev_connect_gpio_out_named(DeviceState *dev=
-, const char *name, int n,
->>>
->>>  qemu_irq qdev_get_gpio_out_connector(DeviceState *dev, const char *n=
-ame, int n)
->>>  {
->>> -    char *propname =3D g_strdup_printf("%s[%d]",
->>> +    g_autofree char *propname =3D g_strdup_printf("%s[%d]",
->>>                                       name ? name : "unnamed-gpio-out=
-", n);
->>>
->>>      qemu_irq ret =3D (qemu_irq)object_property_get_link(OBJECT(dev),=
- propname,
->>> --
->>> 2.18.2
->>>
->>>
->>
->>
->=20
+-- 
+Cheers,
+Changbin Du
 
