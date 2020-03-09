@@ -2,58 +2,82 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B38C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A393C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3FB020873
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:52:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FB020873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 292AB20873
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:54:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f3dEHnBH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 292AB20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBPNn-0006zQ-86
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:52:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36203)
+	id 1jBPQI-00083y-CD
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jBPN7-0006WT-Hc
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:51:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBPPZ-0007bK-Ru
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jBPN5-0005z9-4U
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:51:33 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:16883)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jBPMa-0005Px-RJ; Mon, 09 Mar 2020 16:51:27 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 18767747DFE;
- Mon,  9 Mar 2020 21:50:58 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E6B3F747DFA; Mon,  9 Mar 2020 21:50:57 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id E4C29747DCF;
- Mon,  9 Mar 2020 21:50:57 +0100 (CET)
-Date: Mon, 9 Mar 2020 21:50:57 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 3/3] via-ide: Also emulate non 100% native mode
-In-Reply-To: <20200309163537-mutt-send-email-mst@kernel.org>
-Message-ID: <alpine.BSF.2.22.395.2003092148350.94024@zero.eik.bme.hu>
-References: <cover.1583781493.git.balaton@eik.bme.hu>
- <ac37e5f5b86a3b2680c01d7b0d027dafd27a3ac7.1583781494.git.balaton@eik.bme.hu>
- <20200309163537-mutt-send-email-mst@kernel.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBPPY-0000Ym-Bg
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:54:05 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:33060)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBPPY-0000YQ-3u
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:54:04 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id g15so4937084otr.0
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 13:54:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=j7HNl+3iX314cOvpPmh8SxmKrff7P4cAYTIorD1VxVQ=;
+ b=f3dEHnBHbEH+5W/z7QIz8mAwWiEE/zQLhhm5du4RkqmKkcdke+r3M7weLrpw/oFVOD
+ 1U9vjuHcrj/XGDNysSoodhsmxluI6ElJH77B4/Rr04/XADyJ04oJehPYuwEOmhK7k2fh
+ 4vbCN1z/e8FxAszLVppwOyCcT1uR2Y8OAjzZnMt3+6FpGkM1GryB1uxEAad7oCkaMRET
+ oZorhSDjd5Di+wc/8JQzj11iGRN1+p56cpSC/Srbc37mwfrzMlihURIueNlKefw6ng/R
+ TUf6/f25ti5pc1eCPEkvBXMrgoc4oRqNpyz49HZGORHFYhbggv5InQlNiMy85KZGboVx
+ JC1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=j7HNl+3iX314cOvpPmh8SxmKrff7P4cAYTIorD1VxVQ=;
+ b=VFmac0KFKrcNKOc8wE5cAoktzKffeX6o3lFm0AoTHIsn+na1OVh1uAwWOnfzi3JauM
+ 4yiKAhdBs1hiPC5eShKSFkVpEWDXviKZOlQjF/XVIZXUvdJHD+2owRqQbcGYeuH4KMAw
+ wxSeBwmv1unMxcqPq0qTuYCtzp0HTjYlKp57BWLfrJtM9bApj87Yx1578GOlMwRLsTQu
+ 3TU9yAT8+ZTWkuUlysPTPXvL4vPfTPmzHRDP7duwgGjdIYCoux1o3EGUmmGEhXR6z3nB
+ uMKjAaRWYvVCuFQHXgISuOY5vjL6qzIAcPEqgu5+0czC82CZ3eUGZg+1HeJ0DY0W4Jfh
+ /AWA==
+X-Gm-Message-State: ANhLgQ1ribr5/sph0egPp3wALd3N7JHgZx0H3rRxeaxfbwrHuFUvDCum
+ fTM8OcbmyMnJa8A7NU+KY2n8S1ihOc4gb8KLlVtbNbg3QtI=
+X-Google-Smtp-Source: ADFU+vsu0pI+Blf1joqaDHfQYT4OpohKekum6RLDIkRZ2CD0DLI7TtxUraXsq241P1QslYVzZ9FCmm0icH2ZxiI+bvY=
+X-Received: by 2002:a9d:6c05:: with SMTP id f5mr3616849otq.232.1583787242829; 
+ Mon, 09 Mar 2020 13:54:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+References: <20200309194650.160552-1-dgilbert@redhat.com>
+ <158378679131.20878.15191150168369473187@39012742ff91>
+In-Reply-To: <158378679131.20878.15191150168369473187@39012742ff91>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Mar 2020 20:53:51 +0000
+Message-ID: <CAFEAcA_q+VrpURmMiVH=_9hYreWeQQuM0dxXz7ERa9eLqGWXfw@mail.gmail.com>
+Subject: Re: [PULL 00/12] hmp queue
+To: QEMU Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,97 +89,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020, Michael S. Tsirkin wrote:
-> On Mon, Mar 09, 2020 at 08:18:13PM +0100, BALATON Zoltan wrote:
->> Some machines operate in "non 100% native mode" where interrupts are
->> fixed at legacy IDE interrupts and some guests expect this behaviour
->> without checking based on knowledge about hardware. Even Linux has
->> arch specific workarounds for this that are activated on such boards
->> so this needs to be emulated as well.
->>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->> v2: Don't use PCI_INTERRUPT_LINE in via_ide_set_irq()
->> v3: Patch pci.c instead of local workaround for PCI reset clearing
->>     PCI_INTERRUPT_PIN config reg
->>
->>  hw/ide/via.c            | 37 +++++++++++++++++++++++++++++--------
->>  hw/mips/mips_fulong2e.c |  2 +-
->>  include/hw/ide.h        |  3 ++-
->>  3 files changed, 32 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/ide/via.c b/hw/ide/via.c
->> index 096de8dba0..02d29809f2 100644
->> --- a/hw/ide/via.c
->> +++ b/hw/ide/via.c
->> @@ -1,9 +1,10 @@
->>  /*
->> - * QEMU IDE Emulation: PCI VIA82C686B support.
->> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
->>   *
->>   * Copyright (c) 2003 Fabrice Bellard
->>   * Copyright (c) 2006 Openedhand Ltd.
->>   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
->> + * Copyright (c) 2019-2020 BALATON Zoltan
->>   *
->>   * Permission is hereby granted, free of charge, to any person obtaining a copy
->>   * of this software and associated documentation files (the "Software"), to deal
->> @@ -25,6 +26,8 @@
->>   */
->>
->>  #include "qemu/osdep.h"
->> +#include "qemu/range.h"
->> +#include "hw/qdev-properties.h"
->>  #include "hw/pci/pci.h"
->>  #include "migration/vmstate.h"
->>  #include "qemu/module.h"
->> @@ -111,11 +114,18 @@ static void via_ide_set_irq(void *opaque, int n, int level)
->>      } else {
->>          d->config[0x70 + n * 8] &= ~0x80;
->>      }
->> -
->>      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
->> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
->> -    if (n) {
->> -        qemu_set_irq(isa_get_irq(NULL, n), level);
->> +
->> +    /*
->> +     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
->> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
->> +     * Some guest drivers expect this, often without checking.
->> +     */
->> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
->> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
->> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
->> +    } else {
->> +        qemu_set_irq(isa_get_irq(NULL, 14), level);
->>      }
->>  }
->>
->> @@ -169,7 +179,8 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
->>
->>      pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
->>      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
->> -    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
->> +    dev->wmask[PCI_CLASS_PROG] = 5;
+On Mon, 9 Mar 2020 at 20:48, <no-reply@patchew.org> wrote:
 >
-> What's the story here? Why is class suddenly writeable?
+> Patchew URL: https://patchew.org/QEMU/20200309194650.160552-1-dgilbert@re=
+dhat.com/
+>
+>
+>
+> Hi,
+>
+> This series failed the asan build test. Please find the testing commands =
+and
+> their output below. If you have Docker installed, you can probably reprod=
+uce it
+> locally.
 
-The via-ide (function 1 of some VIA southbridge chips) use bits in this 
-reg to set legacy compatibility mode as described in VT82C686B and VT8231 
-datasheets and Linux writes this on pegasos2 board I'm emulating. See 
-longer description in this message:
+Hi Paolo -- looks like the 'asan' patchew config is also running into
+the dbus-daemon problem :-(
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg00019.html
+Can we disable the offending test in 'make check' so we don't need
+to disable the entire patchew config, maybe?
 
-Regards,
-BALATON Zoltan
+thanks
+-- PMM
+(trimmed patchew output below)
+
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> export ARCH=3Dx86_64
+> make docker-image-fedora V=3D1 NETWORK=3D1
+> time make docker-test-debug@fedora TARGET_LIST=3Dx86_64-softmmu J=3D14 NE=
+TWORK=3D1
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+
+[...]
+
+> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}  QTEST=
+_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3Dqemu-img =
+tests/qtest/drive_del-test -m=3Dquick -k --tap < /dev/null | ./scripts/tap-=
+driver.pl --test-name=3D"drive_del-test"
+> PASS 1 drive_del-test /x86_64/drive_del/without-dev
+> PASS 2 drive_del-test /x86_64/drive_del/after_failed_device_add
+> =3D=3D9151=3D=3DWARNING: ASan doesn't fully support makecontext/swapconte=
+xt functions and may produce false positives in some cases!
+> PASS 3 drive_del-test /x86_64/blockdev/drive_del_device_del
+> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}  QTEST=
+_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3Dqemu-img =
+tests/qtest/wdt_ib700-test -m=3Dquick -k --tap < /dev/null | ./scripts/tap-=
+driver.pl --test-name=3D"wdt_ib700-test"
+> PASS 1 wdt_ib700-test /x86_64/wdt_ib700/pause
+> ---
+> dbus-daemon[9321]: Could not get password database information for UID of=
+ current process: User "???" unknown or no memory to allocate password entr=
+y
+>
+> **
+> ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.c:114:get_connecti=
+on: assertion failed (err =3D=3D NULL): The connection is closed (g-io-erro=
+r-quark, 18)
+> cleaning up pid 9321
+> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.=
+c:114:get_connection: assertion failed (err =3D=3D NULL): The connection is=
+ closed (g-io-error-quark, 18)
+> make: *** [/tmp/qemu-test/src/tests/Makefile.include:632: check-qtest-x86=
+_64] Error 1
+> make: *** Waiting for unfinished jobs....
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 664, in <module>
+> ---
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '=
+--label', 'com.qemu.instance.uuid=3D88b7cca75c974326a7bec1f2d1a837c5', '-u'=
+, '1003', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET_L=
+IST=3Dx86_64-softmmu', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e',=
+ 'J=3D14', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D', '-e', 'CCACHE_DIR=3D/var/=
+tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccach=
+e:z', '-v', '/var/tmp/patchew-tester-tmp-swu9ovfa/src/docker-src.2020-03-09=
+-16.18.07.16195:/var/tmp/qemu:z,ro', 'qemu:fedora', '/var/tmp/qemu/run', 't=
+est-debug']' returned non-zero exit status 2.
+> filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3D88b7cca75c974326a7be=
+c1f2d1a837c5
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-swu9ovfa/src'
+> make: *** [docker-run-test-debug@fedora] Error 2
+>
+> real    28m23.541s
+> user    0m8.580s
+>
+>
+> The full log is available at
+> http://patchew.org/logs/20200309194650.160552-1-dgilbert@redhat.com/testi=
+ng.asan/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
