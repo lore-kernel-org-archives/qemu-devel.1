@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5680BC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7417C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20F7220828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:45:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E7F62083E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 08:46:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="AzQp7wlG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20F7220828
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="qnltBC7y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F62083E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBE2H-0000wl-5y
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:45:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47274)
+	id 1jBE3j-0002ek-JO
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 04:46:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsE-0007dl-FQ
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:55 -0400
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsF-0007fo-6b
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsD-0007MZ-3u
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:54 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38939)
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jBDsE-0007Ol-3X
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:55 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39817)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jBDsC-0007Kj-TC
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:53 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r15so4817921wrx.6
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 01:34:52 -0700 (PDT)
+ id 1jBDsD-0007NG-SL
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 04:34:54 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f7so4204401wml.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 01:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20150623.gappssmtp.com; s=20150623;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=GtBl5NGPRd3fWz+5/kWPEnRPZvuPWKDkS2vvT0gB+Y8=;
- b=AzQp7wlG4j1Vug7B6otwVfXrbmxO6FKa1Hdz1wLgzXVqpnRcBbV4602Fy2km70c9KH
- J5qq6BOgA5QJIfYliiOeFEu3L+00Szawzay6+c43eb4T+TXYccjdU+NcvRMyh69cbAda
- hiY56rTNDMDCWo5UMp5uPNVWFqIXiRbo12Q1BBRcu1mumqIZdVKeRstlqHAkkyav9zSJ
- 8n5kgpPgtz1Jff8PBBAOJL4TMCnyFzsl4Ic7Z/bZ64D0hlbMLr5oWFIgSLCQpqbSjJ6J
- QFPmolf26nk8DkVXreRQAMY75ZLcgrutLorLjL+AdcnlDyNYBiTvnknd3yRov2LL3CyG
- EpHw==
+ bh=qwff9geVcA9Ofl81vgC89M4fcI3BmCYQGSyZyytOdBU=;
+ b=qnltBC7yVakg4nqdoErtT2D3DClG3hrzoJeqQTbHxsSu6xjOcKmoRlZoyUPJ/FuZqC
+ NtkbhXIliOaIO0fHOMAus7ReOo5jdLrtZVUlnxgwGzfB6dRiz3QJfYDHqfvnLwOWnK6V
+ 4M+SEu2cj9x5ywQOJYGMVxXWJ798wxHglx8kfpioHz5LDSktiS1abDLX4N1fgXCKDT8a
+ kfPEYmQKllM5e5FoQGGPyPEX9sN1v95+olwZRd5jN8Zx4dTijR3iwhzQATOX0SAvzY/F
+ 0X0u84WfK5QF6vLkKBJaUHBQgCPbrautaeppeblHpvnKxu6P1DLgkN+d3MnzbAqjTdda
+ mfGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=GtBl5NGPRd3fWz+5/kWPEnRPZvuPWKDkS2vvT0gB+Y8=;
- b=Tit7IXJ+vLBWPDAHydeQRXfzOarPkMgv+93A+yMXIMZeYeTF3jWkGLZ9pj8tR0UbIg
- DtR0RNCrfp/T5Jbn7yVUV4AEAnR8VEijUdFE5ZHlfLTiCR6aCAGkDtRYIB9CPnOgDXSC
- wTqf4XkErwBaRLalq8KsBEbkzJ265BjmIvJtrYqZs/HdHnilVO5XieCl21jh84tQtdPl
- KLNBOCANGSu6zhBV61/qq4o4vMCu9ZyOgQ0sq4ar8pXkI+RA3jKos26aaioZ9mF1/3hh
- 10UiOHHy2WhBdSDsZwdVKqd/S5mestn+IlFgvJtYmPRqfrqlRbgLU6EQGJIF8nFeX0HW
- dOUw==
-X-Gm-Message-State: ANhLgQ3qhx6VaBwFDfGq84ogDX1ryrC3R2zYI/aoWiUmwnwrC3mEVkBL
- LmpYwaPDpLbnmEocmSz6UD4w2y35UFKZ8A==
-X-Google-Smtp-Source: ADFU+vvN56lUur+d0DJwlbJkjVd/SFS8A+y6mIhn3EQOfwCYwlWEdan96nmfk7BGKJBaIuybEoC13w==
-X-Received: by 2002:adf:de10:: with SMTP id b16mr18932617wrm.145.1583742891592; 
- Mon, 09 Mar 2020 01:34:51 -0700 (PDT)
+ bh=qwff9geVcA9Ofl81vgC89M4fcI3BmCYQGSyZyytOdBU=;
+ b=M56f2I0/15gOD1pmyIVc+Rmf2r+ho6V8nPfegzEQXC7zqIkM07ZGjKsu78dFIXYfqz
+ dgd+mb74VC5xMmIohllLQnrYhKsDPItnbRQr6sp+Zxhywjv9NhmaYDtgSevD81Ms9IH+
+ 3r6jaRwbD6YPvW4pczwtSx7jdirIDqmBBPpDjbW+tRm9aYKReHzJG0Fob/OgO1dpMM5z
+ Fsfz27HjYIO9diiiNPVIrlll7C/R+uYRfnmXpHkvI0ghFXiwbls25z8DRX+pT2mtDVrU
+ 7FQodxTMq5iXfBNHHh0h03FeXYKCvKISklMNnDQWRPhD6nlScyZIWE7vNwOSlyZdVAXp
+ PqAA==
+X-Gm-Message-State: ANhLgQ08XUKM5YOxIhOl6S7UuJ4e9fvlev2C0Nk2EU19HL/zrlgV3ZVP
+ 6/FpoJ85liwRcfs/dvBJ8L6Jgp4wbUVi7w==
+X-Google-Smtp-Source: ADFU+vsWax8EvBxUUSu4b017CHsX2Y62Vq1glMujvpYYGxwHtHTxCn7b1dX/DC4aO8gS4rHq52CESQ==
+X-Received: by 2002:a1c:e341:: with SMTP id a62mr7003260wmh.121.1583742892693; 
+ Mon, 09 Mar 2020 01:34:52 -0700 (PDT)
 Received: from f2.redhat.com (bzq-79-177-42-131.red.bezeqint.net.
  [79.177.42.131])
- by smtp.gmail.com with ESMTPSA id h3sm63749726wrb.23.2020.03.09.01.34.50
+ by smtp.gmail.com with ESMTPSA id h3sm63749726wrb.23.2020.03.09.01.34.51
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 09 Mar 2020 01:34:51 -0700 (PDT)
+ Mon, 09 Mar 2020 01:34:52 -0700 (PDT)
 From: Yuri Benditovich <yuri.benditovich@daynix.com>
 To: qemu-devel@nongnu.org,
 	mst@redhat.com,
 	jasowang@redhat.com
-Subject: [PATCH v2 3/4] virtio-net: implement RX RSS processing
-Date: Mon,  9 Mar 2020 10:34:37 +0200
-Message-Id: <20200309083438.2389-4-yuri.benditovich@daynix.com>
+Subject: [PATCH v2 4/4] virtio-net: block migration if RSS feature negotiated
+Date: Mon,  9 Mar 2020 10:34:38 +0200
+Message-Id: <20200309083438.2389-5-yuri.benditovich@daynix.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200309083438.2389-1-yuri.benditovich@daynix.com>
 References: <20200309083438.2389-1-yuri.benditovich@daynix.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,161 +98,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If VIRTIO_NET_F_RSS negotiated and RSS is enabled, process
-incoming packets, calculate packet's hash and place the
-packet into respective RX virtqueue.
+Block migration for reference implementation of
+RSS feature in QEMU. When we add support for RSS
+on backend side, we'll implement migration of
+current RSS settings.
 
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 ---
- hw/net/virtio-net.c            | 86 +++++++++++++++++++++++++++++++++-
+ hw/net/virtio-net.c            | 18 ++++++++++++++++++
  include/hw/virtio/virtio-net.h |  1 +
- 2 files changed, 85 insertions(+), 2 deletions(-)
+ 2 files changed, 19 insertions(+)
 
 diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 27071eccd2..abc41fdb16 100644
+index abc41fdb16..943d1931a2 100644
 --- a/hw/net/virtio-net.c
 +++ b/hw/net/virtio-net.c
-@@ -42,6 +42,7 @@
+@@ -37,6 +37,7 @@
+ #include "qapi/qapi-events-migration.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/misc.h"
++#include "migration/blocker.h"
+ #include "standard-headers/linux/ethtool.h"
+ #include "sysemu/sysemu.h"
  #include "trace.h"
- #include "monitor/qdev.h"
- #include "hw/pci/pci.h"
-+#include "net_rx_pkt.h"
+@@ -627,6 +628,12 @@ static void virtio_net_reset(VirtIODevice *vdev)
+     n->announce_timer.round = 0;
+     n->status &= ~VIRTIO_NET_S_ANNOUNCE;
  
- #define VIRTIO_NET_VM_VERSION    11
- 
-@@ -1610,8 +1611,78 @@ static int receive_filter(VirtIONet *n, const uint8_t *buf, int size)
-     return 0;
- }
- 
-+static uint8_t virtio_net_get_hash_type(bool isip4,
-+                                        bool isip6,
-+                                        bool isudp,
-+                                        bool istcp,
-+                                        uint32_t types)
-+{
-+    uint32_t mask;
-+    if (isip4) {
-+        if (istcp && (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4)) {
-+            return NetPktRssIpV4Tcp;
-+        }
-+        if (isudp && (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4)) {
-+            return NetPktRssIpV4Udp;
-+        }
-+        if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4) {
-+            return NetPktRssIpV4;
-+        }
-+    } else if (isip6) {
-+        mask = VIRTIO_NET_RSS_HASH_TYPE_TCP_EX | VIRTIO_NET_RSS_HASH_TYPE_TCPv6;
-+        if (istcp && (types & mask)) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) ?
-+                NetPktRssIpV6TcpEx : NetPktRssIpV6Tcp;
-+        }
-+        mask = VIRTIO_NET_RSS_HASH_TYPE_UDP_EX | VIRTIO_NET_RSS_HASH_TYPE_UDPv6;
-+        if (isudp && (types & mask)) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) ?
-+                NetPktRssIpV6UdpEx : NetPktRssIpV6Udp;
-+        }
-+        mask = VIRTIO_NET_RSS_HASH_TYPE_IP_EX | VIRTIO_NET_RSS_HASH_TYPE_IPv6;
-+        if (types & mask) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) ?
-+                NetPktRssIpV6Ex : NetPktRssIpV6;
-+        }
-+    }
-+    return 0xff;
-+}
-+
-+static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
-+                                  size_t size)
-+{
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-+    unsigned int index = nc->queue_index, new_index;
-+    struct NetRxPkt *pkt = n->rss_data.pkt;
-+    uint8_t net_hash_type;
-+    uint32_t hash;
-+    bool isip4, isip6, isudp, istcp;
-+    net_rx_pkt_set_protocols(pkt, buf + n->host_hdr_len,
-+                             size - n->host_hdr_len);
-+    net_rx_pkt_get_protocols(pkt, &isip4, &isip6, &isudp, &istcp);
-+    if (isip4 && (net_rx_pkt_get_ip4_info(pkt)->fragment)) {
-+        istcp = isudp = false;
-+    }
-+    if (isip6 && (net_rx_pkt_get_ip6_info(pkt)->fragment)) {
-+        istcp = isudp = false;
-+    }
-+    net_hash_type = virtio_net_get_hash_type(isip4, isip6, isudp, istcp,
-+                                             n->rss_data.hash_types);
-+    if (net_hash_type > NetPktRssIpV6UdpEx) {
-+        return n->rss_data.default_queue;
++    if (n->migration_blocker) {
++        migrate_del_blocker(n->migration_blocker);
++        error_free(n->migration_blocker);
++        n->migration_blocker = NULL;
 +    }
 +
-+    hash = net_rx_pkt_calc_rss_hash(pkt, net_hash_type, n->rss_data.key);
-+    new_index = hash & (n->rss_data.indirections_len - 1);
-+    new_index = n->rss_data.indirections[new_index];
-+    if (index == new_index) {
-+        return -1;
-+    }
-+    return new_index;
-+}
-+
- static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
--                                      size_t size)
-+                                      size_t size, bool no_rss)
- {
-     VirtIONet *n = qemu_get_nic_opaque(nc);
-     VirtIONetQueue *q = virtio_net_get_subqueue(nc);
-@@ -1625,6 +1696,14 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-         return -1;
+     /* Flush any MAC and VLAN filter table state */
+     n->mac_table.in_use = 0;
+     n->mac_table.first_multi = 0;
+@@ -1003,6 +1010,17 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+         vhost_net_ack_features(get_vhost_net(nc->peer), features);
      }
  
-+    if (!no_rss && n->rss_data.enabled) {
-+        int index = virtio_net_process_rss(nc, buf, size);
-+        if (index >= 0) {
-+            NetClientState *nc2 = qemu_get_subqueue(n->nic, index);
-+            return virtio_net_receive_rcu(nc2, buf, size, true);
++    if (virtio_has_feature(features, VIRTIO_NET_F_RSS)) {
++        if (!n->migration_blocker) {
++            error_setg(&n->migration_blocker, "virtio-net: RSS negotiated");
++            migrate_add_blocker(n->migration_blocker, &err);
++            if (err) {
++                error_report_err(err);
++                err = NULL;
++            }
 +        }
 +    }
 +
-     /* hdr_len refers to the header we supply to the guest */
-     if (!virtio_net_has_buffers(q, size + n->guest_hdr_len - n->host_hdr_len)) {
-         return 0;
-@@ -1719,7 +1798,7 @@ static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t *buf,
- {
-     RCU_READ_LOCK_GUARD();
- 
--    return virtio_net_receive_rcu(nc, buf, size);
-+    return virtio_net_receive_rcu(nc, buf, size, false);
- }
- 
- static void virtio_net_rsc_extract_unit4(VirtioNetRscChain *chain,
-@@ -3295,6 +3374,8 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
- 
-     QTAILQ_INIT(&n->rsc_chains);
-     n->qdev = dev;
-+
-+    net_rx_pkt_init(&n->rss_data.pkt, false);
- }
- 
- static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-@@ -3331,6 +3412,7 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-     g_free(n->vqs);
-     qemu_del_nic(n->nic);
-     virtio_net_rsc_cleanup(n);
-+    net_rx_pkt_uninit(n->rss_data.pkt);
-     virtio_cleanup(vdev);
- }
- 
+     if (virtio_has_feature(features, VIRTIO_NET_F_CTRL_VLAN)) {
+         memset(n->vlans, 0, MAX_VLAN >> 3);
+     } else {
 diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index cf16f5192e..45670dd054 100644
+index 45670dd054..fba768ba9b 100644
 --- a/include/hw/virtio/virtio-net.h
 +++ b/include/hw/virtio/virtio-net.h
-@@ -209,6 +209,7 @@ struct VirtIONet {
-         uint16_t indirections[VIRTIO_NET_RSS_MAX_TABLE_LEN];
-         uint16_t indirections_len;
-         uint16_t default_queue;
-+        struct NetRxPkt *pkt;
-     } rss_data;
- };
- 
+@@ -180,6 +180,7 @@ struct VirtIONet {
+     virtio_net_conf net_conf;
+     NICConf nic_conf;
+     DeviceState *qdev;
++    Error *migration_blocker;
+     int multiqueue;
+     uint16_t max_queues;
+     uint16_t curr_queues;
 -- 
 2.17.1
 
