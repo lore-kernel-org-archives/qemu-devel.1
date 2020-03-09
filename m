@@ -2,85 +2,127 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 295C9C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 258B2C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB4AD21D7E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E593A21D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:50:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="leEvIMK8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB4AD21D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fxbI7r+B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E593A21D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKfO-0000ex-Ss
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:50:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40373)
+	id 1jBKfa-000113-VS
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:50:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZq-0001tB-Ij
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:25 -0400
+ (envelope-from <david@redhat.com>) id 1jBKK5-000215-Rq
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZn-0001Q1-OH
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:22 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:36731)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBKZm-0001O8-VM
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:19 -0400
-Received: by mail-wr1-x429.google.com with SMTP id s5so7914364wrg.3
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OzpeqXmGwTCr3pNSFS/ceEjzB2+w8IvRp7XT0MgGdJM=;
- b=leEvIMK8XzUjfwM4kRShiuqek4l+OZMcOACrhZVlIv8HlC9SFxOn/gd8cwpQoI9uZo
- AJu18Om0DF9gh+9wuQfJ1n7nDth+0xjm49xwuPqXj91EKaW5z1BK4iY2m3rDUDotDq+P
- /gkRY9urVOBULtaj0kIyD7Q1glLU7sFfT/vkGCBXie9JFMIEsv8EBL/dF3Ko+jEiVUlb
- Wft4UtsTCsIRg3BjSI2ZTDpbaISweHTkqBhHzQrpYhVo9p/E7zRRUcHaUzuj1pEHEyO6
- B+Qz1c4WdMuBn6dCDj9CjzstAjV/hWhaGXuwDr5DLbj0FvjjExg3FNRrbHmUZ60XXfRt
- fZcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=OzpeqXmGwTCr3pNSFS/ceEjzB2+w8IvRp7XT0MgGdJM=;
- b=Pyi8hHIwq3RY8Ogu5i0We/zWayMosJ8UbnGTUhFuKqpJS9TYPixZj/gneMVxCr1YQ2
- NpheKZiLWXlW8+D8Onv7wCRshzFRtGd6MtN9xudvp0iRZ14Gkpd/Bq3vH0afrETnPU9Z
- LWR/l3LO3+kSOdTYS1yM5SEwPbj16QGrNOH47gi7By/S6WqREvR8BsAEZta5+CQX9NLr
- wMIHFET/1aYiRPxGh8IHOVk6oxQAXECJZ4c+39sDjRXKPqG59ViDwmg/sguqtJvN6jcZ
- /PQBONDkdBPmto5515VrRvojlo2fTlKQI6YvN2cYyxy7CMzobYuLJsOa2P+GvRXPRdIf
- J93Q==
-X-Gm-Message-State: ANhLgQ0qxy3r9yOxu0BZPpUiVdHjQfMGTQEkAul25AwHuk7Itcj7Iehn
- 7ynXNLQJaejKWeruqtfBnORrijT02MNQFg==
-X-Google-Smtp-Source: ADFU+vvDcijNZsH2rMi8ovGnBmMU5C4C8E18ZmPr1ojDnLnrN3afmU0uMfkcOEAd6a7cVTx0FIeVtA==
-X-Received: by 2002:adf:f7c1:: with SMTP id a1mr21526447wrq.299.1583768657169; 
- Mon, 09 Mar 2020 08:44:17 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 08:44:16 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 07/18] docs/sphinx: Add new qapi-doc Sphinx extension
-Date: Mon,  9 Mar 2020 15:43:54 +0000
-Message-Id: <20200309154405.13548-8-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
-References: <20200309154405.13548-1-peter.maydell@linaro.org>
+ (envelope-from <david@redhat.com>) id 1jBKK3-0007Rh-0E
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44657
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBKK1-0007QX-A3
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:28:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583767681;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=82zrjJBhKppaWDktfeKrZYUBmctHGVdwgl2gVBqELh8=;
+ b=fxbI7r+Bfa0Jl3/rAOeNLcte3sBdp9JhUCAyrF5BZmnJyMhWXSLIwsnKXqVYlxdCoYmBCt
+ 16GGUfayqBEtLmYTTUhcNM1ExatTpRF4bD6rh03gyjejBb37k6+rWPGRBT6+kZDCxqKApr
+ qMTP6c9WUutLvqlQSSaNwUc1q/oM3F4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-dLlKazW7PVyKyi5_5I2W7A-1; Mon, 09 Mar 2020 11:27:59 -0400
+X-MC-Unique: dLlKazW7PVyKyi5_5I2W7A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8EBD800D50;
+ Mon,  9 Mar 2020 15:27:57 +0000 (UTC)
+Received: from [10.36.118.226] (unknown [10.36.118.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 06E985C3F8;
+ Mon,  9 Mar 2020 15:27:53 +0000 (UTC)
+Subject: Re: [PATCH v7 08/15] s390x: protvirt: SCLP interpretation
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200309112206.20261-1-frankja@linux.ibm.com>
+ <20200309112206.20261-9-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <6b57a6b8-f864-c5f6-f53f-1ac09e95e271@redhat.com>
+Date: Mon, 9 Mar 2020 16:27:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::429
+In-Reply-To: <20200309112206.20261-9-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,581 +134,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of our documentation is auto-generated from documentation
-comments in the JSON schema.
+On 09.03.20 12:21, Janosch Frank wrote:
+> SCLP for a protected guest is done over the SIDAD, so we need to use
+> the s390_cpu_pv_mem_* functions to access the SIDAD instead of guest
+> memory when reading/writing SCBs.
+> 
+> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
+> since the function that injects the sclp external interrupt would
+> reject a zero sccb address.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/sclp.c         | 28 ++++++++++++++++++++++++++++
+>  include/hw/s390x/sclp.h |  2 ++
+>  target/s390x/kvm.c      | 21 ++++++++++++++++-----
+>  3 files changed, 46 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index af0bfbc2ec..b4bc2dd659 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -193,6 +193,34 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+>      }
+>  }
+>  
+> +/*
+> +* We only need the address to have something valid for the
+> +* service_interrupt call.
+> +*/
+> +#define SCLP_PV_DUMMY_ADDR 0x4000
+> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+> +                                uint32_t code)
+> +{
+> +    SCLPDevice *sclp = get_sclp_device();
+> +    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
+> +    SCCB work_sccb;
+> +    hwaddr sccb_len = sizeof(SCCB);
+> +
+> +    /*
+> +     * Only a very limited amount of calls is permitted by the
+> +     * Ultravisor and we support all of them, so we don't check for
+> +     * them. All other specification exceptions are also interpreted
+> +     * by the Ultravisor and hence never cause an exit we need to
+> +     * handle.
+> +     */
+> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
+> +    sclp_c->execute(sclp, &work_sccb, code);
+> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
+> +                          be16_to_cpu(work_sccb.h.length));
+> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
+> +    return 0;
+> +}
+> +
+>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>  {
+>      SCLPDevice *sclp = get_sclp_device();
+> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> index c54413b78c..c0a3faa37d 100644
+> --- a/include/hw/s390x/sclp.h
+> +++ b/include/hw/s390x/sclp.h
+> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
+>  void sclp_service_interrupt(uint32_t sccb);
+>  void raise_irq_cpu_hotplug(void);
+>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+> +                                uint32_t code);
+>  
+>  #endif
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 295ed12a38..5c7757ac28 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -1226,12 +1226,23 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
+>      sccb = env->regs[ipbh0 & 0xf];
+>      code = env->regs[(ipbh0 & 0xf0) >> 4];
+>  
+> -    r = sclp_service_call(env, sccb, code);
+> -    if (r < 0) {
+> -        kvm_s390_program_interrupt(cpu, -r);
+> -        return;
+> +    switch (run->s390_sieic.icptcode) {
+> +    case ICPT_PV_INSTR_NOTIFICATION:
+> +        /* The notification intercepts are currently handled by KVM */
+> +        fprintf(stderr, "unexpected SCLP PV notification\n");
 
-For Sphinx, rather than creating a file to include, the most natural
-way to handle this is to have a small custom Sphinx extension which
-processes the JSON file and inserts documentation into the rST
-file being processed.
+Maybe g_assert(env->pv);
 
-This is the same approach that kerneldoc and hxtool use.
+error_report() ?
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- MAINTAINERS            |   1 +
- docs/conf.py           |   6 +-
- docs/sphinx/qapidoc.py | 504 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 510 insertions(+), 1 deletion(-)
- create mode 100644 docs/sphinx/qapidoc.py
+> +        exit(1);
+> +        break;
+> +    case ICPT_PV_INSTR:
+> +        sclp_service_call_protected(env, sccb, code);
+> +        break;
+> +    case ICPT_INSTRUCTION:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36d0c6887a9..06a762b9dc4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2822,3 +2822,4 @@ M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
- F: docs/conf.py
- F: docs/*/conf.py
-+F: docs/sphinx/
-diff --git a/docs/conf.py b/docs/conf.py
-index 960043cb860..ac35922daf2 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -51,7 +51,10 @@ except NameError:
- # add these directories to sys.path here. If the directory is relative to the
- # documentation root, use an absolute path starting from qemu_docdir.
- #
-+# Our extensions are in docs/sphinx; the qapidoc extension requires
-+# the QAPI modules from scripts/.
- sys.path.insert(0, os.path.join(qemu_docdir, "sphinx"))
-+sys.path.insert(0, os.path.join(qemu_docdir, "../scripts"))
- 
- 
- # -- General configuration ------------------------------------------------
-@@ -64,7 +67,7 @@ needs_sphinx = '1.3'
- # Add any Sphinx extension module names here, as strings. They can be
- # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
- # ones.
--extensions = ['kerneldoc', 'qmp_lexer', 'hxtool']
-+extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'qapidoc']
- 
- # Add any paths that contain templates here, relative to this directory.
- templates_path = ['_templates']
-@@ -238,3 +241,4 @@ texinfo_documents = [
- kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
- kerneldoc_srctree = os.path.join(qemu_docdir, '..')
- hxtool_srctree = os.path.join(qemu_docdir, '..')
-+qapidoc_srctree = os.path.join(qemu_docdir, '..')
-diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
-new file mode 100644
-index 00000000000..d0dd6e93d4c
---- /dev/null
-+++ b/docs/sphinx/qapidoc.py
-@@ -0,0 +1,504 @@
-+# coding=utf-8
-+#
-+# QEMU qapidoc QAPI file parsing extension
-+#
-+# Copyright (c) 2020 Linaro
-+#
-+# This work is licensed under the terms of the GNU GPLv2 or later.
-+# See the COPYING file in the top-level directory.
-+"""qapidoc is a Sphinx extension that implements the qapi-doc directive"""
-+
-+# The purpose of this extension is to read the documentation comments
-+# in QAPI JSON schema files, and insert them all into the current document.
-+# The conf.py file must set the qapidoc_srctree config value to
-+# the root of the QEMU source tree.
-+# Each qapi-doc:: directive takes one argument which is the
-+# path of the .json file to process, relative to the source tree.
-+
-+import os
-+import re
-+
-+from docutils import nodes
-+from docutils.statemachine import ViewList
-+from docutils.parsers.rst import directives, Directive
-+from sphinx.errors import ExtensionError
-+from sphinx.util.nodes import nested_parse_with_titles
-+import sphinx
-+from qapi.gen import QAPISchemaVisitor
-+from qapi.schema import QAPIError, QAPISchema
-+
-+# Sphinx up to 1.6 uses AutodocReporter; 1.7 and later
-+# use switch_source_input. Check borrowed from kerneldoc.py.
-+Use_SSI = sphinx.__version__[:3] >= '1.7'
-+if Use_SSI:
-+    from sphinx.util.docutils import switch_source_input
-+else:
-+    from sphinx.ext.autodoc import AutodocReporter
-+
-+
-+__version__ = '1.0'
-+
-+# Function borrowed from pydash, which is under the MIT license
-+def intersperse(iterable, separator):
-+    """Like join, but for arbitrary iterables, notably arrays"""
-+    iterable = iter(iterable)
-+    yield next(iterable)
-+    for item in iterable:
-+        yield separator
-+        yield item
-+
-+class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
-+    """A QAPI schema visitor which generates docutils/Sphinx nodes
-+
-+    This class builds up a tree of docutils/Sphinx nodes corresponding
-+    to documentation for the various QAPI objects. To use it, first create
-+    a QAPISchemaGenRSTVisitor object, and call its visit_begin() method.
-+    Then you can call one of the two methods 'freeform' (to add documentation
-+    for a freeform documentation chunk) or 'symbol' (to add documentation
-+    for a QAPI symbol). These will cause the visitor to build up the
-+    tree of document nodes. Once you've added all the documentation
-+    via 'freeform' and 'symbol' method calls, you can call 'get_document_nodes'
-+    to get the final list of document nodes (in a form suitable for returning
-+    from a Sphinx directive's 'run' method).
-+    """
-+    def __init__(self, sphinx_directive):
-+        self._cur_doc = None
-+        self._sphinx_directive = sphinx_directive
-+        self._top_node = nodes.section()
-+        self._active_headings = [self._top_node]
-+
-+    def _serror(self, msg):
-+        """Raise an exception giving a user-friendly syntax error message"""
-+        file = self._cur_doc.info.fname
-+        line = self._cur_doc.info.line
-+        raise ExtensionError('%s line %d: syntax error: %s' % (file, line, msg))
-+
-+    def _make_dlitem(self, term, defn):
-+        """Return a dlitem node with the specified term and definition.
-+
-+        term should be a list of Text and literal nodes.
-+        defn should be one of:
-+        - a string, which will be handed to _parse_text_into_node
-+        - a list of Text and literal nodes, which will be put into
-+          a paragraph node
-+        """
-+        dlitem = nodes.definition_list_item()
-+        dlterm = nodes.term('', '', *term)
-+        dlitem += dlterm
-+        if defn:
-+            dldef = nodes.definition()
-+            if isinstance(defn, list):
-+                dldef += nodes.paragraph('', '', *defn)
-+            else:
-+                self._parse_text_into_node(defn, dldef)
-+            dlitem += dldef
-+        return dlitem
-+
-+    def _make_section(self, title):
-+        """Return a section node with optional title"""
-+        section = nodes.section(ids=[self._sphinx_directive.new_serialno()])
-+        if title:
-+            section += nodes.title(title, title)
-+        return section
-+
-+    def _nodes_for_ifcond(self, ifcond, with_if=True):
-+        """Return list of Text, literal nodes for the ifcond
-+
-+        Return a list which gives text like ' (If: cond1, cond2, cond3)', where
-+        the conditions are in literal-text and the commas are not.
-+        If with_if is False, we don't return the "(If: " and ")".
-+        """
-+        condlist = intersperse([nodes.literal('', c) for c in ifcond],
-+                               nodes.Text(', '))
-+        if not with_if:
-+            return condlist
-+
-+        nodelist = [nodes.Text(' ('), nodes.strong('', 'If: ')]
-+        nodelist.extend(condlist)
-+        nodelist.append(nodes.Text(')'))
-+        return nodelist
-+
-+    def _nodes_for_one_member(self, member):
-+        """Return list of Text, literal nodes for this member
-+
-+        Return a list of doctree nodes which give text like
-+        'name: type (optional) (If: ...)' suitable for use as the
-+        'term' part of a definition list item.
-+        """
-+        term = [nodes.literal('', member.name)]
-+        if member.type.doc_type():
-+            term.append(nodes.Text(': '))
-+            term.append(nodes.literal('', member.type.doc_type()))
-+        if member.optional:
-+            term.append(nodes.Text(' (optional)'))
-+        if member.ifcond:
-+            term.extend(self._nodes_for_ifcond(member.ifcond))
-+        return term
-+
-+    def _nodes_for_variant_when(self, variants, variant):
-+        """Return list of Text, literal nodes for variant 'when' clause
-+
-+        Return a list of doctree nodes which give text like
-+        'when tagname is variant (If: ...)' suitable for use in
-+        the 'variants' part of a definition list.
-+        """
-+        term = [nodes.Text(' when '),
-+                nodes.literal('', variants.tag_member.name),
-+                nodes.Text(' is '),
-+                nodes.literal('', '"%s"' % variant.name)]
-+        if variant.ifcond:
-+            term.extend(self._nodes_for_ifcond(variant.ifcond))
-+        return term
-+
-+    def _nodes_for_members(self, doc, what, base=None, variants=None):
-+        """Return doctree nodes for the table of members"""
-+        dlnode = nodes.definition_list()
-+        for section in doc.args.values():
-+            term = self._nodes_for_one_member(section.member)
-+            # TODO drop fallbacks when undocumented members are outlawed
-+            if section.text:
-+                defn = section.text
-+            elif (variants and variants.tag_member == section.member
-+                  and not section.member.type.doc_type()):
-+                values = section.member.type.member_names()
-+                defn = [nodes.Text('One of ')]
-+                defn.extend(intersperse([nodes.literal('', v) for v in values],
-+                                        nodes.Text(', ')))
-+            else:
-+                defn = [nodes.Text('Not documented')]
-+
-+            dlnode += self._make_dlitem(term, defn)
-+
-+        if base:
-+            dlnode += self._make_dlitem([nodes.Text('The members of '),
-+                                         nodes.literal('', base.doc_type())],
-+                                        None)
-+
-+        if variants:
-+            for v in variants.variants:
-+                if v.type.is_implicit():
-+                    assert not v.type.base and not v.type.variants
-+                    for m in v.type.local_members:
-+                        term = self._nodes_for_one_member(m)
-+                        term.extend(self._nodes_for_variant_when(variants, v))
-+                        dlnode += self._make_dlitem(term, None)
-+                else:
-+                    term = [nodes.Text('The members of '),
-+                            nodes.literal('', v.type.doc_type())]
-+                    term.extend(self._nodes_for_variant_when(variants, v))
-+                    dlnode += self._make_dlitem(term, None)
-+
-+        if not dlnode.children:
-+            return None
-+
-+        section = self._make_section(what)
-+        section += dlnode
-+        return section
-+
-+    def _nodes_for_enum_values(self, doc, what):
-+        """Return doctree nodes for the table of enum values"""
-+        seen_item = False
-+        dlnode = nodes.definition_list()
-+        for section in doc.args.values():
-+            termtext = [nodes.literal('', section.member.name)]
-+            if section.member.ifcond:
-+                termtext.extend(self._nodes_for_ifcond(section.member.ifcond))
-+            # TODO drop fallbacks when undocumented members are outlawed
-+            if section.text:
-+                defn = section.text
-+            else:
-+                defn = [nodes.Text('Not documented')]
-+
-+            dlnode += self._make_dlitem(termtext, defn)
-+            seen_item = True
-+
-+        if not seen_item:
-+            return None
-+
-+        section = self._make_section(what)
-+        section += dlnode
-+        return section
-+
-+    def _nodes_for_arguments(self, doc, boxed_arg_type):
-+        """Return doctree nodes for the arguments section"""
-+        if boxed_arg_type:
-+            assert not doc.args
-+            section = self._make_section('Arguments')
-+            dlnode = nodes.definition_list()
-+            dlnode += self._make_dlitem(
-+                [nodes.Text('The members of '),
-+                 nodes.literal('', boxed_arg_type.name)],
-+                None)
-+            section += dlnode
-+            return section
-+
-+        return self._nodes_for_members(doc, 'Arguments')
-+
-+    def _nodes_for_features(self, doc):
-+        """Return doctree nodes for the table of features"""
-+        seen_item = False
-+        dlnode = nodes.definition_list()
-+        for section in doc.features.values():
-+            dlnode += self._make_dlitem([nodes.literal('', section.name)],
-+                                        section.text)
-+            seen_item = True
-+
-+        if not seen_item:
-+            return None
-+
-+        section = self._make_section('Features')
-+        section += dlnode
-+        return section
-+
-+    def _nodes_for_example(self, exampletext):
-+        """Return doctree nodes for a code example snippet"""
-+        return nodes.literal_block(exampletext, exampletext)
-+
-+    def _nodes_for_sections(self, doc, ifcond):
-+        """Return doctree nodes for additional sections following arguments"""
-+        nodelist = []
-+        for section in doc.sections:
-+            snode = self._make_section(section.name)
-+            if section.name and section.name.startswith('Example'):
-+                snode += self._nodes_for_example(section.text)
-+            else:
-+                self._parse_text_into_node(section.text, snode)
-+            nodelist.append(snode)
-+        if ifcond:
-+            snode = self._make_section('If')
-+            snode += self._nodes_for_ifcond(ifcond, with_if=False)
-+            nodelist.append(snode)
-+        if not nodelist:
-+            return None
-+        return nodelist
-+
-+    def _add_doc(self, typ, sections):
-+        """Add documentation for a command/object/enum...
-+
-+        We assume we're documenting the thing defined in self._cur_doc.
-+        typ is the type of thing being added ("Command", "Object", etc)
-+
-+        sections is a list of nodes for sections to add to the definition.
-+        """
-+
-+        doc = self._cur_doc
-+        snode = nodes.section(ids=[self._sphinx_directive.new_serialno()])
-+        snode += nodes.title('', '', *[nodes.literal(doc.symbol, doc.symbol),
-+                                       nodes.Text(' (' + typ + ')')])
-+        self._parse_text_into_node(doc.body.text, snode)
-+        for s in sections:
-+            if s is not None:
-+                snode += s
-+        self._add_node_to_current_heading(snode)
-+
-+    def visit_enum_type(self, name, info, ifcond, members, prefix):
-+        doc = self._cur_doc
-+        self._add_doc('Enum',
-+                      [self._nodes_for_enum_values(doc, 'Values'),
-+                       self._nodes_for_features(doc),
-+                       self._nodes_for_sections(doc, ifcond)])
-+
-+    def visit_object_type(self, name, info, ifcond, base, members, variants,
-+                          features):
-+        doc = self._cur_doc
-+        if base and base.is_implicit():
-+            base = None
-+        self._add_doc('Object',
-+                      [self._nodes_for_members(doc, 'Members', base, variants),
-+                       self._nodes_for_features(doc),
-+                       self._nodes_for_sections(doc, ifcond)])
-+
-+    def visit_alternate_type(self, name, info, ifcond, variants):
-+        doc = self._cur_doc
-+        self._add_doc('Alternate',
-+                      [self._nodes_for_members(doc, 'Members'),
-+                       self._nodes_for_features(doc),
-+                       self._nodes_for_sections(doc, ifcond)])
-+
-+    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-+        doc = self._cur_doc
-+        self._add_doc('Command',
-+                      [self._nodes_for_arguments(doc,
-+                                                 arg_type if boxed else None),
-+                       self._nodes_for_features(doc),
-+                       self._nodes_for_sections(doc, ifcond)])
-+
-+    def visit_event(self, name, info, ifcond, arg_type, boxed):
-+        doc = self._cur_doc
-+        self._add_doc('Event',
-+                      [self._nodes_for_arguments(doc,
-+                                                 arg_type if boxed else None),
-+                       self._nodes_for_features(doc),
-+                       self._nodes_for_sections(doc, ifcond)])
-+
-+    def symbol(self, doc, entity):
-+        """Add documentation for one symbol to the document tree
-+
-+        This is the main entry point which causes us to add documentation
-+        nodes for a symbol (which could be a 'command', 'object', 'event',
-+        etc). We do this by calling 'visit' on the schema entity, which
-+        will then call back into one of our visit_* methods, depending
-+        on what kind of thing this symbol is.
-+        """
-+        self._cur_doc = doc
-+        entity.visit(self)
-+        self._cur_doc = None
-+
-+    def _start_new_heading(self, heading, level):
-+        """Start a new heading at the specified heading level
-+
-+        Create a new section whose title is 'heading' and which is placed
-+        in the docutils node tree as a child of the most recent level-1
-+        heading. Subsequent document sections (commands, freeform doc chunks,
-+        etc) will be placed as children of this new heading section.
-+        """
-+        if len(self._active_headings) < level:
-+            self._serror('Level %d subheading found outside a level %d heading'
-+                         % (level, level - 1))
-+        snode = self._make_section(heading)
-+        self._active_headings[level - 1] += snode
-+        self._active_headings = self._active_headings[:level]
-+        self._active_headings.append(snode)
-+
-+    def _add_node_to_current_heading(self, node):
-+        """Add the node to whatever the current active heading is"""
-+        self._active_headings[-1] += node
-+
-+    def freeform(self, doc):
-+        """Add a piece of 'freeform' documentation to the document tree
-+
-+        A 'freeform' document chunk doesn't relate to any particular
-+        symbol (for instance, it could be an introduction).
-+
-+        As a special case, if the freeform document is a single line
-+        of the form '= Heading text' it is treated as a section or subsection
-+        heading, with the heading level indicated by the number of '=' signs.
-+        """
-+
-+        # QAPIDoc documentation says free-form documentation blocks
-+        # must have only a body section, nothing else.
-+        assert not doc.sections
-+        assert not doc.args
-+        assert not doc.features
-+        self._cur_doc = doc
-+
-+        if re.match(r'=+ ', doc.body.text):
-+            # Section or subsection heading: must be the only thing in the block
-+            (heading, _, rest) = doc.body.text.partition('\n')
-+            if rest != '':
-+                raise ExtensionError('%s line %s: section or subsection heading'
-+                                     ' must be in its own doc comment block'
-+                                     % (doc.info.fname, doc.info.line))
-+            (leader, _, heading) = heading.partition(' ')
-+            self._start_new_heading(heading, len(leader))
-+            return
-+
-+        node = self._make_section(None)
-+        self._parse_text_into_node(doc.body.text, node)
-+        self._add_node_to_current_heading(node)
-+        self._cur_doc = None
-+
-+    def _parse_text_into_node(self, doctext, node):
-+        """Parse a chunk of QAPI-doc-format text into the node
-+
-+        The doc comment can contain most inline rST markup, including
-+        bulleted and enumerated lists.
-+        As an extra permitted piece of markup, @var will be turned
-+        into ``var``.
-+        """
-+
-+        # Handle the "@var means ``var`` case
-+        doctext = re.sub(r'@([\w-]+)', r'``\1``', doctext)
-+
-+        rstlist = ViewList()
-+        for line in doctext.splitlines():
-+            # The reported line number will always be that of the start line
-+            # of the doc comment, rather than the actual location of the error.
-+            # Being more precise would require overhaul of the QAPIDoc class
-+            # to track lines more exactly within all the sub-parts of the doc
-+            # comment, as well as counting lines here.
-+            rstlist.append(line, self._cur_doc.info.fname,
-+                           self._cur_doc.info.line)
-+        self._sphinx_directive.do_parse(rstlist, node)
-+
-+    def get_document_nodes(self):
-+        """Return the list of docutils nodes which make up the document"""
-+        return self._top_node.children
-+
-+class QAPIDocDirective(Directive):
-+    """Extract documentation from the specified QAPI .json file"""
-+    required_argument = 1
-+    optional_arguments = 1
-+    option_spec = {
-+        'qapifile': directives.unchanged_required
-+    }
-+    has_content = False
-+
-+    def new_serialno(self):
-+        """Return a unique new ID string suitable for use as a node's ID"""
-+        env = self.state.document.settings.env
-+        return 'qapidoc-%d' % env.new_serialno('qapidoc')
-+
-+    def run(self):
-+        env = self.state.document.settings.env
-+        qapifile = env.config.qapidoc_srctree + '/' + self.arguments[0]
-+
-+        # Tell sphinx of the dependency
-+        env.note_dependency(os.path.abspath(qapifile))
-+
-+        try:
-+            schema = QAPISchema(qapifile)
-+        except QAPIError as err:
-+            # Launder QAPI parse errors into Sphinx extension errors
-+            # so they are displayed nicely to the user
-+            raise ExtensionError(str(err))
-+
-+        vis = QAPISchemaGenRSTVisitor(self)
-+        vis.visit_begin(schema)
-+        for doc in schema.docs:
-+            if doc.symbol:
-+                vis.symbol(doc, schema.lookup_entity(doc.symbol))
-+            else:
-+                vis.freeform(doc)
-+
-+        return vis.get_document_nodes()
-+
-+    def do_parse(self, rstlist, node):
-+        """Parse rST source lines and add them to the specified node
-+
-+        Take the list of rST source lines rstlist, parse them as
-+        rST, and add the resulting docutils nodes as children of node.
-+        The nodes are parsed in a way that allows them to include
-+        subheadings (titles) without confusing the rendering of
-+        anything else.
-+        """
-+        # This is from kerneldoc.py -- it works around an API change in
-+        # Sphinx between 1.6 and 1.7. Unlike kerneldoc.py, we use
-+        # sphinx.util.nodes.nested_parse_with_titles() rather than the
-+        # plain self.state.nested_parse(), and so we can drop the saving
-+        # of title_styles and section_level that kerneldoc.py does,
-+        # because nested_parse_with_titles() does that for us.
-+        if Use_SSI:
-+            with switch_source_input(self.state, rstlist):
-+                nested_parse_with_titles(self.state, rstlist, node)
-+        else:
-+            save = self.state.memo.reporter
-+            self.state.memo.reporter = AutodocReporter(rstlist,
-+                                                       self.state.memo.reporter)
-+            try:
-+                nested_parse_with_titles(self.state, rstlist, node)
-+            finally:
-+                self.state.memo.reporter = save
-+
-+def setup(app):
-+    """ Register qapi-doc directive with Sphinx"""
-+    app.add_config_value('qapidoc_srctree', None, 'env')
-+    app.add_directive('qapi-doc', QAPIDocDirective)
-+
-+    return dict(
-+        version=__version__,
-+        parallel_read_safe=True,
-+        parallel_write_safe=True
-+    )
+Maybe g_assert(!env->pv);
+
+> +        r = sclp_service_call(env, sccb, code);
+> +        if (r < 0) {
+> +            kvm_s390_program_interrupt(cpu, -r);
+> +            return;
+> +        }
+> +        setcc(cpu, r);
+>      }
+> -    setcc(cpu, r);
+
+What about the cc in case of ICPT_PV_INSTR?
+
+>  }
+>  
+>  static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+> 
+
+
 -- 
-2.20.1
+Thanks,
+
+David / dhildenb
 
 
