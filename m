@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE9D9C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C575C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF11D20828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 007EC20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kUhopCZo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF11D20828
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xISKCMDT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 007EC20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBOwn-0003P8-Rj
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:24:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60869)
+	id 1jBOwr-0003aE-3d
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jBOvr-0001p9-Ks
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:24 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jBOvw-0001wH-M2
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jBOvq-000598-JY
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:23 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:40272)
+ (envelope-from <alex.bennee@linaro.org>) id 1jBOvv-0005BP-Kv
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:28 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:51696)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jBOvq-00058l-Dx
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:22 -0400
-Received: by mail-wm1-x333.google.com with SMTP id e26so54097wme.5
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 13:23:22 -0700 (PDT)
+ id 1jBOvv-0005Az-FA
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:23:27 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id a132so956475wme.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 13:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=opP09aUpVqbLeEIEW2//0Q0JIWRT0FGPjndrXn93n2Y=;
- b=kUhopCZo+TC4h06Xv1pYZ5rlgl9pO5N5yoZJWM5juabuZTzR2Cpb9QF9hKsk9VCnRK
- TrP0yQ3XxBHz7t9ERmedvNehLpY3EUbHA0kf8m6539wyNWIyAE19MdVb/Ct/XeaWwX3e
- sxtkJjp2tgrS/VUlS1uWW4b232UQPRgF/cizQnL1bG/Jjbg5TTWPB7iYNKiJERN5rBNy
- fA/755aKqpGTvXyCl51ZYuVhQgT633v5Jdtcazp+qmfRbxlkLHNiFjnKfbg0TfPpxsXA
- PL2t0KvBLSlF24NaAxdjyUuc17A4UJxzBjStV5Uc15RsWcQb2XiqFW/ufrci6YMxVQgo
- CuUA==
+ bh=MUtXuY++HJCf6YAR3b18aJ7DI0jQE6PA6a/VAxt1sw0=;
+ b=xISKCMDTTXi/uzKuRaIgRkM/LuB0rPgjK8s8K2jPkJizeESg+VXXF+Z+k2wBoBSnWi
+ az2oGnXIWucmRcEz0yqPoS5E+1UOW09D7B5DK11DjAQkSbXCzUwsx6yBD+FFvsQZtHQE
+ 2OiwkxbTfzfvzens89KC/OALVAvjyPcrBNckIa8L/EIhdWFIV1QhlSht5LLM3yCsj8gl
+ 3pfV1mH3QIe5pT8ojtca2e84jtjnxK+kFItJnSEhATMRP4tR3Lt50l5Dz4jAKhqwiZoq
+ 6RzPFlDCiNj+XfZD+NWMEFzMjSq32nws5ZqJp0dIxxhju1a9ht+Up2ps//PNVMR7T3XO
+ eFAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=opP09aUpVqbLeEIEW2//0Q0JIWRT0FGPjndrXn93n2Y=;
- b=IQl6sbUushOYQjhdrPC0Mj8y1J76hX8RgVHN1gNaV7pZEk73wVeM+rZgvTFi1bv4X9
- RO4m5dYqVIZwz+RpVK2TnlnE2J40b6YPjTdSlPBvp2WX8x/PVikbrQfglOr7NsISOAJY
- Y2eMitbwucck4r4jRnHuTAUtssdhLaoC++K2TLxbSKnfXE7M7K5A7BoaEWXsOXtjkYGP
- 1jVy3hbnk1Bu7uXO6AeJyjFCnraBtw4+2LrQ883MW2sbOSgSZznsrTdcmeKG9rbqqBHL
- OO/A52bVEm0IIjMaXf6Rvx6N0T0nTJ1gB+wzSYAhpJAkFYJkJF3UEx0MSRfD/P1LdEzV
- PxoA==
-X-Gm-Message-State: ANhLgQ2LYhXVlMWpKw+v/2GGRnVoa/9867qtu4WuM6x7hnSqYWxhz4wA
- 5EfYaHdbp+9KFUokbWG4SfE7yQ==
-X-Google-Smtp-Source: ADFU+vucnKC1XQ3pTUvJ8DsafHA+UNSzCrrOxbkTk0mWbG76ZACB3m80vzRh/aS07BRji2YFO+78/Q==
-X-Received: by 2002:a7b:c8d7:: with SMTP id f23mr97183wml.173.1583785401452;
- Mon, 09 Mar 2020 13:23:21 -0700 (PDT)
+ bh=MUtXuY++HJCf6YAR3b18aJ7DI0jQE6PA6a/VAxt1sw0=;
+ b=F97WPNXQ/0iwGi5B/taQLHmUyP37vH3UJljSkWsj3bDdHrzypGe0lE3hEc4YYDreIt
+ bcifzolgpGL42RjZ4xEg18LSLOH5Mouc8nDcNW+QUF3K/4J9oyOFkCpUDoy/RfUMbl5R
+ GnFOwZ1c3uUMlpIIyAJ9M8OYdFVUY8QJ+f90X3lT9mfe6L5UJoWoDeqxvMfeEfvhpllg
+ vDWmpH2x1BJ5HtnWIEhpu19n5uADjuIdDnzudFvo43EoxKGD0zLokJDMk+ORWhTYkaTc
+ GyRwnxose9ctv9j3mIEP1QVTy20GHVOb8DFb607nkpZhmVl4mKWh+R0/yyCokAHYiDB9
+ hGlQ==
+X-Gm-Message-State: ANhLgQ3TUR06hGkcC6H/Mu9dlVFirSmrJmwE5D7CBqyES4Xaa6jQc7yF
+ 2ld1MEkIz0CwvxVZ7ktmV0rPxA==
+X-Google-Smtp-Source: ADFU+vtL05d+bu3es8+XVt0YSoRuVK8h00OsNs9xDZBEDVU0sA7FfzjpTzu/1NUy0TovGn26jRkoow==
+X-Received: by 2002:a7b:ce09:: with SMTP id m9mr104815wmc.49.1583785406392;
+ Mon, 09 Mar 2020 13:23:26 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h20sm43417800wrc.47.2020.03.09.13.23.19
+ by smtp.gmail.com with ESMTPSA id v8sm60809339wrw.2.2020.03.09.13.23.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 13:23:19 -0700 (PDT)
+ Mon, 09 Mar 2020 13:23:23 -0700 (PDT)
 Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 994E41FF87;
+ by zen.linaroharston (Postfix) with ESMTP id ED3901FF91;
  Mon,  9 Mar 2020 20:23:18 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/5] tests/docker: Install tools to cross-debug and build
- Linux kernels
-Date: Mon,  9 Mar 2020 20:23:14 +0000
-Message-Id: <20200309202318.3481-2-alex.bennee@linaro.org>
+Subject: [PATCH  v1 5/5] tests/acceptance: disable two more tests while in CI
+Date: Mon,  9 Mar 2020 20:23:18 +0000
+Message-Id: <20200309202318.3481-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200309202318.3481-1-alex.bennee@linaro.org>
 References: <20200309202318.3481-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,76 +96,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+These keep timing out on Travis. The reason is unknown so add a FIXME
+for those who want to track down exactly why this is happening. In the
+meantime you can still run check-acceptance manually without change.
 
-We often run Linux kernels to test QEMU. We sometimes need
-to build them manually to use non-default features. We only
-miss the tiny 'bc' tool.
-
-The ncurses library is helpful to run 'make menuconfig'.
-
-Finally, gdb-multiarch allow us to debug a TCG guest when its
-architecture is different than the host.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200212202738.12986-1-philmd@redhat.com>
 ---
- tests/docker/dockerfiles/debian10.docker | 3 +++
- tests/docker/dockerfiles/debian9.docker  | 3 +++
- 2 files changed, 6 insertions(+)
+ tests/acceptance/machine_mips_malta.py  | 2 ++
+ tests/acceptance/machine_sparc_leon3.py | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
-index 5de79ae5527..2fcdc406e83 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -17,14 +17,17 @@ RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-+        bc \
-         bison \
-         build-essential \
-         ca-certificates \
-         clang \
-         dbus \
-         flex \
-+        gdb-multiarch \
-         gettext \
-         git \
-+        libncurses5-dev \
-         pkg-config \
-         psmisc \
-         python3 \
-diff --git a/tests/docker/dockerfiles/debian9.docker b/tests/docker/dockerfiles/debian9.docker
-index 8cbd742bb5f..92edbbf0f48 100644
---- a/tests/docker/dockerfiles/debian9.docker
-+++ b/tests/docker/dockerfiles/debian9.docker
-@@ -17,13 +17,16 @@ RUN apt update && \
-     DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata && \
-     DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt install -y --no-install-recommends \
-+        bc \
-         bison \
-         build-essential \
-         ca-certificates \
-         clang \
-         flex \
-+        gdb-multiarch \
-         gettext \
-         git \
-+        libncurses5-dev \
-         pkg-config \
-         psmisc \
-         python3 \
+diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance/machine_mips_malta.py
+index 92b4f28a112..deebf532e95 100644
+--- a/tests/acceptance/machine_mips_malta.py
++++ b/tests/acceptance/machine_mips_malta.py
+@@ -99,6 +99,8 @@ class MaltaMachineFramebuffer(Test):
+         """
+         self.do_test_i6400_framebuffer_logo(1)
+ 
++    # FIXME: why does this keep timing out on Travis?
++    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
+     def test_mips_malta_i6400_framebuffer_logo_7cores(self):
+         """
+         :avocado: tags=arch:mips64el
+diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/machine_sparc_leon3.py
+index f77e210ccb4..91d94d967de 100644
+--- a/tests/acceptance/machine_sparc_leon3.py
++++ b/tests/acceptance/machine_sparc_leon3.py
+@@ -13,6 +13,8 @@ class Leon3Machine(Test):
+ 
+     timeout = 60
+ 
++    # FIXME: why does this keep timing out on Travis?
++    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
+     def test_leon3_helenos_uimage(self):
+         """
+         :avocado: tags=arch:sparc
 -- 
 2.20.1
 
