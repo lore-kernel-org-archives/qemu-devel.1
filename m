@@ -6,49 +6,48 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5752EC10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 459C1C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C01220665
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:26:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C01220665
+	by mail.kernel.org (Postfix) with ESMTPS id 158B52083E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 06:32:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 158B52083E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBBs2-0006xS-BX
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 02:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57599)
+	id 1jBBxH-00082S-9S
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 02:31:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrR-0006Uq-IE
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:59 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBwI-0007cY-7M
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrQ-0004TM-0H
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:57 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:34851)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBwB-0007RU-PW
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:30:58 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:35575)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1jBBrP-0004RA-Ns
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:25:55 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1jBBw9-0007QA-Sj
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 02:30:50 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id BF55956FC0;
- Mon,  9 Mar 2020 15:25:47 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 568DE56128;
+ Mon,  9 Mar 2020 15:30:47 +0900 (JST)
 Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id 32B791C07F7;
- Mon,  9 Mar 2020 15:25:47 +0900 (JST)
-Date: Mon, 09 Mar 2020 15:25:46 +0900
-Message-ID: <87lfoa9h91.wl-ysato@users.sourceforge.jp>
+ by sakura.ysato.name (Postfix) with ESMTPSA id D46891C07F7;
+ Mon,  9 Mar 2020 15:30:46 +0900 (JST)
+Date: Mon, 09 Mar 2020 15:30:46 +0900
+Message-ID: <87k13u9h0p.wl-ysato@users.sourceforge.jp>
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v32 16/22] hw/char: RX62N serial communication interface
- (SCI)
-In-Reply-To: <9a20c7bc-6d32-7384-c8a6-7ff8c852e08b@redhat.com>
+Subject: Re: [PATCH v32 21/22] BootLinuxConsoleTest: Test the RX-Virt machine
+In-Reply-To: <2c26a629-59d4-f6d5-d06d-cf3d1cf65f4c@redhat.com>
 References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
- <20200224141923.82118-17-ysato@users.sourceforge.jp>
- <9a20c7bc-6d32-7384-c8a6-7ff8c852e08b@redhat.com>
+ <20200224141923.82118-22-ysato@users.sourceforge.jp>
+ <2c26a629-59d4-f6d5-d06d-cf3d1cf65f4c@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,215 +68,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 09 Mar 2020 00:41:45 +0900,
+On Mon, 09 Mar 2020 01:20:05 +0900,
 Philippe Mathieu-Daud=E9 wrote:
 >=20
-> Hi Yoshinori,
->=20
 > On 2/24/20 3:19 PM, Yoshinori Sato wrote:
-> > This module supported only non FIFO type.
-> > Hardware manual.
-> > https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh00=
-33ej0140_rx62n.pdf
+> > From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > >=20
+> > Add two tests for the rx-virt machine, based on the recommended test
+> > setup from Yoshinori Sato:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
+> >=20
+> > - U-Boot prompt
+> > - Linux kernel with Sash shell
+> >=20
+> > These are very quick tests:
+> >=20
+> >    $ avocado run -t arch:rx tests/acceptance/boot_linux_console.py
+> >    JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+> >    JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a=
+6ef0/job.log
+> >     (1/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_=
+rx_uboot: PASS (0.11 s)
+> >     (2/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_=
+rx_linux: PASS (0.45 s)
+> >    RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT=
+ 0 | CANCEL 0
+> >=20
+> > Tests can also be run with:
+> >=20
+> >    $ avocado --show=3Dconsole run -t arch:rx tests/acceptance/boot_linu=
+x_console.py
+> >    console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 2=
+1:56:06 +0900)
+> >    console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc versi=
+on 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+> >    console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
+> >    ...
+> >    console: SuperH (H)SCI(F) driver initialized
+> >    console: 88240.serial: ttySC0 at MMIO 0x88240 (irq =3D 215, base_bau=
+d =3D 0) is a sci
+> >    console: console [ttySC0] enabled
+> >    console: 88248.serial: ttySC1 at MMIO 0x88248 (irq =3D 219, base_bau=
+d =3D 0) is a sci
+> >=20
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > Based-on: 20190517045136.3509-1-richard.henderson@linaro.org
+> > "RX architecture support"
 > > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> > Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
-> > Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > > ---
-> >   include/hw/char/renesas_sci.h |  45 +++++
-> >   hw/char/renesas_sci.c         | 342 ++++++++++++++++++++++++++++++++++
-> >   hw/char/Kconfig               |   3 +
-> >   hw/char/Makefile.objs         |   1 +
-> >   4 files changed, 391 insertions(+)
-> >   create mode 100644 include/hw/char/renesas_sci.h
-> >   create mode 100644 hw/char/renesas_sci.c
+> >   tests/acceptance/boot_linux_console.py | 46 ++++++++++++++++++++++++++
+> >   1 file changed, 46 insertions(+)
 > >=20
-> > diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sc=
-i.h
-> > new file mode 100644
-> > index 0000000000..50d1336944
-> > --- /dev/null
-> > +++ b/include/hw/char/renesas_sci.h
-> > @@ -0,0 +1,45 @@
-> > +/*
-> > + * Renesas Serial Communication Interface
-> > + *
-> > + * Copyright (c) 2018 Yoshinori Sato
-> > + *
-> > + * This code is licensed under the GPL version 2 or later.
-> > + *
-> > + */
+> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> > index 34d37eba3b..367cf480a5 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -686,3 +686,49 @@ class BootLinuxConsole(Test):
+> >           tar_hash =3D '49e88d9933742f0164b60839886c9739cb7a0d34'
+> >           self.vm.add_args('-cpu', 'dc233c')
+> >           self.do_test_advcal_2018('02', tar_hash, 'santas-sleigh-ride.=
+elf')
 > > +
-> > +#include "chardev/char-fe.h"
-> > +#include "qemu/timer.h"
-> > +#include "hw/sysbus.h"
+> > +    def test_rx_uboot(self):
+> > +        """
+> > +        :avocado: tags=3Darch:rx
+> > +        :avocado: tags=3Dmachine:rx-virt
+> > +        :avocado: tags=3Dendian:little
+> > +        """
+> > +        uboot_url =3D ('https://acc.dl.osdn.jp/users/23/23888/u-boot.b=
+in.gz')
+> > +        uboot_hash =3D '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
+> > +        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_=
+hash)
+> > +        uboot_path =3D archive.uncompress(uboot_path, self.workdir)
 > > +
-> > +#define TYPE_RENESAS_SCI "renesas-sci"
-> > +#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
+> > +        self.vm.set_machine('rx-virt')
+> > +        self.vm.set_console()
+> > +        self.vm.add_args('-bios', uboot_path,
+> > +                         '-no-reboot')
+> > +        self.vm.launch()
+> > +        uboot_version =3D 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
+> > +        self.wait_for_console_pattern(uboot_version)
+> > +        gcc_version =3D 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (ex=
+perimental)'
+> > +        # FIXME limit baudrate on chardev, else we type too fast
+> > +        #self.exec_command_and_wait_for_pattern('version', gcc_version)
 > > +
-> > +enum {
-> > +    ERI =3D 0,
-> > +    RXI =3D 1,
-> > +    TXI =3D 2,
-> > +    TEI =3D 3,
-> > +    SCI_NR_IRQ =3D 4,
-> > +};
-> > +
-> > +typedef struct {
-> > +    SysBusDevice parent_obj;
-> > +    MemoryRegion memory;
-> > +
-> > +    uint8_t smr;
-> > +    uint8_t brr;
-> > +    uint8_t scr;
-> > +    uint8_t tdr;
-> > +    uint8_t ssr;
-> > +    uint8_t rdr;
-> > +    uint8_t scmr;
-> > +    uint8_t semr;
-> > +
-> > +    uint8_t read_ssr;
-> > +    int64_t trtime;
-> > +    int64_t rx_next;
-> > +    QEMUTimer *timer;
-> > +    CharBackend chr;
-> > +    uint64_t input_freq;
-> > +    qemu_irq irq[SCI_NR_IRQ];
-> > +} RSCIState;
-> > diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
-> > new file mode 100644
-> > index 0000000000..0760a51f43
-> > --- /dev/null
-> > +++ b/hw/char/renesas_sci.c
-> > @@ -0,0 +1,342 @@
-> > +/*
-> > + * Renesas Serial Communication Interface
+> > +    def test_rx_linux(self):
+> > +        """
+> > +        :avocado: tags=3Darch:rx
+> > +        :avocado: tags=3Dmachine:rx-virt
+> > +        :avocado: tags=3Dendian:little
+> > +        """
+> > +        dtb_url =3D ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dt=
+b')
 >=20
-> Looking at this again, have you looked at the SH model
-> (hw/char/sh_serial.c)? This seems the same.
-> (Similarly your timer model with hw/timer/sh_timer.c).
->
+> Sourceforge URL are not very stable, I'm now getting:
+>=20
+> HTTP request sent, awaiting response... 302 Found
+> Location: https://osdn.dl.osdn.net/users/23/23887/rx-qemu.dtb [following]
+> --2020-03-08 17:17:31--  https://osdn.dl.osdn.net/users/23/23887/rx-qemu.=
+dtb
+> Resolving osdn.dl.osdn.net (osdn.dl.osdn.net)... 202.221.179.23
+> Connecting to osdn.dl.osdn.net
+> (osdn.dl.osdn.net)|202.221.179.23|:443... connected.
+> HTTP request sent, awaiting response... 404 Not Found
+> 2020-03-08 17:17:32 ERROR 404: Not Found.
 
-sh_serial has FIFO.
-renesas_sci has no FIFO.
-These are relationships like 8250 and 16550.
-sh_serial is old,so I think it's better to implement
-and integrate FIFO into renesas_sci.
+Permernet link is bellow.
+https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb
+https://osdn.net/users/ysato/pf/qemu/dl/zImage
 
-> > + *
-> > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-> > + * (Rev.1.40 R01UH0033EJ0140)
-> > + *
-> > + * Copyright (c) 2019 Yoshinori Sato
-> > + *
-> > + * This program is free software; you can redistribute it and/or modif=
-y it
-> > + * under the terms and conditions of the GNU General Public License,
-> > + * version 2 or later, as published by the Free Software Foundation.
-> > + *
-> > + * This program is distributed in the hope it will be useful, but WITH=
-OUT
-> > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY =
-or
-> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licen=
-se for
-> > + * more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License a=
-long with
-> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> > + */
+I was misunderstanding. sorry.
+
+> > +        dtb_hash =3D '7b4e4e2c71905da44e86ce47adee2210b026ac18'
+> > +        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
+> > +        kernel_url =3D ('http://acc.dl.osdn.jp/users/23/23845/zImage')
+> > +        kernel_hash =3D '39a81067f8d72faad90866ddfefa19165d68fc99'
+> > +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
+el_hash)
 > > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu/log.h"
-> > +#include "qapi/error.h"
-> > +#include "qemu-common.h"
-> > +#include "hw/hw.h"
-> > +#include "hw/irq.h"
-> > +#include "hw/sysbus.h"
-> > +#include "hw/registerfields.h"
-> > +#include "hw/qdev-properties.h"
-> > +#include "hw/char/renesas_sci.h"
-> > +#include "migration/vmstate.h"
-> > +#include "qemu/error-report.h"
-> > +
-> > +/* SCI register map */
-> > +REG8(SMR, 0)
-> > +  FIELD(SMR, CKS,  0, 2)
-> > +  FIELD(SMR, MP,   2, 1)
-> > +  FIELD(SMR, STOP, 3, 1)
-> > +  FIELD(SMR, PM,   4, 1)
-> > +  FIELD(SMR, PE,   5, 1)
-> > +  FIELD(SMR, CHR,  6, 1)
-> > +  FIELD(SMR, CM,   7, 1)
-> > +REG8(BRR, 1)
-> > +REG8(SCR, 2)
-> > +  FIELD(SCR, CKE, 0, 2)
-> > +  FIELD(SCR, TEIE, 2, 1)
-> > +  FIELD(SCR, MPIE, 3, 1)
-> > +  FIELD(SCR, RE,   4, 1)
-> > +  FIELD(SCR, TE,   5, 1)
-> > +  FIELD(SCR, RIE,  6, 1)
-> > +  FIELD(SCR, TIE,  7, 1)
-> > +REG8(TDR, 3)
-> > +REG8(SSR, 4)
-> > +  FIELD(SSR, MPBT, 0, 1)
-> > +  FIELD(SSR, MPB,  1, 1)
-> > +  FIELD(SSR, TEND, 2, 1)
-> > +  FIELD(SSR, ERR, 3, 3)
-> > +    FIELD(SSR, PER,  3, 1)
-> > +    FIELD(SSR, FER,  4, 1)
-> > +    FIELD(SSR, ORER, 5, 1)
-> > +  FIELD(SSR, RDRF, 6, 1)
-> > +  FIELD(SSR, TDRE, 7, 1)
-> > +REG8(RDR, 5)
-> > +REG8(SCMR, 6)
-> > +  FIELD(SCMR, SMIF, 0, 1)
-> > +  FIELD(SCMR, SINV, 2, 1)
-> > +  FIELD(SCMR, SDIR, 3, 1)
-> > +  FIELD(SCMR, BCP2, 7, 1)
-> > +REG8(SEMR, 7)
-> > +  FIELD(SEMR, ACS0, 0, 1)
-> > +  FIELD(SEMR, ABCS, 4, 1)
-> > +
-> > +static int can_receive(void *opaque)
-> > +{
-> > +    RSCIState *sci =3D RSCI(opaque);
-> > +    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
-> > +        return 0;
-> > +    } else {
-> > +        return FIELD_EX8(sci->scr, SCR, RE);
-> > +    }
-> > +}
-> > +
-> > +static void receive(void *opaque, const uint8_t *buf, int size)
-> > +{
-> > +    RSCIState *sci =3D RSCI(opaque);
-> > +    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trti=
-me;
-> > +    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
-> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
-> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-> > +            qemu_set_irq(sci->irq[ERI], 1);
-> > +        }
-> > +    } else {
-> > +        sci->rdr =3D buf[0];
-> > +        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
-> > +        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-> > +            qemu_irq_pulse(sci->irq[RXI]);
-> > +        }
-> > +    }
-> > +}
-> [...]
+> > +        self.vm.set_machine('rx-virt')
+> > +        self.vm.set_console()
+> > +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'ear=
+lycon'
+> > +        self.vm.add_args('-kernel', kernel_path,
+> > +                         '-dtb', dtb_path,
+> > +                         '-no-reboot')
+> > +        self.vm.launch()
+> > +        self.wait_for_console_pattern('Sash command shell (version 1.1=
+.1)')
+> > +        self.exec_command_and_wait_for_pattern('printenv',
+> > +                                               'TERM=3Dlinux')
+> >=20
 >=20
 >=20
 
