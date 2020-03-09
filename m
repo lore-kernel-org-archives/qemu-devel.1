@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73806C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 207C7C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D8520828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:07:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFF6721D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 16:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gEKRq8iD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D8520828
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="evYc8kRj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF6721D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKwK-00033u-G0
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:07:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40394)
+	id 1jBKxn-0005V3-0d
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 12:09:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZs-0001ub-Tv
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZw-00023r-5V
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBKZq-0001Rb-Tm
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:23 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39299)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZr-0001S5-Pw
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:28 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34024)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBKZq-0001Qz-H1
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:22 -0400
-Received: by mail-wr1-x434.google.com with SMTP id r15so6771172wrx.6
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:22 -0700 (PDT)
+ id 1jBKZr-0001Rh-Jb
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:23 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z15so11841245wrl.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MdwVWEG8hNJRFTkFaf2CNe1RBfSUpiMOo7qqDUbXW8o=;
- b=gEKRq8iDoAqZkWTBvkuHXwNHCY68GM5AzQAThXtkGZWNiT4Y3xvqtEq9m7VFX/ZzBw
- wR13w7QPQyolMqockjEHsOvxRLU/Widh3owIt+YZUvt/WfFkLkeUabMFdO0oNZWFdDrP
- ImqIV2VFLJHya5g8I8UFCDgKWVc5QrcE59SXPRsgImT8tWtaQ6U/0g5RZbFTO0rMqHWx
- gkCv6yObbKfa6T1HEvZd6dXK1EYCGnZS8KP4TvctZ3FC2y5/TI79Wf82nzTwxiqUYWxT
- QooF+DSTD6XPt9/us2tAu/Egyja6VBLgmzkKRXZ7KUFdPOPaUkrheQed4W7LGwf9zipt
- 1Ysg==
+ bh=ct264XXsXB4Yfv0geBlQAhYKTLlUfdyjxR0wyex+U9E=;
+ b=evYc8kRjczeEQH2Qs21K6yiWdgRHCSLFFTg7G5An/ZueMmnxN6NYxn8rrBpSs5w5qi
+ V4gFMh/g50lqoQ0JXvp4JHES/ijuxOqOEnuQhN1FZg9xYM2A5d7tO+uFSp/jRV6Tmiq9
+ FUmZWjUoMEYQJ0/0z0q8V0qnKRtNqSRx7jvs9AQlNlPbZ2lbD/mUE9+0DriYO+ywZCV+
+ aixZtGL/sC0ndqMdum5rUIFDxuJgu16Js/xQH+yLSji9JR6wGtV1alHJJtP08Ly/Opdb
+ dB2Rg902mS3E7/gwWWfw2fc34+X2VBcVMlV1urcK8Y803KL8Ph2Ni8zyXmDFOkXoTRM/
+ sdtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MdwVWEG8hNJRFTkFaf2CNe1RBfSUpiMOo7qqDUbXW8o=;
- b=ErxjfL6zI3Siq9WvwkprXzKI7bk/RO43pg2bRYVwlbSAmrhfRSRbSiRqI7+FuJUGUe
- ukPqKRW7Pb38YLmsUR4cLIk/r8yfpDL//Awua9e0/G//PHZdwwp+kg065eRVWnCCaW86
- BRTrlpRR3QJ6zX/RWG2er7e+z4X1IF3065/BEZPZY+7daldBYhadctt31/obOHQObBZR
- AhhpTAX7u6ERbpvPI+LjsYFaMmtv4d9XkEFB5/eyXfpp31lB6r8aQnuIV1OZeUDhKQXn
- aHw36wU3cNy77NZZe+u4voQ/MJ4ibMlir7OlpozddUcy6WGRT3i6Wm7HjUVxJ5RMsSHi
- FcWw==
-X-Gm-Message-State: ANhLgQ3nYfFDfWeBZHtxFCDotZDtRC+QJGjVtN9yvBeR2oAnXn1ygCF9
- TYK+y1icYoeUVi/CUlQRPQ1qhLc2lP3t+w==
-X-Google-Smtp-Source: ADFU+vsgdDwT0ukFvqOXftOTGTRnFvkqi1ICSrDx80fDr/iOG58ZKccaCUv350y6IXTFHbch8rDUUQ==
-X-Received: by 2002:adf:e9c4:: with SMTP id l4mr9747058wrn.421.1583768661252; 
- Mon, 09 Mar 2020 08:44:21 -0700 (PDT)
+ bh=ct264XXsXB4Yfv0geBlQAhYKTLlUfdyjxR0wyex+U9E=;
+ b=QaBaOo8Ij4HE/9j3gFf9K/zzUC4f0/SfxP6V3V9WO0CpHC0EJT1Xo3MsPkj1YQ2KEb
+ 2wQu28puYOwc45k2cdNG8vVn+wSqKyksdu87u2+Qk6DrqGmZTsXVRNT0Ve1b2QO/iUDu
+ ye/f5hDE4xChFSv5KcQm38P+D04viUAqj+GZDLOGYs+qsX3kNW1IHWscgH7TX4ciBlSi
+ rzJOWlcBmjwE34DvZFZTP7dePpjNMcxOCxyqrzWOhwWVu1l6tOFe7Iye30lUgrWl8VPe
+ IbkKpiyw6uYRHV0poQSefCZfgrSNDtRBa/8jawQL/OeAgp2Do1m+FPY9It4SO5hSL2In
+ 6ccQ==
+X-Gm-Message-State: ANhLgQ3RImsTXsUg9QYSHU7iclTscgmD9OO83V11EdblgKtCl58nW/nN
+ wGZUXa/Z2MAvIgYJvQH+Y0/y21n7Ki9Fhw==
+X-Google-Smtp-Source: ADFU+vumDvYcQExR5DLOSsztmBV9p8Ir90H4ctmibCMxbrSd4vAYgERPM7aDqXId1wLKKhyQmFiFJg==
+X-Received: by 2002:a5d:640e:: with SMTP id z14mr7288051wru.204.1583768662427; 
+ Mon, 09 Mar 2020 08:44:22 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.20
+ by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 08:44:20 -0700 (PDT)
+ Mon, 09 Mar 2020 08:44:21 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/18] qapi: Use rST markup for literal blocks
-Date: Mon,  9 Mar 2020 15:43:57 +0000
-Message-Id: <20200309154405.13548-11-peter.maydell@linaro.org>
+Subject: [PATCH v4 11/18] qga/qapi-schema.json: Add some headings
+Date: Mon,  9 Mar 2020 15:43:58 +0000
+Message-Id: <20200309154405.13548-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
@@ -80,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,71 +100,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are exactly two places in our json doc comments where we
-use the markup accepted by the texi doc generator where a '|' in
-the first line of a doc comment means the line should be emitted
-as a literal block (fixed-width font, whitespace preserved).
-
-Since we use this syntax so rarely, instead of making the rST
-generator support it, instead just convert the two uses to
-rST-format literal blocks, which are indented and introduced
-with '::'.
-
-(The rST generator doesn't complain about the old style syntax,
-it just emits it with the '|' and with the whitespace not
-preserved, which looks odd, but means we can safely leave this
-change until after we've stopped generating texinfo.)
+Add some section headings to the QGA json; this is purely so that we
+have some H1 headings, as otherwise each command ends up being
+visible in the interop/ manual's table of contents.  In an ideal
+world there might be a proper 'Introduction' section the way there is
+in qapi/qapi-schema.json.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- qapi/block-core.json  | 16 +++++++++-------
- qapi/qapi-schema.json |  6 ++++--
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ qga/qapi-schema.json | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 85e27bb61f4..0c9c21927f9 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -550,13 +550,15 @@
- #        For the example above, @bins may be something like [3, 1, 5, 2],
- #        and corresponding histogram looks like:
- #
--# |      5|           *
--# |      4|           *
--# |      3| *         *
--# |      2| *         *    *
--# |      1| *    *    *    *
--# |       +------------------
--# |           10   50   100
-+# ::
-+#
-+#        5|           *
-+#        4|           *
-+#        3| *         *
-+#        2| *         *    *
-+#        1| *    *    *    *
-+#         +------------------
-+#             10   50   100
- #
- # Since: 4.0
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index f6fcb59f34b..d026f9478cf 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1,14 +1,18 @@
+ # *-*- Mode: Python -*-*
+ 
  ##
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index ff5aea59451..440fece703f 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -22,8 +22,10 @@
- #
- # Example:
- #
--# | -> data issued by the Client
--# | <- Server data response
-+# ::
-+#
-+#   -> data issued by the Client
-+#   <- Server data response
- #
- # Please, refer to the QMP specification (docs/interop/qmp-spec.txt) for
- # detailed information on the Server command and response formats.
+-#
+-# General note concerning the use of guest agent interfaces:
+-#
++# = General note concerning the use of guest agent interfaces
++##
++
++##
+ # "unsupported" is a higher-level error than the errors that individual
+ # commands might document. The caller should always be prepared to receive
+ # QERR_UNSUPPORTED, even if the given command doesn't specify it, or doesn't
+ # document any failure mode at all.
+-#
++##
++
++##
++# = QEMU guest agent protocol commands and structs
+ ##
+ 
+ { 'pragma': { 'doc-required': true } }
 -- 
 2.20.1
 
