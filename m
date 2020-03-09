@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 651BBC10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78526C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DB3120873
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB3120873
+	by mail.kernel.org (Postfix) with ESMTPS id 4D60F20873
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:15:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D60F20873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBK7S-0007sG-DZ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:15:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33245)
+	id 1jBK7Z-00087x-E7
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:15:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBK2O-0007Zh-0Z
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:49 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBK2x-0000HV-WE
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBK2M-0007dE-RC
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:09:47 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:53871)
+ (envelope-from <laurent@vivier.eu>) id 1jBK2v-00083a-Pg
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:10:23 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:34875)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBK2D-0007WR-9J; Mon, 09 Mar 2020 11:09:37 -0400
+ id 1jBK2j-0007w1-29; Mon, 09 Mar 2020 11:10:09 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mn2eH-1jaW6g006p-00k9D7; Mon, 09 Mar 2020 16:08:57 +0100
+ id 1N79q6-1jPh9b2kkm-017RUo; Mon, 09 Mar 2020 16:09:15 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/33] hw/net/e1000: Move macreg[] arrays to .rodata to save
- 1MiB of .data
-Date: Mon,  9 Mar 2020 16:08:10 +0100
-Message-Id: <20200309150837.3193387-7-laurent@vivier.eu>
+Subject: [PULL 14/33] hw/alpha/alpha_sys: Remove unused "hw/ide.h" header
+Date: Mon,  9 Mar 2020 16:08:18 +0100
+Message-Id: <20200309150837.3193387-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200309150837.3193387-1-laurent@vivier.eu>
 References: <20200309150837.3193387-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:YyRFb0QVs++UPBSB53XqpVLXEQfKS7K49GB3cL3acP1AOQCExY9
- TtdIBd7g6SYuGpmv+dOlPNbhE9xHYum80NKXyqzLvjt5TeDJjumfiIcTQaljmqKILkU1BG+
- wH2s8w6MW46GmtE95JFraQoQJO4p3m2sizdf+NfwkVNXh6mNEB8AnOMaKl3C75q0EF+yjHk
- tb0b4IEA7aZfHvmNXFgnA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zw3fgSlGvOE=:J5jVvWgMih5r6yNQLJ9g9J
- fBY3mZLV18RGoCgNp1nhVCsuewAU6Yfc9uSNeaf0qCvZDUYzprYb5rxxByBW8W8622rryJ3qX
- AJSgatMlFwhd8TWv0h7sbcq9y56Pw6qYXUCVAv7LkaECS3dEpdfMi85mOkLcG4Ni2bHfd9neA
- J54tvsxY0JH2+ZUOxUmo4WyR3Hwa0+GRKjtvGd33GeNG/0a+sZjbDHtVLPs8aWXDp7G1d09w8
- asJCG/wA45+q+F+jYlVj9/geDlh1TlwV0w6NileQESE1motDTbeE0U5THfrURLKo00ECZ1l8b
- S0CMaDBpYEQhyWSMhw5oB8yWJibAFafiYoLxoRUIzjcv4/pU+j4X4G0YOWR+zr72arng4R9/8
- 4Xpb67IDaHGcYN1zOxp9oKWNVOyG1DjVAo2S2lgmWVxt2VlT2k9C4qbCtp63uxHU7ThCLjgZK
- ivCzhaBc2v0QmAoXlEpJQ0azzQT2ztnNypfp+7Z0Tu/uOFLHG13PBAxdeDCzG0JhRm0UgI2Ck
- iXNRMriIOmhNsqQb7jJtCtbS+PJ5Ea/EyuaLbJGDAuoGaaRm0ALuD81F08y5rtWPU1rBCe4In
- A5uRtHGiJH0s78dFePJTItdKMtreZRMbYtnUAlE3n525BknXIScqJJI0QnwJC56Bqp5w3jgOe
- BLOxG6jsAOhf5rdSWgAOmvIk1tbs9xX6AlwvSB3qnnJQcfyB+6WGW4V/WpYq2lLqPe8m4my7+
- X5lLgqv0yySiTYD+9yMUL2R8SyB5DcHeDfQTD8A4QkmYIl21q3BgsHST4uaPNx+VaVZ4ieRmb
- xuq9u4FXMGNqKhBKsTCz0+cDSXooLeReOfv3pG8D8xh3ZtgAf/Xp/aNeYbYUJAa/BPLbTIS
+X-Provags-ID: V03:K1:uccyuDrkFn+a+xEWYIJHFbgT2Icbc+Sj4ndp1MFnVVx0HLwwqeP
+ la9vjsB5CnghR36yGzsOk/Y3AFTd4A0nSrBItsgyjXayc5Kqho29niLo2I0mAGJg3DhS8n4
+ Q+3IuMpRobwcsbq5qzU/QqonQVILD/6FaMWYTVqJEpWXowNdJ1ZUhQA2ZDAduZJi2q1l5io
+ 80LRGFOeaxEqdTTN6oYpw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:H0CLhIOz0Nk=:xUwZiqy5V4yKaT2+xD0mEx
+ /i05Kz0KbWFGvNO6EQDyHLnZvGTxMZbWdKSphC0934APVF+KRPVIyI0ToU8H6ALe1xdrQKmn2
+ ItJVtcaCBUsbs7XLOgAVnAVs6lcdmnpUZ6wHqI/rFPxFfrbmbzvOyKKZzmaWkVwGJsbeur35f
+ QA3kABJFi4PhJpQddnWHmol8Uzi+cVrNUdpQkXTa/S9XJtoh9J4ZBwSd92z8vdall+pML6dZv
+ d+08yl1DWjlS2w5fQmPFm1PSOiHgVKW17rfdhWpi6TXAz3Y38lS+OJzsl1plEMWX77xK4/Jq3
+ t6fB+rNYyNnnsiONlu9IKLcoqJJHwvgfPak47GlGgGraEhdD7iymLqoJhytytlK4Ypk55siFW
+ CKxAKmGFadVrlBvCZ6coVyKytOO011kzqYu0u0DqUpfwLqFEF9sXdz0N/KTG4o+lM4cGELBM6
+ 9kY79RvfPTbupLP0xtPHIa0VSaFy+/sa88FUbYoJcv2gu7GA1bmuzYsn1985HiZV8yD22EdnB
+ 8ozbw/JtcwZMW9ek2V3m5W0OLFfTkmd5t+VMSQegKihM0pdXFDmSv53mZQg0AxGJYSd8SEXMX
+ 3m6/HwKKNwPzDuvSp0aBw/8EQNNUymE+j61ExzGWzW6rGa9ZqwuTBso/wTlLBYoXeUJemOXgG
+ zUyzobqsrXJkNWwC2w+vHlmKMhOwbXvLBcVpK+hIH3tAiSAHRgSk/FlpkXUxhmNGqe8eBeG43
+ Hi8/6/onj+SjANFK6AP1ok+Gog3VT2uWKnDvYP2p6+kwxMIw2lNj77X2I+Rav4+xG+/PyH/x4
+ I4Ezc4WUJoxXiE60qdBr1b0BDrgzq6n8LqgX447FRAQ+g7L4Ef6xAFHK18Q6OOFc+NCtuSa
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,9 +84,9 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
  qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>, Greg Kurz <groug@kaod.org>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
  Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
@@ -101,65 +100,30 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Each array consumes 256KiB of .data. As we do not reassign entries,
-we can move it to the .rodata section, and save a total of 1MiB of
-.data (size reported on x86_64 host).
+alpha_sys.h does not use anything from the "hw/ide.h" header.
+Remove it.
 
+Acked-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200305010446.17029-3-philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200228114649.12818-8-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/e1000.c       | 4 ++--
- hw/net/e1000e_core.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ hw/alpha/alpha_sys.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 972d9b508399..9233248c9af0 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -1151,7 +1151,7 @@ set_ims(E1000State *s, int index, uint32_t val)
+diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
+index bc0a286226f1..e2c02e2bbe1d 100644
+--- a/hw/alpha/alpha_sys.h
++++ b/hw/alpha/alpha_sys.h
+@@ -6,7 +6,6 @@
+ #include "target/alpha/cpu-qom.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+-#include "hw/ide.h"
+ #include "hw/boards.h"
+ #include "hw/intc/i8259.h"
  
- #define getreg(x)    [x] = mac_readreg
- typedef uint32_t (*readops)(E1000State *, int);
--static readops macreg_readops[] = {
-+static const readops macreg_readops[] = {
-     getreg(PBA),      getreg(RCTL),     getreg(TDH),      getreg(TXDCTL),
-     getreg(WUFC),     getreg(TDT),      getreg(CTRL),     getreg(LEDCTL),
-     getreg(MANC),     getreg(MDIC),     getreg(SWSM),     getreg(STATUS),
-@@ -1207,7 +1207,7 @@ enum { NREADOPS = ARRAY_SIZE(macreg_readops) };
- 
- #define putreg(x)    [x] = mac_writereg
- typedef void (*writeops)(E1000State *, int, uint32_t);
--static writeops macreg_writeops[] = {
-+static const writeops macreg_writeops[] = {
-     putreg(PBA),      putreg(EERD),     putreg(SWSM),     putreg(WUFC),
-     putreg(TDBAL),    putreg(TDBAH),    putreg(TXDCTL),   putreg(RDBAH),
-     putreg(RDBAL),    putreg(LEDCTL),   putreg(VET),      putreg(FCRUC),
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 38bdb90114c6..df957e0c1a09 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -2856,7 +2856,7 @@ e1000e_set_gcr(E1000ECore *core, int index, uint32_t val)
- 
- #define e1000e_getreg(x)    [x] = e1000e_mac_readreg
- typedef uint32_t (*readops)(E1000ECore *, int);
--static readops e1000e_macreg_readops[] = {
-+static const readops e1000e_macreg_readops[] = {
-     e1000e_getreg(PBA),
-     e1000e_getreg(WUFC),
-     e1000e_getreg(MANC),
-@@ -3063,7 +3063,7 @@ enum { E1000E_NREADOPS = ARRAY_SIZE(e1000e_macreg_readops) };
- 
- #define e1000e_putreg(x)    [x] = e1000e_mac_writereg
- typedef void (*writeops)(E1000ECore *, int, uint32_t);
--static writeops e1000e_macreg_writeops[] = {
-+static const writeops e1000e_macreg_writeops[] = {
-     e1000e_putreg(PBA),
-     e1000e_putreg(SWSM),
-     e1000e_putreg(WUFC),
 -- 
 2.24.1
 
