@@ -1,70 +1,84 @@
 Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB046C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4E6C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D30205F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:06:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D30205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7CDAE20663
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:06:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPlgBjCm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CDAE20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBOf3-0000eH-VY
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:06:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57422)
+	id 1jBOfW-0001KV-LA
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:06:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jBOeQ-00005J-DE
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:05:24 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBOeh-0000K1-FP
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jBOeO-0002yH-Js
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:05:22 -0400
-Resent-Date: Mon, 09 Mar 2020 16:05:22 -0400
-Resent-Message-Id: <E1jBOeO-0002yH-Js@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21151)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jBOeO-0002x6-Bq
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:05:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1583784313; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=LiOJjEkHH+VH9W2mBOP5VsbOpMHfXHlYPobfYbapNL0jqZPrFdjLH5yPXxTPGheIEoaMhYM/+cJ9+W075tX1lqqB/aKuqW5oglGtowCPGDTX2oGwTr5QocjDear9GOklq+r7+Ea0NHYG0fiEDONBlOJ69Q3uJK273kdGDUrrWq0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583784313;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=mFQpYHFMxmPjaAEv9VEOfvwp2/CNd4eqNZxreS3QcRE=; 
- b=TfFSTXuwSjOX4gyhuZb/5wzfPFdxTIfCzZr4LjG/eP5Dl84c1O4aY4ChwE2EtGXISYQe5vkWyQSOOjFsLwcksBYC0eZ6ItgkSebL1tTQ8QWYlJ1wfW17iDkfErZhG7d6a9oQXNW9WknJPxVriuDQvZDs2Z/8pIA5RxYCDzQQX7s=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583784311605470.14919203281215;
- Mon, 9 Mar 2020 13:05:11 -0700 (PDT)
-In-Reply-To: <20200309191200.GA60@669c1c222ef4>
-Subject: Re: [PATCH v10 0/10] qemu-binfmt-conf.sh
-Message-ID: <158378431061.20878.10171796187413754739@39012742ff91>
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBOeg-00034q-0O
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:05:39 -0400
+Received: from mail-il1-x134.google.com ([2607:f8b0:4864:20::134]:46280)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jBOef-00033c-R6; Mon, 09 Mar 2020 16:05:37 -0400
+Received: by mail-il1-x134.google.com with SMTP id e8so9866397ilc.13;
+ Mon, 09 Mar 2020 13:05:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bCYjf/nlzsguEkQ3fBcBcG1cf7H0czOyrYB+Vo3sjRk=;
+ b=EPlgBjCmOk44QDTFZu9P8HU05uklFnrxiT0sygEUZDUmWPKjzrRmgEcoviXhpxXkxu
+ 3gzEzbCpnU33Z8u4x2M9wZ1T901+TZK6T9w7E8wd7GPH1gLVq15CkYSM03CvbFzMLbe1
+ bRjPAFY4sN8UBOCZv5V1BN0/b8rRbD95MQVCLfofc4fuw7UWIireAufbLMQIU7dGnx2/
+ i8kcgtsH2vs3w+6GEOg3ECBYeV0TPzExLzvWLWdEqKDGF8YPPejBjU5kSeAyb5MK/IGL
+ uWglFq1O4mn05eiVQOVdhdv4JhTJnFveta8FO49fRQM5RLZEeDRpDE0uPpx6GKEilb5C
+ 4dkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bCYjf/nlzsguEkQ3fBcBcG1cf7H0czOyrYB+Vo3sjRk=;
+ b=AVVvvAXOgPA/Kblx4CG5nlh7xt4eXAAG2ZhPVE3x6NU71nvk24Ct/Tt2Bi6imlUueS
+ PW9CA3jzS5EuaxI83Dpa+oy4xRukBrc9s66fxGzxqM53oKRwcjxxPciYrs8DiBdzVbCO
+ vpTt0QBSWqEtifinnHnabR5oF/CSFvdzTf5vDlaRSB3zJqKcu8habDltgijGQ2uEsxjI
+ HvKMwZujQRrW8QkExTBDiXEFMSzkMHHYLjJhJfUuQcV9EqQjJ1gURnlo9nMMa5OsXfYR
+ QnXnW0U95m+XkTSx/XJ5+aV1r9bMrKLhY4jv5YpjfNdzmvFhAF1sWesfmeq3351bVGxq
+ ONWg==
+X-Gm-Message-State: ANhLgQ1vKjYSJ0TgWe+fK/G86vC8yTiHr7D7unetjjhDIPpTIbVVwRQk
+ cbiac81kwYx2mbAeA/i7K9dwNOeDsRQ2/Kxh1Ms=
+X-Google-Smtp-Source: ADFU+vuL2w+fj5uxwgVGvT0yw4jfqLtY4PekeokxsqS0iYfanr5JdvYeg1Y8txU9HoAjqUZJdhY9wXIOeyHUHqOeERs=
+X-Received: by 2002:a92:d3c7:: with SMTP id c7mr2609319ilh.265.1583784336853; 
+ Mon, 09 Mar 2020 13:05:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: unai.martinezcorral@ehu.eus
-Date: Mon, 9 Mar 2020 13:05:11 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
+ <20200301215029.15196-19-nieklinnenbank@gmail.com> <871rq876h3.fsf@linaro.org>
+ <CAPan3WrNnrnngwE4pGeYpR9HS7Vr936-ojPZZovNo8ZdoAA0sg@mail.gmail.com>
+ <CAFEAcA_6Lm-JwbXFLWeetc7+fhnrc5m2+YU28ymFw0MSoKOhwg@mail.gmail.com>
+ <CAPan3Wo2Nf_d4AxsV5=sfOxv66rmQNfN==rpMn9=FtM5cZG9rw@mail.gmail.com>
+ <CAFEAcA-2-tz7F1vmbggpLnc1SSX+_W5pij-w8Vgjx+vqr-LRUA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-2-tz7F1vmbggpLnc1SSX+_W5pij-w8Vgjx+vqr-LRUA@mail.gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Mon, 9 Mar 2020 21:05:25 +0100
+Message-ID: <CAPan3Wr-oS-QRxmCDPXLRBG81yqjnp56B2WNuxtBMOxr2b9D6A@mail.gmail.com>
+Subject: Re: [PATCH v6 18/18] docs: add Orange Pi PC document
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000cc916e05a071866c"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,145 +90,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, laurent@vivier.eu
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwOTE5MTIwMC5HQTYw
-QDY2OWMxYzIyMmVmNC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29k
-aW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9u
-OgoKU3ViamVjdDogW1BBVENIIHYxMCAwLzEwXSBxZW11LWJpbmZtdC1jb25mLnNoCk1lc3NhZ2Ut
-aWQ6IDIwMjAwMzA5MTkxMjAwLkdBNjBANjY5YzFjMjIyZWY0ClR5cGU6IHNlcmllcwoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
-L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNjk5ODQ1NiBxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgLS10ZXN0CmRlNzZiMzcgcWVt
-dS1iaW5mbXQtY29uZi5zaDogYWRkIG9wdGlvbiAtLWNsZWFyCmE4Nzk5ZWYgcWVtdS1iaW5mbXQt
-Y29uZi5zaDogZ2VuZXJhbGl6ZSA8Q1BVPiB0byBwb3NpdGlvbmFsIFtUQVJHRVRTXQoyY2E5NWFk
-IHFlbXUtYmluZm10LWNvbmYuc2g6IGhvbm91ciBRRU1VX1BBVEggYW5kL29yIFFFTVVfU1VGRklY
-CmYyZWI3NzggcWVtdS1iaW5mbXQtY29uZi5zaDogcmVtb3ZlICdxZW11JyBwcmVmaXggZnJvbSBj
-bGkgb3B0aW9ucwpkMjI0MTQzIHFlbXUtYmluZm10LWNvbmYuc2g6IHVzZSB0aGUgc2FtZSBwcmVz
-ZW50YXRpb24gZm9ybWF0IGFzIGZvciBxZW11LSoKOGI5Yjg0NSBxZW11LWJpbmZtdC1jb25mLnNo
-OiBhZGQgUUVNVV9DUkVERU5USUFMIGFuZCBRRU1VX1BFUlNJU1RFTlQKY2NmOWViNCBxZW11LWJp
-bmZtdC1jb25mLnNoOiBtYWtlIG9wdHMgLXAgYW5kIC1jIGJvb2xlYW4KZWUwZGY4MyBxZW11LWJp
-bmZtdC1jb25mLnNoOiBlbmZvcmNlIHNhZmUgdGVzdHMKZmZlYTU5MCBxZW11LWJpbmZtdC1jb25m
-LnNoOiBlbmZvcmNlIHN0eWxlIGNvbnNpc3RlbmN5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEw
-IENoZWNraW5nIGNvbW1pdCBmZmVhNTkwZjM2ZjMgKHFlbXUtYmluZm10LWNvbmYuc2g6IGVuZm9y
-Y2Ugc3R5bGUgY29uc2lzdGVuY3kpCjIvMTAgQ2hlY2tpbmcgY29tbWl0IGVlMGRmODMwZmFhZCAo
-cWVtdS1iaW5mbXQtY29uZi5zaDogZW5mb3JjZSBzYWZlIHRlc3RzKQpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojMzY6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoz
-MDM6CisgICAgICAgIGlmIFsgIngkbWFnaWMiID0gIngiIF0gfHwgWyAieCRtYXNrIiA9ICJ4IiBd
-IHx8IFsgIngkZmFtaWx5IiA9ICJ4IiBdOyB0aGVuCgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDMzIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KMy8xMCBDaGVja2luZyBjb21taXQgY2NmOWViNDg2MDEzIChxZW11LWJpbmZtdC1jb25mLnNo
-OiBtYWtlIG9wdHMgLXAgYW5kIC1jIGJvb2xlYW4pCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFj
-dGVycwojNTE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMzE6CitvcHRpb25z
-PSQoZ2V0b3B0IC1vIGRzOlE6UzplOmhjcCAtbCBkZWJpYW4sc3lzdGVtZDoscWVtdS1wYXRoOixx
-ZW11LXN1ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVyc2lzdGVudCAtLSAiJEAi
-KQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAz
-LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzEwIENoZWNraW5nIGNvbW1pdCA4Yjli
-ODQ1MWI5MjEgKHFlbXUtYmluZm10LWNvbmYuc2g6IGFkZCBRRU1VX0NSRURFTlRJQUwgYW5kIFFF
-TVVfUEVSU0lTVEVOVCkKNS8xMCBDaGVja2luZyBjb21taXQgZDIyNDE0MzEyZWE4IChxZW11LWJp
-bmZtdC1jb25mLnNoOiB1c2UgdGhlIHNhbWUgcHJlc2VudGF0aW9uIGZvcm1hdCBhcyBmb3IgcWVt
-dS0qKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTE6IEZJTEU6IHNjcmlwdHMv
-cWVtdS1iaW5mbXQtY29uZi5zaDoxODM6CistRnwtLXFlbXUtc3VmZml4IFNVRkZJWCAgICAgICAg
-ICAgICAgIGFkZCBhIHN1ZmZpeCB0byB0aGUgZGVmYXVsdCBpbnRlcnByZXRlciBuYW1lCgpFUlJP
-UjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzUyOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10
-LWNvbmYuc2g6MTg0OgorLXB8LS1wZXJzaXN0ZW50ICAgICAgUUVNVV9QRVJTSVNURU5UICAoeWVz
-KSBsb2FkIHRoZSBpbnRlcnByZXRlciBhbmQga2VlcCBpdCBpbiBtZW1vcnk7IGFsbCBmdXR1cmUK
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTQ6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
-aW5mbXQtY29uZi5zaDoxODY6CistY3wtLWNyZWRlbnRpYWwgICAgICBRRU1VX0NSRURFTlRJQUwg
-ICh5ZXMpIGNyZWRlbnRpYWwgYW5kIHNlY3VyaXR5IHRva2VucyBhcmUgY2FsY3VsYXRlZCBhY2Nv
-cmRpbmcKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTk6IEZJTEU6IHNjcmlwdHMv
-cWVtdS1iaW5mbXQtY29uZi5zaDoxOTE6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHN5c3RlbWQtYmluZm10LnNlcnZpY2UgZm9yIHRoZSBnaXZlbiBDUFU7IGlmIENQVSBp
-cyAiQUxMIiwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjE6IEZJTEU6IHNjcmlw
-dHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxOTM6CistZHwtLWRlYmlhbiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGRvbid0IHdyaXRlIGludG8gL3Byb2MsIGdlbmVyYXRlIHVwZGF0ZS1iaW5mbXRz
-IHRlbXBsYXRlcwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4NjogRklMRTogc2Ny
-aXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjIxMDoKK1RoZSBlbnZpcm9ubWVudCB2YXJpYWJsZSBI
-T1NUX0FSQ0ggYWxsb3dzIHRvIG92ZXJyaWRlICd1bmFtZScgdG8gZ2VuZXJhdGUgY29uZmlndXJh
-dGlvbiBmaWxlcyBmb3IgYQoKdG90YWw6IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCA3OSBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA1LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo2LzEwIENoZWNr
-aW5nIGNvbW1pdCBmMmViNzc4ZGU5MWQgKHFlbXUtYmluZm10LWNvbmYuc2g6IHJlbW92ZSAncWVt
-dScgcHJlZml4IGZyb20gY2xpIG9wdGlvbnMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMzNjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE4NDoKKy1GfC0tc3Vm
-Zml4IFNVRkZJWCAgICAgICAgICAgICAgICAgICAgYWRkIGEgc3VmZml4IHRvIHRoZSBkZWZhdWx0
-IGludGVycHJldGVyIG5hbWUKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDU6IEZJ
-TEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDozMzc6CitvcHRpb25zPSQoZ2V0b3B0IC1v
-IGRzOlE6UzplOmhjcCAtbCBkZWJpYW4sc3lzdGVtZDoscGF0aDosc3VmZml4OixleHBvcnRkaXI6
-LGhlbHAsY3JlZGVudGlhbCxwZXJzaXN0ZW50IC0tICIkQCIpCgp0b3RhbDogMSBlcnJvcnMsIDEg
-d2FybmluZ3MsIDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTAgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCjcvMTAgQ2hlY2tpbmcgY29tbWl0IDJjYTk1YWQ4NzJmMSAocWVtdS1iaW5mbXQt
-Y29uZi5zaDogaG9ub3VyIFFFTVVfUEFUSCBhbmQvb3IgUUVNVV9TVUZGSVgpCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25m
-LnNoOjE4NDoKKy1GfC0tc3VmZml4IFNVRkZJWCAgIFFFTVVfU1VGRklYICAgICAgYWRkIGEgc3Vm
-Zml4IHRvIHRoZSBkZWZhdWx0IGludGVycHJldGVyIG5hbWUKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgMzAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo4LzEwIENoZWNraW5nIGNvbW1pdCBhODc5OWVmNDQxYjEgKHFlbXUtYmluZm10LWNv
-bmYuc2g6IGdlbmVyYWxpemUgPENQVT4gdG8gcG9zaXRpb25hbCBbVEFSR0VUU10pCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzg6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29u
-Zi5zaDoyMDM6CitUQVJHRVRTICAgICAgICAgICAgICBRRU1VX1RBUkdFVFMgICAgIEEgc2luZ2xl
-IGFyY2ggbmFtZSBvciBhIGxpc3Qgb2YgdGhlbSAoc2VlIGFsbCBuYW1lcyBiZWxvdyk7CgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5m
-bXQtY29uZi5zaDoyMTU6Cistc3wtLXN5c3RlbWQgICAgICAgICAgICAgICAgICAgICAgICAgIGRv
-bid0IHdyaXRlIGludG8gL3Byb2MsIGdlbmVyYXRlIGZpbGUocykgZm9yCgpFUlJPUjogbGluZSBv
-dmVyIDkwIGNoYXJhY3RlcnMKIzEwNTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNo
-OjIzNDoKK1RoZSBlbnZpcm9ubWVudCB2YXJpYWJsZSBIT1NUX0FSQ0ggYWxsb3dzIHRvIG92ZXJy
-aWRlICd1bmFtZScgdG8gZ2VuZXJhdGUgY29uZmlndXJhdGlvbiBmaWxlcyBmb3IKCkVSUk9SOiBs
-aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTQ3OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
-bmYuc2g6MzYzOgorb3B0aW9ucz0kKGdldG9wdCAtbyBkc1E6UzplOmhjcCAtbCBkZWJpYW4sc3lz
-dGVtZCxwYXRoOixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVkZW50aWFsLHBlcnNpc3RlbnQg
-LS0gIiRAIikKCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDgvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjkvMTAgQ2hlY2tpbmcgY29t
-bWl0IGRlNzZiMzc4YWIzZSAocWVtdS1iaW5mbXQtY29uZi5zaDogYWRkIG9wdGlvbiAtLWNsZWFy
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzQ6IEZJTEU6IHNjcmlwdHMvcWVt
-dS1iaW5mbXQtY29uZi5zaDoyMDQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGlmIGVtcHR5LCBjb25maWd1cmUvY2xlYXIgYWxsIGtub3duIHRhcmdldHM7CgpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQyOiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
-bmYuc2g6MjEzOgorLXJ8LS1jbGVhciAgICAgICAgICAgUUVNVV9DTEVBUiAgICAgICAoeWVzKSBy
-ZW1vdmUgcmVnaXN0ZXJlZCBpbnRlcnByZXRlcnMgZm9yIHRhcmdldCBUQVJHRVRTOwoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4NTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1j
-b25mLnNoOjM4MToKK29wdGlvbnM9JChnZXRvcHQgLW8gcmRzUTpTOmU6aGNwIC1sIGNsZWFyLGRl
-YmlhbixzeXN0ZW1kLHBhdGg6LHN1ZmZpeDosZXhwb3J0ZGlyOixoZWxwLGNyZWRlbnRpYWwscGVy
-c2lzdGVudCAtLSAiJEAiKQoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA4NSBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA5LzEwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxMC8xMCBDaGVj
-a2luZyBjb21taXQgNjk5ODQ1NjdiOTdkIChxZW11LWJpbmZtdC1jb25mLnNoOiBhZGQgLS10ZXN0
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE6IEZJTEU6IHNjcmlwdHMvcWVt
-dS1iaW5mbXQtY29uZi5zaDoyMDQ6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIGlmIGVtcHR5LCBjb25maWd1cmUvY2xlYXIgYWxsIGtub3duIHRhcmdldHMuCgpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI5OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNv
-bmYuc2g6MjE0OgorLXR8LS10ZXN0ICAgICAgICAgICAgUUVNVV9URVNUICAgICAgICAoeWVzKSB0
-ZXN0IHRoZSBzZXR1cCB3aXRoIHRoZSBwcm92aWRlZCBhcmd1bWVudHMsIGJ1dCBkbyBub3QKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTk6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5m
-bXQtY29uZi5zaDozODE6CitvcHRpb25zPSQoZ2V0b3B0IC1vIHRyZHNROlM6ZTpoY3AgLWwgdGVz
-dCxjbGVhcixkZWJpYW4sc3lzdGVtZCxwYXRoOixzdWZmaXg6LGV4cG9ydGRpcjosaGVscCxjcmVk
-ZW50aWFsLHBlcnNpc3RlbnQgLS0gIiRAIikKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywg
-NjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAw
-MzA5MTkxMjAwLkdBNjBANjY5YzFjMjIyZWY0L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+--000000000000cc916e05a071866c
+Content-Type: text/plain; charset="UTF-8"
+
+On Mon, Mar 9, 2020 at 8:43 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On Mon, 9 Mar 2020 at 19:38, Niek Linnenbank <nieklinnenbank@gmail.com>
+> wrote:
+> > On Mon, Mar 9, 2020 at 12:22 PM Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> >> Yes, this is now the right place to put arm board-specific
+> >> documentation (the rearranging and conversion from texinfo
+> >> is now in master). I should move microvm.rst's contents there
+> >> I guess.
+> >
+> >
+> > OK, I'll move orangepi.rst to docs/system/orangepi.rst and add a short
+> section
+> > about the Orange Pi PC machine to docs/system/target-arm.rst as well.
+>
+> You should include/reference the orangepi.rst from target-arm.rst, I think
+> --
+> that's where the per-board docs would belong in the structure we have.
+> If you just drop a .rst file into the docs directory somewhere it won't
+> actually go into the documentation and instead Sphinx will error
+> out about it not being in the table of contents anywhere.
+>
+
+Ah now I see what is going on here. So the new rst files are ment to
+automatically generate
+documentation in various formats using the Python sphinx tool, correct?
+I played around a bit with running 'make html' and using the include
+directive you suggested in
+the target-arm.rst file like:
+
+  .. include:: orangepi.rst
+
+That seems to work. And, now I also see that the orangepi.rst file contains
+rst syntax errors which
+I need to resolve. I'll make sure those are resolved in the next version.
+
+
+>
+> (I'll have a look at microvm.rst to see how best to make the structure
+> work -- at the moment it kind of assumes there board documentation
+> is always quite short so they're all in one file.)
+>
+
+Yeah that is fine Peter. If you have any update on that later, I'll adjust
+the orangepi.rst file to fit in as well.
+
+Regards,
+Niek
+
+
+>
+> thanks
+> -- PMM
+>
+
+
+-- 
+Niek Linnenbank
+
+--000000000000cc916e05a071866c
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Mar 9, 2020 at 8:43 PM Peter =
+Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linar=
+o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">On Mon, 9 Mar 2020 at 19:38, Niek Linnenbank &lt;<a href=3D"mailto:nie=
+klinnenbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt; w=
+rote:<br>
+&gt; On Mon, Mar 9, 2020 at 12:22 PM Peter Maydell &lt;<a href=3D"mailto:pe=
+ter.maydell@linaro.org" target=3D"_blank">peter.maydell@linaro.org</a>&gt; =
+wrote:<br>
+&gt;&gt; Yes, this is now the right place to put arm board-specific<br>
+&gt;&gt; documentation (the rearranging and conversion from texinfo<br>
+&gt;&gt; is now in master). I should move microvm.rst&#39;s contents there<=
+br>
+&gt;&gt; I guess.<br>
+&gt;<br>
+&gt;<br>
+&gt; OK, I&#39;ll move orangepi.rst to docs/system/orangepi.rst and add a s=
+hort section<br>
+&gt; about the Orange Pi PC machine to docs/system/target-arm.rst as well.<=
+br>
+<br>
+You should include/reference the orangepi.rst from target-arm.rst, I think =
+--<br>
+that&#39;s where the per-board docs would belong in the structure we have.<=
+br>
+If you just drop a .rst file into the docs directory somewhere it won&#39;t=
+<br>
+actually go into the documentation and instead Sphinx will error<br>
+out about it not being in the table of contents anywhere.<br></blockquote><=
+div><br></div><div>Ah now I see what is going on here. So the new rst files=
+ are ment to automatically generate</div><div>documentation in various form=
+ats using the Python sphinx tool, correct?</div><div>I played around a bit =
+with running &#39;make html&#39; and using the include directive you sugges=
+ted in</div><div>the target-arm.rst file like:</div><div><br></div><div>=C2=
+=A0 .. include:: orangepi.rst</div><div><br></div><div>That seems to work. =
+And, now I also see that the orangepi.rst file contains rst syntax errors w=
+hich</div><div>I need to resolve. I&#39;ll make sure those are resolved in =
+the next version.<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex">
+<br>
+(I&#39;ll have a look at microvm.rst to see how best to make the structure<=
+br>
+work -- at the moment it kind of assumes there board documentation<br>
+is always quite short so they&#39;re all in one file.)<br></blockquote><div=
+><br></div><div>Yeah that is fine Peter. If you have any update on that lat=
+er, I&#39;ll adjust the orangepi.rst file to fit in as well.</div><div><br>=
+</div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">
+<br>
+thanks<br>
+-- PMM<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--000000000000cc916e05a071866c--
 
