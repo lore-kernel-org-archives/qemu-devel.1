@@ -2,113 +2,56 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7B9C18E5A
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F300EC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7E2420828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E2420828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C8ED2208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8ED2208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHBQ-0004kb-1T
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:06:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54701)
+	id 1jBHCD-0005x6-1f
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:07:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHAm-0004EL-PL
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:06:17 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHBT-0004wA-8d
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:07:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHAl-0006fq-PI
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:06:16 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:43639)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHAj-0006fF-ET; Mon, 09 Mar 2020 08:06:13 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MowOm-1jgj2C0C6Q-00qRo9; Mon, 09 Mar 2020 13:05:54 +0100
-Subject: Re: [PATCH] core/qdev: fix memleak in qdev_get_gpio_out_connector()
-To: Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org
-References: <20200307030756.5913-1-pannengyuan@huawei.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <065a73ce-c0ee-07be-b442-c98763f99e1c@vivier.eu>
-Date: Mon, 9 Mar 2020 13:05:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBHBR-0006lK-Ff
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:06:58 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:44961)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jBHBR-0006ko-5C; Mon, 09 Mar 2020 08:06:57 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07451612|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.271718-0.00564651-0.722635;
+ FP=1073962757830943102|1|1|7|0|-1|-1|-1; HT=e02c03267; MF=zhiwei_liu@c-sky.com;
+ NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.Gyaaf3X_1583755609; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.Gyaaf3X_1583755609)
+ by smtp.aliyun-inc.com(10.147.41.178);
+ Mon, 09 Mar 2020 20:06:50 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v3 16/60] target/riscv: vector integer min/max instructions
+Date: Mon,  9 Mar 2020 20:05:00 +0800
+Message-Id: <20200309120544.13503-17-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20200307030756.5913-1-pannengyuan@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xH/ThBAAXWcjDMLwZPCc0yT6eD/9YcwuXFAXxJQ60OkagyQWA03
- SLMRKiQ6HTRcIH+zpTC9rgqf2Hp/C/f2ZdNWZM/pI5D5jSJow0CKmk1jEBPeMY/X124gLAQ
- lsYBuLNdgxXr96ru79eq4zRWwNNumDpo9jq+yrQKq47hIwlktgbODFWmM8RmK5cNEFnsq2v
- uFds54OYZNFLkH7Qsz+8Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:iTyDS3J4pSo=:Afc28itw6n3t7VNL15Il/l
- 4gVv5Bp+K4DGEFR5Hu4YtR1kjqz4LRXWiadLmLQ/3p48QKGn8Tln5mvKIxfz1Ayj/fY1gVj6l
- KE8lD75IlYfjQsCzsZgMul6nx78o6OAeGajGbctr2FmemM75nGPdXkkl7XRHl0Cm2DLaDpUhY
- ZKBjmkRUGVDzrOPrL9s+/gHWGJ9Q81rLm+xSDfNeL42720iPQdxHLA8PHs8R4a4bAWH5eok5P
- OlXL7X8zHVAjsM6n6Dn8jRs9hExAT+sj86FUe+u2XJgaxfIWvoAL+9XIhxTYOjPZl1pVgeW8s
- KNEhT8qXO2OiZwEGX7HYbitg7tr+rm2JugryiU5qHIWP4a0shFDRAsk4wZN44kCXcXGpf6OT3
- A6fqMUjKTl4C96wDnUd6kLkXAFY6krFkLcJdfqrnVen2NICpqO0KLAXuIge+Sz/8MHQRlCoEI
- H1S8URoMCneYQC7I0bZBPJNUAgCA/pWXe0g6MXLLoX99cunf00Bc9am7FJ3waxpUuIPY8Hem8
- L3AEzk2Hnm5W41ALLKg1A3vh2O5Be/H1z+v+D2JRlC8KbvVHcf1BjCVVqZFF3iW/yeXushFDz
- Gxp2HZg9p/M1KOnE8bHNCW4GKiWPzbAssHSED7xQxtDJFltPAI7/EnWX70//3SswtgnN1konz
- IRiIvjd468R//Rq2li3Y6sLfODC8zOVxNyciqE9KVAZBfL0uybyrZR8T4MeQjeFIP/yAMDHon
- O4Vz5RosQVPe+RtInyQT5Nd615MgKUcLYzyDtje+ycbamyeYjSMeGBky6ZXCfUsMw7OoPNKlm
- 6EEfvwS2zJ+W4bpZm9Ax4s1eZmJTo8RtCRLasi9dFES7mYp+TOMb2k7lr0sCKIu6Up10Ka5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,39 +63,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com,
- qemu-trivial@nongnu.org, euler.robot@huawei.com, pbonzini@redhat.com,
- ehabkost@redhat.com
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 07/03/2020 à 04:07, Pan Nengyuan a écrit :
-> Fix a memory leak in qdev_get_gpio_out_connector().
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> ---
->  hw/core/qdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 3937d1eb1a..85f062def7 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -557,7 +557,7 @@ void qdev_connect_gpio_out_named(DeviceState *dev, const char *name, int n,
->  
->  qemu_irq qdev_get_gpio_out_connector(DeviceState *dev, const char *name, int n)
->  {
-> -    char *propname = g_strdup_printf("%s[%d]",
-> +    g_autofree char *propname = g_strdup_printf("%s[%d]",
->                                       name ? name : "unnamed-gpio-out", n);
->  
->      qemu_irq ret = (qemu_irq)object_property_get_link(OBJECT(dev), propname,
-> 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   | 33 ++++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
+ target/riscv/vector_helper.c            | 71 +++++++++++++++++++++++++
+ 4 files changed, 122 insertions(+)
 
-Applied to my trivial-patches branch.
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 4e6c47c2d2..c7d4ff185a 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -492,3 +492,36 @@ DEF_HELPER_6(vmsgt_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmsgt_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vminu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmin_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vmax_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vminu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmin_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmaxu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 525b2fa442..a7619f4e3d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -354,6 +354,14 @@ vmsgtu_vx       011110 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgtu_vi       011110 . ..... ..... 011 ..... 1010111 @r_vm
+ vmsgt_vx        011111 . ..... ..... 100 ..... 1010111 @r_vm
+ vmsgt_vi        011111 . ..... ..... 011 ..... 1010111 @r_vm
++vminu_vv        000100 . ..... ..... 000 ..... 1010111 @r_vm
++vminu_vx        000100 . ..... ..... 100 ..... 1010111 @r_vm
++vmin_vv         000101 . ..... ..... 000 ..... 1010111 @r_vm
++vmin_vx         000101 . ..... ..... 100 ..... 1010111 @r_vm
++vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
++vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
++vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
++vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 078d275af6..4437a77878 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1424,3 +1424,13 @@ GEN_OPIVI_TRANS(vmsleu_vi, 1, vmsleu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsle_vi, 0, vmsle_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgtu_vi, 1, vmsgtu_vx, opivx_cmp_check)
+ GEN_OPIVI_TRANS(vmsgt_vi, 0, vmsgt_vx, opivx_cmp_check)
++
++/* Vector Integer Min/Max Instructions */
++GEN_OPIVV_GVEC_TRANS(vminu_vv, umin)
++GEN_OPIVV_GVEC_TRANS(vmin_vv,  smin)
++GEN_OPIVV_GVEC_TRANS(vmaxu_vv, umax)
++GEN_OPIVV_GVEC_TRANS(vmax_vv,  smax)
++GEN_OPIVX_TRANS(vminu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
++GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
++GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index e7a4e99f46..03e001262f 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -849,6 +849,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+ #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
+ #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
+ #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
++#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
++#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
++#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
++#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
+ 
+ /* operation of two vector elements */
+ #define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
+@@ -1479,3 +1483,70 @@ GEN_VEXT_CMP_VX(vmsgt_vx_b, int8_t,  H1, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_h, int16_t, H2, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_w, int32_t, H4, DO_MSGT)
+ GEN_VEXT_CMP_VX(vmsgt_vx_d, int64_t, H8, DO_MSGT)
++
++/* Vector Integer Min/Max Instructions */
++RVVCALL(OPIVV2, vminu_vv_b, OP_UUU_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_h, OP_UUU_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_w, OP_UUU_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vminu_vv_d, OP_UUU_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_b, OP_SSS_B, H1, H1, H1, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_h, OP_SSS_H, H2, H2, H2, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_w, OP_SSS_W, H4, H4, H4, DO_MIN)
++RVVCALL(OPIVV2, vmin_vv_d, OP_SSS_D, H8, H8, H8, DO_MIN)
++RVVCALL(OPIVV2, vmaxu_vv_b, OP_UUU_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_h, OP_UUU_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_w, OP_UUU_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmaxu_vv_d, OP_UUU_D, H8, H8, H8, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_b, OP_SSS_B, H1, H1, H1, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_h, OP_SSS_H, H2, H2, H2, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_w, OP_SSS_W, H4, H4, H4, DO_MAX)
++RVVCALL(OPIVV2, vmax_vv_d, OP_SSS_D, H8, H8, H8, DO_MAX)
++GEN_VEXT_VV(vminu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vminu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vminu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vminu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmin_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmin_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmin_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmin_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmaxu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmaxu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmaxu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmaxu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vmax_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vmax_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vmax_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vmax_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2, vminu_vx_b, OP_UUU_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_h, OP_UUU_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_w, OP_UUU_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vminu_vx_d, OP_UUU_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_b, OP_SSS_B, H1, H1, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_h, OP_SSS_H, H2, H2, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_w, OP_SSS_W, H4, H4, DO_MIN)
++RVVCALL(OPIVX2, vmin_vx_d, OP_SSS_D, H8, H8, DO_MIN)
++RVVCALL(OPIVX2, vmaxu_vx_b, OP_UUU_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_h, OP_UUU_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_w, OP_UUU_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmaxu_vx_d, OP_UUU_D, H8, H8, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_b, OP_SSS_B, H1, H1, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_h, OP_SSS_H, H2, H2, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_w, OP_SSS_W, H4, H4, DO_MAX)
++RVVCALL(OPIVX2, vmax_vx_d, OP_SSS_D, H8, H8, DO_MAX)
++GEN_VEXT_VX(vminu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vminu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vminu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vminu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmin_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmin_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmin_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmin_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vmaxu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmaxu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmaxu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmaxu_vx_d, 8, 8,  clearq)
++GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
+-- 
+2.23.0
 
-Thanks,
-Laurent
 
