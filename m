@@ -2,78 +2,86 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20984C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18EDEC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2A9D20578
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:47:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA52C20578
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 15:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXgi87CV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2A9D20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qlUf7rcU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA52C20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBKca-0005qM-Um
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:47:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36394)
+	id 1jBKeP-0007TT-13
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 11:49:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBKFL-0002L4-Uf
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:23:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZl-0001q8-Vu
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBKFI-0004UR-7a
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:23:11 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38101
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBKFI-0004Te-33
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:23:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583767387;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F3T3ZNbTF9E9t2diUqMgtTS0H0dhU31gFBmlNw2If3Q=;
- b=KXgi87CVKWYXR7ZUDWHkj4Tgl0hzMgHoOEmH2FgGDcvtXBK1I94m4w7ra+GeipropekhZF
- adafeLa4qbCLoipoGrwb2Lhj0JUkU4djw993ALC/KTFCFLd8QIeiULFqkz8fL0wsUqdaTM
- xjvvkjyls13vWuWNMgxa1r38ylDjgZQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-nY0MEOAZOJ-EXvLzkuKzFA-1; Mon, 09 Mar 2020 11:23:03 -0400
-X-MC-Unique: nY0MEOAZOJ-EXvLzkuKzFA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD27E800D50;
- Mon,  9 Mar 2020 15:23:02 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6600E9008F;
- Mon,  9 Mar 2020 15:22:58 +0000 (UTC)
-Date: Mon, 9 Mar 2020 16:22:56 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v5 15/16] i386: Fix pkg_id offset for EPYC cpu models
-Message-ID: <20200309162256.018da8a8@Igors-MacBook-Pro>
-In-Reply-To: <158326551090.40452.9028312447486758348.stgit@naples-babu.amd.com>
-References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
- <158326551090.40452.9028312447486758348.stgit@naples-babu.amd.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jBKZk-0001Mp-4n
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:17 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:33867)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBKZj-0001M8-Tc
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 11:44:16 -0400
+Received: by mail-wr1-x433.google.com with SMTP id z15so11840587wrl.1
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 08:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=oanDNH9UXQs5SQ6FP6wfavjB/jgZbQ32aIl+6zF+rww=;
+ b=qlUf7rcUOo+B7pRTqJbWwSO4XrMFWR379eqyj4dOcmAgDRIRKZoFTNHyIeuXnWb+eq
+ 75JYFNYTUu+ihXnW3PO1dWkj3xxOizLvgmEdV1VWTblIXqd396isIdtQYVJ3w1ruRAVr
+ cAtc4E2MQzUC2vfIth+LauZQTzAhVy89yJzecxbyKzyYxT3FhsRs/yDEVRfcnR8U/SiH
+ HZXHYCuVPjnVzxSjJK986n1drXEoUl6XOeKKv16yYIDGGJL0FZH1YL1N6WlnFxo/Eqp8
+ 8qL7qeEPpGZnhYJZvcp5E2bJVN8erp0nLlAjCqW9ysfAGKLsiMVDUPwMWHQeCLqKtPCj
+ jxuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=oanDNH9UXQs5SQ6FP6wfavjB/jgZbQ32aIl+6zF+rww=;
+ b=SS2+GE0gRh3q1y+81k1GmvBksJ5ftDSf7fmpdf2Vi+AcVBH3De/PWlm6X+Lv5H+9nB
+ bhi9bNIoRb0tqnxBaM7OvG/IctbYelrAVnz90gsz7z4k26sLCaU7fwYSoB1vVfvzEhwi
+ gs/Qu297C73SgHbknpITUM79HoQ2QxAA91/KwIM3GskDLVOMQ7hikwxmSBi9WjFztSya
+ Ka/c1iNomRNTDDOvWpQsBdu/7QsZg3tNFInY8YkcdPYebgdt5sZth+s6m+mD/Of4SKwg
+ sQSGVOMNYE8X/3rBPNWpQHpQevGa9dZ26nn/JWw30tTXTD1l/+bYjXbsjHwv8UfUqzkH
+ dsNg==
+X-Gm-Message-State: ANhLgQ1m5mPOBF2ATzzXajVqEEQy/MloALHUO8NwPfWPxJMe1aG9Sd5Y
+ uiFSenKHpxb5CHULH22FMLw8kC2UkE5wSQ==
+X-Google-Smtp-Source: ADFU+vtX1bt2+d7AlYq1ntuf4cQeuWTVy+gfDj813UE6/CBK26pfB7kUIFrIX9P6u3IKqP6aCgWAwg==
+X-Received: by 2002:a5d:518b:: with SMTP id k11mr22347036wrv.114.1583768654322; 
+ Mon, 09 Mar 2020 08:44:14 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id d63sm25932166wmd.44.2020.03.09.08.44.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Mar 2020 08:44:13 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 05/18] scripts/qapi: Move doc-comment whitespace stripping
+ to doc.py
+Date: Mon,  9 Mar 2020 15:43:52 +0000
+Message-Id: <20200309154405.13548-6-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200309154405.13548-1-peter.maydell@linaro.org>
+References: <20200309154405.13548-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,75 +93,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 03 Mar 2020 13:58:30 -0600
-Babu Moger <babu.moger@amd.com> wrote:
+As we accumulate lines from doc comments when parsing the JSON, the
+QAPIDoc class generally strips leading and trailing whitespace using
+line.strip() when it calls _append_freeform().  This is fine for
+texinfo, but for rST leading whitespace is significant.  We'd like to
+move to having the text in doc comments be rST format rather than a
+custom syntax, so move the removal of leading whitespace from the
+QAPIDoc class to the texinfo-specific processing code in
+texi_format() in qapi/doc.py.
 
-> If the system is numa configured the pkg_offset needs
-> to be adjusted for EPYC cpu models. Fix it calling the
-> model specific handler.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+(Trailing whitespace will always be stripped by the rstrip() in
+Section::append regardless.)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+In a followup commit we will make the whitespace in the lines of doc
+comment sections more consistently follow the input source.
 
-> ---
->  hw/i386/pc.c      |    1 +
->  target/i386/cpu.c |    4 ++--
->  target/i386/cpu.h |    1 +
->  3 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index c600ba0432..b6237a3a14 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1527,6 +1527,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->  
->      env->nr_dies = x86ms->smp_dies;
->      env->nr_nodes = topo_info.nodes_per_pkg;
-> +    env->pkg_offset = x86ms->apicid_pkg_offset(&topo_info);
->  
->      /*
->       * If APIC ID is not set,
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index f870f7c55b..9b160cbdd1 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5503,7 +5503,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
->              break;
->          case 1:
-> -            *eax = apicid_pkg_offset(&topo_info);
-> +            *eax = env->pkg_offset;
->              *ebx = cs->nr_cores * cs->nr_threads;
->              *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
->              break;
-> @@ -5537,7 +5537,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->              *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
->              break;
->          case 2:
-> -            *eax = apicid_pkg_offset(&topo_info);
-> +            *eax = env->pkg_offset;
->              *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
->              *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
->              break;
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 34f0d994ef..aac86af5cf 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1608,6 +1608,7 @@ typedef struct CPUX86State {
->  
->      unsigned nr_dies;
->      unsigned nr_nodes;
-> +    unsigned pkg_offset;
->  } CPUX86State;
->  
->  struct kvm_msrs;
-> 
+There is no change to the generated .texi files before and after this
+commit.
+
+Because the qapi-schema test checks the exact values of the
+documentation comments against a reference, we need to update that
+reference to match the new whitespace.  In the first four places this
+is now correctly checking that we did put in the amount of whitespace
+to pass a rST-formatted list to the backend; in the last two places
+the extra whitespace is 'wrong' and will go away again in the
+following commit.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+New in v2: update doc-good.out as noted in final para of commit msg
+---
+ scripts/qapi/doc.py            |  1 +
+ scripts/qapi/parser.py         | 12 ++++--------
+ tests/qapi-schema/doc-good.out | 12 ++++++------
+ 3 files changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 1787a53d91a..26cd1a1751e 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -79,6 +79,7 @@ def texi_format(doc):
+     inlist = ''
+     lastempty = False
+     for line in doc.split('\n'):
++        line = line.strip()
+         empty = line == ''
+ 
+         # FIXME: Doing this in a single if / elif chain is
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index abadacbb0e8..7fae4478d34 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -417,10 +417,10 @@ class QAPIDoc:
+                 self._append_line = self._append_various_line
+                 self._append_various_line(line)
+             else:
+-                self._append_freeform(line.strip())
++                self._append_freeform(line)
+         else:
+             # This is a free-form documentation block
+-            self._append_freeform(line.strip())
++            self._append_freeform(line)
+ 
+     def _append_args_line(self, line):
+         """
+@@ -453,7 +453,7 @@ class QAPIDoc:
+                 self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_features_line(self, line):
+         name = line.split(' ', 1)[0]
+@@ -472,7 +472,7 @@ class QAPIDoc:
+             self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_various_line(self, line):
+         """
+@@ -495,10 +495,6 @@ class QAPIDoc:
+             line = line[len(name)+1:]
+             self._start_section(name[:-1])
+ 
+-        if (not self._section.name or
+-                not self._section.name.startswith('Example')):
+-            line = line.strip()
+-
+         self._append_freeform(line)
+ 
+     def _start_symbol_section(self, symbols_dict, name):
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index 9503a3a3178..a65bce639ff 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -71,20 +71,20 @@ doc freeform
+ 
+ * List item one
+ * Two, multiple
+-lines
++  lines
+ 
+ * Three
+-Still in list
++  Still in list
+ 
+ Not in list
+ 
+ - Second list
+-Note: still in list
++  Note: still in list
+ 
+ Note: not in list
+ 
+ 1. Third list
+-is numbered
++   is numbered
+ 
+ 2. another item
+ 
+@@ -144,7 +144,7 @@ doc symbol=Alternate
+ 
+     arg=i
+ an integer
+-@b is undocumented
++    @b is undocumented
+     arg=b
+ 
+ doc freeform
+@@ -157,7 +157,7 @@ doc symbol=cmd
+ the first argument
+     arg=arg2
+ the second
+-argument
++       argument
+     arg=arg3
+ 
+     feature=cmd-feat1
+-- 
+2.20.1
 
 
