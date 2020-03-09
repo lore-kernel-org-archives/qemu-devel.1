@@ -6,43 +6,41 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3A9C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93C1C10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 131F420675
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 131F420675
+	by mail.kernel.org (Postfix) with ESMTPS id 8FCF220675
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 12:59:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCF220675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBHy2-0001FS-7w
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:57:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35899)
+	id 1jBI0V-0002j0-PK
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 08:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBHxH-0000V4-7B
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:56:24 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBHzV-0001qe-04
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBHxD-0000qo-Ra
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:56:22 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:42173)
+ (envelope-from <laurent@vivier.eu>) id 1jBHzU-0003DE-1o
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 08:58:40 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:57871)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBHxD-0000kv-Ih; Mon, 09 Mar 2020 08:56:19 -0400
+ id 1jBHzR-0002se-Nj; Mon, 09 Mar 2020 08:58:37 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N4Q8u-1jIbgc2uP8-011VBi; Mon, 09 Mar 2020 13:56:00 +0100
-Subject: Re: [PATCH v3 11/12] usb/hcd-ehci: Remove redundant statements
-To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MaIKJ-1ioTdZ13pN-00WBoM; Mon, 09 Mar 2020 13:58:20 +0100
+Subject: Re: [PATCH v3 12/12] monitor/hmp-cmds: Remove redundant statement in
+ hmp_rocker_of_dpa_groups()
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
 References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-13-kuhn.chenqun@huawei.com>
- <e786f342-7ba6-1c25-dea7-a34372a4ff81@vivier.eu>
- <7412CDE03601674DA8197E2EBD8937E83B67D5D6@dggemm511-mbx.china.huawei.com>
+ <20200302130715.29440-14-kuhn.chenqun@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -86,34 +84,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <85ae07ca-3751-305e-618d-1ab741e9cdbc@vivier.eu>
-Date: Mon, 9 Mar 2020 13:55:58 +0100
+Message-ID: <fe2b84b3-93ff-a6df-9388-719803c954b7@vivier.eu>
+Date: Mon, 9 Mar 2020 13:58:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B67D5D6@dggemm511-mbx.china.huawei.com>
+In-Reply-To: <20200302130715.29440-14-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wbR5t0XVnl5VVGV4MSgxCKgg9PT2a08/+I+Y6lVxE+l98ffFBGZ
- fKYZIGIX/e89XtQUse2339npPWi3UGrG2dvEOByGGHfALfgIeOmLC1dDpSDkPSrm3EnRwRT
- 3GjVWIgfd+3oPSB80pz4GL9C39OHLWd8KtUBRnUEyhwK/4lWrbuY8v+Xnu6wbe7vce8vo2g
- 91s/bQ7YQ8IL3Ahc2tBXg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ceOf0KLACEo=:ESRNaeotz4H9DuaaCOQd1a
- Nbgg+LXpl7JA9usnzHylckWn5mAXS/xPOCwQkFVLMZDnfiC2mXGs49trr8belxtpotQSVKHhm
- t++z57A3fwTpVirdudmIIY2qCMmL4gPD5Qt0QxbFRFQV3kaDaPaIK8FP0hjdEqE5fJxQpMWAn
- 3JmK6q6YML/MvaYJ0UKhbAAPPCiA9SlcuxsO+Tw16EwrUAi8hia8pHdric+o9kvaJIriEiy3S
- lTyQgg02MKiOBC4tOKTe4g/lcd13cDAukAmiAu8QUPXVAwpAH7xHmdKs1KtVl88vyhaK53VYc
- eg/ORQ4UWUoAi1Xa/02fk1V29zt/kMOUaDIkpMHzgvzL873xwQKe/GUgDZ/ImTzX0tMb8kW8C
- HIToxqo75hj6YLwexmT5dlYxbbDZC+ZETvrRleHnXrZXIwk+ekADVKQmh0xsuOLMVIGCqE++u
- nd9izw0DwX51RX7V/EIVM/HsLvXa68XJc4tExGwRhTpIIdp/CSKJwZ4rapitLmOJYZCjQRj1N
- J/AlAcZSeFGNsUG9truUpdmUss9dNgVmH8l5ux++fl1BjY16F7b/iwNxckSsC2R3vSXE38KPO
- R84JpCz84QTdlXdaQzG9CyMcx5HFmrKWwZIEb2ZCBQD6TimS8j7l2uIHTjbdcNksDR1W91/jH
- rlDOzfLEdfw04pjcpyNv+rKCELX872UuSpIDH+75IwEqgjbZQhayxsSlfeQvwV7F3e6sadxoZ
- 4rA6oKMweY/wbKt3lLlr75jUJzFTUD69lq9lErGF2I1rtNd/ZylIY3QBa0qk1oPJQIz1KJJaQ
- 6B1bJvd+6LcG+O5MsKnilbjQpurmwZWru1r11an0gg8lFonIi/QIiGrs6+mFNAu+Hfc7yqx
+X-Provags-ID: V03:K1:E32NhFaeTPHpiVQ1ZBd/5wiod/tKjk1YAlRMzcjfSVkd4WT7y8e
+ nEDi6Vxw9JAQPp1Am+IdFkSASD6QqOA3mdvlUfmFJkzQJIoYlG6jyfteSdeoYi7Bzah8iHn
+ D5bY5cyd0e5+Bg93xIKrP4lsIa32Wq7H87gjVtE8nxuOTdtttaO7iaH7PWRFc5aMPehtwNv
+ Rh2g/Q+vV43AlC4dYp+XA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WZw401g3j08=:EnPEtUuHREm4uYj4WPJAAs
+ /HsUQdu2QcxOmGxQKwyhIkIDnn1jX86tnahGMTABH1aFBzwVc8erlau6FSHTbW1rx5WNwF4F3
+ MEupfxg/BlGJXlpm9NtBrSr+c8MkhluYBmNfiM08Gac8sabMUgC4spkuyAy81u8YThgoG4pn9
+ plcykjX6OkK3AMVZoLhzGMDRgWqFYz3B2B4Qjx3lkxuyFxVzMS4Vf0hmpYh0OCJCSQN4zFcWR
+ TEVceNDgILa2oL4zkeQBvoIjoH8WLf6/7vnGInURZNx4yL8acbIIkB3zAzEDbz0PUHNAI9FSX
+ msr/fgBClUwPUFcBStBH6hLahvjD2voJWj0BYJe9lW9q5e//Xxt1fqMBA73CWXtzuhCwXxJkT
+ NhgqYEJVdZe/6YYAuOUlrVKERQIIbtWMdOcLnGjHZomAOjQuz4b0ISrIwExXWv1B1dW6ge+HJ
+ N6F692tIvk0nk/BMVuPuWCKAx7cBAsvX0lw4+T/23wfNK0bTlek9tzh78zk1RW8kT6FDuRSVO
+ HK+rfGQbpdvPS9szIbSUHDGKoNF0Snd66OIghnh1XT+TiQh9vadxbOULz42HVx89E2dIAmlPD
+ VrpvFbKvQkYvESsXrm8CYrOBLpFXA7Cgq7PcsWnqgage/wM747miTmWiLZlkxZsrq43UoNzkw
+ bUDaoxmieF2RmDDbEe9PDlPk6Er6JBjATZr6oZtwYrdtWDDlYazMB3pV40g9CRHd3Gps2DxUa
+ kLA+LA4iqnBoHcQxmEyLP8Er4/nMSmoRnm9LaO/ppy1V8k5eX6T4T9hbAfEQAJhdW/ZuBEJx7
+ eiBSFBikBKuHkRUtIy2VPI1/4rbTPifKAlXNHczlAlDhrUmt9NsKOnKL9CVxyeXznXTlr+h
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,83 +123,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
+Cc: peter.maydell@linaro.org, Euler Robot <euler.robot@huawei.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Euler Robot <euler.robot@huawei.com>
+ zhang.zhanghailiang@huawei.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/03/2020 à 13:52, Chenqun (kuhn) a écrit :
+Le 02/03/2020 à 14:07, Chen Qun a écrit :
+> Clang static code analyzer show warning:
+> monitor/hmp-cmds.c:2867:17: warning: Value stored to 'set' is never read
+>                 set = true;
+>                 ^     ~~~~
 > 
->> -----Original Message-----
->> From: Laurent Vivier [mailto:laurent@vivier.eu]
->> Sent: Monday, March 9, 2020 8:43 PM
->> To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>; qemu-
->> devel@nongnu.org; qemu-trivial@nongnu.org
->> Cc: peter.maydell@linaro.org; Zhanghailiang
->> <zhang.zhanghailiang@huawei.com>; Gerd Hoffmann <kraxel@redhat.com>;
->> Euler Robot <euler.robot@huawei.com>; Philippe Mathieu-Daudé
->> <philmd@redhat.com>
->> Subject: Re: [PATCH v3 11/12] usb/hcd-ehci: Remove redundant statements
->>
->> Le 02/03/2020 à 14:07, Chen Qun a écrit :
->>> The "again" assignment is meaningless before g_assert_not_reached.
->>> In addition, the break statements no longer needs to be after
->>> g_assert_not_reached.
->>>
->>> Clang static code analyzer show warning:
->>> hw/usb/hcd-ehci.c:2108:13: warning: Value stored to 'again' is never read
->>>             again = -1;
->>>             ^       ~~
->>>
->>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>> Cc: Gerd Hoffmann <kraxel@redhat.com>
->>> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>  hw/usb/hcd-ehci.c | 3 ---
->>>  1 file changed, 3 deletions(-)
->>>
->>> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c index
->>> 56ab2f457f..29d49c2d7e 100644
->>> --- a/hw/usb/hcd-ehci.c
->>> +++ b/hw/usb/hcd-ehci.c
->>> @@ -1301,7 +1301,6 @@ static void ehci_execute_complete(EHCIQueue *q)
->>>          /* should not be triggerable */
->>>          fprintf(stderr, "USB invalid response %d\n", p->packet.status);
->>>          g_assert_not_reached();
->>> -        break;
->>>      }
->>>
->>>      /* TODO check 4.12 for splits */
->>> @@ -2105,9 +2104,7 @@ static void ehci_advance_state(EHCIState *ehci,
->>> int async)
->>>
->>>          default:
->>>              fprintf(stderr, "Bad state!\n");
->>> -            again = -1;
->>>              g_assert_not_reached();
->>> -            break;
->>>          }
->>>
->>>          if (again < 0 || itd_count > 16) {
->>>
->>
->> Applied to my trivial-patches branch.
->>
-> Hi, Laurent
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
-> Gerd has added a patch to the USB queue today.
+> v1->v2: move the 'set' declaration to the for() statement(Base on Philippe's suggestion).
+> ---
+>  monitor/hmp-cmds.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 > 
-> https://patchwork.kernel.org/patch/11405615/
->
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 53bc3f76c4..c6b0495822 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -2808,7 +2808,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
+>      const char *name = qdict_get_str(qdict, "name");
+>      uint8_t type = qdict_get_try_int(qdict, "type", 9);
+>      Error *err = NULL;
+> -    bool set = false;
+>  
+>      list = qmp_query_rocker_of_dpa_groups(name, type != 9, type, &err);
+>      if (err != NULL) {
+> @@ -2820,6 +2819,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
+>  
+>      for (g = list; g; g = g->next) {
+>          RockerOfDpaGroup *group = g->value;
+> +        bool set = false;
+>  
+>          monitor_printf(mon, "0x%08x", group->id);
+>  
+> @@ -2864,14 +2864,11 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const QDict *qdict)
+>  
+>          if (group->has_set_eth_dst) {
+>              if (!set) {
+> -                set = true;
+>                  monitor_printf(mon, " set");
+>              }
+>              monitor_printf(mon, " dst %s", group->set_eth_dst);
+>          }
+>  
+> -        set = false;
+> -
+>          if (group->has_ttl_check && group->ttl_check) {
+>              monitor_printf(mon, " check TTL");
+>          }
+> 
 
-Ok, removing it from mine.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
