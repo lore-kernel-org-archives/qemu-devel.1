@@ -6,83 +6,85 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 552E7C10F25
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3EA3C10F25
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:40:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 260CE20409
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:37:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B32F220409
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 20:40:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6HhQtuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260CE20409
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsKUSHhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B32F220409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBP9Q-0000qm-7m
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:37:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34333)
+	id 1jBPC2-0001pc-Ts
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 16:40:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jBP8a-0000CS-T6
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:36:34 -0400
+ (envelope-from <mst@redhat.com>) id 1jBPBP-0001MG-HL
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:39:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jBP8Y-00064i-V4
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:36:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49005
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1jBPBO-0007NW-Gh
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:39:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42690
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBP8Y-00064O-QW
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:36:30 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBPBO-0007NH-By
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 16:39:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583786190;
+ s=mimecast20190719; t=1583786366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wD6vZcXRaG39R8nB7Nwb8P9389zEZtKV2JYzfRAip/w=;
- b=H6HhQtuDS9PtotKWkUd93Mf1d3bZkXJA7x8zch8gB5jtY2gCv8F921Vjtn073z9eHaNraI
- vDxzyQewSw7ZlP7fO3oQ0C5c9vSxF0ZX935+ZMEPFO8xBdC131SIzeajrkiQFj/nicUqXM
- 0YBNY9sN3QfLENs6lsQUf+qNS4ayotY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-WpdcVpkRPQi3-FyDO1NEoA-1; Mon, 09 Mar 2020 16:36:28 -0400
-X-MC-Unique: WpdcVpkRPQi3-FyDO1NEoA-1
-Received: by mail-wr1-f70.google.com with SMTP id p11so5717940wrn.10
- for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 13:36:27 -0700 (PDT)
+ bh=HJjiwgW2O+3FTgKDKqEeQchdhtqdaj3fqcvL381Rqew=;
+ b=GsKUSHhXckJTt7dlZ/mde/jT1l5Mx4v65xj127E6ee42eEgskhXkPVc6J5wNEZ5s8l91LT
+ pRC8vR1+w1olVnRC9BqYpTT25aKczC1JKg57rpQSTrgtuYNvXXtePTJPBdulFnb3PQz15V
+ DTItLEY1WPtUziy+/poq5eLyeiwHwQc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-rzec28QMPTmB6PzkyP65pg-1; Mon, 09 Mar 2020 16:39:24 -0400
+X-MC-Unique: rzec28QMPTmB6PzkyP65pg-1
+Received: by mail-wm1-f72.google.com with SMTP id a23so52005wmm.8
+ for <qemu-devel@nongnu.org>; Mon, 09 Mar 2020 13:39:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=gCcEIxdfDGEuVQbiHnkew/NRhw04KBgfgm5q349vZpk=;
- b=GbRbPH0IENNMMA9eseEKIJsCmkRkSWb7R+McaW5hC7RosRuivHFp6Y++cqoM0dC6s+
- dWtGDoElaxgREffjGyx4mPJP2Du7Hl9RyYNTxbT70zj9h+/CPeY3VNNCgyM989vO8TUA
- OWx3Gpw0oSMV/PSZgkRmOdKGKHDnfkW7H09OUKokVzHEYnDPgkCNHqa2aE7uifBmVqJu
- 1yzCwCyodt+V27AyLet5pwQfTMxuJSsHAXGaSlTrGRNIAmrQhuO6/QpEa36XI6UTDiEO
- cuuP1Yca6IUbI27J7m/ClpfBFfZ7wO67zBKQ+JQIakg/KIOKrtngsguTRYih+PDANdmA
- 8gsA==
-X-Gm-Message-State: ANhLgQ3mLYnsCLynTpkrwEndH7EXHLIa7ryCPkH4NOjoWZx6bAidI4Lu
- d3kPu9Gqsk7IPQZNdAxEYMoAjR2HYWNDDI6/tdZOyQuFBKJMAKX54jSxmpbv3N+0SF+uaZPYCkd
- ZR3qv/jh2QNB3Kb4=
-X-Received: by 2002:a1c:59c6:: with SMTP id n189mr966177wmb.178.1583786187040; 
- Mon, 09 Mar 2020 13:36:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vv3SwGpT3xweUpTVyFUIZDolCAbc03qC0RcoRqFk7KpTuPxwp8DElDkTURuhaB7UDrJqPB6FA==
-X-Received: by 2002:a1c:59c6:: with SMTP id n189mr966155wmb.178.1583786186678; 
- Mon, 09 Mar 2020 13:36:26 -0700 (PDT)
+ bh=FXFmu5l3T51UteK+EzPwT+ODBdWw/jTrhNXqiMIyEI0=;
+ b=UrrhvpOhQv1TStUJE5fSMdxeh0JJZDMcGLR0vZgafa3h6z16ho5ORBDDIiOmrfq6Zw
+ szAysQxb5FI/LfVZlPnL6aNUBGFeLUYNK/tt6r+HOrFcTvUPZTINrDgvB4aeZx5N5tx1
+ 9Si8jixZJms2QjcSHCu0ZlhI3xFDg49LQfzpJDtpLmCPXqlbcjwl7CzfU1KKjmfGBhLj
+ II8dS66VDNn67DGuIpHB2Mm54QrrXbS3IvsvATtMByaKzFRCU2aXDj8Tu3qcc/Ln9hND
+ Ayn/yyZb/YeSj2O7EiROo+sdgVpJV2CKlOvHjT1mWmc16ngVeBcIJYhTqOo0/xD69kJ/
+ 56FA==
+X-Gm-Message-State: ANhLgQ1IUt1NeknoCBpC25zadgkFujCSp/GWJZkkRIm8b4qNYujKaYJq
+ WK9YtfgpDpri8ENRyPbYGIGGN6NZXQlERKOGAy348v2DrZoG1VgUa/oofMry101IuhVfapWkECA
+ WQy1jevHexawaYdk=
+X-Received: by 2002:a05:6000:370:: with SMTP id
+ f16mr16547914wrf.9.1583786362982; 
+ Mon, 09 Mar 2020 13:39:22 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuwm4lksdkm7rrDkwbJjce1buidWtEEsVeSEpG3bZSgp81QzHiCZG1uDk42JRwM5Eqbi3Gtpw==
+X-Received: by 2002:a05:6000:370:: with SMTP id
+ f16mr16547900wrf.9.1583786362800; 
+ Mon, 09 Mar 2020 13:39:22 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id x24sm956137wmc.36.2020.03.09.13.36.24
+ by smtp.gmail.com with ESMTPSA id y69sm919939wmd.46.2020.03.09.13.39.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Mar 2020 13:36:26 -0700 (PDT)
-Date: Mon, 9 Mar 2020 16:36:23 -0400
+ Mon, 09 Mar 2020 13:39:22 -0700 (PDT)
+Date: Mon, 9 Mar 2020 16:39:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH v3 3/3] via-ide: Also emulate non 100% native mode
-Message-ID: <20200309163537-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v3 2/3] pci: Honour wmask when resetting PCI_INTERRUPT_LINE
+Message-ID: <20200309163632-mutt-send-email-mst@kernel.org>
 References: <cover.1583781493.git.balaton@eik.bme.hu>
- <ac37e5f5b86a3b2680c01d7b0d027dafd27a3ac7.1583781494.git.balaton@eik.bme.hu>
+ <857e327a240f2175fe5105f0ebdfe1357fef32c7.1583781494.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <ac37e5f5b86a3b2680c01d7b0d027dafd27a3ac7.1583781494.git.balaton@eik.bme.hu>
+In-Reply-To: <857e327a240f2175fe5105f0ebdfe1357fef32c7.1583781494.git.balaton@eik.bme.hu>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -90,7 +92,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,162 +113,54 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Mon, Mar 09, 2020 at 08:18:13PM +0100, BALATON Zoltan wrote:
-> Some machines operate in "non 100% native mode" where interrupts are
-> fixed at legacy IDE interrupts and some guests expect this behaviour
-> without checking based on knowledge about hardware. Even Linux has
-> arch specific workarounds for this that are activated on such boards
-> so this needs to be emulated as well.
+> The pci_do_device_reset() function (called from pci_device_reset)
+> clears the PCI_INTERRUPT_LINE config reg of devices on the bus but did
+> this without taking wmask into account. We'll have a device model now
+> that needs to set a constant value for this reg and this patch allows
+> to do that without additional workaround in device emulation to
+> reverse the effect of this PCI bus reset function.
 >=20
+> Suggested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
-> v2: Don't use PCI_INTERRUPT_LINE in via_ide_set_irq()
-> v3: Patch pci.c instead of local workaround for PCI reset clearing
->     PCI_INTERRUPT_PIN config reg
+>  hw/pci/pci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >=20
->  hw/ide/via.c            | 37 +++++++++++++++++++++++++++++--------
->  hw/mips/mips_fulong2e.c |  2 +-
->  include/hw/ide.h        |  3 ++-
->  3 files changed, 32 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/ide/via.c b/hw/ide/via.c
-> index 096de8dba0..02d29809f2 100644
-> --- a/hw/ide/via.c
-> +++ b/hw/ide/via.c
-> @@ -1,9 +1,10 @@
->  /*
-> - * QEMU IDE Emulation: PCI VIA82C686B support.
-> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
->   *
->   * Copyright (c) 2003 Fabrice Bellard
->   * Copyright (c) 2006 Openedhand Ltd.
->   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
-> + * Copyright (c) 2019-2020 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -25,6 +26,8 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/range.h"
-> +#include "hw/qdev-properties.h"
->  #include "hw/pci/pci.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
-> @@ -111,11 +114,18 @@ static void via_ide_set_irq(void *opaque, int n, in=
-t level)
->      } else {
->          d->config[0x70 + n * 8] &=3D ~0x80;
->      }
-> -
->      level =3D (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
-> -    n =3D pci_get_byte(d->config + PCI_INTERRUPT_LINE);
-> -    if (n) {
-> -        qemu_set_irq(isa_get_irq(NULL, n), level);
-> +
-> +    /*
-> +     * Some machines operate in "non 100% native mode" where PCI_INTERRU=
-PT_LINE
-> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native =
-mode.
-> +     * Some guest drivers expect this, often without checking.
-> +     */
-> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
-> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
-> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
-> +    } else {
-> +        qemu_set_irq(isa_get_irq(NULL, 14), level);
->      }
->  }
-> =20
-> @@ -169,7 +179,8 @@ static void via_ide_realize(PCIDevice *dev, Error **e=
-rrp)
-> =20
->      pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mod=
-e */
->      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-> -    dev->wmask[PCI_INTERRUPT_LINE] =3D 0xf;
-> +    dev->wmask[PCI_CLASS_PROG] =3D 5;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index e1ed6677e1..d07e4ed9de 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -302,8 +302,10 @@ static void pci_do_device_reset(PCIDevice *dev)
+>      pci_word_test_and_clear_mask(dev->config + PCI_STATUS,
+>                                   pci_get_word(dev->wmask + PCI_STATUS) |
+>                                   pci_get_word(dev->w1cmask + PCI_STATUS)=
+);
+> +    pci_word_test_and_clear_mask(dev->config + PCI_INTERRUPT_LINE,
+> +                              pci_get_word(dev->wmask + PCI_INTERRUPT_LI=
+NE) |
+> +                              pci_get_word(dev->w1cmask + PCI_INTERRUPT_=
+LINE));
 
-What's the story here? Why is class suddenly writeable?
+PCI spec says:
 
-> +    dev->wmask[PCI_INTERRUPT_LINE] =3D 0;
-> =20
->      memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_o=
-ps,
->                            &d->bus[0], "via-ide0-data", 8);
-> @@ -213,14 +224,23 @@ static void via_ide_exitfn(PCIDevice *dev)
->      }
->  }
-> =20
-> -void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
-> +void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-> +                  bool legacy_irq)
->  {
->      PCIDevice *dev;
-> =20
-> -    dev =3D pci_create_simple(bus, devfn, "via-ide");
-> +    dev =3D pci_create(bus, devfn, "via-ide");
-> +    qdev_prop_set_bit(&dev->qdev, "legacy-irq", legacy_irq);
-> +    qdev_init_nofail(&dev->qdev);
->      pci_ide_create_devs(dev, hd_table);
->  }
-> =20
-> +static Property via_ide_properties[] =3D {
-> +    DEFINE_PROP_BIT("legacy-irq", PCIIDEState, flags, PCI_IDE_LEGACY_IRQ=
-,
-> +                    false),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void via_ide_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -233,6 +253,7 @@ static void via_ide_class_init(ObjectClass *klass, vo=
-id *data)
->      k->device_id =3D PCI_DEVICE_ID_VIA_IDE;
->      k->revision =3D 0x06;
->      k->class_id =3D PCI_CLASS_STORAGE_IDE;
-> +    device_class_set_props(dc, via_ide_properties);
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->  }
-> =20
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 4727b1d3a4..150182c62a 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -257,7 +257,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bu=
-s, int slot, qemu_irq intc,
->      isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
-> =20
->      ide_drive_get(hd, ARRAY_SIZE(hd));
-> -    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
-> +    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1), false);
-> =20
->      pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci")=
-;
->      pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci")=
-;
-> diff --git a/include/hw/ide.h b/include/hw/ide.h
-> index d88c5ee695..2a7001ccba 100644
-> --- a/include/hw/ide.h
-> +++ b/include/hw/ide.h
-> @@ -18,7 +18,8 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInf=
-o **hd_table, int devfn);
->  PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
-fn);
->  PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
-fn);
->  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
-> -void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
-> +void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-> +                  bool legacy_irq);
-> =20
->  /* ide-mmio.c */
->  void mmio_ide_init_drives(DeviceState *dev, DriveInfo *hd0, DriveInfo *h=
-d1);
+Interrupt Line
+The Interrupt Line register is an eight-bit register used to communicate in=
+terrupt line routing
+information.
+
+I don't see how it makes sense to access it as a word.
+
+
+>      dev->config[PCI_CACHE_LINE_SIZE] =3D 0x0;
+> -    dev->config[PCI_INTERRUPT_LINE] =3D 0x0;
+>      for (r =3D 0; r < PCI_NUM_REGIONS; ++r) {
+>          PCIIORegion *region =3D &dev->io_regions[r];
+>          if (!region->size) {
+
+Please add comments here explaining that some devices
+make PCI_INTERRUPT_LINE read-only.
+
+
 > --=20
 > 2.21.1
 >=20
