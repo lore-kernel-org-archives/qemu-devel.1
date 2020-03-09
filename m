@@ -2,68 +2,80 @@ Return-Path: <SRS0=hU7S=42=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63658C10F27
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8592FC10F27
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:12:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CF8E20727
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41D5020727
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Mar 2020 14:12:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="OGqOnNzP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF8E20727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3APvewB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D5020727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBJ6x-0005xl-8J
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:10:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47714)
+	id 1jBJ8a-0008BO-BQ
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 10:12:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jBJ5y-0005GE-RC
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:09:29 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jBJ7M-0006w0-TI
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jBJ5w-0000MP-Cc
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:09:26 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:39423)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jBJ5v-0000LN-VE
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:09:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=vFHDAWnHNjEOiBnYg/8boE8TwzKlfidXyu/gSNlwqq0=; b=OGqOnNzPPMQjyld19V52e78r5B
- +sQBPD7ZzEZvS/KTAxgegAxbUkPdKSwzNLyH9YqZT9Tr1gCUR1yhxqPXoscX9CkuiAb+NdALEjTDI
- QybzZ6hbjvP1dlbOcHO7vGnFqwK9xVKMoNx7Lk38/aoSBvDZZZ1fyEkzBTBWfAD1/OAPrngfkIK6f
- w0Va+Lzb4CkjDtoHHFyx/3uFrYSxs9Wf5WDJJroUbZXCG8SiPoVQtEQOa4iAt5s8RMze6HH7jO9GF
- kEs910asebVSx9S7k0jnn7W/+nnJz7Hd2ggPm7y9TBYtskWlbYdk4U/iBRInr3zA8PrealJOZq7lv
- IzjVBLCztNDyhJLw0FGCL0mZ2GWRSjNR7H1JcEfaQ9/mn90zxUR+Tu/3AnOos3Xw7HZX42ixTXfhY
- 6ETVytRknxpfJrbZ4JuvgDMF5HM1TZcu0gRNOqh3tIvNWxEqSQlUAeQwZcXkgCVaBQJsGKuh/PFSM
- 0FegyzwXgPwMo2BqiKN18aEBbwJVWVm7PssSK2BYh0m8VvoQ2sNrnqFMbEyi+bmu6VaJlFOrytwse
- iIxcfI5vDGuxpY4nFUgZOIFcXuTKsRnrCj49KGtvlwQJX803pIF6bAAHFWZ7f9BES3x4RGN4SAU05
- +e9Vud5RfmxYvZ/OpA8vAXsi5j/yPonUFMzT/HeqU=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
-Date: Mon, 09 Mar 2020 15:09:21 +0100
-Message-ID: <1706149.tZr2OiJYdg@silver>
-In-Reply-To: <cbd48794ab09613589719b37b147589cda5af6dd.1579567020.git.qemu_oss@crudebyte.com>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <cbd48794ab09613589719b37b147589cda5af6dd.1579567020.git.qemu_oss@crudebyte.com>
+ (envelope-from <imammedo@redhat.com>) id 1jBJ7K-0001FR-DZ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56727
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBJ7K-0001Eq-62
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 10:10:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583763049;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fs8eF/9dh0mwPhDSWKfItuHZLRJUeh4QJntnDmxJHhs=;
+ b=a3APvewBvU5IigpZWCnRjcm32t4cC1rYnBWA8qhcFPM8gtm0PBnCNS2828VcaO2bubQyAt
+ KvNm4hSXGs0EqKRYQ22lUtcfnkM1jop44qC+16vMxErdU+dk7o77W1ngixtmKV8xEdSMs6
+ 8GJGXvcksNgToAGTnm5HaFedBs77VDo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-3wQf3JSrPNu6vBYl0KI1Aw-1; Mon, 09 Mar 2020 10:10:47 -0400
+X-MC-Unique: 3wQf3JSrPNu6vBYl0KI1Aw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09E9E10883A6;
+ Mon,  9 Mar 2020 14:10:46 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-206-77.brq.redhat.com [10.40.206.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DB4B5C3FD;
+ Mon,  9 Mar 2020 14:10:41 +0000 (UTC)
+Date: Mon, 9 Mar 2020 15:10:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v5 02/16] hw/i386: Introduce X86CPUTopoInfo to contain
+ topology info
+Message-ID: <20200309151038.0ee0c288@Igors-MacBook-Pro>
+In-Reply-To: <158326542572.40452.15331466265190906874.stgit@naples-babu.amd.com>
+References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
+ <158326542572.40452.15331466265190906874.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,496 +87,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Dienstag, 21. Januar 2020 01:30:10 CET Christian Schoenebeck wrote:
-> Make top half really top half and bottom half really bottom half:
+On Tue, 03 Mar 2020 13:57:05 -0600
+Babu Moger <babu.moger@amd.com> wrote:
+
+> This is an effort to re-arrange few data structure for better readability.
 > 
-> Each T_readdir request handling is hopping between threads (main
-> I/O thread and background I/O driver threads) several times for
-> every individual directory entry, which sums up to huge latencies
-> for handling just a single T_readdir request.
+> 1. Add X86CPUTopoInfo which will have all the topology informations
+>    required to build the cpu topology. There is no functional changes.
+> 2. Introduce init_topo_info to initialize X86CPUTopoInfo members from
+>    X86MachineState.
 > 
-> Instead of doing that, collect now all required directory entries
-> (including all potentially required stat buffers for each entry) in
-> one rush on a background I/O thread from fs driver, then assemble
-> the entire resulting network response message for the readdir
-> request on main I/O thread. The fs driver is still aborting the
-> directory entry retrieval loop (on the background I/O thread) as
-> soon as it would exceed the client's requested maximum R_readdir
-> response size. So we should not have any performance penalty by
-> doing this.
+> There is no functional changes.
 > 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
-
-PING! Idle for 7 weeks.
-
-Could anybody help out reviewing this particular patch 10?
-
-Complete thread:
-https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg04418.html
-
-Patches 1..5 are already on master. Subsequent patches already have been 
-reviewed, this patch 10 is the only one not being reviewed at all yet.
-
-Test cases and benchmark patches are provided by thread, instructions to run 
-them as well.
-
->  hw/9pfs/9p.c    | 124 +++++++++++++++-----------------
->  hw/9pfs/9p.h    |  23 ++++++
->  hw/9pfs/codir.c | 183 +++++++++++++++++++++++++++++++++++++++++++++---
->  hw/9pfs/coth.h  |   3 +
->  4 files changed, 254 insertions(+), 79 deletions(-)
+>  hw/i386/pc.c               |   12 ++++++------
+>  hw/i386/x86.c              |   32 ++++++++++++++++++++++++--------
+>  include/hw/i386/topology.h |   38 ++++++++++++++++++++++++--------------
+>  include/hw/i386/x86.h      |    3 +++
+>  4 files changed, 57 insertions(+), 28 deletions(-)
 > 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 18370183c4..e0ca45d46b 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -971,30 +971,6 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu,
-> V9fsFidState *fidp, return 0;
->  }
-> 
-> -static int coroutine_fn dirent_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-> -                                      struct dirent *dent, V9fsQID *qidp)
-> -{
-> -    struct stat stbuf;
-> -    V9fsPath path;
-> -    int err;
-> -
-> -    v9fs_path_init(&path);
-> -
-> -    err = v9fs_co_name_to_path(pdu, &fidp->path, dent->d_name, &path);
-> -    if (err < 0) {
-> -        goto out;
-> -    }
-> -    err = v9fs_co_lstat(pdu, &path, &stbuf);
-> -    if (err < 0) {
-> -        goto out;
-> -    }
-> -    err = stat_to_qid(pdu, &stbuf, qidp);
-> -
-> -out:
-> -    v9fs_path_free(&path);
-> -    return err;
-> -}
-> -
->  V9fsPDU *pdu_alloc(V9fsState *s)
->  {
->      V9fsPDU *pdu = NULL;
-> @@ -2314,7 +2290,7 @@ out_nofid:
->      pdu_complete(pdu, err);
->  }
-> 
-> -static size_t v9fs_readdir_data_size(V9fsString *name)
-> +size_t v9fs_readdir_response_size(V9fsString *name)
->  {
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 715f79f58c..ef23ae2af5 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1514,6 +1514,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      X86MachineState *x86ms = X86_MACHINE(pcms);
+>      unsigned int smp_cores = ms->smp.cores;
+>      unsigned int smp_threads = ms->smp.threads;
+> +    X86CPUTopoInfo topo_info;
+>  
+>      if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
+>          error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
+> @@ -1521,6 +1522,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          return;
+>      }
+>  
+> +    init_topo_info(&topo_info, x86ms);
+> +
+>      env->nr_dies = x86ms->smp_dies;
+>  
 >      /*
->       * Size of each dirent on the wire: size of qid (13) + size of offset
-> (8) @@ -2323,6 +2299,18 @@ static size_t v9fs_readdir_data_size(V9fsString
-> *name) return 24 + v9fs_string_size(name);
->  }
-> 
-> +static void v9fs_free_dirents(struct V9fsDirEnt *e)
+> @@ -1576,16 +1579,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> -        cpu->apic_id = apicid_from_topo_ids(x86ms->smp_dies, smp_cores,
+> -                                            smp_threads, &topo_ids);
+> +        cpu->apic_id = apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
+>  
+>      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+>      if (!cpu_slot) {
+>          MachineState *ms = MACHINE(pcms);
+>  
+> -        x86_topo_ids_from_apicid(cpu->apic_id, x86ms->smp_dies,
+> -                                 smp_cores, smp_threads, &topo_ids);
+> +        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>          error_setg(errp,
+>              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+>              " APIC ID %" PRIu32 ", valid index range 0:%d",
+> @@ -1606,8 +1607,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
+>       * once -smp refactoring is complete and there will be CPU private
+>       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
+> -    x86_topo_ids_from_apicid(cpu->apic_id, x86ms->smp_dies,
+> -                             smp_cores, smp_threads, &topo_ids);
+> +    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+>          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+>              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 322fb6abbc..03b8962c98 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -57,6 +57,16 @@
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+>  static size_t pvh_start_addr;
+>  
+> +inline void init_topo_info(X86CPUTopoInfo *topo_info,
+> +                                  const X86MachineState *x86ms)
 > +{
-> +    struct V9fsDirEnt *next = NULL;
+> +    MachineState *ms = MACHINE(x86ms);
 > +
-> +    for (; e; e = next) {
-> +        next = e->next;
-> +        g_free(e->dent);
-> +        g_free(e->st);
-> +        g_free(e);
-> +    }
+> +    topo_info->dies_per_pkg = x86ms->smp_dies;
+> +    topo_info->cores_per_die = ms->smp.cores;
+> +    topo_info->threads_per_core = ms->smp.threads;
 > +}
-> +
->  static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
->                                          int32_t max_count)
->  {
-> @@ -2331,54 +2319,53 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU
-> *pdu, V9fsFidState *fidp, V9fsString name;
->      int len, err = 0;
->      int32_t count = 0;
-> -    off_t saved_dir_pos;
->      struct dirent *dent;
-> +    struct stat *st;
-> +    struct V9fsDirEnt *entries = NULL;
-> 
-> -    /* save the directory position */
-> -    saved_dir_pos = v9fs_co_telldir(pdu, fidp);
-> -    if (saved_dir_pos < 0) {
-> -        return saved_dir_pos;
-> -    }
-> -
-> -    while (1) {
-> -        v9fs_readdir_lock(&fidp->fs.dir);
-> +    /*
-> +     * inode remapping requires the device id, which in turn might be
-> +     * different for different directory entries, so if inode remapping is
-> +     * enabled we have to make a full stat for each directory entry
-> +     */
-> +    const bool dostat = pdu->s->ctx.export_flags & V9FS_REMAP_INODES;
-> 
-> -        err = v9fs_co_readdir(pdu, fidp, &dent);
-> -        if (err || !dent) {
-> -            break;
-> -        }
-> -        v9fs_string_init(&name);
-> -        v9fs_string_sprintf(&name, "%s", dent->d_name);
-> -        if ((count + v9fs_readdir_data_size(&name)) > max_count) {
-> -            v9fs_readdir_unlock(&fidp->fs.dir);
-> +    /*
-> +     * Fetch all required directory entries altogether on a background IO
-> +     * thread from fs driver. We don't want to do that for each entry
-> +     * individually, because hopping between threads (this main IO thread
-> +     * and background IO driver thread) would sum up to huge latencies.
-> +     */
-> +    count = v9fs_co_readdir_lowlat(pdu, fidp, &entries, max_count, dostat);
-> +    if (count < 0) {
-> +        err = count;
-> +        count = 0;
-> +        goto out;
-> +    }
-> +    count = 0;
-> 
-> -            /* Ran out of buffer. Set dir back to old position and return
-> */ -            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
-> -            v9fs_string_free(&name);
-> -            return count;
-> -        }
-> +    for (struct V9fsDirEnt *e = entries; e; e = e->next) {
-> +        dent = e->dent;
-> 
->          if (pdu->s->ctx.export_flags & V9FS_REMAP_INODES) {
-> -            /*
-> -             * dirent_to_qid() implies expensive stat call for each entry,
-> -             * we must do that here though since inode remapping requires
-> -             * the device id, which in turn might be different for
-> -             * different entries; we cannot make any assumption to avoid
-> -             * that here.
-> -             */
-> -            err = dirent_to_qid(pdu, fidp, dent, &qid);
-> +            st = e->st;
-> +            /* e->st should never be NULL, but just to be sure */
-> +            if (!st) {
-> +                err = -1;
-> +                break;
-> +            }
-> +
-> +            /* remap inode */
-> +            err = stat_to_qid(pdu, st, &qid);
->              if (err < 0) {
-> -                v9fs_readdir_unlock(&fidp->fs.dir);
-> -                v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
-> -                v9fs_string_free(&name);
-> -                return err;
-> +                break;
->              }
->          } else {
->              /*
->               * Fill up just the path field of qid because the client uses
->               * only that. To fill the entire qid structure we will have
->               * to stat each dirent found, which is expensive. For the
-> -             * latter reason we don't call dirent_to_qid() here. Only
-> drawback +             * latter reason we don't call stat_to_qid() here.
-> Only drawback * is that no multi-device export detection of stat_to_qid() *
-> would be done and provided as error to the user here. But * user would get
-> that error anyway when accessing those @@ -2391,25 +2378,26 @@ static int
-> coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, qid.version
-> = 0;
->          }
-> 
-> +        v9fs_string_init(&name);
-> +        v9fs_string_sprintf(&name, "%s", dent->d_name);
-> +
->          /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
->          len = pdu_marshal(pdu, 11 + count, "Qqbs",
->                            &qid, dent->d_off,
->                            dent->d_type, &name);
-> 
-> -        v9fs_readdir_unlock(&fidp->fs.dir);
-> +        v9fs_string_free(&name);
-> 
->          if (len < 0) {
-> -            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
-> -            v9fs_string_free(&name);
-> -            return len;
-> +            err = len;
-> +            break;
->          }
-> +
->          count += len;
-> -        v9fs_string_free(&name);
-> -        saved_dir_pos = dent->d_off;
->      }
-> 
-> -    v9fs_readdir_unlock(&fidp->fs.dir);
-> -
-> +out:
-> +    v9fs_free_dirents(entries);
->      if (err < 0) {
->          return err;
->      }
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 6fffe44f5a..1dbb0ad189 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -215,6 +215,28 @@ static inline void v9fs_readdir_init(V9fsDir *dir)
->      qemu_mutex_init(&dir->readdir_mutex);
->  }
-> 
-> +/*
-> + * Type for 9p fs drivers' (a.k.a. 9p backends) result of readdir requests,
-> + * which is a chained list of directory entries.
-> + */
-> +typedef struct V9fsDirEnt {
-> +    /* mandatory (must not be NULL) information for all readdir requests */
-> +    struct dirent *dent;
-> +    /*
-> +     * optional (may be NULL): A full stat of each directory entry is just
-> +     * done if explicitly told to fs driver.
-> +     */
-> +    struct stat *st;
-> +    /*
-> +     * instead of an array, directory entries are always returned as
-> +     * chained list, that's because the amount of entries retrieved by fs
-> +     * drivers is dependent on the individual entries' name (since response
-> +     * messages are size limited), so the final amount cannot be estimated
-> +     * before hand
-> +     */
-> +    struct V9fsDirEnt *next;
-> +} V9fsDirEnt;
 > +
 >  /*
->   * Filled by fs driver on open and other
->   * calls.
-> @@ -419,6 +441,7 @@ void v9fs_path_init(V9fsPath *path);
->  void v9fs_path_free(V9fsPath *path);
->  void v9fs_path_sprintf(V9fsPath *path, const char *fmt, ...);
->  void v9fs_path_copy(V9fsPath *dst, const V9fsPath *src);
-> +size_t v9fs_readdir_response_size(V9fsString *name);
->  int v9fs_name_to_path(V9fsState *s, V9fsPath *dirpath,
->                        const char *name, V9fsPath *path);
->  int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-> diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
-> index 73f9a751e1..6ce7dc8cde 100644
-> --- a/hw/9pfs/codir.c
-> +++ b/hw/9pfs/codir.c
-> @@ -18,28 +18,189 @@
->  #include "qemu/main-loop.h"
->  #include "coth.h"
-> 
-> +/*
-> + * This is solely executed on a background IO thread.
-> + */
-> +static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent
-> **dent) +{
-> +    int err = 0;
-> +    V9fsState *s = pdu->s;
-> +    struct dirent *entry;
-> +
-> +    errno = 0;
-> +    entry = s->ops->readdir(&s->ctx, &fidp->fs);
-> +    if (!entry && errno) {
-> +        *dent = NULL;
-> +        err = -errno;
-> +    } else {
-> +        *dent = entry;
-> +    }
-> +    return err;
-> +}
-> +
-> +/*
-> + * TODO: This will be removed for performance reasons.
-> + * Use v9fs_co_readdir_lowlat() instead.
-> + */
->  int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
->                                   struct dirent **dent)
+>   * Calculates initial APIC ID for a specific CPU index
+>   *
+> @@ -68,13 +78,14 @@ static size_t pvh_start_addr;
+>  uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+>                                      unsigned int cpu_index)
 >  {
->      int err;
-> -    V9fsState *s = pdu->s;
-> 
->      if (v9fs_request_cancelled(pdu)) {
->          return -EINTR;
->      }
-> -    v9fs_co_run_in_worker(
-> -        {
-> -            struct dirent *entry;
-> +    v9fs_co_run_in_worker({
-> +        err = do_readdir(pdu, fidp, dent);
-> +    });
-> +    return err;
-> +}
+> -    MachineState *ms = MACHINE(x86ms);
+>      X86MachineClass *x86mc = X86_MACHINE_GET_CLASS(x86ms);
+> +    X86CPUTopoInfo topo_info;
+>      uint32_t correct_id;
+>      static bool warned;
+>  
+> -    correct_id = x86_apicid_from_cpu_idx(x86ms->smp_dies, ms->smp.cores,
+> -                                         ms->smp.threads, cpu_index);
+> +    init_topo_info(&topo_info, x86ms);
 > +
-> +/*
-> + * This is solely executed on a background IO thread.
-> + *
-> + * See v9fs_co_readdir_lowlat() (as its only user) below for details.
-> + */
-> +static int do_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
-> +                             struct V9fsDirEnt **entries,
-> +                             int32_t maxsize, bool dostat)
-> +{
-> +    V9fsState *s = pdu->s;
-> +    V9fsString name;
-> +    int len, err = 0;
-> +    int32_t size = 0;
-> +    off_t saved_dir_pos;
-> +    struct dirent *dent;
-> +    struct V9fsDirEnt *e = NULL;
-> +    V9fsPath path;
-> +    struct stat stbuf;
+> +    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
+>      if (x86mc->compat_apic_id_mode) {
+>          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+>              error_report("APIC IDs set in compatibility mode, "
+> @@ -145,19 +156,22 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>  {
+>     X86CPUTopoIDs topo_ids;
+>     X86MachineState *x86ms = X86_MACHINE(ms);
+> +   X86CPUTopoInfo topo_info;
 > +
-> +    *entries = NULL;
-> +    v9fs_path_init(&path);
-> +
-> +    /*
-> +     * TODO: Here should be a warn_report_once() if lock failed.
-> +     *
-> +     * With a good 9p client we should not get into concurrency here,
-> +     * because a good client would not use the same fid for concurrent
-> +     * requests. We do the lock here for safety reasons though. However
-> +     * the client would then suffer performance issues, so better log that
-> +     * issue here.
-> +     */
-> +    v9fs_readdir_lock(&fidp->fs.dir);
-> +
-> +    /* save the directory position */
-> +    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
-> +    if (saved_dir_pos < 0) {
-> +        err = saved_dir_pos;
-> +        goto out;
-> +    }
-> +
-> +    while (true) {
-> +        /* get directory entry from fs driver */
-> +        err = do_readdir(pdu, fidp, &dent);
-> +        if (err || !dent) {
-> +            break;
-> +        }
-> +
-> +        /*
-> +         * stop this loop as soon as it would exceed the allowed maximum
-> +         * response message size for the directory entries collected so
-> far, +         * because anything beyond that size would need to be
-> discarded by +         * 9p controller (main thread / top half) anyway
-> +         */
-> +        v9fs_string_init(&name);
-> +        v9fs_string_sprintf(&name, "%s", dent->d_name);
-> +        len = v9fs_readdir_response_size(&name);
-> +        v9fs_string_free(&name);
-> +        if (size + len > maxsize) {
-> +            /* this is not an error case actually */
-> +            break;
-> +        }
-> +
-> +        /* append next node to result chain */
-> +        if (!e) {
-> +            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
-> +        } else {
-> +            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
-> +        }
-> +        e->dent = g_malloc0(sizeof(struct dirent));
-> +        memcpy(e->dent, dent, sizeof(struct dirent));
-> 
-> -            errno = 0;
-> -            entry = s->ops->readdir(&s->ctx, &fidp->fs);
-> -            if (!entry && errno) {
-> +        /* perform a full stat() for directory entry if requested by caller
-> */ +        if (dostat) {
-> +            err = s->ops->name_to_path(
-> +                &s->ctx, &fidp->path, dent->d_name, &path
-> +            );
-> +            if (err < 0) {
->                  err = -errno;
-> -            } else {
-> -                *dent = entry;
-> -                err = 0;
-> +                break;
->              }
-> -        });
-> +
-> +            err = s->ops->lstat(&s->ctx, &path, &stbuf);
-> +            if (err < 0) {
-> +                err = -errno;
-> +                break;
-> +            }
-> +
-> +            e->st = g_malloc0(sizeof(struct stat));
-> +            memcpy(e->st, &stbuf, sizeof(struct stat));
-> +        }
-> +
-> +        size += len;
-> +        saved_dir_pos = dent->d_off;
-> +    }
-> +
-> +    /* restore (last) saved position */
-> +    s->ops->seekdir(&s->ctx, &fidp->fs, saved_dir_pos);
-> +
-> +out:
-> +    v9fs_readdir_unlock(&fidp->fs.dir);
-> +    v9fs_path_free(&path);
-> +    if (err < 0) {
-> +        return err;
-> +    }
-> +    return size;
-> +}
-> +
-> +/**
-> + * @brief Low latency variant of fs driver readdir handling.
-> + *
-> + * Retrieves the requested (max. amount of) directory entries from the fs
-> + * driver. This function must only be called by the main IO thread (top
-> half). + * Internally this function call will be dispatched to a background
-> IO thread + * (bottom half) where it is eventually executed by the fs
-> driver. + *
-> + * The old readdir implementation above just retrieves always one dir entry
-> + * per call. The problem of that implementation above is that latency is +
-> * added for (retrieval of) each directory entry, which in practice lead to
-> + * latencies of several hundred ms for readdir of only one directory. + *
-> + * This is avoided in this function by letting the fs driver retrieve all
-> + * required directory entries with only call of this function and hence
-> with + * only a single fs driver request.
-> + *
-> + * @param pdu - the causing 9p (T_readdir) client request
-> + * @param fidp - already opened directory where readdir shall be performed
-> on + * @param entries - output for directory entries (must not be NULL) + *
-> @param maxsize - maximum result message body size (in bytes)
-> + * @param dostat - whether a stat() should be performed and returned for
-> + *                 each directory entry
-> + * @returns resulting response message body size (in bytes) on success,
-> + *          negative error code otherwise
-> + */
-> +int coroutine_fn v9fs_co_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
-> +                                        struct V9fsDirEnt **entries,
-> +                                        int32_t maxsize, bool dostat)
-> +{
-> +    int err = 0;
-> +
-> +    if (v9fs_request_cancelled(pdu)) {
-> +        return -EINTR;
-> +    }
-> +    v9fs_co_run_in_worker({
-> +        err = do_readdir_lowlat(pdu, fidp, entries, maxsize, dostat);
-> +    });
->      return err;
+> +   init_topo_info(&topo_info, x86ms);
+>  
+>     assert(idx < ms->possible_cpus->len);
+>     x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> -                            x86ms->smp_dies, ms->smp.cores,
+> -                            ms->smp.threads, &topo_ids);
+> +                            &topo_info, &topo_ids);
+>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
 >  }
+>  
+>  const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>  {
+>      X86MachineState *x86ms = X86_MACHINE(ms);
+> -    int i;
+>      unsigned int max_cpus = ms->smp.max_cpus;
+> +    X86CPUTopoInfo topo_info;
+> +    int i;
+>  
+>      if (ms->possible_cpus) {
+>          /*
+> @@ -171,6 +185,9 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+>                                    sizeof(CPUArchId) * max_cpus);
+>      ms->possible_cpus->len = max_cpus;
+> +
+> +    init_topo_info(&topo_info, x86ms);
+> +
+>      for (i = 0; i < ms->possible_cpus->len; i++) {
+>          X86CPUTopoIDs topo_ids;
+>  
+> @@ -179,8 +196,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>          ms->possible_cpus->cpus[i].arch_id =
+>              x86_cpu_apic_id_from_index(x86ms, i);
+>          x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> -                                 x86ms->smp_dies, ms->smp.cores,
+> -                                 ms->smp.threads, &topo_ids);
+> +                                 &topo_info, &topo_ids);
+>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+>          if (x86ms->smp_dies > 1) {
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index 52def68610..7ea507f376 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -52,6 +52,12 @@ typedef struct X86CPUTopoIDs {
+>      unsigned smt_id;
+>  } X86CPUTopoIDs;
+>  
+> +typedef struct X86CPUTopoInfo {
+> +    unsigned dies_per_pkg;
+> +    unsigned cores_per_die;
+> +    unsigned threads_per_core;
+> +} X86CPUTopoInfo;
+> +
+>  /* Return the bit width needed for 'count' IDs
+>   */
+>  static unsigned apicid_bitwidth_for_count(unsigned count)
+> @@ -119,11 +125,13 @@ static inline unsigned apicid_pkg_offset(unsigned nr_dies,
+>   *
+>   * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
+>   */
+> -static inline apic_id_t apicid_from_topo_ids(unsigned nr_dies,
+> -                                             unsigned nr_cores,
+> -                                             unsigned nr_threads,
+> +static inline apic_id_t apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
+>                                               const X86CPUTopoIDs *topo_ids)
+>  {
+> +    unsigned nr_dies = topo_info->dies_per_pkg;
+> +    unsigned nr_cores = topo_info->cores_per_die;
+> +    unsigned nr_threads = topo_info->threads_per_core;
+> +
+>      return (topo_ids->pkg_id  <<
+>                 apicid_pkg_offset(nr_dies, nr_cores, nr_threads)) |
+>             (topo_ids->die_id  <<
+> @@ -136,12 +144,14 @@ static inline apic_id_t apicid_from_topo_ids(unsigned nr_dies,
+>  /* Calculate thread/core/package IDs for a specific topology,
+>   * based on (contiguous) CPU index
+>   */
+> -static inline void x86_topo_ids_from_idx(unsigned nr_dies,
+> -                                         unsigned nr_cores,
+> -                                         unsigned nr_threads,
+> +static inline void x86_topo_ids_from_idx(X86CPUTopoInfo *topo_info,
+>                                           unsigned cpu_index,
+>                                           X86CPUTopoIDs *topo_ids)
+>  {
+> +    unsigned nr_dies = topo_info->dies_per_pkg;
+> +    unsigned nr_cores = topo_info->cores_per_die;
+> +    unsigned nr_threads = topo_info->threads_per_core;
+> +
+>      topo_ids->pkg_id = cpu_index / (nr_dies * nr_cores * nr_threads);
+>      topo_ids->die_id = cpu_index / (nr_cores * nr_threads) % nr_dies;
+>      topo_ids->core_id = cpu_index / nr_threads % nr_cores;
+> @@ -152,11 +162,13 @@ static inline void x86_topo_ids_from_idx(unsigned nr_dies,
+>   * based on APIC ID
+>   */
+>  static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
+> -                                            unsigned nr_dies,
+> -                                            unsigned nr_cores,
+> -                                            unsigned nr_threads,
+> +                                            X86CPUTopoInfo *topo_info,
+>                                              X86CPUTopoIDs *topo_ids)
+>  {
+> +    unsigned nr_dies = topo_info->dies_per_pkg;
+> +    unsigned nr_cores = topo_info->cores_per_die;
+> +    unsigned nr_threads = topo_info->threads_per_core;
+> +
+>      topo_ids->smt_id = apicid &
+>              ~(0xFFFFFFFFUL << apicid_smt_width(nr_dies, nr_cores, nr_threads));
+>      topo_ids->core_id =
+> @@ -173,14 +185,12 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
+>   *
+>   * 'cpu_index' is a sequential, contiguous ID for the CPU.
+>   */
+> -static inline apic_id_t x86_apicid_from_cpu_idx(unsigned nr_dies,
+> -                                                unsigned nr_cores,
+> -                                                unsigned nr_threads,
+> +static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
+>                                                  unsigned cpu_index)
+>  {
+>      X86CPUTopoIDs topo_ids;
+> -    x86_topo_ids_from_idx(nr_dies, nr_cores, nr_threads, cpu_index, &topo_ids);
+> -    return apicid_from_topo_ids(nr_dies, nr_cores, nr_threads, &topo_ids);
+> +    x86_topo_ids_from_idx(topo_info, cpu_index, &topo_ids);
+> +    return apicid_from_topo_ids(topo_info, &topo_ids);
+>  }
+>  
+>  #endif /* HW_I386_TOPOLOGY_H */
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index 41fe37b8a3..22babcb3bb 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -21,6 +21,7 @@
+>  #include "exec/hwaddr.h"
+>  #include "qemu/notify.h"
+>  
+> +#include "hw/i386/topology.h"
+>  #include "hw/boards.h"
+>  #include "hw/nmi.h"
+>  #include "hw/isa/isa.h"
+> @@ -82,6 +83,8 @@ typedef struct {
+>  #define X86_MACHINE_CLASS(class) \
+>      OBJECT_CLASS_CHECK(X86MachineClass, class, TYPE_X86_MACHINE)
+>  
+> +void init_topo_info(X86CPUTopoInfo *topo_info, const X86MachineState *x86ms);
+> +
+>  uint32_t x86_cpu_apic_id_from_index(X86MachineState *pcms,
+>                                      unsigned int cpu_index);
+>  
 > 
-> diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
-> index c2cdc7a9ea..1249dbe6df 100644
-> --- a/hw/9pfs/coth.h
-> +++ b/hw/9pfs/coth.h
-> @@ -49,6 +49,9 @@
->  void co_run_in_worker_bh(void *);
->  int coroutine_fn v9fs_co_readlink(V9fsPDU *, V9fsPath *, V9fsString *);
->  int coroutine_fn v9fs_co_readdir(V9fsPDU *, V9fsFidState *, struct dirent
-> **); +int coroutine_fn v9fs_co_readdir_lowlat(V9fsPDU *, V9fsFidState *, + 
->                                       struct V9fsDirEnt **,
-> +                                        int32_t, bool);
->  off_t coroutine_fn v9fs_co_telldir(V9fsPDU *, V9fsFidState *);
->  void coroutine_fn v9fs_co_seekdir(V9fsPDU *, V9fsFidState *, off_t);
->  void coroutine_fn v9fs_co_rewinddir(V9fsPDU *, V9fsFidState *);
-
 
 
