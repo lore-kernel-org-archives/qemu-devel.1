@@ -8,81 +8,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB05EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393C5C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D531208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED24E208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:36:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JveSkupl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D531208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/dAdhr2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED24E208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmXj-0007QO-R3
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53440)
+	id 1jBmY2-0007ns-3e
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUF-0000rH-5m
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:29 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUF-0000sm-Q7
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUC-0008Mt-UJ
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUB-0008Jg-Hs
  for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:27 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:37376)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38883)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jBmUC-0008Km-La; Tue, 10 Mar 2020 17:32:24 -0400
-Received: by mail-wr1-x432.google.com with SMTP id 6so17787644wre.4;
- Tue, 10 Mar 2020 14:32:24 -0700 (PDT)
+ id 1jBmUB-0008If-7n; Tue, 10 Mar 2020 17:32:23 -0400
+Received: by mail-wr1-x441.google.com with SMTP id t11so17801335wrw.5;
+ Tue, 10 Mar 2020 14:32:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zay2CMCI6rS/TelvVAzMjELUkYNv61sz+75/jzgsL7Q=;
- b=JveSkupl+5eNSDTOIvs1Vko1i3mKsOZ6amDPx6oe1HbWU/7C32h4JyGO3WkCRvv/16
- TqV+9cpI9cl19++g1ze+4IYAga+O2FL95t2OOFZpKOQnfA/TUQ/NLxAiopref4mezztb
- qHdvwR7hrhayqIqut899vwlhxNXqLG1XOFaWjeE4dy10Yxh0ULnDk82sWJHsaQEdTTyP
- TovZpRlKq33BNDFvJpkLk5tpCmuT8xmobIkMidLgsVaGKK0onCQJGaqT+kEWZ6hvmJ/2
- dkGcJFDewSjY+e9nlGuxxOhd+qZTkHNmRJTM5S+ETsCtbtFlYVijkb1v3vScpBUfjAh6
- Y3gQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=9tU7GiAWsn34tp9Egx26pkWaPm9drEAZ61bp65pDk+A=;
+ b=D/dAdhr233Y+LFMf00hHyIJY3z3S/X+yzHn01rEZUecKauThA428vC9XjOO27InCVG
+ oIddc3q2yO+PWmZ/e7n87i/4sAd1XuUm5LdX0dFXGva2RGWktys/i76qJ5ksSw7Vjp69
+ OXpJI9/kptLCx24dYL0AF4sXWzLwyY8nC6ThNVBzA8Qj9i8sgVNFVJVHl9i7/0qjrLJu
+ i6yoFp+yVa3cVeklncIHAtly1kbJpu7HQ5bV0VUBeOJObs+mNxTt/uhgX3rCqlfVmhQP
+ SbTdlqmtaY1SIgsPENrOIqtX7Vsoyc8Do9HqTI11vc1wE0xO8DZtk8k0OFdOYeq4T5wc
+ 1CPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zay2CMCI6rS/TelvVAzMjELUkYNv61sz+75/jzgsL7Q=;
- b=POa1o6cUAcCSht+8isBIqVISalRzme7gKvrZQ7f2AKRvUL7qfPuNyHfWweKgnbo8ew
- YJbVAnlno5JLh8J4TqMdu1LZWvvGLlo3YXcCwR7aUS5tXDwzHfH8NpK5WOAkJ/h7AHtM
- mV08k9r9rR2LFS2AsQgZU4qAuI4o61D7raDCopCiXP6cujI/v1S5ruOJ3E0fI+rvK0zd
- gbreSVVPc9NP7v1GGhCxknQM97byn8gzbA8auI03ulkm26dmNzDaWwuZIW1YgrrMg7F7
- IxVDGaS7byOg/0SXdlFTXlwLRxwZsBsbZIIxcGc/bl5qCDr6POXOSW7HyDAyBNPydM8N
- n7MQ==
-X-Gm-Message-State: ANhLgQ32J90UozHuK6rYUG0DBn2MzDlkskMZVK1/gHGhKnIAAnQW3cxM
- SArFHdoBiXglCxyxssakmCSwpr/Ozh8=
-X-Google-Smtp-Source: ADFU+vvxwgH/KqZoiCrOIPjsRFVHRV6Tl6Ase3IamBRNx31BvNdPPDo/qXWFsBVt4S8Ch6hOHSDiSQ==
-X-Received: by 2002:adf:c648:: with SMTP id u8mr21346509wrg.185.1583875943160; 
- Tue, 10 Mar 2020 14:32:23 -0700 (PDT)
+ :references;
+ bh=9tU7GiAWsn34tp9Egx26pkWaPm9drEAZ61bp65pDk+A=;
+ b=M7TwRAJdnG9jdRJxZIf8ogmKsQTMR2+tW9YJl7Nhk5rn0DVPlmKtGES9/kc2xwbSbn
+ vIfrk+S6jyneGYi4RLDbd3OOA1c5Ox4AG8dPT23x6Sv8vQDMgmQhYzebAilEWCvgIZ8t
+ nWwfKXgTCEyqFi91ysjQyKpK+7ZlSRXMk8+sjops1wb2Vnri0VHQQQIpYAFCLeT+JQ2Z
+ KuDoGAqLRi8vgPQRM9GIDo4gTWTVcc+LJoFZi5bQdKUgnMHIeVjUDHwX3fTwq9aJCjT6
+ v0UZSsfGFWMy8TQvJ9X9Kekwl0pCiwDikh1vDYMihM06raweNoZzG8pJbdcTHn8LEZYD
+ W0+Q==
+X-Gm-Message-State: ANhLgQ3WLRCaDcVf6+nnQA2qG3dHWmLC+HyRXPKh6qIVx+jTcsq2MOl6
+ 9d1su1Kv3Ikwtd3zrTo2PQSHB0tD
+X-Google-Smtp-Source: ADFU+vu4wmlaZ4OS90Fz4zgzbz4S0Xqz+4nAGn8CTolQEcY1e1QEh0dvuBo0Cal4kC1ysJ+WH7xJzg==
+X-Received: by 2002:adf:f047:: with SMTP id t7mr31246147wro.371.1583875941297; 
+ Tue, 10 Mar 2020 14:32:21 -0700 (PDT)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.22
+ by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 14:32:22 -0700 (PDT)
+ Tue, 10 Mar 2020 14:32:20 -0700 (PDT)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 13/18] tests/boot_linux_console: Add a quick test for the
- OrangePi PC board
-Date: Tue, 10 Mar 2020 22:31:58 +0100
-Message-Id: <20200310213203.18730-14-nieklinnenbank@gmail.com>
+Subject: [PATCH v7 11/18] hw/arm/allwinner-h3: add SDRAM controller device
+Date: Tue, 10 Mar 2020 22:31:56 +0100
+Message-Id: <20200310213203.18730-12-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200310213203.18730-1-nieklinnenbank@gmail.com>
 References: <20200310213203.18730-1-nieklinnenbank@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,96 +90,638 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
  qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+In the Allwinner H3 SoC the SDRAM controller is responsible
+for interfacing with the external Synchronous Dynamic Random
+Access Memory (SDRAM). Types of memory that the SDRAM controller
+supports are DDR2/DDR3 and capacities of up to 2GiB. This commit
+adds emulation support of the Allwinner H3 SDRAM controller.
 
-This test boots a Linux kernel on a OrangePi PC board and verify
-the serial output is working.
-
-The kernel image and DeviceTree blob are built by the Armbian
-project (based on Debian):
-https://www.armbian.com/orange-pi-pc/
-
-If ARM is a target being built, "make check-acceptance" will
-automatically include this test by the use of the "arch:arm" tags.
-
-Alternatively, this test can be run using:
-
-  $ make check-venv
-  $ ./tests/venv/bin/avocado --show=console,app run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
-  JOB ID     : 2e4d15eceb13c33672af406f08171e6e9de1414a
-  JOB LOG    : ~/job-results/job-2019-12-17T05.46-2e4d15e/job.log
-  (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi:
-  console: Uncompressing Linux... done, booting the kernel.
-  console: Booting Linux on physical CPU 0x0
-  console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
-  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
-  console: CPU: div instructions available: patching division code
-  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
-  console: OF: fdt: Machine model: Xunlong Orange Pi PC
-  console: Memory policy: Data cache writealloc
-  console: OF: reserved mem: failed to allocate memory for node 'cma@4a000000'
-  console: cma: Failed to reserve 128 MiB
-  console: psci: probing for conduit method from DT.
-  console: psci: PSCIv0.2 detected in firmware.
-  console: psci: Using standard PSCI v0.2 function IDs
-  console: psci: Trusted OS migration not required
-  console: random: get_random_bytes called from start_kernel+0x8d/0x3c2 with crng_init=0
-  console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308 u73728
-  console: Built 1 zonelists, mobility grouping on.  Total pages: 32480
-  console: Kernel command line: printk.time=0 console=ttyS0,115200
-  PASS (8.59 s)
-  JOB TIME   : 8.81 s
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- tests/acceptance/boot_linux_console.py | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ include/hw/arm/allwinner-h3.h        |   5 +
+ include/hw/misc/allwinner-h3-dramc.h | 106 ++++++++
+ hw/arm/allwinner-h3.c                |  19 +-
+ hw/arm/orangepi.c                    |   6 +
+ hw/misc/allwinner-h3-dramc.c         | 358 +++++++++++++++++++++++++++
+ hw/misc/Makefile.objs                |   1 +
+ hw/misc/trace-events                 |  10 +
+ 7 files changed, 502 insertions(+), 3 deletions(-)
+ create mode 100644 include/hw/misc/allwinner-h3-dramc.h
+ create mode 100644 hw/misc/allwinner-h3-dramc.c
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 34d37eba3b..6f5af582f3 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -507,6 +507,31 @@ class BootLinuxConsole(Test):
-         exec_command_and_wait_for_pattern(self, 'reboot',
-                                                 'reboot: Restarting system')
+diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
+index d338003724..065d020c73 100644
+--- a/include/hw/arm/allwinner-h3.h
++++ b/include/hw/arm/allwinner-h3.h
+@@ -41,6 +41,7 @@
+ #include "hw/intc/arm_gic.h"
+ #include "hw/misc/allwinner-h3-ccu.h"
+ #include "hw/misc/allwinner-cpucfg.h"
++#include "hw/misc/allwinner-h3-dramc.h"
+ #include "hw/misc/allwinner-h3-sysctrl.h"
+ #include "hw/misc/allwinner-sid.h"
+ #include "hw/sd/allwinner-sdhost.h"
+@@ -80,6 +81,9 @@ enum {
+     AW_H3_UART2,
+     AW_H3_UART3,
+     AW_H3_EMAC,
++    AW_H3_DRAMCOM,
++    AW_H3_DRAMCTL,
++    AW_H3_DRAMPHY,
+     AW_H3_GIC_DIST,
+     AW_H3_GIC_CPU,
+     AW_H3_GIC_HYP,
+@@ -120,6 +124,7 @@ typedef struct AwH3State {
+     AwA10PITState timer;
+     AwH3ClockCtlState ccu;
+     AwCpuCfgState cpucfg;
++    AwH3DramCtlState dramc;
+     AwH3SysCtrlState sysctrl;
+     AwSidState sid;
+     AwSdHostState mmc0;
+diff --git a/include/hw/misc/allwinner-h3-dramc.h b/include/hw/misc/allwinner-h3-dramc.h
+new file mode 100644
+index 0000000000..bacdf236b7
+--- /dev/null
++++ b/include/hw/misc/allwinner-h3-dramc.h
+@@ -0,0 +1,106 @@
++/*
++ * Allwinner H3 SDRAM Controller emulation
++ *
++ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef HW_MISC_ALLWINNER_H3_DRAMC_H
++#define HW_MISC_ALLWINNER_H3_DRAMC_H
++
++#include "qom/object.h"
++#include "hw/sysbus.h"
++#include "exec/hwaddr.h"
++
++/**
++ * Constants
++ * @{
++ */
++
++/** Highest register address used by DRAMCOM module */
++#define AW_H3_DRAMCOM_REGS_MAXADDR  (0x804)
++
++/** Total number of known DRAMCOM registers */
++#define AW_H3_DRAMCOM_REGS_NUM      (AW_H3_DRAMCOM_REGS_MAXADDR / \
++                                     sizeof(uint32_t))
++
++/** Highest register address used by DRAMCTL module */
++#define AW_H3_DRAMCTL_REGS_MAXADDR  (0x88c)
++
++/** Total number of known DRAMCTL registers */
++#define AW_H3_DRAMCTL_REGS_NUM      (AW_H3_DRAMCTL_REGS_MAXADDR / \
++                                     sizeof(uint32_t))
++
++/** Highest register address used by DRAMPHY module */
++#define AW_H3_DRAMPHY_REGS_MAXADDR  (0x4)
++
++/** Total number of known DRAMPHY registers */
++#define AW_H3_DRAMPHY_REGS_NUM      (AW_H3_DRAMPHY_REGS_MAXADDR / \
++                                     sizeof(uint32_t))
++
++/** @} */
++
++/**
++ * Object model
++ * @{
++ */
++
++#define TYPE_AW_H3_DRAMC "allwinner-h3-dramc"
++#define AW_H3_DRAMC(obj) \
++    OBJECT_CHECK(AwH3DramCtlState, (obj), TYPE_AW_H3_DRAMC)
++
++/** @} */
++
++/**
++ * Allwinner H3 SDRAM Controller object instance state.
++ */
++typedef struct AwH3DramCtlState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    /** Physical base address for start of RAM */
++    hwaddr ram_addr;
++
++    /** Total RAM size in megabytes */
++    uint32_t ram_size;
++
++    /**
++     * @name Memory Regions
++     * @{
++     */
++
++    MemoryRegion row_mirror;       /**< Simulates rows for RAM size detection */
++    MemoryRegion row_mirror_alias; /**< Alias of the row which is mirrored */
++    MemoryRegion dramcom_iomem;    /**< DRAMCOM module I/O registers */
++    MemoryRegion dramctl_iomem;    /**< DRAMCTL module I/O registers */
++    MemoryRegion dramphy_iomem;    /**< DRAMPHY module I/O registers */
++
++    /** @} */
++
++    /**
++     * @name Hardware Registers
++     * @{
++     */
++
++    uint32_t dramcom[AW_H3_DRAMCOM_REGS_NUM]; /**< Array of DRAMCOM registers */
++    uint32_t dramctl[AW_H3_DRAMCTL_REGS_NUM]; /**< Array of DRAMCTL registers */
++    uint32_t dramphy[AW_H3_DRAMPHY_REGS_NUM] ;/**< Array of DRAMPHY registers */
++
++    /** @} */
++
++} AwH3DramCtlState;
++
++#endif /* HW_MISC_ALLWINNER_H3_DRAMC_H */
+diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+index 56b5c563a8..0e0fea6223 100644
+--- a/hw/arm/allwinner-h3.c
++++ b/hw/arm/allwinner-h3.c
+@@ -56,6 +56,9 @@ const hwaddr allwinner_h3_memmap[] = {
+     [AW_H3_UART2]      = 0x01c28800,
+     [AW_H3_UART3]      = 0x01c28c00,
+     [AW_H3_EMAC]       = 0x01c30000,
++    [AW_H3_DRAMCOM]    = 0x01c62000,
++    [AW_H3_DRAMCTL]    = 0x01c63000,
++    [AW_H3_DRAMPHY]    = 0x01c65000,
+     [AW_H3_GIC_DIST]   = 0x01c81000,
+     [AW_H3_GIC_CPU]    = 0x01c82000,
+     [AW_H3_GIC_HYP]    = 0x01c84000,
+@@ -110,9 +113,6 @@ struct AwH3Unimplemented {
+     { "scr",       0x01c2c400, 1 * KiB },
+     { "gpu",       0x01c40000, 64 * KiB },
+     { "hstmr",     0x01c60000, 4 * KiB },
+-    { "dramcom",   0x01c62000, 4 * KiB },
+-    { "dramctl0",  0x01c63000, 4 * KiB },
+-    { "dramphy0",  0x01c65000, 4 * KiB },
+     { "spi0",      0x01c68000, 4 * KiB },
+     { "spi1",      0x01c69000, 4 * KiB },
+     { "csi",       0x01cb0000, 320 * KiB },
+@@ -229,6 +229,13 @@ static void allwinner_h3_init(Object *obj)
  
-+    def test_arm_orangepi(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:orangepi-pc
-+        """
-+        deb_url = ('https://apt.armbian.com/pool/main/l/'
-+                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-+        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        kernel_path = self.extract_from_deb(deb_path,
-+                                            '/boot/vmlinuz-4.20.7-sunxi')
-+        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-+        dtb_path = self.extract_from_deb(deb_path, dtb_path)
+     sysbus_init_child_obj(obj, "emac", &s->emac, sizeof(s->emac),
+                           TYPE_AW_SUN8I_EMAC);
 +
-+        self.vm.set_console()
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200n8 '
-+                               'earlycon=uart,mmio32,0x1c28000')
-+        self.vm.add_args('-kernel', kernel_path,
-+                         '-dtb', dtb_path,
-+                         '-append', kernel_command_line)
-+        self.vm.launch()
-+        console_pattern = 'Kernel command line: %s' % kernel_command_line
-+        self.wait_for_console_pattern(console_pattern)
++    sysbus_init_child_obj(obj, "dramc", &s->dramc, sizeof(s->dramc),
++                          TYPE_AW_H3_DRAMC);
++    object_property_add_alias(obj, "ram-addr", OBJECT(&s->dramc),
++                             "ram-addr", &error_abort);
++    object_property_add_alias(obj, "ram-size", OBJECT(&s->dramc),
++                              "ram-size", &error_abort);
+ }
+ 
+ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+@@ -413,6 +420,12 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+                    qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART3),
+                    115200, serial_hd(3), DEVICE_NATIVE_ENDIAN);
+ 
++    /* DRAMC */
++    qdev_init_nofail(DEVICE(&s->dramc));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 0, s->memmap[AW_H3_DRAMCOM]);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 1, s->memmap[AW_H3_DRAMCTL]);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 2, s->memmap[AW_H3_DRAMPHY]);
 +
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
+     /* Unimplemented devices */
+     for (i = 0; i < ARRAY_SIZE(unimplemented); i++) {
+         create_unimplemented_device(unimplemented[i].device_name,
+diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+index 1c32d2898f..be05a533b5 100644
+--- a/hw/arm/orangepi.c
++++ b/hw/arm/orangepi.c
+@@ -81,6 +81,12 @@ static void orangepi_init(MachineState *machine)
+     /* Setup EMAC properties */
+     object_property_set_int(OBJECT(&h3->emac), 1, "phy-addr", &error_abort);
+ 
++    /* DRAMC */
++    object_property_set_uint(OBJECT(h3), h3->memmap[AW_H3_SDRAM],
++                             "ram-addr", &error_abort);
++    object_property_set_int(OBJECT(h3), machine->ram_size / MiB, "ram-size",
++                            &error_abort);
++
+     /* Mark H3 object realized */
+     object_property_set_bool(OBJECT(h3), true, "realized", &error_abort);
+ 
+diff --git a/hw/misc/allwinner-h3-dramc.c b/hw/misc/allwinner-h3-dramc.c
+new file mode 100644
+index 0000000000..2b5260260e
+--- /dev/null
++++ b/hw/misc/allwinner-h3-dramc.c
+@@ -0,0 +1,358 @@
++/*
++ * Allwinner H3 SDRAM Controller emulation
++ *
++ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu/error-report.h"
++#include "hw/sysbus.h"
++#include "migration/vmstate.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "exec/address-spaces.h"
++#include "hw/qdev-properties.h"
++#include "qapi/error.h"
++#include "hw/misc/allwinner-h3-dramc.h"
++#include "trace.h"
++
++#define REG_INDEX(offset)    (offset / sizeof(uint32_t))
++
++/* DRAMCOM register offsets */
++enum {
++    REG_DRAMCOM_CR    = 0x0000, /* Control Register */
++};
++
++/* DRAMCTL register offsets */
++enum {
++    REG_DRAMCTL_PIR   = 0x0000, /* PHY Initialization Register */
++    REG_DRAMCTL_PGSR  = 0x0010, /* PHY General Status Register */
++    REG_DRAMCTL_STATR = 0x0018, /* Status Register */
++};
++
++/* DRAMCTL register flags */
++enum {
++    REG_DRAMCTL_PGSR_INITDONE = (1 << 0),
++};
++
++enum {
++    REG_DRAMCTL_STATR_ACTIVE  = (1 << 0),
++};
++
++static void allwinner_h3_dramc_map_rows(AwH3DramCtlState *s, uint8_t row_bits,
++                                        uint8_t bank_bits, uint16_t page_size)
++{
++    /*
++     * This function simulates row addressing behavior when bootloader
++     * software attempts to detect the amount of available SDRAM. In U-Boot
++     * the controller is configured with the widest row addressing available.
++     * Then a pattern is written to RAM at an offset on the row boundary size.
++     * If the value read back equals the value read back from the
++     * start of RAM, the bootloader knows the amount of row bits.
++     *
++     * This function inserts a mirrored memory region when the configured row
++     * bits are not matching the actual emulated memory, to simulate the
++     * same behavior on hardware as expected by the bootloader.
++     */
++    uint8_t row_bits_actual = 0;
++
++    /* Calculate the actual row bits using the ram_size property */
++    for (uint8_t i = 8; i < 12; i++) {
++        if (1 << i == s->ram_size) {
++            row_bits_actual = i + 3;
++            break;
++        }
++    }
++
++    if (s->ram_size == (1 << (row_bits - 3))) {
++        /* When row bits is the expected value, remove the mirror */
++        memory_region_set_enabled(&s->row_mirror_alias, false);
++        trace_allwinner_h3_dramc_rowmirror_disable();
++
++    } else if (row_bits_actual) {
++        /* Row bits not matching ram_size, install the rows mirror */
++        hwaddr row_mirror = s->ram_addr + ((1 << (row_bits_actual +
++                                                  bank_bits)) * page_size);
++
++        memory_region_set_enabled(&s->row_mirror_alias, true);
++        memory_region_set_address(&s->row_mirror_alias, row_mirror);
++
++        trace_allwinner_h3_dramc_rowmirror_enable(row_mirror);
++    }
++}
++
++static uint64_t allwinner_h3_dramcom_read(void *opaque, hwaddr offset,
++                                          unsigned size)
++{
++    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    if (idx >= AW_H3_DRAMCOM_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return 0;
++    }
++
++    trace_allwinner_h3_dramcom_read(offset, s->dramcom[idx], size);
++
++    return s->dramcom[idx];
++}
++
++static void allwinner_h3_dramcom_write(void *opaque, hwaddr offset,
++                                       uint64_t val, unsigned size)
++{
++    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    trace_allwinner_h3_dramcom_write(offset, val, size);
++
++    if (idx >= AW_H3_DRAMCOM_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return;
++    }
++
++    switch (offset) {
++    case REG_DRAMCOM_CR:   /* Control Register */
++        allwinner_h3_dramc_map_rows(s, ((val >> 4) & 0xf) + 1,
++                                       ((val >> 2) & 0x1) + 2,
++                                       1 << (((val >> 8) & 0xf) + 3));
++        break;
++    default:
++        break;
++    };
++
++    s->dramcom[idx] = (uint32_t) val;
++}
++
++static uint64_t allwinner_h3_dramctl_read(void *opaque, hwaddr offset,
++                                          unsigned size)
++{
++    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    if (idx >= AW_H3_DRAMCTL_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return 0;
++    }
++
++    trace_allwinner_h3_dramctl_read(offset, s->dramctl[idx], size);
++
++    return s->dramctl[idx];
++}
++
++static void allwinner_h3_dramctl_write(void *opaque, hwaddr offset,
++                                       uint64_t val, unsigned size)
++{
++    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    trace_allwinner_h3_dramctl_write(offset, val, size);
++
++    if (idx >= AW_H3_DRAMCTL_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return;
++    }
++
++    switch (offset) {
++    case REG_DRAMCTL_PIR:    /* PHY Initialization Register */
++        s->dramctl[REG_INDEX(REG_DRAMCTL_PGSR)] |= REG_DRAMCTL_PGSR_INITDONE;
++        s->dramctl[REG_INDEX(REG_DRAMCTL_STATR)] |= REG_DRAMCTL_STATR_ACTIVE;
++        break;
++    default:
++        break;
++    }
++
++    s->dramctl[idx] = (uint32_t) val;
++}
++
++static uint64_t allwinner_h3_dramphy_read(void *opaque, hwaddr offset,
++                                          unsigned size)
++{
++    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    if (idx >= AW_H3_DRAMPHY_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return 0;
++    }
++
++    trace_allwinner_h3_dramphy_read(offset, s->dramphy[idx], size);
++
++    return s->dramphy[idx];
++}
++
++static void allwinner_h3_dramphy_write(void *opaque, hwaddr offset,
++                                       uint64_t val, unsigned size)
++{
++    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    trace_allwinner_h3_dramphy_write(offset, val, size);
++
++    if (idx >= AW_H3_DRAMPHY_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return;
++    }
++
++    s->dramphy[idx] = (uint32_t) val;
++}
++
++static const MemoryRegionOps allwinner_h3_dramcom_ops = {
++    .read = allwinner_h3_dramcom_read,
++    .write = allwinner_h3_dramcom_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++    .impl.min_access_size = 4,
++};
++
++static const MemoryRegionOps allwinner_h3_dramctl_ops = {
++    .read = allwinner_h3_dramctl_read,
++    .write = allwinner_h3_dramctl_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++    .impl.min_access_size = 4,
++};
++
++static const MemoryRegionOps allwinner_h3_dramphy_ops = {
++    .read = allwinner_h3_dramphy_read,
++    .write = allwinner_h3_dramphy_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++    .impl.min_access_size = 4,
++};
++
++static void allwinner_h3_dramc_reset(DeviceState *dev)
++{
++    AwH3DramCtlState *s = AW_H3_DRAMC(dev);
++
++    /* Set default values for registers */
++    memset(&s->dramcom, 0, sizeof(s->dramcom));
++    memset(&s->dramctl, 0, sizeof(s->dramctl));
++    memset(&s->dramphy, 0, sizeof(s->dramphy));
++}
++
++static void allwinner_h3_dramc_realize(DeviceState *dev, Error **errp)
++{
++    AwH3DramCtlState *s = AW_H3_DRAMC(dev);
++
++    /* Only power of 2 RAM sizes from 256MiB up to 2048MiB are supported */
++    for (uint8_t i = 8; i < 13; i++) {
++        if (1 << i == s->ram_size) {
++            break;
++        } else if (i == 12) {
++            error_report("%s: ram-size %u MiB is not supported",
++                          __func__, s->ram_size);
++            exit(1);
++        }
++    }
++
++    /* Setup row mirror mappings */
++    memory_region_init_ram(&s->row_mirror, OBJECT(s),
++                           "allwinner-h3-dramc.row-mirror",
++                            4 * KiB, &error_abort);
++    memory_region_add_subregion_overlap(get_system_memory(), s->ram_addr,
++                                       &s->row_mirror, 10);
++
++    memory_region_init_alias(&s->row_mirror_alias, OBJECT(s),
++                            "allwinner-h3-dramc.row-mirror-alias",
++                            &s->row_mirror, 0, 4 * KiB);
++    memory_region_add_subregion_overlap(get_system_memory(),
++                                        s->ram_addr + 1 * MiB,
++                                       &s->row_mirror_alias, 10);
++    memory_region_set_enabled(&s->row_mirror_alias, false);
++}
++
++static void allwinner_h3_dramc_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    AwH3DramCtlState *s = AW_H3_DRAMC(obj);
++
++    /* DRAMCOM registers */
++    memory_region_init_io(&s->dramcom_iomem, OBJECT(s),
++                          &allwinner_h3_dramcom_ops, s,
++                           TYPE_AW_H3_DRAMC, 4 * KiB);
++    sysbus_init_mmio(sbd, &s->dramcom_iomem);
++
++    /* DRAMCTL registers */
++    memory_region_init_io(&s->dramctl_iomem, OBJECT(s),
++                          &allwinner_h3_dramctl_ops, s,
++                           TYPE_AW_H3_DRAMC, 4 * KiB);
++    sysbus_init_mmio(sbd, &s->dramctl_iomem);
++
++    /* DRAMPHY registers */
++    memory_region_init_io(&s->dramphy_iomem, OBJECT(s),
++                          &allwinner_h3_dramphy_ops, s,
++                          TYPE_AW_H3_DRAMC, 4 * KiB);
++    sysbus_init_mmio(sbd, &s->dramphy_iomem);
++}
++
++static Property allwinner_h3_dramc_properties[] = {
++    DEFINE_PROP_UINT64("ram-addr", AwH3DramCtlState, ram_addr, 0x0),
++    DEFINE_PROP_UINT32("ram-size", AwH3DramCtlState, ram_size, 256 * MiB),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static const VMStateDescription allwinner_h3_dramc_vmstate = {
++    .name = "allwinner-h3-dramc",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(dramcom, AwH3DramCtlState, AW_H3_DRAMCOM_REGS_NUM),
++        VMSTATE_UINT32_ARRAY(dramctl, AwH3DramCtlState, AW_H3_DRAMCTL_REGS_NUM),
++        VMSTATE_UINT32_ARRAY(dramphy, AwH3DramCtlState, AW_H3_DRAMPHY_REGS_NUM),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void allwinner_h3_dramc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = allwinner_h3_dramc_reset;
++    dc->vmsd = &allwinner_h3_dramc_vmstate;
++    dc->realize = allwinner_h3_dramc_realize;
++    device_class_set_props(dc, allwinner_h3_dramc_properties);
++}
++
++static const TypeInfo allwinner_h3_dramc_info = {
++    .name          = TYPE_AW_H3_DRAMC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_init = allwinner_h3_dramc_init,
++    .instance_size = sizeof(AwH3DramCtlState),
++    .class_init    = allwinner_h3_dramc_class_init,
++};
++
++static void allwinner_h3_dramc_register(void)
++{
++    type_register_static(&allwinner_h3_dramc_info);
++}
++
++type_init(allwinner_h3_dramc_register)
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index daa734036e..68aae2eabb 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -30,6 +30,7 @@ common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
+ 
+ common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
+ obj-$(CONFIG_ALLWINNER_H3) += allwinner-cpucfg.o
++common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-dramc.o
+ common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
+ common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-sid.o
+ common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 4f38328d9c..a5862b2bed 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -5,6 +5,16 @@ allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t reset_addr) "id %u, reset_ad
+ allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ 
++# allwinner-h3-dramc.c
++allwinner_h3_dramc_rowmirror_disable(void) "Disable row mirror"
++allwinner_h3_dramc_rowmirror_enable(uint64_t addr) "Enable row mirror: addr 0x%" PRIx64
++allwinner_h3_dramcom_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_h3_dramcom_write(uint64_t offset, uint64_t data, unsigned size) "Write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_h3_dramctl_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_h3_dramctl_write(uint64_t offset, uint64_t data, unsigned size) "Write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_h3_dramphy_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++allwinner_h3_dramphy_write(uint64_t offset, uint64_t data, unsigned size) "write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++
+ # allwinner-sid.c
+ allwinner_sid_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ allwinner_sid_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
 -- 
 2.17.1
 
