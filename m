@@ -2,63 +2,82 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA819C3F2D0
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7181C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C0B2467F
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:44:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C0B2467F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AFF692467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:46:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3xGZfze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF692467D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBbR7-00088A-QG
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54581)
+	id 1jBbSn-0000nf-TJ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1jBbQS-0007ce-Kc
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:43:49 -0400
+ (envelope-from <berrange@redhat.com>) id 1jBbS0-0000L7-J5
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1jBbQR-0003bI-69
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:43:48 -0400
-Received: from 14.mo6.mail-out.ovh.net ([46.105.56.113]:43690)
+ (envelope-from <berrange@redhat.com>) id 1jBbRy-0006Wd-Qs
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:45:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34381
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jBbQQ-0003TQ-VB
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:43:47 -0400
-Received: from player691.ha.ovh.net (unknown [10.108.54.119])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 68CE8203BBD
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 10:43:44 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player691.ha.ovh.net (Postfix) with ESMTPSA id 07B2D1054117A;
- Tue, 10 Mar 2020 09:43:32 +0000 (UTC)
-Date: Tue, 10 Mar 2020 10:43:29 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 1/2] spapr: Disable legacy virtio devices for
- pseries-5.0 and later
-Message-ID: <20200310104329.3dd232d2@bahia.home>
-In-Reply-To: <20200305113146.6850f04b@bahia.home>
-References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
- <20200305043009.611636-2-david@gibson.dropbear.id.au>
- <20200305113146.6850f04b@bahia.home>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jBbRy-0006VK-Mt
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:45:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583833522;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hvLrF2Oq+YMGExKE3Cs9Jj7uDIVNRUS+ooAv7RFUWTc=;
+ b=C3xGZfzeLVXsK6s8MGxmzbXWKjnHnKSjmPBnzIT2OpWOr2T85EMc/mqaz472/ecr7k5gCe
+ YXzrrPpeEOOD8po4YThe90yJ+GLaJKxPpentnMlGr7qBbvHtB8FPIe4ncVcjnDOkjOdkYV
+ jcXqyX4A18E5stD6xfE7y5DyVIh6vns=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-yWeerhgtOXq6y4xa98svnA-1; Tue, 10 Mar 2020 05:45:15 -0400
+X-MC-Unique: yWeerhgtOXq6y4xa98svnA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 904F2107B7D4;
+ Tue, 10 Mar 2020 09:45:14 +0000 (UTC)
+Received: from redhat.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44BD119C58;
+ Tue, 10 Mar 2020 09:45:11 +0000 (UTC)
+Date: Tue, 10 Mar 2020 09:45:08 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH v2] qom-qmp-cmds: fix two memleaks in qmp_object_add
+Message-ID: <20200310094508.GC3234052@redhat.com>
+References: <20200310064640.5059-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 7011823147303279078
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvtddgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <20200310064640.5059-1-pannengyuan@huawei.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.56.113
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,137 +89,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, mst@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
- paulus@samba.org, clg@kaod.org, mdroth@us.ibm.com, qemu-ppc@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: pbonzini@redhat.com, zhang.zhanghailiang@huawei.com, euler.robot@huawei.com,
+ ehabkost@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Mar 2020 11:31:46 +0100
-Greg Kurz <groug@kaod.org> wrote:
+On Tue, Mar 10, 2020 at 02:46:40PM +0800, Pan Nengyuan wrote:
+> 'type/id' forgot to free in qmp_object_add, this patch fix that.
+>=20
+> The leak stack:
+> Direct leak of 84 byte(s) in 6 object(s) allocated from:
+>     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
+8)
+>     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
+>     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
+>     #3 0x56344954e692 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
+qom/qom-qmp-cmds.c:258
+>     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
+/qapi/qmp-dispatch.c:132
+>     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
+pi/qmp-dispatch.c:175
+>     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
+/qemu/monitor/qmp.c:145
+>     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
+_test/qemu/monitor/qmp.c:234
+>     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
+l/async.c:136
+>=20
+> Direct leak of 54 byte(s) in 6 object(s) allocated from:
+>     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
+8)
+>     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
+>     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
+>     #3 0x56344954e6c4 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
+qom/qom-qmp-cmds.c:267
+>     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
+/qapi/qmp-dispatch.c:132
+>     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
+pi/qmp-dispatch.c:175
+>     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
+/qemu/monitor/qmp.c:145
+>     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
+_test/qemu/monitor/qmp.c:234
+>     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
+l/async.c:136
+>=20
+> Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+> v2->v1:
+> - do not store both a const and non-const string in the same variable, ch=
+ange it to a non-const string.
+>   (Suggested by Daniel P. Berrang=C3=A9)
+> ---
+>  qom/qom-qmp-cmds.c | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
 
-> On Thu,  5 Mar 2020 15:30:08 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
-> 
-> > PAPR specifies a kind of odd, paravirtualized PCI bus, which looks to
-> > the guess mostly like classic PCI, even if some of the individual
-> > devices on the bus are PCI Express.  One consequence of that is that
-> > virtio-pci devices still default to being in transitional mode, though
-> > legacy mode is now disabled by default on current q35 x86 machine
-> > types.
-> > 
-> > Legacy mode virtio devices aren't really necessary any more, and are
-> > causing some problems for future changes.  Therefore, for the
-> > pseries-5.0 machine type (and onwards), switch to modern-only
-> > virtio-pci devices by default.
-> > 
-> > This does mean we no longer support guest kernels prior to 4.0, unless
-> > they have modern virtio support backported (which some distro kernels
-> > like that in RHEL7 do).
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> 
-> FWIW, I could test the following:
-> - allows a RHEL7 guest with pre 4.0 kernel to boot, as mentioned
->   in the changelog
-> - breaks boot of older RHEL 6.10 guests as expected
-> - allows migration of older machine types to/from QEMU 4.2
-> 
-> Tested-by: Greg Kurz <groug@kaod.org>
-> 
-
-Wait... I gave a try to virtiofsd and there's a problem:
-
-$ ./ppc64-softmmu/qemu-system-ppc64 -device vhost-user-fs-pci
-Unexpected error in object_property_find() at /home/greg/Work/qemu/qemu-ppc/qom/object.c:1231:
-qemu-system-ppc64: -device vhost-user-fs-pci: can't apply global virtio-pci.disable-legacy=on: Property '.disable-legacy' not found
-Aborted (core dumped)
-
-It is still not possible to set the disable-legacy prop on the
-vhost-user-fs-pci device, even without this patch, but QEMU
-doesn't abort:
-
-$ ./ppc64-softmmu/qemu-system-ppc64 -device vhost-user-fs-pci -global virtio-pci.disable-legacy=on
-qemu-system-ppc64: -device vhost-user-fs-pci: can't apply global virtio-pci.disable-legacy=on: Property '.disable-legacy' not found
-$
-
-It seems to be related to the fact that vhost-user-fs-pci is a non-transitional
-only device, as shown with this workaround:
-
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4574,7 +4574,7 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
-      * class since it doesn't have a compat_props.
-      */
-     static GlobalProperty compat[] = {
--        { TYPE_VIRTIO_PCI, "disable-legacy", "on", },
-+        { TYPE_VIRTIO_PCI "-transitional", "disable-legacy", "on", },
-     };
- 
-     mc->alias = "pseries";
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-but there's probably a better way to address this.
-
-MST, Any suggestion ?
-
-> >  hw/ppc/spapr.c | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 2eb0d8f70d..3cfc98ac61 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -65,6 +65,7 @@
-> >  
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/scsi/scsi.h"
-> > +#include "hw/virtio/virtio-pci.h"
-> >  #include "hw/virtio/virtio-scsi.h"
-> >  #include "hw/virtio/vhost-scsi-common.h"
-> >  
-> > @@ -4566,8 +4567,20 @@ static const TypeInfo spapr_machine_info = {
-> >  
-> >  static void spapr_machine_latest_class_options(MachineClass *mc)
-> >  {
-> > +    /*
-> > +     * Most defaults for the latest behaviour are inherited from the
-> > +     * base class, but we need to override the (non ppc specific)
-> > +     * default behaviour for virtio.  We can't do that from the base
-> > +     * class since it doesn't have a compat_props.
-> > +     */
-> > +    static GlobalProperty compat[] = {
-> > +        { TYPE_VIRTIO_PCI, "disable-legacy", "on", },
-> > +    };
-> > +
-> >      mc->alias = "pseries";
-> >      mc->is_default = true;
-> > +
-> > +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> >  }
-> >  
-> >  #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)                 \
-> > @@ -4607,6 +4620,9 @@ DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
-> >  static void spapr_machine_4_2_class_options(MachineClass *mc)
-> >  {
-> >      SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
-> > +    static GlobalProperty compat[] = {
-> > +        { TYPE_VIRTIO_PCI, "disable-legacy", "auto" },
-> > +    };
-> >  
-> >      spapr_machine_5_0_class_options(mc);
-> >      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
-> > @@ -4614,6 +4630,7 @@ static void spapr_machine_4_2_class_options(MachineClass *mc)
-> >      smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
-> >      smc->rma_limit = 16 * GiB;
-> >      mc->nvdimm_supported = false;
-> > +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> >  }
-> >  
-> >  DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
-> 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
