@@ -2,72 +2,94 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7937FC10F25
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5A9C10F25
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48D9B24654
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:35:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D9B24654
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 664DA2465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:39:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="X/Qeqwgv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664DA2465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBSrW-0007Gg-Fn
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:35:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40593)
+	id 1jBSvP-0000fS-JB
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:39:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jBSqt-0006s0-Fl
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:34:33 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBSuZ-000805-P2
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:38:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jBSqr-0000gH-WD
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:34:31 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3194 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jBSqr-0000Zv-Dj
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:34:29 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id D8FD248FFCB34C5681FE;
- Tue, 10 Mar 2020 08:34:22 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.208) with Microsoft SMTP Server (TLS) id 14.3.487.0; Tue, 10 Mar
- 2020 08:34:14 +0800
-Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
- in mac_via
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Markus Armbruster
- <armbru@redhat.com>
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <20200305065422.12707-3-pannengyuan@huawei.com>
- <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
- <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
- <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
- <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
- <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
- <87a74pso48.fsf@dusky.pond.sub.org>
- <2ff8e8e8-a281-1d50-417d-96383240c2df@huawei.com>
- <87ftehd39i.fsf@dusky.pond.sub.org>
- <4fe9c8c9-7dd4-0a6e-15f5-9006ea27744a@ilande.co.uk>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <886f92bc-6226-b1f3-dbe2-1367bfc84547@huawei.com>
-Date: Tue, 10 Mar 2020 08:34:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <liran.alon@oracle.com>) id 1jBSuY-00059D-6d
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:38:19 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:38366)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBSuX-00057r-U1
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:38:18 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02A0We7I023879;
+ Tue, 10 Mar 2020 00:38:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=fRLOQ0i2fa3f5CcKlbY/dGaHuzyDTPmiV0AbAqY4DZE=;
+ b=X/QeqwgvYReMPzOjLUs8on/9ZIG6BBQfXf6P2Me6SxrhZEEEL7Y8BNPhUnhmbqxBMRVt
+ XUbhaqwLEuHlBGa73irfvtMFy5QD/oapmcJhKcajzyXEhiWN7W1lrNwjiLnjQJhsBHw3
+ KhV5FccCmytoHkIQUm/nv76PFnQKNcd0cZ86uu16EctijpPXVE9wS6AjlGOy3gS4IARI
+ rz68OZiXpcZB4sZ3SjOEDN3uRqGk/sgsnnXJSK2H8Vh3oydozjlAk1oGCB6lRBHiamjK
+ u1g0mH0m+058ryQFR7ubuHxTlEOMMoUUwOazaqHwGgb7hRl4DLmjYbwQxEU+eNvv7tze eQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2ym3jqj91w-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 00:38:15 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02A0VRHn173226;
+ Tue, 10 Mar 2020 00:38:14 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2ymun85jt6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 00:38:14 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02A0cDDL001873;
+ Tue, 10 Mar 2020 00:38:13 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 09 Mar 2020 17:38:12 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] i386/kvm: Add CPU property to expose VMware CPUID signature
+Date: Tue, 10 Mar 2020 02:40:17 +0200
+Message-Id: <20200310004017.100484-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <4fe9c8c9-7dd4-0a6e-15f5-9006ea27744a@ilande.co.uk>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ malwarescore=0
+ mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=1 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100000
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ clxscore=1011
+ priorityscore=1501 mlxscore=0 phishscore=0 mlxlogscore=999 impostorscore=0
+ bulkscore=0 spamscore=0 suspectscore=1 lowpriorityscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100000
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,195 +101,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU
- Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>,
- Euler Robot <euler.robot@huawei.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: pbonzini@redhat.com, mtosatti@redhat.com,
+ Liran Alon <liran.alon@oracle.com>, ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Some guests are only familiar with VMware PV interface. Therefore, in
+order for these guests to run properly on KVM, we need to be able to
+expose VMware main CPUID leaf. i.e. leaf 0x40000000.
 
+E.g. Without exposing this VMware CPUID leaf, some guests will fail to boot.
+For example, because of guest attempt to calibrate TSC.
 
-On 3/10/2020 12:16 AM, Mark Cave-Ayland wrote:
-> On 09/03/2020 14:14, Markus Armbruster wrote:
->=20
->> Pan Nengyuan <pannengyuan@huawei.com> writes:
->>
->>> On 3/9/2020 8:34 PM, Markus Armbruster wrote:
->>>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>>
->>>>> On Mon, 9 Mar 2020 at 10:02, Pan Nengyuan <pannengyuan@huawei.com> =
-wrote:
->>>>>> On 3/9/2020 5:21 PM, Peter Maydell wrote:
->>>>>>> Could you explain more? My thought is that we should be using
->>>>>>> sysbus_init_child_obj() and we should be doing it in the init met=
-hod.
->>>>>>> Why does that break the tests ? It's the same thing various other
->>>>>>> devices do.
->>>>>>
->>>>>> device-introspect-test do the follow check for each device type:
->>>>>>
->>>>>>     qtree_start =3D qtest_hmp(qts, "info qtree");
->>>>>>     ...
->>>>>>     qtest_qmp(qts, "{'execute': 'device-list-properties','argument=
-s': {'typename': %s}}", type);
->>>>>>     ...
->>>>>>     qtree_end =3D qtest_hmp(qts, "info qtree");
->>>>>>     g_assert_cmpstr(qtree_start, =3D=3D, qtree_end);
->>>>>>
->>>>>> If we do qdev_set_parent_bus in init, it will check fail when type=
- =3D 'mac_via'.
->>>>>> mac_via_init() is called by q800_init(). But it will not be called=
- in qtest(-machine none) in the step qtree_start.
->>>>>> And after we call 'device-list-properties', mac_via_init() was cal=
-led and set dev parent bus. We can find these
->>>>>> devices in the qtree_end. So it break the test on the assert.
->>>>>
->>>>> Markus, do you know what's happening here? Why is
->>>>> trying to use sysbus_init_child_obj() breaking the
->>>>> device-introspect-test for this particular device,
->>>>> but fine for the other places where we use it?
->>>>> (Maybe we're accidentally leaking a reference to
->>>>> something so the sub-device stays on the sysbus
->>>>> when it should have removed itself when the
->>>>> device was deinited ?)
->>>>
->>>> Pan Nengyuan, please provide the exact patch that fails for you.
->>>
->>> As the follow patch:
->>>
->>> >From 9b4f35e294597410cc03b967c127242ce099692e Mon Sep 17 00:00:00 20=
-01
->>> From: Pan Nengyuan <pannengyuan@huawei.com>
->>> Date: Wed, 4 Mar 2020 11:29:28 +0800
->>> Subject: [PATCH] mac_via: fix incorrect creation of mos6522 device in=
- mac_via
->>>
->>> This patch fix a bug in mac_via where it failed to actually realize d=
-evices it was using.
->>> And move the init codes which inits the mos6522 objects and propertie=
-s on them from realize()
->>> into init(). However, we keep qdev_set_parent_bus in realize(), other=
-wise it will cause
->>> device-introspect-test test fail. Then do the realize mos6522 device =
-in the mac_vir_realize.
->>>
->>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>> ---
->>>  hw/misc/mac_via.c | 40 ++++++++++++++++++++++++++--------------
->>>  1 file changed, 26 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
->>> index b7d0012794..4c5c432140 100644
->>> --- a/hw/misc/mac_via.c
->>> +++ b/hw/misc/mac_via.c
->>> @@ -868,24 +868,21 @@ static void mac_via_reset(DeviceState *dev)
->>>  static void mac_via_realize(DeviceState *dev, Error **errp)
->>>  {
->>>      MacVIAState *m =3D MAC_VIA(dev);
->>> -    MOS6522State *ms;
->>>      struct tm tm;
->>>      int ret;
->>> +    Error *err =3D NULL;
->>>
->>> -    /* Init VIAs 1 and 2 */
->>> -    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
->>> -                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800=
-_VIA1);
->>> -
->>> -    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
->>> -                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800=
-_VIA2);
->>> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realiz=
-ed", &err);
->>> +    if (err !=3D NULL) {
->>> +        error_propagate(errp, err);
->>> +        return;
->>> +    }
->>>
->>> -    /* Pass through mos6522 output IRQs */
->>> -    ms =3D MOS6522(&m->mos6522_via1);
->>> -    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
->>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>> -    ms =3D MOS6522(&m->mos6522_via2);
->>> -    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
->>> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realiz=
-ed", &err);
->>> +    if (err !=3D NULL) {
->>> +        error_propagate(errp, err);
->>> +        return;
->>> +    }
->>>
->>>      /* Pass through mos6522 input IRQs */
->>>      qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
->>> @@ -932,6 +929,7 @@ static void mac_via_init(Object *obj)
->>>  {
->>>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->>>      MacVIAState *m =3D MAC_VIA(obj);
->>> +    MOS6522State *ms;
->>>
->>>      /* MMIO */
->>>      memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
->>> @@ -948,6 +946,20 @@ static void mac_via_init(Object *obj)
->>>      /* ADB */
->>>      qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
->>>                          TYPE_ADB_BUS, DEVICE(obj), "adb.0");
->>> +
->>> +    /* Init VIAs 1 and 2 */
->>> +    sysbus_init_child_obj(OBJECT(m), "via1", &m->mos6522_via1,
->>> +                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800=
-_VIA1);
->>> +    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
->>> +                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800=
-_VIA2);
->>> +
->>> +    /* Pass through mos6522 output IRQs */
->>> +    ms =3D MOS6522(&m->mos6522_via1);
->>> +    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
->>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>> +    ms =3D MOS6522(&m->mos6522_via2);
->>> +    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
->>> +                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>>  }
->>>
->>>  static void postload_update_cb(void *opaque, int running, RunState s=
-tate)
->>> --
->>> 2.18.2
->>
->> In file included from /work/armbru/qemu/include/hw/vmstate-if.h:12,
->>                  from /work/armbru/qemu/include/migration/vmstate.h:30=
-,
->>                  from /work/armbru/qemu/hw/misc/mac_via.c:20:
->> /work/armbru/qemu/hw/misc/mac_via.c: In function =E2=80=98mac_via_init=
-=E2=80=99:
->> /work/armbru/qemu/hw/misc/mac_via.c:953:34: error: =E2=80=98dev=E2=80=99=
- undeclared (first use in this function); did you mean =E2=80=98div=E2=80=
-=99?
->>   953 |     sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via=
-2,
->>       |                                  ^~~
->>
->> Try again?
->=20
-> Looks like a simple copy/paste error: I think that line should read OBJ=
-ECT(m) like
-> the one above it?
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ target/i386/cpu.c |  1 +
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 35 +++++++++++++++++++++++++++++------
+ 3 files changed, 31 insertions(+), 6 deletions(-)
 
-Oh, My bad! You are right.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 92fafa265914..694766d45a9b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -7127,6 +7127,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
+     DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
+                      false),
++    DEFINE_PROP_BOOL("vmware-cpuid", X86CPU, expose_vmware, false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+     DEFINE_PROP_BOOL("x-migrate-smi-count", X86CPU, migrate_smi_count,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 9c7cd7cde107..bca626963e25 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1647,6 +1647,7 @@ struct X86CPU {
+      */
+     bool force_features;
+     bool expose_kvm;
++    bool expose_vmware;
+     bool expose_tcg;
+     bool migratable;
+     bool migrate_smi_count;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 00917196dffb..2656258b96b3 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1187,6 +1187,15 @@ static int hyperv_handle_properties(CPUState *cs,
+     if (!hyperv_enabled(cpu))
+         return 0;
+ 
++    /*
++     * VMware & Hyper-V conflicts in CPUID leafs.
++     * Therefore, they cannot exists together.
++     */
++    if (cpu->expose_vmware) {
++        error_report("vmware-cpuid not compatible with hyperv options");
++        return -ENOTSUP;
++    }
++
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) ||
+         cpu->hyperv_passthrough) {
+         uint16_t evmcs_version;
+@@ -1508,6 +1517,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         has_msr_hv_hypercall = true;
+     }
+ 
++    if (cpu->expose_vmware) {
++        c = &cpuid_data.entries[cpuid_i++];
++        c->function = KVM_CPUID_SIGNATURE;
++        memcpy(signature, "VMwareVMware", 12);
++        c->eax = KVM_CPUID_SIGNATURE;
++        c->ebx = signature[0];
++        c->ecx = signature[1];
++        c->edx = signature[2];
++
++        kvm_base = KVM_CPUID_SIGNATURE_NEXT;
++    }
++
+     if (cpu->expose_kvm) {
+         memcpy(signature, "KVMKVMKVM\0\0\0", 12);
+         c = &cpuid_data.entries[cpuid_i++];
+@@ -1791,11 +1812,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+     }
+ 
+-    if (cpu->vmware_cpuid_freq
+-        /* Guests depend on 0x40000000 to detect this feature, so only expose
+-         * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
+-        && cpu->expose_kvm
+-        && kvm_base == KVM_CPUID_SIGNATURE
++    if (cpu->vmware_cpuid_freq &&
++        (cpu->expose_vmware ||
++         /*
++          * Guests depend on 0x40000000 to detect this feature, so only expose
++          * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V)
++          */
++          (cpu->expose_kvm && kvm_base == KVM_CPUID_SIGNATURE))
+         /* TSC clock must be stable and known for this feature. */
+         && tsc_is_stable_and_known(env)) {
+ 
+@@ -1805,7 +1828,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         c->ebx = env->apic_bus_freq / 1000; /* Hz to KHz */
+         c->ecx = c->edx = 0;
+ 
+-        c = cpuid_find_entry(&cpuid_data.cpuid, kvm_base, 0);
++        c = cpuid_find_entry(&cpuid_data.cpuid, KVM_CPUID_SIGNATURE, 0);
+         c->eax = MAX(c->eax, KVM_CPUID_SIGNATURE | 0x10);
+     }
+ 
+-- 
+2.20.1
 
->=20
->=20
-> ATB,
->=20
-> Mark.
-> .
->=20
 
