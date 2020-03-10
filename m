@@ -2,51 +2,50 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99AC1C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FE7C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6778420727
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:19:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6778420727
+	by mail.kernel.org (Postfix) with ESMTPS id E2FC320727
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2FC320727
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBkPH-0002DC-Jn
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:19:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41826)
+	id 1jBkQv-0004dN-38
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jBkO1-00018p-Hm
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:17:54 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jBkO2-00018u-6w
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jBkO0-00038k-Bh
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:17:53 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:60278)
+ (envelope-from <balaton@eik.bme.hu>) id 1jBkO0-00038Q-5X
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:17:54 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:60272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jBkNw-0002rM-Ad; Tue, 10 Mar 2020 15:17:49 -0400
+ id 1jBkNx-0002rL-87; Tue, 10 Mar 2020 15:17:49 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 92396747E03;
+ by localhost (Postfix) with SMTP id 267BC747E00;
  Tue, 10 Mar 2020 20:17:46 +0100 (CET)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0E211746383; Tue, 10 Mar 2020 20:17:46 +0100 (CET)
-Message-Id: <b261e8ec1325a250ca3c35fbc0a077878e7054df.1583867210.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1583867210.git.balaton@eik.bme.hu>
-References: <cover.1583867210.git.balaton@eik.bme.hu>
+ id 081DF74637D; Tue, 10 Mar 2020 20:17:46 +0100 (CET)
+Message-Id: <cover.1583867210.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v4 1/4] ide/via: Get rid of via_init_ide()
+Subject: [PATCH v4 0/4] Implement "non 100% native mode" in via-ide
 Date: Tue, 10 Mar 2020 20:06:50 +0100
 To: qemu-devel@nongnu.org,
     qemu-block@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,78 +65,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Follow example of CMD646 and remove via_init_ide function and do it
-directly in board code instead.
+This (started to be small but getting bigger) series implements
+"non-100% native mode" of via-ide found at least on pegasos2 where io
+addresses come from PCI BARs but interrupts are hard coded to legacy
+IRQ14 and 15. This is needed for guests that expect it and activate
+work arounds on that platform and don't work unless this is emulated.
+(Symptom is missing IDE IRQs after enabling BMDMA and boot freezes
+waiting for interrupt.)
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/ide/via.c            | 8 --------
- hw/mips/mips_fulong2e.c | 5 ++++-
- include/hw/ide.h        | 1 -
- 3 files changed, 4 insertions(+), 10 deletions(-)
+We need a flag to turn this mode on or off so we repurpose the last
+remaining CMD646 specific field in PCIIDEState to allow more flags and
+make room for the new legacy-irq flag there. (The CMD646 may need
+similar mode or something else may need more flags in the future.)
+Boards using CMD646 and VIA IDE are updated for the above changes.
+Also included a patch fixing up PCI reset to not clear value set by
+device emulation on bus reset when wmask does not allow that and
+another getting rid of via_ide_init helper that's now out of fashion.
 
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 096de8dba0..df0b352b58 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -213,14 +213,6 @@ static void via_ide_exitfn(PCIDevice *dev)
-     }
- }
- 
--void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
--{
--    PCIDevice *dev;
--
--    dev = pci_create_simple(bus, devfn, "via-ide");
--    pci_ide_create_devs(dev, hd_table);
--}
--
- static void via_ide_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 4727b1d3a4..639ba2a091 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -37,6 +37,7 @@
- #include "qemu/log.h"
- #include "hw/loader.h"
- #include "hw/ide.h"
-+#include "hw/ide/pci.h"
- #include "elf.h"
- #include "hw/isa/vt82c686.h"
- #include "hw/rtc/mc146818rtc.h"
-@@ -239,6 +240,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
-     qemu_irq *i8259;
-     ISABus *isa_bus;
-     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-+    PCIDevice *dev;
- 
-     isa_bus = vt82c686b_isa_init(pci_bus, PCI_DEVFN(slot, 0));
-     if (!isa_bus) {
-@@ -256,8 +258,9 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
-     /* Super I/O */
-     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
- 
-+    dev = pci_create_simple(pci_bus, PCI_DEVFN(slot, 1), "via-ide");
-     ide_drive_get(hd, ARRAY_SIZE(hd));
--    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
-+    pci_ide_create_devs(dev, hd);
- 
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci");
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci");
-diff --git a/include/hw/ide.h b/include/hw/ide.h
-index 0c7080ed92..dea0ecf5be 100644
---- a/include/hw/ide.h
-+++ b/include/hw/ide.h
-@@ -16,7 +16,6 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
--void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- 
- /* ide-mmio.c */
- void mmio_ide_init_drives(DeviceState *dev, DriveInfo *hd0, DriveInfo *hd1);
+Tested with Linux and MorphOS on pegasos2 and a Gentoo live CD kernel
+for mips_fulong2e that's the only one I could find but being beta not
+sure if that fully works on real hardware. (The mips_fulong2e also
+seems to have problems with pci devices so to boot Linux you need
+-net none -vga none and use serial console otherwise the kernel panics.)
+
+v4 is rebased on top of Mark's cmd646 patches that are now on the ide
+tree.
+
+Regards,
+BALATON Zoltan
+
+BALATON Zoltan (4):
+  ide/via: Get rid of via_init_ide()
+  ide: Make room for flags in PCIIDEState and add one for legacy IRQ
+    routing
+  pci: Honour wmask when resetting PCI_INTERRUPT_LINE
+  via-ide: Also emulate non 100% native mode
+
+ hw/ide/cmd646.c         |  4 ++--
+ hw/ide/via.c            | 36 +++++++++++++++++++++++-------------
+ hw/mips/mips_fulong2e.c |  5 ++++-
+ hw/pci/pci.c            |  5 ++++-
+ hw/sparc64/sun4u.c      |  2 +-
+ include/hw/ide.h        |  1 -
+ include/hw/ide/pci.h    |  7 ++++++-
+ 7 files changed, 40 insertions(+), 20 deletions(-)
+
 -- 
 2.21.1
 
