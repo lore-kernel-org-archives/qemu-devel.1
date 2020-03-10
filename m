@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C42C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5207C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:04:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D6020866
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:50:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D6020866
+	by mail.kernel.org (Postfix) with ESMTPS id 8A48521D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:04:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A48521D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBh8w-0000TO-6D
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:50:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52763)
+	id 1jBhMS-0000ec-Je
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 12:04:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jBh8H-0008O7-G2
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:27 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jBhJx-0004lW-8m
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jBh8G-0000sq-0C
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:25 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55842)
+ (envelope-from <frankja@linux.ibm.com>) id 1jBhJv-00005D-1p
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:01:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9386
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jBh8F-0000mX-L5
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:23 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02AFkiHE110533
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:49:22 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym85239b9-1
+ id 1jBhJt-0008Pe-8p
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:01:25 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02AFnwbE087844
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 12:01:22 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ynr9djffa-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:49:19 -0400
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 12:01:22 -0400
 Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Tue, 10 Mar 2020 15:49:13 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Tue, 10 Mar 2020 16:01:20 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Mar 2020 15:49:09 -0000
+ Tue, 10 Mar 2020 16:01:16 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
  [9.149.105.232])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02AFn8EW51314758
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02AG1FR157933824
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 15:49:08 GMT
+ Tue, 10 Mar 2020 16:01:15 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B1E3C52051;
- Tue, 10 Mar 2020 15:49:08 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 92D0952054;
+ Tue, 10 Mar 2020 16:01:15 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.23.214])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 60C5E5204F;
- Tue, 10 Mar 2020 15:49:08 +0000 (GMT)
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 390D952059;
+ Tue, 10 Mar 2020 16:01:15 +0000 (GMT)
 Subject: Re: [PATCH v8 02/15] s390x: protvirt: Support unpack facility
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
 References: <20200310134008.130038-1-frankja@linux.ibm.com>
  <20200310134008.130038-3-frankja@linux.ibm.com>
- <6e8508a7-4f8a-fca7-4ca7-4d598b0ccb84@redhat.com>
+ <8f8bedb3-5585-845d-d32e-bfe4ec6c01f7@de.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -111,30 +112,30 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Tue, 10 Mar 2020 16:49:07 +0100
+Date: Tue, 10 Mar 2020 17:01:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <6e8508a7-4f8a-fca7-4ca7-4d598b0ccb84@redhat.com>
+In-Reply-To: <8f8bedb3-5585-845d-d32e-bfe4ec6c01f7@de.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="JKig9r0of6biwk7rHKuixOQ5qufMIAiZj"
+ boundary="P2XUOidzBDleAivCCOTvHhJlPi2Zi0dKQ"
 X-TM-AS-GCONF: 00
-x-cbid: 20031015-0028-0000-0000-000003E2C4A5
+x-cbid: 20031016-0020-0000-0000-000003B26102
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031015-0029-0000-0000-000024A80625
-Message-Id: <f80eddaa-37e2-f152-82a6-3aa66a8d5691@linux.ibm.com>
+x-cbparentid: 20031016-0021-0000-0000-0000220AAD99
+Message-Id: <0c15f682-dcb5-6d3b-d57f-0c3558a7fac3@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-10_10:2020-03-10,
  2020-03-10 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 malwarescore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxlogscore=999 spamscore=0
+ suspectscore=2 malwarescore=0 adultscore=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003100101
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,39 +147,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JKig9r0of6biwk7rHKuixOQ5qufMIAiZj
-Content-Type: multipart/mixed; boundary="ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu"
+--P2XUOidzBDleAivCCOTvHhJlPi2Zi0dKQ
+Content-Type: multipart/mixed; boundary="fWh3z4hwrNo6d1mJU6norWEAZlrZbWZ85"
 
---ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu
-Content-Type: text/plain; charset=windows-1252
+--fWh3z4hwrNo6d1mJU6norWEAZlrZbWZ85
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/10/20 4:26 PM, David Hildenbrand wrote:
+On 3/10/20 4:41 PM, Christian Borntraeger wrote:
+>=20
+>=20
 > On 10.03.20 14:39, Janosch Frank wrote:
 >> The unpack facility provides the means to setup a protected guest. A
 >> protected guest can not be introspected by the hypervisor or any
->=20
-> "cannot"
->=20
 >> user/administrator of the machine it is running on.
 >>
 >> Protected guests are encrypted at rest and need a special boot
 >> mechanism via diag308 subcode 8 and 10.
 >>
 >> Code 8 sets the PV specific IPLB which is retained seperately from
->=20
-> "separately"
-
-Time to find out why my flyspel hooks are failing...
-
->=20
 >> those set via code 5.
 >>
 >> Code 10 is used to unpack the VM into protected memory, verify its
@@ -188,9 +182,218 @@ Time to find out why my flyspel hooks are failing...
 >> Co-developed-by: Christian Borntraeger <borntraeger@de.ibm.com> [Chang=
 es
 >> to machine]
->=20
-> [...]
->=20
+>> ---
+>>  hw/s390x/Makefile.objs              |   1 +
+>>  hw/s390x/ipl.c                      |  56 ++++++++++++-
+>>  hw/s390x/ipl.h                      |  79 +++++++++++++++++++
+>>  hw/s390x/pv.c                       | 104 ++++++++++++++++++++++++
+>>  hw/s390x/pv.h                       |  33 ++++++++
+>>  hw/s390x/s390-virtio-ccw.c          | 118 +++++++++++++++++++++++++++=
+-
+>>  include/hw/s390x/s390-virtio-ccw.h  |   1 +
+>>  target/s390x/cpu.c                  |  23 ++++++
+>>  target/s390x/cpu.h                  |   1 +
+>>  target/s390x/cpu_features_def.inc.h |   1 +
+>>  target/s390x/diag.c                 |  30 ++++++-
+>>  11 files changed, 441 insertions(+), 6 deletions(-)
+>>  create mode 100644 hw/s390x/pv.c
+>>  create mode 100644 hw/s390x/pv.h
+>>
+>> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+>> index e02ed80b68..a46a1c7894 100644
+>> --- a/hw/s390x/Makefile.objs
+>> +++ b/hw/s390x/Makefile.objs
+>> @@ -31,6 +31,7 @@ obj-y +=3D tod-qemu.o
+>>  obj-$(CONFIG_KVM) +=3D tod-kvm.o
+>>  obj-$(CONFIG_KVM) +=3D s390-skeys-kvm.o
+>>  obj-$(CONFIG_KVM) +=3D s390-stattrib-kvm.o
+>> +obj-$(CONFIG_KVM) +=3D pv.o
+>>  obj-y +=3D s390-ccw.o
+>>  obj-y +=3D ap-device.o
+>>  obj-y +=3D ap-bridge.o
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index b81942e1e6..b88b8ff346 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -33,6 +33,7 @@
+>>  #include "qemu/cutils.h"
+>>  #include "qemu/option.h"
+>>  #include "exec/exec-all.h"
+>> +#include "pv.h"
+>> =20
+>>  #define KERN_IMAGE_START                0x010000UL
+>>  #define LINUX_MAGIC_ADDR                0x010008UL
+>> @@ -566,12 +567,31 @@ void s390_ipl_update_diag308(IplParameterBlock *=
+iplb)
+>>  {
+>>      S390IPLState *ipl =3D get_ipl_device();
+>> =20
+>> -    ipl->iplb =3D *iplb;
+>> -    ipl->iplb_valid =3D true;
+>> +    /*
+>> +     * The IPLB set and retrieved by subcodes 8/9 is completely
+>> +     * separate from the one managed via subcodes 5/6.
+>> +     */
+>> +    if (iplb->pbt =3D=3D S390_IPL_TYPE_PV) {
+>> +        ipl->iplb_pv =3D *iplb;
+>> +        ipl->iplb_valid_pv =3D true;
+>> +    } else {
+>> +        ipl->iplb =3D *iplb;
+>> +        ipl->iplb_valid =3D true;
+>> +    }
+>>      ipl->netboot =3D is_virtio_net_device(iplb);
+>>      update_machine_ipl_properties(iplb);
+>>  }
+>> =20
+>> +IplParameterBlock *s390_ipl_get_iplb_pv(void)
+>> +{
+>> +    S390IPLState *ipl =3D get_ipl_device();
+>> +
+>> +    if (!ipl->iplb_valid_pv) {
+>> +        return NULL;
+>> +    }
+>> +    return &ipl->iplb_pv;
+>> +}
+>> +
+>>  IplParameterBlock *s390_ipl_get_iplb(void)
+>>  {
+>>      S390IPLState *ipl =3D get_ipl_device();
+>> @@ -660,6 +680,38 @@ static void s390_ipl_prepare_qipl(S390CPU *cpu)
+>>      cpu_physical_memory_unmap(addr, len, 1, len);
+>>  }
+>> =20
+>> +int s390_ipl_prepare_pv_header(void)
+>> +{
+>> +    IplParameterBlock *ipib =3D s390_ipl_get_iplb_pv();
+>> +    IPLBlockPV *ipib_pv =3D &ipib->pv;
+>> +    void *hdr =3D g_malloc(ipib_pv->pv_header_len);
+>> +    int rc;
+>> +
+>> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+>> +                             ipib_pv->pv_header_len);
+>> +    rc =3D s390_pv_set_sec_parms((uint64_t)hdr,
+>> +                               ipib_pv->pv_header_len);
+>> +    g_free(hdr);
+>> +    return rc;
+>> +}
+>> +
+>> +int s390_ipl_pv_unpack(void)
+>> +{
+>> +    IplParameterBlock *ipib =3D s390_ipl_get_iplb_pv();
+>> +    IPLBlockPV *ipib_pv =3D &ipib->pv;
+>> +    int i, rc =3D 0;
+>> +
+>> +    for (i =3D 0; i < ipib_pv->num_comp; i++) {
+>> +        rc =3D s390_pv_unpack(ipib_pv->components[i].addr,
+>> +                            TARGET_PAGE_ALIGN(ipib_pv->components[i].=
+size),
+>> +                            ipib_pv->components[i].tweak_pref);
+>> +        if (rc) {
+>> +            break;
+>> +        }
+>> +    }
+>> +    return rc;
+>> +}
+>> +
+>>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>>  {
+>>      S390IPLState *ipl =3D get_ipl_device();
+>> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+>> index 3e44abe1c6..919f9e6913 100644
+>> --- a/hw/s390x/ipl.h
+>> +++ b/hw/s390x/ipl.h
+>> @@ -15,6 +15,24 @@
+>>  #include "cpu.h"
+>>  #include "hw/qdev-core.h"
+>> =20
+>> +struct IPLBlockPVComp {
+>> +    uint64_t tweak_pref;
+>> +    uint64_t addr;
+>> +    uint64_t size;
+>> +} QEMU_PACKED;
+>> +typedef struct IPLBlockPVComp IPLBlockPVComp;
+>> +
+>> +struct IPLBlockPV {
+>> +    uint8_t  reserved18[87];    /* 0x18 */
+>> +    uint8_t  version;           /* 0x6f */
+>> +    uint32_t reserved70;        /* 0x70 */
+>> +    uint32_t num_comp;          /* 0x74 */
+>> +    uint64_t pv_header_addr;    /* 0x78 */
+>> +    uint64_t pv_header_len;     /* 0x80 */
+>> +    struct IPLBlockPVComp components[];
+>> +} QEMU_PACKED;
+>> +typedef struct IPLBlockPV IPLBlockPV;
+>> +
+>>  struct IplBlockCcw {
+>>      uint8_t  reserved0[85];
+>>      uint8_t  ssid;
+>> @@ -71,6 +89,7 @@ union IplParameterBlock {
+>>          union {
+>>              IplBlockCcw ccw;
+>>              IplBlockFcp fcp;
+>> +            IPLBlockPV pv;
+>>              IplBlockQemuScsi scsi;
+>>          };
+>>      } QEMU_PACKED;
+>> @@ -85,8 +104,11 @@ typedef union IplParameterBlock IplParameterBlock;=
+
+>> =20
+>>  int s390_ipl_set_loadparm(uint8_t *loadparm);
+>>  void s390_ipl_update_diag308(IplParameterBlock *iplb);
+>> +int s390_ipl_prepare_pv_header(void);
+>> +int s390_ipl_pv_unpack(void);
+>>  void s390_ipl_prepare_cpu(S390CPU *cpu);
+>>  IplParameterBlock *s390_ipl_get_iplb(void);
+>> +IplParameterBlock *s390_ipl_get_iplb_pv(void);
+>> =20
+>>  enum s390_reset {
+>>      /* default is a reset not triggered by a CPU e.g. issued by QMP *=
+/
+>> @@ -94,6 +116,7 @@ enum s390_reset {
+>>      S390_RESET_REIPL,
+>>      S390_RESET_MODIFIED_CLEAR,
+>>      S390_RESET_LOAD_NORMAL,
+>> +    S390_RESET_PV,
+>>  };
+>>  void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)=
+;
+>>  void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset=
+_type);
+>> @@ -133,6 +156,7 @@ struct S390IPLState {
+>>      /*< private >*/
+>>      DeviceState parent_obj;
+>>      IplParameterBlock iplb;
+>> +    IplParameterBlock iplb_pv;
+>>      QemuIplParameters qipl;
+>>      uint64_t start_addr;
+>>      uint64_t compat_start_addr;
+>> @@ -140,6 +164,7 @@ struct S390IPLState {
+>>      uint64_t compat_bios_start_addr;
+>>      bool enforce_bios;
+>>      bool iplb_valid;
+>> +    bool iplb_valid_pv;
+>>      bool netboot;
+>>      /* reset related properties don't have to be migrated or reset */=
+
+>>      enum s390_reset reset_type;
+>> @@ -161,9 +186,11 @@ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) &=
+ 3, "alignment of iplb wrong");
+>> =20
+>>  #define S390_IPL_TYPE_FCP 0x00
+>>  #define S390_IPL_TYPE_CCW 0x02
+>> +#define S390_IPL_TYPE_PV 0x05
+>>  #define S390_IPL_TYPE_QEMU_SCSI 0xff
+>> =20
+>>  #define S390_IPLB_HEADER_LEN 8
+>> +#define S390_IPLB_MIN_PV_LEN 148
+>>  #define S390_IPLB_MIN_CCW_LEN 200
+>>  #define S390_IPLB_MIN_FCP_LEN 384
+>>  #define S390_IPLB_MIN_QEMU_SCSI_LEN 200
+>> @@ -173,6 +200,50 @@ static inline bool iplb_valid_len(IplParameterBlo=
+ck *iplb)
+>>      return be32_to_cpu(iplb->len) <=3D sizeof(IplParameterBlock);
+>>  }
+>> =20
 >> +static inline bool ipl_valid_pv_components(IplParameterBlock *iplb)
 >> +{
 >> +    IPLBlockPV *ipib_pv =3D &iplb->pv;
@@ -203,19 +406,58 @@ es
 >> +    for (i =3D 0; i < ipib_pv->num_comp; i++) {
 >> +        /* Addr must be 4k aligned */
 >> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
->=20
-> I usually find
->=20
-> QEMU_IS_ALIGNED(ipib_pv->components[i].addr, TARGET_PAGE_MASK)
->=20
-> nicer
->=20
-> [...]
-
-huh, didn't know it existed.
-I'll have a try with it.
-
->=20
+>> +            return false;
+>> +        }
+>> +
+>> +        /* Tweak prefix is monotonically increasing with each compone=
+nt */
+>> +        if (i < ipib_pv->num_comp - 1 &&
+>> +            ipib_pv->components[i].tweak_pref >=3D
+>> +            ipib_pv->components[i + 1].tweak_pref) {
+>> +            return false;
+>> +        }
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>> +static inline bool ipl_valid_pv_header(IplParameterBlock *iplb)
+>> +{
+>> +        IPLBlockPV *ipib_pv =3D &iplb->pv;
+>> +
+>> +        if (ipib_pv->pv_header_len > 2 * TARGET_PAGE_SIZE) {
+>> +            return false;
+>> +        }
+>> +
+>> +        if (!address_space_access_valid(&address_space_memory,
+>> +                                        ipib_pv->pv_header_addr,
+>> +                                        ipib_pv->pv_header_len,
+>> +                                        false,
+>> +                                        MEMTXATTRS_UNSPECIFIED)) {
+>> +            return false;
+>> +        }
+>> +
+>> +        return true;
+>> +}
+>> +
+>>  static inline bool iplb_valid(IplParameterBlock *iplb)
+>>  {
+>>      switch (iplb->pbt) {
+>> @@ -180,6 +251,14 @@ static inline bool iplb_valid(IplParameterBlock *=
+iplb)
+>>          return be32_to_cpu(iplb->len) >=3D S390_IPLB_MIN_FCP_LEN;
+>>      case S390_IPL_TYPE_CCW:
+>>          return be32_to_cpu(iplb->len) >=3D S390_IPLB_MIN_CCW_LEN;
+>> +    case S390_IPL_TYPE_PV:
+>> +        if (be32_to_cpu(iplb->len) < S390_IPLB_MIN_PV_LEN) {
+>> +            return false;
+>> +        }
+>> +        if (!ipl_valid_pv_header(iplb)) {
+>> +            return false;
+>> +        }
+>> +        return ipl_valid_pv_components(iplb);
+>>      default:
+>>          return false;
+>>      }
 >> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
 >> new file mode 100644
 >> index 0000000000..1ba8bc7242
@@ -252,194 +494,107 @@ vel
 >> +    "VM_PREP_RESET",
 >> +    "VM_UNSHARE_ALL",
 >> +};
->> +
->> +static int s390_pv_cmd(uint32_t cmd, void *data)
->> +{
->> +    int rc;
 >=20
-> reverse x... :)
+> This is really error-prone (even though this will not change)
+> What about something like this? (and no is an acceptable answer)
 
-ack
-Just FYI, I like christmas trees the right side up
+I'd be ok with that as long as I can add a comment to the macro
+explaining what we're doing. And if I can add a newline between rc and
+the if in the macro.
 
 >=20
->> +    struct kvm_pv_cmd pv_cmd =3D {
->> +        .cmd =3D cmd,
->> +        .data =3D (uint64_t)data,
->> +    };
->> +
->=20
-> and then maybe
->=20
-> int rc =3D  ...
-
-Ack
-
->=20
->> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
->> +    if (rc) {
->> +        error_report("KVM PV command %d (%s) failed: header rc %x rrc=
- %x "
->> +                     "IOCTL rc: %d", cmd, cmd_names[cmd], pv_cmd.rc, =
-pv_cmd.rrc,
->> +                     rc);
->> +    }
->> +    return rc;
->> +}
->> +
->> +static void s390_pv_cmd_exit(uint32_t cmd, void *data)
->> +{
->> +    int rc;
->> +
->> +    rc =3D s390_pv_cmd(cmd, data);
->=20
-> int rc =3D ...
-
-Ack
-
->=20
->> +    if (rc) {
->> +        exit(1);
->> +    }
->> +}
->> +
->=20
-> [...]
->=20
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 895498cca6..455ad31718 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -41,6 +41,8 @@
->>  #include "hw/qdev-properties.h"
->>  #include "hw/s390x/tod.h"
->>  #include "sysemu/sysemu.h"
->> +#include "hw/s390x/pv.h"
->> +#include <linux/kvm.h>
->> =20
->>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>  {
->> @@ -316,10 +318,80 @@ static inline void s390_do_cpu_ipl(CPUState *cs,=
- run_on_cpu_data arg)
->>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->>  }
->> =20
->> +static void s390_machine_unprotect(S390CcwMachineState *ms)
->> +{
->> +
->=20
-> superfluous empty line
->=20
->> +    s390_pv_vm_disable();
->> +    ms->pv =3D false;
->> +}
->> +
->=20
-> [...]
-
-Ack
-
->=20
->> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->> index 3dd396e870..bcb9e47767 100644
->> --- a/target/s390x/cpu.c
->> +++ b/target/s390x/cpu.c
->> @@ -37,6 +37,8 @@
->>  #include "sysemu/hw_accel.h"
->>  #include "hw/qdev-properties.h"
->>  #ifndef CONFIG_USER_ONLY
->> +#include "hw/s390x/s390-virtio-ccw.h"
->> +#include "hw/s390x/pv.h"
->=20
-> Do you need that include here? I don't think so.
->=20
->>  #include "hw/boards.h"
->>  #include "sysemu/arch_init.h"
->>  #include "sysemu/sysemu.h"
->> @@ -174,6 +176,27 @@ static void s390_cpu_disas_set_info(CPUState *cpu=
-, disassemble_info *info)
->>      info->print_insn =3D print_insn_s390;
->>  }
->> =20
->> +#if !defined(CONFIG_USER_ONLY)
->> +bool s390_is_pv(void)
->> +{
->> +    static S390CcwMachineState *ccw;
->> +    Object *obj;
->> +
->> +    if (ccw) {
->> +        return ccw->pv;
->> +    }
->> +
->> +    /* we have to bail out for the "none" machine */
->> +    obj =3D object_dynamic_cast(qdev_get_machine(),
->> +                              TYPE_S390_CCW_MACHINE);
->> +    if (!obj) {
->> +        return false;
->> +    }
->> +    ccw =3D S390_CCW_MACHINE(obj);
->> +    return ccw->pv;
->> +}
->> +#endif
->> +
->=20
-> Nit: I *think* this would be better placed in hw/s390x/pv.h
-
-I'll think about it
-
->=20
->>  static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
->>  {
->>      CPUState *cs =3D CPU(dev);
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 1d17709d6e..8fa25d9ed5 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -762,6 +762,7 @@ static inline void s390_do_cpu_load_normal(CPUStat=
-e *cs, run_on_cpu_data arg)
->> =20
->> =20
->>  /* cpu.c */
->> +bool s390_is_pv(void);
->=20
-> Wonder if this will compile with CONFIG_USER_ONLY (maybe we need a
-> "return false" dummy). I assume you test-compiled that with all variant=
-s
-> (CONFIG_TCG, CONFIG_USER_ONLY, ...)
-
-Oh, right...
-
+> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+> index 1ba8bc7242..fa592513e4 100644
+> --- a/hw/s390x/pv.c
+> +++ b/hw/s390x/pv.c
+> @@ -17,17 +17,7 @@
+>  #include "sysemu/kvm.h"
+>  #include "pv.h"
+> =20
+> -const char *cmd_names[] =3D {
+> -    "VM_ENABLE",
+> -    "VM_DISABLE",
+> -    "VM_SET_SEC_PARAMS",
+> -    "VM_UNPACK",
+> -    "VM_VERIFY",
+> -    "VM_PREP_RESET",
+> -    "VM_UNSHARE_ALL",
+> -};
+> -
+> -static int s390_pv_cmd(uint32_t cmd, void *data)
+> +static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data=
+)
+>  {
+>      int rc;
+>      struct kvm_pv_cmd pv_cmd =3D {
+> @@ -38,20 +28,21 @@ static int s390_pv_cmd(uint32_t cmd, void *data)
+>      rc =3D kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
+>      if (rc) {
+>          error_report("KVM PV command %d (%s) failed: header rc %x rrc =
+%x "
+> -                     "IOCTL rc: %d", cmd, cmd_names[cmd], pv_cmd.rc, p=
+v_cmd.rrc,
+> +                     "IOCTL rc: %d", cmd, cmdname, pv_cmd.rc, pv_cmd.r=
+rc,
+>                       rc);
+>      }
+>      return rc;
+>  }
+> =20
+> -static void s390_pv_cmd_exit(uint32_t cmd, void *data)
+> -{
+> -    int rc;
+> +#define s390_pv_cmd(cmd, data) __s390_pv_cmd(cmd, #cmd, data);
+> =20
+> -    rc =3D s390_pv_cmd(cmd, data);
+> -    if (rc) {
+> -        exit(1);
+> -    }
+> +#define s390_pv_cmd_exit(cmd, data)    \
+> +{                                      \
+> +    int rc;                            \
+> +    rc =3D __s390_pv_cmd(cmd, #cmd, data);\
+> +    if (rc) {                          \
+> +        exit(1);                       \
+> +    }                                  \
+>  }
+> =20
+>  int s390_pv_vm_enable(void)
 >=20
 >=20
-> .. we're almost there ... :)
+>=20
+>=20
+>=20
+>=20
+>=20
 >=20
 
 
 
---ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu--
+--fWh3z4hwrNo6d1mJU6norWEAZlrZbWZ85--
 
---JKig9r0of6biwk7rHKuixOQ5qufMIAiZj
+--P2XUOidzBDleAivCCOTvHhJlPi2Zi0dKQ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5ntvMACgkQ41TmuOI4
-ufiyfQ/+PjKbJLZgdcA4mW+0WgY1/XbIvXsR9Z+LTGOXtWaL0NW5PXTUNj6nPmxL
-aAGv0c4GsQDeLMvvUJXowefzDfkwyVf/Mo6ZtgOzPo5jGv7/xiiurYiXbC9nanQl
-vL0YumcAx3d++22P6H68NUwvhiMcGhgVzO3jd511w+f2/oPjhPtB6OSWtk/XvuEx
-SjJKBA8877cEj16/V6bN350RK35bFuXpS4HD+FDT6qKTIF6SK/CnsKwpqg6kLuo8
-oL2/FH8uA5lHqIVNcXqQgrg7IFL2tR2sSkX66E61vM9HG/SU7YXjNSfy+UaDu0RP
-SO6SdlDB7jRdmAWfBpyjuLw3hYaxJ/FTBktTIzGAyyRx/4KfArsOV3rilUkqoiyU
-vz8rQZ6AdOL4HzZw/OzAnpv2dW+i3zwngEoaRpj88KZKfYe+6wnHuwKn1mgWE6CT
-clrIMm+MoSjJZ2/9HicXsMRtkp7gL3OwykZhIMNgeOkAFppsfj6dgckvrdrfWIhz
-uTXEII46LMSdGN91RZftm2JofSSVpPfc572oLbsuO4201c4SAYRosXNo/gdspdSE
-I4gAWVZqMIUaMPMZoFGvBCi5BQvybANvDFrNGu9GUrRf3b/ulfbISHGpt31+XTXy
-PfYTnNzNDpH7glaAtRrrFGyMJ2Ed9I3U4PnThbQb//AeWJZUa4g=
-=kkAT
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5nucoACgkQ41TmuOI4
+ufib6w//Zs8/PLIvxsfgI1nk+gYDJttnM1FKRsU5b+bgGNbWV51RB28RU4cM3jD9
+vopG+cXvk8PP6LPjp9fmQEXynPdDhaflCnpPDUiLfWOWKUM0O8qPGrveIIu44ovC
+R7sc1dkbVjjdS1tTh7OXK5HmK1FmxMFsfcPosWLNIfeYwShyZFE+Owshzii/H9K8
+ceGNpMr8uanKyUaSqGxfIxUrVx8XMUbdbVn2qsDZglkQ5lBamw7JxmjXCFy3Gq5i
+DVVLFRGRZTh+CZZ38uo8RecnlMA2V9o7VTPPjmZ728gDI5o7wUDQdl+zvL3fY7rX
+4Bnt0wz7LdJ5AjfVfbDIJBRb3nr123aXh2M4CZ2wfMZHzh0fS4WEqkexApQ35taK
+2J17J44fkRieCCS+l1uXAdJ02ipdn4sECwGKWuRW8GQXh8W/EUX4T0THltTlTKg5
+t9UbSLtA3P+v0IjA9dfehqo6XTkfhYfQo/FrycruV+j98z+xHPjKNfgnqOk1v3hE
+QwplEkkU0X7mLbfefKTntVz/ASYrTR7WHaC9rLBMUc5tiHutQ85rHSUiS2ld7U9M
+jyOYailO+FHnaU/TGbqPfqGsjdSmR+cXgOuL6W92gtpARwQKnhKKBz+UKDKMIU6O
+q1JGvXjP0yz6B9OdcC6AkXi/xFEx6K9oWSRTygl2K6h7bfuWJJE=
+=m7JO
 -----END PGP SIGNATURE-----
 
---JKig9r0of6biwk7rHKuixOQ5qufMIAiZj--
+--P2XUOidzBDleAivCCOTvHhJlPi2Zi0dKQ--
 
 
