@@ -2,78 +2,85 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A5EC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21012C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:12:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DB9920873
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E355820873
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:12:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AtyOEBL1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB9920873
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPsGbL2j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E355820873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBhSt-0002xI-It
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 12:10:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52768)
+	id 1jBhUR-0003qq-4g
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 12:12:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jBhSG-0002PP-8T
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:10:05 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jBhTY-0003QO-SM
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jBhSE-00023e-5t
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:10:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57654
+ (envelope-from <alex.williamson@redhat.com>) id 1jBhTW-0004mJ-8Q
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:11:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30168
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jBhSD-00020H-Pm
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:10:02 -0400
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jBhTW-0004ku-33
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:11:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583856601;
+ s=mimecast20190719; t=1583856681;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lWLreIi1AqdTqsZXt7/f4jKx1vCmLHqB9EOtftNCPkw=;
- b=AtyOEBL1imEcCTM4LMWxgqHKVWDYlm6+z58GDRwyqpYZXOY0tlPgiXJO6N2q3vrPEPlQ8E
- XLD1S5yiV5tsvBaCa9l2ZyTbKIT/Hh8p4b21HF7pw7KRPIwY67xg+eAsr9GTIB736dD9Di
- 2PS6evG4OjOo/AVrdUr/XrAZdHKHjKI=
+ bh=4bfKOZr3R4F0BZwo+ubAZXzfY4xLhFaetFjle8rAobg=;
+ b=DPsGbL2ji2mankJGzO+xvraF78hrHeta0gA5m/epzU/P28B6gIpl7nZQqrYfO2anQnIKD5
+ FdukixKJ3n38ltjsqj+8ciL9j/WLsJsDAeyI2V5BHa4ZqKMqtNcJalNkL9nw7wWQYmrv/x
+ /i9G+T21sZcWMBkm6fCwy/7K9Js/v20=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-_lBN8-4_NXeg6jzM9SJvQA-1; Tue, 10 Mar 2020 12:09:57 -0400
-X-MC-Unique: _lBN8-4_NXeg6jzM9SJvQA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-189-dEi8-dQWMaeiVWzTvg9P_g-1; Tue, 10 Mar 2020 12:11:14 -0400
+X-MC-Unique: dEi8-dQWMaeiVWzTvg9P_g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15A3C8C3164;
- Tue, 10 Mar 2020 16:09:54 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BECAB91D9B;
- Tue, 10 Mar 2020 16:09:42 +0000 (UTC)
-Date: Tue, 10 Mar 2020 16:09:41 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v5 07/50] multi-process: define mpqemu-link object
-Message-ID: <20200310160941.GK140737@stefanha-x1.localdomain>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <20ec6f6666cc8adb211642156f5230e478143b81.1582576372.git.jag.raman@oracle.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 966738EDBF2;
+ Tue, 10 Mar 2020 16:11:10 +0000 (UTC)
+Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 09AC128992;
+ Tue, 10 Mar 2020 16:11:08 +0000 (UTC)
+Date: Tue, 10 Mar 2020 10:11:08 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
+ <longpeng2@huawei.com>
+Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
+ vfio_rom_read
+Message-ID: <20200310101108.3377b878@x1.home>
+In-Reply-To: <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
+References: <20200224064219.1434-1-longpeng2@huawei.com>
+ <20200224064219.1434-2-longpeng2@huawei.com>
+ <20200224090458.080152c0@w520.home>
+ <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20ec6f6666cc8adb211642156f5230e478143b81.1582576372.git.jag.raman@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9RxwyT9MtfFuvYYZ"
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,157 +92,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: weifuqiang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org,
+ arei.gonglei@huawei.com, huangzhichao@huawei.com,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---9RxwyT9MtfFuvYYZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, 25 Feb 2020 07:48:33 +0800
+"Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
+<longpeng2@huawei.com> wrote:
 
-On Mon, Feb 24, 2020 at 03:54:58PM -0500, Jagannathan Raman wrote:
-> +/*
-> + * TODO: Dont use mpqemu link object since it is
-> + * not needed to be created via -object.
-> + */
+> On 2020/2/25 0:04, Alex Williamson wrote:
+> > On Mon, 24 Feb 2020 14:42:17 +0800
+> > "Longpeng(Mike)" <longpeng2@huawei.com> wrote:
+> >   
+> >> From: Longpeng <longpeng2@huawei.com>
+> >>
+> >> vfio_pci_load_rom() maybe failed and then the vdev->rom is NULL in
+> >> some situation (though I've not encountered yet), maybe we should
+> >> avoid the VM abort.
+> >>
+> >> Signed-off-by: Longpeng <longpeng2@huawei.com>
+> >> ---
+> >>  hw/vfio/pci.c | 13 ++++++++-----
+> >>  1 file changed, 8 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> >> index 5e75a95..ed798ae 100644
+> >> --- a/hw/vfio/pci.c
+> >> +++ b/hw/vfio/pci.c
+> >> @@ -768,7 +768,7 @@ static void vfio_update_msi(VFIOPCIDevice *vdev)
+> >>      }
+> >>  }
+> >>  
+> >> -static void vfio_pci_load_rom(VFIOPCIDevice *vdev)
+> >> +static bool vfio_pci_load_rom(VFIOPCIDevice *vdev)
+> >>  {
+> >>      struct vfio_region_info *reg_info;
+> >>      uint64_t size;
+> >> @@ -778,7 +778,7 @@ static void vfio_pci_load_rom(VFIOPCIDevice *vdev)
+> >>      if (vfio_get_region_info(&vdev->vbasedev,
+> >>                               VFIO_PCI_ROM_REGION_INDEX, &reg_info)) {
+> >>          error_report("vfio: Error getting ROM info: %m");
+> >> -        return;
+> >> +        return false;
+> >>      }
+> >>  
+> >>      trace_vfio_pci_load_rom(vdev->vbasedev.name, (unsigned long)reg_info->size,
+> >> @@ -797,7 +797,7 @@ static void vfio_pci_load_rom(VFIOPCIDevice *vdev)
+> >>          error_printf("Device option ROM contents are probably invalid "
+> >>                      "(check dmesg).\nSkip option ROM probe with rombar=0, "
+> >>                      "or load from file with romfile=\n");
+> >> -        return;
+> >> +        return false;
+> >>      }
+> >>  
+> >>      vdev->rom = g_malloc(size);
+> >> @@ -849,6 +849,8 @@ static void vfio_pci_load_rom(VFIOPCIDevice *vdev)
+> >>              data[6] = -csum;
+> >>          }
+> >>      }
+> >> +
+> >> +    return true;
+> >>  }
+> >>  
+> >>  static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
+> >> @@ -863,8 +865,9 @@ static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
+> >>      uint64_t data = 0;
+> >>  
+> >>      /* Load the ROM lazily when the guest tries to read it */
+> >> -    if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
+> >> -        vfio_pci_load_rom(vdev);
+> >> +    if (unlikely(!vdev->rom && !vdev->rom_read_failed) &&
+> >> +        !vfio_pci_load_rom(vdev)) {
+> >> +        return 0;
+> >>      }
+> >>  
+> >>      memcpy(&val, vdev->rom + addr,  
+> > 
+> > Looks like an obvious bug, until you look at the rest of this memcpy():
+> > 
+> > memcpy(&val, vdev->rom + addr,
+> >            (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr) : 0);
+> > 
+> > IOW, we'll do a zero sized memcpy() if rom_size is zero, so there's no
+> > risk of the concern identified in the commit log.  This patch is
+> > unnecessary.  Thanks,
+> >   
+> Oh, I missed that, sorry for make the noise, thanks
 
-Please investigate and resolve this TODO.
+Actually, not noise.  After some internal discussion thanks to Laszlo,
+it seems that while memcpy() with a zero size seems to do the right
+thing, the behavior for any case where we pass a null pointer is not
+actually defined.  However, there's still a bug in the implementation
+of the fix above, if vdev->rom_read_failed is set, we'll still fall
+through to the memcpy.  I think there's also another bug in the current
+implementation that we initialize data to zero but we'll overwrite it
+with the uninitialized 'val' in the switch statement.  I think the
+below resolves both.  I'll formally post it after a bit of testing:
 
-> +struct conf_data_msg {
-> +    uint32_t addr;
-> +    uint32_t val;
-> +    int l;
+commit 2088fc1e1f426b98e9ca4d7bcdbe53d886a18c37
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Tue Mar 10 10:04:36 2020 -0600
 
-Please use a self-explanatory field name.  I'm not sure what 'l' is.
+    vfio/pci: Use defined memcpy() behavior
+    
+    vfio_rom_read() relies on memcpy() doing the logically correct thing,
+    ie. safely copying zero bytes from a NULL pointer when rom_size is
+    zero, rather than the spec definition, which is undefined when the
+    source or target pointers are NULL.  Resolve this by wrapping the
+    call in the condition expressed previously by the ternary.
+    
+    Additionally, we still use @val to fill data based on the provided
+    @size regardless of mempcy(), so we should initialize @val rather
+    than @data.
+    
+    Reported-by: Longpeng <longpeng2@huawei.com>
+    Reported-by: Laszlo Ersek <lersek@redhat.com>
+    Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-conf_data_msg is not used in this patch.  Please introduce things when
-they are needed to make the patch series easier to review in a linear
-fashion.
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5e75a95129ac..b0799cdc28ad 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
+         uint16_t word;
+         uint32_t dword;
+         uint64_t qword;
+-    } val;
+-    uint64_t data = 0;
++    } val = { 0 };
++    uint64_t data;
+ 
+     /* Load the ROM lazily when the guest tries to read it */
+     if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
+         vfio_pci_load_rom(vdev);
+     }
+ 
+-    memcpy(&val, vdev->rom + addr,
+-           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr) : 0);
++    if (addr < vdev->rom_size) {
++        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - addr));
++    }
+ 
+     switch (size) {
+     case 1:
 
-> +/*
-> + * TODO: make all communications asynchronous and run in the main
-> + * loop or existing IOThread.
-> + */
 
-Please investigate and decide how to resolve this TODO.
 
-> +void mpqemu_msg_send(MPQemuMsg *msg, MPQemuChannel *chan)
-> +{
-> +    int rc;
-> +    uint8_t *data;
-> +    union {
-> +        char control[CMSG_SPACE(REMOTE_MAX_FDS * sizeof(int))];
-> +        struct cmsghdr align;
-> +    } u;
-> +    struct msghdr hdr;
-> +    struct cmsghdr *chdr;
-> +    int sock = chan->sock;
-> +    QemuMutex *lock = &chan->send_lock;
-> +
-> +    struct iovec iov = {
-> +        .iov_base = (char *) msg,
-> +        .iov_len = MPQEMU_MSG_HDR_SIZE,
-> +    };
-> +
-> +    memset(&hdr, 0, sizeof(hdr));
-> +    memset(&u, 0, sizeof(u));
-> +
-> +    hdr.msg_iov = &iov;
-> +    hdr.msg_iovlen = 1;
-> +
-> +    if (msg->num_fds > REMOTE_MAX_FDS) {
-> +        qemu_log_mask(LOG_REMOTE_DEBUG, "%s: Max FDs exceeded\n", __func__);
-> +        return;
-> +    }
-> +
-> +    if (msg->num_fds > 0) {
-> +        size_t fdsize = msg->num_fds * sizeof(int);
-> +
-> +        hdr.msg_control = &u;
-> +        hdr.msg_controllen = sizeof(u);
-> +
-> +        chdr = CMSG_FIRSTHDR(&hdr);
-> +        chdr->cmsg_len = CMSG_LEN(fdsize);
-> +        chdr->cmsg_level = SOL_SOCKET;
-> +        chdr->cmsg_type = SCM_RIGHTS;
-> +        memcpy(CMSG_DATA(chdr), msg->fds, fdsize);
-> +        hdr.msg_controllen = CMSG_SPACE(fdsize);
-> +    }
-> +
-> +    qemu_mutex_lock(lock);
-> +
-> +    do {
-> +        rc = sendmsg(sock, &hdr, 0);
-> +    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
-> +
-> +    if (rc < 0) {
-> +        qemu_log_mask(LOG_REMOTE_DEBUG, "%s - sendmsg rc is %d, errno is %d,"
-> +                      " sock %d\n", __func__, rc, errno, sock);
-> +        qemu_mutex_unlock(lock);
-> +        return;
-> +    }
-> +
-> +    if (msg->bytestream) {
-> +        data = msg->data2;
-> +    } else {
-> +        data = (uint8_t *)msg + MPQEMU_MSG_HDR_SIZE;
-> +    }
-> +
-> +    do {
-> +        rc = write(sock, data, msg->size);
-> +    } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
-> +
-> +    qemu_mutex_unlock(lock);
-
-Can this lock be avoided by using a single sendmsg(2) syscall instead of
-sendmsg() + write()?  I feel deja vu here, like I maybe have raised this
-in a previous revision of this patch series.
-
-> +    msg->num_fds = 0;
-> +    for (chdr = CMSG_FIRSTHDR(&hdr); chdr != NULL;
-> +         chdr = CMSG_NXTHDR(&hdr, chdr)) {
-> +        if ((chdr->cmsg_level == SOL_SOCKET) &&
-> +            (chdr->cmsg_type == SCM_RIGHTS)) {
-> +            fdsize = chdr->cmsg_len - CMSG_LEN(0);
-> +            msg->num_fds = fdsize / sizeof(int);
-> +            if (msg->num_fds > REMOTE_MAX_FDS) {
-> +                /*
-> +                 * TODO: Security issue detected. Sender never sends more
-> +                 * than REMOTE_MAX_FDS. This condition should be signaled to
-> +                 * the admin
-> +                 */
-
-This TODO doesn't seem actionable.  The error is already handled.
-
-> +                qemu_log_mask(LOG_REMOTE_DEBUG,
-> +                              "%s: Max FDs exceeded\n", __func__);
-> +                return -ERANGE;
-
-The mutex must be released.
-
---9RxwyT9MtfFuvYYZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5nu8UACgkQnKSrs4Gr
-c8hSFAgAtfOfgZfUaSjOvOG4MINCGVUklubwZJOhGBtEtcBEHuMpfwR5zsKG+pBF
-NtXBD/Hau0Bd8aSMG9PNgq47bPxuLttNzTqh9fh+n2DoBMXlvyhSLA+47G29QAhv
-tbabuRjhQSn/TdLx7t/00vbypHnBHXZAgOUKuchGuNrDKmwMChmK2J9dC5xtayCE
-rYxt6QWAbFkJGnc+iQTnp5Fu0sszy0PGOyoLe8fHD0pQOMOdTW3ZKi+7TqcEZ2tE
-6exkqzDaYVfVBTdC2/q22ifEnZsbcjy5mXVeLgE2dHStAV3VHYKZ7UY3LkxqouqV
-+RJfU+6CnEy1l/UJv/zDH6nR4BChiQ==
-=is06
------END PGP SIGNATURE-----
-
---9RxwyT9MtfFuvYYZ--
 
 
