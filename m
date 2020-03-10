@@ -2,70 +2,70 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8C9C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B13C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:25:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A298324677
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2134E24677
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:25:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvecGhrQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A298324677
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jIT8vSoe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2134E24677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBaBT-0004xF-NG
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:24:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53736)
+	id 1jBaCJ-0006Ld-B1
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:25:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBaAr-0004Y8-FW
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:23:38 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jBaBN-00050q-LL
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBaAp-0001TK-Ec
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:23:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55574
+ (envelope-from <kraxel@redhat.com>) id 1jBaBM-0002Ri-JX
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:24:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49112
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBaAp-0001RR-8P
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:23:35 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jBaBM-0002Qj-Fy
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:24:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583828614;
+ s=mimecast20190719; t=1583828648;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Loeg49si0X+YANqIvcDFEujdKJfttjEMR2Becynuzgo=;
- b=gvecGhrQtcadBybCUFwooEi8XEmBaBB/xwWml19uaKw+k3vf69bABCEVv9yMus/6lvJjtR
- GKLm1QJ2Cp84xh8sVac/AxJiMIXXdTPg17yMpMK4jccB7Lr+DZdrTw73IE+Fr+M9QPfBsy
- /fXHZY/8mpF5z3viMhHL4KNlI/022Xs=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=bMW7kf573hat9Op9zhPaTftoynNAJQS01+L97IyOcVk=;
+ b=jIT8vSoeDrp7xFK4BnHEeWS1nbLQudkMYj4QO7A7Y/WLAASx++ngax7e9bgY2Lh5uid3lI
+ sV6Q9G8rMIkHlzCwDHWefEByVal0nfrJQ1gSXQiRrOz8uk+Tvs1a91kZI0sRwJ8fGjWiv2
+ p/9xCIw8KGhIOqWIQhKpcU0bhcGHe/s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-SecMlvimOVyYHuyCT5GBTQ-1; Tue, 10 Mar 2020 04:23:30 -0400
-X-MC-Unique: SecMlvimOVyYHuyCT5GBTQ-1
+ us-mta-414-Gj6N7tz6P96vPHuGGUGhJw-1; Tue, 10 Mar 2020 04:24:06 -0400
+X-MC-Unique: Gj6N7tz6P96vPHuGGUGhJw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B634B18C8C03;
- Tue, 10 Mar 2020 08:23:29 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0E985C1D4;
- Tue, 10 Mar 2020 08:23:27 +0000 (UTC)
-Date: Tue, 10 Mar 2020 09:23:25 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Subject: Re: [PATCH v2] qom-qmp-cmds: fix two memleaks in qmp_object_add
-Message-ID: <20200310092325.39d7d2c0@redhat.com>
-In-Reply-To: <20200310064640.5059-1-pannengyuan@huawei.com>
-References: <20200310064640.5059-1-pannengyuan@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACBD58017CC;
+ Tue, 10 Mar 2020 08:24:05 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-117.ams2.redhat.com
+ [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C46C95C1D4;
+ Tue, 10 Mar 2020 08:24:02 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0EFF29DB6; Tue, 10 Mar 2020 09:24:02 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/2] Usb 20200310 patches
+Date: Tue, 10 Mar 2020 09:24:00 +0100
+Message-Id: <20200310082402.22839-1-kraxel@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
@@ -85,106 +85,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com, pbonzini@redhat.com, zhang.zhanghailiang@huawei.com
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Mar 2020 14:46:40 +0800
-Pan Nengyuan <pannengyuan@huawei.com> wrote:
+The following changes since commit 67f17e23baca5dd545fe98b01169cc351a70fe35=
+:
 
-> 'type/id' forgot to free in qmp_object_add, this patch fix that.
->=20
-> The leak stack:
-> Direct leak of 84 byte(s) in 6 object(s) allocated from:
->     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
-8)
->     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
->     #3 0x56344954e692 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
-qom/qom-qmp-cmds.c:258
->     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
-/qapi/qmp-dispatch.c:132
->     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
-pi/qmp-dispatch.c:175
->     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
-/qemu/monitor/qmp.c:145
->     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
-_test/qemu/monitor/qmp.c:234
->     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
-l/async.c:136
->=20
-> Direct leak of 54 byte(s) in 6 object(s) allocated from:
->     #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
-8)
->     #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->     #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
->     #3 0x56344954e6c4 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
-qom/qom-qmp-cmds.c:267
->     #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
-/qapi/qmp-dispatch.c:132
->     #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
-pi/qmp-dispatch.c:175
->     #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
-/qemu/monitor/qmp.c:145
->     #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
-_test/qemu/monitor/qmp.c:234
->     #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
-l/async.c:136
->=20
-> Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into stagi=
+ng (2020-03-06 17:15:36 +0000)
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
+are available in the Git repository at:
 
-> ---
-> v2->v1:
-> - do not store both a const and non-const string in the same variable, ch=
-ange it to a non-const string.
->   (Suggested by Daniel P. Berrang=C3=A9)
-> ---
->  qom/qom-qmp-cmds.c | 16 ++++++----------
->  1 file changed, 6 insertions(+), 10 deletions(-)
->=20
-> diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-> index 49db926fcc..435193b036 100644
-> --- a/qom/qom-qmp-cmds.c
-> +++ b/qom/qom-qmp-cmds.c
-> @@ -247,26 +247,22 @@ void qmp_object_add(QDict *qdict, QObject **ret_dat=
-a, Error **errp)
->      QDict *pdict;
->      Visitor *v;
->      Object *obj;
-> -    const char *type;
-> -    const char *id;
-> +    g_autofree char *type =3D NULL;
-> +    g_autofree char *id =3D NULL;
-> =20
-> -    type =3D qdict_get_try_str(qdict, "qom-type");
-> +    type =3D g_strdup(qdict_get_try_str(qdict, "qom-type"));
->      if (!type) {
->          error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
->          return;
-> -    } else {
-> -        type =3D g_strdup(type);
-> -        qdict_del(qdict, "qom-type");
->      }
-> +    qdict_del(qdict, "qom-type");
-> =20
-> -    id =3D qdict_get_try_str(qdict, "id");
-> +    id =3D g_strdup(qdict_get_try_str(qdict, "id"));
->      if (!id) {
->          error_setg(errp, QERR_MISSING_PARAMETER, "id");
->          return;
-> -    } else {
-> -        id =3D g_strdup(id);
-> -        qdict_del(qdict, "id");
->      }
-> +    qdict_del(qdict, "id");
-> =20
->      props =3D qdict_get(qdict, "props");
->      if (props) {
+  git://git.kraxel.org/qemu tags/usb-20200310-pull-request
+
+for you to fetch changes up to e13a22db0d47012e19ad02c9dafacbe25f94e1b4:
+
+  usb/hcd-ehci: Remove redundant statements (2020-03-09 11:12:55 +0100)
+
+----------------------------------------------------------------
+usb: bugfixes for ehci & serial.
+
+----------------------------------------------------------------
+
+Chen Qun (1):
+  usb/hcd-ehci: Remove redundant statements
+
+Jason Andryuk (1):
+  usb-serial: wakeup device on input
+
+ hw/usb/dev-serial.c | 6 +++++-
+ hw/usb/hcd-ehci.c   | 3 ---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+--=20
+2.18.2
 
 
