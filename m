@@ -2,81 +2,82 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFCFC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857E0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6EC3215A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ECBF215A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:54:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klfYWUd1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6EC3215A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEbUmRG+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ECBF215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmou-0007cS-UH
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:53:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34640)
+	id 1jBmq0-0000mT-Gx
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:54:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jBmn5-0005GH-QK
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:51:57 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jBmp4-00084d-3g
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jBmn4-000720-F1
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:51:55 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35063)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jBmp3-0004JJ-7Y
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:53:58 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39785)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jBmn1-0006t8-FK; Tue, 10 Mar 2020 17:51:51 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 7so34496pgr.2;
- Tue, 10 Mar 2020 14:51:51 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jBmp3-0004Go-1v
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:53:57 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f7so3092456wml.4
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 14:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=xrITzaKBDT6hlCX5NlWwCs8lcDqgdRQyc9lbFfxyrmI=;
- b=klfYWUd1DUBwvIAUoso5YGQCN2yXiXRA6a9b1cfsUg9GNpGQ6Yd5hmCSbzFexzHL/4
- mX3KRw6ejiKAdGiu8yTu71Xh/3wYj60ZqJmaKtp6yIc/83hoBzS5hZiKn3aXKF/QBBBz
- HPk6zhaL+/MyEU96qRCt1PYG/8bafvU04cETEv9SOh+bgFMtTw91NotVdQZ1eiz5th2S
- sWg64rcwliXS9yy0QW3ZW8xFZSCcvZ239L+XScy0XtGduAetPDFuk5aaQVXy4iCMOJHp
- MqHa2+SMLvzF0FIkHVbck2Fw5ui6/QSvxGgZdnxaInVr34Pr3/+545Dr8b9jiLB3lEA/
- cfUA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=XhyXbvBCeJlDfuSwlmsnRwnAkZH5zIa02jwioq1Fx0I=;
+ b=GEbUmRG+Mx4g/i0/JiU9MLzHXTwa0k2+0qKnljiKelG3x8M0GRZWKCTcHW7NsAXWP+
+ NWFy09k41CY6O/xnDK93nvRPWAdiZE53j5X0Gcg/LdSkJ3UwWviFA6vLG87uMgHU4cGG
+ +heJFBi/t0a7SUO/AuSt6lKRxQgAKe98SZdbSiiIGa6soNrtdhYy9Z6xLPMdAOvOIYIj
+ 4WElRmkHH4iNOWXbKSwR4eFy+WpYLESc0VDonoWN8NLyfOp4k95wNW/oUXnP4yflcPj7
+ H7DTxe11Wiwd5hIECJOg6Pz4Dk6EKVyrRZIDfPRPTDW3SpE7eDMkIV+cKuj2AmCV8trO
+ 9kSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=xrITzaKBDT6hlCX5NlWwCs8lcDqgdRQyc9lbFfxyrmI=;
- b=qCwB1KgKs4PnhDSTb//+HwDL0EIeA/reOMQSFSri3f4436doTjuA0pu5NYTbgbfkUB
- GOhdwSJ+G/dCjwez+zOqaW5WRHKWUWzWQcm38eMzYifhFnFQvkOysDugE4WcmYv0rvO5
- gFpNSDgehL2xDM3aKb0sm3hBMrf70hNGGXum+IspOA5VA5VFjQvxk2nkibicVWne2BCv
- ht7h3E9UL0PPzuLSARj7gMeOZASyDO1/qmBRyRVmduQB5cqKoVnJPbuqQ/i7j7Td+MRG
- IOm6QncdWpui7rJ69RF0too7sAA3gvmFuVA3hlo8MMwvfO6hejvc4TGY6xyvHzqbyRm4
- UiUA==
-X-Gm-Message-State: ANhLgQ2X2gh81ErhdvLCkeowHHFutv3KHtZ9ZS6Q6Oj3zzn0rxri6wFF
- cZJLfor6ORkmgklcCunwSXEosLqv
-X-Google-Smtp-Source: ADFU+vsiXIfSCQjhL5dohN+y/C/o/3byOGoC6J1oTD+yx7nKbK1nhRKK64w8jRMdCdNJ4PksWtmqSA==
-X-Received: by 2002:a62:778d:: with SMTP id s135mr3812973pfc.21.1583877110249; 
- Tue, 10 Mar 2020 14:51:50 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id d19sm3937865pfd.82.2020.03.10.14.51.49
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 10 Mar 2020 14:51:49 -0700 (PDT)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 1/2] hw/arm: fsl-imx25: Wire up eSDHC controllers
-Date: Tue, 10 Mar 2020 14:51:45 -0700
-Message-Id: <20200310215146.19688-2-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200310215146.19688-1-linux@roeck-us.net>
-References: <20200310215146.19688-1-linux@roeck-us.net>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=XhyXbvBCeJlDfuSwlmsnRwnAkZH5zIa02jwioq1Fx0I=;
+ b=oM5ENqOssvJGEr6Q8FRYUnae2hwRgzH8yYQUHl6G9a7KQLMSGzeE3234lzL2YsJ5CC
+ MiwtJVofWz8D2I/AY48vlTev0pN5vwWDH3PpBkjjIkFKeOwynS1AuwwEK6WNk11bCg99
+ EPoitgQ3bemGx2WW96P8tqjqUsL7hTRKfJfGEswLt+vEmfH33oX52O8d9EyCPbr0/ZGB
+ gx7VWll3WQbTLthQ13CuaOjYYiJG3SxYtf4Dhy9rKtLrkexzpiQASgPgjkL/fsAD19Po
+ uCxZksHaB3Snu5qql1+fxV1/IYJlVoKGEsbExqgdkN5E1Sar6tW+vBDcPXIDZS/gQ4q/
+ 5QuQ==
+X-Gm-Message-State: ANhLgQ1n70wf8JEDmvpi3YCSfF4CrMfT9HWLyfgs0+kRL3/OZc4kIoCd
+ DW3KQfZVdhqXFFN5DBSfFS9BNDyXBJ0Q18kZd0Y=
+X-Google-Smtp-Source: ADFU+vtLGu4HGbvhIfuAKZH70G26DyrQhAbZI/T+ynkQlB4cLe2U+5C+F72YhbZK2m7eocmkmMp0JErBWVy3IxKWyfc=
+X-Received: by 2002:a7b:c153:: with SMTP id z19mr3873073wmi.37.1583877235091; 
+ Tue, 10 Mar 2020 14:53:55 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200310152141.13959-1-peter.maydell@linaro.org>
+ <99854e03-fe9e-e6a9-d9ba-3abf8d9acf98@redhat.com>
+In-Reply-To: <99854e03-fe9e-e6a9-d9ba-3abf8d9acf98@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 10 Mar 2020 22:53:43 +0100
+Message-ID: <CAJ+F1CKbt3robdtFw4jB2J13H6D2PKBHNdNOqxDac1cqGZy9Ng@mail.gmail.com>
+Subject: Re: [PATCH] tests: Disable dbus-vmstate-test
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,164 +89,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Guenter Roeck <linux@roeck-us.net>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Wire up eSDHC controllers in fsl-imx25. For imx25-pdk, connect drives
-provided on the command line to available eSDHC controllers.
+Hi
 
-This patch enables booting the imx25-pdk emulation from SD card.
+On Tue, Mar 10, 2020 at 4:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/03/20 16:21, Peter Maydell wrote:
+> >
+> >   dbus-daemon[9321]: Could not get password database information for UI=
+D of current process: User "???" unknown or no memory to allocate password =
+entry
+> >
+> >   **
+> >   ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.c:114:get_conn=
+ection: assertion failed (err =3D=3D NULL): The connection is closed (g-io-=
+error-quark, 18)
+> >   cleaning up pid 9321
+> >   ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-t=
+est.c:114:get_connection: assertion failed (err =3D=3D NULL): The connectio=
+n is closed (g-io-error-quark, 18)
+> >   make: *** [/tmp/qemu-test/src/tests/Makefile.include:632: check-qtest=
+-x86_64] Error 1
+> >   make: *** Waiting for unfinished jobs....
+> >
+> > It's not clear why this is happening (perhaps a recently revealed
+> > race condition or a change in the patchew build environment?).
+> >
+> > For the moment, disable this test so that patchew test runs are
+> > useful and don't email the list with spurious failure mails.
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- hw/arm/fsl-imx25.c         | 32 ++++++++++++++++++++++++++++++++
- hw/arm/imx25_pdk.c         | 16 ++++++++++++++++
- include/hw/arm/fsl-imx25.h |  9 +++++++++
- 3 files changed, 57 insertions(+)
+I tried to reproduce on a fresh ubuntu 19.10, with make
+docker-test-debug@fedora there, and the dbus-vmstate test pass, as
+well as the rest for the build.
 
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index da3471b395..f977c42426 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -31,6 +31,8 @@
- #include "hw/qdev-properties.h"
- #include "chardev/char.h"
- 
-+#define IMX25_ESDHC_CAPABILITIES     0x07e20000
-+
- static void fsl_imx25_init(Object *obj)
- {
-     FslIMX25State *s = FSL_IMX25(obj);
-@@ -74,6 +76,11 @@ static void fsl_imx25_init(Object *obj)
-         sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
-                               TYPE_IMX_GPIO);
-     }
-+
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        sysbus_init_child_obj(obj, "sdhc[*]", &s->esdhc[i], sizeof(s->esdhc[i]),
-+                              TYPE_IMX_USDHC);
-+    }
- }
- 
- static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-@@ -246,6 +253,31 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-                                             gpio_table[i].irq));
-     }
- 
-+    /* Initialize all SDHC */
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        static const struct {
-+            hwaddr addr;
-+            unsigned int irq;
-+        } esdhc_table[FSL_IMX25_NUM_ESDHCS] = {
-+            { FSL_IMX25_ESDHC1_ADDR, FSL_IMX25_ESDHC1_IRQ },
-+            { FSL_IMX25_ESDHC2_ADDR, FSL_IMX25_ESDHC2_IRQ },
-+        };
-+
-+        object_property_set_uint(OBJECT(&s->esdhc[i]), 2, "sd-spec-version",
-+                                 &err);
-+        object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
-+                                 "capareg", &err);
-+        object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->esdhc[i]), 0, esdhc_table[i].addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->esdhc[i]), 0,
-+                           qdev_get_gpio_in(DEVICE(&s->avic),
-+                                            esdhc_table[i].irq));
-+    }
-+
-     /* initialize 2 x 16 KB ROM */
-     memory_region_init_rom(&s->rom[0], NULL,
-                            "imx25.rom0", FSL_IMX25_ROM0_SIZE, &err);
-diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-index 26713d9a7e..b3ca82bafa 100644
---- a/hw/arm/imx25_pdk.c
-+++ b/hw/arm/imx25_pdk.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
-+#include "hw/qdev-properties.h"
- #include "hw/arm/fsl-imx25.h"
- #include "hw/boards.h"
- #include "qemu/error-report.h"
-@@ -120,6 +121,21 @@ static void imx25_pdk_init(MachineState *machine)
-     imx25_pdk_binfo.board_id = 1771,
-     imx25_pdk_binfo.nb_cpus = 1;
- 
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        BusState *bus;
-+        DeviceState *carddev;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        bus = qdev_get_child_bus(DEVICE(&s->soc.esdhc[i]), "sd-bus");
-+        carddev = qdev_create(bus, TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true,
-+                                 "realized", &error_fatal);
-+    }
-+
-     /*
-      * We test explicitly for qtest here as it is not done (yet?) in
-      * arm_load_kernel(). Without this the "make check" command would
-diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
-index 1c86bb55fb..4e2d4868cd 100644
---- a/include/hw/arm/fsl-imx25.h
-+++ b/include/hw/arm/fsl-imx25.h
-@@ -27,6 +27,7 @@
- #include "hw/misc/imx_rngc.h"
- #include "hw/i2c/imx_i2c.h"
- #include "hw/gpio/imx_gpio.h"
-+#include "hw/sd/sdhci.h"
- #include "exec/memory.h"
- #include "target/arm/cpu.h"
- 
-@@ -38,6 +39,7 @@
- #define FSL_IMX25_NUM_EPITS 2
- #define FSL_IMX25_NUM_I2CS 3
- #define FSL_IMX25_NUM_GPIOS 4
-+#define FSL_IMX25_NUM_ESDHCS 2
- 
- typedef struct FslIMX25State {
-     /*< private >*/
-@@ -54,6 +56,7 @@ typedef struct FslIMX25State {
-     IMXRNGCState   rngc;
-     IMXI2CState    i2c[FSL_IMX25_NUM_I2CS];
-     IMXGPIOState   gpio[FSL_IMX25_NUM_GPIOS];
-+    SDHCIState     esdhc[FSL_IMX25_NUM_ESDHCS];
-     MemoryRegion   rom[2];
-     MemoryRegion   iram;
-     MemoryRegion   iram_alias;
-@@ -215,6 +218,10 @@ typedef struct FslIMX25State {
- #define FSL_IMX25_GPIO3_SIZE    0x4000
- #define FSL_IMX25_RNGC_ADDR     0x53FB0000
- #define FSL_IMX25_RNGC_SIZE     0x4000
-+#define FSL_IMX25_ESDHC1_ADDR   0x53FB4000
-+#define FSL_IMX25_ESDHC1_SIZE   0x4000
-+#define FSL_IMX25_ESDHC2_ADDR   0x53FB8000
-+#define FSL_IMX25_ESDHC2_SIZE   0x4000
- #define FSL_IMX25_GPIO1_ADDR    0x53FCC000
- #define FSL_IMX25_GPIO1_SIZE    0x4000
- #define FSL_IMX25_GPIO2_ADDR    0x53FD0000
-@@ -250,5 +257,7 @@ typedef struct FslIMX25State {
- #define FSL_IMX25_GPIO2_IRQ     51
- #define FSL_IMX25_GPIO3_IRQ     16
- #define FSL_IMX25_GPIO4_IRQ     23
-+#define FSL_IMX25_ESDHC1_IRQ    9
-+#define FSL_IMX25_ESDHC2_IRQ    8
- 
- #endif /* FSL_IMX25_H */
--- 
-2.17.1
+Any help on how to reproduce appreciated.
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
