@@ -2,116 +2,127 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF634C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEADC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0144208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:40:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0144208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 6626824673
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:41:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GaT3IiPw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6626824673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBaRW-0005Xq-1S
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:40:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52052)
+	id 1jBaSD-0006u9-KT
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:41:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBaQl-00057b-Cr
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:04 -0400
+ (envelope-from <david@redhat.com>) id 1jBaRJ-0005Yb-Hp
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBaQk-00039N-7P
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:59059)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jBaQj-00030a-Ud
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:02 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MNKuI-1izxQV09DG-00Oskk; Tue, 10 Mar 2020 09:39:49 +0100
-To: unai.martinezcorral@ehu.eus, Eric Blake <eblake@redhat.com>
-References: <20200309191200.GA60@669c1c222ef4>
- <20200309191846.GA65@669c1c222ef4>
- <9f03379d-f4fa-2ac4-409f-123222233cf4@redhat.com>
- <CAGZZdDHj6nA78YYXNOpncOTQSNqWKLwTXY_ppU+REikCQcpRtQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH v10 01/10] qemu-binfmt-conf.sh: enforce style consistency
-Message-ID: <5e41fff2-20af-c4b1-5d57-26da7f08a57c@vivier.eu>
-Date: Tue, 10 Mar 2020 09:39:45 +0100
+ (envelope-from <david@redhat.com>) id 1jBaRI-00059I-EI
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28440
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBaRI-00055l-AA
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:40:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583829635;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=gLKc16s3K0yRI728wwmgYd5ZY5m8e0qtYevlL3xWNjg=;
+ b=GaT3IiPwqgGVrqq0OsisX+ElPWchvk7kBrAISZ2i6UkqA0XWRlgYDPDF5d1yVjrJfODwmL
+ gpMa7SU+W9RXsDP7R4EVIi2NNY8J/s188uXOa92RnWw8MXp+Ni7q6Lbr0EHLgm6BsSAQ+R
+ wVOi0jqaE44RllA0SP9rYcvaj0n5TIU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-S_Jr3YcsMMuSY_AITy7vNw-1; Tue, 10 Mar 2020 04:40:32 -0400
+X-MC-Unique: S_Jr3YcsMMuSY_AITy7vNw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CA558005A1;
+ Tue, 10 Mar 2020 08:40:31 +0000 (UTC)
+Received: from [10.36.118.8] (unknown [10.36.118.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7D8091D6E;
+ Tue, 10 Mar 2020 08:40:29 +0000 (UTC)
+Subject: Re: [PATCH v8 1/2] s390x: ipl: Consolidate iplb validity check into
+ one function
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <b608f7d8-81ac-1e5b-011d-bd576f77aade@redhat.com>
+ <20200310083232.29805-1-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <bcc5c22d-374b-a1e6-6455-55809961a9de@redhat.com>
+Date: Tue, 10 Mar 2020 09:40:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAGZZdDHj6nA78YYXNOpncOTQSNqWKLwTXY_ppU+REikCQcpRtQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Y8eKvHDkh52l1McAtke3sUeIkZ+CLLoN2oGUNkWe/plm/ELbG+Q
- EuvEclyZpc34WZRVQvh/9SrrBXIsn4GIyFCN9vjbpmAaiSBhYB2Iy0Phs3dxh3j/XB3RozF
- jcGXZWZ2BTFDSnxEdEPJtHvcVa5UCaOa7mBNbsbVjAQDp/aagvKzUaZdXx1IqxDmss/i3xp
- ww1cIDh5INT4VA1ootJwg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sDQXzaht94c=:T7C9QxjDYwz1dEhOb2HA7e
- Sh2EEZiiK/ngMYBd2TcPSPIUPuPkXS6S9+ST+/7B1qr8UYE5v5SEbpkiUqbr15Efp4hvKmzAv
- fVyZITqWEpSz95z4rtVTNB7NBt0LFBtPgjs59I9m63R0fPVY2qjWUu/SSZzdVTIateWluYr6o
- /Sd64+EugwNMMveyM1iw4waI8Agpp0Y3hnG8RqWlVhG47/DSc3xryWi8Ar6kCyIEMUmZHa8TG
- 8GWnXOoXBFsDAmi4Tc/BLIOJa3ZHi3SRlClPQqGDKGHzBanf+vz/kVBub2wxhZO3GuQ/GW4YH
- M1mSy+Azgld375vMGgv7jdyCkb6G9ZGy8PMhkNMH/WHSpPtiQ4Sf9UDFp5+uoFO31NrdQBEM5
- jlgbJIVGYcwrg1tCzky2DAiz2mQyCiOu/4BCOHAbU/ni91eenX4+4eB/tHy1uawEEGgHBePFA
- n95hlAYW730KLhpsM35Mkzj2pcf4iRAMBRsbnb/2aV7BnGaOQm4ShShKRq6TqwxPr9Xz/AWhH
- QEGrLErPlgE4+en14+ObeSdath2DqpE6912WL/dA3+fRU0Ivzl0ocqZ7btbXWwcP3N0bK/fra
- BeyM2m8Gl1lcEhi+u77n4TVFvrQokiYvW+hkmqpIMSJinevEKxRgLzj5AxJLTwWeIDPFodagN
- GxOrc+Y7qxjKb8FxKpfKjc0O/kJxY1iOAjikVhrzN35dk2k0TXLAFpykTgWFavKewwBAbbEqx
- QgYS2pW0c9qdKoMuvWMCFZ3i6QvwgaY82SdDcjtvBEyh7/+WHGYQIzY9e2sUR6RyWhnAw+Yrh
- 0rWeUg4LsZzxFWoGREH4YE3/fDc5ukq2DSrb3mlt7BYyWEc3QDLLQPkXDbA6sfSZD7qAs3e
+In-Reply-To: <20200310083232.29805-1-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,37 +134,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/03/2020 à 20:36, Unai Martinez Corral a écrit :
-> 2020/3/9 20:30, Eric Blake:
+On 10.03.20 09:32, Janosch Frank wrote:
+> It's nicer to just call one function than calling a function for each
+> possible iplb type.
 > 
->     On 3/9/20 2:18 PM, Unai Martinez-Corral wrote:
->     > Spaces are removed before '; then', for consistency with other scripts
->     > in the project.
->     >
->     > Signed-off-by: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>
->     > Reviewed-by: Laurent Vivier <laurent@vivier.eu
->     <mailto:laurent@vivier.eu>>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.h      | 20 +++++++++++---------
+>  target/s390x/diag.c |  2 +-
+>  2 files changed, 12 insertions(+), 10 deletions(-)
 > 
->     Technically, since this change is different than what Laurent
->     previously
->     reviewed, it might have been better to drop the R-b to make sure
->     everything is still okay.  But I'll let Laurent chime in, no need to
->     respin just yet.
-> 
-> 
-> Thanks for clarifying. Honestly, I was not sure about how to proceed.
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index d4813105db..211ce2dbeb 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -173,16 +173,18 @@ static inline bool iplb_valid_len(IplParameterBlock *iplb)
+>      return be32_to_cpu(iplb->len) <= sizeof(IplParameterBlock);
+>  }
+>  
+> -static inline bool iplb_valid_ccw(IplParameterBlock *iplb)
+> +static inline bool iplb_valid(IplParameterBlock *iplb)
+>  {
+> -    return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_CCW_LEN &&
+> -           iplb->pbt == S390_IPL_TYPE_CCW;
+> -}
+> -
+> -static inline bool iplb_valid_fcp(IplParameterBlock *iplb)
+> -{
+> -    return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_FCP_LEN &&
+> -           iplb->pbt == S390_IPL_TYPE_FCP;
+> +    switch (iplb->pbt) {
+> +    case S390_IPL_TYPE_FCP:
+> +        return (be32_to_cpu(iplb->len) >= S390_IPLB_MIN_FCP_LEN &&
+> +                iplb->pbt == S390_IPL_TYPE_FCP);
+> +    case S390_IPL_TYPE_CCW:
+> +        return (be32_to_cpu(iplb->len) >= S390_IPLB_MIN_CCW_LEN &&
+> +                iplb->pbt == S390_IPL_TYPE_CCW);
+> +    default:
+> +        return false;
+> +    }
+>  }
+>  
+>  #endif
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index b5aec06d6b..54e5670b3f 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -117,7 +117,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>  
+>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+>  
+> -        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb)) {
+> +        if (!iplb_valid(iplb)) {
+>              env->regs[r1 + 1] = DIAG_308_RC_INVALID;
+>              goto out;
+>          }
 > 
 
-Yes, it's better to drop the R-b if you change something that could
-impact the review.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-But this patch seems good, so you can let my R-b now.
-
+-- 
 Thanks,
-Laurent
+
+David / dhildenb
+
 
