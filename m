@@ -2,65 +2,66 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4476DC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469CCC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:09:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1612724673
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:05:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1612724673
+	by mail.kernel.org (Postfix) with ESMTPS id 1DCA02253D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:09:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DCA02253D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBZtf-0005b1-9r
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52725)
+	id 1jBZwy-00083F-9a
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:09:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58870)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <longpeng2@huawei.com>) id 1jBZsn-0004ci-3x
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:04:58 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jBZwH-0007Lu-PZ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <longpeng2@huawei.com>) id 1jBZsl-00031a-Lw
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:04:56 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:35422 helo=huawei.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jBZwG-0003dI-GP
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:08:33 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:60858 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
- id 1jBZsl-0002fc-8y
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:04:55 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 3D46ACD806B58C211F28;
- Tue, 10 Mar 2020 16:04:46 +0800 (CST)
-Received: from [10.173.228.124] (10.173.228.124) by smtp.huawei.com
- (10.3.19.209) with Microsoft SMTP Server (TLS) id 14.3.487.0; Tue, 10 Mar
- 2020 16:04:35 +0800
-Subject: Re: [PATCH RESEND 2/3] vhost: fix a null pointer reference of
- vhost_log
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200224064219.1434-1-longpeng2@huawei.com>
- <20200224064219.1434-3-longpeng2@huawei.com>
- <20200310014623-mutt-send-email-mst@kernel.org>
-From: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
- <longpeng2@huawei.com>
-Message-ID: <7da2b8b6-afe7-7f1f-9252-925b6bc543d8@huawei.com>
-Date: Tue, 10 Mar 2020 16:04:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20200310014623-mutt-send-email-mst@kernel.org>
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jBZwD-0003RY-HD; Tue, 10 Mar 2020 04:08:29 -0400
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id C490AEDDFAFFE63D0BC4;
+ Tue, 10 Mar 2020 16:08:24 +0800 (CST)
+Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.115]) by
+ DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id 14.03.0439.000;
+ Tue, 10 Mar 2020 16:08:17 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: RE: [PATCH v2] hw/net/imx_fec: write TGSR and TCSR3 in
+ imx_enet_write()
+Thread-Topic: [PATCH v2] hw/net/imx_fec: write TGSR and TCSR3 in
+ imx_enet_write()
+Thread-Index: AQHV8txXWFydji2esEaJwP7bouY1uqg/odiAgAHJJhA=
+Date: Tue, 10 Mar 2020 08:08:17 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B68019B@dggemm511-mbx.china.huawei.com>
+References: <20200305105325.31264-1-kuhn.chenqun@huawei.com>
+ <CAFEAcA8fnz2oaa-CO-EEK_vQTWfPih4PrAB3i4UUgQpv9Y_4mg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8fnz2oaa-CO-EEK_vQTWfPih4PrAB3i4UUgQpv9Y_4mg@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.228.124]
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 45.249.212.255
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,145 +73,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: weifuqiang@huawei.com, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, alex.williamson@redhat.com, arei.gonglei@huawei.com,
- huangzhichao@huawei.com,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/3/10 13:57, Michael S. Tsirkin wrote:
-> On Mon, Feb 24, 2020 at 02:42:18PM +0800, Longpeng(Mike) wrote:
->> From: Longpeng <longpeng2@huawei.com>
->>
->> vhost_log_alloc() may fails and returned pointer of log is null.
->> However there're two places derefernce the return pointer without
->> check.
->>
->> Signed-off-by: Longpeng <longpeng2@huawei.com>
->> ---
->>  hw/virtio/vhost.c | 19 +++++++++++++++++--
->>  1 file changed, 17 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->> index 9edfadc..c7ad6e5 100644
->> --- a/hw/virtio/vhost.c
->> +++ b/hw/virtio/vhost.c
->> @@ -219,6 +219,10 @@ static struct vhost_log *vhost_log_get(uint64_t size, bool share)
->>  
->>      if (!log || log->size != size) {
->>          log = vhost_log_alloc(size, share);
->> +        if (!log) {
->> +            return NULL;
->> +        }
->> +
->>          if (share) {
->>              vhost_log_shm = log;
->>          } else {
->> @@ -270,10 +274,17 @@ static bool vhost_dev_log_is_shared(struct vhost_dev *dev)
->>  
->>  static inline void vhost_dev_log_resize(struct vhost_dev *dev, uint64_t size)
->>  {
->> -    struct vhost_log *log = vhost_log_get(size, vhost_dev_log_is_shared(dev));
->> -    uint64_t log_base = (uintptr_t)log->log;
->> +    struct vhost_log *log;
->> +    uint64_t log_base;
->>      int r;
->>  
->> +    log = vhost_log_get(size, vhost_dev_log_is_shared(dev));
->> +    if (!log) {
->> +        return;
->> +    }
->> +
-> 
-> I'm not sure silently failing like this is safe. Callers assume
-> log can be resized. What can be done? I suspect not much
-> beside exiting ...
-> Speaking of which, lots of other failures in log resizing
-> path seem to be silently ignored.
-> I guess we should propagate them, and fix callers to check
-> the return code?
-> 
-How about to let the callers treat the failure of log_resize as a fatal error ?
-
--static inline void vhost_dev_log_resize(struct vhost_dev *dev, uint64_t size)
-+static inline int vhost_dev_log_resize(struct vhost_dev *dev, uint64_t size)
- {
--    struct vhost_log *log = vhost_log_get(size, vhost_dev_log_is_shared(dev));
--    uint64_t log_base = (uintptr_t)log->log;
-+    struct vhost_log *log;
-+    uint64_t log_base;
-     int r;
-
-+    log = vhost_log_get(size, vhost_dev_log_is_shared(dev));
-+    if (!log) {
-+        r = -1;
-+        goto out;
-+    }
-+
-+    log_base = (uintptr_t)log->log;
-+
-     /* inform backend of log switching, this must be done before
-        releasing the current log, to ensure no logging is lost */
-     r = dev->vhost_ops->vhost_set_log_base(dev, log_base, log);
-@@ -284,6 +296,9 @@ static inline void vhost_dev_log_resize(struct vhost_dev
-*dev, uint64_t size)
-     vhost_log_put(dev, true);
-     dev->log = log;
-     dev->log_size = size;
-+
-+out:
-+    return 0;
- }
-
-
-@@ -510,7 +525,9 @@ static void vhost_commit(MemoryListener *listener)
- #define VHOST_LOG_BUFFER (0x1000 / sizeof *dev->log)
-     /* To log more, must increase log size before table update. */
-     if (dev->log_size < log_size) {
--        vhost_dev_log_resize(dev, log_size + VHOST_LOG_BUFFER);
-+        if (vhost_dev_log_resize(dev, log_size + VHOST_LOG_BUFFER) < 0) {
-+            abort();
-+        }
-     }
-     r = dev->vhost_ops->vhost_set_mem_table(dev, dev->mem);
-     if (r < 0) {
-@@ -518,7 +535,9 @@ static void vhost_commit(MemoryListener *listener)
-     }
-     /* To log less, can only decrease log size after table update. */
-     if (dev->log_size > log_size + VHOST_LOG_BUFFER) {
--        vhost_dev_log_resize(dev, log_size);
-+        if (vhost_dev_log_resize(dev, log_size + VHOST_LOG_BUFFER) < 0) {
-+            abort();
-+        }
-     }
-
- out:
-@@ -818,7 +837,11 @@ static int vhost_migration_log(MemoryListener *listener,
-int enable)
-         }
-         vhost_log_put(dev, false);
-     } else {
--        vhost_dev_log_resize(dev, vhost_get_log_size(dev));
-+        r = vhost_dev_log_resize(dev, vhost_get_log_size(dev));
-+        if (r < 0) {
-+            return r;
-+        }
-+
-         r = vhost_dev_set_log(dev, true);
-         if (r < 0) {
-             return r;
-
-
-> 
-> .
-> 
-
--- 
----
-Regards,
-Longpeng(Mike)
+Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogUGV0ZXIgTWF5ZGVsbCBbbWFpbHRv
+OnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCj5TZW50OiBNb25kYXksIE1hcmNoIDksIDIwMjAg
+NzozNiBQTQ0KPlRvOiBDaGVucXVuIChrdWhuKSA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+
+Q2M6IFFFTVUgRGV2ZWxvcGVycyA8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgUUVNVSBUcml2aWFs
+IDxxZW11LQ0KPnRyaXZpYWxAbm9uZ251Lm9yZz47IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5n
+aGFpbGlhbmdAaHVhd2VpLmNvbT47DQo+SmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47
+IFBldGVyIENodWJiDQo+PHBldGVyLmNodWJiQG5pY3RhLmNvbS5hdT47IHFlbXUtYXJtIDxxZW11
+LWFybUBub25nbnUub3JnPjsgRXVsZXINCj5Sb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4N
+Cj5TdWJqZWN0OiBSZTogW1BBVENIIHYyXSBody9uZXQvaW14X2ZlYzogd3JpdGUgVEdTUiBhbmQg
+VENTUjMgaW4NCj5pbXhfZW5ldF93cml0ZSgpDQo+DQo+T24gVGh1LCA1IE1hciAyMDIwIGF0IDEw
+OjUzLCBDaGVuIFF1biA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+IHdyb3RlOg0KPj4NCj4+IFRo
+ZSBjdXJyZW50IGNvZGUgY2F1c2VzIGNsYW5nIHN0YXRpYyBjb2RlIGFuYWx5emVyIGdlbmVyYXRl
+IHdhcm5pbmc6DQo+PiBody9uZXQvaW14X2ZlYy5jOjg1ODo5OiB3YXJuaW5nOiBWYWx1ZSBzdG9y
+ZWQgdG8gJ3ZhbHVlJyBpcyBuZXZlciByZWFkDQo+PiAgICAgICAgIHZhbHVlID0gdmFsdWUgJiAw
+eDAwMDAwMDBmOw0KPj4gICAgICAgICBeICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+fg0KPj4gaHcv
+bmV0L2lteF9mZWMuYzo4NjQ6OTogd2FybmluZzogVmFsdWUgc3RvcmVkIHRvICd2YWx1ZScgaXMg
+bmV2ZXIgcmVhZA0KPj4gICAgICAgICB2YWx1ZSA9IHZhbHVlICYgMHgwMDAwMDBmZDsNCj4+ICAg
+ICAgICAgXiAgICAgICB+fn5+fn5+fn5+fn5+fn5+fn4NCj4+DQo+PiBBY2NvcmRpbmcgdG8gdGhl
+IGRlZmluaXRpb24gb2YgdGhlIGZ1bmN0aW9uLCB0aGUgdHdvIOKAnHZhbHVl4oCdDQo+PiBhc3Np
+Z25tZW50cyAgc2hvdWxkIGJlIHdyaXR0ZW4gdG8gcmVnaXN0ZXJzLg0KPj4NCj4+IFJlcG9ydGVk
+LWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4+IFNpZ25lZC1vZmYt
+Ynk6IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+IC0tLQ0KPj4gdjEtPnYy
+Og0KPj4gICBUaGUgcmVnaXN0ZXIgJ0VORVRfVEdTUicgd3JpdGUtMS10by1jbGVhciB0aW1lciBm
+bGFnLg0KPj4gICBUaGUgcmVnaXN0ZXIgJ0VORVRfVENTUm4nIDdiaXQoVEYpIHdyaXRlLTEtdG8t
+Y2xlYXIgdGltZXIgZmxhZy4NCj4+IC0tLQ0KPj4gIGh3L25ldC9pbXhfZmVjLmMgfCA2ICsrKyst
+LQ0KPj4gIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+
+Pg0KPj4gZGlmZiAtLWdpdCBhL2h3L25ldC9pbXhfZmVjLmMgYi9ody9uZXQvaW14X2ZlYy5jIGlu
+ZGV4DQo+PiA2YTEyNGExNTRhLi4zMjJjYmRjYzE3IDEwMDY0NA0KPj4gLS0tIGEvaHcvbmV0L2lt
+eF9mZWMuYw0KPj4gKysrIGIvaHcvbmV0L2lteF9mZWMuYw0KPj4gQEAgLTg1NSwxMyArODU1LDE1
+IEBAIHN0YXRpYyB2b2lkIGlteF9lbmV0X3dyaXRlKElNWEZFQ1N0YXRlICpzLA0KPnVpbnQzMl90
+IGluZGV4LCB1aW50MzJfdCB2YWx1ZSkNCj4+ICAgICAgICAgIGJyZWFrOw0KPj4gICAgICBjYXNl
+IEVORVRfVEdTUjoNCj4+ICAgICAgICAgIC8qIGltcGxlbWVudCBjbGVhciB0aW1lciBmbGFnICov
+DQo+PiAtICAgICAgICB2YWx1ZSA9IHZhbHVlICYgMHgwMDAwMDAwZjsNCj4+ICsgICAgICAgIHMt
+PnJlZ3NbaW5kZXhdIF49IHMtPnJlZ3NbaW5kZXhdICYgdmFsdWU7DQo+PiArICAgICAgICBzLT5y
+ZWdzW2luZGV4XSAmPSAweDAwMDAwMDBmOw0KPj4gICAgICAgICAgYnJlYWs7DQo+PiAgICAgIGNh
+c2UgRU5FVF9UQ1NSMDoNCj4+ICAgICAgY2FzZSBFTkVUX1RDU1IxOg0KPj4gICAgICBjYXNlIEVO
+RVRfVENTUjI6DQo+PiAgICAgIGNhc2UgRU5FVF9UQ1NSMzoNCj4+IC0gICAgICAgIHZhbHVlID0g
+dmFsdWUgJiAweDAwMDAwMGZkOw0KPj4gKyAgICAgICAgcy0+cmVnc1tpbmRleF0gPSAodmFsdWUg
+JiAweDAwMDAwMDgwKSA/ICgweDAwMDAwMDdkICYgdmFsdWUpIDoNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgKHZhbHVlICYgMHgwMDAwMDBmZCk7DQo+PiAgICAgICAgICBicmVhazsNCj4+
+ICAgICAgY2FzZSBFTkVUX1RDQ1IwOg0KPj4gICAgICBjYXNlIEVORVRfVENDUjE6DQo+DQo+VGhp
+cyBpc24ndCB0aGUgdXN1YWwgd2F5IHRvIHdyaXRlIFcxQyBiZWhhdmlvdXIuDQo+SWYgYWxsIHRo
+ZSByZWxldmFudCBiaXRzIGFyZSBXMUMsIGFzIGZvciBUR1NSOg0KPg0KPiAgIHMtPnJlZ3NbaW5k
+ZXhdICY9IH4odmFsdWUgJiAweGYpOyAvKiBhbGwgYml0cyBXMUMgKi8NCj4NClllcywgaXQgbG9v
+a3MgYmV0dGVyLg0KQnV0IGRvIHdlIG5lZWQgY2xlYXIgdGhlIHJlc2VydmVkIGJpdCAoMzEgLSA0
+IGJpdHMpIGV4cGxpY2l0bHkgPw0KDQpXZSBzZWUgdGhhdCBvdGhlciByZWdpc3RlcnMgaGF2ZSBl
+eHBsaWNpdGx5IGNsZWFyZWQgdGhlIHJlc2VydmVkIGJpdCwgIHdoaWNoIGFsc28gbWVldHMgdGhl
+IEkuTVggZGF0YXNoZWV0IHJlcXVpcmVtZW50cy4NCg0Kcy0+cmVnc1tpbmRleF0gJj0gfih2YWx1
+ZSAmIDB4ZikgJiAweGY7ICAgIC8qIDAtMyBiaXRzIFcxQywgNC0zMSByZXNlcnZlZCAgYml0cyB3
+cml0ZSB6ZXJvICovDQoNCj5JZiBzb21lIGJ1dCBub3QgYWxsIGJpdHMgYXJlIFcxQywgYXMgZm9y
+IFRDU1IqOg0KPg0KWWVzLCAgdGhpcyBwYXRjaCBpcyAganVzdCBvbmx5IFcxQyBmb3IgN2JpdCwg
+bm90IGFsbCBiaXRzIGZvciBUQ1NSbi4NCkJ1dCBkbyB3ZSBuZWVkIGNsZWFyIHRoZSByZXNlcnZl
+ZCBiaXQgKDMxIC0gOCBiaXRzKSBleHBsaWNpdGx5ID8NCg0KPiAgIHMtPnJlZ3NbaW5kZXhdICY9
+IH4odmFsdWUgJiAweDgwKTsgLyogVzFDIGJpdHMgKi8NCg0Kcy0+cmVnc1tpbmRleF0gJj0gfih2
+YWx1ZSAmIDB4ODApICAgJiAweGZmIDsgLyogNyBiaXRzICBXMUMsICA4LTMxIHJlc2VydmVkICBi
+aXRzIHdyaXRlIHplcm8gKi8NCg0KPiAgIHMtPnJlZ3NbaW5kZXhdICY9IH4weDdkOyAvKiB3cml0
+YWJsZSBmaWVsZHMgKi8NCj4gICBzLT5yZWdzW2luZGV4XSB8PSAodmFsdWUgJiAweDdkKTsgDQo+
+DQo+dGhhbmtzDQo+LS0gUE1NDQo=
 
