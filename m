@@ -2,63 +2,69 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FCBC10F25
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008E7C10F25
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:54:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13F442146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:51:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AkVSzmb2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F442146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id C489C24649
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:54:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C489C24649
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBT7E-0004q3-8o
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:51:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55052)
+	id 1jBT9z-0005nu-Vp
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jBT5a-0003RU-7q
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:49:43 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jBT9D-0005Og-SW
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jBT5Z-00089k-4R
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:49:42 -0400
-Received: from ozlabs.org ([203.11.71.1]:50899)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jBT5Y-00086T-Og; Mon, 09 Mar 2020 20:49:41 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48bxLQ0rHQz9sRY; Tue, 10 Mar 2020 11:49:18 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583801358;
- bh=dGpPDXG3uiSDZfEje5nYJSb0zXZXH5PLk2kfEV6YHBM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=AkVSzmb2mGbNw7LZ3PGsU9XV5oxgCGbHqdXwFOjeLygUze4kS+nuNqUKHBEH5LVaN
- 0xVNYJRdQFu+c/qRMbSmbg382aOrasuK4EV24IKG0TrAqOouu/xjKV1QyTyplFXsJt
- GoVvl5stId66gqPBoECQfRM4ueDx7JBxmizX6qqk=
-Date: Tue, 10 Mar 2020 11:46:05 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] spapr/xive: use SPAPR_IRQ_IPI to define IPI ranges
- exposed to the guest
-Message-ID: <20200310004605.GE660117@umbus.fritz.box>
-References: <20200306123307.1348-1-clg@kaod.org>
+ (envelope-from <no-reply@patchew.org>) id 1jBT9C-0003Xz-AJ
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:53:27 -0400
+Resent-Date: Mon, 09 Mar 2020 20:53:27 -0400
+Resent-Message-Id: <E1jBT9C-0003Xz-AJ@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21170)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jBT9C-0003X0-2P
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:53:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1583801595; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=GkDZu/ZitiM5WsS+BVyk4RBdp6Vgz0PvjPKYVJEbts58iVfCzQ0pWhZxOXBdRKhyznXXLFcoGMwm9Bx23REjXPj1OrIVEp3DFYVz74k0NgB40toAiC+AWGmeULqTM0DtnwMwJOwSvUAJyL6uLtCK/9+xHts6QIU+qQRFHT8d+F4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583801595;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=t687RcDiOlr8jgiX2VQehSp02oBXioIx4GwYlpWF1k4=; 
+ b=ZiT2pJpzDY/jtsXbZxMxewn59KzT0GbBlyQca85HCwbqCiHEWLsJDCumfO5ulAt6r7VZs3rNlyJ3LPh74fAAkB4OfBEsr3BJmau8w9AcjvOuHr/Nt+/XyYSzlsWCL5l/JwHaYLnf31yYnOijRCZTTkfIkoLwRr3+hzOtrs3pV9M=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15838015929691002.7365739551253;
+ Mon, 9 Mar 2020 17:53:12 -0700 (PDT)
+In-Reply-To: <20200309235411.76587-1-liran.alon@oracle.com>
+Subject: Re: [PATCH 00/14]: hw/i386/vmport: Bug fixes and improvements
+Message-ID: <158380159181.20878.10054025532913314694@39012742ff91>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="RpqchZ26BWispMcB"
-Content-Disposition: inline
-In-Reply-To: <20200306123307.1348-1-clg@kaod.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: liran.alon@oracle.com
+Date: Mon, 9 Mar 2020 17:53:12 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,73 +76,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---RpqchZ26BWispMcB
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Mar 06, 2020 at 01:33:07PM +0100, C=E9dric Le Goater wrote:
-> The "ibm,xive-lisn-ranges" defines ranges of interrupt numbers that
-> the guest can use to configure IPIs. It starts at 0 today but it could
-> change to some other offset. Make clear which IRQ range we are
-> exposing by using SPAPR_IRQ_IPI in the property definition.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied to ppc-for-5.0, thanks.,
-
-> ---
->  hw/intc/spapr_xive.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 20c8155557d6..6608d7220a47 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -677,8 +677,8 @@ static void spapr_xive_dt(SpaprInterruptController *i=
-ntc, uint32_t nr_servers,
->      uint64_t timas[2 * 2];
->      /* Interrupt number ranges for the IPIs */
->      uint32_t lisn_ranges[] =3D {
-> -        cpu_to_be32(0),
-> -        cpu_to_be32(nr_servers),
-> +        cpu_to_be32(SPAPR_IRQ_IPI),
-> +        cpu_to_be32(SPAPR_IRQ_IPI + nr_servers),
->      };
->      /*
->       * EQ size - the sizes of pages supported by the system 4K, 64K,
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---RpqchZ26BWispMcB
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5m400ACgkQbDjKyiDZ
-s5LPdxAAlZlcctIuoUJKc2f3MKJ3a1ibUUA7pocQKWdqC3Nkdy4FQJgSyVwH8Rg1
-oTWYL3C/HSxQUIBGDfcYF6WPZTEBlJwB72X4MZTf7EYpHeJ2iw2GQ+sPnjb9FaL4
-D2NLuwCkMFqwNQG6gdVV9Z4u3fQ/d7yhYbI45aLiP1UMAoF4k570Ohhypevzh306
-bQIAjghgSEtBZnsqtYPjtSYTGiVXEbzwa7uQcUVwEvzKlL6qJ3wB74azJuy1DqPZ
-RHcWxt3ASzHz3K0TjH9E90yKB2rXfIHTrNrwVA9pqVEz5nrvte5JrK6St5QfBlzc
-+NX/y1W4wIFpUDEPw00DlTHfAHFk8NHpYwP8v7zwBsNZ/jZXIotGqbP9bH0EoDIp
-saUgt91/PLn3YhU3uY99cHwcW7wQdPELWEn7UpgwIqrlvZzaVW9On05SZG5m2QyR
-+7afSHo33ec/opab9qzRq/NHggLfGqrm2ezp2+9HmK8Q9wlMYnytrjNEB1gTaBTB
-CcpF5x2I42rYwG2SzqvLjWtCQ1C3b6gEZpG9ZSP2Is9Ef9gxnUYE2T6MYAlsDEA5
-59+VHxbA0EQj7QgxLm+6LZh9+1UJiBGpN5n5KVa35YkEWzgVBXT6Vzu9Yt71ewGS
-trxmc8PtHty/6qyXZGlQP9xAvtqmAaenjK9GK7SqEC0309CETWo=
-=Nhb4
------END PGP SIGNATURE-----
-
---RpqchZ26BWispMcB--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwOTIzNTQxMS43NjU4
+Ny0xLWxpcmFuLmFsb25Ab3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAwLzE0XTogaHcvaTM4Ni92bXBvcnQ6IEJ1
+ZyBmaXhlcyBhbmQgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMjAwMzA5MjM1NDExLjc2NTg3
+LTEtbGlyYW4uYWxvbkBvcmFjbGUuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5YTVlZWEzIGh3L2kz
+ODYvdm1wb3J0OiBBc3NlcnQgdm1wb3J0IGluaXRpYWxpemVkIGJlZm9yZSByZWdpc3RlcmluZyBj
+b21tYW5kcwoxZTZkZDA0IGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dFVEha
+CjBhYzBkMDMgaTM4Ni9jcHU6IFN0b3JlIExBUElDIGJ1cyBmcmVxdWVuY3kgaW4gQ1BVIHN0cnVj
+dHVyZQphN2M2N2Y3IGh3L2kzODYvdm1wb3J0OiBBbGxvdyB4MmFwaWMgd2l0aG91dCBJUgo0NWE4
+OTA2IGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dFVF9WQ1BVX0lORk8KYjJl
+NTE4MiBody9pMzg2L3ZtcG9ydDogQWRkIHN1cHBvcnQgZm9yIENNRF9HRVRUSU1FRlVMTAo3ODFj
+NTc4IGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dFVFRJTUUKYjk3NjZlMSBo
+dy9pMzg2L3ZtcG9ydDogQWRkIHN1cHBvcnQgZm9yIENNRF9HRVRCSU9TVVVJRAo0NWQ4NGVhIGh3
+L2kzODYvdm1wb3J0OiBEZWZpbmUgZW51bSBmb3IgYWxsIGNvbW1hbmRzCjRmZDBmMmEgaHcvaTM4
+Ni92bXBvcnQ6IFJlcG9ydCBWTVggdHlwZSBpbiBDTURfR0VUVkVSU0lPTgpmYjlhMzdkIGh3L2kz
+ODYvdm1wb3J0OiBJbnRyb2R1Y2Ugdm14LXZlcnNpb24gcHJvcGVydHkKNDJjOWIxYiBody9pMzg2
+L3ZtcG9ydDogQWRkIGRldmljZSBwcm9wZXJ0aWVzCmVmODBmZTMgaHcvaTM4Ni92bXBvcnQ6IFNl
+dCBFQVggdG8gLTEgb24gZmFpbGVkIGFuZCB1bnN1cHBvcnRlZCBjb21tYW5kcwo0ZjRjMzc2IGh3
+L2kzODYvdm1wb3J0OiBQcm9wYWdhdGUgSU9Qb3J0IHJlYWQgdG8gdkNQVSBFQVggcmVnaXN0ZXIK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTQgQ2hlY2tpbmcgY29tbWl0IDRmNGMzNzY2ZGFiOCAo
+aHcvaTM4Ni92bXBvcnQ6IFByb3BhZ2F0ZSBJT1BvcnQgcmVhZCB0byB2Q1BVIEVBWCByZWdpc3Rl
+cikKMi8xNCBDaGVja2luZyBjb21taXQgZWY4MGZlMzg0ZjJhIChody9pMzg2L3ZtcG9ydDogU2V0
+IEVBWCB0byAtMSBvbiBmYWlsZWQgYW5kIHVuc3VwcG9ydGVkIGNvbW1hbmRzKQozLzE0IENoZWNr
+aW5nIGNvbW1pdCA0MmM5YjFiY2JhMjIgKGh3L2kzODYvdm1wb3J0OiBBZGQgZGV2aWNlIHByb3Bl
+cnRpZXMpCjQvMTQgQ2hlY2tpbmcgY29tbWl0IGZiOWEzN2Q5NGFlOCAoaHcvaTM4Ni92bXBvcnQ6
+IEludHJvZHVjZSB2bXgtdmVyc2lvbiBwcm9wZXJ0eSkKNS8xNCBDaGVja2luZyBjb21taXQgNGZk
+MGYyYTRmYmQ4IChody9pMzg2L3ZtcG9ydDogUmVwb3J0IFZNWCB0eXBlIGluIENNRF9HRVRWRVJT
+SU9OKQo2LzE0IENoZWNraW5nIGNvbW1pdCA0NWQ4NGVhYWQ5YjggKGh3L2kzODYvdm1wb3J0OiBE
+ZWZpbmUgZW51bSBmb3IgYWxsIGNvbW1hbmRzKQo3LzE0IENoZWNraW5nIGNvbW1pdCBiOTc2NmUx
+ZDdiODkgKGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dFVEJJT1NVVUlEKQpF
+UlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojMzM6IEZJTEU6IGh3L2kzODYvdm1w
+b3J0LmM6MTI4OgorICAgIHVpbnQzMl90ICp1dWlkX3BhcnRzID0gKHVpbnQzMl90KikocWVtdV91
+dWlkLmRhdGEpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzOSBsaW5lcyBjaGVja2Vk
+CgpQYXRjaCA3LzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo4LzE0IENoZWNraW5nIGNv
+bW1pdCA3ODFjNTc4NjEwNmEgKGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dF
+VFRJTUUpCjkvMTQgQ2hlY2tpbmcgY29tbWl0IGIyZTUxODI0MTI5ZSAoaHcvaTM4Ni92bXBvcnQ6
+IEFkZCBzdXBwb3J0IGZvciBDTURfR0VUVElNRUZVTEwpCjEwLzE0IENoZWNraW5nIGNvbW1pdCA0
+NWE4OTA2NzAwZjYgKGh3L2kzODYvdm1wb3J0OiBBZGQgc3VwcG9ydCBmb3IgQ01EX0dFVF9WQ1BV
+X0lORk8pCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBu
+b3QgcmVxdWlyZWQKIzQxOiBGSUxFOiBody9pMzg2L3ZtcG9ydC5jOjE4NToKKyAgICByZXR1cm4g
+KDEgPDwgVkNQVV9JTkZPX1JFU0VSVkVEX0JJVCk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDM4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgoxMS8xNCBDaGVja2luZyBjb21taXQgYTdjNjdmNzM2Y2QxIChody9pMzg2L3ZtcG9ydDog
+QWxsb3cgeDJhcGljIHdpdGhvdXQgSVIpCjEyLzE0IENoZWNraW5nIGNvbW1pdCAwYWMwZDAzNjM4
+NzMgKGkzODYvY3B1OiBTdG9yZSBMQVBJQyBidXMgZnJlcXVlbmN5IGluIENQVSBzdHJ1Y3R1cmUp
+CjEzLzE0IENoZWNraW5nIGNvbW1pdCAxZTZkZDA0MmQyYTIgKGh3L2kzODYvdm1wb3J0OiBBZGQg
+c3VwcG9ydCBmb3IgQ01EX0dFVEhaKQoxNC8xNCBDaGVja2luZyBjb21taXQgOWE1ZWVhMzg4NTc2
+IChody9pMzg2L3ZtcG9ydDogQXNzZXJ0IHZtcG9ydCBpbml0aWFsaXplZCBiZWZvcmUgcmVnaXN0
+ZXJpbmcgY29tbWFuZHMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMjAwMzA5MjM1NDExLjc2NTg3LTEtbGlyYW4uYWxvbkBvcmFjbGUuY29tL3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
