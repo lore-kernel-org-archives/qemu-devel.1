@@ -2,97 +2,86 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A990CC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9B8C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76AF32465A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 781412465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:40:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6IGjZ0B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AF32465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VFKr2Jb2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 781412465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBbLL-0002vp-PT
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36725)
+	id 1jBbMn-0004Pu-Ib
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:40:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46978)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jBbHF-0008Oy-PU
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:34:18 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jBbM3-0003fL-BE
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jBbHE-0007tR-LP
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:34:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21464
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBbHE-0007s6-GA
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:34:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583832856;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=csgwDae2nEKtEY7ZjzrZSNCjXSgjMwHxDaBtvNqni+k=;
- b=X6IGjZ0BGoVE9/eFsp8aWGNJSVnhzJe1qEBLef1XJ631qVkPB9UUez80Tsg+JuJMVT17KE
- MNXlGJvjlqVI/WTQCyUguu7i6pr513Uy0mmXj43lC95PzUbXKlgh5yxKaTIxoxNGkbtiS/
- u2snvoLZ4viYCTca7x4DMUw0miphYE8=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-pG2Hfv7pP_Wr9w3yUsoxUA-1; Tue, 10 Mar 2020 05:34:14 -0400
-X-MC-Unique: pG2Hfv7pP_Wr9w3yUsoxUA-1
-Received: by mail-qt1-f197.google.com with SMTP id v10so258542qtk.7
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 02:34:14 -0700 (PDT)
+ (envelope-from <stefanha@gmail.com>) id 1jBbM1-0007gD-W0
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:15 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37952)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jBbM1-0007bP-OQ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:13 -0400
+Received: by mail-wr1-x444.google.com with SMTP id t11so14908911wrw.5
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 02:39:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=yJyHq74z3B7YWvmtwnDx2TgHOG5eMnWNMqe1KqoxD3o=;
+ b=VFKr2Jb2mm7Wa4QER/EHBMsBpH1dVcR/NSNXnH+NnY5A93r3bP7eusZ0ilQ7HOhR/I
+ wFMrkasqThD7SWsdZNkELI8pmtNOpcNdB78JJpaNk2FGD+8p3hcFc/r2QBFPTGyxYSm6
+ e2vrOM/ZoJnaoiXULiJ3vhPVfScJAXMyF/dvhUIrg3rVDL7lSgrlihKT77Aihm/xxmZR
+ xKHMPFQ+eDF+dJeF//90YkfnrFMNZstHubEro7oEG+GXqdcM2mv52DH0g30cHZlHX7NJ
+ pnwCjSjjXavtR06Y6ktoszFWHDfl8vB3yzvJzO0ZJ3d84DO+H5jmBvcWZZHAmunOvy6s
+ ienQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=4t2nm9ttd3zIKOSZ8SP5PPh7QibfglSNqfDL1DCCyYY=;
- b=kcAkwquN4uVi0Dgvf4rpmeybHya4zAtxCHq2KlNcz43+mC6k8cSVRcvoGLRSTXIZqt
- wLyboy3xpnLeGAWIxFN6qCErbX8hx76V9etmLiwrq6LzPKuAvMwnn78Cy4s7oqE28vTh
- cUmdIpF5BgAXlFNBrdQ8ktGK3UjtJMY95chFrmtaGfGRL2Uonj+bcsyiNg61Hxryb7Kr
- clIaNEOiaPVHJD11Wp0N6OeGF1zH+kmI89rLGmiwoj15dpSqwB1A4yy3e+dHoJEsd23D
- aGLfd1liPhAsNwJ+JDfGrMMDAvHBAu9uF/snOTEH+K/oHErkfL7QaelALq9kIU2ulaAO
- POtQ==
-X-Gm-Message-State: ANhLgQ2V3idRazETeIhdODsV1okuKzaWJ9f8iPeTzp4c9oEd5EH+CJle
- g5y+QNg48ZcTulevr5oRLWs4sG0vtFbhmXjzfuZi9fOfRNHvoP4uPBkN+XQaYfotWrChAZqWc2O
- 8/DAazwYn0yWBmks=
-X-Received: by 2002:a05:6214:892:: with SMTP id
- cz18mr10022959qvb.203.1583832853755; 
- Tue, 10 Mar 2020 02:34:13 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtd0ek/o0U5csU/wynCXay1XZ7yE4Owj1zcw+4oy2wPxE9VMi9GHpinA30C7vRNliNJW0W6Og==
-X-Received: by 2002:a05:6214:892:: with SMTP id
- cz18mr10022939qvb.203.1583832853545; 
- Tue, 10 Mar 2020 02:34:13 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id x188sm14602734qka.53.2020.03.10.02.34.10
+ bh=yJyHq74z3B7YWvmtwnDx2TgHOG5eMnWNMqe1KqoxD3o=;
+ b=PqlHDeiVuytZA5f8LSzeizqv+iPl5X/ORiHp8iAl1uTJjfstQEGAfSycLdmslM4QCr
+ ccyU3Hw0jYxpe/+bBcg86KKiVbauVLZY8+4KoAXFyjhAptfjDTT4CiG1K+Y4ziRRkysf
+ TptrGohd5L43JaAUnCL7YTDrwHX+Hce2/5gweU4GH/jFOyfprYwDAUWT77TAMUXDqkDY
+ j2ySZQZJGAFQnl2kQx87ka3vIZOyBFlam/xuchigcIItQAmqf6gPge2PIsc2WCPpA1Mx
+ uoEA60Gao8EK+7/Brj3O2kOrb0fXSFNEu4qORNlTYb9kD5cSWvQdA5H4vT9K0CGQZLdN
+ CWBg==
+X-Gm-Message-State: ANhLgQ3HbyNkl8JIw3rVnBk8TtgsOYOZQGGJ4madmVc2Ffdxs3j/UzCw
+ mXyNGWt4omVogL0+zuJ352w=
+X-Google-Smtp-Source: ADFU+vsQC4aWmlpyDtusRFPUsE+xHgp46spAXWwZrJRjcJgTo4L/EnYls9j8JglHe4L2WXdICAhowA==
+X-Received: by 2002:a5d:67c3:: with SMTP id n3mr21185693wrw.156.1583833152661; 
+ Tue, 10 Mar 2020 02:39:12 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u20sm3434770wmj.14.2020.03.10.02.39.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 02:34:12 -0700 (PDT)
-Date: Tue, 10 Mar 2020 05:34:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 07/14] hw/i386/vmport: Add support for CMD_GETBIOSUUID
-Message-ID: <20200310053305-mutt-send-email-mst@kernel.org>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-8-liran.alon@oracle.com>
+ Tue, 10 Mar 2020 02:39:11 -0700 (PDT)
+Date: Tue, 10 Mar 2020 09:39:10 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Subject: Re: [PATCH] modules: load modules from versioned /var/run dir
+Message-ID: <20200310093910.GB140737@stefanha-x1.localdomain>
+References: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20200309235411.76587-8-liran.alon@oracle.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,89 +93,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, pkg-qemu-devel@lists.alioth.debian.org,
+ Cole Robinson <crobinso@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Miroslav Rezanina <mrezanin@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 01:54:04AM +0200, Liran Alon wrote:
-> This is VMware documented functionallity that some guests rely on.
-> Returns the BIOS UUID of the current virtual machine.
+
+--dc+cDN39EJAMEtIO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 06, 2020 at 02:26:48PM +0100, Christian Ehrhardt wrote:
+> On upgrades the old .so files usually are replaced. But on the other
+> hand since a qemu process represents a guest instance it is usually kept
+> around.
 >=20
-> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-
-So this at least seems guest-visible.
-
-So I suspect you need to add properties to
-disable this for old machine types, to avoid
-breaking compatibility with live-migration.
-
-
+> That makes late addition of dynamic features e.g. 'hot-attach of a ceph
+> disk' fail by trying to load a new version of e.f. block-rbd.so into an
+> old still running qemu binary.
+>=20
+> This adds a fallback to also load modules from a versioned directory in t=
+he
+> temporary /var/run path. That way qemu is providing a way for packaging
+> to store modules of an upgraded qemu package as needed until the next reb=
+oot.
+>=20
+> An example how that can then be used in packaging can be seen in:
+> https://git.launchpad.net/~paelzer/ubuntu/+source/qemu/log/?h=3Dbug-18473=
+61-miss-old-so-on-upgrade-UBUNTU
+>=20
+> Fixes: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1847361
+> Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
 > ---
->  hw/i386/vmport.c     | 14 ++++++++++++++
->  include/hw/i386/pc.h |  1 +
->  2 files changed, 15 insertions(+)
->=20
-> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> index 2ae5afc42b50..7687f3368a55 100644
-> --- a/hw/i386/vmport.c
-> +++ b/hw/i386/vmport.c
-> @@ -26,6 +26,7 @@
->  #include "hw/i386/pc.h"
->  #include "hw/input/i8042.h"
->  #include "hw/qdev-properties.h"
-> +#include "sysemu/sysemu.h"
->  #include "sysemu/hw_accel.h"
->  #include "qemu/log.h"
->  #include "trace.h"
-> @@ -121,6 +122,18 @@ static uint32_t vmport_cmd_get_version(void *opaque,=
- uint32_t addr)
->      return port_state->vmx_version;
->  }
-> =20
-> +static uint32_t vmport_cmd_get_bios_uuid(void *opaque, uint32_t addr)
-> +{
-> +    X86CPU *cpu =3D X86_CPU(current_cpu);
-> +    uint32_t *uuid_parts =3D (uint32_t*)(qemu_uuid.data);
-> +
-> +    cpu->env.regs[R_EAX] =3D uuid_parts[0];
-> +    cpu->env.regs[R_EBX] =3D uuid_parts[1];
-> +    cpu->env.regs[R_ECX] =3D uuid_parts[2];
-> +    cpu->env.regs[R_EDX] =3D uuid_parts[3];
-> +    return cpu->env.regs[R_EAX];
-> +}
-> +
->  static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
->  {
->      X86CPU *cpu =3D X86_CPU(current_cpu);
-> @@ -171,6 +184,7 @@ static void vmport_realizefn(DeviceState *dev, Error =
-**errp)
->      port_state =3D s;
->      /* Register some generic port commands */
->      vmport_register(VMPORT_CMD_GETVERSION, vmport_cmd_get_version, NULL)=
-;
-> +    vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid, NU=
-LL);
->      vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
->  }
-> =20
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 7f15a01137b1..ea87eb93511e 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -140,6 +140,7 @@ typedef uint32_t (VMPortReadFunc)(void *opaque, uint3=
-2_t address);
-> =20
->  typedef enum {
->      VMPORT_CMD_GETVERSION       =3D 10,
-> +    VMPORT_CMD_GETBIOSUUID      =3D 19,
->      VMPORT_CMD_GETRAMSIZE       =3D 20,
->      VMPORT_CMD_VMMOUSE_DATA     =3D 39,
->      VMPORT_CMD_VMMOUSE_STATUS   =3D 40,
-> --=20
-> 2.20.1
+>  util/module.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
+CCing Debian, Fedora, and Red Hat package maintainers in case they have
+comments.
+
+The use of /var/run makes me a little uneasy.  I guess it's related to
+wanting to uninstall the old package so the .so in their original
+location cannot be used (even if they had a versioned path)?
+
+I'm not a package maintainer though so I hope the others will make
+suggestions if there are other solutions :).
+
+>=20
+> diff --git a/util/module.c b/util/module.c
+> index 236a7bb52a..d2446104be 100644
+> --- a/util/module.c
+> +++ b/util/module.c
+> @@ -19,6 +19,7 @@
+>  #endif
+>  #include "qemu/queue.h"
+>  #include "qemu/module.h"
+> +#include "qemu-version.h"
+> =20
+>  typedef struct ModuleEntry
+>  {
+> @@ -170,6 +171,7 @@ bool module_load_one(const char *prefix, const char *=
+lib_name)
+>  #ifdef CONFIG_MODULES
+>      char *fname =3D NULL;
+>      char *exec_dir;
+> +    char *version_dir;
+>      const char *search_dir;
+>      char *dirs[4];
+>      char *module_name;
+> @@ -201,6 +203,11 @@ bool module_load_one(const char *prefix, const char =
+*lib_name)
+>      dirs[n_dirs++] =3D g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
+>      dirs[n_dirs++] =3D g_strdup_printf("%s/..", exec_dir ? : "");
+>      dirs[n_dirs++] =3D g_strdup_printf("%s", exec_dir ? : "");
+> +    version_dir =3D g_strcanon(g_strdup(QEMU_PKGVERSION),
+> +                             G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-=
+=2E~",
+> +                             '_');
+> +    dirs[n_dirs++] =3D g_strdup_printf("/var/run/qemu/%s", version_dir);
+> +
+>      assert(n_dirs <=3D ARRAY_SIZE(dirs));
+> =20
+>      g_free(exec_dir);
+> --=20
+> 2.25.1
+>=20
+>=20
+
+--dc+cDN39EJAMEtIO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5nYD4ACgkQnKSrs4Gr
+c8hSzgf9FFCPQlq9QpkCuXqUF7df/ofCHITtk4pdfVIRyxZpQjaFsz6p8HX5tj+0
+qXPMl9OzrbGAItR5+VedBfUgD2Cvq+8fRm24FdlVDMX6UoKTs1TdLGmp+MxoMReY
+HgT+qMggMKjxF85SQPJNI1sbu7GEYMbkK4HkNIwUALz5DAMqb9SFYSXhbQCTDAcB
+rZ8EFqe04Eop82XOkG68Y1r9BOl3Pv7zbQNqqda7SYEjD0h1m/1SqbHm2xrsNXwj
+rNNxE/TzVJK9a7WUT1DkIaBd2614WJo/eoIW8aYQvu18iumyBbvjYpFLZRtO/G45
+K8WkStZiZJNjmsd/v1YyqbWytCqx+Q==
+=wwRy
+-----END PGP SIGNATURE-----
+
+--dc+cDN39EJAMEtIO--
 
