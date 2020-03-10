@@ -2,107 +2,142 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16ABAC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E3FC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6D1F20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:39:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NkeDyY4x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6D1F20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC08820675
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:42:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC08820675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgyl-0002G3-4g
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37980)
+	id 1jBh1a-0003xF-Rl
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:42:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jBgy8-0001f8-7o
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:38:57 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jBh0v-0003SK-Mw
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jBgy7-0005uU-6T
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:38:56 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20384
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBgy7-0005qG-1g
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:38:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583854734;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ZyUl/pYE/GW1Uo3sA5LONDCumiIMZuncj8XfNsILowU=;
- b=NkeDyY4x1wpaWcb8oQGX7KEHjCKnLyOyQILqICRgP3dJSqhhiWWxpg7Luhm9fV5KCgzmgV
- GkJ0T5i7i6JBOt+QscWFOTNQveV8iz67XiEjJmOCJOcphDyO14Vk7YyqvAGP12bHit0/i4
- X0g3zP3NRPBRt1GgbHwnWY8l1Ih+Spo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-AS8Y3ZZvPSmD_hEdkK89pQ-1; Tue, 10 Mar 2020 11:38:51 -0400
-X-MC-Unique: AS8Y3ZZvPSmD_hEdkK89pQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26BCD800D48;
- Tue, 10 Mar 2020 15:38:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EE0C75D9CA;
- Tue, 10 Mar 2020 15:38:47 +0000 (UTC)
-Subject: Re: [PATCH v3 9/9] block/block-copy: hide structure definitions
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
- <20200306073831.7737-10-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8c944ad9-b79f-88e9-08d6-9e5957e780fd@redhat.com>
-Date: Tue, 10 Mar 2020 16:38:45 +0100
+ (envelope-from <borntraeger@de.ibm.com>) id 1jBh0t-0005hQ-R1
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:41:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4544)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jBh0t-0005bz-IU
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:41:47 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02AFRKgV016659
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:41:42 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ym85231kj-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:41:41 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 10 Mar 2020 15:41:39 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 10 Mar 2020 15:41:35 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02AFfYKB42533010
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 15:41:34 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A55C6A4053;
+ Tue, 10 Mar 2020 15:41:34 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6315DA404D;
+ Tue, 10 Mar 2020 15:41:34 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 10 Mar 2020 15:41:34 +0000 (GMT)
+Subject: Re: [PATCH v8 02/15] s390x: protvirt: Support unpack facility
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200310134008.130038-1-frankja@linux.ibm.com>
+ <20200310134008.130038-3-frankja@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 10 Mar 2020 16:41:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200306073831.7737-10-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="K900wW3y7qeesSgmX9QKXI1E2JOxNmhXO"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200310134008.130038-3-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031015-0016-0000-0000-000002EF0F73
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031015-0017-0000-0000-00003352742B
+Message-Id: <8f8bedb3-5585-845d-d32e-bfe4ec6c01f7@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-10_10:2020-03-10,
+ 2020-03-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 phishscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 suspectscore=2 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100100
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,79 +149,390 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---K900wW3y7qeesSgmX9QKXI1E2JOxNmhXO
-Content-Type: multipart/mixed; boundary="2HbiDAzk3GJ5uMoZB7R4WUPrKcFexgN1Y"
 
---2HbiDAzk3GJ5uMoZB7R4WUPrKcFexgN1Y
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
-> Hide structure definitions and add explicit API instead, to keep an
-> eye on the scope of the shared fields.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 10.03.20 14:39, Janosch Frank wrote:
+> The unpack facility provides the means to setup a protected guest. A
+> protected guest can not be introspected by the hypervisor or any
+> user/administrator of the machine it is running on.
+> 
+> Protected guests are encrypted at rest and need a special boot
+> mechanism via diag308 subcode 8 and 10.
+> 
+> Code 8 sets the PV specific IPLB which is retained seperately from
+> those set via code 5.
+> 
+> Code 10 is used to unpack the VM into protected memory, verify its
+> integrity and start it.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Co-developed-by: Christian Borntraeger <borntraeger@de.ibm.com> [Changes
+> to machine]
 > ---
->  include/block/block-copy.h | 52 +++----------------------------
->  block/backup-top.c         |  6 ++--
->  block/backup.c             | 25 +++++++--------
->  block/block-copy.c         | 63 ++++++++++++++++++++++++++++++++++++--
->  4 files changed, 82 insertions(+), 64 deletions(-)
+>  hw/s390x/Makefile.objs              |   1 +
+>  hw/s390x/ipl.c                      |  56 ++++++++++++-
+>  hw/s390x/ipl.h                      |  79 +++++++++++++++++++
+>  hw/s390x/pv.c                       | 104 ++++++++++++++++++++++++
+>  hw/s390x/pv.h                       |  33 ++++++++
+>  hw/s390x/s390-virtio-ccw.c          | 118 +++++++++++++++++++++++++++-
+>  include/hw/s390x/s390-virtio-ccw.h  |   1 +
+>  target/s390x/cpu.c                  |  23 ++++++
+>  target/s390x/cpu.h                  |   1 +
+>  target/s390x/cpu_features_def.inc.h |   1 +
+>  target/s390x/diag.c                 |  30 ++++++-
+>  11 files changed, 441 insertions(+), 6 deletions(-)
+>  create mode 100644 hw/s390x/pv.c
+>  create mode 100644 hw/s390x/pv.h
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index e02ed80b68..a46a1c7894 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -31,6 +31,7 @@ obj-y += tod-qemu.o
+>  obj-$(CONFIG_KVM) += tod-kvm.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+>  obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
+> +obj-$(CONFIG_KVM) += pv.o
+>  obj-y += s390-ccw.o
+>  obj-y += ap-device.o
+>  obj-y += ap-bridge.o
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index b81942e1e6..b88b8ff346 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -33,6 +33,7 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/option.h"
+>  #include "exec/exec-all.h"
+> +#include "pv.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+>  #define LINUX_MAGIC_ADDR                0x010008UL
+> @@ -566,12 +567,31 @@ void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+>  
+> -    ipl->iplb = *iplb;
+> -    ipl->iplb_valid = true;
+> +    /*
+> +     * The IPLB set and retrieved by subcodes 8/9 is completely
+> +     * separate from the one managed via subcodes 5/6.
+> +     */
+> +    if (iplb->pbt == S390_IPL_TYPE_PV) {
+> +        ipl->iplb_pv = *iplb;
+> +        ipl->iplb_valid_pv = true;
+> +    } else {
+> +        ipl->iplb = *iplb;
+> +        ipl->iplb_valid = true;
+> +    }
+>      ipl->netboot = is_virtio_net_device(iplb);
+>      update_machine_ipl_properties(iplb);
+>  }
+>  
+> +IplParameterBlock *s390_ipl_get_iplb_pv(void)
+> +{
+> +    S390IPLState *ipl = get_ipl_device();
+> +
+> +    if (!ipl->iplb_valid_pv) {
+> +        return NULL;
+> +    }
+> +    return &ipl->iplb_pv;
+> +}
+> +
+>  IplParameterBlock *s390_ipl_get_iplb(void)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+> @@ -660,6 +680,38 @@ static void s390_ipl_prepare_qipl(S390CPU *cpu)
+>      cpu_physical_memory_unmap(addr, len, 1, len);
+>  }
+>  
+> +int s390_ipl_prepare_pv_header(void)
+> +{
+> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
+> +    IPLBlockPV *ipib_pv = &ipib->pv;
+> +    void *hdr = g_malloc(ipib_pv->pv_header_len);
+> +    int rc;
+> +
+> +    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
+> +                             ipib_pv->pv_header_len);
+> +    rc = s390_pv_set_sec_parms((uint64_t)hdr,
+> +                               ipib_pv->pv_header_len);
+> +    g_free(hdr);
+> +    return rc;
+> +}
+> +
+> +int s390_ipl_pv_unpack(void)
+> +{
+> +    IplParameterBlock *ipib = s390_ipl_get_iplb_pv();
+> +    IPLBlockPV *ipib_pv = &ipib->pv;
+> +    int i, rc = 0;
+> +
+> +    for (i = 0; i < ipib_pv->num_comp; i++) {
+> +        rc = s390_pv_unpack(ipib_pv->components[i].addr,
+> +                            TARGET_PAGE_ALIGN(ipib_pv->components[i].size),
+> +                            ipib_pv->components[i].tweak_pref);
+> +        if (rc) {
+> +            break;
+> +        }
+> +    }
+> +    return rc;
+> +}
+> +
+>  void s390_ipl_prepare_cpu(S390CPU *cpu)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index 3e44abe1c6..919f9e6913 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -15,6 +15,24 @@
+>  #include "cpu.h"
+>  #include "hw/qdev-core.h"
+>  
+> +struct IPLBlockPVComp {
+> +    uint64_t tweak_pref;
+> +    uint64_t addr;
+> +    uint64_t size;
+> +} QEMU_PACKED;
+> +typedef struct IPLBlockPVComp IPLBlockPVComp;
+> +
+> +struct IPLBlockPV {
+> +    uint8_t  reserved18[87];    /* 0x18 */
+> +    uint8_t  version;           /* 0x6f */
+> +    uint32_t reserved70;        /* 0x70 */
+> +    uint32_t num_comp;          /* 0x74 */
+> +    uint64_t pv_header_addr;    /* 0x78 */
+> +    uint64_t pv_header_len;     /* 0x80 */
+> +    struct IPLBlockPVComp components[];
+> +} QEMU_PACKED;
+> +typedef struct IPLBlockPV IPLBlockPV;
+> +
+>  struct IplBlockCcw {
+>      uint8_t  reserved0[85];
+>      uint8_t  ssid;
+> @@ -71,6 +89,7 @@ union IplParameterBlock {
+>          union {
+>              IplBlockCcw ccw;
+>              IplBlockFcp fcp;
+> +            IPLBlockPV pv;
+>              IplBlockQemuScsi scsi;
+>          };
+>      } QEMU_PACKED;
+> @@ -85,8 +104,11 @@ typedef union IplParameterBlock IplParameterBlock;
+>  
+>  int s390_ipl_set_loadparm(uint8_t *loadparm);
+>  void s390_ipl_update_diag308(IplParameterBlock *iplb);
+> +int s390_ipl_prepare_pv_header(void);
+> +int s390_ipl_pv_unpack(void);
+>  void s390_ipl_prepare_cpu(S390CPU *cpu);
+>  IplParameterBlock *s390_ipl_get_iplb(void);
+> +IplParameterBlock *s390_ipl_get_iplb_pv(void);
+>  
+>  enum s390_reset {
+>      /* default is a reset not triggered by a CPU e.g. issued by QMP */
+> @@ -94,6 +116,7 @@ enum s390_reset {
+>      S390_RESET_REIPL,
+>      S390_RESET_MODIFIED_CLEAR,
+>      S390_RESET_LOAD_NORMAL,
+> +    S390_RESET_PV,
+>  };
+>  void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
+>  void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
+> @@ -133,6 +156,7 @@ struct S390IPLState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>      IplParameterBlock iplb;
+> +    IplParameterBlock iplb_pv;
+>      QemuIplParameters qipl;
+>      uint64_t start_addr;
+>      uint64_t compat_start_addr;
+> @@ -140,6 +164,7 @@ struct S390IPLState {
+>      uint64_t compat_bios_start_addr;
+>      bool enforce_bios;
+>      bool iplb_valid;
+> +    bool iplb_valid_pv;
+>      bool netboot;
+>      /* reset related properties don't have to be migrated or reset */
+>      enum s390_reset reset_type;
+> @@ -161,9 +186,11 @@ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3, "alignment of iplb wrong");
+>  
+>  #define S390_IPL_TYPE_FCP 0x00
+>  #define S390_IPL_TYPE_CCW 0x02
+> +#define S390_IPL_TYPE_PV 0x05
+>  #define S390_IPL_TYPE_QEMU_SCSI 0xff
+>  
+>  #define S390_IPLB_HEADER_LEN 8
+> +#define S390_IPLB_MIN_PV_LEN 148
+>  #define S390_IPLB_MIN_CCW_LEN 200
+>  #define S390_IPLB_MIN_FCP_LEN 384
+>  #define S390_IPLB_MIN_QEMU_SCSI_LEN 200
+> @@ -173,6 +200,50 @@ static inline bool iplb_valid_len(IplParameterBlock *iplb)
+>      return be32_to_cpu(iplb->len) <= sizeof(IplParameterBlock);
+>  }
+>  
+> +static inline bool ipl_valid_pv_components(IplParameterBlock *iplb)
+> +{
+> +    IPLBlockPV *ipib_pv = &iplb->pv;
+> +    int i;
+> +
+> +    if (ipib_pv->num_comp == 0) {
+> +        return false;
+> +    }
+> +
+> +    for (i = 0; i < ipib_pv->num_comp; i++) {
+> +        /* Addr must be 4k aligned */
+> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
+> +            return false;
+> +        }
+> +
+> +        /* Tweak prefix is monotonically increasing with each component */
+> +        if (i < ipib_pv->num_comp - 1 &&
+> +            ipib_pv->components[i].tweak_pref >=
+> +            ipib_pv->components[i + 1].tweak_pref) {
+> +            return false;
+> +        }
+> +    }
+> +    return true;
+> +}
+> +
+> +static inline bool ipl_valid_pv_header(IplParameterBlock *iplb)
+> +{
+> +        IPLBlockPV *ipib_pv = &iplb->pv;
+> +
+> +        if (ipib_pv->pv_header_len > 2 * TARGET_PAGE_SIZE) {
+> +            return false;
+> +        }
+> +
+> +        if (!address_space_access_valid(&address_space_memory,
+> +                                        ipib_pv->pv_header_addr,
+> +                                        ipib_pv->pv_header_len,
+> +                                        false,
+> +                                        MEMTXATTRS_UNSPECIFIED)) {
+> +            return false;
+> +        }
+> +
+> +        return true;
+> +}
+> +
+>  static inline bool iplb_valid(IplParameterBlock *iplb)
+>  {
+>      switch (iplb->pbt) {
+> @@ -180,6 +251,14 @@ static inline bool iplb_valid(IplParameterBlock *iplb)
+>          return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_FCP_LEN;
+>      case S390_IPL_TYPE_CCW:
+>          return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_CCW_LEN;
+> +    case S390_IPL_TYPE_PV:
+> +        if (be32_to_cpu(iplb->len) < S390_IPLB_MIN_PV_LEN) {
+> +            return false;
+> +        }
+> +        if (!ipl_valid_pv_header(iplb)) {
+> +            return false;
+> +        }
+> +        return ipl_valid_pv_components(iplb);
+>      default:
+>          return false;
+>      }
+> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+> new file mode 100644
+> index 0000000000..1ba8bc7242
+> --- /dev/null
+> +++ b/hw/s390x/pv.c
+> @@ -0,0 +1,104 @@
+> +/*
+> + * Protected Virtualization functions
+> + *
+> + * Copyright IBM Corp. 2020
+> + * Author(s):
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#include "qemu/osdep.h"
+> +
+> +#include <linux/kvm.h>
+> +
+> +#include "qemu/error-report.h"
+> +#include "sysemu/kvm.h"
+> +#include "pv.h"
+> +
+> +const char *cmd_names[] = {
+> +    "VM_ENABLE",
+> +    "VM_DISABLE",
+> +    "VM_SET_SEC_PARAMS",
+> +    "VM_UNPACK",
+> +    "VM_VERIFY",
+> +    "VM_PREP_RESET",
+> +    "VM_UNSHARE_ALL",
+> +};
 
-[...]
+This is really error-prone (even though this will not change)
+What about something like this? (and no is an acceptable answer)
 
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index d66b8eb691..a2d8579ca0 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
+diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+index 1ba8bc7242..fa592513e4 100644
+--- a/hw/s390x/pv.c
++++ b/hw/s390x/pv.c
+@@ -17,17 +17,7 @@
+ #include "sysemu/kvm.h"
+ #include "pv.h"
+ 
+-const char *cmd_names[] = {
+-    "VM_ENABLE",
+-    "VM_DISABLE",
+-    "VM_SET_SEC_PARAMS",
+-    "VM_UNPACK",
+-    "VM_VERIFY",
+-    "VM_PREP_RESET",
+-    "VM_UNSHARE_ALL",
+-};
+-
+-static int s390_pv_cmd(uint32_t cmd, void *data)
++static int __s390_pv_cmd(uint32_t cmd, const char *cmdname, void *data)
+ {
+     int rc;
+     struct kvm_pv_cmd pv_cmd = {
+@@ -38,20 +28,21 @@ static int s390_pv_cmd(uint32_t cmd, void *data)
+     rc = kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
+     if (rc) {
+         error_report("KVM PV command %d (%s) failed: header rc %x rrc %x "
+-                     "IOCTL rc: %d", cmd, cmd_names[cmd], pv_cmd.rc, pv_cmd.rrc,
++                     "IOCTL rc: %d", cmd, cmdname, pv_cmd.rc, pv_cmd.rrc,
+                      rc);
+     }
+     return rc;
+ }
+ 
+-static void s390_pv_cmd_exit(uint32_t cmd, void *data)
+-{
+-    int rc;
++#define s390_pv_cmd(cmd, data) __s390_pv_cmd(cmd, #cmd, data);
+ 
+-    rc = s390_pv_cmd(cmd, data);
+-    if (rc) {
+-        exit(1);
+-    }
++#define s390_pv_cmd_exit(cmd, data)    \
++{                                      \
++    int rc;                            \
++    rc = __s390_pv_cmd(cmd, #cmd, data);\
++    if (rc) {                          \
++        exit(1);                       \
++    }                                  \
+ }
+ 
+ int s390_pv_vm_enable(void)
 
-[...]
-
->  static BlockCopyInFlightReq *find_conflicting_inflight_req(BlockCopyStat=
-e *s,
-> -                                                          int64_t offset=
-,
-> -                                                          int64_t bytes)
-> +                                                           int64_t offse=
-t,
-> +                                                           int64_t bytes=
-)
-
-Now I see why Andrey says that the alignment fits; this should be
-squashed into patch 7.
-
-With that done:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---2HbiDAzk3GJ5uMoZB7R4WUPrKcFexgN1Y--
 
---K900wW3y7qeesSgmX9QKXI1E2JOxNmhXO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5ntIUACgkQ9AfbAGHV
-z0Dwqwf/SlEY9eTanlqc/2nuiQIN1iksZNHZcvRzWBpTjTlI1LGG7F8EaA/9Hqib
-NfnHm5388RYVyq457CBz7NsuKOOInWIBLs8yPBMrfFibPLNrC6Pjb14eCkQ8A6Bj
-drk6VYrUn7lr/hl7oWqU6Nw/y1JYi59TRnwWfHNu5HXOl4gKQUkjbdT9/KbVxh9Y
-hV7cF6ZIh19kCN5+CEsub+n3xkebPmr6IB0tc+zBr4L2wcWz1zxISA++XSaC5jyu
-CZL2JRRt/BPiA2msxgAeDMvZJPjYf2o5j779ZRooMUhqyN0MBSfthlw87ceIujaX
-Tu7LTK6WK3+K6dy0sNWfvTgtzVlKYw==
-=qSzN
------END PGP SIGNATURE-----
-
---K900wW3y7qeesSgmX9QKXI1E2JOxNmhXO--
 
 
