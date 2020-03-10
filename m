@@ -2,86 +2,86 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9B8C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72525C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 781412465A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 381B12465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:42:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VFKr2Jb2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 781412465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EUqlPL2a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 381B12465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBbMn-0004Pu-Ib
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46978)
+	id 1jBbPI-00072P-B1
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:42:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51369)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1jBbM3-0003fL-BE
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBbOi-0006au-AY
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1jBbM1-0007gD-W0
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:15 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37952)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBbOh-00080T-5B
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:41:59 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33801)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jBbM1-0007bP-OQ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:39:13 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t11so14908911wrw.5
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 02:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=yJyHq74z3B7YWvmtwnDx2TgHOG5eMnWNMqe1KqoxD3o=;
- b=VFKr2Jb2mm7Wa4QER/EHBMsBpH1dVcR/NSNXnH+NnY5A93r3bP7eusZ0ilQ7HOhR/I
- wFMrkasqThD7SWsdZNkELI8pmtNOpcNdB78JJpaNk2FGD+8p3hcFc/r2QBFPTGyxYSm6
- e2vrOM/ZoJnaoiXULiJ3vhPVfScJAXMyF/dvhUIrg3rVDL7lSgrlihKT77Aihm/xxmZR
- xKHMPFQ+eDF+dJeF//90YkfnrFMNZstHubEro7oEG+GXqdcM2mv52DH0g30cHZlHX7NJ
- pnwCjSjjXavtR06Y6ktoszFWHDfl8vB3yzvJzO0ZJ3d84DO+H5jmBvcWZZHAmunOvy6s
- ienQ==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBbOg-0007y5-V1
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:41:59 -0400
+Received: by mail-oi1-x241.google.com with SMTP id g6so13211495oiy.1
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 02:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vbizKraB0QJq46h0lqJSkD27wvolg+jD+H/xagV+SDM=;
+ b=EUqlPL2anjzKJV8ZivBASlidEAjI0jkbdkUIQSBaHXOC3T26r5RvqcRYi+FiIcBrX1
+ AbdT2s2BakhP/wjCcRpG+GjZiwji1M1mFY9HvDKNOAGEk6dXCdw7bk8SbhFBd4YOUw+Z
+ 2GoGycf/19pL3wewP0VViiN2GbIsgLB6/m5GKcsWpa5z2tZk05MNTqHwRnSgmsaRMWmh
+ KsdlkSt5xN5qOgWK9uhBpzwwI3YBTQtpxsmmqWhXA4UszWg+sPiNyirJgcMlPVllptPn
+ dZqeUTQnU73OsqohkHD+UBkoDWjZMORuNVRhi+F6pR7/AXWoC8tp7aikKYhvrmcPZeaz
+ 46QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yJyHq74z3B7YWvmtwnDx2TgHOG5eMnWNMqe1KqoxD3o=;
- b=PqlHDeiVuytZA5f8LSzeizqv+iPl5X/ORiHp8iAl1uTJjfstQEGAfSycLdmslM4QCr
- ccyU3Hw0jYxpe/+bBcg86KKiVbauVLZY8+4KoAXFyjhAptfjDTT4CiG1K+Y4ziRRkysf
- TptrGohd5L43JaAUnCL7YTDrwHX+Hce2/5gweU4GH/jFOyfprYwDAUWT77TAMUXDqkDY
- j2ySZQZJGAFQnl2kQx87ka3vIZOyBFlam/xuchigcIItQAmqf6gPge2PIsc2WCPpA1Mx
- uoEA60Gao8EK+7/Brj3O2kOrb0fXSFNEu4qORNlTYb9kD5cSWvQdA5H4vT9K0CGQZLdN
- CWBg==
-X-Gm-Message-State: ANhLgQ3HbyNkl8JIw3rVnBk8TtgsOYOZQGGJ4madmVc2Ffdxs3j/UzCw
- mXyNGWt4omVogL0+zuJ352w=
-X-Google-Smtp-Source: ADFU+vsQC4aWmlpyDtusRFPUsE+xHgp46spAXWwZrJRjcJgTo4L/EnYls9j8JglHe4L2WXdICAhowA==
-X-Received: by 2002:a5d:67c3:: with SMTP id n3mr21185693wrw.156.1583833152661; 
- Tue, 10 Mar 2020 02:39:12 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id u20sm3434770wmj.14.2020.03.10.02.39.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 02:39:11 -0700 (PDT)
-Date: Tue, 10 Mar 2020 09:39:10 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Subject: Re: [PATCH] modules: load modules from versioned /var/run dir
-Message-ID: <20200310093910.GB140737@stefanha-x1.localdomain>
-References: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vbizKraB0QJq46h0lqJSkD27wvolg+jD+H/xagV+SDM=;
+ b=C5Mh884Az4WgOIKOOdYknE8sH74xtJvPBbHiAaedFUqLj5SGzslMpbK7jSyLGJnLgZ
+ I1skB1I8mTkZg/lqbWKseasAxo67xtcgUr6eua0I3oYbTnc9EbJdOwKbP/bnGWRGG/jQ
+ /4GZjNDyA8EPbagCuoS/regpMNSSzEhc1jmp8PmvDyt/8f/GuI15g+RXH13Zdu+uPMTj
+ 4HEtuzd8mF+xV8LpnO0I7fLZRfu4B6HBoexIbpcyzJu9jQ7RK94hjferWdkPuRnFhVJl
+ HMj5DjOjQsdRwxpiPT3Hm/gPr5ZdruFNoFNJ+oHBf3U4zGYdWLRYrsl+wT0319fyiXZp
+ F/Ig==
+X-Gm-Message-State: ANhLgQ3QD1CKV2kOqfdzixFzNiMvkga85FHgXIcAj+mAoWN6mURDwZAa
+ Yyy8hSEDIchta5AypYyU09uO/KD6oTHH0nKpz6fDtw==
+X-Google-Smtp-Source: ADFU+vsWnCxEDNSl1TKLksvEeHFxdYF23Qa5aNR+XRXGxhSEoIrtM+C760nNKJoUj7lmGQEDzFd7e+rtgbEwXHY34m0=
+X-Received: by 2002:a54:478b:: with SMTP id o11mr465050oic.146.1583833317902; 
+ Tue, 10 Mar 2020 02:41:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
-Content-Disposition: inline
-In-Reply-To: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+ <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+ <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
+ <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
+ <871rq08tn9.fsf@dusky.pond.sub.org>
+In-Reply-To: <871rq08tn9.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Mar 2020 09:41:46 +0000
+Message-ID: <CAFEAcA_Hfu-M330faf=5fSZSsJGFgJKZm1N-8ttj29FwWpomZw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,110 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, pkg-qemu-devel@lists.alioth.debian.org,
- Cole Robinson <crobinso@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Miroslav Rezanina <mrezanin@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 10 Mar 2020 at 09:08, Markus Armbruster <armbru@redhat.com> wrote:
+> We have >200 calls of sysbus_init_child_obj() in some 40 files.  I'm
+> arbitrarily picking hw/arm/allwinner-a10.c for a closer look.
+>
+> It calls it from device allwinner-a10's .instance_init() method
+> aw_a10_init().  Side effect, clearly wrong.
 
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Huh. This implies that sysbus_init_child_obj() is a fundamentally
+broken API. It bundles up two things: (a) init the child object and
+(b) say it is on the sysbus. But (a) should be done in 'init' and (b)
+should be done in 'realize'. So that's another line of boilerplate
+code needed, plus because "put the thing on the sysbus" has
+to be its own call it's easier to forget. That's a shame, as
+"this object has a child object" is already pretty boilerplate-heavy,
+and now it looks like:
+ * in init, call object_initialize_chid()
+ * in realize, call qdev_set_parent_bus()
+ * in realize, realize child (which is 5 lines of code because
+   of the "if (err != NULL) { error_propagate(errp, err); return; }")
 
-On Fri, Mar 06, 2020 at 02:26:48PM +0100, Christian Ehrhardt wrote:
-> On upgrades the old .so files usually are replaced. But on the other
-> hand since a qemu process represents a guest instance it is usually kept
-> around.
->=20
-> That makes late addition of dynamic features e.g. 'hot-attach of a ceph
-> disk' fail by trying to load a new version of e.f. block-rbd.so into an
-> old still running qemu binary.
->=20
-> This adds a fallback to also load modules from a versioned directory in t=
-he
-> temporary /var/run path. That way qemu is providing a way for packaging
-> to store modules of an upgraded qemu package as needed until the next reb=
-oot.
->=20
-> An example how that can then be used in packaging can be seen in:
-> https://git.launchpad.net/~paelzer/ubuntu/+source/qemu/log/?h=3Dbug-18473=
-61-miss-old-so-on-upgrade-UBUNTU
->=20
-> Fixes: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1847361
-> Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> ---
->  util/module.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+It's a shame we didn't realize sysbus_init_child_obj() was
+fundamentally broken before we did a lot of conversion
+of code to use it...
 
-CCing Debian, Fedora, and Red Hat package maintainers in case they have
-comments.
-
-The use of /var/run makes me a little uneasy.  I guess it's related to
-wanting to uninstall the old package so the .so in their original
-location cannot be used (even if they had a versioned path)?
-
-I'm not a package maintainer though so I hope the others will make
-suggestions if there are other solutions :).
-
->=20
-> diff --git a/util/module.c b/util/module.c
-> index 236a7bb52a..d2446104be 100644
-> --- a/util/module.c
-> +++ b/util/module.c
-> @@ -19,6 +19,7 @@
->  #endif
->  #include "qemu/queue.h"
->  #include "qemu/module.h"
-> +#include "qemu-version.h"
-> =20
->  typedef struct ModuleEntry
->  {
-> @@ -170,6 +171,7 @@ bool module_load_one(const char *prefix, const char *=
-lib_name)
->  #ifdef CONFIG_MODULES
->      char *fname =3D NULL;
->      char *exec_dir;
-> +    char *version_dir;
->      const char *search_dir;
->      char *dirs[4];
->      char *module_name;
-> @@ -201,6 +203,11 @@ bool module_load_one(const char *prefix, const char =
-*lib_name)
->      dirs[n_dirs++] =3D g_strdup_printf("%s", CONFIG_QEMU_MODDIR);
->      dirs[n_dirs++] =3D g_strdup_printf("%s/..", exec_dir ? : "");
->      dirs[n_dirs++] =3D g_strdup_printf("%s", exec_dir ? : "");
-> +    version_dir =3D g_strcanon(g_strdup(QEMU_PKGVERSION),
-> +                             G_CSET_A_2_Z G_CSET_a_2_z G_CSET_DIGITS "+-=
-=2E~",
-> +                             '_');
-> +    dirs[n_dirs++] =3D g_strdup_printf("/var/run/qemu/%s", version_dir);
-> +
->      assert(n_dirs <=3D ARRAY_SIZE(dirs));
-> =20
->      g_free(exec_dir);
-> --=20
-> 2.25.1
->=20
->=20
-
---dc+cDN39EJAMEtIO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5nYD4ACgkQnKSrs4Gr
-c8hSzgf9FFCPQlq9QpkCuXqUF7df/ofCHITtk4pdfVIRyxZpQjaFsz6p8HX5tj+0
-qXPMl9OzrbGAItR5+VedBfUgD2Cvq+8fRm24FdlVDMX6UoKTs1TdLGmp+MxoMReY
-HgT+qMggMKjxF85SQPJNI1sbu7GEYMbkK4HkNIwUALz5DAMqb9SFYSXhbQCTDAcB
-rZ8EFqe04Eop82XOkG68Y1r9BOl3Pv7zbQNqqda7SYEjD0h1m/1SqbHm2xrsNXwj
-rNNxE/TzVJK9a7WUT1DkIaBd2614WJo/eoIW8aYQvu18iumyBbvjYpFLZRtO/G45
-K8WkStZiZJNjmsd/v1YyqbWytCqx+Q==
-=wwRy
------END PGP SIGNATURE-----
-
---dc+cDN39EJAMEtIO--
+thanks
+-- PMM
 
