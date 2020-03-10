@@ -2,142 +2,95 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63504C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EC9C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38AB02051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:23:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AB02051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 043F32051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:23:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUZzYLGd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043F32051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBb6Q-0007EC-En
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:23:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41566)
+	id 1jBb6w-00087O-73
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBb4z-0005Wh-Fo
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:38 -0400
+ (envelope-from <mst@redhat.com>) id 1jBb4X-0004m1-Aj
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBb4u-0004fo-Sn
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3496)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jBb4u-0004Wt-Lc
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:32 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02A9LSRn002690
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 05:21:28 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ynraxe2cs-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 05:21:27 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 10 Mar 2020 09:21:21 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Mar 2020 09:21:19 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02A9KJb844696022
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 09:20:19 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 769C34203F;
- Tue, 10 Mar 2020 09:21:18 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 47BF142049;
- Tue, 10 Mar 2020 09:21:18 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 10 Mar 2020 09:21:18 +0000 (GMT)
-Subject: Re: [PATCH v8] s390x: ipl: Consolidate iplb validity check into one
- function
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <c9fda605-7911-6c53-26d4-c18942b03773@de.ibm.com>
- <20200310090950.61172-1-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Tue, 10 Mar 2020 10:21:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <mst@redhat.com>) id 1jBb4V-0003ZB-4U
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:09 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38750
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBb4V-0003Y2-0E
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:21:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583832066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=up7rmilaV2crQ934L+7yx+i2C2JCkAoujvw0Bn7Cohk=;
+ b=ZUZzYLGdCYWP4qODaZon5PNwO4b0uHAfQvBLA0p/GL4Bef5J0LknH78FrOCFYG/LicXiE+
+ AfUZNbfl78WShlVB4cAMuOiVWWibZG/3CQhPr6wG7tu/Nq5xzFjZimvonTEBxA+Edh2uBS
+ fxLCjiwWi1MIemoKeaY4Ui4AMPfu2uo=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-Z1LN8pxvM-mLjlhvc3Slrw-1; Tue, 10 Mar 2020 05:21:04 -0400
+X-MC-Unique: Z1LN8pxvM-mLjlhvc3Slrw-1
+Received: by mail-qt1-f198.google.com with SMTP id i25so8694653qtm.17
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 02:21:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kG6qHaxeuj6VW1PfhEColy9fmZ6hVhonZmfHcv/lRPA=;
+ b=Uyeivd4vfBOEey4TjGsRmQjah4N0WqXnKmxJY8k0qICi9IJ1fK0tN9Rz7VZlXM+LY1
+ o2SXgG361CidWX1XrxG6hiCTxAHq82moFhFIuGbcJsdgpsxQW9tT1Jlm6yH7UHx2pynl
+ 1m8LXR4/bLRo0VYXn1K4QxZ2K62LbfKDL08GFEBrPQ1iIFCwRlVHBjM5svTZHqb+oiRP
+ AnJhWqC64s3Meoi2sU6IC2U9lBzAkcSxsTA07a0aChQ40mcnq7eAcKLASkMZVSnrOSxZ
+ Nfu87cTQcOFIwFVxSj7L1yulo6zrttoZEHutt6XNNkiwoHPjg7MW9F+H4NOdkN5vYTnV
+ HI/Q==
+X-Gm-Message-State: ANhLgQ3afdNSVBvJG8v0T3NyHZcZLdAiw7Tr/hVdtfwhhxP7jdWLOsWr
+ +8S6WXPdGG1zVitZzlnWfNZLnowiSWCmIkXMRFtYrAG6gWDAqHv1i7o5R72hn1Hd4EoSO2GssLf
+ 4ZLqzK+alExU3cDo=
+X-Received: by 2002:ac8:1196:: with SMTP id d22mr18487552qtj.344.1583832063674; 
+ Tue, 10 Mar 2020 02:21:03 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtIT2Ed9zeE9dTPLxOVsSajeFV+VeX8T80YMQqepekoU9kbufSccUkN9RLr/tVSZ6CKsLlQDA==
+X-Received: by 2002:ac8:1196:: with SMTP id d22mr18487533qtj.344.1583832063445; 
+ Tue, 10 Mar 2020 02:21:03 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id k50sm24256328qtc.90.2020.03.10.02.21.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 02:21:02 -0700 (PDT)
+Date: Tue, 10 Mar 2020 05:20:57 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
+Message-ID: <20200310051738-mutt-send-email-mst@kernel.org>
+References: <20200309235411.76587-1-liran.alon@oracle.com>
+ <20200309235411.76587-6-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200310090950.61172-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031009-0008-0000-0000-0000035B148C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031009-0009-0000-0000-00004A7C56F5
-Message-Id: <4f48499a-0a71-c84c-5ce4-369dab02f712@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-10_04:2020-03-09,
- 2020-03-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0 mlxscore=0
- phishscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100064
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200309235411.76587-6-liran.alon@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,19 +102,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
+> As can be seen from VmCheck_GetVersion() in open-vm-tools code,
+> CMD_GETVERSION should return VMX type in ECX register.
+>=20
+> Default is to fake host as VMware ESX server. But user can control
+> this value by "-global vmport.vmx-type=3DX".
+>=20
+> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  hw/i386/vmport.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>=20
+> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+> index a2c8ff4b59cf..c03f57f2f636 100644
+> --- a/hw/i386/vmport.c
+> +++ b/hw/i386/vmport.c
+> @@ -36,6 +36,15 @@
+>  #define VMPORT_ENTRIES 0x2c
+>  #define VMPORT_MAGIC   0x564D5868
+> =20
+> +typedef enum {
+> +   VMX_TYPE_UNSET =3D 0,
+> +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Express */
+> +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
+> +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Server */
+> +   VMX_TYPE_WORKSTATION,
+> +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for ACE 1.x *=
+/
+> +} VMX_Type;
+> +
 
-On 10.03.20 10:09, Janosch Frank wrote:
-> It's nicer to just call one function than calling a function for each
-> possible iplb type.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+Can names be prefixed with VMPort pls? VMX has specific unrelated meaning.
 
-thanks applied.
+Same everywhere.
+
+>  #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
+> =20
+>  typedef struct VMPortState {
+> @@ -46,6 +55,7 @@ typedef struct VMPortState {
+>      void *opaque[VMPORT_ENTRIES];
+> =20
+>      uint32_t vmx_version;
+> +    uint8_t vmx_type;
+>  } VMPortState;
+> =20
+>  static VMPortState *port_state;
+> @@ -114,6 +124,7 @@ static uint32_t vmport_cmd_get_version(void *opaque, =
+uint32_t addr)
+>      X86CPU *cpu =3D X86_CPU(current_cpu);
+> =20
+>      cpu->env.regs[R_EBX] =3D VMPORT_MAGIC;
+> +    cpu->env.regs[R_ECX] =3D port_state->vmx_type;
+>      return port_state->vmx_version;
+>  }
+> =20
+> @@ -173,6 +184,8 @@ static void vmport_realizefn(DeviceState *dev, Error =
+**errp)
+>  static Property vmport_properties[] =3D {
+>      /* Default value taken from open-vm-tools code VERSION_MAGIC definit=
+ion */
+>      DEFINE_PROP_UINT32("vmx-version", VMPortState, vmx_version, 6),
+> +    DEFINE_PROP_UINT8("vmx-type", VMPortState, vmx_type,
+> +                      VMX_TYPE_SCALABLE_SERVER),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> --=20
+> 2.20.1
 
 
