@@ -2,113 +2,133 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FF7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8DDC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:24:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90674215A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:17:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90674215A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id D532D208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:24:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjihxGWV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D532D208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBlJW-0007QM-Q3
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 16:17:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49659)
+	id 1jBlQB-0002iZ-2m
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 16:24:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53487)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBlIm-0006zV-Vv
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:16:34 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jBlPP-0002DR-HR
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBlIl-0007Xe-JY
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:16:32 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:44235)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jBlIl-0007TK-AA
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:16:31 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MQ67s-1iyTdV1IGm-00M8N7; Tue, 10 Mar 2020 21:16:22 +0100
-To: chengang@emindsoft.com.cn, riku.voipio@iki.fi
-References: <20200226113834.26404-1-chengang@emindsoft.com.cn>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Message-ID: <6abe4989-6d63-6bc5-f566-96d7bda30df7@vivier.eu>
-Date: Tue, 10 Mar 2020 21:16:17 +0100
+ (envelope-from <groeck7@gmail.com>) id 1jBlPO-00050d-Dn
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:23:23 -0400
+Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:44646)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1jBlPO-0004vS-5E
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:23:22 -0400
+Received: by mail-pf1-x42b.google.com with SMTP id b72so3462348pfb.11
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 13:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+1V8Hk8ofukWs5jvWqI1M7WDDv0ErXVlRm47C1pQFv0=;
+ b=TjihxGWVcARf1+Stj4t4AyGLcoYhhg1pXX/4N3JI8badLc1dM84U7eDVpGltNOlk/H
+ ZoXGiZMtnrRYMFf/6yWmcxwgfU7A2/hdC6S25SfnuZmCEbSAzOI18XQ2itVR0+N47Y5J
+ cVJEHE9HOFHoN2xj1x3WrurXNGO8LX4ARpzA7kDXmKgy4Tis5QTemYm0ui0OiwZCEKs8
+ 6MFftuFW/CUaSBMMZkfL+ZAuUWae42Zp7Ny4HwjKYvstFfoMHRcUkFyUQs3X4cnaxJi3
+ BDgF/jx6ixNJVcVBC1P9HHWl8NJ06YZp4mj65s2pmCO0Ew/5xn8PFXXXlawFDxzjbg0c
+ snlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=+1V8Hk8ofukWs5jvWqI1M7WDDv0ErXVlRm47C1pQFv0=;
+ b=ocIZORAhhnxE2XEGcS06JoarZvVGJoZBfIbVFUie41Xcl1Dd9hWT/+EIPTLJj7BEDM
+ ugFUVDGmZtgQOOUUUNd0efwfSn75L8Yj6ZQtXBQvighFzWYH8LtSKc4JHvKv7COkcEju
+ NmQTfeu0+cHGAZv/Oyz0zo+KSh9L2YW2CAxcc4D6TwyDN3Zxfo6ZtWplAyR5w9+9MEgr
+ 3OWZ9J4KY1hUf7ACJ507H15W0TETn7Txha/u8QzvrkaD21UkOQmwTUB6Xn4nc+LxmmcP
+ KNN9d4d93MoyEmumPV7+67KnYDDPSVEmp/UwATVkPFdXb3GYDuLtKr2rN5pn6yuM9Prj
+ GwXw==
+X-Gm-Message-State: ANhLgQ2JQoT4uhvG0Wv+I40ddkqx1j4uK69b+swRKCjPNfM3NOowYrOW
+ vHITWt5DUjVrG98gd6vRyQw=
+X-Google-Smtp-Source: ADFU+vtuCyBfu8f2h6eYGaCN92MUFc+/Exb1/kL/nEBVq+WEglvarxS36DfYW7crDi8f/E/hvVaMqw==
+X-Received: by 2002:a62:486:: with SMTP id 128mr23918422pfe.236.1583871801060; 
+ Tue, 10 Mar 2020 13:23:21 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ c4sm468411pfc.88.2020.03.10.13.23.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Mar 2020 13:23:19 -0700 (PDT)
+Subject: Re: "Unknown option --exist" message when building qemu
+To: quintela@redhat.com
+References: <66841404-892f-edef-eb1a-37ed2e2e08ee@roeck-us.net>
+ <875zfcyrol.fsf@secure.laptop>
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+Message-ID: <4bccf798-8313-3700-d04b-5fa6a74ed7c6@roeck-us.net>
+Date: Tue, 10 Mar 2020 13:23:18 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226113834.26404-1-chengang@emindsoft.com.cn>
+In-Reply-To: <875zfcyrol.fsf@secure.laptop>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:AgbJ8N8o4gbwxpKVfQAxczb35Iu1A+YwBV3+Gw6xCpU4erBbTpp
- 7RYvJxOTChavMj8zVMypnPLm81PETjIhaaoTNhKRGrXNTdGADyDbHZbbzNpMBPQEauzvktB
- OKzZUjJaSvU8zpO87UcONZ1q98HFFn1wS3aOgw1+P95Ys2d2Va8jSnuj2Kn5KH0djV2d1qG
- 40NkP1D7iIVuwuVHnNSiw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kd6sio9dZnA=:SGcW+q7iX3fSg3s5GjYoVi
- FSvZtb9YzM5tl9T1ewsrRBdoXCVwWrxCRgEtSeI/dJxFVOK5GPElyLC01aPO3kYMdP9DJqJId
- D1shPmsqfyXuxj/KiZhf3ExMCqjemrgoPmMYrYOPFqZ2cngKywjbQ/FUoYqGa7u4kvxYHcEFU
- tGdYsyyMk+CH2yfUwxSC0yXvQoHFJPVgYeeoTpx7jGZLxrfRUe3Op1dY9cL5VXGBt7PX6OmYt
- DeeLMBmeFWHiL1/X6FA6uP+QW+RgWlZisk0LOwZ1ibpGRBi0Vt3npp7JIhjo+n+PQWbhm6Kk5
- xe2Bd3X0TNcnysx39KnJfMghnw3hv17YQRUVPVJeuMYoPowewGwB4il2aigZ5nWkgLArJYU8i
- BLx5IahJFGHeW9ceNsMB+ySShhl8QcmQxC/LC3oM1A1jPNzgh5RbwJ9+cPh3hzXJ1nwWIIMPc
- 6kW9fpRFcFkmQWczHrCOP15WwL/RxDgajHtugeUuvk1viX2o4ED9SdU4Ok3LBfvpa8P911Hvq
- Dtf69dAXIERD4aw51Defkf3i9yjTDT7xVAfT7d2e044/h7SccIjPHTzbftOdWKWi39QsElS6c
- TrbYbME7nkESFniLUmseMs3iaPxQfV/fgu+RKMOqRnLbkk5QJA8rHz/0Gsd008bq4nFli/Eoo
- B6g0s/SIcC7CxlCfDVvqovSCWGkamU8ppDIeKeZwD+XsdAXbAu2N/KqcPc3xnSJ1xWUnxsJSD
- 1OCFHs2KfOrDkWKf4lj4GUcp3eVJvQR7pKm6NjtGelDF68Nsa068yTUUrXdrY2kWuGjyj2R6A
- QsFi48R7YMTN4GGevbG4YFUxl5Tdx75bEQ1+DkjbNqyoaxp7acLZ8Dg6+rXZcVb0dbT1Rqq
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,110 +140,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 26/02/2020 à 12:38, chengang@emindsoft.com.cn a écrit :
-> From: Chen Gang <chengang@emindsoft.com.cn>
+On 3/10/20 11:45 AM, Juan Quintela wrote:
+> Guenter Roeck <linux@roeck-us.net> wrote:
+>> Hi,
+>>
+>> when building qemu, I keep seeing the following message.
+>>
+>> Unknown option --exist
+>>
+>> This was introduced with commit 3a67848134d0 ("configure: Enable test
+>> and libs for zstd").
+>> If I replace "--exist" with "--exists", on a system with libzstd-dev
+>> installed, I get
+>> a number of error messages.
 > 
-> The other DRM_IOCTL_* commands will be done later.
+> Patch is on the line already.  You need to change the test to:
 > 
-> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
-> ---
->  linux-user/ioctls.h        |   3 +
->  linux-user/syscall.c       | 134 +++++++++++++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  |  16 +++++
->  linux-user/syscall_types.h |  12 ++++
->  4 files changed, 165 insertions(+)
+>  if test "$zstd" != "no" ; then
+> -    if $pkg_config --exist libzstd ; then
+> +    libzstd_minver="1.4.0"
+> +    if $pkg_config --atleast-version=$libzstd_minver libzstd ; then
+>          zstd_cflags="$($pkg_config --cflags libzstd)"
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 0defa1d8c1..c2294b48a0 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -574,6 +574,9 @@
->    IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
->                  MK_PTR(MK_STRUCT(STRUCT_rtentry)))
->  
-> +  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-> +                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-> +
+> It is not enough with having zstd installed, you need to have version
+> 1.4.0 for it to work.
+> > Sorry, Juan.
 
-Rather than adding a specific function to process the structure, perhaps
-we can add this in a generic way?
-
-The problem with drm_version structure is the pointers to the strings.
-
-Did you try to add a TYPE_STRING in
-thunk_type_size()/thunk_type_align()/think_convert()/do_ioctl() to do that?
-
-...
-
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 152ec637cb..5e455a32af 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
->  #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
->  #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
->  
-> +/* drm ioctls */
-> +#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-
-Why do you use the TARGET_IOWRU variant?
-
-Can't you use TARGET_IOWR('d', 0x00, struct target_drm_version)?
-
-> +
->  /* from asm/termbits.h */
->  
->  #define TARGET_NCC 8
-> @@ -2598,6 +2602,18 @@ struct target_mq_attr {
->      abi_long mq_curmsgs;
->  };
->  
-> +struct target_drm_version {
-> +    int version_major;
-> +    int version_minor;
-> +    int version_patchlevel;
-> +    abi_ulong name_len;
-> +    abi_ulong name;
-> +    abi_ulong date_len;
-> +    abi_ulong date;
-> +    abi_ulong desc_len;
-> +    abi_ulong desc;
-> +};
-> +
->  #include "socket.h"
->  
->  #include "errno_defs.h"
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 4e12c1661e..52a031ad35 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -292,6 +292,18 @@ STRUCT(dm_target_versions,
->  STRUCT(dm_target_msg,
->         TYPE_ULONGLONG) /* sector */
->  
-> +/* TODO: use #ifdef 32 bit #else 64 bit, next */
-> +STRUCT(drm_version,
-> +       TYPE_INT, /* version_major */
-> +       TYPE_INT, /* version_minor */
-> +       TYPE_INT, /* version_patchlevel */
-> +       TYPE_ULONG, /* name_len */
-> +       TYPE_PTRVOID, /* name */
-> +       TYPE_ULONG, /* date_len */
-> +       TYPE_PTRVOID, /* date */
-> +       TYPE_ULONG, /* desc_len */
-> +       TYPE_PTRVOID) /* desc */
-> +
-
-After defining a TYPE_STRING, you could use MKPTR(TYPE_STRING) for name,
-date and desc.
+No problem; I can live with the message. I just wanted to make sure that
+it gets fixed if there was a problem.
 
 Thanks,
-Laurent
-
-
+Guenter
 
