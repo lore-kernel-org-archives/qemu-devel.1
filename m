@@ -2,157 +2,101 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE1DC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84120C18E5A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45442208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 514CB208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:30:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmVfIR/X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45442208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QwxePHnw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514CB208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmQW-00066N-F4
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:28:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50976)
+	id 1jBmSZ-0007ha-HD
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:30:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jBmPE-00053Y-V3
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:27:18 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBmRl-0007Bu-VN
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jBmPD-0001fO-Lk
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:27:16 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30028
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jBmPD-0001ej-DQ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:27:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583875634;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xkYdlDSuOPh2VUZ2BAuHW/KKL27qBh27oPa0DNRT690=;
- b=OmVfIR/X15pZYedGEfO5eA9PVSPwP0nqLQcvJ6tBobb8y6jyKGQnqHyBeteJS1m+LOyuBe
- +fIrJV1HTCKjVUvoJBY0NJIwjty92jU9kre6WInHjGMdKi9KpER46RKdgwc8rLx+caoxAT
- 8zeI3Rs2Yjye0xgEdfQs2ilL198yOF4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-USpyF1SVPSmzDjOwLum8XQ-1; Tue, 10 Mar 2020 17:27:10 -0400
-X-MC-Unique: USpyF1SVPSmzDjOwLum8XQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E26DD1088380;
- Tue, 10 Mar 2020 21:27:08 +0000 (UTC)
-Received: from [10.18.17.182] (dhcp-17-182.bos.redhat.com [10.18.17.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C51C5C1D4;
- Tue, 10 Mar 2020 21:27:08 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] cmd646: remove pci_cmd646_ide_init() function
-From: John Snow <jsnow@redhat.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- rth@twiddle.net
-References: <20200307091313.24190-1-mark.cave-ayland@ilande.co.uk>
- <75528a74-96fb-260c-0348-5387da519296@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e3bff0c0-053d-fa45-bed5-9ea222cce608@redhat.com>
-Date: Tue, 10 Mar 2020 17:27:07 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <75528a74-96fb-260c-0348-5387da519296@redhat.com>
+ (envelope-from <liran.alon@oracle.com>) id 1jBmRk-0005K6-9Y
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:53 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:56466)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBmRk-0005J3-1t
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:52 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ALOTPs003063;
+ Tue, 10 Mar 2020 21:29:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=mime-version :
+ message-id : date : from : to : cc : subject : references : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=KkPZFmykhUwlfBzqSWVZ3QYJznH9JEVJtiYnK+6jNxM=;
+ b=QwxePHnwsSqjOI1FWqKdTjEPkLGkPOZFn+s9UyR0WIlf6i8jHE+9Dq4TWOuhEWsYDf8z
+ u0poQ1Wa80pGmsnHFjK6EfJdH0ZnptORD+aHLANCselAi1Upf1vH4Qq9Fpm6BQyIO7Ef
+ qgnDeyKHBJTQ6CqcB/LO7UDfUZV5Q0RoEjUVHnESlmXcRFHUhFa7EtSZyhNMyZsQmNlm
+ nOyCs6XHXunTjfxiXxSgvGjIMLOlySlSFuo/zOfvoMAm5JG82QU15CozwJKewMgVBCBK
+ ElgQZ/qZGDUDz+754iRYaAAj+bg1AHYhaDgML9D+Ko3yZBWd0J03W0gu07Q7bjfN2JSm lA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2yp9v638fe-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 21:29:49 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ALMRE6106133;
+ Tue, 10 Mar 2020 21:29:49 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2yp8nvufcb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 21:29:49 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ALTk8G023777;
+ Tue, 10 Mar 2020 21:29:46 GMT
+Received: from [192.168.14.112] (/79.181.212.171) by default (Oracle Beehive
+ Gateway v4.0) with ESMTP ; Tue, 10 Mar 2020 14:29:46 -0700
+USER-AGENT: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+MIME-Version: 1.0
+Message-ID: <b191ba0e-a864-fdc2-a029-c22783eb0106@oracle.com>
+Date: Tue, 10 Mar 2020 14:29:42 -0700 (PDT)
+From: Liran Alon <liran.alon@oracle.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 00/16]: hw/i386/vmport: Bug fixes and improvements
+References: <20200310165332.140774-1-liran.alon@oracle.com>
+ <20200310133932-mutt-send-email-mst@kernel.org>
+ <bcf7f439-7954-a6dc-322e-f8cbddd51d24@oracle.com>
+ <20200310164239-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200310164239-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100127
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,63 +108,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: nikita.leshchenko@oracle.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 10/03/2020 22:56, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 08:09:09PM +0200, Liran Alon wrote:
+>> On 10/03/2020 19:44, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 10, 2020 at 06:53:16PM +0200, Liran Alon wrote:
+>>>> Hi,
+>>>>
+>>>> This series aims to fix several bugs in VMPort and improve it by supporting
+>>>> more VMPort commands and make command results more configurable to
+>>>> user via QEMU command-line.
+>>>>
+>>>> This functionality was proven to be useful to run various VMware VMs
+>>>> when attempting to run them as-is on top of QEMU/KVM.
+>>>>
+>>>> For more details, see commit messages.
+>>> Well two versions in one day and some review comments weren't addressed.
+>> There is a single review comment that wasn't addressed which is replacing an
+>> enum with a comment. And I explicitly mentioned that it's because I want
+>> additional opinion on this.
+>> I don't see why such a small thing should block review for 15 patches...
+>> All the rest of the comments (Which were great) have been addressed. Unless
+>> I have mistakenly missed something, which please point it out if I did.
+> OK I just took a quick peek, two things quickly jumped out at me.
+Thanks for having a look.
+>
+> version property really should be a boolean and have some documentation
+> saying what functionality enables.
+I thought that having a version number approach is more generic and easy 
+to maintain going forward.
+If I understand correctly, this is also the approach taken by qxl & qxl-vga.
 
-On 3/10/20 11:31 AM, John Snow wrote:
-> 
-> 
-> On 3/7/20 4:13 AM, Mark Cave-Ayland wrote:
->> The recent cmd646 discussions reminded me of this patch I've had sitting in an
->> old branch for a while.
->>
->> The DP264 machine is the last remaining user of the deprecated
->> pci_cmd646_ide_init() init function. Switch it over to using qdev via pci_create()
->> and then remove the now-unused pci_cmd646_ide_init() function.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>
->> v3:
->> - Rebase onto master
->> - Add R-B tag from Phil
->> - Use pci_create_simple() instead of pci_create() as suggested by Zoltan
->>
->> v2:
->> - Rebase onto master
->> - Remove setting "secondary" property to 0 for dp264 since this is already the default
->> - Add R-B tags from Richard
->>
->>
->> Mark Cave-Ayland (2):
->>   dp264: use pci_create_simple() to initialise the cmd646 device
->>   cmd646: remove unused pci_cmd646_ide_init() function
->>
->>  hw/alpha/dp264.c |  6 +++++-
->>  hw/ide/cmd646.c  | 12 ------------
->>  include/hw/ide.h |  2 --
->>  3 files changed, 5 insertions(+), 15 deletions(-)
->>
-> 
-> Thanks, applied to my IDE tree:
-> 
-> https://github.com/jnsnow/qemu/commits/ide
-> https://github.com/jnsnow/qemu.git
-> 
-> --js
-> 
+The more elaborate alternative could have been introducing compat_flags 
+(As PVSCSI does) but it seems like it will pollute the property space 
+with a lot of useless VMPort properties.
+(E.g. x-read-eax-bug, x-no-report-unsupported-cmd, x-no-report-vmx-type 
+and etc.).
 
-Sorry, I replied to the wrong series!
+What is the advantage of having a boolean such as "x-vmport-v2" instead 
+of having a single "version" property?
+Will it suffice if I would just add documentation above "version" 
+property on what is was the functionality in "version==1"?
+(Though, it's just easy to scan the vmport.c code for if's involving 
+">version"... "version" is more of an internal field for machine-type 
+compatibility and not really meant to be used by user)
 
-But now it's true.
+Which approach do you prefer?
 
-Thanks, applied to my IDE tree:
+> userspace properties should use the non-abbreviated
+> vm-executable since vmx is easy to confuse with vm extensions.
+I really wish you would reconsider this. VMX is a really common term in 
+VMware terminology.
+It is found in binary names, ".vmx" file, ".vmx" file properties, VMware 
+Tools prints, open-vm-tools source code and etc.
 
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
+In contrast, even though I have dealt for many years with VMware 
+technologies, I have never known that VMX==vm-executable.
+I still think it will introduce much confusion. On the other hard, I 
+don't see much confusing with this use of VMX with Intel VT-x
+because it is only used inside vmport.c and in vmport properties names. 
+And the properties names match the names of the guest
+code that interface with vmport in open-vm-tools source code.
 
---js
+If you still have a strong opinion on this, I will change it as you say 
+in v3... But please consider above arguments.
+>
+> That's just a quick look.
+>
+>
+>>> Some people do this, try to wear the maintainers out by sheer volume.
+>>> It works sometimes but it's not a nice tactic. I personally think it's
+>>> worth taking the time to think harder about ways to address all
+>>> comments, not try to dismiss them.
+>> That's not what I tried to do. I carefully fixed all comments I saw in the
+>> review discussion and run tests.
+>> The only thing which wasn't addressed is removing an enum and replacing it
+>> with a comment.
+>> The hint that I try to manipulate maintainers is disrespectful. I assume
+>> that this isn't your intention, as we all just want to collaborate together
+>> here. No need to make this a personal discussion.
+>>
+>> If you think that replacing the enum with a comment is a blocker for v2
+>> patch-series, I will go ahead and submit v3 with that change.
+> Yes IMHO it needs to be fixed but please go over the comments and try to
+> address them all as best you can, instead of looking for an explanation
+> why the comments were irrelevant and can be dismissed.
+
+I'm not trying to finding explanation on why the comments are irrelevant 
+and can be dismissed... It's not my first time contributing code to 
+QEMU/KVM...
+
+> Sure someone
+> might propose you introduce a bug, and that can't just be addressed, but
+> that's not the case here.  Also please do not send multiple revisions of
+> a large patchset in a day.  People need time for review.
+OK. I will make note of that for next time.
+I would have thought maintainers prefer to always have ability to pick 
+up the latest version that is ready to avoid reviewing old code that was 
+already discussed. Assuming all previous comments were addressed.
+
+Thanks,
+-Liran
+
 
 
