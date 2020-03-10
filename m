@@ -2,110 +2,118 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A817CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 372B8C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 841EC24655
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:46:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841EC24655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0365924655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:48:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Cut52tIu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0365924655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBYf9-0006RR-NB
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 02:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51537)
+	id 1jBYgb-0007ND-7z
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 02:48:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <max@m00nbsd.net>) id 1jBYe7-0005pc-5a
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:45:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jBYfe-0006tw-1O
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <max@m00nbsd.net>) id 1jBYe6-0006rz-4P
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:45:43 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:53515)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1jBYe5-0006W0-RO
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:45:42 -0400
-Received: from mxplan6.mail.ovh.net (unknown [10.108.16.95])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 1EE3A2C1490D;
- Tue, 10 Mar 2020 07:45:27 +0100 (CET)
-Received: from m00nbsd.net (37.59.142.99) by DAG3EX2.mxp6.local (172.16.2.22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Tue, 10 Mar
- 2020 07:45:27 +0100
-Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20200206115731.13552-1-n54@gmx.com>
- <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
- <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
- <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
- <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
-From: Maxime Villard <max@m00nbsd.net>
-Autocrypt: addr=max@m00nbsd.net; keydata=
- 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
-Message-ID: <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
-Date: Tue, 10 Mar 2020 07:45:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jBYfc-0002EK-6L
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:47:17 -0400
+Received: from mail-eopbgr80113.outbound.protection.outlook.com
+ ([40.107.8.113]:34883 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jBYfW-0001qu-IB; Tue, 10 Mar 2020 02:47:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VVRn/JpWJwDk+jXNu1qvMBr3cTbQPkHXU36f75MhKDp444yTTLlkwkx17+evUkRfRt7nOjSIHGiagSY2KZdGL9gQqq6F2Z3EPjsoYxDJ+S7qoSjc4N3bA7F0g3Ij7+TXDYtgnG+zTDDC+pZXepuRojx8DiKuCEM65aWiS/dxpLhSQ+z2mq6oQr6XIqkWrepKvfBVjHZgqexJpCfgSLh1Wj5e+eDo811P6WiCrQRrdoP+ifZ7/qkTXdMZcTEVelAgtDCM5zyauaoWiANe1FEHZ8oVIlS78Yr3Pb18bKLqw7gy8XAd6IjDilcuhS9Y4/rZveA4qckgmGfvM1Ul0LnIHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BkRSGu1l0xSemgRLhlV9PX/SDiy8sJCdZflsNGYtWfc=;
+ b=k8gvO6c7yaci4dbyuX1+npir5oDc/BKpwoZddanC1v2UIqaZBQDO81p3bIKb8UesFRR+aYwv1oxQA5QMbuX9Xao5ECLI3/P01ERzhuSVqrHL2TSrkREiOo9tOyjEpIVeQ8C7KT3orxZ92x49BA3zYE2EJlbj1UxnKCdrfDOJV0BswNLHcWmxw80Xidt4l6lMhoyyuB3YmqTWqC2lDjXdvBtfRP2JzF5+keMULxdKVpwNiQ5Bywv+Pb7MapK5OIw6/BUgbQcpCvcUojnnw4767Iwgk12C9zxHRiWY4PdKUdg/sTGcbnRB1Q75FbXqX1xnuWJqIm+OEJbA3aefJeRnBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BkRSGu1l0xSemgRLhlV9PX/SDiy8sJCdZflsNGYtWfc=;
+ b=Cut52tIuRCX0lRWsxd9OX0ehaL1Eju8xxPbdiR3ut5Yo9oJsyjGpNybTS/S+p3eFw15KbnpCWJeRSSbmGWSUgQw/y6RSAjQMmDNQ+BlXNDPfLTl88ZLuCqmrU5a6vjmjytmAsUpr7jFodl+GYta5lcRt2rZyq84Xn4tvIZCXCA8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5111.eurprd08.prod.outlook.com (10.255.122.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.17; Tue, 10 Mar 2020 06:47:05 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2793.018; Tue, 10 Mar 2020
+ 06:47:05 +0000
+Subject: Re: [PATCH v8 02/10] scripts: add coccinelle script to use auto
+ propagated errp
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
+References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
+ <20200306051536.27803-3-vsementsov@virtuozzo.com> <2464375.yLZ1CyT5Wr@silver>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200310094702631
+Message-ID: <12482a0b-28f8-0a4b-cf3f-b2b390bf238e@virtuozzo.com>
+Date: Tue, 10 Mar 2020 09:47:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <2464375.yLZ1CyT5Wr@silver>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [37.59.142.99]
-X-ClientProxiedBy: DAG2EX1.mxp6.local (172.16.2.11) To DAG3EX2.mxp6.local
- (172.16.2.22)
-X-Ovh-Tracer-GUID: 2fee6322-b001-4da4-89eb-7918e9aac42c
-X-Ovh-Tracer-Id: 4001166797874269999
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudduledgleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkfffgggjtgfgihesthekredttddtjeenucfhrhhomhepofgrgihimhgvucggihhllhgrrhguuceomhgrgiesmhdttdhnsghsugdrnhgvtheqnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnheirdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepmhgrgiesmhdttdhnsghsugdrnhgvthdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhm
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 79.137.123.220
+X-ClientProxiedBy: HE1PR0902CA0040.eurprd09.prod.outlook.com
+ (2603:10a6:7:15::29) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0902CA0040.eurprd09.prod.outlook.com (2603:10a6:7:15::29) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.16 via Frontend Transport; Tue, 10 Mar 2020 06:47:04 +0000
+X-Tagtoolbar-Keys: D20200310094702631
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8729c123-68a8-4951-9bc5-08d7c4bed8ac
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5111:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB51119DC80AF35922FA1249D4C1FF0@AM6PR08MB5111.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
+X-Forefront-PRVS: 033857D0BD
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(346002)(39850400004)(376002)(366004)(396003)(136003)(199004)(189003)(16526019)(2906002)(186003)(6486002)(52116002)(8676002)(26005)(16576012)(54906003)(36756003)(316002)(31686004)(5660300002)(4744005)(31696002)(66476007)(81156014)(2616005)(478600001)(7416002)(81166006)(956004)(8936002)(66946007)(66574012)(4326008)(66556008)(86362001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5111;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FgaOukhwEahABcGPAs9ARbVIdBdoW//mP9vmhc270HIa4LKSoLNsipnnT1vjJoJN+oJ6vjb9dxl5hZk7FOc8yfFZ1Zl8ZRuZTvakxhWaOTA6m6HAorK0KJ7lO7lD9FaunNfSyshSeW6uJKU4js1/ek6RvFErDWWf48Ko6Wp3UpZrAGfjREsRuhvQzGRtlxve+RDxninGiJleIr2Xi8LFh7/0ZglEqzpKp9FczJRCVGgAXhjlldm6IUOW8QCXHp+BFdjciwrPOtpHO4CTddAr8Xla+eMVS0bJwiJf5CSkVKQhSXbGDavltNoZBS2g5LSZYEy1yUpdPz2sOGEu7fZstm2ormj0oMxsblF/yP8T7EwzwUE+LhUX9OWwAhYFIklahfPhmKJfEkkdRLLvdZmtxsL1d1OWnmv2DG8H7tbgXN+gknhGUFRgqD7qz998ew0p
+X-MS-Exchange-AntiSpam-MessageData: hBcwFhI5lsMLRzm4b/6RaWEpIsLMaOUI+XcfmqXJsalX8+C8ASbVFXJFMJrrBb11nocP19Hl/sVAUyauXNV2p0yGibh/ppWQ8kmeVI/jrnST1Orf+AqBA+WD0T6+q1PbhfGUBPd3tXRTmCZKuYRxBQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8729c123-68a8-4951-9bc5-08d7c4bed8ac
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2020 06:47:05.6544 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 133W/ecAWhfGl2NSDwCwhKIPJiRbHHO20rTuhu7LTqzHgwuyKThJtet8yoKqsVBqwjhpj4xv9lSgar3O99e3G3QNeKltqcc6cv5hk9Eb/og=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5111
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.113
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,58 +125,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
- philmd@redhat.com, rth <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ Greg Kurz <groug@kaod.org>, armbru@redhat.com,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/03/2020 =C3=A0 20:35, Paolo Bonzini a =C3=A9crit=C2=A0:
+08.03.2020 22:09, Christian Schoenebeck wrote:
+> On Freitag, 6. M=C3=A4rz 2020 06:15:28 CET Vladimir Sementsov-Ogievskiy w=
+rote:
+>> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci
+>> b/scripts/coccinelle/auto-propagated-errp.cocci new file mode 100644
+>> index 0000000000..bff274bd6d
+>> --- /dev/null
+>> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+>> @@ -0,0 +1,231 @@
+>> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+>> +//
+>> +// Copyright (c) 2020 Virtuozzo International GmbH.
 >=20
+> Just in case:
 >=20
-> Il lun 2 mar 2020, 20:28 Maxime Villard <max@m00nbsd.net <mailto:max@m0=
-0nbsd.net>> ha scritto:
->=20
->=20
->     >> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 nvmm_vcpu_pre_run(cpu);
->     >> +
->     >> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (atomic_read(&cpu->exit_request)=
-) {
->     >> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_cpu_kick_self();
->     >> +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
->     >> +
->     >
->     > This is racy without something like KVM's immediate_exit mechanis=
-m.
->     > This should be fixed in NVMM.
->=20
->     I don't immediately see how this is racy.
->=20
->=20
-> You can get an IPI signal immediately after reading cpu->exit_request.
->=20
->     It reproduces the existing
->     logic found in whpx-all.c, and if there is a real problem it can be
->     fixed in a future commit along with WHPX.
->=20
->=20
-> It's buggy there too and it has to be fixed in the hypervisor so it can=
-'t be done at the same time I'm both. KVM does it right by having a flag =
-("immediate_exit") that is set by the signal handler and checked by the h=
-ypervisor.
->=20
-> An earlier version of KVM instead atomically unblocked the signal while=
- executing the guest, and then ate it with a sigwaitinfo after exiting ba=
-ck to userspace.
->=20
-> You don't have to fix it immediately, but adding a FIXME would be a goo=
-d idea.
->=20
-> Paolo
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
 
-Kamil, please add /* FIXME: possible race here */ before the atomic_read(=
-).
+Hmm, seems this, and some other coccinelle scripts should be added to "Erro=
+r reporting"
+section.
 
-Thanks
+>=20
+> Best regards,
+> Christian Schoenebeck
+>=20
+>=20
+>=20
+
+
+--=20
+Best regards,
+Vladimir
 
