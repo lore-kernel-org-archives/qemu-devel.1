@@ -2,107 +2,104 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFDDC3F2D0
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4430FC18E5A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 282F724686
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:41:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DE532469C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:44:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xu6UN/Fn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 282F724686
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iOUZ0wDe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE532469C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBeC9-0004bE-F9
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:41:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39523)
+	id 1jBeFm-0005vl-Af
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jBeBM-0003aK-Ta
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:40:26 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBeEs-0005Ir-Em
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jBeBJ-0002Ga-Cv
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:40:24 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20622
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBeBJ-0002Bi-81
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:40:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583844018;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=orIfXiVA+cHBeDsqPdA5VeCBx3YMEteEoMn+7uurfl8=;
- b=Xu6UN/Fn5eHzhDxmttmPsBL2aiEv3dY1uWpJuhjelYV0TQqh0RGnwJSAEp6KO0Be7ar6Nt
- CM6778Sueq/1ElLG0/c1MVjkTnuCWDMUAe0HXaYbdDYL4J3+5rTEq1R3Lw1RXuYOKTO2oj
- 9JhRulLGXIiWh3hQoEbR7//qKoo7PgM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-j0axlmL0PJ21yES2ma_X5A-1; Tue, 10 Mar 2020 08:40:13 -0400
-X-MC-Unique: j0axlmL0PJ21yES2ma_X5A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 834701005509;
- Tue, 10 Mar 2020 12:40:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A34A10027A8;
- Tue, 10 Mar 2020 12:40:10 +0000 (UTC)
-Subject: Re: [PATCH v3 1/9] job: refactor progress to separate object
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
- <20200306073831.7737-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8a105e30-2c49-8e7b-ab2e-16b9208ca591@redhat.com>
-Date: Tue, 10 Mar 2020 13:40:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <liran.alon@oracle.com>) id 1jBeEq-0004Ml-Tp
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:44:02 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:42182)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBeEq-0004IZ-Kk
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:44:00 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACgPEQ025776;
+ Tue, 10 Mar 2020 12:43:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hTyV5ARkYpVwRO2g1gg00hnstV/PdRz2KQqxa9tFBfk=;
+ b=iOUZ0wDeN9arSgMt2vZhdgocr5B2+kD1mZJXq4BUXCY4cCzYKvGtbu0PCN1kZhQIA1t1
+ cDGsoPoOD78L3IMMYPJvIrOJVfNfJuT2f+e4CwHm7nvlEG8nabfemJ+o0Sv0tyCSRebw
+ /BOwb/hEoTuaMXbzwzdez8rr8s2u+Bd2N54aZCHWmqxNjTOdRJqVLTT8aK1LPFiiOmcN
+ KTOWcLlqC6DiIXaIx+h86/rq31gOIemCzOjorjpv46AiA5P4wAAh6etPz66IIqeNTdKd
+ cYwKXfxQDx5B/gE2/PpxTTIQ8gjapyXP2d71pdESOA+wNQecc4QN4nkyeN1BJWSGBFzY iA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2yp9v60cdr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 12:43:57 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACg9ct173329;
+ Tue, 10 Mar 2020 12:43:57 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 2yp8pra6vp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 12:43:56 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02AChtIU024075;
+ Tue, 10 Mar 2020 12:43:55 GMT
+Received: from [192.168.14.112] (/79.181.212.171)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 10 Mar 2020 05:43:54 -0700
+Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200309235411.76587-1-liran.alon@oracle.com>
+ <20200309235411.76587-6-liran.alon@oracle.com>
+ <20200310081144-mutt-send-email-mst@kernel.org>
+ <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
+ <20200310082730-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <506ba498-ba50-9415-18b3-bcaff1561c55@oracle.com>
+Date: Tue, 10 Mar 2020 14:43:51 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200306073831.7737-2-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="GmxAmIOrqIv3BmLdczCfY0UzcQNMUU4Ky"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200310082730-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ malwarescore=0
+ mlxlogscore=999 bulkscore=0 suspectscore=0 mlxscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100085
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100085
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,60 +111,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GmxAmIOrqIv3BmLdczCfY0UzcQNMUU4Ky
-Content-Type: multipart/mixed; boundary="zEcLA6f6sscXWxRCRI5JHyvfm6f0cPrMx"
 
---zEcLA6f6sscXWxRCRI5JHyvfm6f0cPrMx
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 10/03/2020 14:35, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 02:25:28PM +0200, Liran Alon wrote:
+>> On 10/03/2020 14:14, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
+>>>> As can be seen from VmCheck_GetVersion() in open-vm-tools code,
+>>>> CMD_GETVERSION should return VMX type in ECX register.
+>>>>
+>>>> Default is to fake host as VMware ESX server. But user can control
+>>>> this value by "-global vmport.vmx-type=X".
+>>>>
+>>>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>>>> ---
+>>>>    hw/i386/vmport.c | 13 +++++++++++++
+>>>>    1 file changed, 13 insertions(+)
+>>>>
+>>>> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+>>>> index a2c8ff4b59cf..c03f57f2f636 100644
+>>>> --- a/hw/i386/vmport.c
+>>>> +++ b/hw/i386/vmport.c
+>>>> @@ -36,6 +36,15 @@
+>>>>    #define VMPORT_ENTRIES 0x2c
+>>>>    #define VMPORT_MAGIC   0x564D5868
+>>>> +typedef enum {
+>>>> +   VMX_TYPE_UNSET = 0,
+>>>> +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Express */
+>>>> +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
+>>>> +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Server */
+>>>> +   VMX_TYPE_WORKSTATION,
+>>>> +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for ACE 1.x */
+>>>> +} VMX_Type;
+>>>> +
+>>> Is this really VMX type? And do users care what it is?
+>> This enum is copied from open-vm-tools source code
+>> (lib/include/vm_version.h). This is how it's called in VMware Tools
+>> terminology... Don't blame me :)
+> I don't even want to go look at it to check license compatibility, but
+> IMHO that's just another reason to avoid copying it.
+> Copying bad code isn't a good idea unless needed for
+> compatibility.
+Preserving original VMware terminology makes sense and is preferred in 
+my opinion. I think diverging from it is more confusing.
+>
+>
+>>> Also, how about friendlier string values so people don't need to
+>>> figure out code numbers?
+>> I could have defined a new PropertyInfo struct in hw/core/qdev-properties.c
+>> for this enum and then define a proper macro in qdev-properties.h.
+>> But it seems like an overkill for a value that is suppose to rarely be
+>> changed. So I thought this should suffice for now for user-experience
+>> perspective.
+>> If you think otherwise, I can do what I just suggested above.
+>>
+>> -Liran
+> I think that's better, and this allows you to use official
+> product names that people can relate to.
+Ok. Will do...
+>
+> Alternatively just drop this enum completely.  As far as you are
+> concerned it's just a number VM executable gives together with the
+> version, right?  We don't even need the enum, just set it to 2 and add a
+> code comment saying it's esx server.
+I could do the latter alternative but why? It just hides information 
+original patch author (myself) know about where this value comes from.
+I don't see a reason to hide information from future code maintainers. 
+Similar to defining all flags of a given flag-field even if we use only 
+a subset of it.
 
-On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
-> We need it in separate to pass to the block-copy object in the next
-> commit.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  include/qemu/job.h            | 11 ++-----
->  include/qemu/progress_meter.h | 58 +++++++++++++++++++++++++++++++++++
->  blockjob.c                    | 16 +++++-----
->  job-qmp.c                     |  4 +--
->  job.c                         |  6 ++--
->  qemu-img.c                    |  6 ++--
->  6 files changed, 76 insertions(+), 25 deletions(-)
->  create mode 100644 include/qemu/progress_meter.h
+-Liran
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---zEcLA6f6sscXWxRCRI5JHyvfm6f0cPrMx--
-
---GmxAmIOrqIv3BmLdczCfY0UzcQNMUU4Ky
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5niqgACgkQ9AfbAGHV
-z0BXCAf+KXJPVigqt2uy+1PFM7MAgvRHPHOsPyUsDosgSx3NhWxSCVoa56HSywri
-mws9KS+isLlq1QUJE4Ij/coSVf07vZAcEU2B9LJaNLnLicrIq1iJqIuOB7kyFttr
-L1kTIQlJ8kFB6y5On/9unsIvvq+HDRrjtbYwyLIjNPQG5uvMnImmRVsXNWRxW4JC
-GDoXPyPp44YOA2rjBzwHrpf7z2yG8NzPUu1r0+XiL/g2YOu/pv5MFTbXF9GqTARu
-Naz+SE32HQaHDSxnMeLgHy3qJBaAao2hgv+N9bEv2+4dZkx75Xr2NehbJqU5J2Tx
-w/fajjWFaQ+qEFFgmgJxnVzhs+W5zw==
-=QpWM
------END PGP SIGNATURE-----
-
---GmxAmIOrqIv3BmLdczCfY0UzcQNMUU4Ky--
 
 
