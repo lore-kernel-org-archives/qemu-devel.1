@@ -2,95 +2,106 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02341C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B5CC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:47:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D01E120637
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:46:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D01E120637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9E2120637
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:47:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1AJgccq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E2120637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBfDE-0000Ks-Vl
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:46:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45915)
+	id 1jBfE2-0002Aa-1e
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:47:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jBfBs-0006xt-ON
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:45:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBf9U-0002Xb-OI
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jBfBr-0005GU-It
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:45:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6954)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jBfBr-0005D6-Bs
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:44:59 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02ADiqdH023047
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:44:58 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ynraxps7a-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:44:54 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Tue, 10 Mar 2020 13:42:16 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Mar 2020 13:42:14 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02ADfD0g49021288
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 13:41:14 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5873E11C052;
- Tue, 10 Mar 2020 13:42:13 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2FB0311C050;
- Tue, 10 Mar 2020 13:42:12 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.23.214])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 10 Mar 2020 13:42:11 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 10/15] s390x: protvirt: Move diag 308 data over SIDA
-Date: Tue, 10 Mar 2020 09:40:03 -0400
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200310134008.130038-1-frankja@linux.ibm.com>
-References: <20200310134008.130038-1-frankja@linux.ibm.com>
+ (envelope-from <mreitz@redhat.com>) id 1jBf9S-0007rI-1Z
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:31 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60874)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBf9Q-0007n1-8I
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583847746;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KxLUBgrxM88Q1Nzsdfcb5tVk/cyez4wfetUgfza8qRs=;
+ b=g1AJgccqH3Kxpu8xN/EO/Yjm8zDPcI1kEtXnf3peULZi9r/TEy4HSae4bKfYPNOO/Q6Kng
+ gu9rrj6tfmclTOrDzT388fKqtKpFTi1zUI/ZredbiSRtM8w322dLOR/Ajo+DVb/4vgzuXp
+ qdGZ0zHbch5oKayFQGMVVN7eMVFJ6tw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-yQR6KxZdPByMUEKVJLM8wg-1; Tue, 10 Mar 2020 09:42:24 -0400
+X-MC-Unique: yQR6KxZdPByMUEKVJLM8wg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 503008017CC;
+ Tue, 10 Mar 2020 13:42:22 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 902995D9C5;
+ Tue, 10 Mar 2020 13:42:20 +0000 (UTC)
+Subject: Re: [PATCH v3 3/9] block/block-copy: specialcase first copy_range
+ request
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
+ <20200306073831.7737-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <db130e8d-80dd-40f5-851c-faebe9baab3e@redhat.com>
+Date: Tue, 10 Mar 2020 14:42:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031013-0020-0000-0000-000003B25549
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031013-0021-0000-0000-0000220AA145
-Message-Id: <20200310134008.130038-11-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-10_07:2020-03-10,
- 2020-03-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=896 lowpriorityscore=0 bulkscore=0 mlxscore=0
- phishscore=0 impostorscore=0 suspectscore=1 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100092
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200306073831.7737-4-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="hLZYl1SZvMmVsaCqpn3qXmuiXE1MxOv4J"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,80 +113,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For protected guests the IPIB is written/read to/from the SIDA, so we
-need those accesses to go through s390_cpu_pv_mem_read/write().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hLZYl1SZvMmVsaCqpn3qXmuiXE1MxOv4J
+Content-Type: multipart/mixed; boundary="AvBcarpGR50kdICRidYOI2pu2CJUJ4paG"
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- target/s390x/diag.c | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+--AvBcarpGR50kdICRidYOI2pu2CJUJ4paG
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index 02918b37b8..417c4b53ab 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -87,6 +87,7 @@ static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
- void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- {
-     CPUState *cs = env_cpu(env);
-+    S390CPU *cpu = S390_CPU(cs);
-     uint64_t addr =  env->regs[r1];
-     uint64_t subcode = env->regs[r3];
-     IplParameterBlock *iplb;
-@@ -123,13 +124,22 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
-             return;
-         }
-         iplb = g_new0(IplParameterBlock, 1);
--        cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
-+        if (!s390_is_pv()) {
-+            cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_read(cpu, 0, iplb, sizeof(iplb->len));
-+        }
-+
-         if (!iplb_valid_len(iplb)) {
-             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
-             goto out;
-         }
- 
--        cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
-+        if (!s390_is_pv()) {
-+            cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len));
-+        }
- 
-         if (!iplb_valid(iplb)) {
-             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
-@@ -151,12 +161,17 @@ out:
-         } else {
-             iplb = s390_ipl_get_iplb();
-         }
--        if (iplb) {
--            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
--            env->regs[r1 + 1] = DIAG_308_RC_OK;
--        } else {
-+        if (!iplb) {
-             env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
-+            return;
-         }
-+
-+        if (!s390_is_pv()) {
-+            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_write(cpu, 0, iplb, be32_to_cpu(iplb->len));
-+        }
-+        env->regs[r1 + 1] = DIAG_308_RC_OK;
-         return;
-     case DIAG308_PV_START:
-         iplb = s390_ipl_get_iplb_pv();
--- 
-2.20.1
+On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
+> In block_copy_do_copy we fallback to read+write if copy_range failed.
+> In this case copy_size is larger than defined for buffered IO, and
+> there is corresponding commit. Still, backup copies data cluster by
+> cluster, and most of requests are limited to one cluster anyway, so the
+> only source of this one bad-limited request is copy-before-write
+> operation.
+>=20
+> Further patch will move backup to use block_copy directly, than for
+> cases where copy_range is not supported, first request will be
+> oversized in each backup. It's not good, let's change it now.
+>=20
+> Fix is simple: just limit first copy_range request like buffer-based
+> request. If it succeed, set larger copy_range limit.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  block/block-copy.c | 41 +++++++++++++++++++++++++++++++----------
+>  1 file changed, 31 insertions(+), 10 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--AvBcarpGR50kdICRidYOI2pu2CJUJ4paG--
+
+--hLZYl1SZvMmVsaCqpn3qXmuiXE1MxOv4J
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5nmToACgkQ9AfbAGHV
+z0CN1AgAiQoFHNl3CcUY49lsmx55Zw4MyZxYKJFsr1W4FAfuEotN9A3fOb0hcMIx
+mYSfipooXBwKfrKNBON5Y/8TSQO1abKksfiuCNj4GN5FYp3dAF1wdNXq/fhir94F
+5lzmkISRlwxU1I3dZNZoe09ifYD2OLd4BQ9fU0hN623KPmefOcZwsjLsE/+5A/rS
+IAUI14cQAV7W9WTQet6sAGAT6ip46QS0cnrLKvO8xvm3nGFRSIJZWVJn7H6v3dsS
+5SGih7jVZS24YLSdf7YtEldAqYM0YQ3/3gSbCbWfyYB+2KyfF6XlfB52FZ5vyjnh
+mAmAXUaV1EhA4AceilhKK0xOO9+8xA==
+=bvrg
+-----END PGP SIGNATURE-----
+
+--hLZYl1SZvMmVsaCqpn3qXmuiXE1MxOv4J--
 
 
