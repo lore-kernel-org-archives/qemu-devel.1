@@ -6,87 +6,89 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4DBC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89049C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:49:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA1D208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:48:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 525D4208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:49:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ameir1er"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA1D208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRQCmbon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 525D4208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdNN-0000hj-BZ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:48:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44852)
+	id 1jBdNd-0000xx-IQ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:49:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42326)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jBdMC-0007V8-DN
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:47:33 -0400
+ (envelope-from <mst@redhat.com>) id 1jBdKx-0005Y3-Ft
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jBdMB-0003y2-4h
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:47:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22126
+ (envelope-from <mst@redhat.com>) id 1jBdKv-0006V1-MG
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:46:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41057
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBdMA-0003vX-VW
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:47:31 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBdKv-0006P8-Fc
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:46:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583840850;
+ s=mimecast20190719; t=1583840771;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oY1mzk/EYBr6J62+WuQ4/jstRSd8m6EHTpJgYFacdpo=;
- b=Ameir1erGyrVweF9ROoDtoqD/S18od76e8fFS+BLg16qJfKZfevQeS3ZcFxG8w6vFD4UJU
- f8V+r7XbhxNMqshbjwt0O/HaVqOM1sge/uOo3dkIOhTZCEJONAwdZ8U6vkZrP3VFF35k/6
- M6G45rsy/42yJERpF0Gw9pXwHKTIngo=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-q9xwfOLaNK215OQVHb7Pzw-1; Tue, 10 Mar 2020 07:47:26 -0400
-X-MC-Unique: q9xwfOLaNK215OQVHb7Pzw-1
-Received: by mail-qt1-f199.google.com with SMTP id f25so8902434qtp.12
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 04:47:26 -0700 (PDT)
+ bh=pHACq79Q+NVuoZ07xxxZN5ECuXOXur+MoD8TeNpTdr0=;
+ b=PRQCmbonr3KlMh5p8hVXF3x3W+rkkkqYYxYUyGbBvKDiMxYkFCuxseTQKtNybFyXZ7ia28
+ axf0N0jnbd7NlzUUQ7+zJLT1bKCOsdzxLDKcPYrm8ig+ekGLifD8k2xFbMy8LsU8JQVva6
+ ZiabiFGa30tUHXI+nQxZgBPHSJHxB8A=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-B_-G27IuOYeVoe30xHdUMQ-1; Tue, 10 Mar 2020 07:46:09 -0400
+X-MC-Unique: B_-G27IuOYeVoe30xHdUMQ-1
+Received: by mail-qt1-f197.google.com with SMTP id w3so3398161qtc.8
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 04:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=01kcaO/83ZRzIyn7MFA2w/DKpbOjEgsN0yIw4DbewCc=;
- b=NHGFWhmDU5vr+1bJUlIkN8N+X0D9bI0ZPmnTr6OcLhScip8WAEMjJt9IFmU4d9lgOC
- 9wsM6nAV/QlYf3CIoKb7gt6CIBwPai1BLde3uwr8JIswBtYtJAXLdwEzt3RSiaZkTbqd
- bFfg8g5X1Uc2EOUbg0BOJqOCTWH2lfbD798VSVLBIFVxAwMMaT/wFYCmWslLM9xLi05j
- nX/CKstO2spZs/dIi+aZpo4USOv6KQIrWOrVpW+YwTjn3oBVAUWdDCP6bm4wgZrbU63t
- Ry7qBdtPEDCBByiaciy72upd76VL5RlB/aKysjgaXOjL9gMQIElqC3qFBo2nl5cqKEhq
- kOkw==
-X-Gm-Message-State: ANhLgQ2zvxXCN6WZePD5kl/YWkKuMHnEPQXhmGWRLNu5k7+01jP7HzxK
- q5xUf0oBpmMc3LOEL5u7VdESk3hTVC3YBmybupk0HJR6mofYxrSldHuTwvafjGqc3X54w0D/nQ6
- 0SxNuwda6V3jUX08=
-X-Received: by 2002:ac8:776c:: with SMTP id h12mr9515628qtu.38.1583840846195; 
- Tue, 10 Mar 2020 04:47:26 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuKJtVYvp3F3qsjHAdOGuw0gHlbWjpkM2DWgZ4VbzqJMrJb2jjffhlnm9/IIKzXJaWreLMaZw==
-X-Received: by 2002:ac8:776c:: with SMTP id h12mr9515612qtu.38.1583840845938; 
- Tue, 10 Mar 2020 04:47:25 -0700 (PDT)
+ bh=WAM8uyefeS70PNpz/ifLl52vFGBm1sEkxH1Ot44WZfw=;
+ b=mOGxn/7ucOAR3+48mlD9SKPFAzwWGZicY93f1VWO4bEP7/STm/NEVxJTZi73R5lq7C
+ bcerWlTXCVh+R9kN2UpZ6dzvonqCthvEWqRLQATX85lezmKqKw2MCM34MW/aDyguEmH5
+ 2z0MKR+9YcdsOlqfV4z+Vep6RdMHMUIvg5N3GLDsnYT039rD262OgsnPyFLFYMOvcwPT
+ Cdc/l/vsdEwacEt3Yb0AMeT+ti0atZaC3aB5BMcHo/VnVpdq5u4rj1vwtre8LL5pCTN2
+ HMkeIq6eDaAcxHchUKSKJz3OZlaudRfrH2Jp7qcRnRqMj4pkP9wA641L1ShOA6+bHPnZ
+ ouYQ==
+X-Gm-Message-State: ANhLgQ0hemCjj3nfmSTB5ZQL3YOBnnw7ipQIWyXU7pENdBXyetoWJNpP
+ x9A0xIfgO+iEYwBZoVIpc0bKxfDB3RtAxou+yd2hVQbl1aVeDCbQ4+8y+vepZlpcRoCo1Tf/VAg
+ HCpQ9aUMWGwQRYQY=
+X-Received: by 2002:a05:620a:848:: with SMTP id
+ u8mr8809652qku.495.1583840769092; 
+ Tue, 10 Mar 2020 04:46:09 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvkTpcZWeQzITXS9Gcl5PGhemo5ZTVlmBXF8cTj/DIAU4SetmWRXC0GUF+Dy1V3CJOmRhHxcA==
+X-Received: by 2002:a05:620a:848:: with SMTP id
+ u8mr8809621qku.495.1583840768727; 
+ Tue, 10 Mar 2020 04:46:08 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id p2sm23027551qkm.64.2020.03.10.04.47.22
+ by smtp.gmail.com with ESMTPSA id i28sm24796737qtc.57.2020.03.10.04.46.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 04:47:25 -0700 (PDT)
-Date: Tue, 10 Mar 2020 07:47:20 -0400
+ Tue, 10 Mar 2020 04:46:06 -0700 (PDT)
+Date: Tue, 10 Mar 2020 07:46:01 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
-Message-ID: <20200310074624-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH 06/14] hw/i386/vmport: Define enum for all commands
+Message-ID: <20200310074457-mutt-send-email-mst@kernel.org>
 References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-6-liran.alon@oracle.com>
- <20200310051738-mutt-send-email-mst@kernel.org>
- <742df43c-d188-5aa3-f9a3-89ba540283a9@oracle.com>
- <20200310072324-mutt-send-email-mst@kernel.org>
- <0077a145-258f-1575-baed-4b3ae99f1934@oracle.com>
+ <20200309235411.76587-7-liran.alon@oracle.com>
+ <20200310052327-mutt-send-email-mst@kernel.org>
+ <63a5be78-65e2-4092-f771-984572cd07cf@oracle.com>
+ <20200310072236-mutt-send-email-mst@kernel.org>
+ <6de0d982-aa39-4188-455e-fe8c11a11b7e@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <0077a145-258f-1575-baed-4b3ae99f1934@oracle.com>
+In-Reply-To: <6de0d982-aa39-4188-455e-fe8c11a11b7e@oracle.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -112,101 +114,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 01:40:24PM +0200, Liran Alon wrote:
+On Tue, Mar 10, 2020 at 01:37:40PM +0200, Liran Alon wrote:
 >=20
 > On 10/03/2020 13:23, Michael S. Tsirkin wrote:
-> > On Tue, Mar 10, 2020 at 01:18:44PM +0200, Liran Alon wrote:
-> > > On 10/03/2020 11:20, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
-> > > > > As can be seen from VmCheck_GetVersion() in open-vm-tools code,
-> > > > > CMD_GETVERSION should return VMX type in ECX register.
+> > On Tue, Mar 10, 2020 at 01:16:51PM +0200, Liran Alon wrote:
+> > > On 10/03/2020 11:28, Michael S. Tsirkin wrote:
+> > > > On Tue, Mar 10, 2020 at 01:54:03AM +0200, Liran Alon wrote:
+> > > > > No functional change.
 > > > > >=20
-> > > > > Default is to fake host as VMware ESX server. But user can contro=
-l
-> > > > > this value by "-global vmport.vmx-type=3DX".
+> > > > > Defining an enum for all VMPort commands have the following advan=
+tages:
+> > > > > * It gets rid of the error-prone requirement to update VMPORT_ENT=
+RIES
+> > > > > when new VMPort commands are added to QEMU.
+> > > > > * It makes it clear to know by looking at one place at the source=
+, what
+> > > > > are all the VMPort commands supported by QEMU.
 > > > > >=20
 > > > > > Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
 > > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > > > > > ---
-> > > > >    hw/i386/vmport.c | 13 +++++++++++++
-> > > > >    1 file changed, 13 insertions(+)
 > > > > >=20
-> > > > > diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> > > > > index a2c8ff4b59cf..c03f57f2f636 100644
-> > > > > --- a/hw/i386/vmport.c
-> > > > > +++ b/hw/i386/vmport.c
-> > > > > @@ -36,6 +36,15 @@
-> > > > >    #define VMPORT_ENTRIES 0x2c
-> > > > >    #define VMPORT_MAGIC   0x564D5868
+> > > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > > > > index d5ac76d54e1f..7f15a01137b1 100644
+> > > > > --- a/include/hw/i386/pc.h
+> > > > > +++ b/include/hw/i386/pc.h
+> > > > > @@ -138,12 +138,21 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bo=
+ol pci_enabled);
+> > > > >    #define TYPE_VMPORT "vmport"
+> > > > >    typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t addre=
+ss);
 > > > > > +typedef enum {
-> > > > > +   VMX_TYPE_UNSET =3D 0,
-> > > > > +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Expre=
-ss */
-> > > > > +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
-> > > > > +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Serve=
-r */
-> > > > > +   VMX_TYPE_WORKSTATION,
-> > > > > +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for A=
-CE 1.x */
-> > > > > +} VMX_Type;
+> > > > > +    VMPORT_CMD_GETVERSION       =3D 10,
+> > > > > +    VMPORT_CMD_GETRAMSIZE       =3D 20,
+> > > > > +    VMPORT_CMD_VMMOUSE_DATA     =3D 39,
+> > > > > +    VMPORT_CMD_VMMOUSE_STATUS   =3D 40,
+> > > > > +    VMPORT_CMD_VMMOUSE_COMMAND  =3D 41,
+> > > > > +    VMPORT_ENTRIES
+> > > > > +} VMPortCommand;
 > > > > > +
-> > > > Can names be prefixed with VMPort pls? VMX has specific unrelated m=
-eaning.
-> > > >=20
-> > > > Same everywhere.
-> > > I didn't thought it matters much given that this enum is only defined
-> > > locally in vmport.c.
-> > > But sure I can rename it in v2.
+> > > > Please don't, let's leave pc.h alone. If you must add a new header =
+for
+> > > > vmport/vmmouse and put this stuff there.
+> > > As you can see, pc.h already contains definitions which are specific =
+to
+> > > vmport. E.g. TYPE_VMPORT, VMPortReadFunc(), vmport_register(),
+> > > vmmouse_get_data(), vmmouse_set_data(). Adding this enum is not what =
+makes
+> > > the difference.
+> > > It is possible to create a new vmport.h header file but it's not real=
+ly
+> > > related to this patch. It's just general refactoring. I can do that i=
+n v2 if
+> > > you think it's appropriate.
 > > >=20
 > > > -Liran
-> > Property names matter more.
-> You mean to rename "vmx-version" and "vmx-type" to "vmport-vmx-version" a=
-nd
-> "vmport-vmx-type"?
-> They are properties of vmport object so it seems redundant no? Also doesn=
-'t
-> seem consistent which how properties of other objects in QEMU are named.
-> (E.g. PVSCSI have "use_msg" property. Not "pvscsi_use_msg").
-> But will do as you will suggest. Just asking for guidance of what you are
-> looking for.
+> > Well I just don't want lots of enums in pc.h
+>=20
+> This is the only one which is global, and makes sense as it's directly
+> related to vmport_register() exposed API.
+> Similar to how the VMPortReadFunc typedef is put in here.
 >=20
 > -Liran
 
-Sorry - no I'm looking for an alternative to "vmx" everywhere but especiall=
-y
-in property names which need to be maintained. Maybe vm-exec or vmexec
-as I suggested separately.
+So pls find another home for this stuff. Whoever touches legacy code
+gets to clean it up a bit first :) Tough but that's the only stick
+maintainers have to make maintainance happen.
 
-> >=20
-> >=20
-> > > > >    #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPO=
-RT)
-> > > > >    typedef struct VMPortState {
-> > > > > @@ -46,6 +55,7 @@ typedef struct VMPortState {
-> > > > >        void *opaque[VMPORT_ENTRIES];
-> > > > >        uint32_t vmx_version;
-> > > > > +    uint8_t vmx_type;
-> > > > >    } VMPortState;
-> > > > >    static VMPortState *port_state;
-> > > > > @@ -114,6 +124,7 @@ static uint32_t vmport_cmd_get_version(void *=
-opaque, uint32_t addr)
-> > > > >        X86CPU *cpu =3D X86_CPU(current_cpu);
-> > > > >        cpu->env.regs[R_EBX] =3D VMPORT_MAGIC;
-> > > > > +    cpu->env.regs[R_ECX] =3D port_state->vmx_type;
-> > > > >        return port_state->vmx_version;
-> > > > >    }
-> > > > > @@ -173,6 +184,8 @@ static void vmport_realizefn(DeviceState *dev=
-, Error **errp)
-> > > > >    static Property vmport_properties[] =3D {
-> > > > >        /* Default value taken from open-vm-tools code VERSION_MAG=
-IC definition */
-> > > > >        DEFINE_PROP_UINT32("vmx-version", VMPortState, vmx_version=
-, 6),
-> > > > > +    DEFINE_PROP_UINT8("vmx-type", VMPortState, vmx_type,
-> > > > > +                      VMX_TYPE_SCALABLE_SERVER),
-> > > > >        DEFINE_PROP_END_OF_LIST(),
-> > > > >    };
-> > > > > --=20
-> > > > > 2.20.1
+--=20
+MST
 
 
