@@ -2,104 +2,78 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF284C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF231C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8439324655
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1D5B24655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tNaAR24I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8439324655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GASlawyW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D5B24655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdDT-0002x6-RD
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54289)
+	id 1jBdEg-0004m2-Ov
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBdCo-0002Wu-Pp
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:37:51 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jBdDl-0003Er-AW
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBdCn-0005cP-Lw
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:37:50 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:48202)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBdCn-0005Yk-Cm
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:37:49 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ABTHEq123231;
- Tue, 10 Mar 2020 11:37:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=CgbgNpSgplm9JA7xWRQiXa4izNaRvZ7iIHfSmxU/2KM=;
- b=tNaAR24IHx02GdV0xhb15pyVoGhbCML5eIU/YOAndYYpPpbHivs9QI4P6FNDG0zgVo1x
- XreVtLnkG/JD2rOhDvgkM4rOEZGvl9eHQCy3gwAM0c6yG2T2ruAIn0rYiCkEf7NYPBkQ
- 4EguPXtcmIvSKgVJMMWL5l6dbbIGUp+eTeozgT5krkFvFSrY0aU5wl1ZpHWz5m9jr5pk
- ugfwSsG2eZyGYmwlutIDD5KmO5wqf+JOXkrSHzVhQDzAKP1i381lm2n+/o4xXwu5rbGn
- MMjYQJOoZ43nVxUm8420R5EiI0WA9j/3o86c0UXBGlBLvhHYRkY3PebpGFhznw4G184p Hg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2yp7hm1c6c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 11:37:47 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ABWsH4064520;
- Tue, 10 Mar 2020 11:37:46 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2yp8ns5j82-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 11:37:46 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ABbj07019018;
- Tue, 10 Mar 2020 11:37:45 GMT
-Received: from [192.168.14.112] (/79.181.212.171)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 10 Mar 2020 04:37:45 -0700
-Subject: Re: [PATCH 06/14] hw/i386/vmport: Define enum for all commands
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-7-liran.alon@oracle.com>
- <20200310052327-mutt-send-email-mst@kernel.org>
- <63a5be78-65e2-4092-f771-984572cd07cf@oracle.com>
- <20200310072236-mutt-send-email-mst@kernel.org>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <6de0d982-aa39-4188-455e-fe8c11a11b7e@oracle.com>
-Date: Tue, 10 Mar 2020 13:37:40 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ (envelope-from <kwolf@redhat.com>) id 1jBdDj-0008N2-6b
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45701
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jBdDh-0008JD-Dv
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583840324;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wr1m7nY8KZW+Pv1GXYAt2uYKV/3H/96a7czWg0SsEP8=;
+ b=GASlawyWGY1SSu+l5p0exZf9+0xc7PR+AIa4IRZwMx1rR4GuCyeseCP4X+RWG1XXJN0SV9
+ 4fGA/hXSoCKWE6beEvi+s0iRhGkKuRNyqIvLKTBvPmob/LFUtb+JnCSiG/IX88MFZYtPSU
+ s2bTt5RDOOV8HOIERdhAK+IPqb1l7xk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-yxzxi2s4M06gBR69TT6Pvg-1; Tue, 10 Mar 2020 07:38:42 -0400
+X-MC-Unique: yxzxi2s4M06gBR69TT6Pvg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B65C3DBA5;
+ Tue, 10 Mar 2020 11:38:41 +0000 (UTC)
+Received: from linux.fritz.box.com (unknown [10.36.118.104])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 92F2F87B2F;
+ Tue, 10 Mar 2020 11:38:40 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 2/7] block: Relax restrictions for blockdev-snapshot
+Date: Tue, 10 Mar 2020 12:38:26 +0100
+Message-Id: <20200310113831.27293-3-kwolf@redhat.com>
+In-Reply-To: <20200310113831.27293-1-kwolf@redhat.com>
+References: <20200310113831.27293-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200310072236-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100077
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- spamscore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100077
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,64 +85,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+blockdev-snapshot returned an error if the overlay was already in use,
+which it defined as having any BlockBackend parent. This is in fact both
+too strict (some parents can tolerate the change of visible data caused
+by attaching a backing file) and too loose (some non-BlockBackend
+parents may not be happy with it).
 
-On 10/03/2020 13:23, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2020 at 01:16:51PM +0200, Liran Alon wrote:
->> On 10/03/2020 11:28, Michael S. Tsirkin wrote:
->>> On Tue, Mar 10, 2020 at 01:54:03AM +0200, Liran Alon wrote:
->>>> No functional change.
->>>>
->>>> Defining an enum for all VMPort commands have the following advantages:
->>>> * It gets rid of the error-prone requirement to update VMPORT_ENTRIES
->>>> when new VMPort commands are added to QEMU.
->>>> * It makes it clear to know by looking at one place at the source, what
->>>> are all the VMPort commands supported by QEMU.
->>>>
->>>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->>>> ---
->>>>
->>>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->>>> index d5ac76d54e1f..7f15a01137b1 100644
->>>> --- a/include/hw/i386/pc.h
->>>> +++ b/include/hw/i386/pc.h
->>>> @@ -138,12 +138,21 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
->>>>    #define TYPE_VMPORT "vmport"
->>>>    typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
->>>> +typedef enum {
->>>> +    VMPORT_CMD_GETVERSION       = 10,
->>>> +    VMPORT_CMD_GETRAMSIZE       = 20,
->>>> +    VMPORT_CMD_VMMOUSE_DATA     = 39,
->>>> +    VMPORT_CMD_VMMOUSE_STATUS   = 40,
->>>> +    VMPORT_CMD_VMMOUSE_COMMAND  = 41,
->>>> +    VMPORT_ENTRIES
->>>> +} VMPortCommand;
->>>> +
->>> Please don't, let's leave pc.h alone. If you must add a new header for
->>> vmport/vmmouse and put this stuff there.
->> As you can see, pc.h already contains definitions which are specific to
->> vmport. E.g. TYPE_VMPORT, VMPortReadFunc(), vmport_register(),
->> vmmouse_get_data(), vmmouse_set_data(). Adding this enum is not what makes
->> the difference.
->> It is possible to create a new vmport.h header file but it's not really
->> related to this patch. It's just general refactoring. I can do that in v2 if
->> you think it's appropriate.
->>
->> -Liran
-> Well I just don't want lots of enums in pc.h
+One important use case that is prevented by the too strict check is live
+storage migration with blockdev-mirror. Here, the target node is
+usually opened without a backing file so that the active layer is
+mirrored while its backing chain can be copied in the background.
 
-This is the only one which is global, and makes sense as it's directly 
-related to vmport_register() exposed API.
-Similar to how the VMPortReadFunc typedef is put in here.
+The backing chain should be attached to the mirror target node when
+finalising the job, just before switching the users of the source node
+to the new copy (at which point the mirror job still has a reference to
+the node). drive-mirror did this automatically, but with blockdev-mirror
+this is the job of the QMP client, so it needs a way to do this.
 
--Liran
+blockdev-snapshot is the obvious way, so this patch makes it work in
+this scenario. The new condition is that no parent uses CONSISTENT_READ
+permissions. This will ensure that the operation will still be blocked
+when the node is attached to the guest device, so blockdev-snapshot
+remains safe.
 
+(For the sake of completeness, x-blockdev-reopen can be used to achieve
+the same, however it is a big hammer, performs the graph change
+completely unchecked and is still experimental. So even with the option
+of using x-blockdev-reopen, there are reasons why blockdev-snapshot
+should be able to perform this operation.)
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ blockdev.c                 | 14 ++++++++------
+ tests/qemu-iotests/085.out |  4 ++--
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/blockdev.c b/blockdev.c
+index 3e44fa766b..bba0e9775b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1501,6 +1501,7 @@ static void external_snapshot_prepare(BlkActionState =
+*common,
+     TransactionAction *action =3D common->action;
+     AioContext *aio_context;
+     AioContext *old_context;
++    uint64_t perm, shared;
+     int ret;
+=20
+     /* 'blockdev-snapshot' and 'blockdev-snapshot-sync' have similar
+@@ -1616,16 +1617,17 @@ static void external_snapshot_prepare(BlkActionStat=
+e *common,
+         goto out;
+     }
+=20
+-    if (bdrv_has_blk(state->new_bs)) {
++    /*
++     * Allow attaching a backing file to an overlay that's already in use =
+only
++     * if the parents don't assume that they are already seeing a valid im=
+age.
++     * (Specifically, allow it as a mirror target, which is write-only acc=
+ess.)
++     */
++    bdrv_get_cumulative_perm(state->new_bs, &perm, &shared);
++    if (perm & BLK_PERM_CONSISTENT_READ) {
+         error_setg(errp, "The overlay is already in use");
+         goto out;
+     }
+=20
+-    if (bdrv_op_is_blocked(state->new_bs, BLOCK_OP_TYPE_EXTERNAL_SNAPSHOT,
+-                           errp)) {
+-        goto out;
+-    }
+-
+     if (state->new_bs->backing !=3D NULL) {
+         error_setg(errp, "The overlay already has a backing image");
+         goto out;
+diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
+index d94ad22f70..fd11aae678 100644
+--- a/tests/qemu-iotests/085.out
++++ b/tests/qemu-iotests/085.out
+@@ -82,7 +82,7 @@ Formatting 'TEST_DIR/12-snapshot-v0.IMGFMT', fmt=3DIMGFMT=
+ size=3D134217728 backing_f
+ =3D=3D=3D Invalid command - cannot create a snapshot using a file BDS =3D=
+=3D=3D
+=20
+ { 'execute': 'blockdev-snapshot', 'arguments': { 'node':'virtio0', 'overla=
+y':'file_12' } }
+-{"error": {"class": "GenericError", "desc": "The overlay does not support =
+backing images"}}
++{"error": {"class": "GenericError", "desc": "The overlay is already in use=
+"}}
+=20
+ =3D=3D=3D Invalid command - snapshot node used as active layer =3D=3D=3D
+=20
+@@ -96,7 +96,7 @@ Formatting 'TEST_DIR/12-snapshot-v0.IMGFMT', fmt=3DIMGFMT=
+ size=3D134217728 backing_f
+ =3D=3D=3D Invalid command - snapshot node used as backing hd =3D=3D=3D
+=20
+ { 'execute': 'blockdev-snapshot', 'arguments': { 'node': 'virtio0', 'overl=
+ay':'snap_11' } }
+-{"error": {"class": "GenericError", "desc": "Node 'snap_11' is busy: node =
+is used as backing hd of 'snap_12'"}}
++{"error": {"class": "GenericError", "desc": "The overlay is already in use=
+"}}
+=20
+ =3D=3D=3D Invalid command - snapshot node has a backing image =3D=3D=3D
+=20
+--=20
+2.20.1
 
 
