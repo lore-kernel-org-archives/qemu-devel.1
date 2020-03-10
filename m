@@ -2,60 +2,82 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8A4C18E5A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6274EC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:11:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2EC72468C
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:10:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2EC72468C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 279DD2467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:11:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPAa2GoF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279DD2467D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdiH-00048g-0I
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:10:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49194)
+	id 1jBdiu-00053G-Di
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:11:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <longpeng2@huawei.com>) id 1jBdhe-0003jw-2N
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:09:43 -0400
+ (envelope-from <berrange@redhat.com>) id 1jBdi3-000465-2L
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <longpeng2@huawei.com>) id 1jBdhc-0008GH-NO
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:09:41 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44750 helo=huawei.com)
+ (envelope-from <berrange@redhat.com>) id 1jBdi1-00019q-8F
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:10:06 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53398
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
- id 1jBdhc-0007yu-BQ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:09:40 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 367925BFBD1AE201AAF7;
- Tue, 10 Mar 2020 20:09:34 +0800 (CST)
-Received: from [127.0.0.1] (10.177.246.209) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0;
- Tue, 10 Mar 2020 20:09:27 +0800
-Subject: Re: [RFC] cpus: avoid get stuck in pause_all_vcpus
-To: <qemu-devel@nongnu.org>
-References: <158383564824.20878.9634431361481694557@39012742ff91>
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-Message-ID: <fed91a01-c545-bcfa-7215-36d69ab0f2ac@huawei.com>
-Date: Tue, 10 Mar 2020 20:09:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jBdi1-00018z-4C
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:10:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583842204;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DTV8CrO4NDBNJ/5rYJxNdJ44EIwRDnmnJlGHvfWYC7c=;
+ b=iPAa2GoFYozI17akOQ4Txju+TELnuIgtnKVLMlU+tMTNHbHQwIyTErz2k9B/Tbz8oNa5PS
+ vb7WduJ/iX2Dkof5exoQBxl3djgV1aYC6fBnDkuImHz7hvlZl27Hv/fv/IM9YeldIEHjxn
+ MFzAvBoRFj4HzHUm260GIIA9ISb1fyI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-42T0WftmMjejSJaLnXiVXg-1; Tue, 10 Mar 2020 08:09:58 -0400
+X-MC-Unique: 42T0WftmMjejSJaLnXiVXg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4EFA8E6D1;
+ Tue, 10 Mar 2020 12:09:56 +0000 (UTC)
+Received: from redhat.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7FC960C87;
+ Tue, 10 Mar 2020 12:09:54 +0000 (UTC)
+Date: Tue, 10 Mar 2020 12:09:51 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH] modules: load modules from versioned /var/run dir
+Message-ID: <20200310120951.GF3234052@redhat.com>
+References: <20200306132648.27577-1-christian.ehrhardt@canonical.com>
+ <20200310093910.GB140737@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <158383564824.20878.9634431361481694557@39012742ff91>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.177.246.209]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200310093910.GB140737@stefanha-x1.localdomain>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,87 +89,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, dgilbert@redhat.com, arei.gonglei@huawei.com,
- huangzhichao@huawei.com, pbonzini@redhat.com, rth@twiddle.net
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org,
+ Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+ pkg-qemu-devel@lists.alioth.debian.org, Cole Robinson <crobinso@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=E5=9C=A8 2020/3/10 18:20, no-reply@patchew.org =E5=86=99=E9=81=93:
-> Patchew URL: https://patchew.org/QEMU/20200310091443.1326-1-longpeng2@h=
-uawei.com/
+On Tue, Mar 10, 2020 at 09:39:10AM +0000, Stefan Hajnoczi wrote:
+> On Fri, Mar 06, 2020 at 02:26:48PM +0100, Christian Ehrhardt wrote:
+> > On upgrades the old .so files usually are replaced. But on the other
+> > hand since a qemu process represents a guest instance it is usually kep=
+t
+> > around.
+> >=20
+> > That makes late addition of dynamic features e.g. 'hot-attach of a ceph
+> > disk' fail by trying to load a new version of e.f. block-rbd.so into an
+> > old still running qemu binary.
+> >=20
+> > This adds a fallback to also load modules from a versioned directory in=
+ the
+> > temporary /var/run path. That way qemu is providing a way for packaging
+> > to store modules of an upgraded qemu package as needed until the next r=
+eboot.
+> >=20
+> > An example how that can then be used in packaging can be seen in:
+> > https://git.launchpad.net/~paelzer/ubuntu/+source/qemu/log/?h=3Dbug-184=
+7361-miss-old-so-on-upgrade-UBUNTU
+> >=20
+> > Fixes: https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1847361
+> > Signed-off-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+> > ---
+> >  util/module.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
 >=20
+> CCing Debian, Fedora, and Red Hat package maintainers in case they have
+> comments.
 >=20
+> The use of /var/run makes me a little uneasy.  I guess it's related to
+> wanting to uninstall the old package so the .so in their original
+> location cannot be used (even if they had a versioned path)?
 >=20
-> Hi,
->=20
-> This series failed the asan build test. Please find the testing command=
-s and
-> their output below. If you have Docker installed, you can probably repr=
-oduce it
-> locally.
->=20
+> I'm not a package maintainer though so I hope the others will make
+> suggestions if there are other solutions :).
 
-Hi guys,
-It seems this failure is NOT caused by my patch, so let's ignore it for t=
-he
-moment...
+My first concern is that this only partially solves the quoted problem.
 
-> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}  QTE=
-ST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3Dqemu-=
-img tests/qtest/wdt_ib700-test -m=3Dquick -k --tap < /dev/null | ./script=
-s/tap-driver.pl --test-name=3D"wdt_ib700-test"=20
-> PASS 1 wdt_ib700-test /x86_64/wdt_ib700/pause
-> ---
-> dbus-daemon[8273]: Could not get password database information for UID =
-of current process: User "???" unknown or no memory to allocate password =
-entry
->=20
-> **
-> ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-test.c:114:get_connec=
-tion: assertion failed (err =3D=3D NULL): The connection is closed (g-io-=
-error-quark, 18)
-> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/dbus-vmstate-tes=
-t.c:114:get_connection: assertion failed (err =3D=3D NULL): The connectio=
-n is closed (g-io-error-quark, 18)
-> cleaning up pid 8273
-> make: *** [/tmp/qemu-test/src/tests/Makefile.include:632: check-qtest-x=
-86_64] Error 1
-> make: *** Waiting for unfinished jobs....
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 664, in <module>
-> ---
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run',=
- '--label', 'com.qemu.instance.uuid=3D88af8ba44214464d881ef7c7786167f4', =
-'-u', '1003', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TA=
-RGET_LIST=3Dx86_64-softmmu', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D=
-', '-e', 'J=3D14', '-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D', '-e', 'CCACHE_D=
-IR=3D/var/tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/v=
-ar/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-a0j9h14_/src/docker-=
-src.2020-03-10-05.52.52.1292:/var/tmp/qemu:z,ro', 'qemu:fedora', '/var/tm=
-p/qemu/run', 'test-debug']' returned non-zero exit status 2.
-> filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3D88af8ba44214464d88=
-1ef7c7786167f4
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-a0j9h14_/src'
-> make: *** [docker-run-test-debug@fedora] Error 2
->=20
-> real    27m55.506s
-> user    0m8.248s
->=20
->=20
-> The full log is available at
-> http://patchew.org/logs/20200310091443.1326-1-longpeng2@huawei.com/test=
-ing.asan/?type=3Dmessage.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
->=20
+Consider the QEMU RBD module which is
+
+   /usr/lib64/qemu/block-rbd.so
+
+This links to
+
+   /usr/lib64/librbd.so.1
+
+On host OS upgrade, just before uninstalling old QEMU we copy RBD
+module into:
+
+   /var/run/qemu-$VER/block-rbd.so
+
+....but the host OS upgrade also upgrades RBD itself to a new
+major version which ships
+
+   /usr/lib64/librbd.so.2
+
+We've got /var/run/qemu-$VER/block-rbd.so saved, but we didn't
+transitively save all the things that this linked to, so there's
+no guarantee it will still be possible to load it.
+
+IOW, this approach of saving QEMU block modules to a scratch dir
+works, *provided* everything else that this QEMU block module needs
+still exists in a compatible form.
+
+Some distros may have a policy that no incompatible soname bumps
+are permitted in updates, but that's not universal.
+
+On the other hand this is not a big amount of new code, so is not
+a huge maint problem even if only a few people ever use it. I would
+be a bit more comfortable if this search path addition was perhaps
+enabled by an opt-in configure argument, rather than being always
+present.
 
 
---=20
+I'm also uneasy about the idea of using a search path ordering for
+doing this.  This means that an old running QEMU is always going
+to first try to load the block-rbd.so from the new QEMU, expect
+to see that fail, and only then fallback to load the block-rbd.so
+that actually matches its build.
+
+IIRC, we have an embedded build-id in the modules that should
+guarantee that the first load attempt always fails, but I'm still
+uneasy about that at a conceptual level.
+
 Regards,
-Longpeng(Mike)
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
