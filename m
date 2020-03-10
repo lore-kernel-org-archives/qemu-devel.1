@@ -2,113 +2,81 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F48C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4115CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B866521927
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:28:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B866521927
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0248821655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 20:38:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QaqF/EMe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0248821655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBlU6-0006vA-SZ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 16:28:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57006)
+	id 1jBleD-0002dv-7z
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 16:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:61000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBlTC-0005me-SB
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:27:19 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBldR-00025v-Ut
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:37:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBlTB-0008EE-Nh
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:27:18 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:46053)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jBlT9-00087s-Ul
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:27:17 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N3Xvv-1jJVDy3Kdv-010gfa; Tue, 10 Mar 2020 21:27:02 +0100
-Subject: Re: [PATCH v2] linux-user: do prlimit selectively
-To: Tobias Koch <tobias.koch@nonterra.com>, qemu-devel@nongnu.org
-References: <20200305202400.27574-1-tobias.koch@nonterra.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b8f8ad61-5f99-a02a-de0d-cb3c93c52768@vivier.eu>
-Date: Tue, 10 Mar 2020 21:27:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBldQ-0002hM-KB
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 16:37:53 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:37323)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jBldN-0002dK-SN; Tue, 10 Mar 2020 16:37:49 -0400
+Received: by mail-io1-xd43.google.com with SMTP id k4so14227235ior.4;
+ Tue, 10 Mar 2020 13:37:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=MvAZVxuil2DxjBj7rVmkBNCfZoBmbXssfX+/IEcrzlc=;
+ b=QaqF/EMeKtroURm0XbhyO7p57iwdEtTS3beUzi0GidKNQhhZ1qKkWeqKlKVKYXkJ/b
+ vEn9Uov/mFXUxrkDv5nY0wSo5vbdbwCUULBi6WCPv0eCOD/1m6uH29jUMcD5fQqbyfhM
+ X4bTV8Y6JPzHO1aStG3xMPrWPFsJ5CH5xpTCgBoXbzbdmOIH1BM37oA7w4ePgxM+UQVn
+ HdzG9rMjV0ALYNgRvLbP8ggIHRTB5XbObxGpNDkeGTiWjkIcGbskl0cMJnpBXcZ17uPF
+ DISlt7frKIHW3NGt1w1GLhXHAtXfSPQtKS6WLnypmAc28ZhFeA56UdWne3UFG5vHPKvJ
+ Ggog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=MvAZVxuil2DxjBj7rVmkBNCfZoBmbXssfX+/IEcrzlc=;
+ b=fn13HsIs7CJtAWP0tEeFwpcoJaEyg0xdS12mXWhELMdwHTMOpSgHjwTdiiQP02AyP4
+ 7dUA7dQaKJUo6T88kI1lD43UuLfl3bLxjJ2pBDuQt2Ert7uFFTU7PC2Gx2jkSilA9xWM
+ W5oMJcv98VILrnrVuUyTi5r+9NDnZVJr0A3SmmXd6QuhF6Xin2x9m4K0rtPCjR8yXW6Z
+ z99vJl9auYwdwxhR5qXiOf8beJwdcQBbalRvXEuimbEadW94xC9rlPefR0JPiscEoGTi
+ 5r2+0dUmhPgjmHZiX+dRezCsuabR4MdwJyk36DS2MRQNXpdWu6H8HsN/6claSBumaFwh
+ A7OA==
+X-Gm-Message-State: ANhLgQ2g+EfLaJukYeLyI7Y65MgEGrI7dP2jZP/dOySRrIxHVCuUatzE
+ yedt3s3kuze/imWFOEBz40SVyuqNzu/xL66scQk=
+X-Google-Smtp-Source: ADFU+vsjIxVAnBDhXpuejUz6RTMV+qPX3RGiVekQJvpD2h3DYpzTuQE3CLMkTcMIJmb8hZvzJXC3qhRvRLPWskU/wOI=
+X-Received: by 2002:a02:7b13:: with SMTP id q19mr21941727jac.73.1583872669058; 
+ Tue, 10 Mar 2020 13:37:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200305202400.27574-1-tobias.koch@nonterra.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZyqQ1JP+FfEJFlyQN4FhKU2AdWpwF8YksJSgKca+AlQEVy1neqA
- 8R+dKmcLZFNxSSjjyX4JhYx/CuPkbRrs3DUGbxkdNV9CjAwxnnVAn7pk26ixwelR9meoc2v
- cGRzsl474muzjZs5grhJzmnLhpsNebn0ggKWgcmSF4RG89QDWkXgXOqWmWt38vvdXo/8h59
- YAJEokp9Q5Otqwl6y2y/A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:nAAv/G4PwQY=:baVkTmKN85hK4XaVlqK0sS
- 6PajRLT8Kzty1ddEoHWC1wZTU82TK53CUuUPfFYwzOyV7qX7XnS/94W5FBZVNL5tM7aHBKSrh
- V7b001Jv5DrhF5fKpby7UsCgNz9ik7j0sxfVTaFtes96oM7r2J45DZDbxjbNnMoKxH505a7n/
- AyicymBcFcgY3z/2YceX83f3iXBr3GFjVOtSImUIxUvP1wsu8k5HmXP/BtPLzYzWMTgnHoofh
- uo+hFW4qkbo8gZlmwCZKxpPZSyWQgWmV2pawrmU9kHUx2sNH/GR39rJJyJUDKrFZH9fH+QFYa
- 5dsZSCLj8qF9gQHfVCpwwi8C5EpV8ga+/doH1P0eXTHGGe0z3g/n6c3PYh3g/3mkZXbfvfCEb
- 5qxHeDUdiitFEL3Vy5kOt+sDToIG1InMBvseS1qU62M1kXFY2P/U0dqMpfDgchOg/vtjXc6M3
- ZQDAkDO2yq3BiuLMab7fMWuIeUtf9lC4yvsaQgCkH8yFm3i7GKXf3FtDM0vmI8nSklHeTHyaP
- xpO5+rsESMqtrborPqQfYTQIGcMUFUFYYCK1gOrFEl/huwokOb5DVVYuw5akW/IiwhEYZlWYM
- TNdJWsRZ1rcR7lT+izxFIQNN/DQvZSDjy+LhXQzd3kiBaNZatmooLbJS+xpTORLbUvI5atOuD
- a77iQQv79e3hEJDAUWZ8pe78Rnq7+g7RI0Q2LFLSSDL/DyJGcNYl/qzAfIHiykWf41qJuxCLl
- Y38Ps9vzy8a6eH72EVl4JECZVxmsaULmdhmqjicXbRcLuk6ZdWVJgTEtw3IfHsd4XK+WTqpQ1
- ChedREFo6cRUdTN4uJTb9uDUf+b57JXMnn/CFPLi5pRTol5KCxfAejrT5XXDBY4+Y3W0kl8
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
+References: <20200309215818.2021-1-peter.maydell@linaro.org>
+ <20200309215818.2021-2-peter.maydell@linaro.org>
+In-Reply-To: <20200309215818.2021-2-peter.maydell@linaro.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Tue, 10 Mar 2020 21:37:37 +0100
+Message-ID: <CAPan3WqtE6NGTd=yCG2zCirgeCDtv+eSgg4DSF+hCtn9rihk7A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] Makefile: Allow for subdirectories in Sphinx manual
+ dependencies
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000cf090905a086173a"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,39 +88,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 05/03/2020 à 21:24, Tobias Koch a écrit :
-> Analogous to what commit 5dfa88f7 did for setrlimit, this commit
-> selectively ignores limits for memory-related resources in prlimit64
-> calls. This is to prevent too restrictive limits from causing QEMU
-> itself to malfunction.
-> 
-> Signed-off-by: Tobias Koch <tobias.koch@nonterra.com>
-> ---
->  linux-user/syscall.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 8d27d10807..4f2f9eb12b 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -11871,7 +11871,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->          struct target_rlimit64 *target_rnew, *target_rold;
->          struct host_rlimit64 rnew, rold, *rnewp = 0;
->          int resource = target_to_host_resource(arg2);
-> -        if (arg3) {
-> +
-> +        if (arg3 && (resource != RLIMIT_AS &&
-> +                     resource != RLIMIT_DATA &&
-> +                     resource != RLIMIT_STACK)) {
->              if (!lock_user_struct(VERIFY_READ, target_rnew, arg3, 1)) {
->                  return -TARGET_EFAULT;
->              }
-> 
+--000000000000cf090905a086173a
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+
+On Mon, Mar 9, 2020 at 10:58 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> Currently we put 'docs/foo/*.rst' in the Make list of dependencies
+> for the Sphinx 'foo' manual, which means all the files must be
+> in the top level of that manual's directory. We'd like to be
+> able to have subdirectories inside some of the manuals, so add
+> 'docs/foo/*/*.rst' to the dependencies too.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 2e930688942..5dba949947a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1081,7 +1081,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
+>  # a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
+>  build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)"
+> $(SPHINX_BUILD) $(if $(V),,-q) -W -b $2 -D version=$(VERSION) -D
+> release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1
+> $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+>  # We assume all RST files in the manual's directory are used in it
+> -manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
+> +manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst
+> $(SRC_PATH)/docs/$1/*/*.rst) \
+>                $(SRC_PATH)/docs/defs.rst.inc \
+>                $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
+>  # Macro to write out the rule and dependencies for building manpages
+> --
+> 2.20.1
+>
+>
+
+-- 
+Niek Linnenbank
+
+--000000000000cf090905a086173a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Reviewed-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklin=
+nenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt;<br></div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Mar 9, 2020 =
+at 10:58 PM Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">p=
+eter.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_=
+quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
+204);padding-left:1ex">Currently we put &#39;docs/foo/*.rst&#39; in the Mak=
+e list of dependencies<br>
+for the Sphinx &#39;foo&#39; manual, which means all the files must be<br>
+in the top level of that manual&#39;s directory. We&#39;d like to be<br>
+able to have subdirectories inside some of the manuals, so add<br>
+&#39;docs/foo/*/*.rst&#39; to the dependencies too.<br>
+<br>
+Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
+" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0Makefile | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/Makefile b/Makefile<br>
+index 2e930688942..5dba949947a 100644<br>
+--- a/Makefile<br>
++++ b/Makefile<br>
+@@ -1081,7 +1081,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \<br>
+=C2=A0# a single doctree: <a href=3D"https://github.com/sphinx-doc/sphinx/i=
+ssues/2946" rel=3D"noreferrer" target=3D"_blank">https://github.com/sphinx-=
+doc/sphinx/issues/2946</a><br>
+=C2=A0build-manual =3D $(call quiet-command,CONFDIR=3D&quot;$(qemu_confdir)=
+&quot; $(SPHINX_BUILD) $(if $(V),,-q) -W -b $2 -D version=3D$(VERSION) -D r=
+elease=3D&quot;$(FULL_VERSION)&quot; -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1=
+ $(MANUAL_BUILDDIR)/$1 ,&quot;SPHINX&quot;,&quot;$(MANUAL_BUILDDIR)/$1&quot=
+;)<br>
+=C2=A0# We assume all RST files in the manual&#39;s directory are used in i=
+t<br>
+-manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) \<br>
++manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst $(SRC_PATH)/docs/$1/*=
+/*.rst) \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$(SRC_PATH)/docs/def=
+s.rst.inc \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$(SRC_PATH)/docs/$1/=
+conf.py $(SRC_PATH)/docs/conf.py<br>
+=C2=A0# Macro to write out the rule and dependencies for building manpages<=
+br>
+-- <br>
+2.20.1<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div>
+
+--000000000000cf090905a086173a--
 
