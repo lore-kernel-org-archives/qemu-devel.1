@@ -2,68 +2,67 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0BEC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922CFC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49D1C20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E2B22465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:03:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mk+ETcAH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49D1C20663
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MW4jDKK7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E2B22465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBalo-0004Yy-GS
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60365)
+	id 1jBan4-0006Jo-Kw
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jBakV-0003Mo-QS
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:00:29 -0400
+ (envelope-from <david@redhat.com>) id 1jBali-0004lp-1M
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jBakT-0005dy-Sh
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:00:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23471
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1jBalg-0008G1-KR
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:01:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38814
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBakT-0005cO-NX
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:00:25 -0400
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jBalg-0008Dz-F1
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:01:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583830825;
+ s=mimecast20190719; t=1583830899;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=aglfHNYcjl1+oLBV0NW7glqkTl9fCrlRglPZCj9XjGc=;
- b=Mk+ETcAHWS8LcPqHefGetu18uoLQpFn59D2PSmEWFALVaIcgYsy8KwqtMjbHAwxsE79ThE
- PUrhLG3yRWnX8qhXywWlfjrMkuE4ESB8htIbxNTYeXxwHGGoUEX9U4ZwayPJrx8xDuKw4A
- BMDyZMuhxYvnSO+sKC6Fp8UjX2fZ0RA=
+ bh=gy3KmrA/CdFiSBc35JdnMIAR9x3Ci7yBj3/GpetLvAk=;
+ b=MW4jDKK7UtzNkog5OilWQ92kKTVw3BmLEndm8IB3icwoOqR1iS4EWprY9uxRkP4g7MwleG
+ +RXKRr73c/+df7ZAeaDAMhR3K84283tZDIqF2Jwe6yxpIH8nu2BtEy4r++dHJj1phiu96y
+ h6B4EO5reHZz0Cn1sTNJcJfG/nQI980=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-OB_PgceTO_uwvbg6YNFEDg-1; Tue, 10 Mar 2020 05:00:23 -0400
-X-MC-Unique: OB_PgceTO_uwvbg6YNFEDg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-256-7vBssEyJPGayVjFMIry5cQ-1; Tue, 10 Mar 2020 05:01:38 -0400
+X-MC-Unique: 7vBssEyJPGayVjFMIry5cQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB7B0800D50;
- Tue, 10 Mar 2020 09:00:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07BFF801E6D;
+ Tue, 10 Mar 2020 09:01:37 +0000 (UTC)
 Received: from [10.36.118.8] (unknown [10.36.118.8])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B56375D9C5;
- Tue, 10 Mar 2020 09:00:20 +0000 (UTC)
-Subject: Re: [PATCH v8 2/2] s390x: protvirt: Support unpack facility
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC22719C58;
+ Tue, 10 Mar 2020 09:01:35 +0000 (UTC)
+Subject: Re: [PATCH v8] s390x: protvirt: SCLP interpretation
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <b608f7d8-81ac-1e5b-011d-bd576f77aade@redhat.com>
- <20200310083232.29805-1-frankja@linux.ibm.com>
- <20200310083232.29805-2-frankja@linux.ibm.com>
+References: <6b57a6b8-f864-c5f6-f53f-1ac09e95e271@redhat.com>
+ <20200310084245.30954-1-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,21 +108,20 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <100bd846-61f1-973b-b97f-753463646e68@redhat.com>
-Date: Tue, 10 Mar 2020 10:00:19 +0100
+Message-ID: <3378680f-3dd0-1a82-68aa-c47854e2fe02@redhat.com>
+Date: Tue, 10 Mar 2020 10:01:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200310083232.29805-2-frankja@linux.ibm.com>
+In-Reply-To: <20200310084245.30954-1-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,256 +138,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10.03.20 09:32, Janosch Frank wrote:
-> The unpack facility provides the means to setup a protected guest. A
-> protected guest can not be introspected by the hypervisor or any
-> user/administrator of the machine it is running on.
->=20
-> Protected guests are encrypted at rest and need a special boot
-> mechanism via diag308 subcode 8 and 10.
->=20
-> Code 8 sets the PV specific IPLB which is retained seperately from
-> those set via code 5.
->=20
-> Code 10 is used to unpack the VM into protected memory, verify its
-> integrity and start it.
->=20
+On 10.03.20 09:42, Janosch Frank wrote:
+> SCLP for a protected guest is done over the SIDAD, so we need to use
+> the s390_cpu_pv_mem_* functions to access the SIDAD instead of guest
+> memory when reading/writing SCBs.
+> 
+> To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
+> since the function that injects the sclp external interrupt would
+> reject a zero sccb address.
+> 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Co-developed-by: Christian Borntraeger <borntraeger@de.ibm.com> [Changes
-> to machine]
-
-[...]
-
-
-> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
-> new file mode 100644
-> index 0000000000..ba6409246e
-> --- /dev/null
-> +++ b/hw/s390x/pv.c
-> @@ -0,0 +1,104 @@
-> +/*
-> + * Secure execution functions
-
-Protected virtualization ;)
-
-> + *
-> + * Copyright IBM Corp. 2020
-> + * Author(s):
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (a=
-t
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-
-[...]
-
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -238,9 +240,11 @@ static void s390_create_sclpconsole(const char *type=
-, Chardev *chardev)
->  static void ccw_init(MachineState *machine)
->  {
->      int ret;
-> +    S390CcwMachineState *ms =3D S390_CCW_MACHINE(machine);
->      VirtualCssBus *css_bus;
->      DeviceState *dev;
-> =20
-> +    ms->pv =3D false;
-
-As discussed, not needed.
-
->      s390_sclp_init();
->      /* init memory + setup max page size. Required for the CPU model */
->      s390_memory_init(machine->ram);
-> @@ -316,10 +320,88 @@ static inline void s390_do_cpu_ipl(CPUState *cs, ru=
-n_on_cpu_data arg)
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->  }
-> =20
-> +static void s390_machine_unprotect(S390CcwMachineState *ms)
-> +{
-> +    CPUState *t;
-> +
-> +    s390_pv_vm_disable();
-> +    CPU_FOREACH(t) {
-> +        S390_CPU(t)->env.pv =3D false;
-> +    }
-
-See below, would be great if we can get rid of env.pv IMHO.
-
-[...]
-
-> +    case S390_RESET_PV: /* Subcode 10 */
-> +        subsystem_reset();
-> +        s390_crypto_reset();
-> +
-> +        CPU_FOREACH(t) {
-> +            if (t =3D=3D cs) {
-> +                continue;
-> +            }
-> +            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-> +        }
-> +        run_on_cpu(cs, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-> +
-> +        if (s390_machine_protect(ms)) {
-> +            s390_machine_inject_pv_error(cs);
-> +            /*
-> +             * Continue after the diag308 so the guest knows something
-> +             * went wrong.
-> +             */
-> +            s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
-> +            return;
-
-Didn't you want to squash in that hunk from the other patch? (I remember
-seeing a goto)
-
-> +        }
-> +
->          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->          break;
->      default:
-
-[...]
-
-> =20
-> +#if !defined(CONFIG_USER_ONLY)
-> +static bool machine_is_pv(MachineState *ms)
-> +{
-> +    static S390CcwMachineState *ccw;
-> +    Object *obj;
-> +
-> +    if (ccw)
-> +=09    return ccw->pv;
-
-missing {}
-
-> +
-> +    /* we have to bail out for the "none" machine */
-> +    obj =3D object_dynamic_cast(OBJECT(ms), TYPE_S390_CCW_MACHINE);
-> +     if (!obj) {
-> +        return false;
-> +    }
-> +    ccw =3D S390_CCW_MACHINE(obj);
-> +    return ccw->pv;
-> +}
-> +#endif
-
-Now that we talked about cached values, what about
-
-#if !defined(CONFIG_USER_ONLY)
-static bool s390_is_pv(void)
-{
-    static S390CcwMachineState *ccw;
-    Object *obj;
-
-    if (ccw) {
-        return ccw->pv;
-    }
-
-    /* we have to bail out for the "none" machine */
-    obj =3D object_dynamic_cast(qdev_get_machine(),
-                              TYPE_S390_CCW_MACHINE);
-    if (!obj) {
-        return false;
-    }
-    ccw =3D S390_CCW_MACHINE(obj);
-    return ccw->pv;
-}
-#endif
-
-and drop all env->pv checks, replacing them by s390_is_pv(). (sorry,
-should have recommended that earlier)
-
-> +
->  static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
->  {
->      CPUState *cs =3D CPU(dev);
-> @@ -205,6 +226,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
->          goto out;
+> ---
+>  hw/s390x/sclp.c         | 30 ++++++++++++++++++++++++++++++
+>  include/hw/s390x/sclp.h |  2 ++
+>  target/s390x/kvm.c      | 24 +++++++++++++++++++-----
+>  3 files changed, 51 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index af0bfbc2ec..15dd15099c 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -193,6 +193,36 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
 >      }
-> =20
-> +    cpu->env.pv =3D machine_is_pv(ms);
->      /* sync cs->cpu_index and env->core_id. The latter is needed for TCG=
-. */
->      cs->cpu_index =3D cpu->env.core_id;
+>  }
+>  
+> +/*
+> +* We only need the address to have something valid for the
+> +* service_interrupt call.
+> +*/
+> +#define SCLP_PV_DUMMY_ADDR 0x4000
+> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+> +                                uint32_t code)
+> +{
+> +    SCLPDevice *sclp = get_sclp_device();
+> +    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
+> +    SCCB work_sccb;
+> +    hwaddr sccb_len = sizeof(SCCB);
+> +
+> +    /*
+> +     * Only a very limited amount of calls is permitted by the
+> +     * Ultravisor and we support all of them, so we don't check for
+> +     * them. All other specification exceptions are also interpreted
+> +     * by the Ultravisor and hence never cause an exit we need to
+> +     * handle.
+> +     *
+> +     * Setting the CC is also done by the Ultravisor.
+> +     */
+> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
+> +    sclp_c->execute(sclp, &work_sccb, code);
+> +    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
+> +                          be16_to_cpu(work_sccb.h.length));
+> +    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
+> +    return 0;
+> +}
+> +
+>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>  {
+>      SCLPDevice *sclp = get_sclp_device();
+> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> index c54413b78c..c0a3faa37d 100644
+> --- a/include/hw/s390x/sclp.h
+> +++ b/include/hw/s390x/sclp.h
+> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
+>  void sclp_service_interrupt(uint32_t sccb);
+>  void raise_irq_cpu_hotplug(void);
+>  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+> +                                uint32_t code);
+>  
 >  #endif
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 1d17709d6e..7e4d9d267c 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -114,6 +114,7 @@ struct CPUS390XState {
-> =20
->      /* Fields up to this point are cleared by a CPU reset */
->      struct {} end_reset_fields;
-> +    bool pv; /* protected virtualization */
-> =20
->  #if !defined(CONFIG_USER_ONLY)
->      uint32_t core_id; /* PoP "CPU address", same as cpu_index */
-> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_featu=
-res_def.inc.h
-> index 31dff0d84e..60db28351d 100644
-> --- a/target/s390x/cpu_features_def.inc.h
-> +++ b/target/s390x/cpu_features_def.inc.h
-> @@ -107,6 +107,7 @@ DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "De=
-flate-conversion facility (
->  DEF_FEAT(VECTOR_PACKED_DECIMAL_ENH, "vxpdeh", STFL, 152, "Vector-Packed-=
-Decimal-Enhancement Facility")
->  DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-ext=
-ension-9 facility (excluding subfunctions)")
->  DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
-> +DEF_FEAT(UNPACK, "unpack", STFL, 161, "Unpack facility")
-
-Random thought: The naming of that facility could have been improved to
-something that gives users/readers an idea what it's actually doing.
-
-
-[...]
-
-> @@ -128,17 +142,31 @@ out:
->          g_free(iplb);
->          return;
->      case DIAG308_STORE:
-> +    case DIAG308_PV_STORE:
->          if (diag308_parm_check(env, r1, addr, ra, true)) {
->              return;
->          }
-> -        iplb =3D s390_ipl_get_iplb();
-> +        if (subcode =3D=3D DIAG308_PV_STORE) {
-> +            iplb =3D s390_ipl_get_iplb_pv();
-> +        } else {
-> +            iplb =3D s390_ipl_get_iplb();
-> +        }
->          if (iplb) {
->              cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len)=
-);
->              env->regs[r1 + 1] =3D DIAG_308_RC_OK;
->          } else {
->              env->regs[r1 + 1] =3D DIAG_308_RC_NO_CONF;
->          }
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 295ed12a38..78e1b34ad5 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -1226,12 +1226,26 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
+>      sccb = env->regs[ipbh0 & 0xf];
+>      code = env->regs[(ipbh0 & 0xf0) >> 4];
+>  
+> -    r = sclp_service_call(env, sccb, code);
+> -    if (r < 0) {
+> -        kvm_s390_program_interrupt(cpu, -r);
 > -        return;
+> +    switch (run->s390_sieic.icptcode) {
+> +    case ICPT_PV_INSTR_NOTIFICATION:
+> +        g_assert(env->pv);
+> +        /* The notification intercepts are currently handled by KVM */
+> +        error_report("unexpected SCLP PV notification\n");
+> +        exit(1);
 > +        break;
-
-return->break is unrelated, but we do have a wild mixture already.
-
-> +    case DIAG308_PV_START:
-> +        iplb =3D s390_ipl_get_iplb_pv();
-> +        if (!iplb) {
-> +            env->regs[r1 + 1] =3D DIAG_308_RC_NO_PV_CONF;
+> +    case ICPT_PV_INSTR:
+> +        g_assert(env->pv);
+> +        sclp_service_call_protected(env, sccb, code);
+> +        break;
+> +    case ICPT_INSTRUCTION:
+> +        g_assert(!env->pv);
+> +        r = sclp_service_call(env, sccb, code);
+> +        if (r < 0) {
+> +            kvm_s390_program_interrupt(cpu, -r);
 > +            return;
 > +        }
-> +
-> +        s390_ipl_reset_request(cs, S390_RESET_PV);
-> +        break;
->      default:
->          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->          break;
->=20
+> +        setcc(cpu, r);
+>      }
+> -    setcc(cpu, r);
+>  }
+>  
+>  static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+> 
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
