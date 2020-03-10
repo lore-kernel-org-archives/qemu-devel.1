@@ -2,101 +2,84 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84120C18E5A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5C2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 514CB208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55254208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QwxePHnw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 514CB208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDFnYK8h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55254208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmSZ-0007ha-HD
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:30:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52273)
+	id 1jBmVL-0002ge-EV
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:33:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBmRl-0007Bu-VN
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:55 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmU3-0000Xb-W8
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBmRk-0005K6-9Y
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:53 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:56466)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBmRk-0005J3-1t
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:29:52 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ALOTPs003063;
- Tue, 10 Mar 2020 21:29:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=mime-version :
- message-id : date : from : to : cc : subject : references : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=KkPZFmykhUwlfBzqSWVZ3QYJznH9JEVJtiYnK+6jNxM=;
- b=QwxePHnwsSqjOI1FWqKdTjEPkLGkPOZFn+s9UyR0WIlf6i8jHE+9Dq4TWOuhEWsYDf8z
- u0poQ1Wa80pGmsnHFjK6EfJdH0ZnptORD+aHLANCselAi1Upf1vH4Qq9Fpm6BQyIO7Ef
- qgnDeyKHBJTQ6CqcB/LO7UDfUZV5Q0RoEjUVHnESlmXcRFHUhFa7EtSZyhNMyZsQmNlm
- nOyCs6XHXunTjfxiXxSgvGjIMLOlySlSFuo/zOfvoMAm5JG82QU15CozwJKewMgVBCBK
- ElgQZ/qZGDUDz+754iRYaAAj+bg1AHYhaDgML9D+Ko3yZBWd0J03W0gu07Q7bjfN2JSm lA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2yp9v638fe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 21:29:49 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ALMRE6106133;
- Tue, 10 Mar 2020 21:29:49 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2yp8nvufcb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 21:29:49 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ALTk8G023777;
- Tue, 10 Mar 2020 21:29:46 GMT
-Received: from [192.168.14.112] (/79.181.212.171) by default (Oracle Beehive
- Gateway v4.0) with ESMTP ; Tue, 10 Mar 2020 14:29:46 -0700
-USER-AGENT: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
-Content-Language: en-US
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmU0-000810-UV
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:15 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37458)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jBmU0-0007yw-Lc; Tue, 10 Mar 2020 17:32:12 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a141so3052830wme.2;
+ Tue, 10 Mar 2020 14:32:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bTP3m04W19DHRbF7HJDAwJz9ToGGdfJLmzi/E7yzn7k=;
+ b=EDFnYK8h0agMq2oc2zgkg7NqAAPMSTqlH6hnTUSu0iZsHx9OczjN9GIJqDmsGDTTJd
+ RPjffaHe/D5y1DDuc7MQ9wfcgWZzOhnpNr+dEninTilThr7L65UHmAXWreHhN2iFGb7F
+ wB924v34ahb3Fd1YitFKgtiHIuCk1+/iyT7OJChn80bHBO9YeijTuQYJN1RKNT62oK0T
+ MFiZYOJQ64Nr/3sWIkxQFtJUXKtnFV0wdEJXjtG5KQvdkZZMob87kq7KMLQIbcpetywM
+ 448iW1f24PeNVMhnb3RdQlBmUR7p0WA91VLLN/vkV+ASjDVCHpcOZKB7UKs+t5uxo5KT
+ LnEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bTP3m04W19DHRbF7HJDAwJz9ToGGdfJLmzi/E7yzn7k=;
+ b=K2N7Flthin6wMkf59w0vEcL+mw1+mg+NuKkW70o8Bahy0LAgbwOeMi6RQk2dLl252J
+ Tj3HJcNajydmHaQyEtXjUObxR14h/F+XOiAtRDYl40xjTJ1ciO4seD8yxH0hhtS/w7Gx
+ KpHACazt6sPI8qLDRYv+6xv9nmYPjafMVhu4SNjR4rrrWIWAaHAhG4EnSo7x9ABNXlKQ
+ /cbf+0YktWNqqxHv4omX6f5l/kd7c9aZYmmOyFAPLDNp5CedwpHwYGJNPkBVwYFyaElQ
+ DVJiKahhXal+4nGPRyJe0vaLWZrbLihv5iM/sIcp2dC5hUkqwx6DTPR5SIVrOQYODroC
+ 4y3Q==
+X-Gm-Message-State: ANhLgQ3BuGY2ub0fw04NiAhbk4blatPH4FR0plYsZLdZ3hcJyKsOU+ir
+ eIiG70n0i7rBpRqTxBeg0c8j3wMW
+X-Google-Smtp-Source: ADFU+vvAxiZLvxthQzGO71nhdNWLjLCuZlUJFa3qRbopUsjsadiPvoEvpHhi+K7vBoax7LH/FN2i+w==
+X-Received: by 2002:a1c:62c5:: with SMTP id w188mr628792wmb.112.1583875930591; 
+ Tue, 10 Mar 2020 14:32:10 -0700 (PDT)
+Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
+ by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 14:32:10 -0700 (PDT)
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/18] Add Allwinner H3 SoC and Orange Pi PC Machine
+Date: Tue, 10 Mar 2020 22:31:45 +0100
+Message-Id: <20200310213203.18730-1-nieklinnenbank@gmail.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Message-ID: <b191ba0e-a864-fdc2-a029-c22783eb0106@oracle.com>
-Date: Tue, 10 Mar 2020 14:29:42 -0700 (PDT)
-From: Liran Alon <liran.alon@oracle.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2 00/16]: hw/i386/vmport: Bug fixes and improvements
-References: <20200310165332.140774-1-liran.alon@oracle.com>
- <20200310133932-mutt-send-email-mst@kernel.org>
- <bcf7f439-7954-a6dc-322e-f8cbddd51d24@oracle.com>
- <20200310164239-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200310164239-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100127
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- spamscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
- phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100127
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,113 +91,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: nikita.leshchenko@oracle.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
+ b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
+ qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Dear QEMU developers,
 
-On 10/03/2020 22:56, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2020 at 08:09:09PM +0200, Liran Alon wrote:
->> On 10/03/2020 19:44, Michael S. Tsirkin wrote:
->>> On Tue, Mar 10, 2020 at 06:53:16PM +0200, Liran Alon wrote:
->>>> Hi,
->>>>
->>>> This series aims to fix several bugs in VMPort and improve it by supporting
->>>> more VMPort commands and make command results more configurable to
->>>> user via QEMU command-line.
->>>>
->>>> This functionality was proven to be useful to run various VMware VMs
->>>> when attempting to run them as-is on top of QEMU/KVM.
->>>>
->>>> For more details, see commit messages.
->>> Well two versions in one day and some review comments weren't addressed.
->> There is a single review comment that wasn't addressed which is replacing an
->> enum with a comment. And I explicitly mentioned that it's because I want
->> additional opinion on this.
->> I don't see why such a small thing should block review for 15 patches...
->> All the rest of the comments (Which were great) have been addressed. Unless
->> I have mistakenly missed something, which please point it out if I did.
-> OK I just took a quick peek, two things quickly jumped out at me.
-Thanks for having a look.
->
-> version property really should be a boolean and have some documentation
-> saying what functionality enables.
-I thought that having a version number approach is more generic and easy 
-to maintain going forward.
-If I understand correctly, this is also the approach taken by qxl & qxl-vga.
+Hereby I would like to contribute the following set of patches to QEMU
+which add support for the Allwinner H3 System on Chip and the
+Orange Pi PC machine. The following features and devices are supported:
 
-The more elaborate alternative could have been introducing compat_flags 
-(As PVSCSI does) but it seems like it will pollute the property space 
-with a lot of useless VMPort properties.
-(E.g. x-read-eax-bug, x-no-report-unsupported-cmd, x-no-report-vmx-type 
-and etc.).
+ * SMP (Quad Core Cortex A7)
+ * Generic Interrupt Controller configuration
+ * SRAM mappings
+ * SDRAM controller
+ * Real Time Clock
+ * Timer device (re-used from Allwinner A10)
+ * UART
+ * SD/MMC storage controller
+ * EMAC ethernet
+ * USB 2.0 interfaces
+ * Clock Control Unit
+ * System Control module
+ * Security Identifier device
 
-What is the advantage of having a boolean such as "x-vmport-v2" instead 
-of having a single "version" property?
-Will it suffice if I would just add documentation above "version" 
-property on what is was the functionality in "version==1"?
-(Though, it's just easy to scan the vmport.c code for if's involving 
-">version"... "version" is more of an internal field for machine-type 
-compatibility and not really meant to be used by user)
+Functionality related to graphical output such as HDMI, GPU,
+Display Engine and audio are not included. Recently released
+mainline Linux kernels (4.19 up to latest master), mainline U-Boot
+and NetBSD 9.0 are known to work.
 
-Which approach do you prefer?
+For full details on how to use the Orange Pi PC machine, see the file
+docs/system/orangepi.rst which is included as a patch in this series.
 
-> userspace properties should use the non-abbreviated
-> vm-executable since vmx is easy to confuse with vm extensions.
-I really wish you would reconsider this. VMX is a really common term in 
-VMware terminology.
-It is found in binary names, ".vmx" file, ".vmx" file properties, VMware 
-Tools prints, open-vm-tools source code and etc.
+The contents of this patch series is available on Github at:
 
-In contrast, even though I have dealt for many years with VMware 
-technologies, I have never known that VMX==vm-executable.
-I still think it will introduce much confusion. On the other hard, I 
-don't see much confusing with this use of VMX with Intel VT-x
-because it is only used inside vmport.c and in vmport properties names. 
-And the properties names match the names of the guest
-code that interface with vmport in open-vm-tools source code.
+  https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v7
 
-If you still have a strong opinion on this, I will change it as you say 
-in v3... But please consider above arguments.
->
-> That's just a quick look.
->
->
->>> Some people do this, try to wear the maintainers out by sheer volume.
->>> It works sometimes but it's not a nice tactic. I personally think it's
->>> worth taking the time to think harder about ways to address all
->>> comments, not try to dismiss them.
->> That's not what I tried to do. I carefully fixed all comments I saw in the
->> review discussion and run tests.
->> The only thing which wasn't addressed is removing an enum and replacing it
->> with a comment.
->> The hint that I try to manipulate maintainers is disrespectful. I assume
->> that this isn't your intention, as we all just want to collaborate together
->> here. No need to make this a personal discussion.
->>
->> If you think that replacing the enum with a comment is a blocker for v2
->> patch-series, I will go ahead and submit v3 with that change.
-> Yes IMHO it needs to be fixed but please go over the comments and try to
-> address them all as best you can, instead of looking for an explanation
-> why the comments were irrelevant and can be dismissed.
+The followings are currently known issues in this series:
 
-I'm not trying to finding explanation on why the comments are irrelevant 
-and can be dismissed... It's not my first time contributing code to 
-QEMU/KVM...
+  - RTC date & time is not persistent
+  - boot0 custom Allwinner bootloader not yet working
+  - Watchdog not yet implemented, affects U-Boot 'reset' and shutdown/reboot
+     -> This is part of the existing A10 timer that needs to be generalized first
 
-> Sure someone
-> might propose you introduce a bug, and that can't just be addressed, but
-> that's not the case here.  Also please do not send multiple revisions of
-> a large patchset in a day.  People need time for review.
-OK. I will make note of that for next time.
-I would have thought maintainers prefer to always have ability to pick 
-up the latest version that is ready to avoid reviewing old code that was 
-already discussed. Assuming all previous comments were addressed.
+Looking forward to your review comments. I will do my best
+to update the patches where needed.
 
-Thanks,
--Liran
+===== CHANGELOG =====
+v7:
+ * tests/acceptances/boot_linux_console.py: extend test_arm_orangepi_sd with checks for ethernet device
+ * docs/system/orangepi.rst: moved from docs/ top level to docs/system/
+ * docs/system/orangepi.rst: correct indentation and section headers to resolve sphinx parse errors
+ * docs/system/orangepi.rst: add .. code-block:: bash for each code example
+ * docs/system/target-arm.rst: include the orangepi.rst file
+ * hw/misc/allwinner-cpucfg.c: use arm_feature(&target_cpu->env, ARM_FEATURE_AARCH64) to fill target_aa64 for 64-bit compatibility
+ * hw/arm/orangepi.c: use object_property_add_child to add H3 SoC object to machine and use object_unref, to avoid memory leak on exit
 
+v6: https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00046.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v6
 
+v5: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04525.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v5
+
+v4: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg03960.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v4
+
+v3: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg01534.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v3
+
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03265.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v2
+
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00320.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v1
+
+With kind regards,
+
+Niek Linnenbank
+
+Niek Linnenbank (13):
+  hw/arm: add Allwinner H3 System-on-Chip
+  hw/arm: add Xunlong Orange Pi PC machine
+  hw/arm/allwinner-h3: add Clock Control Unit
+  hw/arm/allwinner-h3: add USB host controller
+  hw/arm/allwinner-h3: add System Control module
+  hw/arm/allwinner: add CPU Configuration module
+  hw/arm/allwinner: add Security Identifier device
+  hw/arm/allwinner: add SD/MMC host controller
+  hw/arm/allwinner-h3: add EMAC ethernet device
+  hw/arm/allwinner-h3: add Boot ROM support
+  hw/arm/allwinner-h3: add SDRAM controller device
+  hw/arm/allwinner: add RTC device support
+  docs: add Orange Pi PC document
+
+Philippe Mathieu-Daudé (5):
+  tests/boot_linux_console: Add a quick test for the OrangePi PC board
+  tests/boot_linux_console: Add initrd test for the Orange Pi PC board
+  tests/boot_linux_console: Add a SD card test for the OrangePi PC board
+  tests/boot_linux_console: Add a SLOW test booting Ubuntu on OrangePi
+    PC
+  tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi
+    PC
+
+ docs/system/orangepi.rst               | 253 +++++++
+ docs/system/target-arm.rst             |   2 +
+ default-configs/arm-softmmu.mak        |   1 +
+ hw/usb/hcd-ehci.h                      |   1 +
+ include/hw/arm/allwinner-a10.h         |   4 +
+ include/hw/arm/allwinner-h3.h          | 161 +++++
+ include/hw/misc/allwinner-cpucfg.h     |  52 ++
+ include/hw/misc/allwinner-h3-ccu.h     |  66 ++
+ include/hw/misc/allwinner-h3-dramc.h   | 106 +++
+ include/hw/misc/allwinner-h3-sysctrl.h |  67 ++
+ include/hw/misc/allwinner-sid.h        |  60 ++
+ include/hw/net/allwinner-sun8i-emac.h  |  99 +++
+ include/hw/rtc/allwinner-rtc.h         | 134 ++++
+ include/hw/sd/allwinner-sdhost.h       | 135 ++++
+ hw/arm/allwinner-a10.c                 |  19 +
+ hw/arm/allwinner-h3.c                  | 466 +++++++++++++
+ hw/arm/cubieboard.c                    |  15 +
+ hw/arm/orangepi.c                      | 131 ++++
+ hw/misc/allwinner-cpucfg.c             | 282 ++++++++
+ hw/misc/allwinner-h3-ccu.c             | 242 +++++++
+ hw/misc/allwinner-h3-dramc.c           | 358 ++++++++++
+ hw/misc/allwinner-h3-sysctrl.c         | 140 ++++
+ hw/misc/allwinner-sid.c                | 168 +++++
+ hw/net/allwinner-sun8i-emac.c          | 871 +++++++++++++++++++++++++
+ hw/rtc/allwinner-rtc.c                 | 411 ++++++++++++
+ hw/sd/allwinner-sdhost.c               | 854 ++++++++++++++++++++++++
+ hw/usb/hcd-ehci-sysbus.c               |  17 +
+ MAINTAINERS                            |   9 +
+ hw/arm/Kconfig                         |  12 +
+ hw/arm/Makefile.objs                   |   1 +
+ hw/misc/Makefile.objs                  |   5 +
+ hw/misc/trace-events                   |  19 +
+ hw/net/Kconfig                         |   3 +
+ hw/net/Makefile.objs                   |   1 +
+ hw/net/trace-events                    |  10 +
+ hw/rtc/Makefile.objs                   |   1 +
+ hw/rtc/trace-events                    |   4 +
+ hw/sd/Makefile.objs                    |   1 +
+ hw/sd/trace-events                     |   7 +
+ tests/acceptance/boot_linux_console.py | 230 +++++++
+ 40 files changed, 5418 insertions(+)
+ create mode 100644 docs/system/orangepi.rst
+ create mode 100644 include/hw/arm/allwinner-h3.h
+ create mode 100644 include/hw/misc/allwinner-cpucfg.h
+ create mode 100644 include/hw/misc/allwinner-h3-ccu.h
+ create mode 100644 include/hw/misc/allwinner-h3-dramc.h
+ create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
+ create mode 100644 include/hw/misc/allwinner-sid.h
+ create mode 100644 include/hw/net/allwinner-sun8i-emac.h
+ create mode 100644 include/hw/rtc/allwinner-rtc.h
+ create mode 100644 include/hw/sd/allwinner-sdhost.h
+ create mode 100644 hw/arm/allwinner-h3.c
+ create mode 100644 hw/arm/orangepi.c
+ create mode 100644 hw/misc/allwinner-cpucfg.c
+ create mode 100644 hw/misc/allwinner-h3-ccu.c
+ create mode 100644 hw/misc/allwinner-h3-dramc.c
+ create mode 100644 hw/misc/allwinner-h3-sysctrl.c
+ create mode 100644 hw/misc/allwinner-sid.c
+ create mode 100644 hw/net/allwinner-sun8i-emac.c
+ create mode 100644 hw/rtc/allwinner-rtc.c
+ create mode 100644 hw/sd/allwinner-sdhost.c
+
+-- 
+2.17.1
 
