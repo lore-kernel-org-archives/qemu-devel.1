@@ -2,101 +2,76 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C7F1C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4480FC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:15:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 221532468D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:14:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D3FB2468D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:15:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fDRRNwpr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221532468D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YEOHGxZA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D3FB2468D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBcqJ-0006WI-By
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:14:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42222)
+	id 1jBcrO-0007PD-Ev
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:15:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBcpI-0005xs-BV
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:13:33 -0400
+ (envelope-from <quintela@redhat.com>) id 1jBcqN-0006ia-IC
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:14:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBcpH-0004FH-3l
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:13:32 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:42164)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBcpG-0004BN-7g
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:13:30 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ABCRQB181729;
- Tue, 10 Mar 2020 11:13:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=TnMoi9mBqiIDFwqDBxCZr2bIk8ju6Vw9swk+kTioevQ=;
- b=fDRRNwpr8lYUyawJr5znTETE4TTkHvtrI4XrJLrsD2DjE8aWCqVjU2bgQoHN6xNdoDQB
- X461cXnAXtJnEOx40eMB+SqwHhZJrKrF2kljaZXV8ejZwXhkWdlGosZkWTT0Y3ygvSOd
- o39Quw3vIlmXniNU5Eyxw6B5C+oHlJoH0XdkJ636zZjApB+w9QWyMzO4A3gk/GsSXkcy
- dxa5Byn2YHpnuQrWQXYGDbWcZiJ4TkjvJfN8rDrD5gwB3jyfddfXan0OHOQPSTwv6hvv
- FUuyACACsnbxSqIQHgFL5TxcXiNyys2VHL7HigVdzTnluyolqx55kA2cSFWyyvJmVBKq bg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2ym3jqmwd9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 11:13:26 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ABC5nf046662;
- Tue, 10 Mar 2020 11:13:26 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 2yp8pr0vta-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 11:13:26 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02ABDO4T010849;
- Tue, 10 Mar 2020 11:13:24 GMT
-Received: from [192.168.14.112] (/79.181.212.171)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 10 Mar 2020 04:13:24 -0700
-Subject: Re: [PATCH 07/14] hw/i386/vmport: Add support for CMD_GETBIOSUUID
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-8-liran.alon@oracle.com>
- <20200310053305-mutt-send-email-mst@kernel.org>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <9213671d-75e9-b4d6-6e3d-c9221c2b7cc4@oracle.com>
-Date: Tue, 10 Mar 2020 13:13:21 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ (envelope-from <quintela@redhat.com>) id 1jBcqM-0007Rg-0q
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:14:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42702
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jBcqL-0007PI-Rz
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:14:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583838876;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=UkklVopQ1HHnd3o6jX8v6sjMqY3VU44drciZfMmG6v4=;
+ b=YEOHGxZABXtu0i36qsFZ1pocx3z6+AtaI4N+FY4A8lOKz4sx6ySLBxwnB+ri/Lyyj3Xb/a
+ LX+5b0x++lYyX6EMofMVW4qov3PEu02M4DqUKfZphGIlvsjw33ylrQCEYFTMBISsI2qNB2
+ BN1VJ3ewGROZbWfppyrmNwGCJr5b+uA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-bbeQaaMkNu6MYR7HLf2LyQ-1; Tue, 10 Mar 2020 07:14:35 -0400
+X-MC-Unique: bbeQaaMkNu6MYR7HLf2LyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E4E8107B277;
+ Tue, 10 Mar 2020 11:14:34 +0000 (UTC)
+Received: from secure.mitica (unknown [10.36.118.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1797610002A2;
+ Tue, 10 Mar 2020 11:14:31 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] configure: Improve zstd test
+Date: Tue, 10 Mar 2020 12:14:31 +0100
+Message-Id: <20200310111431.173151-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200310053305-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- malwarescore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100075
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- clxscore=1015
- priorityscore=1501 mlxscore=0 phishscore=0 mlxlogscore=999 impostorscore=0
- bulkscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100075
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,40 +83,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+There were one error on the test (missing an s for --exists).
+But we really need a recent zstd (1.4.0).
+Thanks to Michal Privoznik to provide the right vension.
 
-On 10/03/2020 11:34, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2020 at 01:54:04AM +0200, Liran Alon wrote:
->> This is VMware documented functionallity that some guests rely on.
->> Returns the BIOS UUID of the current virtual machine.
->>
->> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> So this at least seems guest-visible.
->
-> So I suspect you need to add properties to
-> disable this for old machine types, to avoid
-> breaking compatibility with live-migration.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reported-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ configure | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-It is indeed guest visible.
-In theory, you are right that for every guest-visible change, we should 
-make sure to expose it to only new machine-types.
-
-However, in this case, I feel it just unnecessary over-complicates the code.
-I don't see how a guest which previously failed to use this command, 
-will fail because after Live-Migration it could succeed.
-
-If you insist, I will add such functionality. In that case, do you think 
-a single flag will suffice for the addition of all new commands
-(i.e. "commands-version" that it's number specifies set of commands to 
-expose), or you want to have a per-command flag?
-
--Liran
+diff --git a/configure b/configure
+index cbf864bff1..f5454bd603 100755
+--- a/configure
++++ b/configure
+@@ -2475,7 +2475,8 @@ fi
+ # zstd check
+=20
+ if test "$zstd" !=3D "no" ; then
+-    if $pkg_config --exist libzstd ; then
++    libzstd_minver=3D"1.4.0"
++    if $pkg_config --atleast-version=3D$libzstd_minver libzstd ; then
+         zstd_cflags=3D"$($pkg_config --cflags libzstd)"
+         zstd_libs=3D"$($pkg_config --libs libzstd)"
+         LIBS=3D"$zstd_libs $LIBS"
+--=20
+2.24.1
 
 
