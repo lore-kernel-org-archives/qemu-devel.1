@@ -2,87 +2,100 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E12C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0DCC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:45:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76B02222C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:45:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE33F222C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:45:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaSw1pTS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76B02222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1CKXP5z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE33F222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmgW-0005my-My
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:45:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53566)
+	id 1jBmh3-0006fS-SZ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:45:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUK-00010j-CA
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:34 -0400
+ (envelope-from <mst@redhat.com>) id 1jBmfp-0004Z8-1L
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUH-0008Vq-8h
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:32 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:45602)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jBmUG-0008TO-Vv; Tue, 10 Mar 2020 17:32:29 -0400
-Received: by mail-wr1-x431.google.com with SMTP id m9so8777695wro.12;
- Tue, 10 Mar 2020 14:32:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5D30snwBn3qi9rHy3hgR2rm8y8MKA4IDTZBxn+hWASc=;
- b=OaSw1pTSX7UuzTevs4z7XOB6XDqI7bs+0cfkKEfqcUyetTzzmfoniHZkclxUlgYxVV
- TKGsq2U5UNszm8riJiYmbRqq4v/MiQ22GclUUiPdBWmn9WrRsaOjAtjheb/Aw+Qh5yLl
- poneXu1LQ4C8HrdD8K7J1ZhLzCHZoNR5DILtj5TmuqHyCuPoTZBuLi52jh5qipqbKFEP
- Gy0sj2/F1gLFEKAxflo3q+jH9kg0dxMcImvUPf09cnjfuVl3mjVMQQKVuR9aOrH46yqd
- OWnvPraUG70ghbke7kiSZkbk1A6bK5GbcWFsAUTeugW22DvnOZlkna9pZ2+uYQHoTnM7
- Tryg==
+ (envelope-from <mst@redhat.com>) id 1jBmfm-0005Fx-Cd
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:44:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23018
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBmfm-0005Co-46
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:44:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583876660;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+pW5Q4cdOWCajEaaNvS77JAvWxHmK38/oLjRoCGReAw=;
+ b=L1CKXP5zL8SXzdZF8tt9nGBc8bN4LrDdcbnF9arVwV7Cn8yV0ubxjq5R2rv0gO3UAo5bTi
+ of7pFSesBgMXO8Y7rcJ4hpd02ZHR1zMgGERwQTl7ITgybmhXliEG+jpwqMJ21N7e6e/R4E
+ Jfr66Az3PsihOk1+Pvw9GXqac9PnSso=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-kZWCE3npPNG2KE898GxuLg-1; Tue, 10 Mar 2020 17:44:18 -0400
+X-MC-Unique: kZWCE3npPNG2KE898GxuLg-1
+Received: by mail-qv1-f72.google.com with SMTP id h17so31558qvc.18
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 14:44:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=5D30snwBn3qi9rHy3hgR2rm8y8MKA4IDTZBxn+hWASc=;
- b=b7vpATozk7V0RR9B54MIThhMG1Hus88vve4XZi/Qqf34RwwNRk64UKYQ3KAaQ3eBzN
- pZbceLG/ngheVb8UAXYh2T6ha6kurZlx1XiSsXgIadqOI8auFUpqWGBN4iSlvFWiUe3j
- 1Dcl2hujn4y+OY6T9IK+b9iHb5YttfRAhqac9oRtaCxnUIFvjgimugnr35jC0MUixJKL
- rojI278K1pupcrFmLKo1k4FyuFhKBnmk87keevrA5rDCGntmOMVq9oG6VfijGNQjqrsT
- R4pXU0qd7PCQ30h6mmUW3O5pqFmdwYgixR4A+MKuthafo1fjj4egg4pJ1LGM063JjeMh
- BHMA==
-X-Gm-Message-State: ANhLgQ0RdBQNyv8rnKWoPlbzuLHBFwRrcuxr+8CGlG34Idirp56gbdHY
- niDd7snESTTCGcklkNuXlTdrBPI+vAM=
-X-Google-Smtp-Source: ADFU+vuACmOObGUju9GXAHZhiSVEw8ai8pvT6HsGKtatDi/wIM7a/L2Tapn14oYIZ148mo/UymVM0g==
-X-Received: by 2002:adf:f6cb:: with SMTP id y11mr2520930wrp.284.1583875947183; 
- Tue, 10 Mar 2020 14:32:27 -0700 (PDT)
-Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.26
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=XOiCiAELTh27dIix4JLjy0/MbyuH+/LsOgb0H2TMTk4=;
+ b=goKPZEG414JkKGrYIuedBq3hX28uY9GO/0cehUYTProZFU2tDgelOk9ursiE8lK+hO
+ 9PNwdAZs84xFt3tIOZ/ebirPPNozxRsTG4nV4aXpHgGGWUwGDBEtIFOIu0Ca77hXT/60
+ Qgovom5h88yCNQ/mfTMxNIe97c2jGtteABRU09bQ2fkfjd3n1ddhpqiPinq23qvqf0gW
+ gJnkbi5KksCIxhiUn7Nc6JO8j+FkoNaFAY/0g22L5jkVa6HdbcoEizxKSlHzrV2N8w5p
+ +4hJHy7Z9MAl82B8mtU3jGKMq2TzRFZ9jF9RBinNXy3ZaQuAVzE1ZO44wp6nmYYNjp+u
+ J65Q==
+X-Gm-Message-State: ANhLgQ31RU/E6yOmA+821P+QF25bClhqdgAiOPTC9VdvxKqYjxy2a3Wa
+ fUJsaoicA07wiZdbWkS+G0786khATCN5I6nrFIWFbfY1d0+4fOO7xma8Vnxqhzz3lHtMhz7hLfM
+ 9u1+4Xz9PzVU6lNI=
+X-Received: by 2002:a05:620a:22b:: with SMTP id
+ u11mr21403283qkm.225.1583876657907; 
+ Tue, 10 Mar 2020 14:44:17 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vslOEu8u2iVOg6ZaujoLXi1MJaweFmncDMucoDm1pRUyR+Ydtb2IqCEpK/vQmNjaQYcIVBiRA==
+X-Received: by 2002:a05:620a:22b:: with SMTP id
+ u11mr21403254qkm.225.1583876657529; 
+ Tue, 10 Mar 2020 14:44:17 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id 11sm25209866qkr.101.2020.03.10.14.44.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 14:32:26 -0700 (PDT)
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 17/18] tests/boot_linux_console: Test booting NetBSD via
- U-Boot on OrangePi PC
-Date: Tue, 10 Mar 2020 22:32:02 +0100
-Message-Id: <20200310213203.18730-18-nieklinnenbank@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200310213203.18730-1-nieklinnenbank@gmail.com>
-References: <20200310213203.18730-1-nieklinnenbank@gmail.com>
+ Tue, 10 Mar 2020 14:44:16 -0700 (PDT)
+Date: Tue, 10 Mar 2020 17:44:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v2 00/16]: hw/i386/vmport: Bug fixes and improvements
+Message-ID: <20200310173020-mutt-send-email-mst@kernel.org>
+References: <20200310165332.140774-1-liran.alon@oracle.com>
+ <20200310133932-mutt-send-email-mst@kernel.org>
+ <bcf7f439-7954-a6dc-322e-f8cbddd51d24@oracle.com>
+ <20200310164239-mutt-send-email-mst@kernel.org>
+ <b191ba0e-a864-fdc2-a029-c22783eb0106@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::431
+In-Reply-To: <b191ba0e-a864-fdc2-a029-c22783eb0106@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,183 +107,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
- qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
+Cc: nikita.leshchenko@oracle.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Tue, Mar 10, 2020 at 02:29:42PM -0700, Liran Alon wrote:
+>=20
+> On 10/03/2020 22:56, Michael S. Tsirkin wrote:
+> > On Tue, Mar 10, 2020 at 08:09:09PM +0200, Liran Alon wrote:
+> > > On 10/03/2020 19:44, Michael S. Tsirkin wrote:
+> > > > On Tue, Mar 10, 2020 at 06:53:16PM +0200, Liran Alon wrote:
+> > > > > Hi,
+> > > > >=20
+> > > > > This series aims to fix several bugs in VMPort and improve it by =
+supporting
+> > > > > more VMPort commands and make command results more configurable t=
+o
+> > > > > user via QEMU command-line.
+> > > > >=20
+> > > > > This functionality was proven to be useful to run various VMware =
+VMs
+> > > > > when attempting to run them as-is on top of QEMU/KVM.
+> > > > >=20
+> > > > > For more details, see commit messages.
+> > > > Well two versions in one day and some review comments weren't addre=
+ssed.
+> > > There is a single review comment that wasn't addressed which is repla=
+cing an
+> > > enum with a comment. And I explicitly mentioned that it's because I w=
+ant
+> > > additional opinion on this.
+> > > I don't see why such a small thing should block review for 15 patches=
+...
+> > > All the rest of the comments (Which were great) have been addressed. =
+Unless
+> > > I have mistakenly missed something, which please point it out if I di=
+d.
+> > OK I just took a quick peek, two things quickly jumped out at me.
+> Thanks for having a look.
+> >=20
+> > version property really should be a boolean and have some documentation
+> > saying what functionality enables.
+> I thought that having a version number approach is more generic and easy =
+to
+> maintain going forward.
+> If I understand correctly, this is also the approach taken by qxl & qxl-v=
+ga.
+>=20
+> The more elaborate alternative could have been introducing compat_flags (=
+As
+> PVSCSI does) but it seems like it will pollute the property space with a =
+lot
+> of useless VMPort properties.
+> (E.g. x-read-eax-bug, x-no-report-unsupported-cmd, x-no-report-vmx-type a=
+nd
+> etc.).
+>=20
+> What is the advantage of having a boolean such as "x-vmport-v2" instead o=
+f
+> having a single "version" property?
 
-This test boots U-Boot then NetBSD (stored on a SD card) on
-a OrangePi PC board.
+It's not clear what should happen going forward. Let's say version is
+incremented again. This then becomes challenging for downstreams to
+backport.
 
-As it requires ~1.3GB of storage, it is disabled by default.
+> Will it suffice if I would just add documentation above "version" propert=
+y
+> on what is was the functionality in "version=3D=3D1"?
+> (Though, it's just easy to scan the vmport.c code for if's involving
+> ">version"... "version" is more of an internal field for machine-type
+> compatibility and not really meant to be used by user)
+>=20
+> Which approach do you prefer?
 
-U-Boot is built by the Debian project [1], and the SD card image
-is provided by the NetBSD organization [2].
+I just dislike versions, they are hard to maintain.
 
-Once the compressed SD card image is downloaded (304MB) and
-extracted, this test is fast:
+Individual ones is cleanest imho. Self-documenting.
+But if not, I'd do something like "x-vmport-fixes" and
+set bits there for each bugfix.
 
-  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
-    avocado --show=app,console run -t machine:orangepi-pc \
-      tests/acceptance/boot_linux_console.py
-  console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
-  console: DRAM: 1024 MiB
-  console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) Allwinner Technology
-  console: CPU:   Allwinner H3 (SUN8I 0000)
-  console: scanning bus usb@1c1b000 for devices... 1 USB Device(s) found
-  console: scanning bus usb@1c1d000 for devices... 1 USB Device(s) found
-  console: scanning usb for storage devices... 0 Storage Device(s) found
-  console: Hit any key to stop autoboot:  0
-  console: => setenv bootargs root=ld0a
-  console: => setenv kernel netbsd-GENERIC.ub
-  console: => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
-  console: => boot
-  console: ## Booting kernel from Legacy Image at 42000000 ...
-  console: Image Name:   NetBSD/earmv7hf 9.0_RC1
-  console: Image Type:   ARM Linux Kernel Image (no loading done) (uncompressed)
-  console: XIP Kernel Image (no loading done)
-  console: Loading Device Tree to 49ff6000, end 49fffe01 ... OK
-  console: Starting kernel ...
-  console: [   1.0000000] NetBSD/evbarm (fdt) booting ...
-  console: [   1.0000000] NetBSD 9.0 (GENERIC) #0: Fri Feb 14 00:06:28 UTC 2020
-  console: [   1.0000000]         mkrepro@mkrepro.NetBSD.org:/usr/src/sys/arch/evbarm/compile/GENERIC
-  console: [   1.0000000] total memory = 1024 MB
-  console: [   1.0000000] avail memory = 1003 MB
-  console: [   1.0000000] armfdt0 (root)
-  console: [   1.0000000] simplebus0 at armfdt0: Xunlong Orange Pi PC
-  console: [   1.0000000] cpu0 at cpus0: Cortex-A7 r0p5 (Cortex V7A core)
-  console: [   1.0000000] cpu0: DC enabled IC enabled WB enabled LABT branch prediction enabled
-  console: [   1.0000000] cpu0: 32KB/64B 2-way L1 VIPT Instruction cache
-  console: [   1.0000000] cpu0: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
-  console: [   1.0000000] cpu0: 2304KB/64B 16-way write-through L2 PIPT Unified cache
-  console: [   1.0000000] vfp0 at cpu0: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
-  ...
-  console: [   2.3812082] sdmmc0: SD card status: 4-bit, C0
-  console: [   2.3812082] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
-  console: [   2.4012856] ld0: 1226 MB, 622 cyl, 64 head, 63 sec, 512 bytes/sect x 2511872 sectors
-  console: [   2.5321222] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
-  console: [   3.1068718] WARNING: 4 errors while detecting hardware; check system log.
-  console: [   3.1179868] boot device: ld0
-  console: [   3.1470623] root on ld0a dumps on ld0b
-  console: [   3.2464436] root file system type: ffs
-  console: [   3.2897123] kern.module.path=/stand/evbarm/9.0/modules
-  console: Mon Feb 17 20:33:35 UTC 2020
-  console: Starting root file system check:
-  PASS (35.96 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-  JOB TIME   : 36.09 s
 
-Note, this test only took ~65 seconds to run on Travis-CI, see: [3].
+> > userspace properties should use the non-abbreviated
+> > vm-executable since vmx is easy to confuse with vm extensions.
+> I really wish you would reconsider this. VMX is a really common term in
+> VMware terminology.
+> It is found in binary names, ".vmx" file, ".vmx" file properties, VMware
+> Tools prints, open-vm-tools source code and etc.
 
-This test is based on a description from Niek Linnenbank from [4].
+Well that at least is easy to google.
 
-[1] https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable_SD_Card_with_u-boot
-[2] https://wiki.netbsd.org/ports/evbarm/allwinner/
-[3] https://travis-ci.org/philmd/qemu/jobs/638823612#L3778
-[4] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669347.html
+=09.vmx
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[NL: changed test to use NetBSD 9.0 final release and -global allwinner-rtc.base-year]
-Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
----
- tests/acceptance/boot_linux_console.py | 70 ++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+=09<vmname>.vmx
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index e035c88b07..f825cd9ef5 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -16,6 +16,7 @@ import shutil
- from avocado import skipUnless
- from avocado_qemu import Test
- from avocado_qemu import exec_command_and_wait_for_pattern
-+from avocado_qemu import interrupt_interactive_console_until_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-@@ -667,6 +668,75 @@ class BootLinuxConsole(Test):
-                                       'to <orangepipc>')
-         self.wait_for_console_pattern('Starting Load Kernel Modules...')
- 
-+    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
-+    def test_arm_orangepi_uboot_netbsd9(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:orangepi-pc
-+        """
-+        # This test download a 304MB compressed image and expand it to 1.3GB...
-+        deb_url = ('http://snapshot.debian.org/archive/debian/'
-+                   '20200108T145233Z/pool/main/u/u-boot/'
-+                   'u-boot-sunxi_2020.01%2Bdfsg-1_armhf.deb')
-+        deb_hash = 'f67f404a80753ca3d1258f13e38f2b060e13db99'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        # We use the common OrangePi PC 'plus' build of U-Boot for our secondary
-+        # program loader (SPL). We will then set the path to the more specific
-+        # OrangePi "PC" device tree blob with 'setenv fdtfile' in U-Boot prompt,
-+        # before to boot NetBSD.
-+        uboot_path = '/usr/lib/u-boot/orangepi_plus/u-boot-sunxi-with-spl.bin'
-+        uboot_path = self.extract_from_deb(deb_path, uboot_path)
-+        image_url = ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/'
-+                     'evbarm-earmv7hf/binary/gzimg/armv7.img.gz')
-+        image_hash = '2babb29d36d8360adcb39c09e31060945259917a'
-+        image_path_gz = self.fetch_asset(image_url, asset_hash=image_hash)
-+        image_path = os.path.join(self.workdir, 'armv7.img')
-+        image_drive_args = 'if=sd,format=raw,snapshot=on,file=' + image_path
-+        archive.gzip_uncompress(image_path_gz, image_path)
-+
-+        # dd if=u-boot-sunxi-with-spl.bin of=armv7.img bs=1K seek=8 conv=notrunc
-+        with open(uboot_path, 'rb') as f_in:
-+            with open(image_path, 'r+b') as f_out:
-+                f_out.seek(8 * 1024)
-+                shutil.copyfileobj(f_in, f_out)
-+
-+                # Extend image, to avoid that NetBSD thinks the partition
-+                # inside the image is larger than device size itself
-+                f_out.seek(0, 2)
-+                f_out.seek(64 * 1024 * 1024, 1)
-+                f_out.write(bytearray([0x00]))
-+
-+        self.vm.set_console()
-+        self.vm.add_args('-nic', 'user',
-+                         '-drive', image_drive_args,
-+                         '-global', 'allwinner-rtc.base-year=2000',
-+                         '-no-reboot')
-+        self.vm.launch()
-+        wait_for_console_pattern(self, 'U-Boot 2020.01+dfsg-1')
-+        interrupt_interactive_console_until_pattern(self,
-+                                       'Hit any key to stop autoboot:',
-+                                       'switch to partitions #0, OK')
-+
-+        exec_command_and_wait_for_pattern(self, '', '=>')
-+        cmd = 'setenv bootargs root=ld0a'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = 'setenv kernel netbsd-GENERIC.ub'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = 'setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb'
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+        cmd = ("setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; "
-+               "fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; "
-+               "fdt addr ${fdt_addr_r}; "
-+               "bootm ${kernel_addr_r} - ${fdt_addr_r}'")
-+        exec_command_and_wait_for_pattern(self, cmd, '=>')
-+
-+        exec_command_and_wait_for_pattern(self, 'boot',
-+                                          'Booting kernel from Legacy Image')
-+        wait_for_console_pattern(self, 'Starting kernel ...')
-+        wait_for_console_pattern(self, 'NetBSD 9.0 (GENERIC)')
-+        # Wait for user-space
-+        wait_for_console_pattern(self, 'Starting root file system check')
-+
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
--- 
-2.17.1
+=09This is the primary configuration file, which stores settings
+=09chosen in the New Virtual Machine Wizard or virtual machine settings
+=09editor. If you created the virtual machine under an earlier version of
+=09VMware Workstation on a Linux host, this file may have a .cfg extension
+
+so .vmx as used here has nothing to do with VM Executable version or
+type. Looks like it's just a source of confusion on the vmware
+side too :)
+
+
+
+>=20
+> In contrast, even though I have dealt for many years with VMware
+> technologies, I have never known that VMX=3D=3Dvm-executable.
+
+Well you said that's what it stands for. I have no idea.  From what you
+say now maybe vmx basically is being used as a prefix for all things
+vmware. In that case vmport-version and vmport-type or even
+vmware-version and vmware-type will do just as well.
+
+
+> I still think it will introduce much confusion. On the other hard, I don'=
+t
+> see much confusing with this use of VMX with Intel VT-x
+> because it is only used inside vmport.c and in vmport properties names. A=
+nd
+> the properties names match the names of the guest
+> code that interface with vmport in open-vm-tools source code.
+>=20
+> If you still have a strong opinion on this, I will change it as you say i=
+n
+> v3... But please consider above arguments.
+
+I'm just saying don't use vmx. It's too late to try to give
+it a different meaning. Figure out what it's supposed to
+stand for and write it out in full.
+
+> >=20
+> > That's just a quick look.
+> >=20
+> >=20
+> > > > Some people do this, try to wear the maintainers out by sheer volum=
+e.
+> > > > It works sometimes but it's not a nice tactic. I personally think i=
+t's
+> > > > worth taking the time to think harder about ways to address all
+> > > > comments, not try to dismiss them.
+> > > That's not what I tried to do. I carefully fixed all comments I saw i=
+n the
+> > > review discussion and run tests.
+> > > The only thing which wasn't addressed is removing an enum and replaci=
+ng it
+> > > with a comment.
+> > > The hint that I try to manipulate maintainers is disrespectful. I ass=
+ume
+> > > that this isn't your intention, as we all just want to collaborate to=
+gether
+> > > here. No need to make this a personal discussion.
+> > >=20
+> > > If you think that replacing the enum with a comment is a blocker for =
+v2
+> > > patch-series, I will go ahead and submit v3 with that change.
+> > Yes IMHO it needs to be fixed but please go over the comments and try t=
+o
+> > address them all as best you can, instead of looking for an explanation
+> > why the comments were irrelevant and can be dismissed.
+>=20
+> I'm not trying to finding explanation on why the comments are irrelevant =
+and
+> can be dismissed... It's not my first time contributing code to QEMU/KVM.=
+..
+>=20
+> > Sure someone
+> > might propose you introduce a bug, and that can't just be addressed, bu=
+t
+> > that's not the case here.  Also please do not send multiple revisions o=
+f
+> > a large patchset in a day.  People need time for review.
+> OK. I will make note of that for next time.
+> I would have thought maintainers prefer to always have ability to pick up
+> the latest version that is ready to avoid reviewing old code that was
+> already discussed. Assuming all previous comments were addressed.
+>=20
+> Thanks,
+> -Liran
+>=20
 
 
