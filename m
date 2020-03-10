@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC94C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B19C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0A9D208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:17:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A9D208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 7BE35208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 09:18:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BE35208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBb1O-0007k7-Vs
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60067)
+	id 1jBb2M-0000sc-GJ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 05:18:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBazb-0005Z8-M8
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:04 -0400
+ (envelope-from <bounces@canonical.com>) id 1jBazc-0005Zy-HG
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBaza-00051Q-HH
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40050)
+ (envelope-from <bounces@canonical.com>) id 1jBazb-00053p-6C
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40102)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBaza-0004z4-BM
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:02 -0400
+ id 1jBazb-00050o-0S
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 05:16:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBazY-0003rR-Kg
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:16:00 +0000
+ id 1jBaza-000462-7p
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:16:02 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9B9042E80CD
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:16:00 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 322652E80C0
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:16:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Mar 2020 09:09:20 -0000
+Date: Tue, 10 Mar 2020 09:08:25 -0000
 From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: i2c m68k rtc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dcb314 laurent-vivier philmd
-X-Launchpad-Bug-Reporter: dcb (dcb314)
+X-Launchpad-Bug-Commenters: berrange laurent-vivier npes87184 samuel-t
+X-Launchpad-Bug-Reporter: Samuel (samuel-t)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <157649490094.7480.17075229014510714852.malonedeb@soybean.canonical.com>
-Message-Id: <158383136090.26517.12563791436034539117.malone@gac.canonical.com>
-Subject: [Bug 1856549] Re: qemu-4.2.0/hw/misc/mac_via.c: 2 * bad test ?
+References: <157191258679.29920.9268940625941119092.malonedeb@soybean.canonical.com>
+Message-Id: <158383130534.12830.16161237946111660876.malone@soybean.canonical.com>
+Subject: [Bug 1849644] Re: QEMU VNC websocket proxy requires non-standard
+ 'binary' subprotocol
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9f6c6ee13eda426cdb9aeef8ecd42e95c3e5d897
+X-Launchpad-Hash: f66f8f2bfda89d5f0194e1338185592cf1ae6d68
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,48 +78,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856549 <1856549@bugs.launchpad.net>
+Reply-To: Bug 1849644 <1849644@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Fixed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Db2619c158ab5
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dc64e1e75381d
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856549
+https://bugs.launchpad.net/bugs/1849644
 
 Title:
-  qemu-4.2.0/hw/misc/mac_via.c: 2 * bad test ?
+  QEMU VNC websocket proxy requires non-standard 'binary' subprotocol
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
-  1.
+  When running a machine using "-vnc" and the "websocket" option QEMU
+  seems to require the subprotocol called 'binary'. This subprotocol
+  does not exist in the WebSocket specification. In fact it has never
+  existed in the spec, in one of the very early drafts of WebSockets it
+  was briefly mentioned but it never made it to a final version.
 
-  qemu-4.2.0/hw/misc/mac_via.c:417:27: style: Expression is always false
-  because 'else if' condition matches previous condition at line 412.
-  [multiCondition]
+  When the WebSocket server requires a non-standard subprotocol any
+  WebSocket client that works correctly won't be able to connect.
 
-                  } else if ((m->data_out & 0xf3) =3D=3D 0xa1) {
-  ...
-                  } else if ((m->data_out & 0xf3) =3D=3D 0xa1) {
+  One example of such a client is noVNC, it tells the server that it
+  doesn't want to use any subprotocol. QEMU's WebSocket proxy doesn't
+  let noVNC connect. If noVNC is modified to ask for 'binary' it will
+  work, this is, however, incorrect behavior.
 
-  2.
+  Looking at the code in "io/channel-websock.c" it seems it's quite
+  hard-coded to binary:
 
-  qemu-4.2.0/hw/misc/mac_via.c:467:27: style: Expression is always false
-  because 'else if' condition matches previous condition at line 463.
-  [multiCondition]
+  Look at line 58 and 433 here:
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dio/channel-websock.c
 
-  Duplicate.
+  This code has to be made more dynamic, and shouldn't require binary.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856549/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1849644/+subscriptions
 
