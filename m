@@ -2,70 +2,70 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DA1C18E5A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B60B4C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D50720873
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:56:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D50720873
+	by mail.kernel.org (Postfix) with ESMTPS id 8DE6620873
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:58:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE6620873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBagv-0008I5-I2
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:56:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52133)
+	id 1jBaic-0001O6-OZ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:58:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBag0-0007Pe-CF
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:55:49 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBafz-00011U-0x
+ (envelope-from <bounces@canonical.com>) id 1jBafz-0007Nw-4G
  for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:55:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37354)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <bounces@canonical.com>) id 1jBafx-0000vo-Rw
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:55:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37312)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBafy-0000yy-RG
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:55:46 -0400
+ id 1jBafx-0000sU-LQ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:55:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBafy-0002Bk-0J
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 08:55:46 +0000
+ id 1jBafw-0002BF-Sn
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 08:55:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 013862E80C7
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 08:55:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id D7D9E2E8048
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 08:55:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Mar 2020 08:48:08 -0000
+Date: Tue, 10 Mar 2020 08:48:36 -0000
 From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: linux-user ppc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cleber-gnu th-huth
-X-Launchpad-Bug-Reporter: Cleber Rosa (cleber-gnu)
+X-Launchpad-Bug-Commenters: ajbennee alex-bennee pmaydell scherft th-huth
+X-Launchpad-Bug-Reporter: Daan Scherft (scherft)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <155837363818.14706.8629235118425908874.malonedeb@gac.canonical.com>
-Message-Id: <158383008939.12830.17134143197911389759.launchpad@soybean.canonical.com>
-Subject: [Bug 1829779] Re: qemu-system-arm and qemu-system-aarch64 QMP hangs
- after kernel boots
+References: <156318593102.28533.3075291509963886255.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158383011784.26092.13468469140059449176.launchpad@gac.canonical.com>
+Subject: [Bug 1836558] Re: Qemu-ppc Memory leak creating threads
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 64328e108bf57de6d9002b5022dd384b58f67685
+X-Launchpad-Hash: ce16fd092d9eb1ebd72822784e1b338c9a2cb306
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,7 +78,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829779 <1829779@bugs.launchpad.net>
+Reply-To: Bug 1836558 <1836558@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -90,59 +90,71 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829779
+https://bugs.launchpad.net/bugs/1836558
 
 Title:
-  qemu-system-arm and qemu-system-aarch64 QMP hangs after kernel boots
+  Qemu-ppc Memory leak creating threads
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  After booting a Linux kernel on both arm and aarch64, the QMP sockets get=
-s unresponsive. Initially, this was thought to be limited to "quit" command=
-s, but it reproduced with others (such as in this
-  reproducer).  This is a partial log output:
+  When creating c++ threads (with c++ std::thread), the resulting binary
+  has memory leaks when running with qemu-ppc.
 
-  =C2=A0=C2=A0=C2=A0>>> {'execute': 'qmp_capabilities'}
-  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
-  =C2=A0=C2=A0=C2=A0Booting Linux on physical CPU 0x0000000000 [0x410fd034]
-  =C2=A0=C2=A0=C2=A0Linux version 4.18.16-300.fc29.aarch64 (mockbuild@build=
-vm-aarch64-02.arm.fedoraproject.org) (gcc version 8.2.1 20180801 (Red Hat 8=
-.2.1-2) (GCC)) #1 SMP Sat Oct 20 23:12:22 UTC 2018
-  =C2=A0=C2=A0=C2=A0...
-  =C2=A0=C2=A0=C2=A0Policy zone: DMA32
-  =C2=A0=C2=A0=C2=A0Kernel command line: printk.time=3D0 console=3DttyAMA0
-  =C2=A0=C2=A0=C2=A0>>> {'execute': 'stop'}
-  =C2=A0=C2=A0=C2=A0<<< {'timestamp': {'seconds': 1558370331, 'microseconds=
-': 470173}, 'event': 'STOP'}
-  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
-  =C2=A0=C2=A0=C2=A0>>> {'execute': 'cont'}
-  =C2=A0=C2=A0=C2=A0<<< {'timestamp': {'seconds': 1558370331, 'microseconds=
-': 470849}, 'event': 'RESUME'}
-  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
-  =C2=A0=C2=A0=C2=A0>>> {'execute': 'stop'}
+  Eg the following c++ program, when compiled with gcc, consumes more
+  and more memory while running at qemu-ppc. (does not have memory leaks
+  when compiling for Intel, when running same binary on real powerpc CPU
+  hardware also no memory leaks).
 
-  Sometimes it takes just the first "stop" command.  Overall, I was able
-  to reproduce 100% of times when applied on top of
-  6d8e75d41c58892ccc5d4ad61c4da476684c1c83.
+  (Note I used function getCurrentRSS to show available memory, see
+  https://stackoverflow.com/questions/669438/how-to-get-memory-usage-at-
+  runtime-using-c; calls commented out here)
 
-  The reproducer test can be seen/fetched at:
-  =C2=A0- https://github.com/clebergnu/qemu/commit/c778e28c24030c4a36548b71=
-4293b319f4bf18df
+  Compiler: powerpc-linux-gnu-g++ (Debian 8.3.0-2) 8.3.0 (but same problem =
+with older g++ compilers even 4.9)
+  Os: Debian 10.0 ( Buster) (but same problem seen on Debian 9/stetch)
+  qemu: qemu-ppc version 3.1.50
 
-  And test results from Travis CI can be seen at:
-  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669
 
-  For convenience purposes, here's qemu-system-aarch64 launching and hangin=
-g on the first "stop":
-  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3634
-  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3664
+  ---
 
-  And here's qemu-system-arm hanging the very same way:
-  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3799
-  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3819
+  #include <iostream>
+  #include <thread>
+  #include <chrono>
+
+  =
+
+  using namespace std::chrono_literals;
+
+  // Create/run and join a 100 threads.
+  void Fun100()
+  {
+  //    auto b4 =3D getCurrentRSS();
+  //    std::cout << getCurrentRSS() << std::endl;
+      for(int n =3D 0; n < 100; n++)
+      {
+          std::thread t([]
+          {
+              std::this_thread::sleep_for( 10ms );
+          });
+  //        std::cout << n << ' ' << getCurrentRSS() << std::endl;
+          t.join();
+      }
+      std::this_thread::sleep_for( 500ms ); // to give OS some time to wipe=
+ memory...
+  //    auto after =3D getCurrentRSS();
+      std::cout << b4 << ' ' << after << std::endl;
+  }
+
+  =
+
+  int main(int, char **)
+  {
+      Fun100();
+      Fun100();  // memory used keeps increasing
+  }
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829779/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1836558/+subscriptions
 
