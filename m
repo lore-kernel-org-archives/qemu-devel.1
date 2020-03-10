@@ -2,90 +2,106 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 431FCC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A92C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:33:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B97E20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:31:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D943B20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:33:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uPQzn8nD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B97E20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jN1lLioe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D943B20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBez5-0003Zc-8i
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:31:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48993)
+	id 1jBf0Q-0005Ip-3G
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:33:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jBexq-0002ex-9L
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:31 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBezc-0004E6-VU
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jBexo-00038o-Ry
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:30 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36010)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jBexo-00036d-K4
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:28 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g62so1358311wme.1
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 06:30:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bo2tBndkpkzB6/29hZp0+G3KOqfBm7NxtWzBJP62dzw=;
- b=uPQzn8nDbz9zWbOgo0e//fzWTe413Ljvje4JJSFOOqJQ3Ow5vq29cuAsMMarfd6pG5
- 8gf2HKKVtWp/gmhuNFd8ErMg2YzjmmWgC3YUZeLfBNdYXOwAvZp61IqNki2QhBg7BbR9
- VAw47aBh+6r2Wd0Lm4YZ9q9RhnyWb+LlYlnR/7S5LVe/UIXSzzFmRcagjViFf302Cnk6
- ce93rctHsTozmbNFFnNdso1lHkgP+8Suap7i6mkFPsVzWq7vy9M2XhqJO0mTrVzjHjO8
- tvpRO2QgpenFlogCvLYiBKV7dWSwwq4/sokQaD0OnRKGsKYvfKUr20jM6A1LXYpvSrl5
- uhVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=bo2tBndkpkzB6/29hZp0+G3KOqfBm7NxtWzBJP62dzw=;
- b=PjlB8SgqLMw3D7HusRKIOjJNjh+EnEROOGFHgTMmTzhgUAquKugydh42u+8qUa9Mem
- WFlYNORbs1ioCRiGsO6oi6g/ELenwTO5iM01ihzik5cHAJMs6Z4/yl/ZBNED+rM0eN+u
- s4LVy8rrPTBpgQazNpzt1anSGBuDR8N+U1vyLNNp8pCUG6TlTI/WXZhXBYGKXLpn6+C1
- RVjvHsie6SSCbQUVy5vzrina4Z2+pfXG9U/91edJjWAfuNorS8rAkiRMRJgpkjTO6m+w
- jP8exYJaRE2m7OzamMwSvZYsgipjWGjkL4INVkwzRslOzh79UewBiVnuXie89ia/O3ZP
- z0tw==
-X-Gm-Message-State: ANhLgQ3lpW+9Rx5d/99uQDlnHZp4+ZwFS25edtR/j8j0ONwIZGk90OV+
- 6ZcAD6HXo9aNuy7uEiQiGNu/nA==
-X-Google-Smtp-Source: ADFU+vv0j6is6BB58FmxqxXWJxw+06h32Y8LDKFkQ8+YH5nhKVvsMdir9NML49LQOSkcvjacYGjXIw==
-X-Received: by 2002:a05:600c:2213:: with SMTP id
- z19mr2101181wml.141.1583847027348; 
- Tue, 10 Mar 2020 06:30:27 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y69sm4254503wmd.46.2020.03.10.06.30.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 06:30:26 -0700 (PDT)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C0ECD1FF7E;
- Tue, 10 Mar 2020 13:30:24 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org,
-	qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] docs/system: add a little more detail to ARM machines
-Date: Tue, 10 Mar 2020 13:30:20 +0000
-Message-Id: <20200310133020.27196-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <mreitz@redhat.com>) id 1jBezb-0006oM-TQ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:32:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36116
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBezb-0006mK-Nb
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:32:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583847139;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=pA86EmBBIHLKbsW+oK8S2/1sCRBNqoQwSZNEL2blloU=;
+ b=jN1lLioeB8CEfkCwkhur4kmoJML/EVeGbzTbpwmDZ4ZwrK+0+Ztdm6XNLFunuyaIVfHjjB
+ /mzg9FoK+FoE31sjK/V+oViq6vACNocLBfwvkn23jbZmDyCqBTx7A5j2IegZ++b2yVIqH0
+ B7Wvv6g2K/T0++lSXMSHCYG3iR5OGSs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-8t1RHRFFNuum6zscn4BuMg-1; Tue, 10 Mar 2020 09:32:15 -0400
+X-MC-Unique: 8t1RHRFFNuum6zscn4BuMg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CF4385EE6D;
+ Tue, 10 Mar 2020 13:32:14 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ACD669182B;
+ Tue, 10 Mar 2020 13:32:11 +0000 (UTC)
+Subject: Re: [PATCH v3 2/9] block/block-copy: fix progress calculation
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
+ <20200306073831.7737-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <395858d9-43d4-89a0-d877-bb4ce29b473e@redhat.com>
+Date: Tue, 10 Mar 2020 14:32:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20200306073831.7737-3-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wAQst935oY1td9s5MylSPi9YarJyltLwM"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,114 +113,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Taking from the wiki page mention:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wAQst935oY1td9s5MylSPi9YarJyltLwM
+Content-Type: multipart/mixed; boundary="RcC7g4UuKX8cRc31ubobghVTnMPV4G0F2"
 
-  - both 32 and 64 bit architectures
-  - the roll of A/M profile chips
-  - warn about kernel portability
-  - gently suggest -M virt
-  - add headlines for groups of boards
+--RcC7g4UuKX8cRc31ubobghVTnMPV4G0F2
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-This is still incomplete but hopefully is a less of a straight dive
-into a dry list of peripherals.
+On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
+> Assume we have two regions, A and B, and region B is in-flight now,
+> region A is not yet touched, but it is unallocated and should be
+> skipped.
+>=20
+> Correspondingly, as progress we have
+>=20
+>   total =3D A + B
+>   current =3D 0
+>=20
+> If we reset unallocated region A and call progress_reset_callback,
+> it will calculate 0 bytes dirty in the bitmap and call
+> job_progress_set_remaining, which will set
+>=20
+>    total =3D current + 0 =3D 0 + 0 =3D 0
+>=20
+> So, B bytes are actually removed from total accounting. When job
+> finishes we'll have
+>=20
+>    total =3D 0
+>    current =3D B
+>=20
+> , which doesn't sound good.
+>=20
+> This is because we didn't considered in-flight bytes, actually when
+> calculating remaining, we should have set (in_flight + dirty_bytes)
+> as remaining, not only dirty_bytes.
+>=20
+> To fix it, let's refactor progress calculation, moving it to block-copy
+> itself instead of fixing callback. And, of course, track in_flight
+> bytes count.
+>=20
+> We still have to keep one callback, to maintain backup job bytes_read
+> calculation, but it will go on soon, when we turn the whole backup
+> process into one block_copy call.
+>=20
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  include/block/block-copy.h | 14 +++++---------
+>  block/backup.c             | 13 ++-----------
+>  block/block-copy.c         | 16 ++++++++++++----
+>  3 files changed, 19 insertions(+), 24 deletions(-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- docs/system/target-arm.rst | 47 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+Looks good, but I suppose we should also drop the
+ProgressResetCallbackFunc type.
 
-diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-index d2a3b44ce88..28aaef011d6 100644
---- a/docs/system/target-arm.rst
-+++ b/docs/system/target-arm.rst
-@@ -3,8 +3,35 @@
- ARM System emulator
- -------------------
- 
--Use the executable ``qemu-system-arm`` to simulate a ARM machine. The
--ARM Integrator/CP board is emulated with the following devices:
-+Use the executable ``qemu-system-arm`` to simulate a 32 bit ARM
-+machine. The ``qemu-system-aarch64`` executable is used to simulate
-+the 64 bit ARM AArch64 architecture. AArch64 CPUs can often include an
-+AArch32 execution unit and execute a mix of 64 and 32 bit code.
-+
-+The emulator supports both "A-profile" and "M-profile" CPUs. The
-+A-profile CPUs have a full MMU and can run things like the Linux while
-+the M-profile CPUs are typically used in embedded micro-controller
-+boards.
-+
-+Because ARM systems differ so much and in fundamental ways, typically
-+operating system or firmware images intended to run on one machine
-+will not run at all on any other.
-+
-+If you don't care about running on a particular piece of hardware the
-+``-M virt`` board provides a PCI based virtio board which can be
-+configured with a range of RAM sizes, CPU types and virtio based
-+peripherals. It is generally the target you want to use if general
-+purpose operating systems.
-+
-+Otherwise a range of other machine types are available. Passing ``-M
-+help`` to the command line will list them all. They include the
-+following:
-+
-+ARM Integrator/CP
-+~~~~~~~~~~~~~~~~~
-+
-+This is a development board intended for prototyping and developing
-+ARM-based devices.
- 
- -  ARM926E, ARM1026E, ARM946E, ARM1136 or Cortex-A8 CPU
- 
-@@ -18,7 +45,11 @@ ARM Integrator/CP board is emulated with the following devices:
- 
- -  PL181 MultiMedia Card Interface with SD card.
- 
--The ARM Versatile baseboard is emulated with the following devices:
-+ARM Versatile/Versatile Express
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Another family of development boards. The more recent Versatile
-+Express boards are designed for modern Cortex processors.
- 
- -  ARM926E, ARM1136 or Cortex-A8 CPU
- 
-@@ -45,6 +76,9 @@ The ARM Versatile baseboard is emulated with the following devices:
- 
- -  PL181 MultiMedia Card Interface with SD card.
- 
-+ARM RealView
-+~~~~~~~~~~~~
-+
- Several variants of the ARM RealView baseboard are emulated, including
- the EB, PB-A8 and PBX-A9. Due to interactions with the bootloader, only
- certain Linux kernel configurations work out of the box on these boards.
-@@ -77,6 +111,9 @@ The following devices are emulated:
- 
- -  PL181 MultiMedia Card Interface with SD card.
- 
-+Various PDA machines
-+~~~~~~~~~~~~~~~~~~~~
-+
- The XScale-based clamshell PDA models (\"Spitz\", \"Akita\", \"Borzoi\"
- and \"Terrier\") emulation includes the following peripherals:
- 
-@@ -156,6 +193,10 @@ Nokia N800 and N810 internet tablets (known also as RX-34 and RX-44 /
- -  Nokia RETU and TAHVO multi-purpose chips with an RTC, connected
-    through CBUS
- 
-+
-+M-profile boards
-+~~~~~~~~~~~~~~~~
-+
- The Luminary Micro Stellaris LM3S811EVB emulation includes the following
- devices:
- 
--- 
-2.20.1
+Max
+
+
+--RcC7g4UuKX8cRc31ubobghVTnMPV4G0F2--
+
+--wAQst935oY1td9s5MylSPi9YarJyltLwM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5nltkACgkQ9AfbAGHV
+z0AD1gf9H7fLxiZdWTDS4pOk9LNFvgkTkA3hBwBXpHfw/KcLKV7VrXWt1HCynYfb
+qHtdBaIvkkI3asO95JBYDkqluqSiNsQnXI5c8YW2K0VkxjiapfaxzoqJ357n3XV9
+E7XW0xOnpeS3HZougKKbDP/YmAfB/8u6QJ2kzTCntlYiaDK9FUWNsJYi4CKhqU2a
+h6N3lbSm60Ot4KujCW70NWlA7SEIivLt3iqh3M+J/rLAqwvHIA5iLN5Kknri5c4u
+vJw030XboZawCe7WEz2V5lPvDe7X3tVaikMkbXfU3PUV2IvRM4I2WrT2j5QLLyZd
+PDgJ+4j550IJqD8QYStES12nHdsfzQ==
+=C2jb
+-----END PGP SIGNATURE-----
+
+--wAQst935oY1td9s5MylSPi9YarJyltLwM--
 
 
