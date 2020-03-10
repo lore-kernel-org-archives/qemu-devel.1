@@ -2,77 +2,106 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB748C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C400BC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0BF20727
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:08:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FD9A20727
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:09:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1MXEk3x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0BF20727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="le8L/ns4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD9A20727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgUg-0003Sz-TU
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:08:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34239)
+	id 1jBgVu-00056Q-T2
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:09:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jBgHg-0007Bv-1U
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:04 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBgJI-0001rx-7X
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jBgHf-0002FL-2j
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34924
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jBgHe-0002E4-VL
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583852102;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g1Y7SAIkQ6YKL70iv+PevVOHVnPkk+5bW/+E3fVVoME=;
- b=Q1MXEk3xFv6bkIgyQvt6o1CVxR0MB5W9lYYWBAYsodifmCsFNcqD4pv2rpS2UKmy0B8TRn
- VeS1xBY/KhU/zdlT7woTUPnpz74LXRglc+bkgw0QpwqHC83mHD0bo9ed4x66aU0ZUueLZe
- 9O/ySJXjumT2APycfxAZA8Sr5JGpolY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-iCXgruqYP3KD12YZLIk2GA-1; Tue, 10 Mar 2020 10:54:25 -0400
-X-MC-Unique: iCXgruqYP3KD12YZLIk2GA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AACCF8017CC;
- Tue, 10 Mar 2020 14:54:23 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-117-85.ams2.redhat.com [10.36.117.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C111E60F89;
- Tue, 10 Mar 2020 14:54:20 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v5 01/13] libcflat: Add other size defines
-Date: Tue, 10 Mar 2020 15:53:58 +0100
-Message-Id: <20200310145410.26308-2-eric.auger@redhat.com>
-In-Reply-To: <20200310145410.26308-1-eric.auger@redhat.com>
-References: <20200310145410.26308-1-eric.auger@redhat.com>
+ (envelope-from <liran.alon@oracle.com>) id 1jBgJG-0006j1-OU
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:43 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:59430)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBgJF-0006Ze-5m
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:42 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEqx3N160864;
+ Tue, 10 Mar 2020 14:56:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=o/gBr0ijaiU8tOfu2ljig2IMh4oadadSpk649OMhkC8=;
+ b=le8L/ns4kLPJtkxgjGdD9ADR3pKI6v/uW6vvU4Ip0/sAYqS5ta20MUMkXjRAb3dw7ei5
+ C5QtjosJ6zz4EH5PZ3O72gj7hopECZhYjfdGB5JVaNjDklUX54J96WvVAmbmMQYa9/4J
+ Vl3klVJKQIgFgOiGnrhkNYBZKeHZ+1x5RUKy9c2aNu2b884J8VTcQcIqFNGC3U+dsq9b
+ YIYiNPC1T7NQJRQ0mLIqKLOoYdiDFHjpb10FAjYCTBf0eDE20qVPxpcuqXvtq3WVxPlX
+ /FO1zL9tcKftGMg4Zl3+NmDV6Icj9ja0Uyb1VO0AV8J9V1x41+/1+kRS/VwiyjvXkIIR 3A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2ym31ue2gr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 14:56:34 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEWQUc001299;
+ Tue, 10 Mar 2020 14:56:33 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2yp8nt8pj0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 14:56:33 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02AEuXAp025811;
+ Tue, 10 Mar 2020 14:56:33 GMT
+Received: from Lirans-MacBook-Pro.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 10 Mar 2020 07:56:32 -0700
+Subject: Re: [PATCH 07/14] hw/i386/vmport: Add support for CMD_GETBIOSUUID
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200309235411.76587-1-liran.alon@oracle.com>
+ <20200309235411.76587-8-liran.alon@oracle.com>
+ <20200310053305-mutt-send-email-mst@kernel.org>
+ <9213671d-75e9-b4d6-6e3d-c9221c2b7cc4@oracle.com>
+ <20200310071934-mutt-send-email-mst@kernel.org>
+ <0a826472-2fd4-75f8-2b32-9029fe980556@oracle.com>
+ <20200310103555-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <81a85aa1-2ae7-bbe0-3b66-754281d6fa86@oracle.com>
+Date: Tue, 10 Mar 2020 16:56:29 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200310103555-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100098
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ lowpriorityscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100098
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,37 +113,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
- thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce additional SZ_256, SZ_8K, SZ_16K macros that will
-be used by ITS tests.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- lib/libcflat.h | 3 +++
- 1 file changed, 3 insertions(+)
+On 10/03/2020 16:39, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 04:24:45PM +0200, Liran Alon wrote:
+>
+>> Re-thinking about this...
+>>
+>> QEMU VMPort interface was quite broken already (See first patch in series
+>> "hw/i386/vmport: Propagate IOPort read to vCPU EAX register").
+>> The introduction of that fix already changes the result of all existing
+>> commands from guest perspective which relied on return-value from
+>> vmport_ioport_read().
+>> E.g. CMD_GETVERSION and CMD_GETRAMSIZE.
+>>
+>> In theory, we should have also made that bug-fix be tied to machine-type. To
+>> similarly avoid the issue of migrating a VM from a working VMPort command
+>> implementation to a non-working one.
+>> i.e. In case of migrating from new QEMU to old QEMU. Do we wish to create a
+>> property-flag for that fix as-well?
+> Yes, I meants that too. Just include everything in the same property.
+It ugly the code with a lot of "if"s for maintaining compatibility for 
+guests that somehow relies on interface being broken and unusable.
+Can do this but am wondering if it's worth it.
+>
+>> Or can we just drop all the machine-type
+>> flags alltogether (Including the suggested "commands-v2")
+>> and declare this the first actually working VMPort implementation?
+>>
+>> -Liran
+> It's hard to be sure no one used this
 
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index ea19f61..7092af2 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -36,7 +36,10 @@
- #define ALIGN(x, a)		__ALIGN((x), (a))
- #define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) =3D=3D 0)
-=20
-+#define SZ_256			(1 << 8)
- #define SZ_4K			(1 << 12)
-+#define SZ_8K			(1 << 13)
-+#define SZ_16K			(1 << 14)
- #define SZ_64K			(1 << 16)
- #define SZ_2M			(1 << 21)
- #define SZ_1G			(1 << 30)
---=20
-2.20.1
+Well... Both implemented commands (CMD_GETVERSION and CMD_GETRRAMSIZE) 
+fails to return their proper value.
+CMD_GETVERSION will always return VMPORT_MAGIC that happened to be in 
+EAX previously (i.e. return 0x564D5868 instead of 6).
+CMD_GETRAMSIZE will always return VMPORT_MAGIC that happened to be in 
+EAX previously (i.e. return 0x564D5868 instead of VM RAM size).
+
+If guest somehow relied on this, it is already quite broken...
+My belief is that all upstream QEMU users today relies on VMPort only 
+for the sake of a functioning VMMouse which is indeed not broken because 
+vmmouse_set_data() explicitly override EAX.
+
+> , and the overhead isn't big.  But
+> that would be a maintainer call. In any case you need to call this out
+> explicitly in the commit log, and I guess block migration for old
+> machine types.
+>
+Blocking migration for old machine-types is a "no go" in my opinion as 
+vmport is enabled by default. It will cause too many VMs to need be able 
+to backwards migrate.
+
+So it's either doing nothing (as patch-series is now) or adding a flag 
+that adds a bunch of ugly "ifs" and is tied to a machine-type.
+
+-Liran
+
 
 
