@@ -2,92 +2,73 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B75C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 18:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B5FC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 18:06:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 230D620873
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 18:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CED0F2146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 18:06:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JoO+4W0g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230D620873
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dgt+AbCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED0F2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBjGO-00087k-Cw
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 14:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50816)
+	id 1jBjH5-0000cD-W2
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 14:06:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jBjF8-0006mY-I5
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:04:39 -0400
+ (envelope-from <wainersm@redhat.com>) id 1jBjFq-0007an-AU
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jBjF7-0001Ke-Ji
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:04:38 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46076
+ (envelope-from <wainersm@redhat.com>) id 1jBjFp-0004q0-DR
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:05:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24228
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jBjF7-0001Fn-Aa
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:04:37 -0400
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1jBjFp-0004nS-9x
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 14:05:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583863476;
+ s=mimecast20190719; t=1583863520;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=c+xOX9mv1vWnOIs8IVFTxa/x0zvudG4n7w9pUfQnze4=;
- b=JoO+4W0gWKSwKaIjisOkvP/L09nisCOs3bO3Y8FL1ES57hr5CAmYJI3s4/Et/G007shgIT
- Nqm1MGvf+4ElnT21Ey8iau79+7fcjLRb9qMQVHLwDR92K7v67D8NcGD2z7YOWXmNewEv4o
- H94QQiKzC8Memtd9gDCAvODJEOX9dOc=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-66Nx8vOeMWK-rC6l1rbuFQ-1; Tue, 10 Mar 2020 14:04:35 -0400
-X-MC-Unique: 66Nx8vOeMWK-rC6l1rbuFQ-1
-Received: by mail-qk1-f198.google.com with SMTP id b82so3317581qkc.11
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:04:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=X35yfMQwReR+oTrvPOM9crrpSHxbP8d45e9HTzSa+XQ=;
- b=sLZ4RffJy6sz7mDYuK34c5AeB7hWqPeb3vNetph961RRqGctBsPhK3o7udp5DP6PLQ
- 9zBGF71N+fCGZqL3lvR2h8au+mNh5+DIPpMlMeNFkuZ1ewUPCpvSQoVNv/M0m7t2CdDI
- t+qLWUZApKCWra/tTT1lu8z4ZA7iderl3436cIP+87x4zP96yEwDb5Q4Samk3OnAhKBP
- yPTrnqv6obHF8gyrMoFjGhq6l52hGWeOqtNSkiXx2QK7NbEmvCgA1F2FA3B6vTs3071n
- L9pV9mGM+menCQHcoRskthgWCl/OeUZ52zy7uzihgE6u9wAvqFbDd9a5TDHJIDop/qtS
- C29w==
-X-Gm-Message-State: ANhLgQ3SPdG6DPsA8RDVxtJSsFlKdoHZobMaYaGQotQ7OGWOMuuSvnsm
- 1hsGDZ6bQ+osqHWgEnWnGLf4UKwbj4Fwx9EJnk6HeCm9EIJCaSf1stHL13Jgm+XMOn32LWH+Z7n
- 1F7HLvJJVhKP91ec=
-X-Received: by 2002:aed:2266:: with SMTP id o35mr20192942qtc.392.1583863474460; 
- Tue, 10 Mar 2020 11:04:34 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vupJ9MZihiUVW/UcGwd8JnUygSYSdRRMpjccDmheeO6ochpXKGqUCT2sOLtGxhjDQqYp6q3KQ==
-X-Received: by 2002:aed:2266:: with SMTP id o35mr20192923qtc.392.1583863474153; 
- Tue, 10 Mar 2020 11:04:34 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id w204sm11834507qkb.133.2020.03.10.11.04.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 11:04:33 -0700 (PDT)
-Date: Tue, 10 Mar 2020 14:04:32 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: Re: [PATCH] hw/i386/intel_iommu: Fix out-of-bounds access on guest IRT
-Message-ID: <20200310180432.GB479302@xz-x1>
-References: <4b15b728-bdfe-3bbe-3a5c-ca3baeef3c5c@siemens.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=AskQw9qgYsEMOV22AdOqjDiWjiymP47kaacwlM6/4Xc=;
+ b=dgt+AbCh9NJXQmXukvSuAxIMZLUw/v7ddgcSrh+DR4SbHw3NglNi9L86HNZgf7AsyyF2D5
+ wF/1pYw3VNTjhRooT7B4//y/WPJUzekb8S9qRdZifYdiTYzg7jAyanvXySPSz5F6o72dAf
+ j+FJ6GPj+oTWKO01kgiESPgf4v9paUA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-rgO0qu1qN4GGZQElMZMvMg-1; Tue, 10 Mar 2020 14:05:19 -0400
+X-MC-Unique: rgO0qu1qN4GGZQElMZMvMg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04E05189D6C1;
+ Tue, 10 Mar 2020 18:05:18 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-125-115.rdu2.redhat.com
+ [10.10.125.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A428927184;
+ Tue, 10 Mar 2020 18:05:12 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] hw/mem/pc-dimm: Trivial code changes
+Date: Tue, 10 Mar 2020 15:05:08 -0300
+Message-Id: <20200310180510.19489-1-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4b15b728-bdfe-3bbe-3a5c-ca3baeef3c5c@siemens.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,33 +82,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, imammedo@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 06:42:11PM +0100, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
->=20
-> vtd_irte_get failed to check the index against the configured table
-> size, causing an out-of-bounds access on guest memory and potentially
-> misinterpreting the result.
->=20
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Improve one error message and fix one code style warning.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Wainer dos Santos Moschetta (2):
+  hw/mem/pc-dimm: Print slot number on error at pc_dimm_pre_plug()
+  hw/mem/pc-dimm: Fix line over 80 characters warning
 
-> ---
->=20
-> BTW, we still miss error reporting emulation, right? Therefore, I added=
-=20
-> that simple error_report_once thing, like the other paths do.
-
-Yes...
-
-Thanks,
+ hw/mem/pc-dimm.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 --=20
-Peter Xu
+2.24.1
 
 
