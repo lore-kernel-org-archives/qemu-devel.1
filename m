@@ -2,154 +2,104 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 608A5C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8370C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:33:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E2DB20578
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9423520578
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:33:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULofeUHN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2DB20578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpOnrc88"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9423520578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgt3-0007Jp-BB
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:33:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56695)
+	id 1jBgtK-0007dk-RT
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:33:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jBgqm-0005VY-4t
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:31:21 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBgsR-0006id-3w
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jBgqk-0002j6-IJ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:31:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54219
+ (envelope-from <mreitz@redhat.com>) id 1jBgsP-00005R-Qf
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:33:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24186
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jBgqk-0002gb-Db
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:31:18 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBgsP-0008Vw-MJ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:33:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583854277;
+ s=mimecast20190719; t=1583854381;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=edrFWErXktJwpAT3fRwoJ6W/7Yj+oPrWAEXvwRsf8Qk=;
- b=ULofeUHNMWBwrBNDRPByza/ZxwSzrszfgTRRRTAbBLjS8zDgFtx9QlboiraIZOOyD2sGDD
- FTa9uiH4iG4bmiDcQ/Y9sroBCJPmdVAEqMKoJ6o0BaZqRx/YsuVW6YfnsarS79AT1ZPAJl
- UoW0f+ToG6izTT0Ojzmlf5tuMneuB10=
+ bh=6ABJap80LElFuvEHfetuDSgrJ9axbWwyv1UXPUTJnWQ=;
+ b=OpOnrc886SlRoh8RBPMoZm3AfzruFGS/gnutbra7b6ucb+0EC3SStg1bTwKccWMURg1glO
+ Luldrf61+SoZM3P8INQcIB7y+DweRdFxgKKwcFzB/D/EawSavGZZVS3kmGcThGP5WZicN+
+ pQHqhVgOQQruxwwJ5SQfy3um9NADVOk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28--R-k0UtOOw6rOZ9A7HOIFg-1; Tue, 10 Mar 2020 11:31:15 -0400
-X-MC-Unique: -R-k0UtOOw6rOZ9A7HOIFg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-182-h4uJaBcDNpybkeHBW88wbw-1; Tue, 10 Mar 2020 11:32:57 -0400
+X-MC-Unique: h4uJaBcDNpybkeHBW88wbw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEF3B8017CC;
- Tue, 10 Mar 2020 15:31:13 +0000 (UTC)
-Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A2445D9CA;
- Tue, 10 Mar 2020 15:31:13 +0000 (UTC)
-Subject: Re: [PATCH v3 0/2] cmd646: remove pci_cmd646_ide_init() function
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- rth@twiddle.net
-References: <20200307091313.24190-1-mark.cave-ayland@ilande.co.uk>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <75528a74-96fb-260c-0348-5387da519296@redhat.com>
-Date: Tue, 10 Mar 2020 11:31:12 -0400
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F929107ACC4;
+ Tue, 10 Mar 2020 15:32:56 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7776F60BF4;
+ Tue, 10 Mar 2020 15:32:54 +0000 (UTC)
+Subject: Re: [PATCH v3 8/9] block/block-copy: reduce intersecting request lock
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
+ <20200306073831.7737-9-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d261061c-607b-d7a3-e43b-f436d46e4f0a@redhat.com>
+Date: Tue, 10 Mar 2020 16:32:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200307091313.24190-1-mark.cave-ayland@ilande.co.uk>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200306073831.7737-9-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="zG4kBNkr5JTX3hUbLRUGMzabqXC8fwEm4"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -163,48 +113,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zG4kBNkr5JTX3hUbLRUGMzabqXC8fwEm4
+Content-Type: multipart/mixed; boundary="4cbhubXc3lC6FtfrjiEgZRREUwtNl9Hof"
+
+--4cbhubXc3lC6FtfrjiEgZRREUwtNl9Hof
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
+> Currently, block_copy operation lock the whole requested region. But
+> there is no reason to lock clusters, which are already copied, it will
+> disturb other parallel block_copy requests for no reason.
+>=20
+> Let's instead do the following:
+>=20
+> Lock only sub-region, which we are going to operate on. Then, after
+> copying all dirty sub-regions, we should wait for intersecting
+> requests block-copy, if they failed, we should retry these new dirty
+> clusters.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  block/block-copy.c | 128 ++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 104 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index 2b29131653..d66b8eb691 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+
+[...]
+
+> +/* Called only on full-dirty region */
+>  static void block_copy_inflight_req_begin(BlockCopyState *s,
+>                                            BlockCopyInFlightReq *req,
+>                                            int64_t offset, int64_t bytes)
+>  {
+> +    assert(!find_conflicting_inflight_req(s, offset, bytes));
+> +
+> +    bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+> +    s->in_flight_bytes +=3D bytes;
+> +
+>      req->offset =3D offset;
+>      req->bytes =3D bytes;
+>      qemu_co_queue_init(&req->wait_queue);
+>      QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
+>  }
+> =20
+> -static void coroutine_fn block_copy_inflight_req_end(BlockCopyInFlightRe=
+q *req)
+> +/*
+> + * block_copy_inflight_req_shrink
+> + *
+> + * Drop the tail of the request to be handled later. Set dirty bits back=
+ and
+> + * wake up all requests waiting for us (may be some of them are not inte=
+rsecting
+> + * with shrunk request)
+> + */
+> +static void coroutine_fn block_copy_inflight_req_shrink(BlockCopyState *=
+s,
+> +        BlockCopyInFlightReq *req, int64_t new_bytes)
+>  {
+> +    if (new_bytes =3D=3D req->bytes) {
+> +        return;
+> +    }
+> +
+> +    assert(new_bytes > 0 && new_bytes < req->bytes);
+> +
+> +    bdrv_set_dirty_bitmap(s->copy_bitmap,
+> +                          req->offset + new_bytes, req->bytes - new_byte=
+s);
+
+I think we need to reduce in_flight_bytes here.
+
+> +
+> +    req->bytes =3D new_bytes;
+> +    qemu_co_queue_restart_all(&req->wait_queue);
+> +}
+> +
+> +static void coroutine_fn block_copy_inflight_req_end(BlockCopyState *s,
+> +                                                     BlockCopyInFlightRe=
+q *req,
+> +                                                     int ret)
+> +{
+> +    s->in_flight_bytes -=3D req->bytes;
+> +    if (ret < 0) {
+> +        bdrv_set_dirty_bitmap(s->copy_bitmap, req->offset, req->bytes);
+> +    }
+>      QLIST_REMOVE(req, list);
+>      qemu_co_queue_restart_all(&req->wait_queue);
+>  }
+
+[...]
+
+> @@ -432,7 +479,40 @@ int coroutine_fn block_copy(BlockCopyState *s,
+>          bytes -=3D cur_bytes;
+>      }
+> =20
+> -    block_copy_inflight_req_end(&req);
+> +    return found_dirty;
+> +}
+> +
+> +/*
+> + * block_copy
+> + *
+> + * Copy requested region, accordingly to dirty bitmap.
+> + * Collaborate with parallel block_copy requests: if they success it hel=
+p us. If
+
+s/success/succeed/, s/it help/it will help/
+
+> + * they fail, we retry not-copied regions. So, if we return error, it me=
+ans that
+
+s/retry/will retry/
+
+(In theory also s/it means/it will mean/, but I suppose that also works
+as-is.)
+
+> + * io operation failed in context of _this_ block_copy call, not some pa=
+rallel
+
+Perhaps rather =93some I/O operation failed in the context of [=85]=94?
+
+> + * operation.
+> + */
+> +int coroutine_fn block_copy(BlockCopyState *s, int64_t offset, int64_t b=
+ytes,
+> +                            bool *error_is_read)
+> +{
+> +    int ret;
+> +
+> +    do {
+> +        ret =3D block_copy_dirty_clusters(s, offset, bytes, error_is_rea=
+d);
+> +
+> +        if (ret =3D=3D 0) {
+> +            ret =3D block_copy_wait_one(s, offset, bytes);
+> +        }
+> +
+> +        /*
+> +         * We retry in two cases:
+> +         * 1. Some progress done
+> +         *    Something was copied, which means that there were yield po=
+ints
+> +         *    and some new dirty bits may have appeared (due to failed p=
+arallel
+> +         *    block-copy requests).
+> +         * 2. We have waited for some intersecting block-copy request
+> +         *    It may have failed and produced new dirty bits.
+> +         */
+> +    } while (ret > 0);
+> =20
+>      return ret;
+>  }
+
+This new code looks good.
+
+Max
 
 
-On 3/7/20 4:13 AM, Mark Cave-Ayland wrote:
-> The recent cmd646 discussions reminded me of this patch I've had sitting in an
-> old branch for a while.
-> 
-> The DP264 machine is the last remaining user of the deprecated
-> pci_cmd646_ide_init() init function. Switch it over to using qdev via pci_create()
-> and then remove the now-unused pci_cmd646_ide_init() function.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
-> v3:
-> - Rebase onto master
-> - Add R-B tag from Phil
-> - Use pci_create_simple() instead of pci_create() as suggested by Zoltan
-> 
-> v2:
-> - Rebase onto master
-> - Remove setting "secondary" property to 0 for dp264 since this is already the default
-> - Add R-B tags from Richard
-> 
-> 
-> Mark Cave-Ayland (2):
->   dp264: use pci_create_simple() to initialise the cmd646 device
->   cmd646: remove unused pci_cmd646_ide_init() function
-> 
->  hw/alpha/dp264.c |  6 +++++-
->  hw/ide/cmd646.c  | 12 ------------
->  include/hw/ide.h |  2 --
->  3 files changed, 5 insertions(+), 15 deletions(-)
-> 
+--4cbhubXc3lC6FtfrjiEgZRREUwtNl9Hof--
 
-Thanks, applied to my IDE tree:
+--zG4kBNkr5JTX3hUbLRUGMzabqXC8fwEm4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
+-----BEGIN PGP SIGNATURE-----
 
---js
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5nsyQACgkQ9AfbAGHV
+z0DvIwf/SWGr56EFduk50TgC09hX8DIoAACCp0OqxIVujzK5I5neuABAcj05peUt
+THG35UTrPK31o50agFrWqyPpB9So+D5FoEGAc9j7J16xDtPuVS6CYraSNrQk36GG
+OBoK2rmWArcDeAzcS8pRJxlMTvePijF3dA03qhECWjd1qUy+p03Y81FW9A+LS6Ps
+Pe82ls/lVKdPDe4jhNKx8PW4baJOv2jMrwHzREO38cs0exrQGzUEOcJBThtyNIbK
+OQPcmrCS3uHRHZHxgHTnDN/7VEi4AAmjeE9FzDC4S+9OazHSQTddN/T1JJhoNeQT
+/wCF0syJx0iSBwFW67EUOe3izrVeyQ==
+=PxRS
+-----END PGP SIGNATURE-----
+
+--zG4kBNkr5JTX3hUbLRUGMzabqXC8fwEm4--
 
 
