@@ -2,99 +2,110 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF446C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 17:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9246EC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 17:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACA8F21927
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 17:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B8C721D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 17:59:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7PivQKE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA8F21927
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NZARFedu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8C721D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBj5N-0001eb-Qb
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 13:54:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
+	id 1jBj9q-0003HD-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 13:59:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jBj4f-0001DR-Et
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:53:50 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBj99-0002c7-Ng
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jBj4d-0001a7-Ra
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:53:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37278
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jBj4d-0001WS-Ng
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:53:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583862826;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5i+9BmQW2HnWTZtXIfDBeNaFzeAC80VRIaZM2+zrlFQ=;
- b=c7PivQKEYiLHp6fxnSLfyzl6fSCfUBWBxBfTp9oSlEKp+0tWPqm17m2BbO1BzUVD7JiRj8
- +F0ZytydvkwBOn9BzdWqQBSwGVgV3Av/gEkxetXj/LL3UI44sxLVXjzrAwr6UKxe/sTBtM
- i/GihyBNlTIHV8xgZIJmKc4bsbR1eD8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-F5BQ6mBcNz2nqzL4uL_X_w-1; Tue, 10 Mar 2020 13:53:45 -0400
-X-MC-Unique: F5BQ6mBcNz2nqzL4uL_X_w-1
-Received: by mail-wm1-f71.google.com with SMTP id d129so679927wmd.2
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 10:53:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5i+9BmQW2HnWTZtXIfDBeNaFzeAC80VRIaZM2+zrlFQ=;
- b=TJYVO1B1xVcwsyau67QJZj3R6L0IUa79iguKqK5TKleRyDcXTZ68xL5ijtFKLERoGd
- YA91rvnfkTbLlqJOIY82UueeNlOJeT8KQ5NAhZZOigTWqngoGsnpJ2yAQFFacXvQEWt4
- GzwLBk5NDTiXNndZpHgF8msrWhnlQybP3rE+PSZiYa3kI3/4Ncs6Agqk+LSG6BxelbbD
- f2CunYtJlw8gSq3rxq6I/jtRICpr81n4cWGH6JEkxmfPwbYyoDWO016n4aSU0SckaPUK
- JcL3WKYlE7W5KkJPWyHVQuFCWArTGheoTqmBpSnPCV8RhO8DFu9t17pXZaNtF+VC8MGf
- Ks4g==
-X-Gm-Message-State: ANhLgQ1uP/DtUuCsUkTNMZtL8qWJSgko93nI+wF6bLSGIoPVkcBAAMef
- Wy6Xc/wW4zXVgsyCppho+HnuR8kuUbvnouRlyW3xrVSVrHOH3L4jZAlWSbhTUbw1L1wRck12OaH
- 8boMBNN+XlpaLvos=
-X-Received: by 2002:adf:9364:: with SMTP id 91mr22428121wro.223.1583862823840; 
- Tue, 10 Mar 2020 10:53:43 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsCmyFe3lPXVb1D7qy7HLLRIy2lvOzEQxZzBieR4r6s4sTRrBczJ3Bn+/PgMpl7s9K2FOpRiQ==
-X-Received: by 2002:adf:9364:: with SMTP id 91mr22428111wro.223.1583862823617; 
- Tue, 10 Mar 2020 10:53:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f1b5:9f9:3125:2a5a?
- ([2001:b07:6468:f312:f1b5:9f9:3125:2a5a])
- by smtp.gmail.com with ESMTPSA id f6sm4794739wmh.29.2020.03.10.10.53.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 10:53:43 -0700 (PDT)
-Subject: Re: [PATCH] hw/i386/intel_iommu: Fix out-of-bounds access on guest IRT
-To: Jan Kiszka <jan.kiszka@siemens.com>, Peter Xu <peterx@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
-References: <4b15b728-bdfe-3bbe-3a5c-ca3baeef3c5c@siemens.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <93446379-400a-8ed1-f0bb-648dfe97c3ba@redhat.com>
-Date: Tue, 10 Mar 2020 18:53:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <liran.alon@oracle.com>) id 1jBj97-0001Lo-KY
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:58:27 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBj97-0001H5-BK
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 13:58:25 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AHrMMl144335;
+ Tue, 10 Mar 2020 17:58:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=HV8Iwr0DteVjS3q2TLJELwn0PySRl/nA9TwjoDkVA0g=;
+ b=NZARFeduMn/NczJUshMzNElhNXfEQuWkqSFtVEbtK4wzpXHEHQYfVAL4X/cl+u+m4Dnu
+ pzpqqWnEl1voBtJqzr3mcPJG8jz2NBsMe0mNAls7BHuRV0/o3CSFR3GotAcCHAfqwcG+
+ SkO/RmpuaQMa/VzSw3Nso3I3N+GRNS4U7Fi8DN9wU9/0GGBOVecSHRjTP9PJQCIzJ9DK
+ VkvxiIzIdu167Zr1W7O+Xbv1t016/EJxWKeWZvh3cDQ0VH5hSGueZ5RkbEsUxX9uLkmw
+ tjqn6harGEoNIXxs2LJdoHHSTuv6PWSpGwju0k8w3Ppoz5aLdTCD52tMtQ+2lyI5UxBk qA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2yp7hm3h60-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 17:58:22 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AHrGMP015816;
+ Tue, 10 Mar 2020 17:58:22 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 2yp8qpjmpy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 17:58:22 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02AHwKiV010786;
+ Tue, 10 Mar 2020 17:58:20 GMT
+Received: from [192.168.14.112] (/79.181.212.171)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 10 Mar 2020 10:58:20 -0700
+Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200310081144-mutt-send-email-mst@kernel.org>
+ <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
+ <20200310082730-mutt-send-email-mst@kernel.org>
+ <506ba498-ba50-9415-18b3-bcaff1561c55@oracle.com>
+ <20200310084758-mutt-send-email-mst@kernel.org>
+ <1f4766b2-9683-8ebf-752e-a0378bb0cbc3@oracle.com>
+ <20200310094350-mutt-send-email-mst@kernel.org>
+ <6d3c248f-f8fe-754d-59e5-8f2740a55263@oracle.com>
+ <20200310104713-mutt-send-email-mst@kernel.org>
+ <8c856884-a5f1-d522-b0be-9edee6623ca4@oracle.com>
+ <20200310125426-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <e44d7551-d888-9a96-fb26-2b71b7bfdf01@oracle.com>
+Date: Tue, 10 Mar 2020 19:58:15 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <4b15b728-bdfe-3bbe-3a5c-ca3baeef3c5c@siemens.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200310125426-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ malwarescore=0 mlxscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100108
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ spamscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100108
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,47 +117,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/03/20 18:42, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
-> 
-> vtd_irte_get failed to check the index against the configured table
-> size, causing an out-of-bounds access on guest memory and potentially
-> misinterpreting the result.
-> 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
-> 
-> BTW, we still miss error reporting emulation, right? Therefore, I added 
-> that simple error_report_once thing, like the other paths do.
-> 
->  hw/i386/intel_iommu.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 204b6841ec..df7ad254ac 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3094,6 +3094,12 @@ static int vtd_irte_get(IntelIOMMUState *iommu, uint16_t index,
->      uint16_t mask, source_id;
->      uint8_t bus, bus_max, bus_min;
->  
-> +    if (index >= iommu->intr_size) {
-> +        error_report_once("%s: index too large: ind=0x%x",
-> +                          __func__, index);
-> +        return -VTD_FR_IR_INDEX_OVER;
-> +    }
-> +
->      addr = iommu->intr_root + index * sizeof(*entry);
->      if (dma_memory_read(&address_space_memory, addr, entry,
->                          sizeof(*entry))) {
-> 
 
-Queued, thanks.
+On 10/03/2020 19:36, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 06:39:33PM +0200, Liran Alon wrote:
+>>>> Isn't enum invented exactly for enumerating all possible values of a field?
+>>> No - it just assigns names to constants. If you then proceed not to use
+>>> the names, then it's pointless.
+>> It's not. It exactly lists all the various possible values.
+> That's not factually correct in this case. In C, enum does not
+> necessarily list all possible values generally. Neither is it always
+> used like this in QEMU. Neither does it do it in this case, nothing
+> prevents user from sticking any single-byte value in the property.
+It lists all currently known values for this enum. Exactly as you do in 
+your comment...
+The only way to prevent user from entering a value that is not defined 
+in enum is to restrict user to enum-values.
+Which can be done if you think it's appropriate. I think it just limits 
+production flexibility.
+>
+>> Giving new names to existing terminology that can be matched against
+>> existing guest code which interface with your device emulation is what
+>> requires guesswork.
+>> Using names matching the guest code driver is what doesn't require guesswork
+>> and is more intuitive to understand.
+> Yes, it's sometimes helpful to match guest driver since that helps debug
+> the whole stack. There's literally nothing to help debug here though.
+The "guest driver" in this case is open-vm-tools. And it helps that the 
+names match.
+> But if you feel strongly, here's a conversation starter.
+> But it raises some questions that need to be answered
+> properly:
+>
+>
+> /*
+>   * Virtual Machine eXecutable type (VMX).
+>   *
+>   * Most guests are fine with the default.
+>   *
+>   * Some legacy guests hard-code a given type.
+>
+> ^ Is this the real reason we are including this option?
+> Because if it is how is it helpful to add link to
+> the open-source drivers? These likely are not legacy ...
+The "driver" in this case is open-vm-tools.
+The legacy guests have proprietary drivers that mimics VMware Tools or a 
+subset of it's functionality.
+>
+>
+>   * See https://urldefense.com/v3/__https://github.com/vmware/open-vm-tools/blob/master/open-vm-tools/lib/include/vm_vmx_type.h__;!!GqivPVa7Brio!IuRMdod4d33nvVKOiG-itVXtxnHA9nAouQdYDxv3E62rIzVzPBWZ5M54D7BEF3g$
+>   * for an up-to-date list of values.
+>   * To help locate relevant portions of guest driver code
+>   * and debug guest failures, enum names from the above header
+>   * are listed below:
+>   *
+>   * Reasonable options:
+>   * 0 - unset? - see VMX_TYPE_UNSET
+>
+> 			^^^ Note as you know what this is, please write it up.
+>
+>   * 1 - VMware Express (deprecated) - see VMX_TYPE_UNSET
+>   * 2 - VMware ESX server - see VMX_TYPE_EXPRESS
+>   * 3 - VMware Server (deprecated) - see VMX_TYPE_WGS
+>   * 4 - VMware Workstation - see VMX_TYPE_WORKSTATION
+>   * 5 - ACE 1.x (deprecated) - see VMX_TYPE_WORKSTATION_ENTERPRISE
+>   */
+> DEFINE_PROP_UINT8("vm-executable-type", VMPortState, vm_executable_type, 2),
+>
+>
+> Maybe above is OK, if above questions can be addressed.
+I still don't understand why you view a comment to be better than an enum.
+This also contradict the approach taken for other enums in device 
+emulation code, as I have provided multiple examples in previous reply.
+>
+>
+>
+>> Let's agree that I will fix coding convention issue (VMX_Type -> VMXType)
+>> and link to open-vm-tools but remain with the enum.
+>> And see what other maintainers have to see about this on v2.
+> Sorry, if you don't address my comments from v1 please do not expect me
+> to review v2.  I also feel strongly about proper attribution.  Ignoring
+> original license on vmport.c making it depend on "GPL v2 but not later"
+> bits for cosmetic reasons just isn't right.
 
-Paolo
+Which part of license to I ignore?
+
+I fixed all the comments you have mentioned beside this thing that is 
+debatable. I wish to hear an additional opinion.
+If you really strongly insist on this, I can change this to what you 
+want without further discussion...
+
+Why not allow to review all the 15 patches besides a discussion of 
+whether constants should be defined in enum or comment?
+That seems a little harsh to me.
+
+-Liran
+
+
+
 
 
