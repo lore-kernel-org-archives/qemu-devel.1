@@ -2,108 +2,85 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737A2C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F384AC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BD8520674
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5C30205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:54:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6JBmaHR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD8520674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VM4W883o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5C30205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgFJ-0004RO-F8
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56480)
+	id 1jBgHR-00061Q-Vm
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jBgDS-0002tJ-IV
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:50:43 -0400
+ (envelope-from <kchamart@redhat.com>) id 1jBgGf-0005F2-6b
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jBgDR-0000aI-K4
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:50:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40588
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kchamart@redhat.com>) id 1jBgGe-0007QR-4u
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:54:01 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27945
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBgDR-0000XV-Dm
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:50:41 -0400
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1jBgGe-0007Ow-1G
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:54:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583851841;
+ s=mimecast20190719; t=1583852039;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9gqMhk2aZv8QvPgFVgodpZzg4YAjjiy5ft9QutMscj8=;
- b=W6JBmaHRi1OQlaUKHyl2r5FZFz+trFRc1ISgYz5LJN0b5xOhDxgB29YCt/v3MwRY/1qOdW
- gzRg38fEVMDBi36sAZVN8lQ415eP+vev6XcyKmbdL4mmrLthSLBwJuchiUNdk5cmvB4y8e
- 5z+5vYamvVo1SRy23gP3ZI51SMDCbBE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z2M2WV2Pj9ziGqEgBxJxP3f0n9bWbDBnsy/0DGzajiM=;
+ b=VM4W883omRTccBxIbDgj98gwgQ/Ft+0V7MIGHeBtRUTnzr1CBYTDuQ0+UnUms3RCZ1pYUg
+ 8rpB5aCVSXTHTlEMhM2jK2rYmCAE75LpJOj6JfqBy8sm4tAoo4bgS8egJI3rtC1TGc8lNL
+ 9Wl9588JfKCZO/RtfCPkiZPDZxyMVs0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-2FlmisSJP1iH_WafqpGbUw-1; Tue, 10 Mar 2020 10:50:33 -0400
-X-MC-Unique: 2FlmisSJP1iH_WafqpGbUw-1
+ us-mta-398-oBpVNgr8PRGjq_rGn6R3XA-1; Tue, 10 Mar 2020 10:53:55 -0400
+X-MC-Unique: oBpVNgr8PRGjq_rGn6R3XA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AA2C19067E7;
- Tue, 10 Mar 2020 14:50:32 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7D4873874;
- Tue, 10 Mar 2020 14:50:30 +0000 (UTC)
-Subject: Re: [PATCH v3 7/9] block/block-copy: rename start to offset in
- interfaces
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
- <20200306073831.7737-8-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <826a06c1-49d0-24a0-4098-fc0ec8f9f5a0@redhat.com>
-Date: Tue, 10 Mar 2020 15:50:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B543E107ACC7;
+ Tue, 10 Mar 2020 14:53:53 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F26DF73874;
+ Tue, 10 Mar 2020 14:53:50 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 8C88D3E04B8; Tue, 10 Mar 2020 15:53:49 +0100 (CET)
+Date: Tue, 10 Mar 2020 15:53:49 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v3 4/4] qemu-img: Deprecate use of -b without -F
+Message-ID: <20200310145349.GF22884@paraplu>
+References: <20200306225121.3199279-1-eblake@redhat.com>
+ <20200306225121.3199279-5-eblake@redhat.com>
+ <20200309153119.GA20640@paraplu>
+ <11ba06c9-fa1e-3168-0322-1859040b655e@redhat.com>
+ <20200310094723.GC22884@paraplu>
+ <2fd580c2-4b94-4430-1072-ef04bbd2da60@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200306073831.7737-8-vsementsov@virtuozzo.com>
+In-Reply-To: <2fd580c2-4b94-4430-1072-ef04bbd2da60@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NEZ5k1BGm0LB1aQxVtQKwwBOA7cvuqIYx"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,75 +92,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-block@nongnu.org,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NEZ5k1BGm0LB1aQxVtQKwwBOA7cvuqIYx
-Content-Type: multipart/mixed; boundary="XSB3zTv9Fy6D78ccLW5mLqH6vvvTBLXpv"
-
---XSB3zTv9Fy6D78ccLW5mLqH6vvvTBLXpv
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
-> offset/bytes pair is more usual naming in block layer, let's use it.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
->  include/block/block-copy.h |  4 +-
->  block/block-copy.c         | 84 +++++++++++++++++++-------------------
->  2 files changed, 44 insertions(+), 44 deletions(-)
-
+On Tue, Mar 10, 2020 at 07:15:29AM -0500, Eric Blake wrote:
+> On 3/10/20 4:47 AM, Kashyap Chamarthy wrote:
+=20
 [...]
 
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index 4c947e548b..2b29131653 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
-> @@ -25,13 +25,13 @@
->  #define BLOCK_COPY_MAX_MEM (128 * MiB)
-> =20
->  static BlockCopyInFlightReq *find_conflicting_inflight_req(BlockCopyStat=
-e *s,
-> -                                                           int64_t start=
-,
-> -                                                           int64_t bytes=
-)
-> +                                                          int64_t offset=
-,
-> +                                                          int64_t bytes)
+> > <digression>
+> >=20
+> > Ah, didn't realize the inconsistency of 'convert' lacking the '-F'
+> > shorthand ... which reminds me, there are at least _three_ ways that I
+> > know of, to specify backing file format with 'create':
+> >=20
+> >      $ qemu-img create -f qcow2 -o 'backing_file=3D./base.raw,backing_f=
+mt=3Draw' ./overlay1.qcow2
+> >      $ qemu-img create -f qcow2 -b ./base.raw -o backing_fmt=3Draw over=
+lay1.qcow2
+> >      $ qemu-img create -f qcow2 -b ./base.raw -F raw ./overlay1.qcow2
+> >=20
+> > I'm wondering about the consistency of having all the above three
+> > supported for other operations too.  Now I at least know 'convert' lack=
+s
+> > the "-F".
+>=20
+> The -o forms (backing_file=3D and backing_fmt=3D) always work.  Various c=
+ommands
+> then have additional shorthand: -b/-F for create, -B for convert.  You're
+> right that we aren't very consistent, but I'm reluctant to change the
+> inconsistencies in this patch=20
 
-The alignment=92s off now.
+Oh, I wasn't implying to tackle the inconsistency as part of this
+patch, or series.  Hence the 'digression' :-)  Was just wondering out
+loud.
 
-Max
+> (at one point in the past, we tried to get rid
+> of the shorthand and force all users to go through -o, but that broke too
+> many clients that were depending on the undocumented shorthand, so we
+> documented the existing shorthand instead).
 
+Fair enough; let's not touch these things for now.
 
---XSB3zTv9Fy6D78ccLW5mLqH6vvvTBLXpv--
-
---NEZ5k1BGm0LB1aQxVtQKwwBOA7cvuqIYx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5nqTUACgkQ9AfbAGHV
-z0Ceswf/XOQgllj1DuB4cLFBs/9CvPivEz+l7jKkxWu7EZMZDRSprqLbBbpDtANz
-sebnhx6t2mMi2XkkqEGltg8mtZeumEMjuqzxqGXH96oTv2PPUGdDn4zozBCJNCpL
-P6kdFVZ/hZqaCuhbw3V/IK17Rnsb50SrugxBx5m5HMqtWdVeriYLwPnJRvzHnt4M
-t7MqVqbWWRiHkkwzZFZ0T1wbNxdb2tEDMpMjIxhZyL4R3Rw8CIBLPDC8DYFmYNOc
-/TAV4YeHGv376Fyu2H1qrJ4p3f3M5U1c72hySOZK2Yl9Ptwf2Mbd/2+wkXPIuz5o
-ni+G+hDnCxySo7IiWZBtzntxtoYkMQ==
-=xpkW
------END PGP SIGNATURE-----
-
---NEZ5k1BGm0LB1aQxVtQKwwBOA7cvuqIYx--
+--=20
+/kashyap
 
 
