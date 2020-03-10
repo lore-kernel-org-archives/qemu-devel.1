@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF453C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0F6C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95C7A24649
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:37:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C7A24649
+	by mail.kernel.org (Postfix) with ESMTPS id A11DB24649
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11DB24649
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBcFv-0006gw-Pl
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 06:36:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41971)
+	id 1jBcGt-0000PE-Qa
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 06:37:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBcEa-000502-SP
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:35:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBcE0-00047b-It
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBcEZ-0001Ip-2o
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:35:36 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:33355)
+ (envelope-from <laurent@vivier.eu>) id 1jBcDy-0008Pf-Lf
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:35:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:39247)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBcEU-00015C-Jh; Tue, 10 Mar 2020 06:35:30 -0400
+ id 1jBcDy-0008Np-C4; Tue, 10 Mar 2020 06:34:58 -0400
 Received: from localhost.localdomain ([82.252.135.106]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mwfn8-1jZLOb1d18-00yCMx; Tue, 10 Mar 2020 11:34:35 +0100
+ id 1M5fZ4-1jHfxO2dR4-007C8t; Tue, 10 Mar 2020 11:34:28 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 18/21] linux-user,
- scripts: add a script to update syscall.tbl
-Date: Tue, 10 Mar 2020 11:34:00 +0100
-Message-Id: <20200310103403.3284090-19-laurent@vivier.eu>
+Subject: [PATCH v4 13/21] linux-user, x86_64,
+ i386: cleanup TARGET_NR_arch_prctl
+Date: Tue, 10 Mar 2020 11:33:55 +0100
+Message-Id: <20200310103403.3284090-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200310103403.3284090-1-laurent@vivier.eu>
 References: <20200310103403.3284090-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:s1bzgPY2Vf/MOHs2PEGnkQKPE33w0q71iaBmCRUZuR3rWmD0jVR
- 2UqlgrXvbuNKcK+t+y5MbuLoDMB/hL+/BuLN31a8bHRw4b6cjweaA+7Pd96pgKfRZWhy/c5
- LXLXxpMigr6g7kEbAo3MrkfnJCVrWHCmwIANPOELbTeiNr98gs7bmtfXu12B6Rp7oNdBK63
- dewECRzzm6W3G7mJ4gfmA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:twoqnOooQRk=:ZiUuaIOqFKWfgEDTPgAI+S
- 9tvBOvRLflPbbYeX8csLHlKO0IYvskEI9V1YdvxCJeqiTAvS3TiW4zwQo2wr6uoMW10iTA977
- GXda6MIBf16YPOamwY2M83vYnvagAGHt+E6EnsRKzxxtnf0iJm3jlKAtm84O2rI534iIzR4O3
- W6l+4twpNSosChRx3dnRry30DrpjELuilAnb31bhGRV7tttBqbIgdKsoqKcNIkWSStaID01zV
- QlgfpdQb+SdDUd1MmcfDE3lnWZNkG7l+oQV2obaiU/Q4N0c8P4RkkzxyjCDSl9IeajicjlSYF
- SZha2O/SRy1AXHpHKnhMksHW+iH/vAt9kxdlJQRVzL5zNXJi3sWXDTO9U/6m3lKXlZnXEiQm/
- USAseNz1FVlmhx+NP1xM8bECaiUN9TalRBb5QVfO0U72frtIrg3LkDUUz+7zNVVmGcXfnpaKY
- SOMzcR5M8kCj06tudbGO7CjpC08Aku3TDJExF31uAhXtGTSqNQgZBWvzXtUaZ6vGOp7iZROLu
- 7FDH6A7v/sXkvCQtvvmhG+nMnBHJazZmywFUMYM09Nm9+GufBALZe/tNqQby4P/rTniCzTumj
- MWo/3rZYjFmEBjmKxdEyMaFCGVkl1ciqUW65hwDJxN7cl90IGbAXYbwhz3kSivJNq8nLwta8A
- sR1LL3LuVjkpihBI9DUHt2kOU5byqwtzBeYUOkx8a7r8lDdawJrj+Kuk39IRGl2Md+oLn0rQt
- IdNScroMdqhe5nDT6SNuqMUiSgMlXNlKZpf1OZISYXhHXJqi0jVB5LrHVmkacr3Df7r0DktL7
- kwEx8qVeVQCHjY75lvSPDSjfdfLeqslb2qJyt9bJpBftJUe1vZPBwa9hOWEQMjpX/acXJqt
+X-Provags-ID: V03:K1:JMfjy5/7c3qMzApFbqRpNeFq4CWoeV3+w2FEWoaXZ8qj0FXQylw
+ i7I4G04Z6+mzGxbeAfGbAb8pphoyA5YINja2dDKp7fG43gmi0d8mTXjYcZ3dNFXfCHjCtSw
+ jjVlRC4F2CRtKlADxo03Q7jlF4UVzNxHZjfmSA4XCITWIEOfbyoAIjI+eoU0m6JaVuQwhEH
+ FFWOtaRNz5v7DEhANp+yA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mqwtP1i2yig=:ahBjceFpM/6SCV/MqdwOnM
+ h2zE+p31SL5qcCnNAon/NXKNM0yzburLNCos96J2xihFfDxfMy4vcyeRF4QqY0hWIyNGc0MWc
+ xH/eZBGQzS11FtRquPkqEF/xqmRBk1iUclISqX3pYAXaXlis5RmWVEKD7+vYnaSKim0DDHyPf
+ L7u75hhREtXsPBklHsWMoKIIu85I9khPAI1rnBJPOYm1kDJlViyS1wYpXYx4KZvjtf2Byy7le
+ sDgSIkMCxTHs9IS0wO4Lt4FsCdaqKm9CjsAUyO9VWphmybXf7MWnum2xsc2h/Wy4Iw76UMSww
+ wwZeTgfXONhp/vDphAsp26DFWC8oqS8u8QhIAbs41KpuiO9AwM9ZffdD0YNYEDw7Z+UOe/jfG
+ SaJNyLZYKDXyvP90p7FTwMrZQfk7EhkTPCUlJQdWAHB2u/T6V2NsmzPAKfBr9ggrYuP+wTjVL
+ oDMcB6m9B0Yau1OcjygZluNhr0UeXVIC/pGxqEjJKd19DfLW55iKGgNg0zCYTx8W089+IAnGj
+ o6Xlrvo5OzsXl81FkXptA6fJDpyusJ1eoizU5TakrLXTXbUXYPT4RzEfxU2dbluCT0OOnDct7
+ dAjDbtVEqT0a4gMzKpsQnHj8wZA7eHu9MfeuGkenCaGlq5qZeKUkmzvcEkmhW/RUnkDbRf7ux
+ 9TDQHL/sTQz0yPEw596qPuw+f9b6iJRJiUkUIyEOux2SPmHuN1IqMgT+TcgL70S00rB4ND2ZV
+ vYYt+D/25QsxS7RxalHbRs5eNpWGzNCtBbkg2V/AACjvD34imCswsJ9mThpnl0ruO3cIFB1nw
+ eId4VIt+L3LpvuVELo2NwfKZN+JpqWxsdrXo92EoYD2qcNPNNWHsFAYMZY8dnWbkMcbjRFZ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,84 +86,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-scripts/update-syscalltbl.sh has the list of syscall.tbl to update and
-can copy them from the linux source directory
+Define do_arch_prctl() for i386 and x86_64, but return -TARGET_ENOSYS
+for i386.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
 ---
- MAINTAINERS                  |  1 +
- scripts/update-syscalltbl.sh | 49 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
- create mode 100755 scripts/update-syscalltbl.sh
+ linux-user/i386/target_cpu.h |  4 ++--
+ linux-user/syscall.c         | 19 +++++++++++--------
+ 2 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36d0c6887a99..709832758e51 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2448,6 +2448,7 @@ S: Maintained
- F: linux-user/
- F: default-configs/*-linux-user.mak
- F: scripts/qemu-binfmt-conf.sh
-+F: scripts/update-syscalltbl.sh
+diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
+index 0b44530854c8..2207d24c2eb0 100644
+--- a/linux-user/i386/target_cpu.h
++++ b/linux-user/i386/target_cpu.h
+@@ -33,6 +33,8 @@ static inline void cpu_clone_regs_parent(CPUX86State *env, unsigned flags)
+ {
+ }
  
- Tiny Code Generator (TCG)
- -------------------------
-diff --git a/scripts/update-syscalltbl.sh b/scripts/update-syscalltbl.sh
-new file mode 100755
-index 000000000000..2d23e5680075
---- /dev/null
-+++ b/scripts/update-syscalltbl.sh
-@@ -0,0 +1,49 @@
-+TBL_LIST="\
-+arch/alpha/kernel/syscalls/syscall.tbl,linux-user/alpha/syscall.tbl \
-+arch/arm/tools/syscall.tbl,linux-user/arm/syscall.tbl \
-+arch/m68k/kernel/syscalls/syscall.tbl,linux-user/m68k/syscall.tbl \
-+arch/microblaze/kernel/syscalls/syscall.tbl,linux-user/microblaze/syscall.tbl \
-+arch/mips/kernel/syscalls/syscall_n32.tbl,linux-user/mips64/syscall_n32.tbl \
-+arch/mips/kernel/syscalls/syscall_n64.tbl,linux-user/mips64/syscall_n64.tbl \
-+arch/mips/kernel/syscalls/syscall_o32.tbl,linux-user/mips/syscall_o32.tbl \
-+arch/parisc/kernel/syscalls/syscall.tbl,linux-user/hppa/syscall.tbl \
-+arch/powerpc/kernel/syscalls/syscall.tbl,linux-user/ppc/syscall.tbl \
-+arch/s390/kernel/syscalls/syscall.tbl,linux-user/s390x/syscall.tbl \
-+arch/sh/kernel/syscalls/syscall.tbl,linux-user/sh4/syscall.tbl \
-+arch/sparc/kernel/syscalls/syscall.tbl,linux-user/sparc64/syscall.tbl \
-+arch/sparc/kernel/syscalls/syscall.tbl,linux-user/sparc/syscall.tbl \
-+arch/x86/entry/syscalls/syscall_32.tbl,linux-user/i386/syscall_32.tbl \
-+arch/x86/entry/syscalls/syscall_64.tbl,linux-user/x86_64/syscall_64.tbl \
-+arch/xtensa/kernel/syscalls/syscall.tbl,linux-user/xtensa/syscall.tbl\
-+"
++abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr);
 +
-+linux="$1"
-+output="$2"
-+
-+if [ -z "$linux" ] || ! [ -d "$linux" ]; then
-+    cat << EOF
-+usage: update-syscalltbl.sh LINUX_PATH [OUTPUT_PATH]
-+
-+LINUX_PATH      Linux kernel directory to obtain the syscall.tbl from
-+OUTPUT_PATH     output directory, usually the qemu source tree (default: $PWD)
-+EOF
-+    exit 1
-+fi
-+
-+if [ -z "$output" ]; then
-+    output="$PWD"
-+fi
-+
-+for entry in $TBL_LIST; do
-+    OFS="$IFS"
-+    IFS=,
-+    set $entry
-+    src=$1
-+    dst=$2
-+    IFS="$OFS"
-+    if ! cp "$linux/$src" "$output/$dst" ; then
-+        echo "Cannot copy $linux/$src to $output/$dst" 1>&2
-+        exit 1
-+    fi
-+done
-+
+ #if defined(TARGET_ABI32)
+ abi_long do_set_thread_area(CPUX86State *env, abi_ulong ptr);
+ 
+@@ -42,8 +44,6 @@ static inline void cpu_set_tls(CPUX86State *env, target_ulong newtls)
+     cpu_x86_load_seg(env, R_GS, env->segs[R_GS].selector);
+ }
+ #else
+-abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr);
+-
+ static inline void cpu_set_tls(CPUX86State *env, target_ulong newtls)
+ {
+     do_arch_prctl(env, TARGET_ARCH_SET_FS, newtls);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index f50a16070815..0eede7620664 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -5498,6 +5498,10 @@ static bitmask_transtbl mmap_flags_tbl[] = {
+     { 0, 0, 0, 0 }
+ };
+ 
++/*
++ * NOTE: TARGET_ABI32 is defined for TARGET_I386 (but not for TARGET_X86_64)
++ *       TARGET_I386 is defined if TARGET_X86_64 is defined
++ */
+ #if defined(TARGET_I386)
+ 
+ /* NOTE: there is really one LDT for all the threads */
+@@ -5637,7 +5641,7 @@ static abi_long do_modify_ldt(CPUX86State *env, int func, abi_ulong ptr,
+     return ret;
+ }
+ 
+-#if defined(TARGET_I386) && defined(TARGET_ABI32)
++#if defined(TARGET_ABI32)
+ abi_long do_set_thread_area(CPUX86State *env, abi_ulong ptr)
+ {
+     uint64_t *gdt_table = g2h(env->gdt.base);
+@@ -5769,9 +5773,12 @@ static abi_long do_get_thread_area(CPUX86State *env, abi_ulong ptr)
+     unlock_user_struct(target_ldt_info, ptr, 1);
+     return 0;
+ }
+-#endif /* TARGET_I386 && TARGET_ABI32 */
+ 
+-#ifndef TARGET_ABI32
++abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr)
++{
++    return -ENOSYS;
++}
++#else
+ abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr)
+ {
+     abi_long ret = 0;
+@@ -5804,7 +5811,7 @@ abi_long do_arch_prctl(CPUX86State *env, int code, abi_ulong addr)
+     }
+     return ret;
+ }
+-#endif
++#endif /* defined(TARGET_ABI32 */
+ 
+ #endif /* defined(TARGET_I386) */
+ 
+@@ -10247,11 +10254,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         break;
+ #ifdef TARGET_NR_arch_prctl
+     case TARGET_NR_arch_prctl:
+-#if defined(TARGET_I386) && !defined(TARGET_ABI32)
+         return do_arch_prctl(cpu_env, arg1, arg2);
+-#else
+-#error unreachable
+-#endif
+ #endif
+ #ifdef TARGET_NR_pread64
+     case TARGET_NR_pread64:
 -- 
 2.24.1
 
