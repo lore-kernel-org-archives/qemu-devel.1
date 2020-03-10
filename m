@@ -2,42 +2,45 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87619C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD479C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:18:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E80D20727
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:16:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E80D20727
+	by mail.kernel.org (Postfix) with ESMTPS id 62D5920873
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:18:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62D5920873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgcm-0008Az-IC
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43426)
+	id 1jBge0-0001rQ-AU
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:18:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jBgOT-0001zv-W4
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:02:10 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBgRh-00082H-Ed
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jBgOO-0001kV-T5
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:02:05 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:60543)
+ (envelope-from <laurent@vivier.eu>) id 1jBgRg-0000SD-5p
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:05:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:53235)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jBgOL-0001Wa-RH; Tue, 10 Mar 2020 11:01:58 -0400
+ id 1jBgRW-0008QU-Ox; Tue, 10 Mar 2020 11:05:15 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MNKyQ-1j0Cyq2uZG-00OrTB; Tue, 10 Mar 2020 16:01:26 +0100
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N1wdd-1jMITT02af-012Hyk; Tue, 10 Mar 2020 16:04:34 +0100
+Subject: Re: [PATCH] hw/scsi/megasas:Clean up some redundant code fix Clang
+ warnings
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 References: <20200310130844.30076-1-kuhn.chenqun@huawei.com>
+ <CAFEAcA_W2pRztEAmd1v+6O-1J9-CckVV8+G6kZ3igmR-ie6k+Q@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +84,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH] hw/scsi/megasas:Clean up some redundant code fix Clang
- warnings
-Message-ID: <bccf78b8-4c63-1587-742c-2595fe78e632@vivier.eu>
-Date: Tue, 10 Mar 2020 16:01:24 +0100
+Message-ID: <3e551fba-8bda-a2b4-d223-356493cac4db@vivier.eu>
+Date: Tue, 10 Mar 2020 16:04:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200310130844.30076-1-kuhn.chenqun@huawei.com>
+In-Reply-To: <CAFEAcA_W2pRztEAmd1v+6O-1J9-CckVV8+G6kZ3igmR-ie6k+Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:GiHOeaRLQQTOTlINiy4SADyFp1QMn97dMKxLoWqoggbacfXI0Kr
- YbK6/YNNVaRzB7maXqrAzYaEa3SLR4Y/tDuesMWYmmdbYNvxIp3i9tEBZoYgZLRc8I2Xs2Q
- jd5Bq6TjmePli11p/mn3mOWJtZUOPIZAd1e5Wgc7PlIdrEPl2ksjHb7oNHbTwaXNwy1o2Kv
- hDqTCF9lV3XxiLoJlypVQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DMFcKEtiNOw=:WXU03oMflDDRSp+6wIKLFj
- IpfD4WkQd30WuM6MUPONDh5RpOQuUPZvLzPXuaNzdvQrDaAEobLUQLF7paCbrNP7iyVWOFn8Z
- rrmJlCMpQmjRJ2hCwSlqYAG1AcPSwUXGfSmHkhrEwlwHrG/koNvSyp8mf23Y4AJn2BF2tMG4W
- ZlOoRIbcOUdBzC6sTaA1lfHyhhpfTm4NFoX7OvnXd/oedDTRePNcb78PjuzqPJYHnytLXqH43
- Awr9SdJkC8TIox6gp3IPO1It3X8v0aEhioygeEvwDhm6Skcgt50NmhWNatmSjsptCP6C6iFkD
- WBj6WGYatQCpPFgCo6JZn8VoBjbED5gAXv7WvBHl8uO/p53vzos5Ujr253mO30CPzi4THmtDY
- hJEGc89CHno1oemV5Z80tgl4zWCpNkZJeEZ0uwJjyLX0M1rCqPXOrxMpW6n+F/WZNdvnWe2oH
- d56XxrSvHHcM8QAuk5ObX/jBxxTn1pqsz1cdyDjTuTqS87HMIqqrhj0g+apdeyOe1JWFa9kcf
- EzvcE/tbX4ZGrg7leYODNBGGtay3XU3IZrdmWWCCajz7NU2yye22qY003314WiPJqgOPdk1bd
- s+Irg0sry0NOeevDkTNFGvaYsugzXQxv/HxoDHbTFR+pCJPuZYLMcDY2vHJsXCDKnq34rnwgG
- J+/deVywPGFprAYYlE1CM4ZbgBxY6daTtc6NfSEhWNY3tM+ydjKWM/5SzgIKZIGJrp8P6cauR
- qGW5c8KdL8mdAjwXSO3Z/NvdTc6lFSK8YJ+nkHjdBjVmdZ93WitNyBUkk0X2I9hRl54zz2rjo
- KkZmmU4bTI0RLM5IrfrD1UiazwZ3sKe+4gTDDUXGOKx8R5NCsYuXt4sMKrj3ab4zo6BVghv
+X-Provags-ID: V03:K1:JkLH/S6Rec/tr78Bh6CWTV1WIIdEuqwtEB7ZH8DNQ3uVKiAxW6G
+ BnpPLGIIo50DsNmfTd6mwBFDC5ZZ708uz4IhWemEC58iKeeBTVvOQyJ4Vji3niwoEJmL8ea
+ I/FmCbwpwuw9glQQ0hxwE4kcqIlVYUhvEYLJqn/SnOYWdnfbMhZIpgqwjIK18pB5IqVGym4
+ 6AIBEUhxnXA3Ke6TyjQfA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:SAtAZydQ0CQ=:AYTzFhbz+Jy1skKkrbbm3k
+ w3Hn4whqLnwgWIOq+ls5kQ4bSRjaMlRiWyIXp/21WjHsY/EfSBTQPnCFO5ak1zJy3rpTGoUzg
+ oYI+pJ+ZuVC7qGhhAHD2G6Pk4xEQdFXubrijcvKZeZ+ml7KzrFJcLh9EDJDjulXS+Y7TpmRD2
+ QQLVDPmQlJsylkcBOlYIkxtAltmA4SsNVEZsdiqudHxfwBY8e6wWLXS9oX3UriFireSaR5mnt
+ fnNlGn33ROx0VxVnu81IC6YORL1NpUpE6KOGZ7+wE3ifNZiSDQLSA/yxoFAih3Fs77sJKEaEF
+ 3ivOMu7VY3D77VGqbt0lyt6nWVPwNClEA6jZqUb25fHsCJAVA9LN6s4GkfDcOdknOCWU67hK2
+ odvdWUdkDEZ35T76rgDbBYc9U9hzPOVnqXy1bnhvuAcUcm5p8UdSmKrGlCxQjqFo0kwYg0kXE
+ taJ1cKgiCWFS2C/CDnHPYY7afm43LQu1kx61hRsWMN96VMgCanpsv6K4PrrBXvLZkZSHERe/6
+ SI1ptTQy5DfuAuzfGw6JNuQd80v/7X3QFTPzVUujI+4B30qyrZ7+wAZrD//K8mEVg2dxw3KtU
+ NSBr7wLgUGV22ApRnzOyYjviAkOeCeji74A6hgzRS1BZctIbrDIu0eVq2CBDS3/SMik+OOGnF
+ MmhwY5MxiyNIQBIQChFW3SFvoDZkx2pyr/fVVKU4xLLzcldgrNSqHyHljXaw1LTlNZy3zpXrV
+ bnMkJFyFJcu5ucFzR+sxa7chAMNQOu3KNNx0Yt5bCFJbY5YiHyCXa0IInv9FWK7mi858c3PLk
+ 9nmEByvKPYC1/ScUn5pTQop7MQcgitBRiEY0WNtmi06VUePjZpjihHySEVUg2sU2A7iLXQv
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,62 +124,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Hannes Reinecke <hare@suse.com>,
- zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Euler Robot <euler.robot@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/03/2020 à 14:08, Chen Qun a écrit :
-> Here are some redundant statements, we can clean them up.
-> Clang static code analyzer show warning:
-> hw/scsi/megasas.c:1175:32: warning: Value stored to 'max_ld_disks' during its initialization is never read
->     uint32_t num_ld_disks = 0, max_ld_disks = s->fw_luns;
->                                ^~~~~~~~~~~~   ~~~~~~~~~~
-> hw/scsi/megasas.c:1183:9: warning: Value stored to 'max_ld_disks' is never read
->         max_ld_disks = 0;
->         ^              ~
+Le 10/03/2020 à 14:46, Peter Maydell a écrit :
+> On Tue, 10 Mar 2020 at 13:10, Chen Qun <kuhn.chenqun@huawei.com> wrote:
+>>
+>> Here are some redundant statements, we can clean them up.
+>> Clang static code analyzer show warning:
+>> hw/scsi/megasas.c:1175:32: warning: Value stored to 'max_ld_disks' during its initialization is never read
+>>     uint32_t num_ld_disks = 0, max_ld_disks = s->fw_luns;
+>>                                ^~~~~~~~~~~~   ~~~~~~~~~~
+>> hw/scsi/megasas.c:1183:9: warning: Value stored to 'max_ld_disks' is never read
+>>         max_ld_disks = 0;
+>>         ^              ~
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+>> ---
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Fam Zheng <fam@euphon.net>
+>> Cc: Hannes Reinecke <hare@suse.com>
+>> Cc: qemu-block@nongnu.org
+>> ---
+>>  hw/scsi/megasas.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+>> index af18c88b65..3f982e1d3b 100644
+>> --- a/hw/scsi/megasas.c
+>> +++ b/hw/scsi/megasas.c
+>> @@ -1172,7 +1172,7 @@ static int megasas_dcmd_ld_list_query(MegasasState *s, MegasasCmd *cmd)
+>>      uint16_t flags;
+>>      struct mfi_ld_targetid_list info;
+>>      size_t dcmd_size = sizeof(info), resid;
+>> -    uint32_t num_ld_disks = 0, max_ld_disks = s->fw_luns;
+>> +    uint32_t num_ld_disks = 0, max_ld_disks;
+>>      BusChild *kid;
+>>
+>>      /* mbox0 contains flags */
+>> @@ -1180,7 +1180,6 @@ static int megasas_dcmd_ld_list_query(MegasasState *s, MegasasCmd *cmd)
+>>      trace_megasas_dcmd_ld_list_query(cmd->index, flags);
+>>      if (flags != MR_LD_QUERY_TYPE_ALL &&
+>>          flags != MR_LD_QUERY_TYPE_EXPOSED_TO_HOST) {
+>> -        max_ld_disks = 0;
+>>      }
+> 
+> This doesn't look right -- your change removes the only statement
+> in the body of this "if". I think you need to examine what the
+> function is trying to do with the test it is doing on these flags
+> in order to identify what the right change is... Probably this
+> means going back to the h/w spec to identify the correct behaviour
+> overall.
 
-This has been introduced by:
-
-d97ae3684863 ("megasas: fixup MFI_DCMD_LD_LIST_QUERY")
-
-And modified by:
-
-commit 3f2cd4dd47719497540fb0e0aa0635e127f2838f
-Author: Hannes Reinecke <hare@suse.de>
-Date:   Wed Oct 29 13:00:07 2014 +0100
-
-    megasas: fixup device mapping
-
-    Logical drives can only be addressed with the 'target_id' number;
-    LUN numbers cannot be selected.
-    Physical drives can be selected with both, target and LUN id.
-
-    So we should disallow LUN numbers not equal to 0 when in
-    RAID mode.
-
-    Signed-off-by: Hannes Reinecke <hare@suse.de>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-...
-@@ -1143,10 +1152,13 @@ static int
-megasas_dcmd_ld_list_query(MegasasState *s, MegasasCmd *cmd)
-         return MFI_STAT_INVALID_PARAMETER;
-     }
-     dcmd_size = sizeof(uint32_t) * 2 + 3;
--
-+    max_ld_disks = cmd->iov_size - dcmd_size;
-     if (megasas_is_jbod(s)) {
-         max_ld_disks = 0;
-     }
-+    if (max_ld_disks > MFI_MAX_LD) {
-+        max_ld_disks = MFI_MAX_LD;
-+    }
-     QTAILQ_FOREACH(kid, &s->bus.qbus.children, sibling) {
-         SCSIDevice *sdev = DO_UPCAST(SCSIDevice, qdev, kid->child);
-...
-
+Moreover this "if" is the only user of MR_LD_QUERY_TYPE_ALL and
+MR_LD_QUERY_TYPE_EXPOSED_TO_HOST.
 
 Thanks,
 Laurent
+
 
