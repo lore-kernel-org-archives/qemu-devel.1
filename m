@@ -2,101 +2,120 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2074CC18E5A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E0EC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:02:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2C9A20674
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:54:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCiErY3q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C9A20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D563F24649
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:02:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D563F24649
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60415 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBePL-0003ES-78
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:54:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59459)
+	id 1jBeWZ-0005ZT-0s
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:02:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jBeOU-0002nr-86
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:54:02 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jBeVC-0004es-UF
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:00:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jBeOS-0000iX-Gi
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:53:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59914
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBeOS-0000e6-5z
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:53:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583844835;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ur0BoRMxbPbOiTFBR5345OMILTdPYKQ2fCf+jly9Jwk=;
- b=bCiErY3qQjrWpTcqBh3dK7eUbhBD3cL6iIejJ7avI93Esh6SEdNVCABLucaAfTDXNvIQyY
- 3dgdmCKwrs1gTZUToucOhboXxAn1c5EesfCXCMFIZB0lZmS5vf23sfaBHhcgbupa1mS42Y
- PaP56LufO15EtZhEVL5gGSTlCS+cZFs=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-qmYWTkJ5NY-VU7jMXvgRWg-1; Tue, 10 Mar 2020 08:53:53 -0400
-X-MC-Unique: qmYWTkJ5NY-VU7jMXvgRWg-1
-Received: by mail-qt1-f199.google.com with SMTP id k20so9029985qtm.11
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 05:53:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=MPSUgjKUKIpncu4u/o4N26CFuFLYY1NmtWxe6gLBqRk=;
- b=V4p9OvkKZkTsMbe7nW01CGtf94F5s4Ln1cwbHLHP5xZsb5z5JLit/H7trfb67nbfTH
- xm0bOB30yHSc/EXOx/rGujKkgs7lullOU1YvLiz6SbfV0gZREl+wHUFC5KmH4nWwLKhM
- hlyEtUugz2d0TTbZF/8hPrKbhq49KvZrjOmW4D2ykw6bnmGw904QBt4uOpuicbgty+mQ
- /Ca840EFxvEq3WjmXGaGLihIgK8B0uwfRx2xkpgUnZ3HI7Jm4yw0YVRYjOKnJT0/KrTQ
- jO6+MQfIH3oKMKOMppSmJF1g83FT2jh5fYuVF9Q0QhkKD/KpUhlhkk6LTPHpL237TVbA
- 4VZA==
-X-Gm-Message-State: ANhLgQ2wuTWsRE774CDszsfMmV5VbhaEFnT8UEqksYcF4F7Kl50t8kgx
- JNm/mUFQB2WIEgfqEZuNEImo208oBfQwIiZf9WTt3WFnEsC7zbmCFpz5y4aDto+HllK4sNkV1C7
- IPz3ZdC8LnoooLYs=
-X-Received: by 2002:a05:620a:2085:: with SMTP id
- e5mr19210642qka.492.1583844832984; 
- Tue, 10 Mar 2020 05:53:52 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvTdRIfkKALKmFz6naqmzIXqBqfmvuR/Adb6ZXI9mZex/lMLkJqTfSA3SNLS6/4Dksj+gbQ0g==
-X-Received: by 2002:a05:620a:2085:: with SMTP id
- e5mr19210631qka.492.1583844832642; 
- Tue, 10 Mar 2020 05:53:52 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id j11sm22872394qtc.91.2020.03.10.05.53.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 05:53:51 -0700 (PDT)
-Date: Tue, 10 Mar 2020 08:53:46 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
-Message-ID: <20200310084758-mutt-send-email-mst@kernel.org>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-6-liran.alon@oracle.com>
- <20200310081144-mutt-send-email-mst@kernel.org>
- <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
- <20200310082730-mutt-send-email-mst@kernel.org>
- <506ba498-ba50-9415-18b3-bcaff1561c55@oracle.com>
+ (envelope-from <laurent@vivier.eu>) id 1jBeV7-000820-Pt
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:00:54 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:53565)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jBeV7-0007zD-FN; Tue, 10 Mar 2020 09:00:49 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MYedH-1iowfq0WOZ-00VdvT; Tue, 10 Mar 2020 14:00:25 +0100
+Subject: Re: [PATCH v3 04/12] scsi/esp-pci: Remove redundant statement in
+ esp_pci_io_write()
+To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>
+References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
+ <20200302130715.29440-6-kuhn.chenqun@huawei.com>
+ <111d4416-2281-6f8d-9b1d-66e60a05e02a@vivier.eu>
+ <7412CDE03601674DA8197E2EBD8937E83B681D85@dggemm511-mbx.china.huawei.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <88cf82c2-9318-1be9-1d56-b1af891acdea@vivier.eu>
+Date: Tue, 10 Mar 2020 14:00:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <506ba498-ba50-9415-18b3-bcaff1561c55@oracle.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B681D85@dggemm511-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:g1D0t4oSLKzMdYiH8RvEfUeTUQxuSFR/83A2KrcieVp+T0GOrAK
+ s60038tBQVkEhqcA1vL+LRQrHjOWW5/KFnw1sfHIrIIlylldH4Q5DUzurOPNBwWsq1D9eOn
+ zSn3hcSAGS/dlJRvT7o8Ht6H73dKr8iEjo+TGE4Ry25bGOLGizEd4BI02Cx6zMfbKfBb6h9
+ 5GXwczOZif2gy/l5dBTvw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rBU6bvA0PWE=:AuomNXMMOv5cfSnv+2O66o
+ LPj8uGFbx9ZhTLeBEv0qzmxCRuR9nODcuRkLk7vfnV8Az0dj9Zh6Ar30jX43YdEAzVW6yJkYU
+ o+w5aCKHIomCU/3SYXqNtEFM+EfdwTITI2G7av5GdCzXs7Gv8Y3+CUJ3mDi1pvBMjOfxLttVD
+ U5bT6UPKiQrlY9KGl7vQsGRninAfj5dTL35ZRYxri0njvyS4qkEs2DOmvwbfyS7Y8pH1Guk7S
+ VpBjl4fua4pvgOoNGrR27PFWVvFIxT7jQwm0c0avmkG7sDhntLo0PzNCQ0qAD4wMZVlCV2wnZ
+ 6g8Xmtd2xkPxnAIuGHbeo1oa99nclCiFhKrKS4+KTlXk8xnXmTxxe80yWrKEiQixcVsYqRPBF
+ SUfKtFWOwNW/aBuzhdBao1A89c61dExHMNqjLtgygN5Zz2Zjuv9fMUEx2EEpKhWuGNl+LzA24
+ ulj25aLvvio89A2TcfLhdVEYTOlN+aH8b8lmtOld/S4a695WDYjy0/912B+BPlNzB86DjCU7X
+ Cv3OURgFBl5IxUpPPUWV2aYVmAHj9NP9NiOvUgExSyTGk7tuhyJ7ca4qXhsn5YyxmL5995FhW
+ lnVttYiC21EeMctE7K3wWqJ4IWlagSZsf7IOST3PanDTlHaPc/zBHXGCounEYjBbJFVQ7Y+ba
+ y8H9kzGcyEyc5cevf8e3T3Sb5XHACDfEWk/iuwpjS0covsR0Cn+mXCc2fSlfdpdDENGSMCGYQ
+ TgSc8ZHlkx0COYvU8NWlKZDc9LGzn61nf2b7fDaHfBihT9aKndhJ3HYWGKZxihphRKX8uTcfZ
+ 7uYURgaJylFKzhC+4BwcECV2mNWnbhCUgxvlSjUA9FTCDiAfEwemq3x1orEAM5r4FzXaZfg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,107 +127,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 02:43:51PM +0200, Liran Alon wrote:
->=20
-> On 10/03/2020 14:35, Michael S. Tsirkin wrote:
-> > On Tue, Mar 10, 2020 at 02:25:28PM +0200, Liran Alon wrote:
-> > > On 10/03/2020 14:14, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
-> > > > > As can be seen from VmCheck_GetVersion() in open-vm-tools code,
-> > > > > CMD_GETVERSION should return VMX type in ECX register.
-> > > > >=20
-> > > > > Default is to fake host as VMware ESX server. But user can contro=
-l
-> > > > > this value by "-global vmport.vmx-type=3DX".
-> > > > >=20
-> > > > > Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> > > > > ---
-> > > > >    hw/i386/vmport.c | 13 +++++++++++++
-> > > > >    1 file changed, 13 insertions(+)
-> > > > >=20
-> > > > > diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> > > > > index a2c8ff4b59cf..c03f57f2f636 100644
-> > > > > --- a/hw/i386/vmport.c
-> > > > > +++ b/hw/i386/vmport.c
-> > > > > @@ -36,6 +36,15 @@
-> > > > >    #define VMPORT_ENTRIES 0x2c
-> > > > >    #define VMPORT_MAGIC   0x564D5868
-> > > > > +typedef enum {
-> > > > > +   VMX_TYPE_UNSET =3D 0,
-> > > > > +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Expre=
-ss */
-> > > > > +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
-> > > > > +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Serve=
-r */
-> > > > > +   VMX_TYPE_WORKSTATION,
-> > > > > +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for A=
-CE 1.x */
-> > > > > +} VMX_Type;
-> > > > > +
-> > > > Is this really VMX type? And do users care what it is?
-> > > This enum is copied from open-vm-tools source code
-> > > (lib/include/vm_version.h). This is how it's called in VMware Tools
-> > > terminology... Don't blame me :)
-> > I don't even want to go look at it to check license compatibility, but
-> > IMHO that's just another reason to avoid copying it.
-> > Copying bad code isn't a good idea unless needed for
-> > compatibility.
-> Preserving original VMware terminology makes sense and is preferred in my
-> opinion. I think diverging from it is more confusing.
+Le 10/03/2020 à 12:52, Chenqun (kuhn) a écrit :
+>> -----Original Message-----
+>> From: Laurent Vivier [mailto:laurent@vivier.eu]
+>> Sent: Monday, March 9, 2020 8:22 PM
+>> To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>; qemu-
+>> devel@nongnu.org; qemu-trivial@nongnu.org
+>> Cc: peter.maydell@linaro.org; Euler Robot <euler.robot@huawei.com>;
+>> Zhanghailiang <zhang.zhanghailiang@huawei.com>; Paolo Bonzini
+>> <pbonzini@redhat.com>
+>> Subject: Re: [PATCH v3 04/12] scsi/esp-pci: Remove redundant statement in
+>> esp_pci_io_write()
+>>
+>> Le 02/03/2020 à 14:07, Chen Qun a écrit :
+>>> Clang static code analyzer show warning:
+>>>   hw/scsi/esp-pci.c:198:9: warning: Value stored to 'size' is never read
+>>>         size = 4;
+>>>         ^      ~
+>>>
+>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+>>> ---
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com> Cc:Fam Zheng
+>> <fam@euphon.net>
+>>> ---
+>>>  hw/scsi/esp-pci.c | 1 -
+>>>  1 file changed, 1 deletion(-)
+>>>
+>>> diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c index
+>>> d5a1f9e017..2e6cc07d4e 100644
+>>> --- a/hw/scsi/esp-pci.c
+>>> +++ b/hw/scsi/esp-pci.c
+>>> @@ -195,7 +195,6 @@ static void esp_pci_io_write(void *opaque, hwaddr
+>> addr,
+>>>          val <<= shift;
+>>>          val |= current & ~(mask << shift);
+>>>          addr &= ~3;
+>>> -        size = 4;
+>>>      }
+>>
+>> perhaps a "g_assert(size >= 4)" instead would be cleaner to mute the warning?
+>>
+> Yes, add 'g_assert(size >= 4)' can mute the warning.
+> 
+>>
+>> I think it's a good point to update the size if in the future the code below is
+>> modified to use size.
+>>
+> Hmm, maybe it is true.
+> 
+> So, let's  keep ' size = 4'  and  add 'g_assert(size >= 4)' after if() statement , shall we?
 
-Yea tell it to people who got in hot water because they copied
-some variable names to avoid confusion. Oh wait.
+Yes, it's what I would prefer. But it's a question of taste...
 
-This is not an official terminology I think.
-So please just make it make sense by itself, and make it
-easy to research.
+Paolo? Fam?
 
-> >=20
-> >=20
-> > > > Also, how about friendlier string values so people don't need to
-> > > > figure out code numbers?
-> > > I could have defined a new PropertyInfo struct in hw/core/qdev-proper=
-ties.c
-> > > for this enum and then define a proper macro in qdev-properties.h.
-> > > But it seems like an overkill for a value that is suppose to rarely b=
-e
-> > > changed. So I thought this should suffice for now for user-experience
-> > > perspective.
-> > > If you think otherwise, I can do what I just suggested above.
-> > >=20
-> > > -Liran
-> > I think that's better, and this allows you to use official
-> > product names that people can relate to.
-> Ok. Will do...
-> >=20
-> > Alternatively just drop this enum completely.  As far as you are
-> > concerned it's just a number VM executable gives together with the
-> > version, right?  We don't even need the enum, just set it to 2 and add =
-a
-> > code comment saying it's esx server.
-> I could do the latter alternative but why? It just hides information
-> original patch author (myself) know about where this value comes from.
-> I don't see a reason to hide information from future code maintainers.
-> Similar to defining all flags of a given flag-field even if we use only a
-> subset of it.
->=20
-> -Liran
-
-That belongs in a code comment. Removes need to follow silly names from
-unrelated and possibly incompatible license.  By comparison dead code is
-dead code.  But sure, if you want to code up user friendly names, that's
-ok too. But do follow official names then please, not something lifted
-from some piece of code.
-
---=20
-MST
+Thanks,
+Laurent
 
 
