@@ -8,76 +8,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EF1C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2130C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 161C6222C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A374222C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 21:42:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0FlkszR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161C6222C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RS+DxZ7j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A374222C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBmct-0007Ql-Il
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:41:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53358)
+	id 1jBmds-0000Qp-CN
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 17:42:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUB-0000jo-Gx
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:25 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUI-0000xm-Ss
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBmU9-0008Gq-Sk
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:23 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36208)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBmUG-0008SF-0h
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 17:32:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50716)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jBmU9-0008Ex-LK; Tue, 10 Mar 2020 17:32:21 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s5so13871132wrg.3;
- Tue, 10 Mar 2020 14:32:21 -0700 (PDT)
+ id 1jBmUF-0008Pa-NH; Tue, 10 Mar 2020 17:32:27 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a5so3072366wmb.0;
+ Tue, 10 Mar 2020 14:32:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=KeVWgG0tQOdDh3sW6tFRRQGle6mis16f8XBbusoV4Zo=;
- b=J0FlkszRBqG4Mi7AM0T0DXUxaa6JqVLMAvgdSHOYPFdyaFue0H296OMmcvagtHYs5E
- 6MJXhfCIzeqOhAf+IcG3ppIEJZWmMEWdjUr1kakj1illr4XBzoOTBzMGUK7bglpc1HPy
- YCt+7RT+b+fc7ZCNRaeuHqvl643tsVTz86pCPhsZtftOXkUv5QXrfJXP6MuDjBZooxNe
- Yt/c3/29psLZOHnzTSh8DxLvIbR1jVIs1vlh0MgCw25srPy2HGty3LTwbtriCD1YYyvb
- ETe6pBBAoHLskIrkIFcf4xp5YHdOtxH6VCLYjel0QVXXkiV+kuCaOfuDjcWp5WThDV70
- t4Wg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=0P/rWCOfhT9JnQcS9p3ZeVjot7/8P5V7SBIoIKAPhe4=;
+ b=RS+DxZ7jklfglFBD/v2ZbODPW0sv6Upu4r580Zl+AAMCgDKN/T9ikeT2MM67c2MF2x
+ SPYYVI+GdewWJTFnzEL+LhsS5Ox7GlyDkUcYwSxOBZWRlfo4+3mUl8AhsoKI3jxQ6JDY
+ cMqgJ30PNnpvcvx9qMkhundR4aKrmdBASszGq/aMdLH+E1BHIxqu70+2+kPm0Rjag6RY
+ AcbUpc+BFUJJfqGhjsifEC9rRKWHVRJmEGzsvsKhIXbqrF/fsq2B1L0aJLid0iIuEGaH
+ 2B40OH9Dyq9eH0hQAY+431K4tGnZqQtTxNkWT/IOQS7aZnE+s70qhMbTrPFiUk8fP9sK
+ XAGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=KeVWgG0tQOdDh3sW6tFRRQGle6mis16f8XBbusoV4Zo=;
- b=PP9d6KUg4MChAu3CZprHzrL0js2I2AUg4Wd0VqtNO2H/BqHS39RTATdxc/PPn03Tta
- +MVsNpb0v1WeVLwmTZXFLwHqvNa9W8XjtFjvvOBoWhKAV99a9ueU7snmGElB9ZK/g0g/
- GosLpWjSU+5DkkP3Gg/Eeq6WvD6Mlx1oRluS8jMPQnoymaFM+w1m0RUyAKcU26FC9KvN
- dEi5tAKkjZSGrc5o1O0TNiPUIrSSaxBlaLbg75HhRSkaRAyyVmTStYCPe9XXwnJn+Kjd
- zdo+B2NAkxS1Pw396D1N6smmOj2DqMtT0LKhl6AhzOni0uzfjeGtQE0oeyuUYkzMKNXc
- zuCQ==
-X-Gm-Message-State: ANhLgQ3to0LClskX2wDIUuAjPCNMJsNEmcphD7BWX2PEp7hJjM9fqkpC
- NlVRBJTnlALYYB3ifR5cZATr8B4O
-X-Google-Smtp-Source: ADFU+vuxMCRRA2eEHeDV86z9zH9ilJcQiYikHNesEwPucmHY6h6eu2BbNV2c3aHL7tCEWtOkKNchJg==
-X-Received: by 2002:adf:ed09:: with SMTP id a9mr13275215wro.307.1583875940220; 
- Tue, 10 Mar 2020 14:32:20 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=0P/rWCOfhT9JnQcS9p3ZeVjot7/8P5V7SBIoIKAPhe4=;
+ b=IjdrWH/3ORG+pYGfie4pDawBanXy5Rhtz9blNoyBuciDAwCF/pgt8UA9QLGBGkb/5j
+ xaWBv9w9anRnnaXpRxwhyNCcpYO0E0aCHS5E7Z134PSNHRjE9NsXTx+X3xIEP5pKKjmd
+ 1IyB7Dph3V5uZXbRyRUE7+admjSifHYsPP5S0ihEdXEDVNnXsOm5z/S/bJMrksP882z6
+ /bZpIRYxlqsLUSKLOOqht/ge5g8A5ZO03ka+Yb+rezjmkokm9lMg5cLDaCAID9c7ev4q
+ o3o+wH5OzjvTVqfCX/Zra0cQkl9t71ebe8kDakJC11qeSiylrGGitnPRXY06kRvK5Ntz
+ 3/Ew==
+X-Gm-Message-State: ANhLgQ30GBEoxWLes5pQv1vvmguQF0M3tmF5PCz+W9uQ0+QYOLXui1z+
+ XQzmHClJBUQgc0mzaRntC7BadXYW8Pk=
+X-Google-Smtp-Source: ADFU+vsjJh0ipLp63W2ZKJ1+aoJY/NjhXZgYH9/ozvG89JQ407ab4GyHt38zpw1PuiUziAP+syJh3A==
+X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr4043761wmi.89.1583875946222;
+ Tue, 10 Mar 2020 14:32:26 -0700 (PDT)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.19
+ by smtp.gmail.com with ESMTPSA id 2sm32803580wrf.79.2020.03.10.14.32.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 14:32:19 -0700 (PDT)
+ Tue, 10 Mar 2020 14:32:25 -0700 (PDT)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 10/18] hw/arm/allwinner-h3: add Boot ROM support
-Date: Tue, 10 Mar 2020 22:31:55 +0100
-Message-Id: <20200310213203.18730-11-nieklinnenbank@gmail.com>
+Subject: [PATCH v7 16/18] tests/boot_linux_console: Add a SLOW test booting
+ Ubuntu on OrangePi PC
+Date: Tue, 10 Mar 2020 22:32:01 +0100
+Message-Id: <20200310213203.18730-17-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200310213203.18730-1-nieklinnenbank@gmail.com>
 References: <20200310213203.18730-1-nieklinnenbank@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,123 +95,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
  qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A real Allwinner H3 SoC contains a Boot ROM which is the
-first code that runs right after the SoC is powered on.
-The Boot ROM is responsible for loading user code (e.g. a bootloader)
-from any of the supported external devices and writing the downloaded
-code to internal SRAM. After loading the SoC begins executing the code
-written to SRAM.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This commits adds emulation of the Boot ROM firmware setup functionality
-by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
-64KiB, we limit the size to 32KiB because the real H3 Boot ROM also rejects
-sizes larger than 32KiB. For reference, this behaviour is documented
-by the Linux Sunxi project wiki at:
+This test boots Ubuntu Bionic on a OrangePi PC board.
 
-  https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
+As it requires 1GB of storage, and is slow, this test is disabled
+on automatic CI testing.
 
+It is useful for workstation testing. Currently Avocado timeouts too
+quickly, so we can't run userland commands.
+
+The kernel image and DeviceTree blob are built by the Armbian
+project (based on Debian):
+https://www.armbian.com/orange-pi-pc/
+
+The Ubuntu image is downloaded from:
+https://dl.armbian.com/orangepipc/Bionic_current
+
+This test can be run using:
+
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
+  console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
+  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi PC
+  console: DRAM:  1 GiB
+  console: MMC:   mmc@1c0f000: 0
+  [...]
+  console: Uncompressing Linux... done, booting the kernel.
+  console: Booting Linux on physical CPU 0x0
+  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
+  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
+  console: CPU: div instructions available: patching division code
+  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+  console: OF: fdt: Machine model: Xunlong Orange Pi PC
+  [...]
+  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+  console: done.
+  console: Begin: Running /scripts/local-bottom ... done.
+  console: Begin: Running /scripts/init-bottom ... done.
+  console: systemd[1]: systemd 237 running in system mode. (...)
+  console: systemd[1]: Detected architecture arm.
+  console: Welcome to Ubuntu 18.04.3 LTS!
+  console: systemd[1]: Set hostname to <orangepipc>.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
+[NL: changed test to boot from SD card via BootROM, added check for 7z]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- include/hw/arm/allwinner-h3.h | 21 +++++++++++++++++++++
- hw/arm/allwinner-h3.c         | 18 ++++++++++++++++++
- hw/arm/orangepi.c             |  5 +++++
- 3 files changed, 44 insertions(+)
+ tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index f9b9a02373..d338003724 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -46,6 +46,7 @@
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/net/allwinner-sun8i-emac.h"
- #include "target/arm/cpu.h"
-+#include "sysemu/block-backend.h"
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 0762dbe83a..e035c88b07 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -19,7 +19,13 @@ from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
++from avocado.utils.path import find_command, CmdNotFoundError
  
- /**
-  * Allwinner H3 device list
-@@ -129,4 +130,24 @@ typedef struct AwH3State {
-     MemoryRegion sram_c;
- } AwH3State;
++P7ZIP_AVAILABLE = True
++try:
++    find_command('7z')
++except CmdNotFoundError:
++    P7ZIP_AVAILABLE = False
  
-+/**
-+ * Emulate Boot ROM firmware setup functionality.
-+ *
-+ * A real Allwinner H3 SoC contains a Boot ROM
-+ * which is the first code that runs right after
-+ * the SoC is powered on. The Boot ROM is responsible
-+ * for loading user code (e.g. a bootloader) from any
-+ * of the supported external devices and writing the
-+ * downloaded code to internal SRAM. After loading the SoC
-+ * begins executing the code written to SRAM.
-+ *
-+ * This function emulates the Boot ROM by copying 32 KiB
-+ * of data from the given block device and writes it to
-+ * the start of the first internal SRAM memory.
-+ *
-+ * @s: Allwinner H3 state object pointer
-+ * @blk: Block backend device object pointer
-+ */
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk);
+ class BootLinuxConsole(Test):
+     """
+@@ -619,6 +625,48 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
+ 
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
++    def test_arm_orangepi_bionic(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:orangepi-pc
++        """
 +
- #endif /* HW_ARM_ALLWINNER_H3_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index d1245d2b01..56b5c563a8 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -29,6 +29,7 @@
- #include "hw/char/serial.h"
- #include "hw/misc/unimp.h"
- #include "hw/usb/hcd-ehci.h"
-+#include "hw/loader.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/allwinner-h3.h"
- 
-@@ -170,6 +171,23 @@ enum {
-     AW_H3_GIC_NUM_SPI       = 128
- };
- 
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk)
-+{
-+    const int64_t rom_size = 32 * KiB;
-+    uint8_t *buffer = g_new0(uint8_t, rom_size);
++        # This test download a 196MB compressed image and expand it to 932MB...
++        image_url = ('https://dl.armbian.com/orangepipc/archive/'
++                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
++        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
++        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
++        image_path = os.path.join(self.workdir, image_name)
++        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
 +
-+    if (blk_pread(blk, 8 * KiB, buffer, rom_size) < 0) {
-+        error_setg(&error_fatal, "%s: failed to read BlockBackend data",
-+                   __func__);
-+        return;
-+    }
++        self.vm.set_console()
++        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
++                         '-nic', 'user',
++                         '-no-reboot')
++        self.vm.launch()
 +
-+    rom_add_blob("allwinner-h3.bootrom", buffer, rom_size,
-+                  rom_size, s->memmap[AW_H3_SRAM_A1],
-+                  NULL, NULL, NULL, NULL, false);
-+    g_free(buffer);
-+}
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'loglevel=7 '
++                               'nosmp '
++                               'systemd.default_timeout_start_sec=9000 '
++                               'systemd.mask=armbian-zram-config.service '
++                               'systemd.mask=armbian-ramlog.service')
 +
- static void allwinner_h3_init(Object *obj)
- {
-     AwH3State *s = AW_H3(obj);
-diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-index 4299c59b8a..1c32d2898f 100644
---- a/hw/arm/orangepi.c
-+++ b/hw/arm/orangepi.c
-@@ -98,6 +98,11 @@ static void orangepi_init(MachineState *machine)
-     memory_region_add_subregion(get_system_memory(), h3->memmap[AW_H3_SDRAM],
-                                 machine->ram);
- 
-+    /* Load target kernel or start using BootROM */
-+    if (!machine->kernel_filename && blk_is_available(blk)) {
-+        /* Use Boot ROM to copy data from SD card to SRAM */
-+        allwinner_h3_bootrom_setup(h3, blk);
-+    }
-     orangepi_binfo.loader_start = h3->memmap[AW_H3_SDRAM];
-     orangepi_binfo.ram_size = machine->ram_size;
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
++        self.wait_for_console_pattern('U-Boot SPL')
++        self.wait_for_console_pattern('Autoboot in ')
++        exec_command_and_wait_for_pattern(self, ' ', '=>')
++        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
++                                                kernel_command_line + "'", '=>')
++        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++
++        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
++                                      'to <orangepipc>')
++        self.wait_for_console_pattern('Starting Load Kernel Modules...')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.17.1
 
