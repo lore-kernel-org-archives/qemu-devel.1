@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A36C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C525C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:56:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 529A721D7E
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AEA021D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 16:56:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I/jfGyPo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529A721D7E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OmhoJ0Rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AEA021D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBiB0-0005Kl-Jr
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 12:56:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49296)
+	id 1jBiB3-0005O1-Kg
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 12:56:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBi6V-0006Py-Ar
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:41 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBi6a-0006YD-J2
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBi6U-0005gR-63
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:39 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:48098)
+ (envelope-from <liran.alon@oracle.com>) id 1jBi6Z-0006GA-Io
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:44 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47996)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBi6T-0005ce-Ty
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:38 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AGdL8a104000;
- Tue, 10 Mar 2020 16:51:36 GMT
+ id 1jBi6Z-00066e-87
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 12:51:43 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AGcLo8010592;
+ Tue, 10 Mar 2020 16:51:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=U32aodggjpFbRI9pQdgcDhChVONF+RTDX2KHaPvvSBU=;
- b=I/jfGyPos0ezCP3qj5dWTo8LcbVXuPc6zC8oD4fp/jOpvt2gvmf6LcpptYjsSih7VM36
- BxqPjV9JsiQramPNaPRbhgTqE65amCeqxuPvVB9r1uSs2ZRnn+DpUlWyOpYnC/uzDZDb
- 0m4qQn+noqVbUYFbPrfVFYYM+QAcnVtTNgG4GncVW93R7I1b29EaRmxI4l3JGyKn3H9Z
- 57wdRvJQDg2tZrvjn81nT+cTMT4kI1U8l7f/6Cx9ULyTTnxuWEC6WPgG3PXze1QcIS0z
- Z94wouySSU+H6sNw/Ixp2e5Ilf1uAVJEiMc4zYFUzbcTpGxw7GNhm9yrX77WTnNolZE7 MQ== 
+ bh=UQjy1VwWA2VcbtHOtRUI+1J6Ijx9B1l+DyoKZk7XItI=;
+ b=OmhoJ0RpWL/ZcDxZjFoedbPkGT9uIbQYIJ1Iu5flnQUqcv/I4lmhQYCrgSjG5Hi/prJM
+ 2FwO4ysKTFJjdzzGC2e6gBrpFV4Wu6gvQyKEFo+/pQmoEVP8Q6m4PExkvNA/rPrHMNJZ
+ LMLnq0zFP4CVrxzxvRoVxqg3DBmVGTcqOPi+99g7meq+JDqW0gMevE5T+ywTO6v6h2Yc
+ czD5W/Ycd9tqurm8LGfMEyrfAO2osBMEF+SxDskWIXo+zEOmAknaBcw4pY06n985tZed
+ dQI9JUBpkYmPPiPBvW4J47rxFw+okHvy6kLl4C3GLmALckewO0vem+PSkpZofCBmF9u6 aA== 
 Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2yp7hm35pu-1
+ by aserp2120.oracle.com with ESMTP id 2yp9v61vcf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 16:51:36 +0000
+ Tue, 10 Mar 2020 16:51:41 +0000
 Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AGcOfS053104;
- Tue, 10 Mar 2020 16:51:35 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2yp8nu24su-1
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AGcOsm053102;
+ Tue, 10 Mar 2020 16:51:40 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3020.oracle.com with ESMTP id 2yp8nu25af-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 16:51:35 +0000
+ Tue, 10 Mar 2020 16:51:40 +0000
 Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02AGpYfm001913;
- Tue, 10 Mar 2020 16:51:34 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02AGpenU030680;
+ Tue, 10 Mar 2020 16:51:40 GMT
 Received: from spark.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 10 Mar 2020 09:51:34 -0700
+ with ESMTP ; Tue, 10 Mar 2020 09:51:39 -0700
 From: Liran Alon <liran.alon@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 04/16] hw/i386/vmport: Set EAX to -1 on failed and
- unsupported commands
-Date: Tue, 10 Mar 2020 18:53:20 +0200
-Message-Id: <20200310165332.140774-5-liran.alon@oracle.com>
+Subject: [PATCH v2 06/16] hw/i386/vmport: Report VMX type in CMD_GETVERSION
+Date: Tue, 10 Mar 2020 18:53:22 +0200
+Message-Id: <20200310165332.140774-7-liran.alon@oracle.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200310165332.140774-1-liran.alon@oracle.com>
 References: <20200310165332.140774-1-liran.alon@oracle.com>
@@ -86,14 +85,14 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
  definitions=main-2003100103
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9556
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- spamscore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0
- mlxlogscore=999 suspectscore=1 phishscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100103
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100103
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,56 +110,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is used as a signal for VMware Tools to know if a command it
-attempted to invoke, failed or is unsupported. As a result, VMware Tools
-will either report failure to user or fallback to another backdoor command
-in attempt to perform some operation.
+As can be seen from VmCheck_GetVersion() in open-vm-tools code,
+CMD_GETVERSION should return VMX type in ECX register.
 
-A few examples:
-* open-vm-tools TimeSyncReadHost() function fallbacks to
-CMD_GETTIMEFULL command when CMD_GETTIMEFULL_WITH_LAG
-fails/unsupported.
-* open-vm-tools Hostinfo_NestingSupported() function verifies
-EAX != -1 to check for success.
-* open-vm-tools Hostinfo_VCPUInfoBackdoor() functions checks
-if reserved-bit is set to indicate command is unimplemented.
+Default is to fake host as VMware ESX server. But user can control
+this value by "-global vmport.vmx-type=X".
 
 Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
 Signed-off-by: Liran Alon <liran.alon@oracle.com>
 ---
- hw/i386/vmport.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/i386/vmport.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 736d78263889..8115852720c8 100644
+index 0d3f19b0bb71..973f3f6448e9 100644
 --- a/hw/i386/vmport.c
 +++ b/hw/i386/vmport.c
-@@ -75,17 +75,23 @@ static uint64_t vmport_ioport_read(void *opaque, hwaddr addr,
+@@ -36,6 +36,16 @@
+ #define VMPORT_ENTRIES 0x2c
+ #define VMPORT_MAGIC   0x564D5868
  
-     eax = env->regs[R_EAX];
-     if (eax != VMPORT_MAGIC) {
--        goto out;
-+        goto err;
-     }
- 
-     command = env->regs[R_ECX];
-     trace_vmport_command(command);
-     if (command >= VMPORT_ENTRIES || !s->func[command]) {
-         qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
--        goto out;
-+        goto err;
-     }
- 
-     eax = s->func[command](s->opaque[command], addr);
-+    goto out;
++/* Enum taken from open-vm-tools lib/include/vm_vmx_type.h */
++typedef enum {
++   VMX_TYPE_UNSET = 0,
++   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Express */
++   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
++   VMX_TYPE_WGS,        /* Deprecated type used for VMware Server */
++   VMX_TYPE_WORKSTATION,
++   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for ACE 1.x */
++} VMXType;
 +
-+err:
-+    if (s->version > 1) {
-+        eax = UINT32_MAX;
-+    }
+ #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
  
- out:
-     /*
+ typedef struct VMPortState {
+@@ -46,6 +56,7 @@ typedef struct VMPortState {
+     void *opaque[VMPORT_ENTRIES];
+ 
+     uint32_t vmx_version;
++    uint8_t vmx_type;
+ 
+     uint8_t version;
+ } VMPortState;
+@@ -125,6 +136,9 @@ static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
+     X86CPU *cpu = X86_CPU(current_cpu);
+ 
+     cpu->env.regs[R_EBX] = VMPORT_MAGIC;
++    if (port_state->version > 1) {
++        cpu->env.regs[R_ECX] = port_state->vmx_type;
++    }
+     return port_state->vmx_version;
+ }
+ 
+@@ -191,6 +205,8 @@ static Property vmport_properties[] = {
+ 
+     /* Default value taken from open-vm-tools code VERSION_MAGIC definition */
+     DEFINE_PROP_UINT32("vmx-version", VMPortState, vmx_version, 6),
++    DEFINE_PROP_UINT8("vmx-type", VMPortState, vmx_type,
++                      VMX_TYPE_SCALABLE_SERVER),
+ 
+     DEFINE_PROP_END_OF_LIST(),
+ };
 -- 
 2.20.1
 
