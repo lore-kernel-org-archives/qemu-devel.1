@@ -2,65 +2,102 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B4AC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08609C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:27:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C81524655
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:26:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C81524655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C3DBC24655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:27:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eRGSXgM5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3DBC24655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdxv-0000dj-GP
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49188)
+	id 1jBdye-0001Kg-TD
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1jBdwc-0008Ni-CG
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:12 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBdxD-0000Rq-Km
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1jBdwa-0004Qh-LM
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:10 -0400
-Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:50717)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jBdwa-00048s-EP
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:08 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.35.197])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id F0C71127959
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 13:25:05 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id AF46B104FA79B;
- Tue, 10 Mar 2020 12:24:52 +0000 (UTC)
-Date: Tue, 10 Mar 2020 13:24:50 +0100
-From: Greg Kurz <groug@kaod.org>
+ (envelope-from <liran.alon@oracle.com>) id 1jBdx8-0007cg-UR
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:47 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:60354)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBdx4-0007PK-PU
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:42 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACMaUj073914;
+ Tue, 10 Mar 2020 12:25:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=q0f2cVAsS+gSPU1TLGzg45dV74mn0SLz/Dn3+uwV8OQ=;
+ b=eRGSXgM59tOJUGW1mWr+Mt8Yuj9k6QUBRCWnd31SuRj8Y71+a+xq2aGbdNfCwZuFRoOK
+ YSA83ifH9XEgL1U3ftjjNDyMDygGzXtBIdVksa0u6i/D7xq9RIT7/dSbxf0uRp0TP9n5
+ lgwpwhiykm9/ydFPGjbo8fhu6f/du3c165csyYVtzpqtJud0/kpsZtskCxmMxcJMF+LF
+ w/nVU8VcUXfYVdklfkCSVhhCjIlpJ25NTFhx1XmMw1PEFiymaSiuXDBr+vsdPNsHeeYm
+ asaDKYfr3ITrLObyMBmEbuQ1TSGFNT8pVySUd8rITIFPDKF2C7m5nCiKeNxLH2xs9wno 2g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2ym31ud7as-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 12:25:35 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACIdOI038079;
+ Tue, 10 Mar 2020 12:25:35 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2yp8nscu5n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 12:25:35 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ACPXsL019310;
+ Tue, 10 Mar 2020 12:25:33 GMT
+Received: from [192.168.14.112] (/79.181.212.171)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 10 Mar 2020 05:25:33 -0700
+Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 1/2] spapr: Disable legacy virtio devices for
- pseries-5.0 and later
-Message-ID: <20200310132450.603ac70c@bahia.home>
-In-Reply-To: <20200310065901-mutt-send-email-mst@kernel.org>
-References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
- <20200305043009.611636-2-david@gibson.dropbear.id.au>
- <20200305113146.6850f04b@bahia.home>
- <20200310104329.3dd232d2@bahia.home>
- <20200310065901-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+References: <20200309235411.76587-1-liran.alon@oracle.com>
+ <20200309235411.76587-6-liran.alon@oracle.com>
+ <20200310081144-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
+Date: Tue, 10 Mar 2020 14:25:28 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 9737063873581521369
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvtddgfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.109.80
+In-Reply-To: <20200310081144-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100083
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ lowpriorityscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100083
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,190 +109,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@samba.org,
- clg@kaod.org, mdroth@us.ibm.com, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Mar 2020 07:03:34 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Tue, Mar 10, 2020 at 10:43:29AM +0100, Greg Kurz wrote:
-> > On Thu, 5 Mar 2020 11:31:46 +0100
-> > Greg Kurz <groug@kaod.org> wrote:
-> >=20
-> > > On Thu,  5 Mar 2020 15:30:08 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >=20
-> > > > PAPR specifies a kind of odd, paravirtualized PCI bus, which looks =
-to
-> > > > the guess mostly like classic PCI, even if some of the individual
-> > > > devices on the bus are PCI Express.  One consequence of that is that
-> > > > virtio-pci devices still default to being in transitional mode, tho=
-ugh
-> > > > legacy mode is now disabled by default on current q35 x86 machine
-> > > > types.
-> > > >=20
-> > > > Legacy mode virtio devices aren't really necessary any more, and are
-> > > > causing some problems for future changes.  Therefore, for the
-> > > > pseries-5.0 machine type (and onwards), switch to modern-only
-> > > > virtio-pci devices by default.
-> > > >=20
-> > > > This does mean we no longer support guest kernels prior to 4.0, unl=
-ess
-> > > > they have modern virtio support backported (which some distro kerne=
-ls
-> > > > like that in RHEL7 do).
-> > > >=20
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > >=20
-> > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > >=20
-> > > FWIW, I could test the following:
-> > > - allows a RHEL7 guest with pre 4.0 kernel to boot, as mentioned
-> > >   in the changelog
-> > > - breaks boot of older RHEL 6.10 guests as expected
-> > > - allows migration of older machine types to/from QEMU 4.2
-> > >=20
-> > > Tested-by: Greg Kurz <groug@kaod.org>
-> > >=20
-> >=20
-> > Wait... I gave a try to virtiofsd and there's a problem:
-> >=20
-> > $ ./ppc64-softmmu/qemu-system-ppc64 -device vhost-user-fs-pci
-> > Unexpected error in object_property_find() at /home/greg/Work/qemu/qemu=
--ppc/qom/object.c:1231:
-> > qemu-system-ppc64: -device vhost-user-fs-pci: can't apply global virtio=
--pci.disable-legacy=3Don: Property '.disable-legacy' not found
-> > Aborted (core dumped)
-> >=20
-> > It is still not possible to set the disable-legacy prop on the
-> > vhost-user-fs-pci device, even without this patch, but QEMU
-> > doesn't abort:
-> >=20
-> > $ ./ppc64-softmmu/qemu-system-ppc64 -device vhost-user-fs-pci -global v=
-irtio-pci.disable-legacy=3Don
-> > qemu-system-ppc64: -device vhost-user-fs-pci: can't apply global virtio=
--pci.disable-legacy=3Don: Property '.disable-legacy' not found
-> > $
-> >=20
-> > It seems to be related to the fact that vhost-user-fs-pci is a non-tran=
-sitional
-> > only device, as shown with this workaround:
-> >=20
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -4574,7 +4574,7 @@ static void spapr_machine_latest_class_options(Ma=
-chineClass *mc)
-> >       * class since it doesn't have a compat_props.
-> >       */
-> >      static GlobalProperty compat[] =3D {
-> > -        { TYPE_VIRTIO_PCI, "disable-legacy", "on", },
-> > +        { TYPE_VIRTIO_PCI "-transitional", "disable-legacy", "on", },
-> >      };
-> > =20
-> >      mc->alias =3D "pseries";
->=20
-> Does this actually help? There's no type virtio-pci-transitional, is
-> there?
->=20
+On 10/03/2020 14:14, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
+>> As can be seen from VmCheck_GetVersion() in open-vm-tools code,
+>> CMD_GETVERSION should return VMX type in ECX register.
+>>
+>> Default is to fake host as VMware ESX server. But user can control
+>> this value by "-global vmport.vmx-type=X".
+>>
+>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>>   hw/i386/vmport.c | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
+>>
+>> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+>> index a2c8ff4b59cf..c03f57f2f636 100644
+>> --- a/hw/i386/vmport.c
+>> +++ b/hw/i386/vmport.c
+>> @@ -36,6 +36,15 @@
+>>   #define VMPORT_ENTRIES 0x2c
+>>   #define VMPORT_MAGIC   0x564D5868
+>>   
+>> +typedef enum {
+>> +   VMX_TYPE_UNSET = 0,
+>> +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Express */
+>> +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
+>> +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Server */
+>> +   VMX_TYPE_WORKSTATION,
+>> +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for ACE 1.x */
+>> +} VMX_Type;
+>> +
+> Is this really VMX type? And do users care what it is?
+This enum is copied from open-vm-tools source code 
+(lib/include/vm_version.h). This is how it's called in VMware Tools 
+terminology... Don't blame me :)
+> Also, how about friendlier string values so people don't need to
+> figure out code numbers?
 
-Oops you're right. There's no such type and it doesn't help in
-the end... I should have tried that with -global before posting
+I could have defined a new PropertyInfo struct in 
+hw/core/qdev-properties.c for this enum and then define a proper macro 
+in qdev-properties.h.
+But it seems like an overkill for a value that is suppose to rarely be 
+changed. So I thought this should suffice for now for user-experience 
+perspective.
+If you think otherwise, I can do what I just suggested above.
 
-   -global virtio-pci-transitional.disable-legacy=3Don
+-Liran
 
-qemu-system-ppc64: warning: global virtio-pci-transitional.disable-legacy h=
-as invalid class name
-
-Maybe worth adding a warning as well when done from the machine code, but
-this is another story. Sorry for the noise.
-
-> >=20
-> > but there's probably a better way to address this.
-> >=20
-> > MST, Any suggestion ?
->=20
-> Hmm I'm not sure how to fix this properly. The only idea that comes
-> to mind is a new internal-only "x-disable-legacy" that would be on virtio=
--pci,
-> duplicating functionality of disable-legacy but intended for
-> globals like this.
->=20
-
-Maybe but Daniel P. Berrang=C3=A9 jumped in and has some arguments
-against what we're trying to achieve with this series...
-
-A suivre.
-
->=20
->=20
-> > > >  hw/ppc/spapr.c | 17 +++++++++++++++++
-> > > >  1 file changed, 17 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index 2eb0d8f70d..3cfc98ac61 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -65,6 +65,7 @@
-> > > > =20
-> > > >  #include "hw/pci/pci.h"
-> > > >  #include "hw/scsi/scsi.h"
-> > > > +#include "hw/virtio/virtio-pci.h"
-> > > >  #include "hw/virtio/virtio-scsi.h"
-> > > >  #include "hw/virtio/vhost-scsi-common.h"
-> > > > =20
-> > > > @@ -4566,8 +4567,20 @@ static const TypeInfo spapr_machine_info =3D=
- {
-> > > > =20
-> > > >  static void spapr_machine_latest_class_options(MachineClass *mc)
-> > > >  {
-> > > > +    /*
-> > > > +     * Most defaults for the latest behaviour are inherited from t=
-he
-> > > > +     * base class, but we need to override the (non ppc specific)
-> > > > +     * default behaviour for virtio.  We can't do that from the ba=
-se
-> > > > +     * class since it doesn't have a compat_props.
-> > > > +     */
-> > > > +    static GlobalProperty compat[] =3D {
-> > > > +        { TYPE_VIRTIO_PCI, "disable-legacy", "on", },
-> > > > +    };
-> > > > +
-> > > >      mc->alias =3D "pseries";
-> > > >      mc->is_default =3D true;
-> > > > +
-> > > > +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat=
-));
-> > > >  }
-> > > > =20
-> > > >  #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)              =
-   \
-> > > > @@ -4607,6 +4620,9 @@ DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
-> > > >  static void spapr_machine_4_2_class_options(MachineClass *mc)
-> > > >  {
-> > > >      SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > > > +    static GlobalProperty compat[] =3D {
-> > > > +        { TYPE_VIRTIO_PCI, "disable-legacy", "auto" },
-> > > > +    };
-> > > > =20
-> > > >      spapr_machine_5_0_class_options(mc);
-> > > >      compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_=
-2_len);
-> > > > @@ -4614,6 +4630,7 @@ static void spapr_machine_4_2_class_options(M=
-achineClass *mc)
-> > > >      smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
-> > > >      smc->rma_limit =3D 16 * GiB;
-> > > >      mc->nvdimm_supported =3D false;
-> > > > +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat=
-));
-> > > >  }
-> > > > =20
-> > > >  DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
-> > >=20
->=20
-
+>
+>>   #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
+>>   
+>>   typedef struct VMPortState {
+>> @@ -46,6 +55,7 @@ typedef struct VMPortState {
+>>       void *opaque[VMPORT_ENTRIES];
+>>   
+>>       uint32_t vmx_version;
+>> +    uint8_t vmx_type;
+>>   } VMPortState;
+>>   
+>>   static VMPortState *port_state;
+>> @@ -114,6 +124,7 @@ static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
+>>       X86CPU *cpu = X86_CPU(current_cpu);
+>>   
+>>       cpu->env.regs[R_EBX] = VMPORT_MAGIC;
+>> +    cpu->env.regs[R_ECX] = port_state->vmx_type;
+>>       return port_state->vmx_version;
+>>   }
+>>   
+>> @@ -173,6 +184,8 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
+>>   static Property vmport_properties[] = {
+>>       /* Default value taken from open-vm-tools code VERSION_MAGIC definition */
+>>       DEFINE_PROP_UINT32("vmx-version", VMPortState, vmx_version, 6),
+>> +    DEFINE_PROP_UINT8("vmx-type", VMPortState, vmx_type,
+>> +                      VMX_TYPE_SCALABLE_SERVER),
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>   
+>> -- 
+>> 2.20.1
 
