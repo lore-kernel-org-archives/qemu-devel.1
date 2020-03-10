@@ -1,74 +1,85 @@
 Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C1FC18E7A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6099AC3F2D0
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDDAA246A6
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:46:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDDAA246A6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CF5FC24691
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:50:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aD95HXan"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5FC24691
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBeHP-0007Ag-5H
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:46:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47228)
+	id 1jBeLP-0001Pd-Q5
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:50:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBeGc-0006kO-3i
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:45:52 -0400
+ (envelope-from <luoyonggang@gmail.com>) id 1jBeJx-00006V-3N
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBeGa-0001tm-M9
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:45:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53642)
+ (envelope-from <luoyonggang@gmail.com>) id 1jBeJm-0001oU-Qu
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:49:16 -0400
+Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:42765)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBeGa-0001ql-Fu
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:45:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBeGZ-0004Qv-01
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 12:45:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F1DFD2E8029
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 12:45:46 +0000 (UTC)
+ (Exim 4.71) (envelope-from <luoyonggang@gmail.com>)
+ id 1jBeJl-0001fC-Rz; Tue, 10 Mar 2020 08:49:06 -0400
+Received: by mail-lf1-x12d.google.com with SMTP id t21so10746288lfe.9;
+ Tue, 10 Mar 2020 05:49:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=XgJvGryUi/7nwpplF+X3ulToxLCxBl5Kj24bGWZejLI=;
+ b=aD95HXany5IkkT40ySaulUB4+1d8mLnVptBeXgkTw8raoi/g9ESy9YIvbZBetcXKWk
+ ZgfNkVvTfTa898fj9dHkGw08o69gLBcqP+5k0vgFmomA2MrSwmHeO9tfmBJK/hI4YJd+
+ d4ZXe3JYb7UMAllSv9HFNmFk/3i6tV0wpExhH5506jvaIvzKR6QrEtb+ZTX40mjiZFOu
+ yCddpIrJWn01QFTRZupTvmabxND7OdWTMlAykwsim8mBT6HJCC+8awxEQ88jBaz0tqFA
+ Z3JQZOptdphqGaMRmWP3m9fEf4b4706EOapV6LN+ZKozfFKmEmbhv/eJOI0Rx1s3Sbp/
+ 3LPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=XgJvGryUi/7nwpplF+X3ulToxLCxBl5Kj24bGWZejLI=;
+ b=HPLysV7KfyjQSwHdpOs2a5bNj5hJaTUKyNYt5S5ElEZwxsiyUanTRithqwGfKky8+c
+ NUGZ0JQ6t42qpFlAZjskevJQ0g8Vt3sfcSQH0EQOa3UvYjky9LhNjHQK4biNlR2aJhgF
+ vQ6dnfCDQfWC8WVRaOAVYhOkpQtZrvOzipQrocOmgz9P0ZBlBoH4LPhHaOtrH9dXE7iK
+ /uH0opK7JwqUWRRTF2XuHW9rpbcmljZQ3+P61PwPGhAWB6IBPGcJQ9jBrTlw8KRthv8C
+ IAOQJblRBzQkC10B1PL6mDFSSkY6FifZaE4FXDk9ZS9Yu78xc9C9GdbycKqpSyRhTaMG
+ 4NHQ==
+X-Gm-Message-State: ANhLgQ3sf3HNVxyySIdooOCSFGtxyeTROnI4imo+HjBLl4GbDUkK3z3T
+ VH7pDJ4CEL9nXEpLw2H007b3MX67CFxosTdLaBA=
+X-Google-Smtp-Source: ADFU+vv/80h/XnfB0XxFr6GFbr+1q4ui/+4Ei1NumPxgd3zWlVup+I3uug99pL6uby4XCNAUtbZ+NYdVklNKj4CslR0=
+X-Received: by 2002:a05:6512:68a:: with SMTP id
+ t10mr12803736lfe.126.1583844541447; 
+ Tue, 10 Mar 2020 05:49:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Mar 2020 12:38:03 -0000
-From: Vitaly Kuznetsov <1813165@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
- tstrike34 vkuznets
-X-Launchpad-Bug-Reporter: Thomas (himbeere)
-X-Launchpad-Bug-Modifier: Vitaly Kuznetsov (vkuznets)
-References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
-Message-Id: <158384388341.6905.1746737040493034724.malone@chaenomeles.canonical.com>
-Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0f58bf3ff62461e313745d6b8c5e0dfcd95a592f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <CAE2XoE-XeFmmPHsy6KT-zHtRcZqZnuWzaXR+SkMP60cCL2jx0w@mail.gmail.com>
+ <20200310100418.GE140737@stefanha-x1.localdomain>
+In-Reply-To: <20200310100418.GE140737@stefanha-x1.localdomain>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Tue, 10 Mar 2020 20:48:49 +0800
+Message-ID: <CAE2XoE_aFDLGCFZvsxV+Q2nPqdOeUfQS8KJ+bUs3wwch1auzMw@mail.gmail.com>
+Subject: Re: I am trying to fixes a issue with QEMU with VxWorks.
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000045c22105a07f8b79"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::12d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,93 +88,2676 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
+Reply-To: luoyonggang@gmail.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry but I'm not at all familiar with bug reporting process in Ubuntu.
-The "KVM internal error. Suberror: 1" issue is definitely not libvirt
-related (may be induced by the VM configuration created in libvirt but
-that's it).
+--00000000000045c22105a07f8b79
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- =
+I  have already debugging it. I have infinite interrupt after calling to
+motTsecGracefulStop,
+I am simulating wrSbc834x using etsec with PPC.
+```
+Chain 0: 00000000088bad00 [00000000/00e0ccf0/0x2000] sysTimestamp64Set
+Trace 0: 0000000008a90940 [00000000/00e06358/0x2000] motTsecGracefulStop
+32-bits write 0x00001039 to register 0x00000
+32-bits write 0x00001002 to register 0x00000
+32-bits write 0x62110180 to register 0x00000
+32-bits write 0x00000935 to register 0x00000
+32-bits write 0x00000937 to register 0x00000
+Chain 0: 00000000086f9c40 [00000000/00e2b51c/0x2000] intUnlock
+Stopped execution of TB chain before 00000000086f9c40 [00e2b51c] intUnlock
+Trace 0: 00000000086f9c40 [00000000/00e2b51c/0x2000] intUnlock
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Stopped execution of TB chain before 00000000087501c0 [00e7bb78] windExit
+Raise exception at 00e7bb78 =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Linking TBs 0000000008901480 [00e08168] index 0 -> 0000000008902600
+[00e08278]
+Trace 0: 0000000008902600 [00000000/00e08278/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Stopped execution of TB chain before 00000000087762c0 [00e00c74]
+quiccIntrDeMux
+Trace 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Stopped execution of TB chain before 00000000087762c0 [00e00c74]
+quiccIntrDeMux
+Trace 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Stopped execution of TB chain before 0000000008772bc0 [00e00f48]
+quiccIvecToInum
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Stopped execution of TB chain before 0000000008752700 [00e050d8]
+timeMonitorCtxSwitchToTask2
+Trace 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Stopped execution of TB chain before 0000000008772200 [00e87294]
+excConnectCode
+Trace 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Stopped execution of TB chain before 0000000008748b00 [00e7c0b4] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Stopped execution of TB chain before 0000000008771f80 [00000500]
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt
+Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock
+Chain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce
+Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce
+Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdvance
+Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce
+Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce
+Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit
+Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit
+Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windExit
+Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit
+Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit
+Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit
+Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce
+Chain 0: 0000000008750500 [00000000/00e0d8f0/0] usrClock
+Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt
+Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock
+Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux
+Chain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt
+Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux
+Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock
+Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock
+Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock
+Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux
+Chain 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Stopped execution of TB chain before 0000000008776800 [00e872ac]
+excConnectCode
+Trace 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode
+Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit
+Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit
+Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit
+Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit
+Raise exception at 00e2b52c =3D> 00000004 (00)
+Trace 0: 0000000008771f80 [00000000/00000500/0]
+Chain 0: 00000000087720c0 [00000000/00e87280/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode
+Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux
+Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux
+Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum
+Chain 0: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux
+Chain 0: 0000000008773400 [00000000/00e00b38/0] quiccIntrDeMux
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock
+Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUnlock
+Raise exception at 00e2b52c =3D> 0000000a (00)
+Trace 0: 0000000008747a40 [00000000/00000900/0]
+Chain 0: 0000000008747b80 [00000000/00e87480/0] excConnectCode
+Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt
+Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt
+Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt
+Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr
+Chain 0: 0000000008749040 [00000000/00e7c0cc/0] intEnt
+Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode
+Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt
+Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet
+Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get
+Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt
+Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock
+```
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1813165
+On Tue, Mar 10, 2020 at 6:04 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-Title:
-  KVM internal error. Suberror: 1 emulation failure
+> On Mon, Mar 09, 2020 at 11:26:07AM +0800, =E7=BD=97=E5=8B=87=E5=88=9A(Yon=
+ggang Luo) wrote:
+> > When I am running QEMU to simulating PowerPC.
+> > And after running the following powerpc code:
+> > 00e2b5dc <intUnlock>:
+> > intUnlock():
+> >   e2b5dc: 54 63 04 20 rlwinm r3,r3,0,16,16
+> >   e2b5e0: 7c 80 00 a6 mfmsr r4
+> >   e2b5e4: 7c 83 1b 78 or r3,r4,r3
+> >   e2b5e8: 7c 60 01 24 mtmsr r3
+> >   e2b5ec: 4c 00 01 2c isync
+> >   e2b5f0: 4e 80 00 20 blr
+> >
+> > The QEMU are getting stuck and can not running the following
+> instructions,
+> > What I need to do to inspect which instruction are getting stuck and ho=
+w
+> to
+> > fix it?
+> > Any means to debugging that.
+>
+> CCing ppc maintainers.
+>
+> You could begin debugging this using QEMU's GDB stub (the -s
+> command-line option), TCG debug output (the -d command-line option), and
+> the HMP "info status" command to check that the CPU is running.
+>
+> Good luck!
+>
+> Stefan
+>
 
-Status in QEMU:
-  New
 
-Bug description:
-  Hello Devs.
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-  Having problems getting VM to run with qemu 3.1.0. I should mention
-  it's a nested configuration.
+--00000000000045c22105a07f8b79
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
-ersion: 3.1.0, kernel: 4.14.94, hostname: one....
-  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
-sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
-AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
-ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
-ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
-djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
-time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
-f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
-charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
-ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
-tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
-e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
-rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
-ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
-ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
--ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
-etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
-chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
-serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
-0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
-x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
-=3Ddeny -msg timestamp=3Don
-  char device redirected to /dev/pts/1 (label charserial0)
-  KVM internal error. Suberror: 1
-  emulation failure
-  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
-  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
-  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
-T=3D0
-  ES =3D0010 00000000 ffffffff 00c09300
-  CS =3D0000 00000000 00000fff 00809b00
-  SS =3D0010 00000000 ffffffff 00c09300
-  DS =3D0010 00000000 ffffffff 00c09300
-  FS =3D0010 00000000 ffffffff 00c09300
-  GS =3D0010 00000000 ffffffff 00c09300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     10387cfe 0000fe6c
-  IDT=3D     0010387c 00003810
-  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
-  EFER=3D0000000000000000
-  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
-a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
-b 25 a8 3b
-  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
-/usr/sbin/libvirtd)
+<div dir=3D"ltr">I=C2=A0 have already debugging it.=C2=A0I have infinite in=
+terrupt after calling to=C2=A0
 
-  Someone has an idea whats going wrong here?
+motTsecGracefulStop,<div>I am simulating wrSbc834x using etsec with PPC.<br=
+><div>```</div><div>Chain 0: 00000000088bad00 [00000000/00e0ccf0/0x2000] sy=
+sTimestamp64Set<br>Trace 0: 0000000008a90940 [00000000/00e06358/0x2000] mot=
+TsecGracefulStop<br>32-bits write 0x00001039 to register 0x00000<br>32-bits=
+ write 0x00001002 to register 0x00000<br>32-bits write 0x62110180 to regist=
+er 0x00000<br>32-bits write 0x00000935 to register 0x00000<br>32-bits write=
+ 0x00000937 to register 0x00000<br>Chain 0: 00000000086f9c40 [00000000/00e2=
+b51c/0x2000] intUnlock<br>Stopped execution of TB chain before 00000000086f=
+9c40 [00e2b51c] intUnlock<br>Trace 0: 00000000086f9c40 [00000000/00e2b51c/0=
+x2000] intUnlock<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Tr=
+ace 0: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0=
+ [00000000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [0000000=
+0/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] int=
+Ent<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0=
+000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [=
+00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040=
+ [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e872=
+94/0] excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] qui=
+ccIntrDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeM=
+ux<br>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Ch=
+ain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 00=
+00000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008=
+773180 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [0=
+0000000/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/0=
+0e2b51c/0] intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<b=
+r>Trace 0: 0000000008747a40 [00000000/00000900/0] <br>Chain 0: 000000000874=
+7b80 [00000000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [000=
+00000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0]=
+ intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace =
+0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748d=
+c0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 000000000874=
+9040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00=
+e87494/0] excConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0]=
+ sysClkInt<br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet=
+<br>Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Ch=
+ain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 0000000=
+0086b0ac0 [00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [000=
+00000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530=
+/0] intUnlock<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<=
+br>Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000=
+000000874c3c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9=
+c0 [00000000/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [000=
+00000/00e54b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [00000000/00=
+e7d238/0] windTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/=
+0] qPriListGetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] wi=
+ndTickAnnounce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnou=
+nce<br>Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0:=
+ 000000000874eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 000000000874eb=
+c0 [00000000/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [00000000/00=
+e7bb54/0] windExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windE=
+xit<br>Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>Stopped =
+execution of TB chain before 00000000087501c0 [00e7bb78] windExit<br>Raise =
+exception at 00e7bb78 =3D&gt; 0000000a (00)<br>Trace 0: 0000000008747a40 [0=
+0000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87480/0] exc=
+ConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br>Ch=
+ain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 0000000008=
+748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [00000000/=
+00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] timeM=
+onitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] int=
+Ent<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode<br>Ch=
+ain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain 0: 0000000=
+0086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 000000000874a180 =
+[00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a5c0 [00000=
+000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0=
+] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br=
+>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000=
+00000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 000000000874c180 [=
+00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000000/00e6f1=
+10/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] windT=
+ickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriListAdva=
+nce<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounce<br>=
+Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired<br>Chain=
+ 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Chain 0: 000=
+000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 000000000874e7=
+40 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [00000000/00=
+e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] windE=
+xit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<br>Trace 0:=
+ 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 00000000087501=
+c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [00000000/00=
+e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e0d8f0/0] u=
+srClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt<br>Cha=
+in 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Chain 0: 000=
+0000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [0=
+0000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc=
+/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit<br>T=
+race 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0: 00000000=
+087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [00000=
+000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e0d8f=
+0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt<=
+br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Chain =
+0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750=
+b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00=
+e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExi=
+t<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0: 00=
+000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00=
+ [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000/00e=
+00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168/0] =
+motTsecTxInt<br>Linking TBs 0000000008901480 [00e08168] index 0 -&gt; 00000=
+00008902600 [00e08278]<br>Trace 0: 0000000008902600 [00000000/00e08278/0] m=
+otTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeM=
+ux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace 0: 0=
+0000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086af140 =
+[00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/00e00c=
+74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0] exc=
+ConnectCode<br>Stopped execution of TB chain before 0000000008776800 [00e87=
+2ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0] excC=
+onnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Tr=
+ace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 000000000=
+8750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [0000000=
+0/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980 [000=
+00000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0=
+] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Rai=
+se exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000000008771f80=
+ [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0] =
+excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br=
+>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 0000000=
+008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [000000=
+00/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] ti=
+meMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] =
+intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<br=
+>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace 0:=
+ 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 00000000=
+08772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772ec0=
+ [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [0000000=
+0/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e00a=
+fc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] qui=
+ccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br=
+>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 0000=
+0000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [=
+00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/=
+00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0]=
+ quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<=
+br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 0000=
+0000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00=
+000000/00e00c74/0] quiccIntrDeMux<br>Stopped execution of TB chain before 0=
+0000000087762c0 [00e00c74] quiccIntrDeMux<br>Trace 0: 00000000087762c0 [000=
+00000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e=
+872ac/0] excConnectCode<br>Stopped execution of TB chain before 00000000087=
+76800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e8=
+72ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] i=
+ntExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace =
+0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752=
+700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 000000000=
+8752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [0000000=
+0/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] in=
+tExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000=
+000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/=
+00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/=
+0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trac=
+e 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000000874=
+8c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00=
+e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/=
+00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excCo=
+nnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux=
+<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace=
+ 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000=
+000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772=
+bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [000=
+00000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e=
+00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] =
+intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: =
+0000000008747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000=
+000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7b=
+f24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>=
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 00000000=
+08748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [0000000=
+0/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000=
+000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] e=
+xcConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<=
+br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0=
+: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 0000=
+00000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [=
+00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b=
+52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlo=
+ck<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0:=
+ 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3=
+c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [0000000=
+0/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54=
+b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] w=
+indTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriList=
+GetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnou=
+nce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chai=
+n 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 0000000008=
+74eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [0000000=
+0/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] w=
+indExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trac=
+e 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008=
+750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [000=
+00000/00e0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/=
+0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectC=
+ode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: =
+0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80=
+ [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c=
+344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<b=
+r>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 000=
+00000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 =
+[00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000=
+/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0=
+] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock=
+<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 000=
+00000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [0=
+0000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/0=
+0e872ac/0] excConnectCode<br>Stopped execution of TB chain before 000000000=
+8776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00=
+e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0]=
+ intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trac=
+e 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 00000000087=
+52700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000=
+008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000=
+000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] =
+intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 00=
+00000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [0000000=
+0/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf2=
+4/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Tr=
+ace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008=
+748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/=
+00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [0000000=
+0/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] exc=
+ConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeM=
+ux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00=
+00000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 00000000087=
+72bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [0=
+0000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/0=
+0e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0=
+] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br=
+>Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUnlock=
+<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 000000000=
+8747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87=
+480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] in=
+tEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: =
+0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 =
+[00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050b=
+c/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c=
+0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnect=
+Code<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain =
+0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 0000000=
+00874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a=
+5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/=
+00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] in=
+tUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Cha=
+in 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 00000000=
+0874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000=
+000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f=
+8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qP=
+riListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAn=
+nounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpire=
+d<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Ch=
+ain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 0000=
+00000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [0=
+0000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb4=
+8/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<b=
+r>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 0000=
+0000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [0=
+0000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e=
+0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClk=
+Int<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Ch=
+ain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 000000000=
+8750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [0000000=
+0/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] in=
+tExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0=
+: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b=
+0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000=
+/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168=
+/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIn=
+trDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace=
+ 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086a=
+f140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/0=
+0e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0=
+] excConnectCode<br>Stopped execution of TB chain before 0000000008776800 [=
+00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0]=
+ excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<=
+br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000=
+000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [00=
+000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980=
+ [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c=
+344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<b=
+r>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 00000000087=
+71f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e8728=
+0/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intE=
+nt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 00=
+00000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [0=
+0000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/=
+0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0c=
+c/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCo=
+de<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 000=
+0000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00000000087=
+72ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00=
+000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/0=
+0e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0=
+] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlo=
+ck<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0:=
+ 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773=
+640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [0000=
+0000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00b=
+a4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] int=
+Lock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0:=
+ 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c=
+0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [000000=
+00/00e872ac/0] excConnectCode<br>Stopped execution of TB chain before 00000=
+00008776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [0000000=
+0/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e=
+8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>=
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000=
+008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 000=
+0000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [0=
+0000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c=
+/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0=
+: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [000=
+00000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e=
+7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<b=
+r>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000=
+0008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000=
+000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [000=
+00000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0]=
+ excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccInt=
+rDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br=
+>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0=
+: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000=
+008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 000000000877318=
+0 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [000000=
+00/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b5=
+1c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnloc=
+k<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: =
+0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 000000000=
+8901480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00=
+000000/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00=
+e2b508/0] intLock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLoc=
+k<br>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00=
+000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Stopped execution of=
+ TB chain before 00000000087762c0 [00e00c74] quiccIntrDeMux<br>Trace 0: 000=
+00000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 000000000877=
+6800 [00000000/00e872ac/0] excConnectCode<br>Stopped execution of TB chain =
+before 0000000008776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776=
+800 [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [0000=
+0000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0]=
+ intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chai=
+n 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>=
+Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 0000000=
+0087516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000=
+000/00e7c34c/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00=
+)<br>Trace 0: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 000000000=
+87720c0 [00000000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [=
+00000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c=
+/0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Tra=
+ce 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 00000000087=
+48dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 000000000=
+8749040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000=
+/00e87294/0] excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20=
+/0] quiccIntrDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quicc=
+IntrDeMux<br>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInu=
+m<br>Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trac=
+e 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 000=
+0000008773180 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 000000000877=
+3400 [00000000/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [000=
+00000/00e2b51c/0] intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a=
+ (00)<br>Trace 0: 0000000008747a40 [00000000/00000900/0] <br>Chain 0: 00000=
+00008747b80 [00000000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747c=
+c0 [00000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7=
+c09c/0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br=
+>Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000=
+008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 00000=
+00008749040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [0000=
+0000/00e87494/0] excConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0=
+c654/0] sysClkInt<br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTime=
+BaseGet<br>Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Ge=
+t<br>Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: =
+00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c=
+00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/0=
+0e2b530/0] intUnlock<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sys=
+ClkInt<br>Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain=
+ 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 0000000=
+00874c9c0 [00000000/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d5=
+80 [00000000/00e54b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [0000=
+0000/00e7d238/0] windTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00=
+e54b8c/0] qPriListGetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d=
+4/0] windTickAnnounce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] ti=
+ckAnnounce<br>Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>T=
+race 0: 000000000874eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 0000000=
+00874ebc0 [00000000/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [0000=
+0000/00e7bb54/0] windExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0=
+] windExit<br>Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>C=
+hain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 000=
+0000008750500 [00000000/00e0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [=
+00000000/00e0c874/0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00e87=
+4ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] in=
+tExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0=
+: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087516=
+c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e=
+7c34c/0] intExit<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlo=
+ck<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0:=
+ 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 00000000=
+08901480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [0=
+0000000/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/0=
+0e2b508/0] intLock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLo=
+ck<br>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 0=
+0000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008=
+776800 [00000000/00e872ac/0] excConnectCode<br>Stopped execution of TB chai=
+n before 0000000008776800 [00e872ac] excConnectCode<br>Trace 0: 00000000087=
+76800 [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00=
+000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/=
+0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Ch=
+ain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<b=
+r>Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000=
+000087516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [000=
+00000/00e7c34c/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (=
+00)<br>Trace 0: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 0000000=
+0087720c0 [00000000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0=
+ [00000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c0=
+9c/0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>T=
+race 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 000000000=
+8748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000=
+008749040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [000000=
+00/00e87294/0] excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a=
+20/0] quiccIntrDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] qui=
+ccIntrDeMux<br>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToI=
+num<br>Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Tr=
+ace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Stopped ex=
+ecution of TB chain before 0000000008772bc0 [00e00f48] quiccIvecToInum<br>T=
+race 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: =
+0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 000000000=
+8773400 [00000000/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [=
+00000000/00e2b51c/0] intUnlock<br>Raise exception at 00e2b52c =3D&gt; 00000=
+00a (00)<br>Trace 0: 0000000008747a40 [00000000/00000900/0] <br>Chain 0: 00=
+00000008747b80 [00000000/00e87480/0] excConnectCode<br>Chain 0: 00000000087=
+47cc0 [00000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/0=
+0e7c09c/0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt=
+<br>Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000=
+000008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 00=
+00000008749040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [0=
+0000000/00e87494/0] excConnectCode<br>Chain 0: 0000000008749380 [00000000/0=
+0e0c654/0] sysClkInt<br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxT=
+imeBaseGet<br>Chain 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp6=
+4Get<br>Chain 0: 000000000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain =
+0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086=
+b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [0000000=
+0/00e2b530/0] intUnlock<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] =
+sysClkInt<br>Chain 0: 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Ch=
+ain 0: 000000000874c3c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 0000=
+00000874c9c0 [00000000/00e7d0f8/0] windTickAnnounce<br>Chain 0: 00000000087=
+4d580 [00000000/00e54b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [0=
+0000000/00e7d238/0] windTickAnnounce<br>Chain 0: 000000000874da40 [00000000=
+/00e54b8c/0] qPriListGetExpired<br>Chain 0: 000000000874de40 [00000000/00e7=
+d4d4/0] windTickAnnounce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0]=
+ tickAnnounce<br>Chain 0: 000000000874e740 [00000000/00e7bb20/0] windExit<b=
+r>Trace 0: 000000000874eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 0000=
+00000874ebc0 [00000000/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [0=
+0000000/00e7bb54/0] windExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb7=
+0/0] windExit<br>Trace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<b=
+r>Chain 0: 0000000008750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: =
+0000000008750500 [00000000/00e0d8f0/0] usrClock<br>Chain 0: 000000000875070=
+0 [00000000/00e0c874/0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00=
+e874ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0]=
+ intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trac=
+e 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087=
+516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/=
+00e7c34c/0] intExit<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intU=
+nlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain=
+ 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 00000=
+00008901480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00=
+ [00000000/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [0000000=
+0/00e2b508/0] intLock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] in=
+tLock<br>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0=
+: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000=
+008776800 [00000000/00e872ac/0] excConnectCode<br>Stopped execution of TB c=
+hain before 0000000008776800 [00e872ac] excConnectCode<br>Trace 0: 00000000=
+08776800 [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 =
+[00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0=
+f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br=
+>Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask=
+2<br>Chain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00=
+000000087516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [=
+00000000/00e7c34c/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 0000000=
+4 (00)<br>Trace 0: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 0000=
+0000087720c0 [00000000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747=
+cc0 [00000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e=
+7c09c/0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<b=
+r>Trace 0: 0000000008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 000000=
+0008748dc0 [00000000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000=
+000008749040 [00000000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [000=
+00000/00e87294/0] excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e=
+00a20/0] quiccIntrDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] =
+quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvec=
+ToInum<br>Chain 0: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br=
+>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0=
+: 0000000008773180 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000=
+008773400 [00000000/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0=
+ [00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e=
+2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUn=
+lock<br>Chain 0: 0000000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>C=
+hain 0: 0000000008901480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 000=
+0000008775b00 [00000000/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086a=
+ef00 [00000000/00e2b508/0] intLock<br>Trace 0: 00000000086af040 [00000000/0=
+0e2b514/0] intLock<br>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLo=
+ck<br>Chain 0: 00000000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Cha=
+in 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode<br>Stopped exec=
+ution of TB chain before 0000000008776800 [00e872ac] excConnectCode<br>Trac=
+e 0: 0000000008776800 [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000=
+000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00=
+000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/=
+0] intExit<br>Chain 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCt=
+xSwitchToTask2<br>Stopped execution of TB chain before 0000000008752700 [00=
+e050d8] timeMonitorCtxSwitchToTask2<br>Trace 0: 0000000008752700 [00000000/=
+00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980 [00000=
+000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] =
+intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Raise=
+ exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000000008771f80 [=
+00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0] ex=
+cConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br>C=
+hain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 000000000=
+8748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [00000000=
+/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] time=
+MonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] in=
+tEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<br>C=
+hain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace 0: 0=
+000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 0000000008=
+772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772ec0 [=
+00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00000000/=
+00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e00afc=
+/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] quicc=
+IntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br>R=
+aise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 0000000008747a=
+40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87480/0=
+] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<=
+br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 00000=
+00008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [0000=
+0000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] =
+timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0=
+] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode<=
+br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain 0: 00=
+000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 000000000874=
+a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a5c0 [=
+00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/00e2b=
+51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlo=
+ck<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0:=
+ 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 000000000874c=
+180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000000/0=
+0e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] =
+windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriLis=
+tAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounc=
+e<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired<br>=
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Chain 0=
+: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 000000000=
+874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [000000=
+00/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] =
+windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<br>Tra=
+ce 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 000000000=
+87501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [000000=
+00/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e0d8f0=
+/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt<b=
+r>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Chain 0=
+: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b=
+80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e=
+7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit=
+<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0: 000=
+00000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 =
+[00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000/00e0=
+0b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168/0] m=
+otTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeM=
+ux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace 0: 0=
+0000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086af140 =
+[00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/00e00c=
+74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0] exc=
+ConnectCode<br>Stopped execution of TB chain before 0000000008776800 [00e87=
+2ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0] excC=
+onnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Tr=
+ace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 000000000=
+8750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [0000000=
+0/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980 [000=
+00000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0=
+] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Rai=
+se exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000000008771f80=
+ [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0] =
+excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br=
+>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 0000000=
+008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [000000=
+00/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] ti=
+meMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] =
+intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<br=
+>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace 0:=
+ 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 00000000=
+08772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772ec0=
+ [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [0000000=
+0/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e00a=
+fc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] qui=
+ccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br=
+>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 000000000874=
+7a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87480=
+/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEn=
+t<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 000=
+0000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [00=
+000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0=
+] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc=
+/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCod=
+e<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain 0: =
+00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 0000000008=
+74a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a5c0=
+ [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/00e=
+2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUn=
+lock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain =
+0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 00000000087=
+4c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000000=
+/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0=
+] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriL=
+istAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnou=
+nce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired<b=
+r>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Chain=
+ 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 0000000=
+00874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [0000=
+0000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb48/0=
+] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<br>T=
+race 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 0000000=
+0087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [0000=
+0000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e0d8=
+f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt=
+<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Chain=
+ 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 000000000875=
+0b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/0=
+0e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] intEx=
+it<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0: 0=
+0000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d0=
+0 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000/00=
+e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168/0]=
+ motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrD=
+eMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace 0:=
+ 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086af14=
+0 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/00e0=
+0c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0] e=
+xcConnectCode<br>Stopped execution of TB chain before 0000000008776800 [00e=
+872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0] ex=
+cConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>=
+Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000=
+008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [00000=
+000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980 [0=
+0000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344=
+/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>R=
+aise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000000008771f=
+80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0=
+] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<=
+br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 00000=
+00008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [0000=
+0000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] =
+timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0=
+] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<=
+br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace =
+0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 000000=
+0008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772e=
+c0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00000=
+000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e0=
+0afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] q=
+uiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<=
+br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00=
+000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640=
+ [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [0000000=
+0/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/=
+0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLoc=
+k<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00=
+000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [=
+00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/=
+00e872ac/0] excConnectCode<br>Stopped execution of TB chain before 00000000=
+08776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/0=
+0e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0=
+] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Tra=
+ce 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008=
+752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 000000=
+0008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [0000=
+0000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0]=
+ intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0=
+000000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [000000=
+00/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf=
+24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>T=
+race 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000000=
+8748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000=
+/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [000000=
+00/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] ex=
+cConnectCode<br>Stopped execution of TB chain before 0000000008772200 [00e8=
+7294] excConnectCode<br>Trace 0: 0000000008772200 [00000000/00e87294/0] exc=
+ConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeM=
+ux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00=
+00000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 00000000087=
+72bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [0=
+0000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/0=
+0e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0=
+] intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0=
+: 0000000008747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [000=
+00000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e=
+7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<b=
+r>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000=
+0008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000=
+000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [000=
+00000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0]=
+ excConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkIn=
+t<br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain=
+ 0: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 00=
+0000000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0=
+ [00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e=
+2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUn=
+lock<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain =
+0: 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874=
+c3c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000=
+000/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e=
+54b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0]=
+ windTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriLi=
+stGetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnn=
+ounce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Ch=
+ain 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 00000000=
+0874eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000=
+000/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0]=
+ windExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Tr=
+ace 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 00000000=
+08750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [0=
+0000000/00e0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c87=
+4/0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnec=
+tCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0=
+: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c=
+80 [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e=
+7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit=
+<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 0=
+0000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 000000000877364=
+0 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [000000=
+00/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4=
+/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLo=
+ck<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 0=
+0000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 =
+[00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000=
+/00e872ac/0] excConnectCode<br>Stopped execution of TB chain before 0000000=
+008776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/=
+00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/=
+0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Tr=
+ace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 000000000=
+8752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 00000=
+00008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [000=
+00000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0=
+] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: =
+0000000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000=
+000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7b=
+f24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>=
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 00000000=
+08748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [0000000=
+0/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000=
+000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] e=
+xcConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrD=
+eMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>T=
+race 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: =
+0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 000000000=
+8772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 =
+[00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000=
+/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c=
+/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<=
+br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 00=
+00000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 00000000089=
+01480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [0000=
+0000/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2=
+b508/0] intLock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<=
+br>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 0000=
+0000087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776=
+800 [00000000/00e872ac/0] excConnectCode<br>Stopped execution of TB chain b=
+efore 0000000008776800 [00e872ac] excConnectCode<br>Trace 0: 00000000087768=
+00 [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000=
+000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] =
+intExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain=
+ 0: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>C=
+hain 0: 0000000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000=
+087516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [000000=
+00/00e7c34c/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)=
+<br>Trace 0: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 0000000008=
+7720c0 [00000000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [0=
+0000000/00e7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/=
+0] intEnt<br>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Stop=
+ped execution of TB chain before 0000000008748b00 [00e7c0b4] intEnt<br>Trac=
+e 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000000874=
+8c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00=
+e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/=
+00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excCo=
+nnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux=
+<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace=
+ 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000=
+000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772=
+bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [000=
+00000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e=
+00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] =
+intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: =
+0000000008747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000=
+000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7b=
+f24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>=
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 00000000=
+08748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [0000000=
+0/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000=
+000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] e=
+xcConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<=
+br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0=
+: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 0000=
+00000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [=
+00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b=
+52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlo=
+ck<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0:=
+ 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3=
+c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [0000000=
+0/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54=
+b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] w=
+indTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriList=
+GetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnou=
+nce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chai=
+n 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 0000000008=
+74eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [0000000=
+0/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] w=
+indExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trac=
+e 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008=
+750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [000=
+00000/00e0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/=
+0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectC=
+ode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: =
+0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80=
+ [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c=
+344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<b=
+r>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 000=
+00000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 =
+[00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000=
+/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0=
+] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock=
+<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 000=
+00000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [0=
+0000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/0=
+0e872ac/0] excConnectCode<br>Stopped execution of TB chain before 000000000=
+8776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00=
+e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0]=
+ intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trac=
+e 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 00000000087=
+52700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000=
+008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000=
+000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] =
+intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 00=
+00000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [0000000=
+0/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf2=
+4/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Tr=
+ace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008=
+748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/=
+00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [0000000=
+0/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] exc=
+ConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeM=
+ux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00=
+00000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 00000000087=
+72bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [0=
+0000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/0=
+0e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0=
+] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br=
+>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000=
+000008773640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901=
+480 [00000000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [000000=
+00/00e00ba4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b5=
+08/0] intLock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br=
+>Trace 0: 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 000000=
+00087762c0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 000000000877680=
+0 [00000000/00e872ac/0] excConnectCode<br>Stopped execution of TB chain bef=
+ore 0000000008776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800=
+ [00000000/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [0000000=
+0/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] in=
+tExit<br>Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0=
+: 0000000008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Cha=
+in 0: 0000000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 0000000008=
+7516c0 [00000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000=
+/00e7c34c/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<b=
+r>Trace 0: 0000000008771f80 [00000000/00000500/0] <br>Stopped execution of =
+TB chain before 0000000008771f80 [00000500] <br>Trace 0: 0000000008771f80 [=
+00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0] ex=
+cConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br>C=
+hain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 000000000=
+8748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [00000000=
+/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] time=
+MonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] in=
+tEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<br>C=
+hain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace 0: 0=
+000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 0000000008=
+772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772ec0 [=
+00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00000000/=
+00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e00afc=
+/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] quicc=
+IntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br>R=
+aise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 0000000008747a=
+40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87480/0=
+] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<=
+br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 00000=
+00008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [0000=
+0000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] =
+timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0=
+] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnectCode<=
+br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain 0: 00=
+000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 000000000874=
+a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a5c0 [=
+00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/00e2b=
+51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlo=
+ck<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0:=
+ 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 000000000874c=
+180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000000/0=
+0e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f8/0] =
+windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qPriLis=
+tAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAnnounc=
+e<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpired<br>=
+Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Chain 0=
+: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 000000000=
+874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [000000=
+00/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb48/0] =
+windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<br>Tra=
+ce 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 000000000=
+87501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [000000=
+00/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e0d8f0=
+/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClkInt<b=
+r>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Chain 0=
+: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 0000000008750b=
+80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [00000000/00e=
+7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] intExit=
+<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0: 000=
+00000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b0d00 =
+[00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000/00e0=
+0b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168/0] m=
+otTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIntrDeM=
+ux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace 0: 0=
+0000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086af140 =
+[00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/00e00c=
+74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0] exc=
+ConnectCode<br>Stopped execution of TB chain before 0000000008776800 [00e87=
+2ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0] excC=
+onnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Tr=
+ace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 000000000=
+8750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [0000000=
+0/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980 [000=
+00000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0=
+] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Rai=
+se exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000000008771f80=
+ [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e87280/0] =
+excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intEnt<br=
+>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 0000000=
+008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [000000=
+00/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/0] ti=
+meMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0cc/0] =
+intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCode<br=
+>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Trace 0:=
+ 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 00000000=
+08772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008772ec0=
+ [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [0000000=
+0/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/00e00a=
+fc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0] qui=
+ccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlock<br=
+>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 0000=
+0000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [=
+00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/=
+00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0]=
+ quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<=
+br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 0000=
+0000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00=
+000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00=
+e872ac/0] excConnectCode<br>Stopped execution of TB chain before 0000000008=
+776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e=
+872ac/0] excConnectCode<br>Stopped execution of TB chain before 00000000087=
+76800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e8=
+72ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] i=
+ntExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace =
+0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752=
+700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 000000000=
+8752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [0000000=
+0/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] in=
+tExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 0000=
+000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/=
+00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/=
+0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trac=
+e 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000000874=
+8c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00=
+e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/=
+00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excCo=
+nnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux=
+<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace=
+ 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000=
+000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772=
+bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [000=
+00000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e=
+00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] =
+intUnlock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: =
+0000000008747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000=
+000/00e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7b=
+f24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>=
+Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 00000000=
+08748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [0000000=
+0/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000=
+000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] e=
+xcConnectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<=
+br>Chain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0=
+: 000000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 0000=
+00000874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [=
+00000000/00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b=
+52c/0] intUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlo=
+ck<br>Chain 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0:=
+ 000000000874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3=
+c0 [00000000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [0000000=
+0/00e7d0f8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54=
+b80/0] qPriListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] w=
+indTickAnnounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriList=
+GetExpired<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnou=
+nce<br>Chain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chai=
+n 0: 000000000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 0000000008=
+74eac0 [00000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [0000000=
+0/00e7bb48/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] w=
+indExit<br>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trac=
+e 0: 00000000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008=
+750340 [00000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [000=
+00000/00e0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/=
+0] sysClkInt<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectC=
+ode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: =
+0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80=
+ [00000000/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c=
+344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<b=
+r>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 000=
+00000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 =
+[00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000=
+/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0=
+] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock=
+<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 000=
+00000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [0=
+0000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/0=
+0e872ac/0] excConnectCode<br>Stopped execution of TB chain before 000000000=
+8776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00=
+e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0]=
+ intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trac=
+e 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 00000000087=
+52700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000=
+008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000=
+000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] =
+intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 00=
+00000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [0000000=
+0/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf2=
+4/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Tr=
+ace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008=
+748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/=
+00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [0000000=
+0/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] exc=
+ConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeM=
+ux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00=
+00000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 00000000087=
+72bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [0=
+0000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/0=
+0e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0=
+] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br=
+>Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUnlock=
+<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 000000000=
+8747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/00e87=
+480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] in=
+tEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: =
+0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 =
+[00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050b=
+c/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c=
+0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excConnect=
+Code<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Chain =
+0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 0000000=
+00874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000874a=
+5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000000/=
+00e2b51c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] in=
+tUnlock<br>Trace 0: 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Cha=
+in 0: 000000000874bdc0 [00000000/00e0c848/0] sysClkInt<br>Chain 0: 00000000=
+0874c180 [00000000/00e0d8d8/0] usrClock<br>Chain 0: 000000000874c3c0 [00000=
+000/00e6f110/0] tickAnnounce<br>Chain 0: 000000000874c9c0 [00000000/00e7d0f=
+8/0] windTickAnnounce<br>Chain 0: 000000000874d580 [00000000/00e54b80/0] qP=
+riListAdvance<br>Chain 0: 000000000874d700 [00000000/00e7d238/0] windTickAn=
+nounce<br>Chain 0: 000000000874da40 [00000000/00e54b8c/0] qPriListGetExpire=
+d<br>Chain 0: 000000000874de40 [00000000/00e7d4d4/0] windTickAnnounce<br>Ch=
+ain 0: 000000000874e640 [00000000/00e6f1d8/0] tickAnnounce<br>Chain 0: 0000=
+00000874e740 [00000000/00e7bb20/0] windExit<br>Trace 0: 000000000874eac0 [0=
+0000000/00e7bb44/0] windExit<br>Trace 0: 000000000874ebc0 [00000000/00e7bb4=
+8/0] windExit<br>Chain 0: 000000000874f340 [00000000/00e7bb54/0] windExit<b=
+r>Trace 0: 00000000087500c0 [00000000/00e7bb70/0] windExit<br>Trace 0: 0000=
+0000087501c0 [00000000/00e7bb78/0] windExit<br>Chain 0: 0000000008750340 [0=
+0000000/00e6f1dc/0] tickAnnounce<br>Chain 0: 0000000008750500 [00000000/00e=
+0d8f0/0] usrClock<br>Chain 0: 0000000008750700 [00000000/00e0c874/0] sysClk=
+Int<br>Chain 0: 0000000008750900 [00000000/00e874ac/0] excConnectCode<br>Ch=
+ain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<br>Trace 0: 000000000=
+8750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000000008750c80 [0000000=
+0/00e7c0fc/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c344/0] in=
+tExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<br>Trace 0=
+: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0: 00000000086b=
+0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773640 [00000000=
+/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [00000000/00e08168=
+/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00ba4/0] quiccIn=
+trDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] intLock<br>Trace=
+ 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0: 00000000086a=
+f140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c0 [00000000/0=
+0e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [00000000/00e872ac/0=
+] excConnectCode<br>Stopped execution of TB chain before 0000000008776800 [=
+00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [00000000/00e872ac/0]=
+ excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e8/0] intExit<=
+br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>Trace 0: 0000=
+000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000008752700 [00=
+000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 0000000008752980=
+ [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [00000000/00e7c=
+344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c/0] intExit<b=
+r>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0: 00000000087=
+71f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [00000000/00e8728=
+0/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0] intE=
+nt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace 0: 00=
+00000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748c00 [0=
+0000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e050bc/=
+0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/00e7c0c=
+c/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0] excConnectCo=
+de<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccIntrDeMux<br>Tra=
+ce 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br>Trace 0: 000=
+0000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 00000000087=
+72ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000008772bc0 [00=
+000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 0000000008773180 [00000000/0=
+0e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [00000000/00e00b38/0=
+] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b51c/0] intUnlo=
+ck<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnlock<br>Trace 0:=
+ 00000000086b0d00 [00000000/00e2b530/0] intUnlock<br>Chain 0: 0000000008773=
+640 [00000000/00e00b64/0] quiccIntrDeMux<br>Chain 0: 0000000008901480 [0000=
+0000/00e08168/0] motTsecTxInt<br>Chain 0: 0000000008775b00 [00000000/00e00b=
+a4/0] quiccIntrDeMux<br>Chain 0: 00000000086aef00 [00000000/00e2b508/0] int=
+Lock<br>Trace 0: 00000000086af040 [00000000/00e2b514/0] intLock<br>Trace 0:=
+ 00000000086af140 [00000000/00e2b518/0] intLock<br>Chain 0: 00000000087762c=
+0 [00000000/00e00c74/0] quiccIntrDeMux<br>Chain 0: 0000000008776800 [000000=
+00/00e872ac/0] excConnectCode<br>Stopped execution of TB chain before 00000=
+00008776800 [00e872ac] excConnectCode<br>Trace 0: 0000000008776800 [0000000=
+0/00e872ac/0] excConnectCode<br>Chain 0: 0000000008750a40 [00000000/00e7c0e=
+8/0] intExit<br>Trace 0: 0000000008750b80 [00000000/00e7c0f8/0] intExit<br>=
+Trace 0: 0000000008750c80 [00000000/00e7c0fc/0] intExit<br>Chain 0: 0000000=
+008752700 [00000000/00e050d8/0] timeMonitorCtxSwitchToTask2<br>Chain 0: 000=
+0000008752980 [00000000/00e7c2f4/0] intExit<br>Trace 0: 00000000087516c0 [0=
+0000000/00e7c344/0] intExit<br>Trace 0: 00000000087517c0 [00000000/00e7c34c=
+/0] intExit<br>Raise exception at 00e2b52c =3D&gt; 00000004 (00)<br>Trace 0=
+: 0000000008771f80 [00000000/00000500/0] <br>Chain 0: 00000000087720c0 [000=
+00000/00e87280/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e=
+7bf24/0] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<b=
+r>Trace 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 000000=
+0008748c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000=
+000/00e050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [000=
+00000/00e7c0cc/0] intEnt<br>Chain 0: 0000000008772200 [00000000/00e87294/0]=
+ excConnectCode<br>Chain 0: 0000000008772380 [00000000/00e00a20/0] quiccInt=
+rDeMux<br>Trace 0: 0000000008772840 [00000000/00e00a6c/0] quiccIntrDeMux<br=
+>Trace 0: 0000000008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0=
+: 0000000008772ec0 [00000000/00e00abc/0] quiccIntrDeMux<br>Trace 0: 0000000=
+008772bc0 [00000000/00e00f48/0] quiccIvecToInum<br>Chain 0: 000000000877318=
+0 [00000000/00e00afc/0] quiccIntrDeMux<br>Chain 0: 0000000008773400 [000000=
+00/00e00b38/0] quiccIntrDeMux<br>Chain 0: 00000000086b0ac0 [00000000/00e2b5=
+1c/0] intUnlock<br>Trace 0: 00000000086b0c00 [00000000/00e2b52c/0] intUnloc=
+k<br>Stopped execution of TB chain before 00000000086b0c00 [00e2b52c] intUn=
+lock<br>Raise exception at 00e2b52c =3D&gt; 0000000a (00)<br>Trace 0: 00000=
+00008747a40 [00000000/00000900/0] <br>Chain 0: 0000000008747b80 [00000000/0=
+0e87480/0] excConnectCode<br>Chain 0: 0000000008747cc0 [00000000/00e7bf24/0=
+] intEnt<br>Chain 0: 0000000008748980 [00000000/00e7c09c/0] intEnt<br>Trace=
+ 0: 0000000008748b00 [00000000/00e7c0b4/0] intEnt<br>Trace 0: 0000000008748=
+c00 [00000000/00e7c0bc/0] intEnt<br>Chain 0: 0000000008748dc0 [00000000/00e=
+050bc/0] timeMonitorCtxSwitchToIsr<br>Chain 0: 0000000008749040 [00000000/0=
+0e7c0cc/0] intEnt<br>Chain 0: 0000000008749200 [00000000/00e87494/0] excCon=
+nectCode<br>Chain 0: 0000000008749380 [00000000/00e0c654/0] sysClkInt<br>Ch=
+ain 0: 00000000086a0a00 [00000000/00e7ac78/0] vxTimeBaseGet<br>Chain 0: 000=
+000000874a180 [00000000/00e0cc44/0] sysTimestamp64Get<br>Chain 0: 000000000=
+874a5c0 [00000000/00e0c780/0] sysClkInt<br>Chain 0: 00000000086b0ac0 [00000=
+000/00e2b51c/0] intUnlock<br></div><div>```</div></div></div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Mar 10, 2020=
+ at 6:04 PM Stefan Hajnoczi &lt;<a href=3D"mailto:stefanha@gmail.com">stefa=
+nha@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
+ng-left:1ex">On Mon, Mar 09, 2020 at 11:26:07AM +0800, =E7=BD=97=E5=8B=87=
+=E5=88=9A(Yonggang Luo) wrote:<br>
+&gt; When I am running QEMU to simulating PowerPC.<br>
+&gt; And after running the following powerpc code:<br>
+&gt; 00e2b5dc &lt;intUnlock&gt;:<br>
+&gt; intUnlock():<br>
+&gt;=C2=A0 =C2=A0e2b5dc: 54 63 04 20 rlwinm r3,r3,0,16,16<br>
+&gt;=C2=A0 =C2=A0e2b5e0: 7c 80 00 a6 mfmsr r4<br>
+&gt;=C2=A0 =C2=A0e2b5e4: 7c 83 1b 78 or r3,r4,r3<br>
+&gt;=C2=A0 =C2=A0e2b5e8: 7c 60 01 24 mtmsr r3<br>
+&gt;=C2=A0 =C2=A0e2b5ec: 4c 00 01 2c isync<br>
+&gt;=C2=A0 =C2=A0e2b5f0: 4e 80 00 20 blr<br>
+&gt; <br>
+&gt; The QEMU are getting stuck and can not running the following instructi=
+ons,<br>
+&gt; What I need to do to inspect which instruction are getting stuck and h=
+ow to<br>
+&gt; fix it?<br>
+&gt; Any means to debugging that.<br>
+<br>
+CCing ppc maintainers.<br>
+<br>
+You could begin debugging this using QEMU&#39;s GDB stub (the -s<br>
+command-line option), TCG debug output (the -d command-line option), and<br=
+>
+the HMP &quot;info status&quot; command to check that the CPU is running.<b=
+r>
+<br>
+Good luck!<br>
+<br>
+Stefan<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div>
 
-  thanks and cheers
-  t.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
+--00000000000045c22105a07f8b79--
 
