@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A02C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B81C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:37:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7085A2253D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C82A2465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 08:37:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYGld0+R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7085A2253D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aonYkJ5x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C82A2465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBaNs-000344-Kr
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:37:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40348)
+	id 1jBaOU-0004Cv-Cu
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 04:37:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jBaJe-0004ve-FH
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:32:43 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jBaMe-0001Jg-LB
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jBaJd-0004Cr-5B
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:32:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25943
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1jBaMd-0001uP-84
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:35:48 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36589
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jBaJc-0004BO-Sc
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:32:41 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBaMd-0001so-2y
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 04:35:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583829160;
+ s=mimecast20190719; t=1583829346;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=umJLVabTlxfOYRdcqqJPgQHpfKmMGvR8MmZg0s3LCOY=;
- b=ZYGld0+RYuji3HpDpv2iZlaT7Dm7BgDrqfiaWyC5BNoJDkYN65K2V941ZLUKypqySFZ3gy
- 47O+u0m3PAXY9ccJRiYl2rAlD5uDznC+yRJMk3Ld7ZSBTM6MiCXGVcZ4Mo4qUrxBrIBnpQ
- iCjR0DDQ6Z96vTBHyJUOYWyrTJLw0eg=
+ bh=XQNY5tMmeuKY+b0M87+IciUh/b+Bg8PYBEMffitrExs=;
+ b=aonYkJ5xod3FfwddThcIEhEY9K0mvSuuW8YdvEJH0/9MVuVWuhzJw7BoMgl51aDM+2GzYf
+ pUmqH01XrUvf+Jec58nhfGbQsLfa0Gz7GxixIKHLYDpjLAPVkhNmrSQpuLfmXigm2XBE6a
+ tnSwvxNF+7WMGqpFJFyZ9782ZGFSz2I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-swIc5mRaMLKyaIn18emcJQ-1; Tue, 10 Mar 2020 04:32:23 -0400
-X-MC-Unique: swIc5mRaMLKyaIn18emcJQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-146-pUVN8yFjMI2Zg3GK0i_7Iw-1; Tue, 10 Mar 2020 04:35:44 -0400
+X-MC-Unique: pUVN8yFjMI2Zg3GK0i_7Iw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AD911005513;
- Tue, 10 Mar 2020 08:32:22 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-117.ams2.redhat.com
- [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F305391D6E;
- Tue, 10 Mar 2020 08:32:18 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 47EE09D3C; Tue, 10 Mar 2020 09:32:18 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] tests/vm: update NetBSD to 9.0
-Date: Tue, 10 Mar 2020 09:32:18 +0100
-Message-Id: <20200310083218.26355-5-kraxel@redhat.com>
-In-Reply-To: <20200310083218.26355-1-kraxel@redhat.com>
-References: <20200310083218.26355-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97B4D189F760;
+ Tue, 10 Mar 2020 08:35:43 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7BCC5C1D4;
+ Tue, 10 Mar 2020 08:35:39 +0000 (UTC)
+Date: Tue, 10 Mar 2020 09:35:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v5 14/16] hw/i386: Move arch_id decode inside x86_cpus_init
+Message-ID: <20200310093537.192f855f@redhat.com>
+In-Reply-To: <b008461c-d7c0-58f2-1c77-69a2fb5dae3e@amd.com>
+References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
+ <158326550403.40452.15934956681175349815.stgit@naples-babu.amd.com>
+ <20200309162123.5ab6a750@Igors-MacBook-Pro>
+ <b008461c-d7c0-58f2-1c77-69a2fb5dae3e@amd.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,93 +88,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The installer supports GPT now, so the install workflow has changed a
-bit.  Also: run without VGA device.  This works around a bug in the
-seabios sercon code and makes the bootloader menu show up on the serial
-line, so we can drop the quirk for that.
+On Mon, 9 Mar 2020 14:31:31 -0500
+Babu Moger <babu.moger@amd.com> wrote:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- tests/vm/netbsd | 25 +++++++------------------
- 1 file changed, 7 insertions(+), 18 deletions(-)
+> On 3/9/20 10:21 AM, Igor Mammedov wrote:
+> > On Tue, 03 Mar 2020 13:58:24 -0600
+> > Babu Moger <babu.moger@amd.com> wrote:
+> >   
+> >> Apicid calculation depends on knowing the total number of numa nodes
+> >> for EPYC cpu models. Right now, we are calculating the arch_id while
+> >> parsing the numa(parse_numa). At this time, it is not known how many
+> >> total numa nodes are configured in the system.
+> >>
+> >> Move the arch_id inside x86_cpus_init. At this time smp parameter is already
+> >> completed and numa node information is available.
+> >>
+> >> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> >> ---
+> >>  hw/i386/x86.c |   17 +++++++++++------
+> >>  1 file changed, 11 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> >> index d46dd4ad9e..66998b065c 100644
+> >> --- a/hw/i386/x86.c
+> >> +++ b/hw/i386/x86.c
+> >> @@ -121,6 +121,9 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+> >>      MachineState *ms = MACHINE(x86ms);
+> >>      MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+> >>  
+> >> +    /* Initialize apicid handlers first */
+> >> +    cpu_x86_init_apicid_fns(ms);
+> >> +
+> >>      x86_cpu_set_default_version(default_cpu_version);
+> >>  
+> >>      /*
+> >> @@ -134,6 +137,12 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+> >>      x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+> >>                                                        ms->smp.max_cpus - 1) + 1;
+> >>      possible_cpus = mc->possible_cpu_arch_ids(ms);
+> >> +
+> >> +    for (i = 0; i < ms->smp.cpus; i++) {
+> >> +        ms->possible_cpus->cpus[i].arch_id =
+> >> +            x86_cpu_apic_id_from_index(x86ms, i);
+> >> +    }
+> >> +
+> >>      for (i = 0; i < ms->smp.cpus; i++) {
+> >>          x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+> >>      }
+> >> @@ -158,8 +167,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+> >>     init_topo_info(&topo_info, x86ms);
+> >>  
+> >>     assert(idx < ms->possible_cpus->len);
+> >> -   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> >> -                               &topo_info, &topo_ids);
+> >> +   x86_topo_ids_from_idx(&topo_info, idx, &topo_ids);  
+> > not necessary if default x86ms->topo_ids_from_apicid were initialized from x86 machine class
+> > 
+> > I also wonder if this default contraption we have is going to work
+> > in case of EPYC cpu (i.e. is would generate valid nodeids).  
+> 
+> From what I understand, we call this x86_get_default_cpu_node_id only when
+> the user does not specify the numa binding requirements. We tried to
+> generate the default node it for a given config. This works fine for EPYC
+> also. I am not sure about changing this right now. what do you think?
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index f3257bc245a3..b10c9d429ded 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -22,8 +22,8 @@ class NetBSDVM(basevm.BaseVM):
-     name =3D "netbsd"
-     arch =3D "x86_64"
-=20
--    link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.1/images/NetBSD-8=
-.1-amd64.iso"
--    csum =3D "718f275b7e0879599bdac95630c5e3f2184700032fdb6cdebf3bdd636878=
-98c48ff3f08f57b89f4437a86cdd8ea07c01a39d432dbb37e1e4b008f4985f98da3f"
-+    link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9=
-.0-amd64.iso"
-+    csum =3D "34da4882ee61bdbf69f241195a8933dc800949d30b43fc6988da853d57fc=
-2b8cac50cf97a0d2adaf93250b4e329d189c1a8b83c33bd515226f37745d50c33369"
-     size =3D "20G"
-     pkgs =3D [
-         # tools
-@@ -86,42 +86,31 @@ class NetBSDVM(basevm.BaseVM):
-         self.boot(img_tmp, extra_args =3D [
-             "-bios", "pc-bios/bios-256k.bin",
-             "-machine", "graphics=3Doff",
--            "-device", "VGA",
-             "-cdrom", iso
-         ])
-         self.console_init()
--        self.console_wait("Primary Bootstrap")
--
--        # serial console boot menu output doesn't work for some
--        # reason, so we have to fly blind ...
--        for char in list("5consdev com0\n"):
--            time.sleep(0.2)
--            self.console_send(char)
--            self.console_consume()
-+        self.console_wait_send("3. Drop to boot prompt", "3")
-+        self.console_wait_send("> ", "consdev com0\n")
-         self.console_wait_send("> ", "boot\n")
-=20
-         self.console_wait_send("Terminal type",            "xterm\n")
-         self.console_wait_send("a: Installation messages", "a\n")
--        self.console_wait_send("b: US-English",            "b\n")
-         self.console_wait_send("a: Install NetBSD",        "a\n")
-         self.console_wait("Shall we continue?")
-         self.console_wait_send("b: Yes",                   "b\n")
-=20
-         self.console_wait_send("a: ld0",                   "a\n")
-+        self.console_wait_send("a: Guid Partition Table",  "a\n")
-         self.console_wait_send("a: This is the correct",   "a\n")
--        self.console_wait_send("b: Use the entire disk",   "b\n")
--        self.console_wait("NetBSD bootcode")
--        self.console_wait_send("a: Yes",                   "a\n")
--        self.console_wait_send("b: Use existing part",     "b\n")
-+        self.console_wait_send("b: Use default part",      "b\n")
-         self.console_wait_send("x: Partition sizes ok",    "x\n")
--        self.console_wait_send("for your NetBSD disk",     "\n")
-         self.console_wait("Shall we continue?")
-         self.console_wait_send("b: Yes",                   "b\n")
-=20
-         self.console_wait_send("b: Use serial port com0",  "b\n")
-         self.console_wait_send("f: Set serial baud rate",  "f\n")
-         self.console_wait_send("a: 9600",                  "a\n")
--        self.console_wait_send("x: Exit",                  "x\n")
-+        self.console_wait_send("x: Continue",              "x\n")
-=20
-         self.console_wait_send("a: Full installation",     "a\n")
-         self.console_wait_send("a: CD-ROM",                "a\n")
---=20
-2.18.2
+if it work for EPYC with default x86_topo_ids_from_idx() then it's fine.
+
+Just keep callback here, given that callback is always initialized early (class_init)
+there is no point to create mix of callback/non-callback usage.
+ 
+> > 
+> > Bot instead of than trying to fix it if it's broken,
+> > I'd rather deprecate and drop get_default_cpu_node_id() requiring users
+> > to explicitly define CPU mapping to numa nodes.
+> > That would be consistent with req for explicit RAM for numa nodes
+> > (postponed till 5.1 due to libvirt not being ready),
+> > i.e if one wants numa, one should explicitly provide necessary mapping
+> > or machine won't start.
+> > 
+> >   
+> >>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
+> >>  }
+> >>  
+> >> @@ -193,10 +201,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+> >>  
+> >>          ms->possible_cpus->cpus[i].type = ms->cpu_type;
+> >>          ms->possible_cpus->cpus[i].vcpus_count = 1;
+> >> -        ms->possible_cpus->cpus[i].arch_id =
+> >> -            x86_cpu_apic_id_from_index(x86ms, i);
+> >> -        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> >> -                                 &topo_info, &topo_ids);
+> >> +        x86_topo_ids_from_idx(&topo_info, i, &topo_ids);  
+> > ditto
+> >   
+> >>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+> >>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+> >>          if (x86ms->smp_dies > 1) {
+> >>  
+> >   
+> 
 
 
