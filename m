@@ -2,65 +2,86 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 539B7C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B385C18E5A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:14:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B35A222D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:07:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B35A222D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5D30D20637
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 10:14:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GLVDyI3x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D30D20637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBbnR-0001g4-Ad
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 06:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59959)
+	id 1jBbua-0003tL-Ee
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 06:14:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jBbmS-0000ia-MQ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:06:34 -0400
+ (envelope-from <stefanha@gmail.com>) id 1jBbtn-0003TJ-Rw
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jBbmQ-0008SM-S4
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:06:32 -0400
-Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:53992)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jBbmQ-0008Oa-JZ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:06:30 -0400
-Received: from player761.ha.ovh.net (unknown [10.110.103.199])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 02CAF15827A
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:06:27 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player761.ha.ovh.net (Postfix) with ESMTPSA id 7BA4E10404BCE;
- Tue, 10 Mar 2020 10:06:09 +0000 (UTC)
-Subject: Re: [PATCH v7 07/17] target/ppc: Use class fields to simplify LPCR
- masking
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, groug@kaod.org
-References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-8-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a844ff46-e918-f0f0-e225-01fa10610700@kaod.org>
-Date: Tue, 10 Mar 2020 11:06:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <stefanha@gmail.com>) id 1jBbtm-0004aq-U9
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:14:07 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:35833)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1jBbtm-0004Wb-NH
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:14:06 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id m3so641371wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 03:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=pknhD5uPr4WOV2Q9zoveaP/srxnbWb1KCchhbmEaHO4=;
+ b=GLVDyI3xzLVV6d0a/eMUfZOZcKxFqUTcnZRdOSg0tiEexA1cvswNwIhtTADsFvmdIV
+ dZimQ66m6MPI5zjD1THbzkuCp31u8Ydl0NFy4w2pn24VvNNWdhY+P9H+BrbFmZygGWox
+ STjyJo3BII2Bwa5ReVQzduPdlyMqfxF0qxIuEdK1Hu5Jt2fHZii2inVcEvmZ8MjTrxJ+
+ Jsj2rG0LPs5I+H20oWkfx5Q9dlJp1RningR1CbcuQ6CNFJ2YxWfXMch75ZzA3Vhc3pwY
+ p7RmLeHxUNG2P6Yk6N3oGYQjKDnvMmfR7z1GvwycLRDnxqEHSexeI5WzVi6o+vRP9JGz
+ rFgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=pknhD5uPr4WOV2Q9zoveaP/srxnbWb1KCchhbmEaHO4=;
+ b=r/YPMWCLRK1eCnfF+5X3Cs+lKKGvy8+OlhUermjc3dO2EZzRKglEfLn8LzH+W15ILm
+ Rk724+uOr1u1zqXbPTOB/lOzE5Fa+rHFAd1niB6SPLq/otDN33Ac+JYplsnmM1OkoHfw
+ 2eAc5kASDSSwaZ8HGIGVu8MC8tNOYXPl6WvP7fdbAYv3v6uD6KEu4zxzGCdwhABL5z7q
+ ZFo8kf4R8/GXwPcFl6ofO53WYHmdgvW9cdkV5TYFBLs3Hd033p0j5hs8GtmomsT0+nW9
+ EyVgMNZaOpy9LWx5PSjNdO/NQHSoc+zPpDQF80PkmYYN1HkvI68PNjUrcmsvxBKCUU7v
+ Xlzg==
+X-Gm-Message-State: ANhLgQ2/MRTrt54Tq6jkGpsPAcT0Fb/6cbNWcuUl2MET9w14eHGD/FvB
+ 5C380tsqXwDiKr8S89qAw+o=
+X-Google-Smtp-Source: ADFU+vtcynrLTrSLyDzhmqa8dkpdq8zrwTegX9ArehdQvo10RolJ4IVUB22W9psaywEdhYgG3haFqA==
+X-Received: by 2002:a05:600c:247:: with SMTP id
+ 7mr1412895wmj.181.1583835245562; 
+ Tue, 10 Mar 2020 03:14:05 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id a7sm10409624wrn.25.2020.03.10.03.14.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 03:14:04 -0700 (PDT)
+Date: Tue, 10 Mar 2020 10:14:03 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Adema Yergara <adema.yergara@nu.edu.kz>
+Subject: Re: Wiki account creation request
+Message-ID: <20200310101403.GF140737@stefanha-x1.localdomain>
+References: <CAFTFcbCVQxiH-acfX4rPmnNp6M4cREExaj0FEnB3KgqaBjdq0A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200303034351.333043-8-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 7395755014425775065
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvtddgudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.35.227
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ni93GHxFvA+th69W"
+Content-Disposition: inline
+In-Reply-To: <CAFTFcbCVQxiH-acfX4rPmnNp6M4cREExaj0FEnB3KgqaBjdq0A@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,260 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
- aik@ozlabs.ru, "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Paolo Bonzini <pbonzini@redhat.com>, paulus@samba.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/3/20 4:43 AM, David Gibson wrote:
-> When we store the Logical Partitioning Control Register (LPCR) we have =
-a
-> big switch statement to work out which are valid bits for the cpu model
-> we're emulating.
->=20
-> As well as being ugly, this isn't really conceptually correct, since it=
- is
-> based on the mmu_model variable, whereas the LPCR isn't (only) about th=
-e
-> MMU, so mmu_model is basically just acting as a proxy for the cpu model=
-.
->=20
-> Handle this in a simpler way, by adding a suitable lpcr_mask to the QOM
-> class.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
->  target/ppc/cpu-qom.h            |  1 +
->  target/ppc/mmu-hash64.c         | 36 ++-------------------------------
->  target/ppc/translate_init.inc.c | 27 +++++++++++++++++++++----
->  3 files changed, 26 insertions(+), 38 deletions(-)
->=20
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index e499575dc8..15d6b54a7d 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -177,6 +177,7 @@ typedef struct PowerPCCPUClass {
->      uint64_t insns_flags;
->      uint64_t insns_flags2;
->      uint64_t msr_mask;
-> +    uint64_t lpcr_mask;         /* Available bits in the LPCR */
->      uint64_t lpcr_pm;           /* Power-saving mode Exit Cause Enable=
- bits */
->      powerpc_mmu_t   mmu_model;
->      powerpc_excp_t  excp_model;
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index caf47ad6fc..0ef330a614 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -1095,42 +1095,10 @@ static void ppc_hash64_update_vrma(PowerPCCPU *=
-cpu)
-> =20
->  void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
->  {
-> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      CPUPPCState *env =3D &cpu->env;
-> -    uint64_t lpcr =3D 0;
-> =20
-> -    /* Filter out bits */
-> -    switch (env->mmu_model) {
-> -    case POWERPC_MMU_2_03: /* P5p */
-> -        lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
-> -                      LPCR_LPES0 | LPCR_LPES1 |
-> -                      LPCR_RMI | LPCR_HDICE);
-> -        break;
-> -    case POWERPC_MMU_2_06: /* P7 */
-> -        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
-> -                      LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-> -                      LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
-> -                      LPCR_MER | LPCR_TC |
-> -                      LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
-> -        break;
-> -    case POWERPC_MMU_2_07: /* P8 */
-> -        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
-> -                      LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-> -                      LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PE=
-CE1 |
-> -                      LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
-> -                      LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE);
-> -        break;
-> -    case POWERPC_MMU_3_00: /* P9 */
-> -        lpcr =3D val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
-> -                      (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR=
-_AIL |
-> -                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LP=
-CR_LD |
-> -                      (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPC=
-R_EEE |
-> -                      LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | L=
-PCR_TC |
-> -                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE=
-);
-> -        break;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> -    env->spr[SPR_LPCR] =3D lpcr;
-> +    env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
->      ppc_hash64_update_rmls(cpu);
->      ppc_hash64_update_vrma(cpu);
->  }
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> index f7acd3d61d..68aa4dfad8 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -8476,6 +8476,8 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *da=
-ta)
->                      (1ull << MSR_DR) |
->                      (1ull << MSR_PMM) |
->                      (1ull << MSR_RI);
-> +    pcc->lpcr_mask =3D LPCR_RMLS | LPCR_ILE | LPCR_LPES0 | LPCR_LPES1 =
-|
-> +        LPCR_RMI | LPCR_HDICE;
->      pcc->mmu_model =3D POWERPC_MMU_2_03;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-> @@ -8614,6 +8616,12 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *da=
-ta)
->                      (1ull << MSR_PMM) |
->                      (1ull << MSR_RI) |
->                      (1ull << MSR_LE);
-> +    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
-> +        LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-> +        LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
-> +        LPCR_MER | LPCR_TC |
-> +        LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE;
-> +    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
->      pcc->mmu_model =3D POWERPC_MMU_2_06;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-> @@ -8630,7 +8638,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *dat=
-a)
->      pcc->l1_dcache_size =3D 0x8000;
->      pcc->l1_icache_size =3D 0x8000;
->      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
-> -    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
->  }
-> =20
->  static void init_proc_POWER8(CPUPPCState *env)
-> @@ -8785,6 +8792,13 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *da=
-ta)
->                      (1ull << MSR_TS0) |
->                      (1ull << MSR_TS1) |
->                      (1ull << MSR_LE);
-> +    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
-> +        LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-> +        LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-> +        LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
-> +        LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE;
-> +    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
-> +                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
->      pcc->mmu_model =3D POWERPC_MMU_2_07;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
-> @@ -8802,8 +8816,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *dat=
-a)
->      pcc->l1_dcache_size =3D 0x8000;
->      pcc->l1_icache_size =3D 0x8000;
->      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
-> -    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
-> -                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
->  }
-> =20
->  #ifdef CONFIG_SOFTMMU
-> @@ -8995,6 +9007,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *da=
-ta)
->                      (1ull << MSR_PMM) |
->                      (1ull << MSR_RI) |
->                      (1ull << MSR_LE);
-> +    pcc->lpcr_mask =3D LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
-> +        (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
-> +        LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR_LD |
-> +        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
-> +                             LPCR_DEE | LPCR_OEE))
-> +        | LPCR_MER | LPCR_GTSE | LPCR_TC |
-> +        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE;
-> +    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPC=
-R_OEE;
->      pcc->mmu_model =3D POWERPC_MMU_3_00;
->  #if defined(CONFIG_SOFTMMU)
->      pcc->handle_mmu_fault =3D ppc64_v3_handle_mmu_fault;
-> @@ -9014,7 +9034,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *dat=
-a)
->      pcc->l1_dcache_size =3D 0x8000;
->      pcc->l1_icache_size =3D 0x8000;
->      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
-> -    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPC=
-R_OEE;
->  }
-> =20
->  #ifdef CONFIG_SOFTMMU
->=20
 
-David,
+--ni93GHxFvA+th69W
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-We forgot the POWER10 CPU. Could you squeeze the changes below in that=20
-patch ?
+On Mon, Mar 09, 2020 at 11:29:34PM +0600, Adema Yergara wrote:
+> I understand that I subscribed to your mailing lit now but what about the
+> point
+> - To create an account in the QEMU wiki, you must ask on the mailing list
+> for someone else to do it on your behalf (self-creation is prohibited to
+> cut down on spam accounts)
+> Who can create this for me?
+
+Hi,
+I have created an account and sent you the details in a private email.
+
+Please use the "Subject" line on emails, it makes it easier to identify
+email conversations (if all your emails have no subject I won't be able
+to distinguish between them when browsing by inbox).  For example,
+"Wiki account creation request" could be the subject of this email.
 
 Thanks,
+Stefan
 
-C.=20
+--ni93GHxFvA+th69W
+Content-Type: application/pgp-signature; name="signature.asc"
 
-From a0d8cbc786c16b73376642f632cba99d75783da7 Mon Sep 17 00:00:00 2001
-From: =3D?UTF-8?q?C=3DC3=3DA9dric=3D20Le=3D20Goater?=3D <clg@kaod.org>
-Date: Tue, 10 Mar 2020 11:02:40 +0100
-Subject: [PATCH] target/ppc: Add a LPCR mask to POWER10 CPU
-MIME-Version: 1.0
-Content-Type: text/plain; charset=3DUTF-8
-Content-Transfer-Encoding: 8bit
+-----BEGIN PGP SIGNATURE-----
 
-Fixes: 2d21e1e2a35c ("target/ppc: Use class fields to simplify LPCR maski=
-ng")
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- target/ppc/translate_init.inc.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5naGsACgkQnKSrs4Gr
+c8ji6Af/Ux1AoPbuAZxjKHpJc7n59hL64GNK5ugAGu+UA6saJCRT7PxpfB3qZWs5
+otleVM/f4woXP4HTJ5GcmoowKBokxviiLwjtktXrU/nQAXNdiQGsQp+W0nPElmxS
+eRiLnrZAVUn/cAXN6QSSy4BNTTr8cCbXHEanPgP9KJVbWo9qoNmxxculSHa3HEFx
+NJQphmMwbZHCb21Vm92tZAzigqARiCsayKOI8o8N5M6CPewIhTSeCLkI0730gb5A
+FSnKgewrdyRWykF/E338v1n8jxWMWE/7EC4Wz//4sTNAfLOcBwKqQDPMjCeQSg5N
+qsKzpMdcVlnDeyB+MWcNgHwM9hkrjw==
+=X2+Z
+-----END PGP SIGNATURE-----
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 68aa4dfad875..0ae145e18d80 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -9224,6 +9224,14 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *dat=
-a)
-                     (1ull << MSR_PMM) |
-                     (1ull << MSR_RI) |
-                     (1ull << MSR_LE);
-+    pcc->lpcr_mask =3D LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
-+        (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
-+        LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR_LD |
-+        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
-+                             LPCR_DEE | LPCR_OEE))
-+        | LPCR_MER | LPCR_GTSE | LPCR_TC |
-+        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE;
-+    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
-OEE;
-     pcc->mmu_model =3D POWERPC_MMU_3_00;
- #if defined(CONFIG_SOFTMMU)
-     pcc->handle_mmu_fault =3D ppc64_v3_handle_mmu_fault;
-@@ -9242,7 +9250,6 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
-)
-     pcc->l1_dcache_size =3D 0x8000;
-     pcc->l1_icache_size =3D 0x8000;
-     pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
--    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
-OEE;
- }
-=20
- #if !defined(CONFIG_USER_ONLY)
---=20
-2.21.1
+--ni93GHxFvA+th69W--
 
