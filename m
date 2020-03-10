@@ -2,97 +2,90 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B255AC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31204C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88D2A20727
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:11:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D2A20727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id F26BC20727
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:12:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nVHkjoqQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26BC20727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgXI-0007kO-Kn
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54671)
+	id 1jBgYP-00016i-5C
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:12:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38190)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBgW8-0005wi-AR
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:10:01 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jBgKS-00044a-5t
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jBgW7-0003vD-2M
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:10:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65182)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jBgW6-0003te-QC
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:09:58 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02AF1aaJ126027
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:09:58 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ym852247b-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:09:57 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 10 Mar 2020 15:09:55 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Mar 2020 15:09:51 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02AF8oNW48890240
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 15:08:50 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A38DEA406F;
- Tue, 10 Mar 2020 15:09:49 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 919D5A406E;
- Tue, 10 Mar 2020 15:09:49 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Tue, 10 Mar 2020 15:09:49 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 54687E0249; Tue, 10 Mar 2020 16:09:49 +0100 (CET)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jBgKQ-0000m1-R8
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:57:56 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54158)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jBgKQ-0000kC-Lq
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:57:54 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 25so1760009wmk.3
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 07:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=oSrHBCEthDr0+360W+Bn+h+UKU5Wjj1Xj/HsJNF3QW8=;
+ b=nVHkjoqQr1/vppboc/Bby8mNW/yerk/3OIRw75dFIa6Tjq/fS9xBnfsH2563V65DK9
+ uD9d3B6qs0/U6vGOo4jo+Yxw2ivxf1xhVHS7xtpQjD9WY6ldoD7Qt8KvlfpeNhvLVwwz
+ JLqYmR4kg2Kldy4yh9qiGr4IwjSq81SBfKEbeY7XOgvBOWRihn9be/3TkhDBV/JCId62
+ M5X8BFhFS8ynHAhfqsiW1zBdYBVPxs8brWL5gL3uvyYnAIoQMS8VYtJmLeMkh70bxRZZ
+ Hmb9p4yOkwfP4iQ5FF7k1SwVripaD4sSsMuU+x+tqszQbCRKKOgVqy8m6nLXDN9giz5L
+ z4ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=oSrHBCEthDr0+360W+Bn+h+UKU5Wjj1Xj/HsJNF3QW8=;
+ b=MCOsUVs7wUzMBOs+rOs8VeQe9KHu+lyIsodZzfi2bL5ee5VJZhAX+SJemZ8TUK740p
+ dcSK+QV+fGmqJoLIyBa4kVsyBXFpxK0Ca4TKNwfH4YR+8cCV15E8jZ/lNlBe0Ff5hWCM
+ KZBPTJjlwdWIX9c7z59iIeoDnB00RxoqBh9BhcoG4lZXBhF34uPrlz3hAdUPsc8ABo6p
+ Crq6P8Bgp8B14QChsS6ysZGlQGXmM5+PzrMqjibEmEdUz4DkELCl1f207v08vLS4s6qo
+ 5/tXnuFt8MAfUDOi/wYeMOSu4iduqVgNTODyglWtGGDOAX4yoe3xcdn/dH6yMa8G8eGd
+ E/nw==
+X-Gm-Message-State: ANhLgQ0dqpmE2xwQDK1V29eMKAFhIxQzGeooRrb1HQeQTB4AyE8YEJJB
+ PST3OKhUOU35xSWK/L+q/1d3YQ==
+X-Google-Smtp-Source: ADFU+vv7A34oMksafKoLUA0SEOQ6YoqQmJ9kJTaAMTchXcvf/TuCceziifx7sT5y8ha5GWpP2NPvgA==
+X-Received: by 2002:a05:600c:214f:: with SMTP id
+ v15mr2633381wml.110.1583852273052; 
+ Tue, 10 Mar 2020 07:57:53 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s2sm4305192wmj.15.2020.03.10.07.57.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 07:57:52 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5ACE21FF7E;
+ Tue, 10 Mar 2020 14:57:51 +0000 (GMT)
+References: <20200310133020.27196-1-alex.bennee@linaro.org>
+ <CAFEAcA-S1g4ojEkYdEa-ZHH+=uNUgCDWo0Z29ikbvNoX8Ro7Cw@mail.gmail.com>
+User-agent: mu4e 1.3.9; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 3/4] s390/ipl: sync back loadparm
-Date: Tue, 10 Mar 2020 16:09:46 +0100
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200310150947.3510824-1-borntraeger@de.ibm.com>
-References: <20200310150947.3510824-1-borntraeger@de.ibm.com>
+Subject: Re: [PATCH] docs/system: add a little more detail to ARM machines
+In-reply-to: <CAFEAcA-S1g4ojEkYdEa-ZHH+=uNUgCDWo0Z29ikbvNoX8Ro7Cw@mail.gmail.com>
+Date: Tue, 10 Mar 2020 14:57:51 +0000
+Message-ID: <87y2s8gsuo.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031015-0008-0000-0000-0000035B3407
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031015-0009-0000-0000-00004A7C778F
-Message-Id: <20200310150947.3510824-4-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-10_08:2020-03-10,
- 2020-03-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 malwarescore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003100099
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,86 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Marc Hartmayer <mhartmay@linux.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Halil Pasic <pasic@linux.ibm.com>
 
-We expose loadparm as a r/w machine property, but if loadparm is set by
-the guest via DIAG 308, we don't update the property. Having a
-disconnect between the guest view and the QEMU property is not nice in
-itself, but things get even worse for SCSI, where under certain
-circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-expected" for details) we call s390_gen_initial_iplb() on resets
-effectively overwriting the guest/user supplied loadparm with the stale
-value.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200309133223.100491-1-pasic@linux.ibm.com>
-[borntraeger@de.ibm.com: use reverse xmas tree]
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/ipl.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> On Tue, 10 Mar 2020 at 13:30, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>> Taking from the wiki page mention:
+>>
+>>   - both 32 and 64 bit architectures
+>>   - the roll of A/M profile chips
+>>   - warn about kernel portability
+>>   - gently suggest -M virt
+>>   - add headlines for groups of boards
+>>
+>> This is still incomplete but hopefully is a less of a straight dive
+>> into a dry list of peripherals.
+>
+> This is a semi-duplicate of the series I sent last night:
+> https://patchew.org/QEMU/20200309215818.2021-1-peter.maydell@linaro.org/
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 9c1ecd423c23..b81942e1e6f9 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -538,6 +538,30 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
-     return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
- }
- 
-+static void update_machine_ipl_properties(IplParameterBlock *iplb)
-+{
-+    Object *machine = qdev_get_machine();
-+    Error *err = NULL;
-+
-+    /* Sync loadparm */
-+    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-+        uint8_t *ebcdic_loadparm = iplb->loadparm;
-+        char ascii_loadparm[8];
-+        int i;
-+
-+        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
-+            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
-+        }
-+        ascii_loadparm[i] = 0;
-+        object_property_set_str(machine, ascii_loadparm, "loadparm", &err);
-+    } else {
-+        object_property_set_str(machine, "", "loadparm", &err);
-+    }
-+    if (err) {
-+        warn_report_err(err);
-+    }
-+}
-+
- void s390_ipl_update_diag308(IplParameterBlock *iplb)
- {
-     S390IPLState *ipl = get_ipl_device();
-@@ -545,6 +569,7 @@ void s390_ipl_update_diag308(IplParameterBlock *iplb)
-     ipl->iplb = *iplb;
-     ipl->iplb_valid = true;
-     ipl->netboot = is_virtio_net_device(iplb);
-+    update_machine_ipl_properties(iplb);
- }
- 
- IplParameterBlock *s390_ipl_get_iplb(void)
--- 
-2.24.1
+Ahh I missed that, as your changes are more comprehensive I've reviewed
+them. They render well enough:
 
+  https://qemu-stsquad.readthedocs.io/en/docs-review/system/target-arm.html
+
+>
+> thanks
+> -- PMM
+
+
+--=20
+Alex Benn=C3=A9e
 
