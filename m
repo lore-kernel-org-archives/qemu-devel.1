@@ -2,103 +2,73 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BFDC10F25
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EBBC10F25
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:26:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 432B324649
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:17:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wkIwyugg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 432B324649
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id B77B124654
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 00:26:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77B124654
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBSaD-0003yZ-Gs
-	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:17:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53443)
+	id 1jBSjP-0005cz-Rq
+	for qemu-devel@archiver.kernel.org; Mon, 09 Mar 2020 20:26:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBSZG-0003YE-9s
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:16:19 -0400
+ (envelope-from <bounces@canonical.com>) id 1jBSiV-00058p-HM
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBSZE-0001QR-Cw
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:16:17 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:51752)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBSZE-0001PM-3Y
- for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:16:16 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02A0DZSl086068;
- Tue, 10 Mar 2020 00:16:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=3BM1M+8zcCYyEMUItXIOcAm+65hdZEUJx2bdFzfcl30=;
- b=wkIwyugggHJVGz4pdWQtll1XmbhfsNNxlgLNlnAdzaVHbJZCLxl3bYbQ7Pozq6HTSwpB
- jWqHj0/M4lrRD0gzBM8qbeZMmECv3izqJceYMNhhH4FabJf+Ucjj7QhIXuQ12NOJff9p
- TMjlojpVpBhbb4e+yf71m4WP740o/2t8IXrG1e8KA/XxQCPvK+7gDyfpAjqhY4kRq4I1
- x/CGKm70q0f1nfDyAgPYnmWK+/sxDQDt7h0WggmUJTxVxF4GCK2/TIjXohRBDjvp2HXc
- OMikrztRjmzuPpW33EPEgY3TKItFwbf5zwPzEVtBYCDkVAuzLQH++kVVgFb5u/veGjyD HA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2ym48st2y5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 00:16:14 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02A0BSNR039837;
- Tue, 10 Mar 2020 00:16:13 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2ymun83fxq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 00:16:13 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02A0GCOl023604;
- Tue, 10 Mar 2020 00:16:12 GMT
-Received: from Lirans-MacBook-Pro.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 09 Mar 2020 17:16:12 -0700
-Subject: Re: [PATCH 00/14]: hw/i386/vmport: Bug fixes and improvements
-To: qemu-devel@nongnu.org
-References: <158379920808.20878.11449383700170470292@39012742ff91>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <c103abaf-0ba4-44e5-8551-209422d24955@oracle.com>
-Date: Tue, 10 Mar 2020 02:16:09 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ (envelope-from <bounces@canonical.com>) id 1jBSiU-0004lg-4i
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:25:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jBSiT-0004hZ-VC
+ for qemu-devel@nongnu.org; Mon, 09 Mar 2020 20:25:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jBSiQ-0001Ca-OF
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 00:25:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 786332E80CC
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 00:25:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <158379920808.20878.11449383700170470292@39012742ff91>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- malwarescore=0
- mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090147
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- impostorscore=0
- mlxlogscore=999 suspectscore=0 priorityscore=1501 lowpriorityscore=0
- phishscore=0 adultscore=0 spamscore=0 mlxscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003090147
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Mar 2020 00:18:24 -0000
+From: tstrike <1813165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: albrt brogers-q dgilbert-h himbeere lersek
+ tstrike34 vkuznets
+X-Launchpad-Bug-Reporter: Thomas (himbeere)
+X-Launchpad-Bug-Modifier: tstrike (tstrike34)
+References: <154833838504.19548.14915901097039330455.malonedeb@gac.canonical.com>
+Message-Id: <158379950496.11830.17996727164244383963.malone@soybean.canonical.com>
+Subject: [Bug 1813165] Re: KVM internal error. Suberror: 1 emulation failure
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 28897d4385461d3e884aff55693a7d0a28a53130
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,95 +77,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, mst@redhat.com, ehabkost@redhat.com, rth@twiddle.net
+Reply-To: Bug 1813165 <1813165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+L0 DistroRelease: Ubuntu 20.04  on Kernel Linux 5.4.0-14-generic x86_64
+L1 3 guests    Windows 10, Centos 8
+No L2s
 
-On 10/03/2020 2:13, no-reply@patchew.org wrote:
-> Patchew URL: https://urldefense.com/v3/__https://patchew.org/QEMU/20200309235411.76587-1-liran.alon@oracle.com/__;!!GqivPVa7Brio!IXfneuptZ4caQyQEEgsIN74dLYkkLHJ8XSqL2iGyrzODUx_Jt8Vk-eKN_QQftVU$
->
->
->
-> Hi,
->
-> This series seems to have some coding style problems. See output below for
-> more information:
->
-> Subject: [PATCH 00/14]: hw/i386/vmport: Bug fixes and improvements
-> Message-id: 20200309235411.76587-1-liran.alon@oracle.com
-> Type: series
->
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
->
-> Switched to a new branch 'test'
-> ec54414 hw/i386/vmport: Assert vmport initialized before registering commands
-> 77ea4ed hw/i386/vmport: Add support for CMD_GETHZ
-> b1ed920 i386/cpu: Store LAPIC bus frequency in CPU structure
-> 62d770f hw/i386/vmport: Allow x2apic without IR
-> 5c97d52 hw/i386/vmport: Add support for CMD_GET_VCPU_INFO
-> e4a716d hw/i386/vmport: Add support for CMD_GETTIMEFULL
-> febcb47 hw/i386/vmport: Add support for CMD_GETTIME
-> 25890df hw/i386/vmport: Add support for CMD_GETBIOSUUID
-> 9e6211d hw/i386/vmport: Define enum for all commands
-> fc5f5ec hw/i386/vmport: Report VMX type in CMD_GETVERSION
-> f284754 hw/i386/vmport: Introduce vmx-version property
-> 114bf59 hw/i386/vmport: Add device properties
-> 8acf5a2 hw/i386/vmport: Set EAX to -1 on failed and unsupported commands
-> 97c3de7 hw/i386/vmport: Propagate IOPort read to vCPU EAX register
->
-> === OUTPUT BEGIN ===
-> 1/14 Checking commit 97c3de7b1b98 (hw/i386/vmport: Propagate IOPort read to vCPU EAX register)
-> 2/14 Checking commit 8acf5a2b7630 (hw/i386/vmport: Set EAX to -1 on failed and unsupported commands)
-> 3/14 Checking commit 114bf59021b3 (hw/i386/vmport: Add device properties)
-> 4/14 Checking commit f284754e01a3 (hw/i386/vmport: Introduce vmx-version property)
-> 5/14 Checking commit fc5f5ec6f72f (hw/i386/vmport: Report VMX type in CMD_GETVERSION)
-> 6/14 Checking commit 9e6211d4df01 (hw/i386/vmport: Define enum for all commands)
-> 7/14 Checking commit 25890df0767b (hw/i386/vmport: Add support for CMD_GETBIOSUUID)
-> ERROR: "(foo*)" should be "(foo *)"
-> #33: FILE: hw/i386/vmport.c:128:
-> +    uint32_t *uuid_parts = (uint32_t*)(qemu_uuid.data);
->
-> total: 1 errors, 0 warnings, 39 lines checked
->
-> Patch 7/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> 8/14 Checking commit febcb4730cb2 (hw/i386/vmport: Add support for CMD_GETTIME)
-> 9/14 Checking commit e4a716de3f06 (hw/i386/vmport: Add support for CMD_GETTIMEFULL)
-> 10/14 Checking commit 5c97d52c360a (hw/i386/vmport: Add support for CMD_GET_VCPU_INFO)
-> ERROR: return is not a function, parentheses are not required
-> #41: FILE: hw/i386/vmport.c:185:
-> +    return (1 << VCPU_INFO_RESERVED_BIT);
->
-> total: 1 errors, 0 warnings, 38 lines checked
->
-> Patch 10/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> 11/14 Checking commit 62d770f375b6 (hw/i386/vmport: Allow x2apic without IR)
-> 12/14 Checking commit b1ed920b0bf3 (i386/cpu: Store LAPIC bus frequency in CPU structure)
-> 13/14 Checking commit 77ea4ed42420 (hw/i386/vmport: Add support for CMD_GETHZ)
-> 14/14 Checking commit ec54414bea14 (hw/i386/vmport: Assert vmport initialized before registering commands)
-> === OUTPUT END ===
->
-> Test command exited with code: 1
+No guests are enabled for UEFI Boot
 
-Arr...
-Will fix these minor coding-conventions after the patches are reviewed 
-so I will take all into account in v2.
+-- =
 
--Liran
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1813165
 
+Title:
+  KVM internal error. Suberror: 1 emulation failure
 
+Status in QEMU:
+  New
+
+Bug description:
+  Hello Devs.
+
+  Having problems getting VM to run with qemu 3.1.0. I should mention
+  it's a nested configuration.
+
+  2019-01-24 13:46:08.648+0000: starting up libvirt version: 4.10.0, qemu v=
+ersion: 3.1.0, kernel: 4.14.94, hostname: one....
+  LC_ALL=3DC PATH=3D/bin:/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/bin:/usr/=
+sbin:/usr/local/bin:/usr/local/sbin:/opt/bin HOME=3D/root USER=3Droot QEMU_=
+AUDIO_DRV=3Dnone /usr/bin/kvm -name guest=3Done-266,debug-threads=3Don -S -=
+object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/dom=
+ain-1-one-266/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,usb=3Doff,d=
+ump-guest-core=3Doff -cpu Skylake-Client-IBRS,ss=3Don,hypervisor=3Don,tsc_a=
+djust=3Don,clflushopt=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don -m 1024 -real=
+time mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -uuid b219b45d-a2=
+f0-4128-a948-8673a7abf968 -no-user-config -nodefaults -chardev socket,id=3D=
+charmonitor,fd=3D21,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,m=
+ode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device piix3-=
+usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive file=3D/var/lib/one//da=
+tastores/0/266/disk.0,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk0,cach=
+e=3Dnone -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don -drive f=
+ile=3D/var/lib/one//datastores/0/266/disk.1,format=3Draw,if=3Dnone,id=3Ddri=
+ve-ide0-0-0,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Ddrive=
+-ide0-0-0,id=3Dide0-0-0 -netdev tap,fd=3D23,id=3Dhostnet0 -device rtl8139,n=
+etdev=3Dhostnet0,id=3Dnet0,mac=3D02:00:00:76:69:85,bus=3Dpci.0,addr=3D0x3 -=
+chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharserial0,id=3D=
+serial0 -vnc 0.0.0.0:266 -device cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D=
+0x2 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -sandbo=
+x on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny -msg timestamp=3Don
+  char device redirected to /dev/pts/1 (label charserial0)
+  KVM internal error. Suberror: 1
+  emulation failure
+  EAX=3D00000001 EBX=3D000f7c2c ECX=3D00000001 EDX=3D00000001
+  ESI=3D00006a26 EDI=3D3ffbdc48 EBP=3D000069e6 ESP=3D000a8000
+  EIP=3D000fd057 EFL=3D00010016 [----AP-] CPL=3D0 II=3D0 A20=3D1 SMM=3D1 HL=
+T=3D0
+  ES =3D0010 00000000 ffffffff 00c09300
+  CS =3D0000 00000000 00000fff 00809b00
+  SS =3D0010 00000000 ffffffff 00c09300
+  DS =3D0010 00000000 ffffffff 00c09300
+  FS =3D0010 00000000 ffffffff 00c09300
+  GS =3D0010 00000000 ffffffff 00c09300
+  LDT=3D0000 00000000 0000ffff 00008200
+  TR =3D0000 00000000 0000ffff 00008b00
+  GDT=3D     10387cfe 0000fe6c
+  IDT=3D     0010387c 00003810
+  CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
+  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
+=3D0000000000000000
+  DR6=3D00000000fffecffc DR7=3D000000000e1e0400
+  EFER=3D0000000000000000
+  Code=3Dcb 66 ba 4d d0 0f 00 e9 c8 fe bc 00 80 0a 00 e8 31 3a ff ff <0f> a=
+a fa fc 66 ba 66 d0 0f 00 e9 b1 fe f3 90 f0 0f ba 2d ac 3b 0f 00 00 72 f3 8=
+b 25 a8 3b
+  2019-01-24T13:47:39.383366Z kvm: terminating on signal 15 from pid 2708 (=
+/usr/sbin/libvirtd)
+
+  Someone has an idea whats going wrong here?
+
+  thanks and cheers
+  t.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1813165/+subscriptions
 
