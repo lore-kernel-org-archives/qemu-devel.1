@@ -2,107 +2,110 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BE5C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C93D5C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:47:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96242208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:45:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8412F215A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:47:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUsD+pto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96242208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Zvyy28++"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8412F215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34557 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBg7z-0007s4-SH
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:45:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48169)
+	id 1jBgAN-00017T-Q4
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:47:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jBg7D-0007QI-IF
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:17 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jBg9P-0000Z5-Ft
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jBg7B-0000fj-4w
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29294
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBg7B-0000eO-05
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583851452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1frh014VE7ZTywaJsrF6qrFgIGVVAr/xQnm4BpT6Bls=;
- b=bUsD+ptozsOXl+pTguq7C5v9RA2TNPPlbY1Ss1j2l4lMka0gFwLC4GMTzNQibF+o+t5fdK
- oXaeWE9C3yYRHjra0sBv/nVn6YnQaOHvALB0u9Jyrs6wUMqMnrOqYL1rr3ux0PLZl9yELZ
- y2WHyjcfFSwgktarxqenF/PlxccKOCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-ozcM-kwGMUeA4DbW0_WZAQ-1; Tue, 10 Mar 2020 10:44:10 -0400
-X-MC-Unique: ozcM-kwGMUeA4DbW0_WZAQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66C738010E8;
- Tue, 10 Mar 2020 14:44:09 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D805963742;
- Tue, 10 Mar 2020 14:44:05 +0000 (UTC)
-Subject: Re: [PATCH v3 6/9] block/block-copy: refactor interfaces to use bytes
- instead of end
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
- <20200306073831.7737-7-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <66631524-e6a6-7f1c-1b87-eee64c5b421a@redhat.com>
-Date: Tue, 10 Mar 2020 15:44:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <liran.alon@oracle.com>) id 1jBg9M-0005a6-8R
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:46:30 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54638)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jBg9L-0005Xs-Ty
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:46:28 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEXbjh061395;
+ Tue, 10 Mar 2020 14:46:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ZIZm9zc8v3zWoNNOKlx1pME50t4C5799yI5AIcFj2TA=;
+ b=Zvyy28++ObFsVC2T1XRhrWDemhLO1ojV/0chJ8Ywxe1V/JlghgRnW5J8rvc3tnLDWHXi
+ l9X89UmzZ7HBTY6mpFE6l8BYQgzboKJOg/SPb/ALl1M8uJx970nBHcOvIMjBb/HawQ6A
+ mnVVAA7J0mTTHfDHEk1E/YHW9XaWb+OLfVXmUALUwkmvLXX6OlUe+ICnVujngmUnlr2p
+ uklWVw/PcPZS5naO08UighkwbWmqzJB++s9deO3NQs/Qu0fXlxDBS7wvlYnaSl3y9/5J
+ B+MGgiSWNf3aVx1fSo9AgZXEdNI3L2zbohp4UuQt+z6u7Unt7MTIEtdOKQLZ0FAsXb/m Tg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2yp7hm2bu9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 14:46:25 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEXb9r075654;
+ Tue, 10 Mar 2020 14:46:24 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2yp8rj95c3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 14:46:24 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02AEkNFZ019491;
+ Tue, 10 Mar 2020 14:46:23 GMT
+Received: from Lirans-MacBook-Pro.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 10 Mar 2020 07:46:23 -0700
+Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200309235411.76587-1-liran.alon@oracle.com>
+ <20200309235411.76587-6-liran.alon@oracle.com>
+ <20200310081144-mutt-send-email-mst@kernel.org>
+ <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
+ <20200310082730-mutt-send-email-mst@kernel.org>
+ <506ba498-ba50-9415-18b3-bcaff1561c55@oracle.com>
+ <20200310084758-mutt-send-email-mst@kernel.org>
+ <1f4766b2-9683-8ebf-752e-a0378bb0cbc3@oracle.com>
+ <20200310094350-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <6d3c248f-f8fe-754d-59e5-8f2740a55263@oracle.com>
+Date: Tue, 10 Mar 2020 16:46:19 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200306073831.7737-7-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200310094350-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ phishscore=0 mlxscore=0
+ spamscore=0 malwarescore=0 bulkscore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003100098
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ spamscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100098
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
+ 02AEXbjh061395
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,58 +117,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93
-Content-Type: multipart/mixed; boundary="nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j"
 
---nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 10/03/2020 16:08, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 03:35:25PM +0200, Liran Alon wrote:
+>> On 10/03/2020 14:53, Michael S. Tsirkin wrote:
+>>> On Tue, Mar 10, 2020 at 02:43:51PM +0200, Liran Alon wrote:
+>>>> On 10/03/2020 14:35, Michael S. Tsirkin wrote:
+>>>>> On Tue, Mar 10, 2020 at 02:25:28PM +0200, Liran Alon wrote:
+>>>>>> On 10/03/2020 14:14, Michael S. Tsirkin wrote:
+>>>>>>> On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
+>>>>>>>> As can be seen from VmCheck_GetVersion() in open-vm-tools code,
+>>>>>>>> CMD_GETVERSION should return VMX type in ECX register.
+>>>>>>>>
+>>>>>>>> Default is to fake host as VMware ESX server. But user can contr=
+ol
+>>>>>>>> this value by "-global vmport.vmx-type=3DX".
+>>>>>>>>
+>>>>>>>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>>>>>>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>>>>>>>> ---
+>>>>>>>>      hw/i386/vmport.c | 13 +++++++++++++
+>>>>>>>>      1 file changed, 13 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+>>>>>>>> index a2c8ff4b59cf..c03f57f2f636 100644
+>>>>>>>> --- a/hw/i386/vmport.c
+>>>>>>>> +++ b/hw/i386/vmport.c
+>>>>>>>> @@ -36,6 +36,15 @@
+>>>>>>>>      #define VMPORT_ENTRIES 0x2c
+>>>>>>>>      #define VMPORT_MAGIC   0x564D5868
+>>>>>>>> +typedef enum {
+>>>>>>>> +   VMX_TYPE_UNSET =3D 0,
+>>>>>>>> +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Expr=
+ess */
+>>>>>>>> +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
+>>>>>>>> +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Serv=
+er */
+>>>>>>>> +   VMX_TYPE_WORKSTATION,
+>>>>>>>> +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for =
+ACE 1.x */
+>>>>>>>> +} VMX_Type;
+>>>>>>>> +
+>>>>>>> Is this really VMX type? And do users care what it is?
+>>>>>> This enum is copied from open-vm-tools source code
+>>>>>> (lib/include/vm_version.h). This is how it's called in VMware Tool=
+s
+>>>>>> terminology... Don't blame me :)
+>>>>> I don't even want to go look at it to check license compatibility, =
+but
+>>>>> IMHO that's just another reason to avoid copying it.
+>>>>> Copying bad code isn't a good idea unless needed for
+>>>>> compatibility.
+>>>> Preserving original VMware terminology makes sense and is preferred =
+in my
+>>>> opinion. I think diverging from it is more confusing.
+>>> Yea tell it to people who got in hot water because they copied
+>>> some variable names to avoid confusion. Oh wait.
+>>>
+>>> This is not an official terminology I think.
+>> Maybe it wasn't clear from my previous messages, but open-vm-tools is =
+an
+>> official VMware open-source project...
+>> VMX is the official name of the VMware Userspace-VMM and VMX-Type is a=
+n
+>> official name as-well.
+>>
+>> I'm also not copying code here... I'm copying definitions from relevan=
+t
+>> header files to implement a compatible interface.
+> You don't need to have enum have same names to be compatible.
+> And in this case, all we really need is just a single number *2*
+> and a comment saying that's ESX server.
+I don't have to. I want to. It makes code much more clearer to reader. I=20
+don't see any harm in that.
+>
+>> This is no different than copying constants from a Linux device driver=
+ to
+>> implement it's device emulation in QEMU.
+> We really try to avoid stuff like this. If one does this one has to
+> check license etc etc.
+There is no license issue here. It's only definitions. And if you really=20
+wonder about it, this is the license written in the header files of=20
+open-vm-tools:
+/*********************************************************
+ =C2=A0* Copyright (C) 2006 VMware, Inc. All rights reserved.
+ =C2=A0*
+ =C2=A0* This program is free software; you can redistribute it and/or mo=
+dify it
+ =C2=A0* under the terms of the GNU Lesser General Public License as publ=
+ished
+ =C2=A0* by the Free Software Foundation version 2.1 and no later version.
+ =C2=A0*
+ =C2=A0* This program is distributed in the hope that it will be useful, =
+but
+ =C2=A0* WITHOUT ANY WARRANTY; without even the implied warranty of=20
+MERCHANTABILITY
+ =C2=A0* or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the Lesser GNU Ge=
+neral Public
+ =C2=A0* License for more details.
+ =C2=A0*
+ =C2=A0* You should have received a copy of the GNU Lesser General Public=
+ License
+ =C2=A0* along with this program; if not, write to the Free Software=20
+Foundation, Inc.,
+ =C2=A0* 51 Franklin St, Fifth Floor, Boston, MA=C2=A0 02110-1301 USA.
+ =C2=A0*
+ =C2=A0*********************************************************/
+> But in this case, the names are confusing,
+> violate our coding style, I could go on.
+The only thing that violates the coding style is "VMX_Type" enum type=20
+name instead of "VMXType". And that is right and I will change it in v2.=20
+However, the rest doesn't violate coding style.
+In addition, I disagree this is confusing. These are official VMX=20
+product names defined by VMware. I don't see any value in renaming them.=20
+It just results in additional confusion.
+>
+>
+>>> So please just make it make sense by itself, and make it
+>>> easy to research.
+>> I think I have made it the most easiest to research. Having exactly sa=
+me
+>> names as VMware official project and pointing to it directly from comm=
+ents
+>> and commit messages.
+> What good does this do when that code will change tomorrow?
+Why would the enum constants change tomorrow?
+And even if that will happen, it still allows a reader to just search in=20
+Google the name of the constant and find results.
+Which is better than just making up names that we think our more=20
+intuitive than the names VMware decided for their own product.
+>
+> You worry about code being easy to write, I worry about it
+> being easy to read.
 
-On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
-> We have a lot of "chunk_end - start" invocations, let's switch to
-> bytes/cur_bytes scheme instead.
->=20
-> While being here, improve check on block_copy_do_copy parameters to not
-> overflow when calculating nbytes and use int64_t for bytes in
-> block_copy for consistency.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  include/block/block-copy.h |  6 +--
->  block/block-copy.c         | 78 ++++++++++++++++++++------------------
->  2 files changed, 44 insertions(+), 40 deletions(-)
+No I don't. This doesn't matter at all for writing code but matters only=20
+to reading it.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>
+> Here are things we can do to make things easier for users and readers:
+> - use full name VM executable instead of VMX
+Why? Searching for "VMware VM executable" in Google provides completely=20
+unrelated results.
+In contrast, searching for "VMware VMX" provides concrete related results.
+We shouldn't rename terminology given by VMware itself to it's own=20
+product. It just adds confusion in my opinion.
+> - put in official product names in comments instead of enums
+I don't see how it provides extra value. Especially due to the fact that=20
+the enum constants have their more common product name next to them in=20
+comment.
+I provide both reference that can be searched in other VMware projects=20
+and web and the more user-friendly well-known name.
+> - write code using our coding style
+Will do. The only coding style violation I see here is the enum type=20
+name. Will change from "VMX_Type" to "VMXType".
+The rest seems not violating coding convention. Please tell me if I=20
+missed something.
+> - add a link to where you found a specific number in comments
+Good idea. Will add a link to open-vm-tools git repo in vmport.c comment=20
+in general.
+>
+>
+>
+>
+>
+>
+>>>>>>> Also, how about friendlier string values so people don't need to
+>>>>>>> figure out code numbers?
+>>>>>> I could have defined a new PropertyInfo struct in hw/core/qdev-pro=
+perties.c
+>>>>>> for this enum and then define a proper macro in qdev-properties.h.
+>>>>>> But it seems like an overkill for a value that is suppose to rarel=
+y be
+>>>>>> changed. So I thought this should suffice for now for user-experie=
+nce
+>>>>>> perspective.
+>>>>>> If you think otherwise, I can do what I just suggested above.
+>>>>>>
+>>>>>> -Liran
+>>>>> I think that's better, and this allows you to use official
+>>>>> product names that people can relate to.
+>>>> Ok. Will do...
+>>>>> Alternatively just drop this enum completely.  As far as you are
+>>>>> concerned it's just a number VM executable gives together with the
+>>>>> version, right?  We don't even need the enum, just set it to 2 and =
+add a
+>>>>> code comment saying it's esx server.
+>>>> I could do the latter alternative but why? It just hides information
+>>>> original patch author (myself) know about where this value comes fro=
+m.
+>>>> I don't see a reason to hide information from future code maintainer=
+s.
+>>>> Similar to defining all flags of a given flag-field even if we use o=
+nly a
+>>>> subset of it.
+>>>>
+>>>> -Liran
+>>> That belongs in a code comment. Removes need to follow silly names fr=
+om
+>>> unrelated and possibly incompatible license.
+>> What do you mean "unrelated"? It's an official VMware open-source proj=
+ect
+>> for VMware Tools...
+>> I'm only copying definition of constants...
+> No you also copy names and comments. Which might make sense in the
+> context of the original project but seem to make no sense here.
+> E.g. for vmware a given product is deprecated but why does QEMU care?
+What is the harm in specifying that? It gives more context.
+> enum values are not even listed. What is poor user supposed to do -
+> take out a calculator to figure it out?
+What do you mean by listed?
+>
+>>> By comparison dead code is
+>>> dead code.
+>> Right. That's why I think the enum PropertyInfo mechanism is an overki=
+ll at
+>> this point.
+>>> But sure, if you want to code up user friendly names, that's
+>>> ok too. But do follow official names then please, not something lifte=
+d
+>>> from some piece of code.
+>> These are all official names.
+> Official as in will stick around, not official as in pushed to
+> a github repo.
+>
+>
+>> I'm not sure I understand what you are
+>> suggesting.
+>>
+>> -Liran
+> Something like the below.
+>
+> /*
+>   * Most guests are fine with the default.
+>   * Some legacy guests hard-code a given type.
+>   * See https://urldefense.com/v3/__https://github.com/vmware/open-vm-t=
+ools/blob/master/open-vm-tools/lib/include/vm_vmx_type.h__;!!GqivPVa7Brio=
+!M9wko4CSBSs3xFA2QY7MIL_jvAxlU5aRZE1jN2hzG5jnk8rdlpYCDs2ymrkJ8GE$
+>   * for an up-to-date list of values.
+>   *
+>   * Reasonable options:
+>   * 0 - unset?
+>   * 1 - VMware Express (deprecated)
+>   * 2 - VMware ESX server
+>   * 3 - VMware Workstation
+>   * 4 - ACE 1.x (deprecated)
+>   */
+>
+> DEFINE_PROP_UINT8("vm-executable-type", VMPortState, vm_executable_type=
+, 2 /* VMware ESX server */),
+>
+Why is it better to specify a list of all options in a comment than an=20
+enum? Isn't enum invented exactly for enumerating all possible values of=20
+a field?
+Note that even in this simple case, you needed to write "VMware ESX=20
+server" twice instead of referring to an enum constant. It doesn't seem=20
+more elegant to me.
+
+And again, I disagree with renaming the field to "vm-executable-type"=20
+instead of "vmx-type".
+
+-Liran
 
 
---nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j--
-
---ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5np7MACgkQ9AfbAGHV
-z0CGiQgAqZtXHSCnz4BbRte8eeUEJzWB2leE975iPkexVk4R3IY4AVn1O+ttfV8W
-LMeYEN7ZmGPpjShj02IqoXptyKmdIb189VmkXt6HKsaz0QTBYwhpF90EUCnRyRsf
-ecBnhwy2y/sI3ACk9Eb8Koj1PJTrUxHb4AFRa5JTIeX0BlqOaEr8Pf65pHzrQqQo
-f1E/N+pI+lwWImLj0gZwrzY/z11/oEQHt2NCue5vUrTpP4DBWG7ieJr1bDFcHBct
-GSdyVOwRPwRP1Vbq4H1d1ouzPJiuKEawzwazPNTzLOcGPf7EbGjZFqRnPq0gGiU6
-3VO0ifcNKuoR2qb4A/aQ/aP09A+7Kw==
-=HNnz
------END PGP SIGNATURE-----
-
---ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93--
 
 
