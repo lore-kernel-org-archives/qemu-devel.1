@@ -2,85 +2,83 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B95C2BB8C
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93077C2BB8C
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:44:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F89724684
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:43:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F89724684
+	by mail.kernel.org (Postfix) with ESMTPS id 63FB424686
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:44:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FB424686
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBfAn-00044d-G7
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42426)
+	id 1jBfB4-0004jp-H4
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:44:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jBf9Q-0002SV-3V
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:29 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jBfA7-00031y-37
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jBf9N-0007jh-OG
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59954
+ (envelope-from <frankja@linux.ibm.com>) id 1jBfA5-0000JD-S8
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:43:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24356
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jBf9N-0007iJ-JE
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:42:25 -0400
+ id 1jBfA5-0007XA-Le
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:43:09 -0400
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02ADgJZu074555
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:42:25 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ym649xmn8-1
+ 02ADgKGp074573
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:42:20 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ym649xm9f-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:42:24 -0400
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 09:42:19 -0400
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Tue, 10 Mar 2020 13:42:23 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Tue, 10 Mar 2020 13:42:02 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 10 Mar 2020 13:42:20 -0000
+ Tue, 10 Mar 2020 13:41:58 -0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
  [9.149.105.61])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02ADgJjq42729936
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02ADfvD152691032
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 13:42:19 GMT
+ Tue, 10 Mar 2020 13:41:57 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C977C11C04C;
- Tue, 10 Mar 2020 13:42:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 843B911C052;
+ Tue, 10 Mar 2020 13:41:57 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8D0DD11C04A;
- Tue, 10 Mar 2020 13:42:18 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 51CEB11C04A;
+ Tue, 10 Mar 2020 13:41:56 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.23.214])
  by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 10 Mar 2020 13:42:18 +0000 (GMT)
+ Tue, 10 Mar 2020 13:41:56 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 14/15] docs: Add protvirt docs
-Date: Tue, 10 Mar 2020 09:40:07 -0400
+Subject: [PATCH v8 00/15] s390x: Protected Virtualization support
+Date: Tue, 10 Mar 2020 09:39:53 -0400
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200310134008.130038-1-frankja@linux.ibm.com>
-References: <20200310134008.130038-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031013-0016-0000-0000-000002EF0551
+x-cbid: 20031013-0020-0000-0000-000003B25543
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031013-0017-0000-0000-000033526972
-Message-Id: <20200310134008.130038-15-frankja@linux.ibm.com>
+x-cbparentid: 20031013-0021-0000-0000-0000220AA13F
+Message-Id: <20200310134008.130038-1-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-10_07:2020-03-10,
  2020-03-10 signatures=0
@@ -109,86 +107,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Lets add some documentation for the Protected VM functionality.
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- docs/system/index.rst    |  1 +
- docs/system/protvirt.rst | 56 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
+
+v8:
+	* Removed the iplb_valid changes as they are picked
+	* Checkpatch fixes
+	* Review fixes
+	* Replaced env/ms->pv with s390_is_pv()
+v7:
+	* Merged the diag 308 subcode patches and the unpack
+	* Moved the SIDA memops into the sync patch
+	* Bailout for the none machien and fencing of CONFIG_USER_ONLY
+	* Changes due to review
+
+v6:
+	* diag308 rc numbers were changed by architecture
+	* IPL pv block received one more reserved field by architecture
+	* Officially added the bios patch to the series
+	* Dropped picked constant rename patch
+
+v5:
+	* Moved docs into docs/system
+	* Some more enable/disable changes
+	* Moved enablement/disablement of pv in separate functions
+	* Some review fixes
+
+v4:
+	* Sync with KVM changes
+	* Review changes
+
+V3:
+	* Use dedicated functions to access SIDA
+	* Smaller cleanups and segfault fixes
+	* Error reporting for Ultravisor calls
+	* Inject of RC of diag308 subcode 10 fails
+
+V2:
+	* Split out cleanups
+	* Internal PV state tracking
+	* Review feedback
+
+
+Christian Borntraeger (1):
+  s390x: Add unpack facility feature to GA1
+
+Janosch Frank (14):
+  Sync pv
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Add migration blocker
+  s390x: protvirt: Inhibit balloon when switching to protected mode
+  s390x: protvirt: KVM intercept changes
+  s390x: Add SIDA memory ops
+  s390x: protvirt: Move STSI data over SIDAD
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDA
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Move IO control structures over SIDA
+  s390x: protvirt: Handle SIGP store status correctly
+  docs: Add protvirt docs
+
+ docs/system/index.rst               |   1 +
+ docs/system/protvirt.rst            |  56 +++++++++++
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  56 ++++++++++-
+ hw/s390x/ipl.h                      |  79 ++++++++++++++++
+ hw/s390x/pv.c                       | 104 +++++++++++++++++++++
+ hw/s390x/pv.h                       |  33 +++++++
+ hw/s390x/s390-virtio-ccw.c          | 140 +++++++++++++++++++++++++++-
+ hw/s390x/sclp.c                     |  30 ++++++
+ include/hw/s390x/s390-virtio-ccw.h  |   1 +
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/linux/kvm.h           |  45 ++++++++-
+ target/s390x/cpu.c                  |  45 +++++++--
+ target/s390x/cpu.h                  |   8 +-
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 |  57 +++++++++--
+ target/s390x/gen-features.c         |   1 +
+ target/s390x/helper.c               |   5 +
+ target/s390x/ioinst.c               | 119 ++++++++++++++++-------
+ target/s390x/kvm.c                  |  68 ++++++++++++--
+ target/s390x/kvm_s390x.h            |   2 +
+ target/s390x/mmu_helper.c           |  14 +++
+ 22 files changed, 804 insertions(+), 64 deletions(-)
  create mode 100644 docs/system/protvirt.rst
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
 
-diff --git a/docs/system/index.rst b/docs/system/index.rst
-index 6e5f20fa13..74afbd7cc3 100644
---- a/docs/system/index.rst
-+++ b/docs/system/index.rst
-@@ -34,3 +34,4 @@ Contents:
-    deprecated
-    build-platforms
-    license
-+   protvirt
-diff --git a/docs/system/protvirt.rst b/docs/system/protvirt.rst
-new file mode 100644
-index 0000000000..6c8cf0f791
---- /dev/null
-+++ b/docs/system/protvirt.rst
-@@ -0,0 +1,56 @@
-+Protected Virtualization on s390x
-+=================================
-+
-+The memory and most of the registers of Protected Virtual Machines
-+(PVMs) are encrypted or inaccessible to the hypervisor, effectively
-+prohibiting VM introspection when the VM is running. At rest, PVMs are
-+encrypted and can only be decrypted by the firmware, represented by an
-+entity called Ultravisor, of specific IBM Z machines.
-+
-+
-+Prerequisites
-+-------------
-+
-+To run PVMs a machine with the Protected Virtualization feature
-+which is indicated by the Ultravisor Call facility (stfle bit
-+158) is required. The Ultravisor needs to be initialized at boot by
-+setting `prot_virt=1` on the kernel command line.
-+
-+If those requirements are met, the capability `KVM_CAP_S390_PROTECTED`
-+will indicate that KVM can support PVMs on that LPAR.
-+
-+
-+QEMU Settings
-+-------------
-+
-+To indicate to the VM that it can transition into protected mode, the
-+`Unpack facility` (stfle bit 161 represented by the feature
-+`S390_FEAT_UNPACK`) needs to be part of the cpu model of the VM.
-+
-+All I/O devices need to use the IOMMU.
-+Passthrough (vfio) devices are currently not supported.
-+
-+Host huge page backings are not supported. However guests can use huge
-+pages as indicated by its facilities.
-+
-+
-+Boot Process
-+------------
-+
-+A secure guest image can either be loaded from disk or supplied on the
-+QEMU command line. Booting from disk is done by the unmodified
-+s390-ccw BIOS. I.e., the bootmap is interpreted, multiple components
-+are read into memory and control is transferred to one of the
-+components (zipl stage3). Stag3 does some fixups and then transfers
-+control to some program residing in guest memory, which is normally
-+the OS kernel. The secure image has another component prepended
-+(stage3a) that uses the new diag308 subcodes 8 and 10 to trigger the
-+transition into secure mode.
-+
-+Booting from the image supplied via the QEMU command line requires
-+that the file passed via -kernel has the same memory layout as would
-+result from the disk boot. This memory layout includes the encrypted
-+components (kernel, initrd, cmdline), the stage3a loader and
-+metadata. In case this boot method is used, the command line
-+options -initrd and -cmdline are ineffective. The preparation of a PVM
-+image is done by genprotimg of the s390-tools package.
 -- 
 2.20.1
 
