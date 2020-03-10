@@ -2,102 +2,96 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08609C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2F5C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:28:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3DBC24655
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA7AF24655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:28:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eRGSXgM5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3DBC24655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WghMFRmQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7AF24655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdye-0001Kg-TD
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50044)
+	id 1jBdzt-0002Jk-7b
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:28:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBdxD-0000Rq-Km
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:49 -0400
+ (envelope-from <mst@redhat.com>) id 1jBdyl-0001fv-Hn
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBdx8-0007cg-UR
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:47 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:60354)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBdx4-0007PK-PU
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:25:42 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACMaUj073914;
- Tue, 10 Mar 2020 12:25:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=q0f2cVAsS+gSPU1TLGzg45dV74mn0SLz/Dn3+uwV8OQ=;
- b=eRGSXgM59tOJUGW1mWr+Mt8Yuj9k6QUBRCWnd31SuRj8Y71+a+xq2aGbdNfCwZuFRoOK
- YSA83ifH9XEgL1U3ftjjNDyMDygGzXtBIdVksa0u6i/D7xq9RIT7/dSbxf0uRp0TP9n5
- lgwpwhiykm9/ydFPGjbo8fhu6f/du3c165csyYVtzpqtJud0/kpsZtskCxmMxcJMF+LF
- w/nVU8VcUXfYVdklfkCSVhhCjIlpJ25NTFhx1XmMw1PEFiymaSiuXDBr+vsdPNsHeeYm
- asaDKYfr3ITrLObyMBmEbuQ1TSGFNT8pVySUd8rITIFPDKF2C7m5nCiKeNxLH2xs9wno 2g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2ym31ud7as-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 12:25:35 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ACIdOI038079;
- Tue, 10 Mar 2020 12:25:35 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2yp8nscu5n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 12:25:35 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ACPXsL019310;
- Tue, 10 Mar 2020 12:25:33 GMT
-Received: from [192.168.14.112] (/79.181.212.171)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 10 Mar 2020 05:25:33 -0700
-Subject: Re: [PATCH 05/14] hw/i386/vmport: Report VMX type in CMD_GETVERSION
-To: "Michael S. Tsirkin" <mst@redhat.com>
+ (envelope-from <mst@redhat.com>) id 1jBdyk-000496-5h
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:27:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49448
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBdyj-00043Z-R0
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:27:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583843241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nEWBm7c9j10Sxtu/tisotHrVDe1+OXzhJCghP/u4mmg=;
+ b=WghMFRmQH1HI5yWlvk0U/fxfoLabonF32ask7Q5rz8KMCdDhEs64WEnKtDhAKvwmnIISgs
+ SyKH8vf+yh8+H3mBM9tIbVTPUXwq1qiMkRJ/H3MWbI5u6n4GwiKaDAbvPPie7vtO4YsTl7
+ XoqYGqHAhsZC5Rj0SMcKRLgU7TJN/bU=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-fY8632HWOI2jufpCHUsn4g-1; Tue, 10 Mar 2020 08:27:17 -0400
+X-MC-Unique: fY8632HWOI2jufpCHUsn4g-1
+Received: by mail-qk1-f198.google.com with SMTP id w2so9578937qka.4
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 05:27:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=L/fc0tjaGRxVSgKEiKUII0LB9scZp2X6AysaWaSjqqI=;
+ b=RLEpTJDZM0/ebRp6/Hvxb0P7V9f0i2uXDFvOCBjmEDaKaKflq49Puode/lMVHn5/dk
+ 7SBojhIU/Mx+haixgUKHWXxqDaGdp2ipp2TOoujO2UaPCCmlZtQ/LzYjS6GfA7F14MHV
+ ruOfD9uHKzPGsenTnKFg7okIKf8n5Xn/n521uT0sN1BFyhzzoLP9hdZG5rdUe7GIovBf
+ iOMOHDD2Uq0TDtpl9iyNvTWn5nS/wrNQLHLT/3XfvhjlcBuk5TwlLxOdqQsxqR7XncPL
+ mXngLTudSyob1cVMfnvOxMBrBvVTFJeFVUm+zQpUBMbTSDJvpoeAXGclfr6peb9w/PrF
+ jRNQ==
+X-Gm-Message-State: ANhLgQ0Dp0E3JjYBTcj0HyPzhk7uHiFYyzg/udKCIJwVlgtu4oR2HO4X
+ CvDVBkk4Khkyo45y1sOIYdLqng9Twn08Rzj+WREivESibMncyaTxA21ROm1E04NGc/c7pMNNxgq
+ 55nxZ8Fiz+cUmB4Q=
+X-Received: by 2002:a37:a551:: with SMTP id o78mr6039719qke.453.1583843236919; 
+ Tue, 10 Mar 2020 05:27:16 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vujdmvHEt9rKQjaYMaR1jxuVhQrFueKFeAp1+N+wxOnj1DRFryeFOt661ArZplQV5WPWIg8ow==
+X-Received: by 2002:a37:a551:: with SMTP id o78mr6039699qke.453.1583843236680; 
+ Tue, 10 Mar 2020 05:27:16 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id 127sm17400275qkj.97.2020.03.10.05.27.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 05:27:15 -0700 (PDT)
+Date: Tue, 10 Mar 2020 08:27:10 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH 12/14] i386/cpu: Store LAPIC bus frequency in CPU structure
+Message-ID: <20200310082542-mutt-send-email-mst@kernel.org>
 References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-6-liran.alon@oracle.com>
- <20200310081144-mutt-send-email-mst@kernel.org>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <43b5d99e-70f2-39dc-1a12-e6c6d9e75d5a@oracle.com>
-Date: Tue, 10 Mar 2020 14:25:28 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ <20200309235411.76587-13-liran.alon@oracle.com>
+ <20200310052900-mutt-send-email-mst@kernel.org>
+ <7d511194-6af1-efe6-1170-623144bdcc20@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200310081144-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100083
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- lowpriorityscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+In-Reply-To: <7d511194-6af1-efe6-1170-623144bdcc20@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,84 +110,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Mar 10, 2020 at 12:53:28PM +0200, Liran Alon wrote:
+>=20
+> On 10/03/2020 11:29, Michael S. Tsirkin wrote:
+> > On Tue, Mar 10, 2020 at 01:54:09AM +0200, Liran Alon wrote:
+> > > No functional change.
+> > > This information will be used by following patches.
+> > >=20
+> > > Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > > ---
+> > >   linux-headers/asm-x86/kvm.h | 4 ++++
+> > >   target/i386/cpu.h           | 1 +
+> > >   target/i386/kvm.c           | 6 +++---
+> > >   3 files changed, 8 insertions(+), 3 deletions(-)
+> > >=20
+> > > diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.=
+h
+> > > index 503d3f42da16..99eeaaf2f0b4 100644
+> > > --- a/linux-headers/asm-x86/kvm.h
+> > > +++ b/linux-headers/asm-x86/kvm.h
+> > > @@ -446,4 +446,8 @@ struct kvm_pmu_event_filter {
+> > >   #define KVM_PMU_EVENT_ALLOW 0
+> > >   #define KVM_PMU_EVENT_DENY 1
+> > > +/* From arch/x86/kvm/lapic.h */
+> > > +#define KVM_APIC_BUS_CYCLE_NS       1
+> > > +#define KVM_APIC_BUS_FREQUENCY      (1000000000ULL / KVM_APIC_BUS_CY=
+CLE_NS)
+> > > +
+> > >   #endif /* _ASM_X86_KVM_H */
+> >=20
+> > This header is auto-generated from UAPI - you can't add
+> > your own stuff here.
+> Oh I didn't notice that. OK, I will move definitions to somewhere else.
+> Is it fine by you if I will just put them then in target/i386/kvm.c
+> directly?
+> Or do you prefer I will put them in target/i386/kvm_i386.h
+>=20
+> -Liran
+>=20
 
-On 10/03/2020 14:14, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2020 at 01:54:02AM +0200, Liran Alon wrote:
->> As can be seen from VmCheck_GetVersion() in open-vm-tools code,
->> CMD_GETVERSION should return VMX type in ECX register.
->>
->> Default is to fake host as VMware ESX server. But user can control
->> this value by "-global vmport.vmx-type=X".
->>
->> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->> ---
->>   hw/i386/vmport.c | 13 +++++++++++++
->>   1 file changed, 13 insertions(+)
->>
->> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
->> index a2c8ff4b59cf..c03f57f2f636 100644
->> --- a/hw/i386/vmport.c
->> +++ b/hw/i386/vmport.c
->> @@ -36,6 +36,15 @@
->>   #define VMPORT_ENTRIES 0x2c
->>   #define VMPORT_MAGIC   0x564D5868
->>   
->> +typedef enum {
->> +   VMX_TYPE_UNSET = 0,
->> +   VMX_TYPE_EXPRESS,    /* Deprecated type used for VMware Express */
->> +   VMX_TYPE_SCALABLE_SERVER,    /* VMware ESX server */
->> +   VMX_TYPE_WGS,        /* Deprecated type used for VMware Server */
->> +   VMX_TYPE_WORKSTATION,
->> +   VMX_TYPE_WORKSTATION_ENTERPRISE /* Deprecated type used for ACE 1.x */
->> +} VMX_Type;
->> +
-> Is this really VMX type? And do users care what it is?
-This enum is copied from open-vm-tools source code 
-(lib/include/vm_version.h). This is how it's called in VMware Tools 
-terminology... Don't blame me :)
-> Also, how about friendlier string values so people don't need to
-> figure out code numbers?
+That's Paolo's area. Myself, I don't really know what this is doing,
+nor how is this supposed to work e.g. on TCG.
 
-I could have defined a new PropertyInfo struct in 
-hw/core/qdev-properties.c for this enum and then define a proper macro 
-in qdev-properties.h.
-But it seems like an overkill for a value that is suppose to rarely be 
-changed. So I thought this should suffice for now for user-experience 
-perspective.
-If you think otherwise, I can do what I just suggested above.
+--=20
+MST
 
--Liran
-
->
->>   #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
->>   
->>   typedef struct VMPortState {
->> @@ -46,6 +55,7 @@ typedef struct VMPortState {
->>       void *opaque[VMPORT_ENTRIES];
->>   
->>       uint32_t vmx_version;
->> +    uint8_t vmx_type;
->>   } VMPortState;
->>   
->>   static VMPortState *port_state;
->> @@ -114,6 +124,7 @@ static uint32_t vmport_cmd_get_version(void *opaque, uint32_t addr)
->>       X86CPU *cpu = X86_CPU(current_cpu);
->>   
->>       cpu->env.regs[R_EBX] = VMPORT_MAGIC;
->> +    cpu->env.regs[R_ECX] = port_state->vmx_type;
->>       return port_state->vmx_version;
->>   }
->>   
->> @@ -173,6 +184,8 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
->>   static Property vmport_properties[] = {
->>       /* Default value taken from open-vm-tools code VERSION_MAGIC definition */
->>       DEFINE_PROP_UINT32("vmx-version", VMPortState, vmx_version, 6),
->> +    DEFINE_PROP_UINT8("vmx-type", VMPortState, vmx_type,
->> +                      VMX_TYPE_SCALABLE_SERVER),
->>       DEFINE_PROP_END_OF_LIST(),
->>   };
->>   
->> -- 
->> 2.20.1
 
