@@ -2,90 +2,84 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF191C18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A61AFC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E5A24686
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:19:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6643124686
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 12:21:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WqoZfzwg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E5A24686
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhNRRx++"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6643124686
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdrV-0003iL-15
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:19:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36268)
+	id 1jBdsv-0005qn-Kd
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 08:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jBdqW-0002pO-38
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:18:53 -0400
+ (envelope-from <eblake@redhat.com>) id 1jBdrC-0003Zx-P6
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:19:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jBdqU-00067H-LV
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:18:51 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40154)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jBdqU-0005zR-D9
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:18:50 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p2so14783077wrw.7
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 05:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=E4yvEs46Oefqmfs2RdFm8irR9Pfwko3RhlbyZlNc5nU=;
- b=WqoZfzwgeaqsg41MetPPDdKHB0+VUZaJz0RLn/a2htPw0ITPULE67Vd2Gk2WsB0ou3
- Cx9mn0sTakaJhBBusUbnI/Jg3QkVapUQAg1K3uL2a45kfNG3skJ/kYFM1NQb6cIrk2te
- BWhgn2AodGhEIq/DH2skbH8xRBekw7oaOX3KpDM3eI5zi1ZwvIEh/vNzskzfU5+BeO/l
- EczUEC9g4wPPX/grkOEgNTyfcyD3tuPtQwIBapCsOS0Us/Uo8Ntv1BuBS3t02gy+oLIc
- dnNTnC5R6ZPGnHWuCCoby0pHFpsuZa8UrMcxoFAEyCAUk8uRK+q2YULz2L9BIqco7Nvy
- 5yEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=E4yvEs46Oefqmfs2RdFm8irR9Pfwko3RhlbyZlNc5nU=;
- b=i8+FkcD6X6zsROKGEBgCs8aW1r9JhcLq0tcQp6HSnH5eVVRwyQmHIc7pTPL8oHi2bN
- a7EbC6syGSdQrPtlvUPCq5Fd2J9+eouxL6pk6xllBh+kQbVHaKFGwBbG5trtCLtPUlZS
- wZ2w/KM5rg0mLdMI3Sn5oqN4kqNJEOKwl/UlzPx5pBtkqYzDE3wRgtcAYRo5w7Sr81Kf
- IrIJ7ocGe9NnR2lndZi8d1LkTZ4CYxfVLhjw8s8HsJj37S4421aIC9xrzzGCpg4idXYq
- iRNT+cCvu6cJH5ZL1nu9Xvq3uoCUTO0IcFyuXU/wc8Q2YMBCS7rTpNFjuIe/lH7gnMxb
- ga2w==
-X-Gm-Message-State: ANhLgQ0eAlgxFtI/6yBhcpxUw1J1WBcinQ+URMmcZsc4KXb/Y5RvguPX
- rupOspYoT+5GDjXqfl0mV8SAHQ==
-X-Google-Smtp-Source: ADFU+vuYIp5PN8/u/Fz9S2uacYAQSYWynxfllv369KBsR8be/CxxEM6xxFKwOXG5Qyf2s40W1mqnMQ==
-X-Received: by 2002:adf:eac8:: with SMTP id o8mr14169719wrn.105.1583842729182; 
- Tue, 10 Mar 2020 05:18:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q13sm14563600wrs.91.2020.03.10.05.18.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 05:18:47 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 224071FF7E;
- Tue, 10 Mar 2020 12:18:47 +0000 (GMT)
-References: <20200310083218.26355-1-kraxel@redhat.com>
- <20200310083218.26355-4-kraxel@redhat.com> <87lfo8ijfg.fsf@linaro.org>
- <20200310120232.6lor5opu7iykqgcr@sirius.home.kraxel.org>
-User-agent: mu4e 1.3.9; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH 3/4] tests/vm: update FreeBSD to 12.1
-In-reply-to: <20200310120232.6lor5opu7iykqgcr@sirius.home.kraxel.org>
-Date: Tue, 10 Mar 2020 12:18:47 +0000
-Message-ID: <87imjcies8.fsf@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1jBdrB-00010l-Lb
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:19:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56730
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jBdrB-00010D-Hy
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 08:19:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583842773;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ub1y87WBl5ESLCZ3TGJ2ZE0YhuWBUMi64J6Yl16T9PY=;
+ b=fhNRRx++zKggjRN8vcH10eyvH/2sxIgo/YkUzaxatUs8LM4QPALovNiihiwEHMN+1pcKpy
+ B+0tQOFsd825C2qICv1FuNUdAKGNddC+9WdnWTviSGXzxHe8o8j5waFuT59g1mLHL8Hwb0
+ peaz4OkWm06w2CUTPuFLY6Xb14kYVVI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-sbs6U2c9OkGf5Jn_w9haoQ-1; Tue, 10 Mar 2020 08:19:31 -0400
+X-MC-Unique: sbs6U2c9OkGf5Jn_w9haoQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77EF08010E8;
+ Tue, 10 Mar 2020 12:19:30 +0000 (UTC)
+Received: from [10.3.116.177] (ovpn-116-177.phx2.redhat.com [10.3.116.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA0D410027AA;
+ Tue, 10 Mar 2020 12:19:25 +0000 (UTC)
+Subject: Re: [PATCH v3 4/4] qemu-img: Deprecate use of -b without -F
+To: Kashyap Chamarthy <kchamart@redhat.com>
+References: <20200306225121.3199279-1-eblake@redhat.com>
+ <20200306225121.3199279-5-eblake@redhat.com> <20200309153119.GA20640@paraplu>
+ <11ba06c9-fa1e-3168-0322-1859040b655e@redhat.com>
+ <20200310105746.GD22884@paraplu>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <090db695-2281-6704-1d72-4c4c64e3b72a@redhat.com>
+Date: Tue, 10 Mar 2020 07:19:25 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <20200310105746.GD22884@paraplu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,58 +91,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kamil Rytarowski <kamil@netbsd.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-block@nongnu.org,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 3/10/20 5:57 AM, Kashyap Chamarthy wrote:
+> On Mon, Mar 09, 2020 at 10:42:25AM -0500, Eric Blake wrote:
+> 
+> [...]
+> 
+>>>> +qemu-img backing file without format (since 5.0.0)
+>>>> +''''''''''''''''''''''''''''''''''''''''''''''''''
+>>>> +
+>>>> +The use of ``qemu-img create``, ``qemu-img rebase``, ``qemu-img
+>>>> +convert``, or ``qemu-img amend`` to create or modify an image that
+>>>> +depends on a backing file now recommends that an explicit backing
+>>>> +format be provided.
+> 
+> Also for the `qemu-img amend` case, I'm not clear if the following scenario
+> ought to throw the warning:
+> 
+>      $> ~/build/qemu/qemu-img info --backing-chain overlay1.qcow2
+>      image: overlay1.qcow2
+>      file format: qcow2
+>      virtual size: 4 GiB (4294967296 bytes)
+>      disk size: 196 KiB
+>      cluster_size: 65536
+>      backing file: base.raw
+>      Format specific information:
+>          compat: 1.1
+>          lazy refcounts: false
+>          refcount bits: 16
+>          corrupt: false
+>      
+>      image: base.raw
+>      file format: raw
+>      virtual size: 4 GiB (4294967296 bytes)
+>      disk size: 778 MiB
+> 
+>      $> ~/build/qemu/qemu-img amend -o compat=v3 overlay1.qcow2
 
-Gerd Hoffmann <kraxel@redhat.com> writes:
+This particular amend is not changing the backing file, and since I did 
+not add warnings on the opening of an existing unsafe image, it is 
+silent.  Instead, you need to test a case where amend provokes a path 
+that would change the backing file (perhaps as simple as '-o 
+backing_file=./base.raw'), while omitting a format for the new backing 
+file string.
 
->> > -    link =3D "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12=
-.0/FreeBSD-12.0-RELEASE-amd64-disc1.iso.xz"
->> > -    csum =3D "1d40015bea89d05b8bd13e2ed80c40b522a9ec1abd8e7c8b80954fb=
-485fb99db"
->> > +    link =3D "https://download.freebsd.org/ftp/releases/ISO-IMAGES/12=
-.1/FreeBSD-12.1-RELEASE-amd64-disc1.iso.xz"
->> > +    csum =3D "7394c3f60a1e236e7bd3a05809cf43ae39a3b8e5d42d782004cf2f2=
-6b1cfcd88"
->
->> Warning: Permanently added '[127.0.0.1]:39533' (ECDSA) to the list of kn=
-own hosts.
->> Bootstrapping pkg from
->> pkg+http://pkg.FreeBSD.org/FreeBSD:12:amd64/quarterly, please wait...
->> Verifying signature with trusted certificate
->> pkg.freebsd.org.2013102301... done
->> Installing pkg-1.12.0_1...
->> Newer FreeBSD version for package pkg:
->> To ignore this error set IGNORE_OSVERSION=3Dyes
->> - package: 1201000
->              ^^^^
-> 12.1 package
->
->> - running kernel: 1200086
->                     ^^^^
-> 12.0 running
->
-> I saw that too, but only *without* the patch.  The upgrade to 12.1 fixes
-> that.
+> 
+>      $> echo $?
+>      0
+> 
+> I'm just trying to work out the scenarios where the warnings ought to
+> show up (for all the four cases: create, rebase, convert, amend).
 
-Hmm I wonder if the cached assets got confused? It certainly re-ran the
-install rather than skipping straight to running the test.
+Look at patch 2/4 - that patch was written AFTER this patch in order to 
+silence every warning that was introduced because of this patch, then 
+rebased to occur first.  My experience in writing 2/4 was that I indeed 
+hit warnings through all four sub-commands.
 
-> We might consider setting IGNORE_OSVERSION=3Dyes, so this doesn't happen
-> again after FreeBSD 12.2 release.  Not sure whenever that can have
-> unwanted side effects though, like packages not working properly.
->
-> Any advise from the bsd guys?
->
-> cheers,
->   Gerd
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-
---=20
-Alex Benn=C3=A9e
 
