@@ -2,57 +2,63 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF6FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E3AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8465B2464B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:32:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8465B2464B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C9B524655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 06:42:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C9B524655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBYRW-0003TT-Nw
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 02:32:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54770)
+	id 1jBYb4-00057Z-RZ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 02:42:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jBYQR-00031q-Lb
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:31:36 -0400
+ (envelope-from <clg@kaod.org>) id 1jBYaT-0004br-SM
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jBYQQ-0001iu-EI
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:31:35 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59720 helo=huawei.com)
+ (envelope-from <clg@kaod.org>) id 1jBYaS-0005qb-EM
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:41:57 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:53412)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jBYQQ-0001Ud-3G
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:31:34 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 9CC3B7F5F86EE8CE53FA;
- Tue, 10 Mar 2020 14:31:23 +0800 (CST)
-Received: from localhost.huawei.com (10.175.104.216) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 10 Mar 2020 14:31:14 +0800
-From: Pan Nengyuan <pannengyuan@huawei.com>
-To: <pbonzini@redhat.com>, <berrange@redhat.com>, <ehabkost@redhat.com>
-Subject: [PATCH v2] qom-qmp-cmds: fix two memleaks in qmp_object_add
-Date: Tue, 10 Mar 2020 14:46:40 +0800
-Message-ID: <20200310064640.5059-1-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.18.2
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jBYaS-0005m1-8q
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 02:41:56 -0400
+Received: from player739.ha.ovh.net (unknown [10.110.171.125])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 733C815E58C
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 07:41:54 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player739.ha.ovh.net (Postfix) with ESMTPSA id 2EE93C36DBE7;
+ Tue, 10 Mar 2020 06:41:47 +0000 (UTC)
+Subject: Re: [PATCH qemu v8 1/3] ppc/spapr: Move GPRs setup to one place
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+References: <20200310050733.29805-1-aik@ozlabs.ru>
+ <20200310050733.29805-2-aik@ozlabs.ru>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0365dff7-7135-7118-3e12-e07472e9937d@kaod.org>
+Date: Tue, 10 Mar 2020 07:41:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [10.175.104.216]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200310050733.29805-2-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3941212626391436262
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudduledgleekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 46.105.56.76
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,102 +70,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Pan Nengyuan <pannengyuan@huawei.com>,
- qemu-devel@nongnu.org, euler.robot@huawei.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'type/id' forgot to free in qmp_object_add, this patch fix that.
+On 3/10/20 6:07 AM, Alexey Kardashevskiy wrote:
+> At the moment "pseries" starts in SLOF which only expects the FDT blob
+> pointer in r3. As we are going to introduce a OpenFirmware support in
+> QEMU, we will be booting OF clients directly and these expect a stack
+> pointer in r1, Linux looks at r3/r4 for the initramdisk location
+> (although vmlinux can find this from the device tree but zImage from
+> distro kernels cannot).
+> 
+> This extends spapr_cpu_set_entry_state() to take more registers. This
+> should cause no behavioral change.
 
-The leak stack:
-Direct leak of 84 byte(s) in 6 object(s) allocated from:
-    #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
-8)
-    #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
-    #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
-    #3 0x56344954e692 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
-qom/qom-qmp-cmds.c:258
-    #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
-/qapi/qmp-dispatch.c:132
-    #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
-pi/qmp-dispatch.c:175
-    #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
-/qemu/monitor/qmp.c:145
-    #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
-_test/qemu/monitor/qmp.c:234
-    #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
-l/async.c:136
+LGTM, one question below.
 
-Direct leak of 54 byte(s) in 6 object(s) allocated from:
-    #0 0x7fe2a5ebf768 in __interceptor_malloc (/lib64/libasan.so.5+0xef76=
-8)
-    #1 0x7fe2a5044445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
-    #2 0x7fe2a505dd92 in g_strdup (/lib64/libglib-2.0.so.0+0x6bd92)
-    #3 0x56344954e6c4 in qmp_object_add /mnt/sdb/qemu-new/qemu_test/qemu/=
-qom/qom-qmp-cmds.c:267
-    #4 0x563449960f5a in do_qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu=
-/qapi/qmp-dispatch.c:132
-    #5 0x563449960f5a in qmp_dispatch /mnt/sdb/qemu-new/qemu_test/qemu/qa=
-pi/qmp-dispatch.c:175
-    #6 0x563449498a30 in monitor_qmp_dispatch /mnt/sdb/qemu-new/qemu_test=
-/qemu/monitor/qmp.c:145
-    #7 0x56344949a64f in monitor_qmp_bh_dispatcher /mnt/sdb/qemu-new/qemu=
-_test/qemu/monitor/qmp.c:234
-    #8 0x563449a92a3a in aio_bh_call /mnt/sdb/qemu-new/qemu_test/qemu/uti=
-l/async.c:136
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v7:
+> * removed r5 as it points to prom entry which is now provided by
+> a new firmware in later patches
+> ---
+>  include/hw/ppc/spapr_cpu_core.h | 4 +++-
+>  hw/ppc/spapr.c                  | 2 +-
+>  hw/ppc/spapr_cpu_core.c         | 6 +++++-
+>  hw/ppc/spapr_rtas.c             | 2 +-
+>  4 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> index 1c4cc6559c52..7aed8f555b4f 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -40,7 +40,9 @@ typedef struct SpaprCpuCoreClass {
+>  } SpaprCpuCoreClass;
+>  
+>  const char *spapr_get_cpu_core_type(const char *cpu_type);
+> -void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3);
+> +void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip,
+> +                               target_ulong r1, target_ulong r3,
+> +                               target_ulong r4);
+>  
+>  typedef struct SpaprCpuState {
+>      uint64_t vpa_addr;
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2eb0d8f70de6..64bc8b83e91e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1698,7 +1698,7 @@ static void spapr_machine_reset(MachineState *machine)
+>      spapr->fdt_blob = fdt;
+>  
+>      /* Set up the entry state */
+> -    spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, fdt_addr);
+> +    spapr_cpu_set_entry_state(first_ppc_cpu, SPAPR_ENTRY_POINT, 0, fdt_addr, 0);
+>      first_ppc_cpu->env.gpr[5] = 0;
 
-Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
----
-v2->v1:
-- do not store both a const and non-const string in the same variable, ch=
-ange it to a non-const string.
-  (Suggested by Daniel P. Berrang=C3=A9)
----
- qom/qom-qmp-cmds.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-index 49db926fcc..435193b036 100644
---- a/qom/qom-qmp-cmds.c
-+++ b/qom/qom-qmp-cmds.c
-@@ -247,26 +247,22 @@ void qmp_object_add(QDict *qdict, QObject **ret_dat=
-a, Error **errp)
-     QDict *pdict;
-     Visitor *v;
-     Object *obj;
--    const char *type;
--    const char *id;
-+    g_autofree char *type =3D NULL;
-+    g_autofree char *id =3D NULL;
-=20
--    type =3D qdict_get_try_str(qdict, "qom-type");
-+    type =3D g_strdup(qdict_get_try_str(qdict, "qom-type"));
-     if (!type) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
-         return;
--    } else {
--        type =3D g_strdup(type);
--        qdict_del(qdict, "qom-type");
-     }
-+    qdict_del(qdict, "qom-type");
-=20
--    id =3D qdict_get_try_str(qdict, "id");
-+    id =3D g_strdup(qdict_get_try_str(qdict, "id"));
-     if (!id) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "id");
-         return;
--    } else {
--        id =3D g_strdup(id);
--        qdict_del(qdict, "id");
-     }
-+    qdict_del(qdict, "id");
-=20
-     props =3D qdict_get(qdict, "props");
-     if (props) {
---=20
-2.18.2
+Why is this done in the machine reset handler and not in the CPU reset 
+handler ? 
+
+C. 
+
+
+>      spapr->cas_reboot = false;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 36ed3a2b665b..ac1c10942771 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -76,13 +76,17 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+>      spapr_irq_cpu_intc_reset(spapr, cpu);
+>  }
+>  
+> -void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
+> +void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip,
+> +                               target_ulong r1, target_ulong r3,
+> +                               target_ulong r4)
+>  {
+>      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+>      CPUPPCState *env = &cpu->env;
+>  
+>      env->nip = nip;
+> +    env->gpr[1] = r1;
+>      env->gpr[3] = r3;
+> +    env->gpr[4] = r4;
+>      kvmppc_set_reg_ppc_online(cpu, 1);
+>      CPU(cpu)->halted = 0;
+>      /* Enable Power-saving mode Exit Cause exceptions */
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 656fdd221665..fe83b50c6629 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -190,7 +190,7 @@ static void rtas_start_cpu(PowerPCCPU *callcpu, SpaprMachineState *spapr,
+>       */
+>      newcpu->env.tb_env->tb_offset = callcpu->env.tb_env->tb_offset;
+>  
+> -    spapr_cpu_set_entry_state(newcpu, start, r3);
+> +    spapr_cpu_set_entry_state(newcpu, start, 0, r3, 0);
+>  
+>      qemu_cpu_kick(CPU(newcpu));
+>  
+> 
 
 
