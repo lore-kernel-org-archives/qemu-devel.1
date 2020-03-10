@@ -2,106 +2,77 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C400BC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A2AC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:10:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FD9A20727
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B63120727
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:10:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="le8L/ns4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD9A20727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OhqzRouP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B63120727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBgVu-00056Q-T2
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:09:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36856)
+	id 1jBgX0-0006wz-CR
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:10:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jBgJI-0001rx-7X
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:45 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jBgI7-0008BO-9T
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jBgJG-0006j1-OU
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:43 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59430)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jBgJF-0006Ze-5m
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:56:42 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEqx3N160864;
- Tue, 10 Mar 2020 14:56:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=o/gBr0ijaiU8tOfu2ljig2IMh4oadadSpk649OMhkC8=;
- b=le8L/ns4kLPJtkxgjGdD9ADR3pKI6v/uW6vvU4Ip0/sAYqS5ta20MUMkXjRAb3dw7ei5
- C5QtjosJ6zz4EH5PZ3O72gj7hopECZhYjfdGB5JVaNjDklUX54J96WvVAmbmMQYa9/4J
- Vl3klVJKQIgFgOiGnrhkNYBZKeHZ+1x5RUKy9c2aNu2b884J8VTcQcIqFNGC3U+dsq9b
- YIYiNPC1T7NQJRQ0mLIqKLOoYdiDFHjpb10FAjYCTBf0eDE20qVPxpcuqXvtq3WVxPlX
- /FO1zL9tcKftGMg4Zl3+NmDV6Icj9ja0Uyb1VO0AV8J9V1x41+/1+kRS/VwiyjvXkIIR 3A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2ym31ue2gr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 14:56:34 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02AEWQUc001299;
- Tue, 10 Mar 2020 14:56:33 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2yp8nt8pj0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Mar 2020 14:56:33 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02AEuXAp025811;
- Tue, 10 Mar 2020 14:56:33 GMT
-Received: from Lirans-MacBook-Pro.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 10 Mar 2020 07:56:32 -0700
-Subject: Re: [PATCH 07/14] hw/i386/vmport: Add support for CMD_GETBIOSUUID
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-8-liran.alon@oracle.com>
- <20200310053305-mutt-send-email-mst@kernel.org>
- <9213671d-75e9-b4d6-6e3d-c9221c2b7cc4@oracle.com>
- <20200310071934-mutt-send-email-mst@kernel.org>
- <0a826472-2fd4-75f8-2b32-9029fe980556@oracle.com>
- <20200310103555-mutt-send-email-mst@kernel.org>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <81a85aa1-2ae7-bbe0-3b66-754281d6fa86@oracle.com>
-Date: Tue, 10 Mar 2020 16:56:29 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ (envelope-from <eric.auger@redhat.com>) id 1jBgI5-0003br-Cl
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30376
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jBgI5-0003aG-6N
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:55:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583852128;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MAp8RdDEyAKvxcS3g2UpeYtP12iSpRle1qI8h18ScZY=;
+ b=OhqzRouPNhrhjV/eOGWV10qD44lLE/yMRhdxh8sViESmbqDKWzHFgzSaqzANanrzxbT87q
+ LIi1PaTaoFtytImPlPgMWMjCPsbwpNMezKU68km5JML2n9tizJqvHbKsaf3Jxe9nAiuq22
+ yM4jyTHq8MdIaGfthfA6nII6/3TO1AA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-Q_qcSjMWMwmfTyooyI3Q5w-1; Tue, 10 Mar 2020 10:55:25 -0400
+X-MC-Unique: Q_qcSjMWMwmfTyooyI3Q5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86BB21005509;
+ Tue, 10 Mar 2020 14:55:23 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-117-85.ams2.redhat.com [10.36.117.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9BFC760BF3;
+ Tue, 10 Mar 2020 14:55:20 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Subject: [kvm-unit-tests PATCH v5 12/13] arm/arm64: ITS: migration tests
+Date: Tue, 10 Mar 2020 15:54:09 +0100
+Message-Id: <20200310145410.26308-13-eric.auger@redhat.com>
+In-Reply-To: <20200310145410.26308-1-eric.auger@redhat.com>
+References: <20200310145410.26308-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200310103555-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100098
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9555
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- lowpriorityscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003100098
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,68 +84,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
+ thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This test maps LPIs (populates the device table, the collection table,
+interrupt translation tables, configuration table), migrates and make
+sure the translation is correct on the destination.
 
-On 10/03/2020 16:39, Michael S. Tsirkin wrote:
-> On Tue, Mar 10, 2020 at 04:24:45PM +0200, Liran Alon wrote:
->
->> Re-thinking about this...
->>
->> QEMU VMPort interface was quite broken already (See first patch in series
->> "hw/i386/vmport: Propagate IOPort read to vCPU EAX register").
->> The introduction of that fix already changes the result of all existing
->> commands from guest perspective which relied on return-value from
->> vmport_ioport_read().
->> E.g. CMD_GETVERSION and CMD_GETRAMSIZE.
->>
->> In theory, we should have also made that bug-fix be tied to machine-type. To
->> similarly avoid the issue of migrating a VM from a working VMPort command
->> implementation to a non-working one.
->> i.e. In case of migrating from new QEMU to old QEMU. Do we wish to create a
->> property-flag for that fix as-well?
-> Yes, I meants that too. Just include everything in the same property.
-It ugly the code with a lot of "if"s for maintaining compatibility for 
-guests that somehow relies on interface being broken and unusable.
-Can do this but am wondering if it's worth it.
->
->> Or can we just drop all the machine-type
->> flags alltogether (Including the suggested "commands-v2")
->> and declare this the first actually working VMPort implementation?
->>
->> -Liran
-> It's hard to be sure no one used this
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Well... Both implemented commands (CMD_GETVERSION and CMD_GETRRAMSIZE) 
-fails to return their proper value.
-CMD_GETVERSION will always return VMPORT_MAGIC that happened to be in 
-EAX previously (i.e. return 0x564D5868 instead of 6).
-CMD_GETRAMSIZE will always return VMPORT_MAGIC that happened to be in 
-EAX previously (i.e. return 0x564D5868 instead of VM RAM size).
+---
+v4 -> v5:
+- move stub from header to arm/gic.c
 
-If guest somehow relied on this, it is already quite broken...
-My belief is that all upstream QEMU users today relies on VMPort only 
-for the sake of a functioning VMMouse which is indeed not broken because 
-vmmouse_set_data() explicitly override EAX.
+v3 -> v4:
+- assert in its_get_device/collection if the id is not found
+---
+ arm/gic.c                  | 59 ++++++++++++++++++++++++++++++++++----
+ arm/unittests.cfg          |  8 ++++++
+ lib/arm64/asm/gic-v3-its.h |  3 ++
+ lib/arm64/gic-v3-its.c     | 22 ++++++++++++++
+ 4 files changed, 86 insertions(+), 6 deletions(-)
 
-> , and the overhead isn't big.  But
-> that would be a maintainer call. In any case you need to call this out
-> explicitly in the commit log, and I guess block migration for old
-> machine types.
->
-Blocking migration for old machine-types is a "no go" in my opinion as 
-vmport is enabled by default. It will cause too many VMs to need be able 
-to backwards migrate.
-
-So it's either doing nothing (as patch-series is now) or adding a flag 
-that adds a bunch of ugly "ifs" and is tied to a machine-type.
-
--Liran
-
+diff --git a/arm/gic.c b/arm/gic.c
+index 32b709e..b8fbc13 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -590,6 +590,7 @@ static void gic_test_mmio(void)
+=20
+ static void test_its_introspection(void) {}
+ static void test_its_trigger(void) {}
++static void test_its_migration(void) {}
+=20
+ #else /* __aarch64__ */
+=20
+@@ -658,13 +659,19 @@ static int its_prerequisites(int nb_cpus)
+ 	return 0;
+ }
+=20
+-static void test_its_trigger(void)
++/*
++ * Setup the configuration for those mappings:
++ * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
++ * dev_id=3D7 event=3D255 -> vcpu 2, intid=3D8196
++ * LPIs ready to hit
++ */
++static int its_setup1(void)
+ {
+ 	struct its_collection *col3, *col2;
+ 	struct its_device *dev2, *dev7;
+=20
+ 	if (its_prerequisites(4))
+-		return;
++		return -1;
+=20
+ 	dev2 =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
+ 	dev7 =3D its_create_device(7 /* dev id */, 8 /* nb_ites */);
+@@ -678,14 +685,10 @@ static void test_its_trigger(void)
+ 	its_send_invall(col2);
+ 	its_send_invall(col3);
+=20
+-	report_prefix_push("int");
+ 	/*
+ 	 * dev=3D2, eventid=3D20  -> lpi=3D 8195, col=3D3
+ 	 * dev=3D7, eventid=3D255 -> lpi=3D 8196, col=3D2
+-	 * Trigger dev2, eventid=3D20 and dev7, eventid=3D255
+-	 * Check both LPIs hit
+ 	 */
+-
+ 	its_send_mapd(dev2, true);
+ 	its_send_mapd(dev7, true);
+=20
+@@ -694,6 +697,23 @@ static void test_its_trigger(void)
+=20
+ 	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
+ 	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
++	return 0;
++}
++
++static void test_its_trigger(void)
++{
++	struct its_collection *col3, *col2;
++	struct its_device *dev2, *dev7;
++
++	if (its_setup1())
++		return;
++
++	col3 =3D its_get_collection(3);
++	col2 =3D its_get_collection(2);
++	dev2 =3D its_get_device(2);
++	dev7 =3D its_get_device(7);
++
++	report_prefix_push("int");
+=20
+ 	lpi_stats_expect(3, 8195);
+ 	its_send_int(dev2, 20);
+@@ -756,6 +776,29 @@ static void test_its_trigger(void)
+ 	check_lpi_stats("no LPI after collection unmap");
+ 	report_prefix_pop();
+ }
++
++static void test_its_migration(void)
++{
++	struct its_device *dev2, *dev7;
++
++	if (its_setup1())
++		return;
++
++	dev2 =3D its_get_device(2);
++	dev7 =3D its_get_device(7);
++
++	puts("Now migrate the VM, then press a key to continue...\n");
++	(void)getchar();
++	report_info("Migration complete");
++
++	lpi_stats_expect(3, 8195);
++	its_send_int(dev2, 20);
++	check_lpi_stats("dev2/eventid=3D20 triggers LPI 8195 en PE #3 after mig=
+ration");
++
++	lpi_stats_expect(2, 8196);
++	its_send_int(dev7, 255);
++	check_lpi_stats("dev7/eventid=3D255 triggers LPI 8196 on PE #2 after mi=
+gration");
++}
+ #endif
+=20
+ int main(int argc, char **argv)
+@@ -793,6 +836,10 @@ int main(int argc, char **argv)
+ 		report_prefix_push(argv[1]);
+ 		test_its_trigger();
+ 		report_prefix_pop();
++	} else if (!strcmp(argv[1], "its-migration")) {
++		report_prefix_push(argv[1]);
++		test_its_migration();
++		report_prefix_pop();
+ 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
+ 		report_prefix_push(argv[1]);
+ 		test_its_introspection();
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index b9a7a2c..480adec 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -136,6 +136,14 @@ extra_params =3D -machine gic-version=3D3 -append 'i=
+ts-trigger'
+ groups =3D its
+ arch =3D arm64
+=20
++[its-migration]
++file =3D gic.flat
++smp =3D $MAX_SMP
++accel =3D kvm
++extra_params =3D -machine gic-version=3D3 -append 'its-migration'
++groups =3D its migration
++arch =3D arm64
++
+ # Test PSCI emulation
+ [psci]
+ file =3D psci.flat
+diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+index 889d6ce..e9f89c1 100644
+--- a/lib/arm64/asm/gic-v3-its.h
++++ b/lib/arm64/asm/gic-v3-its.h
+@@ -166,4 +166,7 @@ extern void __its_send_sync(struct its_collection *co=
+l, bool verbose);
+ #define its_send_movi_nv(dev, col, id)			__its_send_movi(dev, col, id, f=
+alse)
+ #define its_send_sync_nv(col)				__its_send_sync(col, false)
+=20
++extern struct its_device *its_get_device(u32 id);
++extern struct its_collection *its_get_collection(u32 id);
++
+ #endif /* _ASMARM64_GIC_V3_ITS_H_ */
+diff --git a/lib/arm64/gic-v3-its.c b/lib/arm64/gic-v3-its.c
+index 442dcf0..9c9fa60 100644
+--- a/lib/arm64/gic-v3-its.c
++++ b/lib/arm64/gic-v3-its.c
+@@ -148,3 +148,25 @@ struct its_collection *its_create_collection(u32 col=
+_id, u32 pe)
+ 	its_data.nr_collections++;
+ 	return new;
+ }
++
++struct its_device *its_get_device(u32 id)
++{
++	int i;
++
++	for (i =3D 0; i < GITS_MAX_DEVICES; i++) {
++		if (its_data.devices[i].device_id =3D=3D id)
++			return &its_data.devices[i];
++	}
++	assert(0);
++}
++
++struct its_collection *its_get_collection(u32 id)
++{
++	int i;
++
++	for (i =3D 0; i < GITS_MAX_COLLECTIONS; i++) {
++		if (its_data.collections[i].col_id =3D=3D id)
++			return &its_data.collections[i];
++	}
++	assert(0);
++}
+--=20
+2.20.1
 
 
