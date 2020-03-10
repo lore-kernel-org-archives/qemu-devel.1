@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EDAC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C9F6C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:41:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0073C24655
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:40:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 056B724655
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:41:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYaDksYA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0073C24655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHvgrfvq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 056B724655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58493 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBdFD-0005Cz-6r
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:40:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56061)
+	id 1jBdGX-0007aS-5r
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:41:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1jBdDj-0003D2-BO
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:49 -0400
+ (envelope-from <kwolf@redhat.com>) id 1jBdDm-0003I2-ME
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1jBdDh-0008KC-EK
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33893
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1jBdDl-0008Qf-98
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29745
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jBdDg-0008HE-0v
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:45 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1jBdDj-0008Lu-B5
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:38:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583840323;
+ s=mimecast20190719; t=1583840326;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g4PbVj5xMlkqK+kn4NuY73/Y3URpFPXVaHBSpTgqM98=;
- b=PYaDksYAELgy8zCHZ1aZsP2VEDngS8c+UGwuAIoVzPTbm0r9d1K7zmvFHeFKhe6wb6z9qE
- Dt5+j7S0SaIkPq4NUcpbu7moGvN19hDnLn1CumDtFgq+GrCcNPYw+kefFzDZVDKfb8Gd4K
- Tx261azdwa6pFtCjY7TxkS9WGRvYhDY=
+ bh=GWmFsTqSPEH50eOtsc4mu7xbbfJh9pJRysylAo4hCak=;
+ b=RHvgrfvqSQPid1G0ANxqBgNPX6E0uDuoki8EMm7z2Pyceiw37vcY+MB9Geu7yANmv4HrE4
+ Uk/GiYCpTWOmXJFjGwupolZ1pzbkL+Fr1QTuxgHHl+GEUck3OXs1mOUa106wIhT+oTbFat
+ gCSwCO1kNd8hNGSTjO/ErJpRQpITJE4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-2qwaqT7NPruAFOzOFqYYEg-1; Tue, 10 Mar 2020 07:38:41 -0400
-X-MC-Unique: 2qwaqT7NPruAFOzOFqYYEg-1
+ us-mta-154--oWC9KkBPFu4n9eZm0n9rg-1; Tue, 10 Mar 2020 07:38:44 -0400
+X-MC-Unique: -oWC9KkBPFu4n9eZm0n9rg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BAB0801E53;
- Tue, 10 Mar 2020 11:38:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 284B2800D50;
+ Tue, 10 Mar 2020 11:38:43 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2AECA87B2F;
- Tue, 10 Mar 2020 11:38:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 08E5690A0E;
+ Tue, 10 Mar 2020 11:38:41 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 1/7] block: Make bdrv_get_cumulative_perm() public
-Date: Tue, 10 Mar 2020 12:38:25 +0100
-Message-Id: <20200310113831.27293-2-kwolf@redhat.com>
+Subject: [PATCH v2 3/7] iotests: Fix run_job() with use_log=False
+Date: Tue, 10 Mar 2020 12:38:27 +0100
+Message-Id: <20200310113831.27293-4-kwolf@redhat.com>
 In-Reply-To: <20200310113831.27293-1-kwolf@redhat.com>
 References: <20200310113831.27293-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -72,8 +72,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,55 +90,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The 'job-complete' QMP command should be run with qmp() rather than
+qmp_log() if use_log=3DFalse is passed.
+
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h | 3 +++
- block.c                   | 6 ++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/iotests.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f422c0bff0..71164c4ee1 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1226,6 +1226,9 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *c=
-hild_bs,
-                                   void *opaque, Error **errp);
- void bdrv_root_unref_child(BdrvChild *child);
-=20
-+void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
-+                              uint64_t *shared_perm);
-+
- /**
-  * Sets a BdrvChild's permissions.  Avoid if the parent is a BDS; use
-  * bdrv_child_refresh_perms() instead and make the parent's
-diff --git a/block.c b/block.c
-index 957630b1c5..79a5a2770f 100644
---- a/block.c
-+++ b/block.c
-@@ -1872,8 +1872,6 @@ static int bdrv_child_check_perm(BdrvChild *c, BlockR=
-eopenQueue *q,
-                                  bool *tighten_restrictions, Error **errp)=
-;
- static void bdrv_child_abort_perm_update(BdrvChild *c);
- static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shar=
-ed);
--static void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
--                                     uint64_t *shared_perm);
-=20
- typedef struct BlockReopenQueueEntry {
-      bool prepared;
-@@ -2097,8 +2095,8 @@ static void bdrv_set_perm(BlockDriverState *bs, uint6=
-4_t cumulative_perms,
-     }
- }
-=20
--static void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
--                                     uint64_t *shared_perm)
-+void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
-+                              uint64_t *shared_perm)
- {
-     BdrvChild *c;
-     uint64_t cumulative_perms =3D 0;
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 8815052eb5..23043baa26 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -624,7 +624,10 @@ class VM(qtest.QEMUQtestMachine):
+                         if use_log:
+                             log('Job failed: %s' % (j['error']))
+             elif status =3D=3D 'ready':
+-                self.qmp_log('job-complete', id=3Djob)
++                if use_log:
++                    self.qmp_log('job-complete', id=3Djob)
++                else:
++                    self.qmp('job-complete', id=3Djob)
+             elif status =3D=3D 'pending' and not auto_finalize:
+                 if pre_finalize:
+                     pre_finalize()
 --=20
 2.20.1
 
