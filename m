@@ -2,96 +2,105 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E0AC10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BE5C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3343F20848
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:40:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96242208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 14:45:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YabmGjdE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3343F20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUsD+pto"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96242208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBg3t-00065Q-Fk
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:40:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44111)
+	id 1jBg7z-0007s4-SH
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 10:45:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jBg3D-0005aC-2e
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:40:08 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBg7D-0007QI-IF
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jBg3B-00024J-Rf
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:40:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57777
+ (envelope-from <mreitz@redhat.com>) id 1jBg7B-0000fj-4w
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29294
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBg3B-00023g-N7
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:40:05 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBg7B-0000eO-05
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 10:44:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583851205;
+ s=mimecast20190719; t=1583851452;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F3fjsmRleaLKra6RhiVl8ud63m2+oikvRtyy7O5tLck=;
- b=YabmGjdEWL1vvLY0Z5UamWg9JXRls56NWnTm4HLF5Vya/jDh2hX78ZvaFgf9jsuJn6Jvjh
- eIgOVkim2E02sPJ7vQ4j/GQt0kQ4SamYVfV4z0vhV+oMIO5P4QBQKDaXGci4knK2gUU7D0
- asVoVl+iZI951pWUQqkYsKvLQxye/zw=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-Gk1YO-S2Nui3UjyBcavscA-1; Tue, 10 Mar 2020 10:40:01 -0400
-X-MC-Unique: Gk1YO-S2Nui3UjyBcavscA-1
-Received: by mail-qk1-f198.google.com with SMTP id a21so9851396qkg.6
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 07:40:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=bD/1ypvq1QpOFCTcrz5iEfXt2h85auzgRqV4onTJ0Bk=;
- b=NuVg77RQ1r1rgVew173iN5mRKq0HqiVODBRaslvJHZtfWljBJhwy8nEn9JZvAG31dl
- igSpKFCU5LWM9rQcb3m6f7NHoQU53voypGVPlAh8GkDu/IoH0pwOrnfhp7YIWncp9DEu
- GWayyMJtKF+sXx3sH9qskwL5JiM6ioRwMcuPp02PL9EC7eWWQu5pOxR/CqFVsW53yKR9
- 1vBzDyBIK/HTtvHf+YG216w8GOlLXp0/MzyHN3WoC6kiBX2X2rnYdkfzTvLCRgyYw0LT
- reG+qDI1aJtAvVrfqNd5zSJDg35kiaZ04pw3Qg/lQBWKgG3sjgA0EPAfQIbWpE9vZcNI
- 5vxg==
-X-Gm-Message-State: ANhLgQ3fzCQML+SbVosH4anrO0T5SQnSC6erWhXaZxkDOQwXfDS7+Vgf
- Dg8dPxm6/T9RbPIRVQ2Io5tvwE3fbuj227O9UTG2ZjwyHY0I818S8x/C66RuRMmjCfJFbQ0ozSi
- 5n8z7eQ0IaRDs2kw=
-X-Received: by 2002:ac8:8d6:: with SMTP id y22mr18501068qth.85.1583851201020; 
- Tue, 10 Mar 2020 07:40:01 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtOJ6Cpoufee0fVl7dE8wU27rUi6hFVWoCTeJoIJBvTMqSXszoqIarwvZbWK8qM4J6/qIyRDQ==
-X-Received: by 2002:ac8:8d6:: with SMTP id y22mr18501042qth.85.1583851200690; 
- Tue, 10 Mar 2020 07:40:00 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id v19sm8316734qtb.67.2020.03.10.07.39.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Mar 2020 07:39:59 -0700 (PDT)
-Date: Tue, 10 Mar 2020 10:39:54 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 07/14] hw/i386/vmport: Add support for CMD_GETBIOSUUID
-Message-ID: <20200310103555-mutt-send-email-mst@kernel.org>
-References: <20200309235411.76587-1-liran.alon@oracle.com>
- <20200309235411.76587-8-liran.alon@oracle.com>
- <20200310053305-mutt-send-email-mst@kernel.org>
- <9213671d-75e9-b4d6-6e3d-c9221c2b7cc4@oracle.com>
- <20200310071934-mutt-send-email-mst@kernel.org>
- <0a826472-2fd4-75f8-2b32-9029fe980556@oracle.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=1frh014VE7ZTywaJsrF6qrFgIGVVAr/xQnm4BpT6Bls=;
+ b=bUsD+ptozsOXl+pTguq7C5v9RA2TNPPlbY1Ss1j2l4lMka0gFwLC4GMTzNQibF+o+t5fdK
+ oXaeWE9C3yYRHjra0sBv/nVn6YnQaOHvALB0u9Jyrs6wUMqMnrOqYL1rr3ux0PLZl9yELZ
+ y2WHyjcfFSwgktarxqenF/PlxccKOCs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-ozcM-kwGMUeA4DbW0_WZAQ-1; Tue, 10 Mar 2020 10:44:10 -0400
+X-MC-Unique: ozcM-kwGMUeA4DbW0_WZAQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66C738010E8;
+ Tue, 10 Mar 2020 14:44:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D805963742;
+ Tue, 10 Mar 2020 14:44:05 +0000 (UTC)
+Subject: Re: [PATCH v3 6/9] block/block-copy: refactor interfaces to use bytes
+ instead of end
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200306073831.7737-1-vsementsov@virtuozzo.com>
+ <20200306073831.7737-7-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <66631524-e6a6-7f1c-1b87-eee64c5b421a@redhat.com>
+Date: Tue, 10 Mar 2020 15:44:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <0a826472-2fd4-75f8-2b32-9029fe980556@oracle.com>
+In-Reply-To: <20200306073831.7737-7-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,84 +114,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 04:24:45PM +0200, Liran Alon wrote:
->=20
-> On 10/03/2020 13:22, Michael S. Tsirkin wrote:
-> > On Tue, Mar 10, 2020 at 01:13:21PM +0200, Liran Alon wrote:
-> > > On 10/03/2020 11:34, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 10, 2020 at 01:54:04AM +0200, Liran Alon wrote:
-> > > > > This is VMware documented functionallity that some guests rely on=
-.
-> > > > > Returns the BIOS UUID of the current virtual machine.
-> > > > >=20
-> > > > > Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> > > > So this at least seems guest-visible.
-> > > >=20
-> > > > So I suspect you need to add properties to
-> > > > disable this for old machine types, to avoid
-> > > > breaking compatibility with live-migration.
-> > > It is indeed guest visible.
-> > > In theory, you are right that for every guest-visible change, we shou=
-ld make
-> > > sure to expose it to only new machine-types.
-> > >=20
-> > > However, in this case, I feel it just unnecessary over-complicates th=
-e code.
-> > > I don't see how a guest which previously failed to use this command, =
-will
-> > > fail because after Live-Migration it could succeed.
-> > The reverse can happen, start guest on a new qemu, command seems to
-> > work, then we migrate and it fails.
-> >=20
-> > And I guess this applies to the version right?
-> >=20
-> > > If you insist, I will add such functionality. In that case, do you th=
-ink a
-> > > single flag will suffice for the addition of all new commands
-> > > (i.e. "commands-version" that it's number specifies set of commands t=
-o
-> > > expose), or you want to have a per-command flag?
-> > >=20
-> > > -Liran
-> > Can be a single flag but I'd just do it a boolean that enables a group
-> > of commands. E.g. "commands-v2".
-> >=20
-> Re-thinking about this...
->=20
-> QEMU VMPort interface was quite broken already (See first patch in series
-> "hw/i386/vmport: Propagate IOPort read to vCPU EAX register").
-> The introduction of that fix already changes the result of all existing
-> commands from guest perspective which relied on return-value from
-> vmport_ioport_read().
-> E.g. CMD_GETVERSION and CMD_GETRAMSIZE.
->=20
-> In theory, we should have also made that bug-fix be tied to machine-type.=
- To
-> similarly avoid the issue of migrating a VM from a working VMPort command
-> implementation to a non-working one.
-> i.e. In case of migrating from new QEMU to old QEMU. Do we wish to create=
- a
-> property-flag for that fix as-well?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93
+Content-Type: multipart/mixed; boundary="nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j"
 
-Yes, I meants that too. Just include everything in the same property.
+--nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Or can we just drop all the machine-type
-> flags alltogether (Including the suggested "commands-v2")
-> and declare this the first actually working VMPort implementation?
+On 06.03.20 08:38, Vladimir Sementsov-Ogievskiy wrote:
+> We have a lot of "chunk_end - start" invocations, let's switch to
+> bytes/cur_bytes scheme instead.
 >=20
-> -Liran
+> While being here, improve check on block_copy_do_copy parameters to not
+> overflow when calculating nbytes and use int64_t for bytes in
+> block_copy for consistency.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  include/block/block-copy.h |  6 +--
+>  block/block-copy.c         | 78 ++++++++++++++++++++------------------
+>  2 files changed, 44 insertions(+), 40 deletions(-)
 
-It's hard to be sure no one used this, and the overhead isn't big.  But
-that would be a maintainer call. In any case you need to call this out
-explicitly in the commit log, and I guess block migration for old
-machine types.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--nt0XlMjIHEGC9b1gbg4ewKFbk1YTE4p5j--
+
+--ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5np7MACgkQ9AfbAGHV
+z0CGiQgAqZtXHSCnz4BbRte8eeUEJzWB2leE975iPkexVk4R3IY4AVn1O+ttfV8W
+LMeYEN7ZmGPpjShj02IqoXptyKmdIb189VmkXt6HKsaz0QTBYwhpF90EUCnRyRsf
+ecBnhwy2y/sI3ACk9Eb8Koj1PJTrUxHb4AFRa5JTIeX0BlqOaEr8Pf65pHzrQqQo
+f1E/N+pI+lwWImLj0gZwrzY/z11/oEQHt2NCue5vUrTpP4DBWG7ieJr1bDFcHBct
+GSdyVOwRPwRP1Vbq4H1d1ouzPJiuKEawzwazPNTzLOcGPf7EbGjZFqRnPq0gGiU6
+3VO0ifcNKuoR2qb4A/aQ/aP09A+7Kw==
+=HNnz
+-----END PGP SIGNATURE-----
+
+--ZEiP5vTrtWzgtfvf90Cl7Aoj2CO8fDk93--
 
 
