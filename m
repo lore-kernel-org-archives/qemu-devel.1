@@ -2,81 +2,83 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03798C10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3E1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B957C208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:50:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E471821D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:56:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbXt4QTP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B957C208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fc+HIJYd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E471821D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBktK-0004Cx-S4
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35885)
+	id 1jBkzJ-00070Q-4w
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:56:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBksO-0003gy-PW
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:49:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBkyX-00069v-D9
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:55:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jBksN-00020r-IF
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:49:16 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:35141)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBkyV-0002fV-RZ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:55:37 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43576)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jBksK-0001xx-DY; Tue, 10 Mar 2020 15:49:12 -0400
-Received: by mail-io1-xd42.google.com with SMTP id h8so14085707iob.2;
- Tue, 10 Mar 2020 12:49:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jBkyV-0002c5-L4
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:55:35 -0400
+Received: by mail-ot1-x343.google.com with SMTP id a6so6526287otb.10
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 12:55:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uI3JFUHhKOPjEYddkRjvpoV1Wbus4myLT0ZKlUz2e8k=;
- b=FbXt4QTPtEBYhXNQIALGPjvlKbzjTdneQdPmS+GAwxXzThsUQI7iLsTPT1ON08wfxu
- Yb6UCt8VKs86ZS2/vadlI1OG5EBT5kbC7mmVHYMQwO4o0UYEoqps0s1hurLtm+slIRv9
- yYrFfRC6tqMePKk6TvuzKn9vnH3MZUQZ9wyLB3axobBHvC7KA+GtKgzAX7ERnnGrkTvO
- /rNdOSp31k2xIAmH0M00c54rUeV2NCHNcLwbPjtASouoyU1xWTR2aTih0nMREEFR6+NI
- MKvfvtqLUWz5muSBJLmWKwFQOa9y7EnXqcH0bJ0tHDmx4zqfkLbcLK3sVPtbJRrKt2Xs
- qAUw==
+ :cc; bh=1pyw82QS4ZZRYkQoubeSy5bpQaJIvgsbJXLiwnBer6U=;
+ b=fc+HIJYdVkCYOTrYvlOo7T843VljKHeIv0loZkpsnl+wGh30u7v/tleEOUVD6/1GEb
+ qSfroeWsmJvjmFvBpXdAElyFdpjs+KxKY9wGRhDylxot2286wHRt2glb4hOkKmhaC94I
+ 7ANpY7sRDtkdy1rRxeTTdoYa+WzT/l+FGJoob4p6/9M98+258mVsVbBx3OuqV3I8VC6x
+ H/CgqileeLEt532plA9/hmqy9JScCFWZYYdTZrJTnHqTDHNjmmELHyb2ze420V6A3nUM
+ yy2tlQOh5DoAREGjkBbRk+3Zc0gzLMe469Noz1/RJrh3dHyMYNytmKSKuUUPYR6fSEAc
+ bVfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=uI3JFUHhKOPjEYddkRjvpoV1Wbus4myLT0ZKlUz2e8k=;
- b=cyuydcsQy5yy77yWYdhACGTqIUoLDuZ6uDksV42CJRgaT9LUWzXjokJHxHrJ22pLB9
- QifnSx+MkL66lAUFSafXDHWhw/rPXskCOYyBcAU7fx4ibz6/3h+sUfzWKTOnPBpnPQtM
- db/piCvaB9RzL/zPJoO/PHQzGTl14JJyqiVh3liH1REZzXOU41IKtUs7JhK6fHziW0bG
- +YIZNKtTrjKjFVGQYTkWVbsgH5i7ogxzJMy5zQ2N1ycG2WcksbrldwLMLA71/0f0b6vI
- NpgGdzLp5q5tKcWd2bKKmGls7dwRtSGa82mGPsZbYXVVWUmXTEUh68ZaqQdKd0UT2dwh
- yGTA==
-X-Gm-Message-State: ANhLgQ01OB2mtSDlLfsH3Y7t1sKKzBn1fOmwNK/9wy4X5Bg8aOlKh3IA
- hJGATm+lq3gB6GEUSRLXuPM2XqlXBSzM2fm6Z2o=
-X-Google-Smtp-Source: ADFU+vt+WZzpVEwuecKC3cU40BJhHw4NM0oT4kXJZs8GtH4Y7doqJ1UNyZ81+ScMbzzQOw9OpcpteeZ+YDWUpGwhXNM=
-X-Received: by 2002:a02:caa8:: with SMTP id e8mr22139910jap.126.1583869751241; 
- Tue, 10 Mar 2020 12:49:11 -0700 (PDT)
+ bh=1pyw82QS4ZZRYkQoubeSy5bpQaJIvgsbJXLiwnBer6U=;
+ b=A2lCIdZwtByRbAGkEz+LJibWudFaiAYDQGZFShTLx8St3Gv5Xau60Cewyy3TMUeNKY
+ cn0jA+tKMFUSXENww3ev8L4fdlWhwR9u5OJrHxMgyNyhzLB7gr3Lru4SHdN8atdjpn0c
+ n7h93cV6+/ndcZvLT3wCCmwIm70izdUFcJ9VRak5PbAxo/J8y7UsKJJJCTmqDD+OGnlU
+ Ng+JsNpzJQcl4iFiiQUIZcTV3/AzeS7EjyOhPl95w3TafQROXCLbZ0PaYAHtz01ZnFJH
+ q3dOPlsDVjQP4Cfw1JIN3SIWU6Br7CmFFUHfaMTgMnjgzVPwdFFoMHryZTF49KCBIMEn
+ C+ug==
+X-Gm-Message-State: ANhLgQ3gDe6kiJ4YagKTCBTJKeQko8rSklpDQFOiw3m0xWXU7skWqBCj
+ Ah4bHtF0VbOUO4vc0pK5XH5LkUAw3OoktPY7GnH+PA==
+X-Google-Smtp-Source: ADFU+vu4ZyzkOyhsv4TOmd51m64FKP2+iXJlcpAfHVg4Jinj8iCne9uMGk3h41kKxkxyd06qwu23xfad1w/oECJCF8Q=
+X-Received: by 2002:a9d:1920:: with SMTP id j32mr9462411ota.221.1583870134403; 
+ Tue, 10 Mar 2020 12:55:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200303091254.22373-1-imammedo@redhat.com>
- <aef518d0-d8e5-7972-0530-8f8a4c64f1e1@redhat.com>
- <20200306114838.27603031@redhat.com>
-In-Reply-To: <20200306114838.27603031@redhat.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Tue, 10 Mar 2020 20:49:00 +0100
-Message-ID: <CAPan3WqN4dFcsLz6eCrfA_MT-iQoOvmKxFYyq0=mZnVkEPG8QQ@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/cubieboard: make sure SOC object isn't leaked
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000e4b07405a0856905"
+References: <20200302105516.5972-1-eric.auger@redhat.com>
+ <20200302105516.5972-6-eric.auger@redhat.com>
+ <CAFEAcA-XD9LiokquaHj+kCYWA3N=7k3V3R8r5gA1HZM9Adus1A@mail.gmail.com>
+ <1370e0bc-ae17-c891-72b5-4cbc58ff3247@redhat.com>
+In-Reply-To: <1370e0bc-ae17-c891-72b5-4cbc58ff3247@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Mar 2020 19:55:22 +0000
+Message-ID: <CAFEAcA9W9=5s4Bfr9otP1p984AUxYxckgzZkhgOxzFOwSPfj3Q@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] hw/arm/virt: kvm: Check the chosen gic version is
+ supported by the host
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,183 +90,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com,
- QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e4b07405a0856905
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Igor,
-
-On Fri, Mar 6, 2020 at 11:49 AM Igor Mammedov <imammedo@redhat.com> wrote:
-
-> On Fri, 6 Mar 2020 11:33:07 +0100
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Tue, 10 Mar 2020 at 18:02, Auger Eric <eric.auger@redhat.com> wrote:
 >
-> > On 3/3/20 10:12 AM, Igor Mammedov wrote:
-> > > SOC object returned by object_new() is leaked in current code.
-> > > Set SOC parent explicitly to board and then unref to SOC object
-> > > to make sure that refererence returned by object_new() is taken
-> > > care of.
-> > >
-> > > The SOC object will be kept alive by its parent (machine) and
-> > > will be automatically freed when MachineState is destroyed.
-> > >
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > Reported-by: Andrew Jones <drjones@redhat.com>
-> > > ---
-> > >   hw/arm/cubieboard.c | 7 ++++++-
-> > >   1 file changed, 6 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-> > > index 089f9a30c1..12f8ac798d 100644
-> > > --- a/hw/arm/cubieboard.c
-> > > +++ b/hw/arm/cubieboard.c
-> > > @@ -30,9 +30,14 @@ static struct arm_boot_info cubieboard_binfo =3D {
-> > >
-> > >   static void cubieboard_init(MachineState *machine)
-> > >   {
-> > > -    AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10));
-> > > +    AwA10State *a10;
-> > >       Error *err =3D NULL;
-> > >
+> Hi Peter,
+>
+> On 3/9/20 2:28 PM, Peter Maydell wrote:
+> > On Mon, 2 Mar 2020 at 10:55, Eric Auger <eric.auger@redhat.com> wrote:
+> >>
+> >> Restructure the finalize_gic_version with switch cases and, in
+> >> KVM mode, explictly check whether the chosen version is supported
+> >> by the host.
+> >>
+> >> if the end-user explicitly sets v2/v3 and this is not supported by
+> >> the host, then the user gets an explicit error message.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> >> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> >>
+> >> ---
+> >>
+> >> v2 -> v3:
+> >> - explictly list V2 and V3 in the switch/case
+> >> - fix indent
+> >> ---
+> >>  hw/arm/virt.c | 77 +++++++++++++++++++++++++++++++++++----------------
+> >>  1 file changed, 53 insertions(+), 24 deletions(-)
+> >>
+> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >> index eb8c57c85e..aeb6c45e51 100644
+> >> --- a/hw/arm/virt.c
+> >> +++ b/hw/arm/virt.c
+> >> @@ -1542,33 +1542,62 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >>   */
+> >>  static void finalize_gic_version(VirtMachineState *vms)
+> >>  {
+> >> -    if (vms->gic_version == VIRT_GIC_VERSION_HOST ||
+> >> -        vms->gic_version == VIRT_GIC_VERSION_MAX) {
+> >> -        if (!kvm_enabled()) {
+> >> -            if (vms->gic_version == VIRT_GIC_VERSION_HOST) {
+> >> -                error_report("gic-version=host requires KVM");
+> >> -                exit(1);
+> >> -            } else {
+> >> -                /* "max": currently means 3 for TCG */
+> >> -                vms->gic_version = VIRT_GIC_VERSION_3;
+> >> -            }
+> >> -        } else {
+> >> -            int probe_bitmap = kvm_arm_vgic_probe();
+> >> +    if (kvm_enabled()) {
+> >> +        int probe_bitmap = kvm_arm_vgic_probe();
 > >
-> > What about using object_new_with_props similarly to commit e4c81e3a451f=
-?
-> I prefer explicit object_property_add_child() and would use
-> above only if there are list of properties to feed to it.
->
->
-> >      a10 =3D AW_A10(object_new_with_props(TYPE_AW_A10, OBJECT(s), "soc"=
-,
-> >                                         &err, NULL));
-> >      if (err !=3D NULL) {
-> >          error_propagate(errp, err);
-> >          return;
-> >      }
+> > Previously we would only do kvm_arm_vgic_probe() if the
+> > user asked for 'host' or 'max'. Now we do it always,
+> > which means that if the user is on a really old kernel
+> > where the CREATE_DEVICE ioctl doesn't exist then we
+> > will now fail if the user specifically asked for gicv2,
+> > where previously we (probably) would have succeeded.
+> > I don't think we should put too much weight on continuing
+> > to theoretically support ancient kernels which we're not
+> > actually testing against, but it does seem a bit odd to
+> > probe even if we don't need to know the answer.
 > >
-> > > +    a10 =3D AW_A10(object_new(TYPE_AW_A10));
-> > > +    object_property_add_child(OBJECT(machine), "soc", OBJECT(a10),
-> > > +                              &error_abort);
-> > > +    object_unref(OBJECT(a10));
->
+> > More relevant to actual plausible use cases, if
+> > kvm_irqchip_in_kernel() == false, we shouldn't be
+> > probing the kernel to ask what kind of GIC to use.
+> I think the existing code also does the same:
+> kvm_arm_vgic_probe() gets called as soon as vms->gic_version <= 0 &&
+> kvm_enabled() whatever the state of kvm_irqchip_in_kernel().
 
-Thanks, I added this same solution to the Allwinner H3 series, and its
-working fine there.
+Yes, but your change here makes it call kvm_arm_vgic_probe()
+even if the gic_version was explicitly set to 2 or 3
+by the user, doesn't it ? That's what I was commenting on.
 
-Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> So in case the host only supports GICv2, in kvm mode with userspace
+> irqchip we would use GICV2 in host/max mode. If host supports GICv3 we
+> would select GICv3 which is not supported in !kvm_irqchip_in_kernel().
 
+> So do I understand correctly that you want me to change that behavior
+> and always set v2 in KVM/!kvm_irqchip_in_kernel() max/host mode?
 
-> > > +
-> > >       object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err=
-);
-> > >       if (err !=3D NULL) {
-> > >           error_reportf_err(err, "Couldn't set phy address: ");
-> > >
-> >
->
->
->
+I think:
+(1) we should retain the current behaviour that if the user
+asked for userspace-irqchip and specifically chose gic
+version 2, then we don't probe the kernel for its capabilities,
+we just create a userspace gicv2.
 
---=20
-Niek Linnenbank
+(2) we should also retain the current behaviour that we
+default to "2" if the user requests userspace-irqchip but
+doesn't specify the gic-version.
 
---000000000000e4b07405a0856905
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+(3) the ideal-world behaviour would be that we correctly
+handle the user asking for userspace-irqchip plus either "max"
+(choose '2') or "3" (produce a useful error message if we
+don't do so already). I'm not sure what "host" should mean
+here. But this point (3) is separate from what this series is
+doing, I think, and is basically fixing the bug that we didn't
+think about the userspace-irqchip case when we implemented
+"host" and "max" or when we added GICv3 support.
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi Igor,<br></div><br><div class=3D"gmail=
-_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Mar 6, 2020 at 11:49 =
-AM Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat=
-.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
-ex">On Fri, 6 Mar 2020 11:33:07 +0100<br>
-Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=
-=3D"_blank">philmd@redhat.com</a>&gt; wrote:<br>
-<br>
-&gt; On 3/3/20 10:12 AM, Igor Mammedov wrote:<br>
-&gt; &gt; SOC object returned by object_new() is leaked in current code.<br=
->
-&gt; &gt; Set SOC parent explicitly to board and then unref to SOC object<b=
-r>
-&gt; &gt; to make sure that refererence returned by object_new() is taken<b=
-r>
-&gt; &gt; care of.<br>
-&gt; &gt; <br>
-&gt; &gt; The SOC object will be kept alive by its parent (machine) and<br>
-&gt; &gt; will be automatically freed when MachineState is destroyed.<br>
-&gt; &gt; <br>
-&gt; &gt; Signed-off-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redha=
-t.com" target=3D"_blank">imammedo@redhat.com</a>&gt;<br>
-&gt; &gt; Reported-by: Andrew Jones &lt;<a href=3D"mailto:drjones@redhat.co=
-m" target=3D"_blank">drjones@redhat.com</a>&gt;<br>
-&gt; &gt; ---<br>
-&gt; &gt;=C2=A0 =C2=A0hw/arm/cubieboard.c | 7 ++++++-<br>
-&gt; &gt;=C2=A0 =C2=A01 file changed, 6 insertions(+), 1 deletion(-)<br>
-&gt; &gt; <br>
-&gt; &gt; diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c<br>
-&gt; &gt; index 089f9a30c1..12f8ac798d 100644<br>
-&gt; &gt; --- a/hw/arm/cubieboard.c<br>
-&gt; &gt; +++ b/hw/arm/cubieboard.c<br>
-&gt; &gt; @@ -30,9 +30,14 @@ static struct arm_boot_info cubieboard_binfo =
-=3D {<br>
-&gt; &gt;=C2=A0 =C2=A0<br>
-&gt; &gt;=C2=A0 =C2=A0static void cubieboard_init(MachineState *machine)<br=
->
-&gt; &gt;=C2=A0 =C2=A0{<br>
-&gt; &gt; -=C2=A0 =C2=A0 AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10)=
-);<br>
-&gt; &gt; +=C2=A0 =C2=A0 AwA10State *a10;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0Error *err =3D NULL;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0<br>
-&gt; <br>
-&gt; What about using object_new_with_props similarly to commit e4c81e3a451=
-f?<br>
-I prefer explicit object_property_add_child() and would use<br>
-above only if there are list of properties to feed to it.<br>
-<br>
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 a10 =3D AW_A10(object_new_with_props(TYPE_AW_A10, =
-OBJECT(s), &quot;soc&quot;,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0&amp;err, NULL));<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 if (err !=3D NULL) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_propagate(errp, err);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; <br>
-&gt; &gt; +=C2=A0 =C2=A0 a10 =3D AW_A10(object_new(TYPE_AW_A10));<br>
-&gt; &gt; +=C2=A0 =C2=A0 object_property_add_child(OBJECT(machine), &quot;s=
-oc&quot;, OBJECT(a10),<br>
-&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_abort);<br>
-&gt; &gt; +=C2=A0 =C2=A0 object_unref(OBJECT(a10));<br></blockquote><div><b=
-r></div><div>Thanks, I added this same solution to the Allwinner H3 series,=
- and its working fine there.</div><div><br></div><div>Tested-by: Niek Linne=
-nbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmail.=
-com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" sty=
-le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
-ng-left:1ex">
-&gt; &gt; +<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0object_property_set_int(OBJECT(&amp;a10=
--&gt;emac), 1, &quot;phy-addr&quot;, &amp;err);<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err !=3D NULL) {<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0error_reportf_err(err, &q=
-uot;Couldn&#39;t set phy address: &quot;);<br>
-&gt; &gt;=C2=A0 =C2=A0<br>
-&gt; <br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---000000000000e4b07405a0856905--
+thanks
+-- PMM
 
