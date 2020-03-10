@@ -2,88 +2,139 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11137C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C42C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:50:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C511020866
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:49:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5XDWbxT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C511020866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6D6020866
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 15:50:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D6020866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBh81-0007gr-36
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:49:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50453)
+	id 1jBh8w-0000TO-6D
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 11:50:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jBh70-0006Ut-RJ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:48:10 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jBh8H-0008O7-G2
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jBh6x-0005Dm-3I
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:48:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32346
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBh6w-00059w-UL
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:48:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583855281;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=llDx5f/9wcs3vbiatzh0myHKONfdDXiTM5J6AYYnUJM=;
- b=D5XDWbxT6PT56bDcEECsoR+xQBsxUUEjcZX99ITtBBCwjPkCH/o3u/25BWm9aQ3BJZHTdK
- w1yRc2AAdUTReyFPQKaK7gN/chylNpG6oGF9TNrrLdtVK8CYGTDOClzY0D8ivMKiw/fQ3H
- g4+ujhzdRrx4vFtQqVzs/zQOtpT86K8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-aRqdc__hM86O2bD4Qkxjvg-1; Tue, 10 Mar 2020 11:47:58 -0400
-X-MC-Unique: aRqdc__hM86O2bD4Qkxjvg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F164800D50;
- Tue, 10 Mar 2020 15:47:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
- [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D3F75D9C5;
- Tue, 10 Mar 2020 15:47:49 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C2C9511386A6; Tue, 10 Mar 2020 16:47:47 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v8 02/10] scripts: add coccinelle script to use auto
- propagated errp
-References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
- <20200306051536.27803-3-vsementsov@virtuozzo.com>
- <87lfo997hs.fsf@dusky.pond.sub.org>
- <e5b19cf6-f206-a0ed-27cc-173c3a137ef2@virtuozzo.com>
-Date: Tue, 10 Mar 2020 16:47:47 +0100
-In-Reply-To: <e5b19cf6-f206-a0ed-27cc-173c3a137ef2@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Tue, 10 Mar 2020 10:44:22 +0300")
-Message-ID: <87lfo8nrdo.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <frankja@linux.ibm.com>) id 1jBh8G-0000sq-0C
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55842)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jBh8F-0000mX-L5
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 11:49:23 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02AFkiHE110533
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:49:22 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ym85239b9-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 11:49:19 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Tue, 10 Mar 2020 15:49:13 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 10 Mar 2020 15:49:09 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02AFn8EW51314758
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Mar 2020 15:49:08 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B1E3C52051;
+ Tue, 10 Mar 2020 15:49:08 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.23.214])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 60C5E5204F;
+ Tue, 10 Mar 2020 15:49:08 +0000 (GMT)
+Subject: Re: [PATCH v8 02/15] s390x: protvirt: Support unpack facility
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200310134008.130038-1-frankja@linux.ibm.com>
+ <20200310134008.130038-3-frankja@linux.ibm.com>
+ <6e8508a7-4f8a-fca7-4ca7-4d598b0ccb84@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Tue, 10 Mar 2020 16:49:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <6e8508a7-4f8a-fca7-4ca7-4d598b0ccb84@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JKig9r0of6biwk7rHKuixOQ5qufMIAiZj"
+X-TM-AS-GCONF: 00
+x-cbid: 20031015-0028-0000-0000-000003E2C4A5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031015-0029-0000-0000-000024A80625
+Message-Id: <f80eddaa-37e2-f152-82a6-3aa66a8d5691@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-10_10:2020-03-10,
+ 2020-03-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 malwarescore=0 phishscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003100101
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,830 +146,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JKig9r0of6biwk7rHKuixOQ5qufMIAiZj
+Content-Type: multipart/mixed; boundary="ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu"
 
-> 09.03.2020 12:56, Markus Armbruster wrote:
->> Suggest
->>
->>      scripts: Coccinelle script to use auto-propagated errp
->>
->> or
->>
->>      scripts: Coccinelle script to use ERRP_AUTO_PROPAGATE()
->>
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>
->>> Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
->>> does corresponding changes in code (look for details in
->>> include/qapi/error.h)
->>>
->>> Usage example:
->>> spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->>>   --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
->>>   blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
->>
->> Suggest FILES... instead of a specific set of files.
->>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>
->>> Cc: Eric Blake <eblake@redhat.com>
->>> Cc: Kevin Wolf <kwolf@redhat.com>
->>> Cc: Max Reitz <mreitz@redhat.com>
->>> Cc: Greg Kurz <groug@kaod.org>
->>> Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
->>> Cc: Stefano Stabellini <sstabellini@kernel.org>
->>> Cc: Anthony Perard <anthony.perard@citrix.com>
->>> Cc: Paul Durrant <paul@xen.org>
->>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->>> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->>> Cc: Laszlo Ersek <lersek@redhat.com>
->>> Cc: Gerd Hoffmann <kraxel@redhat.com>
->>> Cc: Stefan Berger <stefanb@linux.ibm.com>
->>> Cc: Markus Armbruster <armbru@redhat.com>
->>> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
->>> Cc: qemu-block@nongnu.org
->>> Cc: qemu-devel@nongnu.org
->>> Cc: xen-devel@lists.xenproject.org
->>>
->>>   include/qapi/error.h                          |   3 +
->>>   scripts/coccinelle/auto-propagated-errp.cocci | 231 +++++++++++++++++=
-+
->>>   2 files changed, 234 insertions(+)
->>>   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
->>>
->>> diff --git a/include/qapi/error.h b/include/qapi/error.h
->>> index bb9bcf02fb..fbfc6f1c0b 100644
->>> --- a/include/qapi/error.h
->>> +++ b/include/qapi/error.h
->>> @@ -211,6 +211,9 @@
->>>    *         }
->>>    *         ...
->>>    *     }
->>> + *
->>> + * For mass conversion use script
->>
->> mass-conversion (we're not converting mass, we're converting en masse)
->>
->>> + *   scripts/coccinelle/auto-propagated-errp.cocci
->>>    */
->>>     #ifndef ERROR_H
->>> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/co=
-ccinelle/auto-propagated-errp.cocci
->>> new file mode 100644
->>> index 0000000000..bff274bd6d
->>> --- /dev/null
->>> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
->>
->> Preface to my review of this script: may aim isn't to make it
->> bullet-proof.  I want to (1) make it good enough (explained in a
->> jiffie), and (2) automatically identify the spots where it still isn't
->> obviously safe for manual review.
->>
->> The latter may involve additional scripting.  That's okay.
->>
->> The script is good enough when the number of possibly unsafe spots is
->> low enough for careful manual review.
->>
->> When I ask for improvements that, in your opinion, go beyond "good
->> enough", please push back.  I'm sure we can work it out together.
->>
->>> @@ -0,0 +1,231 @@
->>> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
->>> +//
->>> +// Copyright (c) 2020 Virtuozzo International GmbH.
->>> +//
->>> +// This program is free software; you can redistribute it and/or modif=
-y
->>> +// it under the terms of the GNU General Public License as published b=
-y
->>> +// the Free Software Foundation; either version 2 of the License, or
->>> +// (at your option) any later version.
->>> +//
->>> +// This program is distributed in the hope that it will be useful,
->>> +// but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> +// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> +// GNU General Public License for more details.
->>> +//
->>> +// You should have received a copy of the GNU General Public License
->>> +// along with this program.  If not, see <http://www.gnu.org/licenses/=
->.
->>> +//
->>> +// Usage example:
->>> +// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->>> +//  --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff =
-\
->>> +//  --max-width 80 blockdev-nbd.c qemu-nbd.c \
->>
->> You have --max-width 80 here, but not in the commit message.  Default
->> seems to be 78.  Any particular reason to change it to 80?
->
-> Hmm. As I remember, without this parameter, reindenting doesn't work corr=
-ectly.
-> So, I'm OK with "--max-width 78", but I doubt that it will work without a=
- parameter.
-> Still, may be I'm wrong, we can check it.
+--ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-If you can point to an example where --max-width helps, keep it, and
-update the commit message to match.  Else, drop it.
+On 3/10/20 4:26 PM, David Hildenbrand wrote:
+> On 10.03.20 14:39, Janosch Frank wrote:
+>> The unpack facility provides the means to setup a protected guest. A
+>> protected guest can not be introspected by the hypervisor or any
+>=20
+> "cannot"
+>=20
+>> user/administrator of the machine it is running on.
+>>
+>> Protected guests are encrypted at rest and need a special boot
+>> mechanism via diag308 subcode 8 and 10.
+>>
+>> Code 8 sets the PV specific IPLB which is retained seperately from
+>=20
+> "separately"
 
->>
->>> +//  {block/nbd*,nbd/*,include/block/nbd*}.[hc]
->>> +
->>> +// Switch unusual (Error **) parameter names to errp
->>
->> Let's drop the parenthesis around Error **
->>
->>> +// (this is necessary to use ERRP_AUTO_PROPAGATE).
->>
->> Perhaps ERRP_AUTO_PROPAGATE() should be ERRP_AUTO_PROPAGATE(errp) to
->> make the fact we're messing with @errp more obvious.  Too late; I
->> shouldn't rock the boat that much now.
->>
->>> +//
->>> +// Disable optional_qualifier to skip functions with "Error *const *er=
-rp"
->>> +// parameter.
->>> +//
->>> +// Skip functions with "assert(_errp && *_errp)" statement, as they ha=
-ve
->>> +// non generic semantics and may have unusual Error ** argument name f=
-or purpose
->>
->> non-generic
->>
->> for a purpose
->>
->> Wrap comment lines around column 70, please.  It's easier to read.
->>
->> Maybe
->>
->>     // Skip functions with "assert(_errp && *_errp)" statement, because =
-that
->>     // signals unusual semantics, and the parameter name may well serve =
-a
->>     // purpose.
->
-> Sounds good.
->
->>
->>> +// (like nbd_iter_channel_error()).
->>> +//
->>> +// Skip util/error.c to not touch, for example, error_propagate and
->>> +// error_propagate_prepend().
->>
->> error_propagate()
->>
->> I much appreciate your meticulous explanation of what you skip and why.
->>
->>> +@ depends on !(file in "util/error.c") disable optional_qualifier@
->>> +identifier fn;
->>> +identifier _errp !=3D errp;
->>> +@@
->>> +
->>> + fn(...,
->>> +-   Error **_errp
->>> ++   Error **errp
->>> +    ,...)
->>> + {
->>> +(
->>> +     ... when !=3D assert(_errp && *_errp)
->>> +&
->>> +     <...
->>> +-    _errp
->>> ++    errp
->>> +     ...>
->>> +)
->>> + }
->>
->> This rule is required to make the actual transformations (below) work
->> even for parameters with names other than @errp.  I believe it's not
->> used in this series.  In fact, I can't see a use for it in the entire
->> tree right now.  Okay anyway.
->>
->>> +
->>> +// Add invocation of ERRP_AUTO_PROPAGATE to errp-functions where neces=
-sary
->>> +//
->>> +// Note, that without "when any" final "..." may not want to mach some=
-thing
->>
->> s/final "..." may not mach/the final "..." does not match/
->>
->>> +// matched by previous pattern, i.e. the rule will not match double
->>> +// error_prepend in control flow like in vfio_set_irq_signaling().
->>
->> Can't say I fully understand Coccinelle there.  I figure you came to
->> this knowledge the hard way.
->
-> It's follows from smpl grammar document:
->
-> "Implicitly, =E2=80=9C...=E2=80=9D matches the shortest path between some=
-thing that matches the pattern before the dots (or the beginning of the fun=
-ction, if there is nothing before the dots) and something that matches the =
-pattern after the dots (or the end of the function, if there is nothing aft=
-er the dots)."
-> ...
-> "_when any_ removes the aforementioned constraint that =E2=80=9C...=E2=80=
-=9D matches the shortest path"
+Time to find out why my flyspel hooks are failing...
 
-Let me think that through.
+>=20
+>> those set via code 5.
+>>
+>> Code 10 is used to unpack the VM into protected memory, verify its
+>> integrity and start it.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Co-developed-by: Christian Borntraeger <borntraeger@de.ibm.com> [Chang=
+es
+>> to machine]
+>=20
+> [...]
+>=20
+>> +static inline bool ipl_valid_pv_components(IplParameterBlock *iplb)
+>> +{
+>> +    IPLBlockPV *ipib_pv =3D &iplb->pv;
+>> +    int i;
+>> +
+>> +    if (ipib_pv->num_comp =3D=3D 0) {
+>> +        return false;
+>> +    }
+>> +
+>> +    for (i =3D 0; i < ipib_pv->num_comp; i++) {
+>> +        /* Addr must be 4k aligned */
+>> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
+>=20
+> I usually find
+>=20
+> QEMU_IS_ALIGNED(ipib_pv->components[i].addr, TARGET_PAGE_MASK)
+>=20
+> nicer
+>=20
+> [...]
 
-The pattern with the cases other than error_prepend() omitted:
+huh, didn't know it existed.
+I'll have a try with it.
 
-     fn(..., Error **errp, ...)
-     {
-    +   ERRP_AUTO_PROPAGATE();
-        ...  when !=3D ERRP_AUTO_PROPAGATE();
-        error_prepend(errp, ...);
-        ... when any
-     }
+>=20
+>> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+>> new file mode 100644
+>> index 0000000000..1ba8bc7242
+>> --- /dev/null
+>> +++ b/hw/s390x/pv.c
+>> @@ -0,0 +1,104 @@
+>> +/*
+>> + * Protected Virtualization functions
+>> + *
+>> + * Copyright IBM Corp. 2020
+>> + * Author(s):
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ (at
+>> + * your option) any later version. See the COPYING file in the top-le=
+vel
+>> + * directory.
+>> + */
+>> +#include "qemu/osdep.h"
+>> +
+>> +#include <linux/kvm.h>
+>> +
+>> +#include "qemu/error-report.h"
+>> +#include "sysemu/kvm.h"
+>> +#include "pv.h"
+>> +
+>> +const char *cmd_names[] =3D {
+>> +    "VM_ENABLE",
+>> +    "VM_DISABLE",
+>> +    "VM_SET_SEC_PARAMS",
+>> +    "VM_UNPACK",
+>> +    "VM_VERIFY",
+>> +    "VM_PREP_RESET",
+>> +    "VM_UNSHARE_ALL",
+>> +};
+>> +
+>> +static int s390_pv_cmd(uint32_t cmd, void *data)
+>> +{
+>> +    int rc;
+>=20
+> reverse x... :)
 
-Tail of vfio_set_irq_signaling():
+ack
+Just FYI, I like christmas trees the right side up
 
-        name =3D index_to_str(vbasedev, index);
-        if (name) {
-            error_prepend(errp, "%s-%d: ", name, subindex);
-        } else {
-            error_prepend(errp, "index %d-%d: ", index, subindex);
-        }
-        error_prepend(errp,
-                      "Failed to %s %s eventfd signaling for interrupt ",
-                      fd < 0 ? "tear down" : "set up", action_to_str(action=
-));
-        return ret;
-    }
+>=20
+>> +    struct kvm_pv_cmd pv_cmd =3D {
+>> +        .cmd =3D cmd,
+>> +        .data =3D (uint64_t)data,
+>> +    };
+>> +
+>=20
+> and then maybe
+>=20
+> int rc =3D  ...
 
-The pattern's first ... matches a "shortest" path to an error_prepend(),
-where "shortest" means "does not cross an error_prepend().  Its when
-clause makes us ignore functions that already use ERRP_AUTO_PROPAGATE().
+Ack
 
-There are two such "shortest" paths, one to the first error_prepend() in
-vfio_set_irq_signaling(), and one to the second.  Neither path to the
-third one is not "shortest": they both cross one of the other two
-error_prepend().
+>=20
+>> +    rc =3D kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
+>> +    if (rc) {
+>> +        error_report("KVM PV command %d (%s) failed: header rc %x rrc=
+ %x "
+>> +                     "IOCTL rc: %d", cmd, cmd_names[cmd], pv_cmd.rc, =
+pv_cmd.rrc,
+>> +                     rc);
+>> +    }
+>> +    return rc;
+>> +}
+>> +
+>> +static void s390_pv_cmd_exit(uint32_t cmd, void *data)
+>> +{
+>> +    int rc;
+>> +
+>> +    rc =3D s390_pv_cmd(cmd, data);
+>=20
+> int rc =3D ...
 
-The pattern' s second ... matches a path from a matched error_prepend()
-to the end of the function.  There are two paths.  Both cross the third
-error_prepend().  You need "when any" to make the pattern match anyway.
+Ack
 
-Alright, I think I got it.  But now I'm paranoid about ... elsewhere.
-For instance, here's rule1 with error_propagate_prepend() omitted:
+>=20
+>> +    if (rc) {
+>> +        exit(1);
+>> +    }
+>> +}
+>> +
+>=20
+> [...]
+>=20
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index 895498cca6..455ad31718 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -41,6 +41,8 @@
+>>  #include "hw/qdev-properties.h"
+>>  #include "hw/s390x/tod.h"
+>>  #include "sysemu/sysemu.h"
+>> +#include "hw/s390x/pv.h"
+>> +#include <linux/kvm.h>
+>> =20
+>>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>>  {
+>> @@ -316,10 +318,80 @@ static inline void s390_do_cpu_ipl(CPUState *cs,=
+ run_on_cpu_data arg)
+>>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>>  }
+>> =20
+>> +static void s390_machine_unprotect(S390CcwMachineState *ms)
+>> +{
+>> +
+>=20
+> superfluous empty line
+>=20
+>> +    s390_pv_vm_disable();
+>> +    ms->pv =3D false;
+>> +}
+>> +
+>=20
+> [...]
 
-    // Match scenarios with propagation of local error to errp.
-    @rule1 disable optional_qualifier exists@
-    identifier fn, local_err;
-    symbol errp;
-    @@
+Ack
 
-     fn(..., Error **errp, ...)
-     {
-         ...
-         Error *local_err =3D NULL;
-         ...
-         error_propagate(errp, local_err);
-         ...
-     }
+>=20
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index 3dd396e870..bcb9e47767 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -37,6 +37,8 @@
+>>  #include "sysemu/hw_accel.h"
+>>  #include "hw/qdev-properties.h"
+>>  #ifndef CONFIG_USER_ONLY
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>> +#include "hw/s390x/pv.h"
+>=20
+> Do you need that include here? I don't think so.
+>=20
+>>  #include "hw/boards.h"
+>>  #include "sysemu/arch_init.h"
+>>  #include "sysemu/sysemu.h"
+>> @@ -174,6 +176,27 @@ static void s390_cpu_disas_set_info(CPUState *cpu=
+, disassemble_info *info)
+>>      info->print_insn =3D print_insn_s390;
+>>  }
+>> =20
+>> +#if !defined(CONFIG_USER_ONLY)
+>> +bool s390_is_pv(void)
+>> +{
+>> +    static S390CcwMachineState *ccw;
+>> +    Object *obj;
+>> +
+>> +    if (ccw) {
+>> +        return ccw->pv;
+>> +    }
+>> +
+>> +    /* we have to bail out for the "none" machine */
+>> +    obj =3D object_dynamic_cast(qdev_get_machine(),
+>> +                              TYPE_S390_CCW_MACHINE);
+>> +    if (!obj) {
+>> +        return false;
+>> +    }
+>> +    ccw =3D S390_CCW_MACHINE(obj);
+>> +    return ccw->pv;
+>> +}
+>> +#endif
+>> +
+>=20
+> Nit: I *think* this would be better placed in hw/s390x/pv.h
 
-The second and third ... won't match anything containing
-error_propagate().  What if a function has multiple error_propagate() on
-all paths?  Like this one:
+I'll think about it
 
-    extern foo(int, Error **);
-    extern bar(int, Error **);
+>=20
+>>  static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+>>  {
+>>      CPUState *cs =3D CPU(dev);
+>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>> index 1d17709d6e..8fa25d9ed5 100644
+>> --- a/target/s390x/cpu.h
+>> +++ b/target/s390x/cpu.h
+>> @@ -762,6 +762,7 @@ static inline void s390_do_cpu_load_normal(CPUStat=
+e *cs, run_on_cpu_data arg)
+>> =20
+>> =20
+>>  /* cpu.c */
+>> +bool s390_is_pv(void);
+>=20
+> Wonder if this will compile with CONFIG_USER_ONLY (maybe we need a
+> "return false" dummy). I assume you test-compiled that with all variant=
+s
+> (CONFIG_TCG, CONFIG_USER_ONLY, ...)
 
-    void frob(Error **errp)
-    {
-        Error *local_err =3D NULL;
-        int arg;
+Oh, right...
 
-        foo(arg, errp);
-        bar(arg, &local_err);
-        error_propagate(errp, local_err);
-        bar(arg + 1, &local_err);
-        error_propagate(errp, local_err);
-    }
+>=20
+>=20
+> .. we're almost there ... :)
+>=20
 
-This is actually a variation of error.h's "Receive and accumulate
-multiple errors (first one wins)" code snippet.
 
-The Coccinelle script transforms it like this:
 
-     void frob(Error **errp)
-     {
-    +    ERRP_AUTO_PROPAGATE();
-         Error *local_err =3D NULL;
-         int arg;
+--ii2r7qVCVvgodXSNWKupuXN08TB2vNlFu--
 
-The rule that adds ERRP_AUTO_PROPAGATE() matches (it has ... when any),
-but rule1 does not, and we therefore don't convert any of the
-error_propagate().
+--JKig9r0of6biwk7rHKuixOQ5qufMIAiZj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-The result isn't wrong, just useless.
+-----BEGIN PGP SIGNATURE-----
 
-Is this the worst case?
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5ntvMACgkQ41TmuOI4
+ufiyfQ/+PjKbJLZgdcA4mW+0WgY1/XbIvXsR9Z+LTGOXtWaL0NW5PXTUNj6nPmxL
+aAGv0c4GsQDeLMvvUJXowefzDfkwyVf/Mo6ZtgOzPo5jGv7/xiiurYiXbC9nanQl
+vL0YumcAx3d++22P6H68NUwvhiMcGhgVzO3jd511w+f2/oPjhPtB6OSWtk/XvuEx
+SjJKBA8877cEj16/V6bN350RK35bFuXpS4HD+FDT6qKTIF6SK/CnsKwpqg6kLuo8
+oL2/FH8uA5lHqIVNcXqQgrg7IFL2tR2sSkX66E61vM9HG/SU7YXjNSfy+UaDu0RP
+SO6SdlDB7jRdmAWfBpyjuLw3hYaxJ/FTBktTIzGAyyRx/4KfArsOV3rilUkqoiyU
+vz8rQZ6AdOL4HzZw/OzAnpv2dW+i3zwngEoaRpj88KZKfYe+6wnHuwKn1mgWE6CT
+clrIMm+MoSjJZ2/9HicXsMRtkp7gL3OwykZhIMNgeOkAFppsfj6dgckvrdrfWIhz
+uTXEII46LMSdGN91RZftm2JofSSVpPfc572oLbsuO4201c4SAYRosXNo/gdspdSE
+I4gAWVZqMIUaMPMZoFGvBCi5BQvybANvDFrNGu9GUrRf3b/ulfbISHGpt31+XTXy
+PfYTnNzNDpH7glaAtRrrFGyMJ2Ed9I3U4PnThbQb//AeWJZUa4g=
+=kkAT
+-----END PGP SIGNATURE-----
 
-Possible improvement to the ERRP_AUTO_PROPAGATE() rule: don't use
-"... when any" in the error_propagate() case, only in the other cases.
-Would that help?
-
-I think this is the only other rule with "..." matching control flow.
-
->>
->>> +//
->>> +// Note, "exists" says that we want apply rule even if it matches not =
-on
->>> +// all possible control flows (otherwise, it will not match standard p=
-attern
->>> +// when error_propagate() call is in if branch).
->>
->> Learned something new.  Example: kvm_set_kvm_shadow_mem().
->>
->> Spelling it "exists disable optional_qualifier" would avoid giving
->> readers the idea we're disabling "exists", but Coccinelle doesn't let
->> us.  Oh well.
->>
->>> +@ disable optional_qualifier exists@
->>> +identifier fn, local_err, errp;
->>
->> I believe this causes
->>
->>      warning: line 98: errp, previously declared as a metavariable, is u=
-sed as an identifier
->>      warning: line 104: errp, previously declared as a metavariable, is =
-used as an identifier
->>      warning: line 106: errp, previously declared as a metavariable, is =
-used as an identifier
->>      warning: line 131: errp, previously declared as a metavariable, is =
-used as an identifier
->>      warning: line 192: errp, previously declared as a metavariable, is =
-used as an identifier
->>      warning: line 195: errp, previously declared as a metavariable, is =
-used as an identifier
->>      warning: line 228: errp, previously declared as a metavariable, is =
-used as an identifier
->>
->> Making @errp symbol instead of identifier should fix this.
->
-> Hmm, I didn't see these warnings.. But yes, it should be symbol.
->
->>
->>> +@@
->>> +
->>> + fn(..., Error **errp, ...)
->>> + {
->>> ++   ERRP_AUTO_PROPAGATE();
->>> +    ...  when !=3D ERRP_AUTO_PROPAGATE();
->>> +(
->>> +    error_append_hint(errp, ...);
->>> +|
->>> +    error_prepend(errp, ...);
->>> +|
->>> +    error_vprepend(errp, ...);
->>> +|
->>> +    Error *local_err =3D NULL;
->>> +    ...
->>> +(
->>> +    error_propagate_prepend(errp, local_err, ...);
->>> +|
->>> +    error_propagate(errp, local_err);
->>> +)
->>> +)
->>> +    ... when any
->>> + }
->>> +
->>> +
->>> +// Match scenarios with propagation of local error to errp.
->>> +@rule1 disable optional_qualifier exists@
->>> +identifier fn, local_err;
->>> +symbol errp;
->>> +@@
->>> +
->>> + fn(..., Error **errp, ...)
->>> + {
->>> +     ...
->>> +     Error *local_err =3D NULL;
->>> +     ...
->>> +(
->>> +    error_propagate_prepend(errp, local_err, ...);
->>> +|
->>> +    error_propagate(errp, local_err);
->>> +)
->>
->> Indentation off by one.
->>
->>> +     ...
->>> + }
->>> +
->>> +// Convert special case with goto in separate.
->>
->> s/in separate/separately/
->>
->>> +// We can probably merge this into the following hunk with help of ( |=
- )
->>> +// operator, but it significantly reduce performance on block.c parsin=
-g (or it
->>
->> s/reduce/reduces/
->>
->>> +// hangs, I don't know)
->>
->> Sounds like you tried to merge this into the following hunk, but then
->> spatch took so long on block.c that you killed it.  Correct?
->
-> Yes.
-
-I'd say something like "I tried merging this into the following rule the
-obvious way, but it made Coccinelle hang on block.c."
-
->>
->>> +//
->>> +// Note interesting thing: if we don't do it here, and try to fixup "o=
-ut: }"
->>> +// things later after all transformations (the rule will be the same, =
-just
->>> +// without error_propagate() call), coccinelle fails to match this "ou=
-t: }".
->>
->> Weird, but not worth further investigation.
->
-> It partially match to the idea which I saw somewhere in coccinelle docume=
-ntation,
-> that coccinelle converts correct C code to correct C code. "out: }" is an=
- example
-> of incorrect, impossible code flow, and coccinelle can't work with it... =
-But it's
-> just a thought.
->
->>
->>> +@@
->>> +identifier rule1.fn, rule1.local_err, out;
->>> +symbol errp;
->>> +@@
->>> +
->>> + fn(...)
->>> + {
->>> +     <...
->>> +-    goto out;
->>> ++    return;
->>> +     ...>
->>> +- out:
->>> +-    error_propagate(errp, local_err);
->>
->> You neglect to match error_propagate_prepend().  Okay, because (1) that
->> pattern doesn't occur in the tree right now, and (2) if it gets added,
->> gcc will complain.
->
-> No, because it should not removed. error_propagate_prepend should be conv=
-erted
-> to prepend, not removed. So, corresponding gotos should not be removed as=
- well.
-
-You're right.
-
->>
->>> + }
->>> +
->>> +// Convert most of local_err related staff.
->>
->> s/staff/stuff/
->>
->>> +//
->>> +// Note, that we update everything related to matched by rule1 functio=
-n name
->>> +// and local_err name. We may match something not related to the patte=
-rn
->>> +// matched by rule1. For example, local_err may be defined with the sa=
-me name
->>> +// in different blocks inside one function, and in one block follow th=
-e
->>> +// propagation pattern and in other block doesn't. Or we may have seve=
-ral
->>> +// functions with the same name (for different configurations).
->>
->> Context: rule1 matches functions that have all three of
->>
->> * an Error **errp parameter
->>
->> * an Error *local_err =3D NULL variable declaration
->>
->> * an error_propagate(errp, local_err) or error_propagate_prepend(errp,
->>    local_err, ...) expression, where @errp is the parameter and
->>    @local_err is the variable.
->>
->> If I understand you correctly, you're pointing out two potential issues:
->>
->> 1. This rule can match functions rule1 does not match if there is
->> another function with the same name that rule1 does match.
->>
->> 2. This rule matches in the entire function matched by rule1, even when
->> parts of that function use a different @errp or @local_err.
->>
->> I figure these apply to all rules with identifier rule1.fn, not just
->> this one.  Correct?
->
-> Yes.
-
-Thanks!
-
->>
->> Regarding 1.  There must be a better way to chain rules together, but I
->> don't know it.
->>  Can we make Coccinelle at least warn us when it converts
->> multiple functions with the same name?  What about this:
->>
->>     @initialize:python@
->>     @@
->>     fnprev =3D {}
->>
->>     def pr(fn, p):
->>         print("### %s:%s: %s()" % (p[0].file, p[0].line, fn))
->>
->>     @r@
->>     identifier rule1.fn;
->>     position p;
->>     @@
->>      fn(...)@p
->>      {
->>          ...
->>      }
->>     @script:python@
->>         fn << rule1.fn;
->>         p << r.p;
->>     @@
->>     if fn not in fnprev:
->>         fnprev[fn] =3D p
->>     else:
->>         if fnprev[fn]:
->
-> hmm, the condition can't be false
->
->>             pr(fn, fnprev[fn])
->>             fnprev[fn] =3D None
->>         pr(fn, p)
->
-> and we'll miss next duplication..
-
-The idea is
-
-    first instance of fn:
-        fn not in fnprev
-        fnprev[fn] =3D position of instance
-        don't print
-    second instance:
-        fnprev[fn] is the position of the first instance
-        print first two instances
-    subsequent instances: fnprev[fn] is None
-        print this instance
-
-I might have screwed up the coding, of course :)
-
-> But I like the idea.
->
->>
->> For each function @fn matched by rule1, fncnt[fn] is an upper limit of
->> the number of functions with the same name we touch.  If it's more than
->> one, we print.
->>
->> Reports about a dozen function names for the whole tree in my testing.
->> Inspecting the changes to them manually is feasible.  None of them are
->> in files touched by this series.
->>
->> The line printed for the first match is pretty useless for me: it points
->> to a Coccinelle temporary file *shrug*.
->>
->> Regarding 2.  Shadowing @errp or @local_err would be in bad taste, and I
->> sure hope we don't do that.  Multiple @local_err variables... hmm.
->> Perhaps we could again concoct some script rules to lead us to spots to
->> check manually.  See below for my attempt.
->>
->> What's the worst that could happen if we blindly converted such code?
->> The answer to that question tells us how hard to work on finding and
->> checking these guys.
->>
->>> +//
->>> +// Note also that errp-cleaning functions
->>> +//   error_free_errp
->>> +//   error_report_errp
->>> +//   error_reportf_errp
->>> +//   warn_report_errp
->>> +//   warn_reportf_errp
->>> +// are not yet implemented. They must call corresponding Error* - free=
-ing
->>> +// function and then set *errp to NULL, to avoid further propagation t=
-o
->>> +// original errp (consider ERRP_AUTO_PROPAGATE in use).
->>> +// For example, error_free_errp may look like this:
->>> +//
->>> +//    void error_free_errp(Error **errp)
->>> +//    {
->>> +//        error_free(*errp);
->>> +//        *errp =3D NULL;
->>> +//    }
->>> +@ exists@
->>> +identifier rule1.fn, rule1.local_err;
->>> +expression list args;
->>> +symbol errp;
->>> +@@
->>> +
->>> + fn(...)
->>> + {
->>> +     <...
->>> +(
->>
->> Each of the following patterns applies anywhere in the function.
->>
->> First pattern: delete @local_err
->>
->>> +-    Error *local_err =3D NULL;
->>
->> Common case: occurs just once, not nested.  Anything else is suspicious.
->>
->> Both can be detected in the resulting patches with a bit of AWK
->> wizardry:
->>
->>      $ git-diff -U0 master..review-error-v8 | awk '/^@@ / { ctx =3D $5; =
-for (i =3D 6; i <=3D NF; i++) ctx =3D ctx " " $i; if (ctx !=3D octx) { octx=
- =3D ctx; n =3D 0 } } /^- *Error *\* *[A-Za-z0-9_]+ *=3D *NULL;/ { if (inde=
-x($0, "E") > 6) print "nested\n    " ctx; if (n) print "more than one\n    =
-" ctx; n++ }'
->>      nested
->>          static void xen_block_drive_destroy(XenBlockDrive *drive, Error=
- **errp)
->>      nested
->>          static void xen_block_device_destroy(XenBackendInstance *backen=
-d,
->>      nested
->>          static void xen_block_device_destroy(XenBackendInstance *backen=
-d,
->>      more than one
->>          static void xen_block_device_destroy(XenBackendInstance *backen=
-d,
->>
->> Oh.
->>
->> xen_block_drive_destroy() nests its Error *local_err in a conditional.
->>
->> xen_block_device_destroy() has multiple Error *local_err.
->>
->> In both cases, manual review is required to ensure the conversion is
->> okay.  I believe it is.
->>
->> Note that the AWK script relies on diff showing the function name in @@
->> lines, which doesn't always work due to our coding style.
->>
->> For the whole tree, I get some 30 spots.  Feasible.
->>
->>> +|
->>
->> Second pattern: clear @errp after freeing it
->>
->>> +
->>> +// Convert error clearing functions
->>
->> Suggest: Ensure @local_err is cleared on free
->>
->>> +(
->>> +-    error_free(local_err);
->>> ++    error_free_errp(errp);
->>> +|
->>> +-    error_report_err(local_err);
->>> ++    error_report_errp(errp);
->>> +|
->>> +-    error_reportf_err(local_err, args);
->>> ++    error_reportf_errp(errp, args);
->>> +|
->>> +-    warn_report_err(local_err);
->>> ++    warn_report_errp(errp);
->>> +|
->>> +-    warn_reportf_err(local_err, args);
->>> ++    warn_reportf_errp(errp, args);
->>> +)
->>
->> As you mention above, these guys don't exist, yet.  Builds anyway,
->> because this part of the rule is not used in this patch series.  You
->> don't want to omit it, because then the script becomes unsafe to use.
->>
->> We could also open-code:
->>
->>     // Convert error clearing functions
->>     (
->>     -    error_free(local_err);
->>     +    error_free(*errp);
->>     +    *errp =3D NULL;
->>     |
->>     ... and so forth ...
->>     )
->>
->> Matter of taste.  Whatever is easier to explain in the comments.  Since
->> you already wrote one...
->
-> I just feel that using helper functions is safer way..
->
->>
->> We talked about extending this series slightly so these guys are used.
->> I may still look into that.
->>
->>> +?-    local_err =3D NULL;
->>> +
->>
->> The new helpers clear @local_err.  Assignment now redundant, delete.
->> Okay.
->>
->>> +|
->>
->> Third and fourth pattern: delete error_propagate()
->>
->>> +-    error_propagate_prepend(errp, local_err, args);
->>> ++    error_prepend(errp, args);
->>> +|
->>> +-    error_propagate(errp, local_err);
->>> +|
->>
->> Fifth pattern: use @errp directly
->>
->>> +-    &local_err
->>> ++    errp
->>> +)
->>> +     ...>
->>> + }
->>> +
->>> +// Convert remaining local_err usage. It should be different kinds of =
-error
->>> +// checking in if operators. We can't merge this into previous hunk, a=
-s this
->>
->> In if conditionals, I suppose.  It's the case for this patch.  If I
->> apply the script to the whole tree, the rule gets also applied in other
->> contexts.  The sentence might mislead as much as it helps.  Keep it or
->> delete it?
->
-> Maybe, just be more honest: "It should be ..., but it may be any other pa=
-ttern, be careful"
-
-"Need to be careful" means "needs careful manual review", which I
-believe is not feasible; see "Preface to my review of this script"
-above.
-
-But do we really need to be careful here?
-
-This rule should apply only where we added ERRP_AUTO_PROPAGATE().
-
-Except when rule chaining via function name fails us, but we plan to
-detect that and review manually, so let's ignore this issue here.
-
-Thanks to ERRP_AUTO_PROPAGATE(), @errp is not null.  Enabling
-replacement of @local_err by @errp is its whole point.
-
-What exactly do we need to be careful about?
-
->
->>
->>> +// conflicts with other substitutions in it (at least with "- local_er=
-r =3D NULL").
->>> +@@
->>> +identifier rule1.fn, rule1.local_err;
->>> +symbol errp;
->>> +@@
->>> +
->>> + fn(...)
->>> + {
->>> +     <...
->>> +-    local_err
->>> ++    *errp
->>> +     ...>
->>> + }
->>> +
->>> +// Always use the same patter for checking error
->>
->> s/patter/pattern/
->>
->>> +@@
->>> +identifier rule1.fn;
->>> +symbol errp;
->>> +@@
->>> +
->>> + fn(...)
->>> + {
->>> +     <...
->>> +-    *errp !=3D NULL
->>> ++    *errp
->>> +     ...>
->>> + }
->>
+--JKig9r0of6biwk7rHKuixOQ5qufMIAiZj--
 
 
