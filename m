@@ -2,100 +2,81 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D076C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:01:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFF3C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 448522465A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:01:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79D132465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 11:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grRrHKLK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448522465A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRAwJfCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D132465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBcdD-0001qc-Ct
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:01:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45526)
+	id 1jBcdo-0002aX-LA
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 07:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jBcao-0007vy-IP
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:58:35 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jBccj-0001i9-I3
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jBcan-0003kX-Jv
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:58:34 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33170
+ (envelope-from <eric.auger@redhat.com>) id 1jBcch-00085G-Ux
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:00:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44590
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jBcan-0003jr-FX
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 06:58:33 -0400
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jBcch-00083E-RW
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 07:00:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583837913;
+ s=mimecast20190719; t=1583838030;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SZH700B7j00PQlDsDjUOLvroZz4mzS5XKsuvb7LeVsk=;
- b=grRrHKLK808UnmfBOARzlmVyGRUALTnljRTEg2RZLXvDnmnleP4JtaMVQW7BLuO7e4k6Lk
- 337jcvd3LqG5ZDiKwofH3GZVGY4Xt46XaNzosLKEVr8q0cZjNXqp5VDFW7jW+aKgUAa+//
- eXXj9OOKF9zj1FdSv/6WAoBWVF6A7rc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-zkKMRHKyPl279M1i2wmTJg-1; Tue, 10 Mar 2020 06:58:30 -0400
-X-MC-Unique: zkKMRHKyPl279M1i2wmTJg-1
-Received: by mail-wm1-f69.google.com with SMTP id a23so217288wmm.8
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 03:58:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SZH700B7j00PQlDsDjUOLvroZz4mzS5XKsuvb7LeVsk=;
- b=SrKQJSgTrXOF8rfp6495YQk6kD+Uo3JWBYsZ4xWzOCGWqrrf422579aemCAYnSUfmd
- Qi6xX2AdJOF0jr+hk1rNI6o+7DPnUiq05o98CL9EnalMVe8HfiRHbBVH5Ft7MSooCfRT
- aEFCHcPzDRN6CSDbf7KDGQrmCUAmasFATty+oxlRQY4TaeTv4EyM7nqwjrS8lg4iBaRO
- WoDTxx/0UW3Ph2oCQ/WhbhNrlc2dg9JScpXIEQh4qsu+4xND55QCWWS4SHj4MQlQGBj7
- Tk+wQyva3F+xHsZIKpFyBBoxM9jL+S9C0g5bUrnZeYXTJDnRNgqsORcA6KMb+BUM69aT
- T1iQ==
-X-Gm-Message-State: ANhLgQ0jnSapXDxTPu7BV8sGFMsn2k/yl/00uKboCrf6AnPHk1Kyl3P6
- sy1Bpo4QI/hgW+PsBZ3dm+Jby6ZEtVXN8HhbYn11hEqiEMO+kX3ft5TDHUKKXp3XXQF8eKmqwop
- pBMNzjKXfno+pSd8=
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr1650708wmb.118.1583837907474; 
- Tue, 10 Mar 2020 03:58:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsETdVdYlC2o1JeIlMvTK1GQsehzbpYwvmPmmcObrRqvpv0jG0D7W33siTdtcTrpzcU7wrlxA==
-X-Received: by 2002:a1c:cc06:: with SMTP id h6mr1650679wmb.118.1583837907234; 
- Tue, 10 Mar 2020 03:58:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4887:2313:c0bc:e3a8?
- ([2001:b07:6468:f312:4887:2313:c0bc:e3a8])
- by smtp.gmail.com with ESMTPSA id j15sm26480746wrp.85.2020.03.10.03.58.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 03:58:26 -0700 (PDT)
-Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
-To: Maxime Villard <max@m00nbsd.net>
-References: <20200206115731.13552-1-n54@gmx.com>
- <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
- <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
- <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
- <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
- <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
-Date: Tue, 10 Mar 2020 11:58:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=4JG1xSI0M7SxiOdT+XP4LAA8ykTyWX0vFprHuiZRRDg=;
+ b=WRAwJfChBlqQ/zxb4khPDLh4Mt4rCJGTl8Nv5pQn5cawzgf6pQGB/GgY4cvvbfa4h3Hv+4
+ 5yRTa9wGV8uMN64e21lDHeIqa/ckXSMyRT763M/LO5kfbo5viYQWydTDaJ4zVfYCFo2Vxb
+ Fl85efo6RQU6Y/1Eb6OjjjFpBFM53tw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-si_hbHt5POCEjnAl5TJIig-1; Tue, 10 Mar 2020 07:00:26 -0400
+X-MC-Unique: si_hbHt5POCEjnAl5TJIig-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95F1213EA;
+ Tue, 10 Mar 2020 11:00:24 +0000 (UTC)
+Received: from [10.36.117.85] (ovpn-117-85.ams2.redhat.com [10.36.117.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 871E35C13D;
+ Tue, 10 Mar 2020 11:00:21 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 03/13] arm/arm64: gic: Introduce
+ setup_irq() helper
+To: Andrew Jones <drjones@redhat.com>
+References: <20200309102420.24498-1-eric.auger@redhat.com>
+ <20200309102420.24498-4-eric.auger@redhat.com>
+ <20200309105601.3hm2kfhuufgxoydl@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3e1e2c24-2f30-03f2-ca9c-a2d99aba0740@redhat.com>
+Date: Tue, 10 Mar 2020 12:00:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200309105601.3hm2kfhuufgxoydl@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,25 +90,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
- philmd@redhat.com, rth <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/03/20 07:45, Maxime Villard wrote:
-> > It reproduces the existing logic found in whpx-all.c, and if there is
-> >
+Hi Drew,
+On 3/9/20 11:56 AM, Andrew Jones wrote:
+> On Mon, Mar 09, 2020 at 11:24:10AM +0100, Eric Auger wrote:
+>> ipi_enable() code would be reusable for other interrupts
+>> than IPI. Let's rename it setup_irq() and pass an interrupt
+>> handler pointer.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - do not export setup_irq anymore
+>> ---
+>>  arm/gic.c | 20 +++++++-------------
+>>  1 file changed, 7 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index fcf4c1f..abf08c7 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -34,6 +34,7 @@ static struct gic *gic;
+>>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>>  static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
+>>  static cpumask_t ready;
+>> +typedef void (*handler_t)(struct pt_regs *regs __unused);
 > 
-> It's buggy there too and it has to be fixed in the hypervisor so it
-> can't be done at the same time I'm both. KVM does it right by having
-> a flag ("immediate_exit") that is set by the signal handler and
-> checked by the hypervisor.
+> This is just irq_handler_fn, which is already defined in processor.h.
+> We don't need the __unused, not since 6b07148d06b1 ("Replace -Wextra
+> with a saner list of warning flags").
+Shall I duplicate it into ./lib/arm/asm/processor.h as well?
 
-For what it's worth, WHPX's whpx_kick_vcpu invokes a "cancel entry" API
-that is probably similar to what KVM does, so there's nothing to do there.
+Thanks
 
-Paolo
+Eric
+> 
+>>  
+>>  static void nr_cpu_check(int nr)
+>>  {
+>> @@ -215,20 +216,20 @@ static void ipi_test_smp(void)
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> -static void ipi_enable(void)
+>> +static void setup_irq(handler_t handler)
+>>  {
+>>  	gic_enable_defaults();
+>>  #ifdef __arm__
+>> -	install_exception_handler(EXCPTN_IRQ, ipi_handler);
+>> +	install_exception_handler(EXCPTN_IRQ, handler);
+>>  #else
+>> -	install_irq_handler(EL1H_IRQ, ipi_handler);
+>> +	install_irq_handler(EL1H_IRQ, handler);
+>>  #endif
+>>  	local_irq_enable();
+>>  }
+>>  
+>>  static void ipi_send(void)
+>>  {
+>> -	ipi_enable();
+>> +	setup_irq(ipi_handler);
+>>  	wait_on_ready();
+>>  	ipi_test_self();
+>>  	ipi_test_smp();
+>> @@ -238,7 +239,7 @@ static void ipi_send(void)
+>>  
+>>  static void ipi_recv(void)
+>>  {
+>> -	ipi_enable();
+>> +	setup_irq(ipi_handler);
+>>  	cpumask_set_cpu(smp_processor_id(), &ready);
+>>  	while (1)
+>>  		wfi();
+>> @@ -295,14 +296,7 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>>  static void run_active_clear_test(void)
+>>  {
+>>  	report_prefix_push("active");
+>> -	gic_enable_defaults();
+>> -#ifdef __arm__
+>> -	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
+>> -#else
+>> -	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
+>> -#endif
+>> -	local_irq_enable();
+>> -
+>> +	setup_irq(ipi_clear_active_handler);
+>>  	ipi_test_self();
+>>  	report_prefix_pop();
+>>  }
+>> -- 
+>> 2.20.1
+>>
 
 
