@@ -2,72 +2,84 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7682EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03798C10DCE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15C9C208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15C9C208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B957C208E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 19:50:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbXt4QTP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B957C208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBkpn-0002xy-B7
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34722)
+	id 1jBktK-0004Cx-S4
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 15:50:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBkou-0002FR-Gq
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:45:42 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBksO-0003gy-PW
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBkos-0006qW-FS
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:45:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39916)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jBksN-00020r-IF
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:49:16 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:35141)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBkos-0006oz-8T
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 15:45:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBkoq-0000sY-9D
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 19:45:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 437112E8047
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 19:45:36 +0000 (UTC)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jBksK-0001xx-DY; Tue, 10 Mar 2020 15:49:12 -0400
+Received: by mail-io1-xd42.google.com with SMTP id h8so14085707iob.2;
+ Tue, 10 Mar 2020 12:49:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uI3JFUHhKOPjEYddkRjvpoV1Wbus4myLT0ZKlUz2e8k=;
+ b=FbXt4QTPtEBYhXNQIALGPjvlKbzjTdneQdPmS+GAwxXzThsUQI7iLsTPT1ON08wfxu
+ Yb6UCt8VKs86ZS2/vadlI1OG5EBT5kbC7mmVHYMQwO4o0UYEoqps0s1hurLtm+slIRv9
+ yYrFfRC6tqMePKk6TvuzKn9vnH3MZUQZ9wyLB3axobBHvC7KA+GtKgzAX7ERnnGrkTvO
+ /rNdOSp31k2xIAmH0M00c54rUeV2NCHNcLwbPjtASouoyU1xWTR2aTih0nMREEFR6+NI
+ MKvfvtqLUWz5muSBJLmWKwFQOa9y7EnXqcH0bJ0tHDmx4zqfkLbcLK3sVPtbJRrKt2Xs
+ qAUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uI3JFUHhKOPjEYddkRjvpoV1Wbus4myLT0ZKlUz2e8k=;
+ b=cyuydcsQy5yy77yWYdhACGTqIUoLDuZ6uDksV42CJRgaT9LUWzXjokJHxHrJ22pLB9
+ QifnSx+MkL66lAUFSafXDHWhw/rPXskCOYyBcAU7fx4ibz6/3h+sUfzWKTOnPBpnPQtM
+ db/piCvaB9RzL/zPJoO/PHQzGTl14JJyqiVh3liH1REZzXOU41IKtUs7JhK6fHziW0bG
+ +YIZNKtTrjKjFVGQYTkWVbsgH5i7ogxzJMy5zQ2N1ycG2WcksbrldwLMLA71/0f0b6vI
+ NpgGdzLp5q5tKcWd2bKKmGls7dwRtSGa82mGPsZbYXVVWUmXTEUh68ZaqQdKd0UT2dwh
+ yGTA==
+X-Gm-Message-State: ANhLgQ01OB2mtSDlLfsH3Y7t1sKKzBn1fOmwNK/9wy4X5Bg8aOlKh3IA
+ hJGATm+lq3gB6GEUSRLXuPM2XqlXBSzM2fm6Z2o=
+X-Google-Smtp-Source: ADFU+vt+WZzpVEwuecKC3cU40BJhHw4NM0oT4kXJZs8GtH4Y7doqJ1UNyZ81+ScMbzzQOw9OpcpteeZ+YDWUpGwhXNM=
+X-Received: by 2002:a02:caa8:: with SMTP id e8mr22139910jap.126.1583869751241; 
+ Tue, 10 Mar 2020 12:49:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Mar 2020 19:39:35 -0000
-From: Robert Henry <1866892@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mhodog
-X-Launchpad-Bug-Reporter: Robert Henry (mhodog)
-X-Launchpad-Bug-Modifier: Robert Henry (mhodog)
-Message-Id: <158386917575.11737.1131406657888792626.malonedeb@soybean.canonical.com>
-Subject: [Bug 1866892] [NEW] guest OS catches a page fault bug when running
- dotnet
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 48935a2232c80fbd926ce428bddf263a1d36a21f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <20200303091254.22373-1-imammedo@redhat.com>
+ <aef518d0-d8e5-7972-0530-8f8a4c64f1e1@redhat.com>
+ <20200306114838.27603031@redhat.com>
+In-Reply-To: <20200306114838.27603031@redhat.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Tue, 10 Mar 2020 20:49:00 +0100
+Message-ID: <CAPan3WqN4dFcsLz6eCrfA_MT-iQoOvmKxFYyq0=mZnVkEPG8QQ@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/cubieboard: make sure SOC object isn't leaked
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000e4b07405a0856905"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,267 +88,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866892 <1866892@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+--000000000000e4b07405a0856905
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The linux guest OS catches a page fault bug when running the dotnet
-application.
+Hi Igor,
 
-host =3D metal =3D x86_64
-host OS =3D ubuntu 19.10
-qemu emulation, without KVM, with "tiny code generator" tcg; no plugins; bu=
-ilt from head/master
-guest emulation =3D x86_64
-guest OS =3D ubuntu 19.10
-guest app =3D dotnet, running any program
+On Fri, Mar 6, 2020 at 11:49 AM Igor Mammedov <imammedo@redhat.com> wrote:
 
-qemu sha=3D7bc4d1980f95387c4cc921d7a066217ff4e42b70 (head/master Mar 10,
-2020)
+> On Fri, 6 Mar 2020 11:33:07 +0100
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+>
+> > On 3/3/20 10:12 AM, Igor Mammedov wrote:
+> > > SOC object returned by object_new() is leaked in current code.
+> > > Set SOC parent explicitly to board and then unref to SOC object
+> > > to make sure that refererence returned by object_new() is taken
+> > > care of.
+> > >
+> > > The SOC object will be kept alive by its parent (machine) and
+> > > will be automatically freed when MachineState is destroyed.
+> > >
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > Reported-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >   hw/arm/cubieboard.c | 7 ++++++-
+> > >   1 file changed, 6 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+> > > index 089f9a30c1..12f8ac798d 100644
+> > > --- a/hw/arm/cubieboard.c
+> > > +++ b/hw/arm/cubieboard.c
+> > > @@ -30,9 +30,14 @@ static struct arm_boot_info cubieboard_binfo =3D {
+> > >
+> > >   static void cubieboard_init(MachineState *machine)
+> > >   {
+> > > -    AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10));
+> > > +    AwA10State *a10;
+> > >       Error *err =3D NULL;
+> > >
+> >
+> > What about using object_new_with_props similarly to commit e4c81e3a451f=
+?
+> I prefer explicit object_property_add_child() and would use
+> above only if there are list of properties to feed to it.
+>
+>
+> >      a10 =3D AW_A10(object_new_with_props(TYPE_AW_A10, OBJECT(s), "soc"=
+,
+> >                                         &err, NULL));
+> >      if (err !=3D NULL) {
+> >          error_propagate(errp, err);
+> >          return;
+> >      }
+> >
+> > > +    a10 =3D AW_A10(object_new(TYPE_AW_A10));
+> > > +    object_property_add_child(OBJECT(machine), "soc", OBJECT(a10),
+> > > +                              &error_abort);
+> > > +    object_unref(OBJECT(a10));
+>
 
-qemu invocation is:
+Thanks, I added this same solution to the Allwinner H3 series, and its
+working fine there.
 
-qemu/build/x86_64-softmmu/qemu-system-x86_64 \
-  -m size=3D4096 \
-  -smp cpus=3D1 \
-  -machine type=3Dpc-i440fx-5.0,accel=3Dtcg \
-  -cpu Skylake-Server-v1 \
-  -nographic \
-  -bios OVMF-pure-efi.fd \
-  -drive if=3Dnone,id=3Dhd0,file=3Dubuntu-19.10-server-cloudimg-amd64.img \
-  -device virtio-blk,drive=3Dhd0 \
-  -drive if=3Dnone,id=3Dcloud,file=3Dlinux_cloud_config.img \
-  -device virtio-blk,drive=3Dcloud \
-  -netdev user,id=3Duser0,hostfwd=3Dtcp::2223-:22 \
-  -device virtio-net,netdev=3Duser0
+Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 
 
-Here's the guest kernel console output:
+> > > +
+> > >       object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err=
+);
+> > >       if (err !=3D NULL) {
+> > >           error_reportf_err(err, "Couldn't set phy address: ");
+> > >
+> >
+>
+>
+>
 
+--=20
+Niek Linnenbank
 
-[ 2834.005449] BUG: unable to handle page fault for address: 00007fffffffc2=
-c0
-[ 2834.009895] #PF: supervisor read access in user mode
-[ 2834.013872] #PF: error_code(0x0001) - permissions violation
-[ 2834.018025] IDT: 0xfffffe0000000000 (limit=3D0xfff) GDT: 0xfffffe0000001=
-000 (limit=3D0x7f)
-[ 2834.022242] LDTR: NULL
-[ 2834.026306] TR: 0x40 -- base=3D0xfffffe0000003000 limit=3D0x206f
-[ 2834.030395] PGD 80000000360d0067 P4D 80000000360d0067 PUD 36105067 PMD 3=
-6193067 PTE 8000000076d8e867
-[ 2834.038672] Oops: 0001 [#4] SMP PTI
-[ 2834.042707] CPU: 0 PID: 13537 Comm: dotnet Tainted: G      D           5=
-.3.0-29-generic #31-Ubuntu
-[ 2834.050591] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-0.0.0 02/06/2015
-[ 2834.054785] RIP: 0033:0x1555547eaeda
-[ 2834.059017] Code: d0 00 00 00 4c 8b a7 d8 00 00 00 4c 8b af e0 00 00 00 =
-4c 8b b7 e8 00 00 00 4c 8b bf f0 00 00 00 48 8b bf b0 00 00 00 9d 74 02 <48=
-> cf 48 8d 64 24 30 5d c3 90 cc c3 66 90 55 4c 8b a7 d8 00 00 00
-[ 2834.072103] RSP: 002b:00007fffffffc2c0 EFLAGS: 00000202
-[ 2834.076507] RAX: 0000000000000000 RBX: 00001554b401af38 RCX: 00000000000=
-00001
-[ 2834.080832] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00007ffffff=
-fcfb0
-[ 2834.085010] RBP: 00007fffffffd730 R08: 0000000000000000 R09: 00007ffffff=
-fd1b0
-[ 2834.089184] R10: 0000155555331dd5 R11: 00001555553ad8d0 R12: 00000000000=
-00002
-[ 2834.093350] R13: 0000000000000001 R14: 0000000000000001 R15: 00001554b40=
-1d388
-[ 2834.097309] FS:  0000155554fa5740 GS:  0000000000000000
-[ 2834.101131] Modules linked in: isofs nls_iso8859_1 dm_multipath scsi_dh_=
-rdac scsi_dh_emc scsi_dh_alua ppdev input_leds serio_raw parport_pc parport=
- sch_fq_codel ip_tables x_tables autofs4 btrfs zstd_compress raid10 raid456=
- async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq li=
-bcrc32c raid1 raid0 multipath linear crct10dif_pclmul crc32_pclmul ghash_cl=
-mulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper virtio_ne=
-t psmouse net_failover failover virtio_blk floppy
-[ 2834.122539] CR2: 00007fffffffc2c0
-[ 2834.126867] ---[ end trace dfae51f1d9432708 ]---
-[ 2834.131239] RIP: 0033:0x14d793262eda
-[ 2834.135715] Code: Bad RIP value.
-[ 2834.140243] RSP: 002b:00007ffddb4e2980 EFLAGS: 00000202
-[ 2834.144615] RAX: 0000000000000000 RBX: 000014d6f402acb8 RCX: 00000000000=
-00002
-[ 2834.148943] RDX: 0000000001cd6950 RSI: 0000000000000000 RDI: 00007ffddb4=
-e3670
-[ 2834.153335] RBP: 00007ffddb4e3df0 R08: 0000000000000001 R09: 00007ffddb4=
-e3870
-[ 2834.157774] R10: 000014d793da9dd5 R11: 000014d793e258d0 R12: 00000000000=
-00002
-[ 2834.162132] R13: 0000000000000001 R14: 0000000000000001 R15: 000014d6f40=
-2d040
-[ 2834.166239] FS:  0000155554fa5740(0000) GS:ffff97213ba00000(0000) knlGS:=
-0000000000000000
-[ 2834.170529] CS:  0033 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 2834.174751] CR2: 000014d793262eb0 CR3: 0000000036130000 CR4: 00000000007=
-406f0
-[ 2834.178892] PKRU: 55555554
+--000000000000e4b07405a0856905
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I run the application from a shell with `ulimit -s unlimited` (unlimited
-stack to size).
+<div dir=3D"ltr"><div dir=3D"ltr">Hi Igor,<br></div><br><div class=3D"gmail=
+_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Mar 6, 2020 at 11:49 =
+AM Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat=
+.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
+ex">On Fri, 6 Mar 2020 11:33:07 +0100<br>
+Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=
+=3D"_blank">philmd@redhat.com</a>&gt; wrote:<br>
+<br>
+&gt; On 3/3/20 10:12 AM, Igor Mammedov wrote:<br>
+&gt; &gt; SOC object returned by object_new() is leaked in current code.<br=
+>
+&gt; &gt; Set SOC parent explicitly to board and then unref to SOC object<b=
+r>
+&gt; &gt; to make sure that refererence returned by object_new() is taken<b=
+r>
+&gt; &gt; care of.<br>
+&gt; &gt; <br>
+&gt; &gt; The SOC object will be kept alive by its parent (machine) and<br>
+&gt; &gt; will be automatically freed when MachineState is destroyed.<br>
+&gt; &gt; <br>
+&gt; &gt; Signed-off-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redha=
+t.com" target=3D"_blank">imammedo@redhat.com</a>&gt;<br>
+&gt; &gt; Reported-by: Andrew Jones &lt;<a href=3D"mailto:drjones@redhat.co=
+m" target=3D"_blank">drjones@redhat.com</a>&gt;<br>
+&gt; &gt; ---<br>
+&gt; &gt;=C2=A0 =C2=A0hw/arm/cubieboard.c | 7 ++++++-<br>
+&gt; &gt;=C2=A0 =C2=A01 file changed, 6 insertions(+), 1 deletion(-)<br>
+&gt; &gt; <br>
+&gt; &gt; diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c<br>
+&gt; &gt; index 089f9a30c1..12f8ac798d 100644<br>
+&gt; &gt; --- a/hw/arm/cubieboard.c<br>
+&gt; &gt; +++ b/hw/arm/cubieboard.c<br>
+&gt; &gt; @@ -30,9 +30,14 @@ static struct arm_boot_info cubieboard_binfo =
+=3D {<br>
+&gt; &gt;=C2=A0 =C2=A0<br>
+&gt; &gt;=C2=A0 =C2=A0static void cubieboard_init(MachineState *machine)<br=
+>
+&gt; &gt;=C2=A0 =C2=A0{<br>
+&gt; &gt; -=C2=A0 =C2=A0 AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10)=
+);<br>
+&gt; &gt; +=C2=A0 =C2=A0 AwA10State *a10;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0Error *err =3D NULL;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0<br>
+&gt; <br>
+&gt; What about using object_new_with_props similarly to commit e4c81e3a451=
+f?<br>
+I prefer explicit object_property_add_child() and would use<br>
+above only if there are list of properties to feed to it.<br>
+<br>
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 a10 =3D AW_A10(object_new_with_props(TYPE_AW_A10, =
+OBJECT(s), &quot;soc&quot;,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0&amp;err, NULL));<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 if (err !=3D NULL) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_propagate(errp, err);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; <br>
+&gt; &gt; +=C2=A0 =C2=A0 a10 =3D AW_A10(object_new(TYPE_AW_A10));<br>
+&gt; &gt; +=C2=A0 =C2=A0 object_property_add_child(OBJECT(machine), &quot;s=
+oc&quot;, OBJECT(a10),<br>
+&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_abort);<br>
+&gt; &gt; +=C2=A0 =C2=A0 object_unref(OBJECT(a10));<br></blockquote><div><b=
+r></div><div>Thanks, I added this same solution to the Allwinner H3 series,=
+ and its working fine there.</div><div><br></div><div>Tested-by: Niek Linne=
+nbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmail.=
+com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
+ng-left:1ex">
+&gt; &gt; +<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0object_property_set_int(OBJECT(&amp;a10=
+-&gt;emac), 1, &quot;phy-addr&quot;, &amp;err);<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err !=3D NULL) {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0error_reportf_err(err, &q=
+uot;Couldn&#39;t set phy address: &quot;);<br>
+&gt; &gt;=C2=A0 =C2=A0<br>
+&gt; <br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
 
-The application creates a number of threads, and those threads make a
-lot of calls to sigaltstack() and mprotect(); see the relevant source
-for dotnet here
-https://github.com/dotnet/runtime/blob/15ec69e47b4dc56098e6058a11ccb6ae4d5d=
-4fa1/src/coreclr/src/pal/src/thread/thread.cpp#L2467
-
-using strace -f on the app shows that no alt stacks come anywhere near
-the failing address; all alt stacks are in the heap, as expected.  None
-of the mmap/mprotect/munmap syscalls were given arguments in the high
-memory 0x7fffffff0000 and up.
-
-gdb (with default signal stop/print/pass semantics) does not report any
-signals prior to the kernel bug being tripped, so I doubt the alternate
-signal stack is actually used.
-
-When I run the same dotnet binary on the host (eg, on "bare metal"), the
-host kernel seems happy and dotnet runs as expected.
-
-I have not tried different qemu or guest or host O/S.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866892
-
-Title:
-  guest OS catches a page  fault bug when running dotnet
-
-Status in QEMU:
-  New
-
-Bug description:
-  The linux guest OS catches a page fault bug when running the dotnet
-  application.
-
-  host =3D metal =3D x86_64
-  host OS =3D ubuntu 19.10
-  qemu emulation, without KVM, with "tiny code generator" tcg; no plugins; =
-built from head/master
-  guest emulation =3D x86_64
-  guest OS =3D ubuntu 19.10
-  guest app =3D dotnet, running any program
-
-  qemu sha=3D7bc4d1980f95387c4cc921d7a066217ff4e42b70 (head/master Mar 10,
-  2020)
-
-  qemu invocation is:
-
-  qemu/build/x86_64-softmmu/qemu-system-x86_64 \
-    -m size=3D4096 \
-    -smp cpus=3D1 \
-    -machine type=3Dpc-i440fx-5.0,accel=3Dtcg \
-    -cpu Skylake-Server-v1 \
-    -nographic \
-    -bios OVMF-pure-efi.fd \
-    -drive if=3Dnone,id=3Dhd0,file=3Dubuntu-19.10-server-cloudimg-amd64.img=
- \
-    -device virtio-blk,drive=3Dhd0 \
-    -drive if=3Dnone,id=3Dcloud,file=3Dlinux_cloud_config.img \
-    -device virtio-blk,drive=3Dcloud \
-    -netdev user,id=3Duser0,hostfwd=3Dtcp::2223-:22 \
-    -device virtio-net,netdev=3Duser0
-
-  =
-
-  Here's the guest kernel console output:
-
-  =
-
-  [ 2834.005449] BUG: unable to handle page fault for address: 00007fffffff=
-c2c0
-  [ 2834.009895] #PF: supervisor read access in user mode
-  [ 2834.013872] #PF: error_code(0x0001) - permissions violation
-  [ 2834.018025] IDT: 0xfffffe0000000000 (limit=3D0xfff) GDT: 0xfffffe00000=
-01000 (limit=3D0x7f)
-  [ 2834.022242] LDTR: NULL
-  [ 2834.026306] TR: 0x40 -- base=3D0xfffffe0000003000 limit=3D0x206f
-  [ 2834.030395] PGD 80000000360d0067 P4D 80000000360d0067 PUD 36105067 PMD=
- 36193067 PTE 8000000076d8e867
-  [ 2834.038672] Oops: 0001 [#4] SMP PTI
-  [ 2834.042707] CPU: 0 PID: 13537 Comm: dotnet Tainted: G      D          =
- 5.3.0-29-generic #31-Ubuntu
-  [ 2834.050591] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S 0.0.0 02/06/2015
-  [ 2834.054785] RIP: 0033:0x1555547eaeda
-  [ 2834.059017] Code: d0 00 00 00 4c 8b a7 d8 00 00 00 4c 8b af e0 00 00 0=
-0 4c 8b b7 e8 00 00 00 4c 8b bf f0 00 00 00 48 8b bf b0 00 00 00 9d 74 02 <=
-48> cf 48 8d 64 24 30 5d c3 90 cc c3 66 90 55 4c 8b a7 d8 00 00 00
-  [ 2834.072103] RSP: 002b:00007fffffffc2c0 EFLAGS: 00000202
-  [ 2834.076507] RAX: 0000000000000000 RBX: 00001554b401af38 RCX: 000000000=
-0000001
-  [ 2834.080832] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00007ffff=
-fffcfb0
-  [ 2834.085010] RBP: 00007fffffffd730 R08: 0000000000000000 R09: 00007ffff=
-fffd1b0
-  [ 2834.089184] R10: 0000155555331dd5 R11: 00001555553ad8d0 R12: 000000000=
-0000002
-  [ 2834.093350] R13: 0000000000000001 R14: 0000000000000001 R15: 00001554b=
-401d388
-  [ 2834.097309] FS:  0000155554fa5740 GS:  0000000000000000
-  [ 2834.101131] Modules linked in: isofs nls_iso8859_1 dm_multipath scsi_d=
-h_rdac scsi_dh_emc scsi_dh_alua ppdev input_leds serio_raw parport_pc parpo=
-rt sch_fq_codel ip_tables x_tables autofs4 btrfs zstd_compress raid10 raid4=
-56 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq =
-libcrc32c raid1 raid0 multipath linear crct10dif_pclmul crc32_pclmul ghash_=
-clmulni_intel aesni_intel aes_x86_64 crypto_simd cryptd glue_helper virtio_=
-net psmouse net_failover failover virtio_blk floppy
-  [ 2834.122539] CR2: 00007fffffffc2c0
-  [ 2834.126867] ---[ end trace dfae51f1d9432708 ]---
-  [ 2834.131239] RIP: 0033:0x14d793262eda
-  [ 2834.135715] Code: Bad RIP value.
-  [ 2834.140243] RSP: 002b:00007ffddb4e2980 EFLAGS: 00000202
-  [ 2834.144615] RAX: 0000000000000000 RBX: 000014d6f402acb8 RCX: 000000000=
-0000002
-  [ 2834.148943] RDX: 0000000001cd6950 RSI: 0000000000000000 RDI: 00007ffdd=
-b4e3670
-  [ 2834.153335] RBP: 00007ffddb4e3df0 R08: 0000000000000001 R09: 00007ffdd=
-b4e3870
-  [ 2834.157774] R10: 000014d793da9dd5 R11: 000014d793e258d0 R12: 000000000=
-0000002
-  [ 2834.162132] R13: 0000000000000001 R14: 0000000000000001 R15: 000014d6f=
-402d040
-  [ 2834.166239] FS:  0000155554fa5740(0000) GS:ffff97213ba00000(0000) knlG=
-S:0000000000000000
-  [ 2834.170529] CS:  0033 DS: 0000 ES: 0000 CR0: 0000000080050033
-  [ 2834.174751] CR2: 000014d793262eb0 CR3: 0000000036130000 CR4: 000000000=
-07406f0
-  [ 2834.178892] PKRU: 55555554
-
-  I run the application from a shell with `ulimit -s unlimited`
-  (unlimited stack to size).
-
-  The application creates a number of threads, and those threads make a
-  lot of calls to sigaltstack() and mprotect(); see the relevant source
-  for dotnet here
-  https://github.com/dotnet/runtime/blob/15ec69e47b4dc56098e6058a11ccb6ae4d=
-5d4fa1/src/coreclr/src/pal/src/thread/thread.cpp#L2467
-
-  using strace -f on the app shows that no alt stacks come anywhere near
-  the failing address; all alt stacks are in the heap, as expected.
-  None of the mmap/mprotect/munmap syscalls were given arguments in the
-  high memory 0x7fffffff0000 and up.
-
-  gdb (with default signal stop/print/pass semantics) does not report
-  any signals prior to the kernel bug being tripped, so I doubt the
-  alternate signal stack is actually used.
-
-  When I run the same dotnet binary on the host (eg, on "bare metal"),
-  the host kernel seems happy and dotnet runs as expected.
-
-  I have not tried different qemu or guest or host O/S.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866892/+subscriptions
+--000000000000e4b07405a0856905--
 
