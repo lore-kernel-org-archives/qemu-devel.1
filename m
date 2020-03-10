@@ -2,80 +2,81 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4152C10F27
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 935E1C10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 826A921D7E
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5922421D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xZORU5CF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826A921D7E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EtL/ROEE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5922421D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBfJM-0002NJ-Ot
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58058)
+	id 1jBfJy-0003KB-LD
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:53:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jBfIe-0001XW-TY
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:52:02 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jBfDe-0001t9-B1
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jBfId-0000xm-IU
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:52:00 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:40142)
+ (envelope-from <peter.maydell@linaro.org>) id 1jBfDd-0001ue-1o
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:46:50 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35239)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jBfId-0000v6-Br
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:51:59 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id y71so8513927oia.7
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 06:51:59 -0700 (PDT)
+ id 1jBfDc-0001sc-RM
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:46:48 -0400
+Received: by mail-oi1-x243.google.com with SMTP id c1so13882378oiy.2
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 06:46:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ApIoAECcBP6gzgRvXKLM9FBd0AbBTm/GWFiNc9Bjnmc=;
- b=xZORU5CF/tcys1Dq9aXLVRnSDORRtJpE3PHVvM2mOmo5l2Xl+DVelLTq+kmzfmlqtv
- iD+NYGTiY5X+y4qJJmHIP8cpdK/KGh+wd/ROzO+4sbrke6MSn+Nrng7LsNWcFAQN9pkc
- 4a1kufPP90bMA2vp8u9xOJZJHIW9cekubCgzgRPkhHovmOSP/ajq/pxLSN7vE4UjR5Zr
- dZFuSL58TbobGqcBIDtSPl9/+H2EFXUegEplYYkqDjGt2cU0pglEuEa65r/iLJh73iBA
- VCb/kj+ZHFn1XAOFpJxjjLJ72kRK6xYOdY3lUVf6jdnRGtw20pkJpZXASiVHBJuUO0ga
- aatA==
+ :cc; bh=UriesWLsts8g3AWLL3Fr/KU3sYx2gYgtiZ9+aQWTYxI=;
+ b=EtL/ROEEMfsDdQCxW7ixrxfjnD+GmQCe/yjYNSS7W7og6xFtrnuT2frcZ5K/JSoCK6
+ PW1BeGoC3aLn821yTK/h+xIKJXy0FHlESIAeGV2JWBekoZ24MrusnZ+qFzanCqoni5oS
+ mi+c0WpEnZcnZwcnsjIGy9Yz2OI8d0bnZcLBwKd2H6DG1Sgw4W1YpCYn2w1oThW0azu9
+ VQH/zyucAu2D/rQZL5iDpIgQjGAkxil5XWponyH2FDbkX5rZTlLoe6lvcnq3x4Y/RzPl
+ i3mTJweXc2oxTxkrfzNLaABn4ogkmw75+UMC2Uda4a5iNoSY0kNElsNfonX3ptUXSARI
+ B5yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ApIoAECcBP6gzgRvXKLM9FBd0AbBTm/GWFiNc9Bjnmc=;
- b=Ax3GfRLympb4lfNnn8rT99ZWv06aySHau1TYLYGotXlZADu77yFYJ7EWpGMeMchFFX
- MdVmiWVZm7rHzilOp5G1cqYdE2PNf2Xsz34w3o0HtjLpU0qSpqH6hTtUc37rtcgcgJNi
- R6jTgyfqR70hh7sgOr1LKqvLVlTAlIPJjGTHI7y7rKuPI1Qq0lveTGQz9IzZvUJ7SgIo
- izgbBcYiaNrJX0QChGp17nFhN581ZUdW+5KUHZDP+wur0OSeeqR00+31oj06qLYbo/sP
- XF88JRWD2K46giyQqID5+ATauGWxydyDMcV3C8DjclHzSG8wrSUuKYe9trpjbpjrYVIL
- HE7g==
-X-Gm-Message-State: ANhLgQ1BZyfm18Q8dL7LDEvZIUQJl7hgV1QUvEgGRGY6R/VuJXXLIWuu
- zQiKc8w5wOIMuu3jaFAMv71EhHL7j5jebcZye5EyMA==
-X-Google-Smtp-Source: ADFU+vsM1r1+Bv91+w3ZCutQlFfsiFQrKzPrEU+7csJO7uSfDqqoAEtP/XfT2vASmzeTLZnmOLFDKO11M7Pbhxk3TL8=
+ bh=UriesWLsts8g3AWLL3Fr/KU3sYx2gYgtiZ9+aQWTYxI=;
+ b=S9irpa+vkptOZI2q2UExi5ctvRikCjV6eC1M+f5o1zO6HgW0vhNoIdo6p9S4rDbtwg
+ DbB10E1ID/6ZvvbxhNfLay6d3GNGwaGZTRWUo1dXxOzYGwSbUe5SvnCMouOgxTT5anHx
+ afxdWEtoByFUMY0RVxC552rNzlAkGxqo2JQv0ASH+p9nL0X1+LaQv/2+ms0SDTvDXmNP
+ iiV/XuA7xAeyd8gSMfobAHnz2Q+ra2yEvb3FjO30VncfubeGJ5ijOvNOXlKho9sbgA6N
+ nqVc94qVOA/oR1yr6xpocT6IWNduusjgkF29ldAgW0mwNWxy2uUyRlTyYNw/RldqHE/d
+ GJAg==
+X-Gm-Message-State: ANhLgQ0bhgo0PoNOly5z9+MHJ5t7OV485XOhmMqGr0FwHbeF5Y417D+m
+ qMHxrcPVBPfw4aQw6xDeDWXasiAhXZH+JlYaxzbeug==
+X-Google-Smtp-Source: ADFU+vvBq1lO9r1au90d1RE3F8//jA0ax/bbF4YpGGq2Lk9d7ZSa0TvP1aoYvVuHqIScMSo9NB86sAVZrnCMVk+aHeA=
 X-Received: by 2002:a05:6808:289:: with SMTP id
- z9mr1184339oic.48.1583848318508; 
- Tue, 10 Mar 2020 06:51:58 -0700 (PDT)
+ z9mr1170441oic.48.1583848007667; 
+ Tue, 10 Mar 2020 06:46:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200309194650.160552-1-dgilbert@redhat.com>
-In-Reply-To: <20200309194650.160552-1-dgilbert@redhat.com>
+References: <20200310130844.30076-1-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200310130844.30076-1-kuhn.chenqun@huawei.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Mar 2020 13:51:47 +0000
-Message-ID: <CAFEAcA8c-5-C_CWzyBXsQHeSTPckoxxu_Y_KTHasRMecjQF4PQ@mail.gmail.com>
-Subject: Re: [PULL 00/12] hmp queue
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 10 Mar 2020 13:46:35 +0000
+Message-ID: <CAFEAcA_W2pRztEAmd1v+6O-1J9-CckVV8+G6kZ3igmR-ie6k+Q@mail.gmail.com>
+Subject: Re: [PATCH] hw/scsi/megasas:Clean up some redundant code fix Clang
+ warnings
+To: Chen Qun <kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +88,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Hannes Reinecke <hare@suse.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Euler Robot <euler.robot@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Mar 2020 at 19:48, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
+On Tue, 10 Mar 2020 at 13:10, Chen Qun <kuhn.chenqun@huawei.com> wrote:
 >
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Here are some redundant statements, we can clean them up.
+> Clang static code analyzer show warning:
+> hw/scsi/megasas.c:1175:32: warning: Value stored to 'max_ld_disks' during its initialization is never read
+>     uint32_t num_ld_disks = 0, max_ld_disks = s->fw_luns;
+>                                ^~~~~~~~~~~~   ~~~~~~~~~~
+> hw/scsi/megasas.c:1183:9: warning: Value stored to 'max_ld_disks' is never read
+>         max_ld_disks = 0;
+>         ^              ~
 >
-> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Fam Zheng <fam@euphon.net>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: qemu-block@nongnu.org
+> ---
+>  hw/scsi/megasas.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
->   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index af18c88b65..3f982e1d3b 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -1172,7 +1172,7 @@ static int megasas_dcmd_ld_list_query(MegasasState *s, MegasasCmd *cmd)
+>      uint16_t flags;
+>      struct mfi_ld_targetid_list info;
+>      size_t dcmd_size = sizeof(info), resid;
+> -    uint32_t num_ld_disks = 0, max_ld_disks = s->fw_luns;
+> +    uint32_t num_ld_disks = 0, max_ld_disks;
+>      BusChild *kid;
 >
-> are available in the Git repository at:
->
->   git://github.com/dagrh/qemu.git tags/pull-hmp-20200309
->
-> for you to fetch changes up to b4983c570c7a5848c9df519cd9e056bea3177fe2:
->
->   net: Remove deprecated [hub_id name] tuple of 'hostfwd_add' / 'hostfwd_remove' (2020-03-09 18:44:04 +0000)
->
-> ----------------------------------------------------------------
-> HMP Pull 2020-03-09
->
-> Maxim's hmp block move, Thomas's deprecation in hostfwd.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
+>      /* mbox0 contains flags */
+> @@ -1180,7 +1180,6 @@ static int megasas_dcmd_ld_list_query(MegasasState *s, MegasasCmd *cmd)
+>      trace_megasas_dcmd_ld_list_query(cmd->index, flags);
+>      if (flags != MR_LD_QUERY_TYPE_ALL &&
+>          flags != MR_LD_QUERY_TYPE_EXPOSED_TO_HOST) {
+> -        max_ld_disks = 0;
+>      }
 
+This doesn't look right -- your change removes the only statement
+in the body of this "if". I think you need to examine what the
+function is trying to do with the test it is doing on these flags
+in order to identify what the right change is... Probably this
+means going back to the h/w spec to identify the correct behaviour
+overall.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
+thanks
 -- PMM
 
