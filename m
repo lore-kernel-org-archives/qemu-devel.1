@@ -2,82 +2,90 @@ Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B893DC18E5A
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 431FCC10F27
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88DD624694
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:30:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B97E20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 13:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPJAQWof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88DD624694
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uPQzn8nD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B97E20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBexi-0002If-VH
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:30:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47274)
+	id 1jBez5-0003Zc-8i
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 09:31:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48993)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1jBewS-0001Dh-ND
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:29:05 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jBexq-0002ex-9L
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1jBewR-0000xv-Oa
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:29:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55107)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1jBewR-0000w8-Ko
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:29:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583846942;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BDZdjAo9bYlVSp8OMWCtQh6cbNCEIN3g7GjKNgE4fU4=;
- b=GPJAQWofIMW/Dx6KrcAG51qYHllpP22I4jutbtU4ETmpndtnqxaNJF029YwcOB91ZylBS4
- PQqr8QMPp0czwqcGWOhkl6DKJ8oRJXPBac4/UNiZZWnWFBuIkw3LjUjruhSz3Cr7ZwZRSb
- 1NXKWlrOT0eRe3JEEY79FGzN51uyU90=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-IyKQ1zZ_M1CI8n8LopHttw-1; Tue, 10 Mar 2020 09:29:00 -0400
-X-MC-Unique: IyKQ1zZ_M1CI8n8LopHttw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C086800D48;
- Tue, 10 Mar 2020 13:28:59 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 383535C290;
- Tue, 10 Mar 2020 13:28:58 +0000 (UTC)
-Date: Tue, 10 Mar 2020 14:28:55 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 6/7] iotests: Add iothread cases to 155
-Message-ID: <20200310132855.GD1320660@angien.pipo.sk>
-References: <20200310113831.27293-1-kwolf@redhat.com>
- <20200310113831.27293-7-kwolf@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jBexo-00038o-Ry
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jBexo-00036d-K4
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 09:30:28 -0400
+Received: by mail-wm1-x342.google.com with SMTP id g62so1358311wme.1
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 06:30:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bo2tBndkpkzB6/29hZp0+G3KOqfBm7NxtWzBJP62dzw=;
+ b=uPQzn8nDbz9zWbOgo0e//fzWTe413Ljvje4JJSFOOqJQ3Ow5vq29cuAsMMarfd6pG5
+ 8gf2HKKVtWp/gmhuNFd8ErMg2YzjmmWgC3YUZeLfBNdYXOwAvZp61IqNki2QhBg7BbR9
+ VAw47aBh+6r2Wd0Lm4YZ9q9RhnyWb+LlYlnR/7S5LVe/UIXSzzFmRcagjViFf302Cnk6
+ ce93rctHsTozmbNFFnNdso1lHkgP+8Suap7i6mkFPsVzWq7vy9M2XhqJO0mTrVzjHjO8
+ tvpRO2QgpenFlogCvLYiBKV7dWSwwq4/sokQaD0OnRKGsKYvfKUr20jM6A1LXYpvSrl5
+ uhVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bo2tBndkpkzB6/29hZp0+G3KOqfBm7NxtWzBJP62dzw=;
+ b=PjlB8SgqLMw3D7HusRKIOjJNjh+EnEROOGFHgTMmTzhgUAquKugydh42u+8qUa9Mem
+ WFlYNORbs1ioCRiGsO6oi6g/ELenwTO5iM01ihzik5cHAJMs6Z4/yl/ZBNED+rM0eN+u
+ s4LVy8rrPTBpgQazNpzt1anSGBuDR8N+U1vyLNNp8pCUG6TlTI/WXZhXBYGKXLpn6+C1
+ RVjvHsie6SSCbQUVy5vzrina4Z2+pfXG9U/91edJjWAfuNorS8rAkiRMRJgpkjTO6m+w
+ jP8exYJaRE2m7OzamMwSvZYsgipjWGjkL4INVkwzRslOzh79UewBiVnuXie89ia/O3ZP
+ z0tw==
+X-Gm-Message-State: ANhLgQ3lpW+9Rx5d/99uQDlnHZp4+ZwFS25edtR/j8j0ONwIZGk90OV+
+ 6ZcAD6HXo9aNuy7uEiQiGNu/nA==
+X-Google-Smtp-Source: ADFU+vv0j6is6BB58FmxqxXWJxw+06h32Y8LDKFkQ8+YH5nhKVvsMdir9NML49LQOSkcvjacYGjXIw==
+X-Received: by 2002:a05:600c:2213:: with SMTP id
+ z19mr2101181wml.141.1583847027348; 
+ Tue, 10 Mar 2020 06:30:27 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y69sm4254503wmd.46.2020.03.10.06.30.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 10 Mar 2020 06:30:26 -0700 (PDT)
+Received: from zen.home.arpa (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C0ECD1FF7E;
+ Tue, 10 Mar 2020 13:30:24 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org,
+	qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] docs/system: add a little more detail to ARM machines
+Date: Tue, 10 Mar 2020 13:30:20 +0000
+Message-Id: <20200310133020.27196-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200310113831.27293-7-kwolf@redhat.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,29 +97,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 10, 2020 at 12:38:30 +0100, Kevin Wolf wrote:
-> This patch adds test cases for attaching the backing chain to a mirror
-> job target right before finalising the job, where the image is in a
-> non-mainloop AioContext (i.e. the backing chain needs to be moved to the
-> AioContext of the mirror target).
->=20
-> This requires switching the test case from virtio-blk to virtio-scsi
-> because virtio-blk only actually starts using the iothreads when the
-> guest driver initialises the device (which never happens in a test case
-> without a guest OS). virtio-scsi always keeps its block nodes in the
-> AioContext of the the requested iothread without guest interaction.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/155     | 32 +++++++++++++++++++++++---------
->  tests/qemu-iotests/155.out |  4 ++--
->  2 files changed, 25 insertions(+), 11 deletions(-)
+Taking from the wiki page mention:
 
-Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+  - both 32 and 64 bit architectures
+  - the roll of A/M profile chips
+  - warn about kernel portability
+  - gently suggest -M virt
+  - add headlines for groups of boards
+
+This is still incomplete but hopefully is a less of a straight dive
+into a dry list of peripherals.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ docs/system/target-arm.rst | 47 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index d2a3b44ce88..28aaef011d6 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -3,8 +3,35 @@
+ ARM System emulator
+ -------------------
+ 
+-Use the executable ``qemu-system-arm`` to simulate a ARM machine. The
+-ARM Integrator/CP board is emulated with the following devices:
++Use the executable ``qemu-system-arm`` to simulate a 32 bit ARM
++machine. The ``qemu-system-aarch64`` executable is used to simulate
++the 64 bit ARM AArch64 architecture. AArch64 CPUs can often include an
++AArch32 execution unit and execute a mix of 64 and 32 bit code.
++
++The emulator supports both "A-profile" and "M-profile" CPUs. The
++A-profile CPUs have a full MMU and can run things like the Linux while
++the M-profile CPUs are typically used in embedded micro-controller
++boards.
++
++Because ARM systems differ so much and in fundamental ways, typically
++operating system or firmware images intended to run on one machine
++will not run at all on any other.
++
++If you don't care about running on a particular piece of hardware the
++``-M virt`` board provides a PCI based virtio board which can be
++configured with a range of RAM sizes, CPU types and virtio based
++peripherals. It is generally the target you want to use if general
++purpose operating systems.
++
++Otherwise a range of other machine types are available. Passing ``-M
++help`` to the command line will list them all. They include the
++following:
++
++ARM Integrator/CP
++~~~~~~~~~~~~~~~~~
++
++This is a development board intended for prototyping and developing
++ARM-based devices.
+ 
+ -  ARM926E, ARM1026E, ARM946E, ARM1136 or Cortex-A8 CPU
+ 
+@@ -18,7 +45,11 @@ ARM Integrator/CP board is emulated with the following devices:
+ 
+ -  PL181 MultiMedia Card Interface with SD card.
+ 
+-The ARM Versatile baseboard is emulated with the following devices:
++ARM Versatile/Versatile Express
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Another family of development boards. The more recent Versatile
++Express boards are designed for modern Cortex processors.
+ 
+ -  ARM926E, ARM1136 or Cortex-A8 CPU
+ 
+@@ -45,6 +76,9 @@ The ARM Versatile baseboard is emulated with the following devices:
+ 
+ -  PL181 MultiMedia Card Interface with SD card.
+ 
++ARM RealView
++~~~~~~~~~~~~
++
+ Several variants of the ARM RealView baseboard are emulated, including
+ the EB, PB-A8 and PBX-A9. Due to interactions with the bootloader, only
+ certain Linux kernel configurations work out of the box on these boards.
+@@ -77,6 +111,9 @@ The following devices are emulated:
+ 
+ -  PL181 MultiMedia Card Interface with SD card.
+ 
++Various PDA machines
++~~~~~~~~~~~~~~~~~~~~
++
+ The XScale-based clamshell PDA models (\"Spitz\", \"Akita\", \"Borzoi\"
+ and \"Terrier\") emulation includes the following peripherals:
+ 
+@@ -156,6 +193,10 @@ Nokia N800 and N810 internet tablets (known also as RX-34 and RX-44 /
+ -  Nokia RETU and TAHVO multi-purpose chips with an RTC, connected
+    through CBUS
+ 
++
++M-profile boards
++~~~~~~~~~~~~~~~~
++
+ The Luminary Micro Stellaris LM3S811EVB emulation includes the following
+ devices:
+ 
+-- 
+2.20.1
 
 
