@@ -1,83 +1,69 @@
-Return-Path: <SRS0=ZRpO=43=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFDCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 23:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A803C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 00:44:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6126C21D56
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Mar 2020 23:55:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPGW6JOY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6126C21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1B26A215A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 00:44:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B26A215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBoif-0000CJ-Eq
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 19:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49670)
+	id 1jBpTl-0002q9-8f
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 20:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1jBoi6-0008EQ-FM
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 19:54:55 -0400
+ (envelope-from <jingqi.liu@intel.com>) id 1jBpTA-0002RL-4w
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 20:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1jBoi4-0008Ml-I2
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 19:54:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30558
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jingqi.liu@intel.com>) id 1jBpT8-0007z0-6w
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 20:43:31 -0400
+Received: from mga14.intel.com ([192.55.52.115]:4390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1jBoi4-0008Lp-Ds
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 19:54:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583884491;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fRRI7W3mGAOd+0o7Dz/AmVq2LVwZvBHiSW/7NdS3rtE=;
- b=WPGW6JOYqo/3bFZsJG7DCSz/OMOWp4jdacl2wVB8gQt5rkhoViwv7RJs0rbMYNIkx5KSJw
- uKEWfkxlCGJBmrJ9vxRQ7Coa/BA6x0QhPa+8OuZd6AouaikYHtwp07KJbD5cepmYKgQ7xv
- wHiUiqHAhB5hn/VDrKyEBhwVvNNaAGw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-fee3QWRtPvSRW8rID8d63w-1; Tue, 10 Mar 2020 19:54:49 -0400
-X-MC-Unique: fee3QWRtPvSRW8rID8d63w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B28F8018D8;
- Tue, 10 Mar 2020 23:54:48 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-246.ams2.redhat.com
- [10.36.116.246])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A915D8B547;
- Tue, 10 Mar 2020 23:54:47 +0000 (UTC)
-Subject: Re: [PATCH] vfio/pci: Use defined memcpy() behavior
-To: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
-References: <158386047731.30997.5580377889283866404.stgit@gimli.home>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a6ffe170-bd01-1733-888e-cb116fd1972d@redhat.com>
-Date: Wed, 11 Mar 2020 00:54:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
+ id 1jBpT7-0007h6-RM
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 20:43:30 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Mar 2020 17:43:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,538,1574150400"; d="scan'208";a="289203113"
+Received: from jingqili-mobl.ccr.corp.intel.com (HELO [10.238.4.117])
+ ([10.238.4.117])
+ by FMSMGA003.fm.intel.com with ESMTP; 10 Mar 2020 17:43:19 -0700
+Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200305154142.63070-1-jingqi.liu@intel.com>
+ <20200305161047.GB3627464@lpt>
+ <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+ <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
+ <CAFEAcA8HMSg8nS27YGPEQsPeGW2UicWRxeJDQf3oKbyHH2TY6Q@mail.gmail.com>
+ <a57d479a-c9d5-0acc-b808-fe4e5a20ae80@intel.com>
+ <20200310051003-mutt-send-email-mst@kernel.org>
+From: "Liu, Jingqi" <jingqi.liu@intel.com>
+Message-ID: <16328974-3c7f-0e69-9614-a085c5841a2e@intel.com>
+Date: Wed, 11 Mar 2020 08:43:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <158386047731.30997.5580377889283866404.stgit@gimli.home>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20200310051003-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,67 +75,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: longpeng2@huawei.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/10/20 18:15, Alex Williamson wrote:
-> vfio_rom_read() relies on memcpy() doing the logically correct thing,
-> ie. safely copying zero bytes from a NULL pointer when rom_size is
-> zero, rather than the spec definition, which is undefined when the
-> source or target pointers are NULL.  Resolve this by wrapping the
-> call in the condition expressed previously by the ternary.
-> 
-> Additionally, we still use @val to fill data based on the provided
-> @size regardless of mempcy(), so we should initialize @val rather
-> than @data.
-> 
-> Reported-by: Longpeng <longpeng2@huawei.com>
-> Reported-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  hw/vfio/pci.c |    9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 5e75a95129ac..b0799cdc28ad 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
->          uint16_t word;
->          uint32_t dword;
->          uint64_t qword;
-> -    } val;
-> -    uint64_t data = 0;
-> +    } val = { 0 };
-> +    uint64_t data;
->  
->      /* Load the ROM lazily when the guest tries to read it */
->      if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
->          vfio_pci_load_rom(vdev);
->      }
->  
-> -    memcpy(&val, vdev->rom + addr,
-> -           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr) : 0);
-> +    if (addr < vdev->rom_size) {
-> +        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - addr));
-> +    }
->  
->      switch (size) {
->      case 1:
-> 
+On 3/10/2020 5:12 PM, Michael S. Tsirkin wrote:
+> On Tue, Mar 10, 2020 at 04:58:38PM +0800, Liu, Jingqi wrote:
+>> On 3/9/2020 9:35 PM, Peter Maydell wrote:
+>>> On Mon, 9 Mar 2020 at 13:23, Liu, Jingqi <jingqi.liu@intel.com> wrote:
+>>>> On 3/6/2020 12:40 AM, Peter Maydell wrote:
+>>>>> On Thu, 5 Mar 2020 at 16:11, Ján Tomko <jtomko@redhat.com> wrote:
+>>>>>> On a Thursday in 2020, Jingqi Liu wrote:
+>>>>>>> The CONFIG_LINUX symbol is always not defined in this file.
+>>>>>>> This fixes that "config-host.h" header file is not included
+>>>>>>> for getting macros.
+>>>>>>>
+>>>>>>> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+>>>>>>> ---
+>>>>>>> util/mmap-alloc.c | 2 ++
+>>>>>>> 1 file changed, 2 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>>>>>>> index 27dcccd8ec..24c0e380f3 100644
+>>>>>>> --- a/util/mmap-alloc.c
+>>>>>>> +++ b/util/mmap-alloc.c
+>>>>>>> @@ -10,6 +10,8 @@
+>>>>>>>     * later.  See the COPYING file in the top-level directory.
+>>>>>>>     */
+>>>>>>>
+>>>>>>> +#include "config-host.h"
+>>>>>>> +
+>>>>>> According to CODING_STYLE.rst, qemu/osdep.h is the header file
+>>>>>> that should be included first, before all the other includes.
+>>>>>>
+>>>>>> So the minimal fix would be moving qemu/osdep.h up here.
+>>>>> Yes, osdep must always be first.
+>>>>>
+>>>>>>> #ifdef CONFIG_LINUX
+>>>>>>> #include <linux/mman.h>
+>>>>>>> #else  /* !CONFIG_LINUX */
+>>>>> Do we really need this? osdep.h will pull in sys/mman.h
+>>>>> for you, which should define the MAP_* constants.
+>>>>>
+>>>>> Also, you have no fallbmack for "I'm on Linux but the
+>>>>> system headers don't define MAP_SHARED_VALIDATE or
+>>>>> MAP_SYNC". Wouldn't it be better to just have
+>>>>> #ifndef MAP_SYNC
+>>>>> #define MAP_SYNC 0
+>>>>> #endif
+>>>>>
+>>>>> etc ?
+>>>> osdep.h pulls in sys/mman.h, which defines the MAP_* constants
+>>>>
+>>>> except for MAP_SYNC and MAP_SHARED_VALIDATE on Linux.
+>>> Why not? Is this just "not yet in the version of glibc
+>>> we're using", or is it a bug/missed feature in glibc
+>>> that needs to be addressed there ?
+>> I'm using the version 2.27 of glibc.
+>>
+>> I downloaded the version 2.28 of glibc source for compilation and
+>> installation.
+>>
+>> I found MAP_SYNC and MAP_SHARED_VALIDATE are defined in this version.
+>>
+>> Seems it's older glibc version issue.
+>>
+>>>> How about just adding the following code in util/mmap-alloc.c ?
+>>>> #ifndef MAP_SYNC
+>>>> #define MAP_SYNC 0x80000
+>>>> #endif
+>>>>
+>>>> #ifndef MAP_SHARED_VALIDATE
+>>>> #define MAP_SHARED_VALIDATE 0x03
+>>>> #endif
+>>> You don't want to do that for non-Linux systems, so there
+>>> you need to fall back to defining them to be 0.
+>>>
+>>> Are there any systems (distros) where the standard system
+>>> sys/mman.h does not define these new MAP_* constants but we
+>>> still really really need to use them? If not, then we
+>>> could just have the fallback-to-0 fallback everywhere.
+>> Good point.
+>>
+>> So as you mentioned, it would be better to just have the following code:
+>>
+>> #ifndef MAP_SYNC
+>> #define MAP_SYNC 0
+>> #endif
+>>
+>> #ifndef MAP_SHARED_VALIDATE
+>> #define MAP_SHARED_VALIDATE 0
+>> #endif
+> Won't this defeat the purpose of MAP_SHARED_VALIDATE?
+>
+> We really have linux-headers/linux/mman.h for exactly this purpose.
 
-sorry I'm processing my INBOX in basically... random order. :/
+Yes, linux-headers/linux/mman.h has defined MAP_SYNC and 
+MAP_SHARED_VALIDATE.
 
-So as I stated in the earlier thread, I suggest casting "vdev->rom" to a
-character type, before the addition operator "+" binds.
+1) If '#include <linux/mman.h>' first then '#include qemu/osdep.h', it 
+should be fine.
 
-With that:
+2) Peter mentioned osdep.h should go first.
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+It will  cause redefinitions of other MAP_* macros after '#include 
+<linux/mman.h>'.
 
-Thanks
-Laszlo
+This is where the conflict lies.
 
+Any comments ?
+
+Thanks,
+
+Jingqi
+
+>> Thanks,
+>>
+>> Jingqi
+>>
+>>> thanks
+>>> -- PMM
 
