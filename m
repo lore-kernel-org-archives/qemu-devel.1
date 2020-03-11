@@ -2,83 +2,120 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53530C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96CCC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:53:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E71D62072F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:52:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85F0C20734
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMA0dl2R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E71D62072F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="UaDEMTza"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F0C20734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC2iw-000071-Ca
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:52:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50196)
+	id 1jC2k1-0000zq-Sv
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:53:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jC2gp-0006Iq-VD
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:50:33 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jC2j9-0000SW-PF
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jC2go-0005XJ-01
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:50:31 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56633
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jC2gn-0005Ti-LJ
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:50:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583938228;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jsKkDSgyQz2pLGCyrcLc9VQw/vTQBxdYWH0tEharUX4=;
- b=KMA0dl2RUcu71p74VSTLGIKHCzx+Shl8OgC8o61o14sjtFsDUye9LDwHREIHac72+BKgHN
- DIftFelWD73i9bwLJsq5WjR/F0p8p+AfFTqjnbzB/4MkGvg3YIVe81uXhlQmmzBITWaDMi
- ZONuhOYgZ/gob6oN26V1Ca9PBZ2BpRM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-5QHxOei5MXatAU_1bhWitw-1; Wed, 11 Mar 2020 10:50:24 -0400
-X-MC-Unique: 5QHxOei5MXatAU_1bhWitw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36D458017DF;
- Wed, 11 Mar 2020 14:50:23 +0000 (UTC)
-Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B24C10013A1;
- Wed, 11 Mar 2020 14:50:18 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v6 06/13] arm/arm64: ITS: Introspection
- tests
-To: Andrew Jones <drjones@redhat.com>
-References: <20200311135117.9366-1-eric.auger@redhat.com>
- <20200311135117.9366-7-eric.auger@redhat.com>
- <20200311143331.yesdkxuobng3qzuu@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <94f73aef-9898-d551-f440-5dff2c3d2a63@redhat.com>
-Date: Wed, 11 Mar 2020 15:50:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200311143331.yesdkxuobng3qzuu@kamzik.brq.redhat.com>
+ (envelope-from <Babu.Moger@amd.com>) id 1jC2j8-00024X-Mq
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:52:55 -0400
+Received: from mail-mw2nam12on2080.outbound.protection.outlook.com
+ ([40.107.244.80]:10836 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jC2j8-0001zO-Ex
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:52:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Cnw4Tp34TtRQFfPqcSuYwbYQ9wt9rlz+p6h5s0EHfA6VDc7Is3fBZ18KnsgqS1gDUtUxLYYLL3ktM9SgOkvhgrpU/HQYM4JfKZ7wR18B9DYyxer3K2S3Gn9s/4AREe7e3YDpRZ4UI/NDlhfEcOLeZ0+xhKgD3o+aQyRzbGNJtOZypnwCn7lbbUvMeRNFfLCHTp1I7NpablRk8awmDL7pAj09n0JdpcEIMIq4Xy9UgqGZ99SrGhgi5E9D8wxuHJkM90rgTJ0Nnd3TpLVn5+LhCR/MTG6rDwabRoE0Dn5p/4u0jMUNOiZEA2vdBc6nn5y6tWXM171VRTMztME+bnr6Ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=//iPV1IRqFgOd5mZhnmxjShP6/H7FKhETmNYosSrC60=;
+ b=Kij5TEs79Q0QlmPauNhI/zEVqGj+3vlRpPP0+EzU6iOI9DC9CcrciPFnIXxyKrw+lMDw2013hPqGyngOn3CF6iP9MJFQwKQgODcWqRTP6vgMQPkFPEZxmizR+YrCX5yVy+zsh2yHoYy67ak0D1FWa5PbM+AzpOGVLuMDgw9rAT0yi8JSqxdAXjSRWVh8NgAAxBW01eG+RQ08PCv/0tGJCUp9YinK9KKylKcUf4MFNkJmjDNoPcqUEiHxuctdYBylhnT9aeNL7GyVC4TqM45dU1hKGVpA0Hf70qsTz6mFNInnUzTRKgacSb69MgofiyYCmRWwG/iWKj2xHlf74NoL/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=//iPV1IRqFgOd5mZhnmxjShP6/H7FKhETmNYosSrC60=;
+ b=UaDEMTzauN8CHaxou7EFtNoSezLsJs2dLNyJsISEYJcOmsVArUMSchitdNUAOXhT/gCdQqFarZ/1VpQatTO7Nl0n2QstM8Ns7voKz67OCYDk3sFNkjbbO1ANiJNwPBokWBIL22O9o9VYiB7DruDgxoUBA3qcKiudMOWgrfTTzUQ=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2575.namprd12.prod.outlook.com (2603:10b6:802:25::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14; Wed, 11 Mar
+ 2020 14:52:52 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Wed, 11 Mar 2020
+ 14:52:52 +0000
+Subject: Re: [PATCH v6 12/13] hw/i386: Move arch_id decode inside x86_cpus_init
+To: Igor Mammedov <imammedo@redhat.com>
+References: <158389385028.22020.7608244627303132902.stgit@naples-babu.amd.com>
+ <158389407977.22020.8482854741622304295.stgit@naples-babu.amd.com>
+ <20200311132930.6408bccc@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <d7ef4bbf-2d4e-bca4-5a21-7ab952af8591@amd.com>
+Date: Wed, 11 Mar 2020 09:52:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200311132930.6408bccc@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-ClientProxiedBy: SN4PR0701CA0012.namprd07.prod.outlook.com
+ (2603:10b6:803:28::22) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ SN4PR0701CA0012.namprd07.prod.outlook.com (2603:10b6:803:28::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14 via Frontend
+ Transport; Wed, 11 Mar 2020 14:52:51 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7272120c-e603-44f2-ae67-08d7c5cbdfa7
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2575:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2575E5402E151D20A47A763695FC0@SN1PR12MB2575.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
+X-Forefront-PRVS: 0339F89554
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(199004)(52116002)(5660300002)(8936002)(81166006)(31696002)(81156014)(44832011)(66946007)(86362001)(66476007)(66556008)(478600001)(8676002)(36756003)(31686004)(956004)(4326008)(316002)(16576012)(2616005)(2906002)(26005)(53546011)(6486002)(186003)(16526019)(6916009);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2575;
+ H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JDrbgQVtJBn+3ap5oTzcT3jJVhCHMxBjrwSmcUHYkVEszKDmE+GCcKFkR64MAzLxDTNjcnSySsGVJuMVtAHLkX+aK3ORr0UBQWaXoRpAM808qbYsxcdLJSPrgmRF0VB1/9JSIr59VfvgJrV11OHUFoD6oBHR8uDfVfAOfM/79h1j/7/7z0bLPKdreN5pnnTip38ocDN2xah67w4byQBy4tY7MYixgyfl1vmfOWm9HCcNr0zWZZk5isgHlAtJzUCCu2mgbYl/F4xBrLNMLEu4X6qJp5N/aU62UoDrgdHtqzXPqJc8wxQr9axwqCgwVJLkGLcMdZIwIci099EaD6y7R9gu4knjRhTimWDr0mcNed39JsTS07ZQsIUlTMRbXVmAd5cqtu87fOflWz1Lb4rvSyHIrGWsFaaDurJxiR4PliR7VEqHBrydelLrKCqgiejB
+X-MS-Exchange-AntiSpam-MessageData: E3+VXjR9O24OvFW1LFshcTQwm39K5DVUw9U5kMb3Hz16ZndO9lvENNo+1kRgdreGNyrHIEbI4o3BPMYMbE2QxkI+pem7LUxT5yNM8sBxx41EOGvuqJq8kwkHCbT2D/QxClS0g5sZyku27C0aww/AUg==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7272120c-e603-44f2-ae67-08d7c5cbdfa7
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 14:52:52.0234 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lsIGRpHz4/tAyc3iLQcafZKOJ2yrKrrT4z7dYR9i5yPpuJNdzyZwjTU7New5l0q0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2575
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.244.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,216 +127,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
 
-On 3/11/20 3:33 PM, Andrew Jones wrote:
-> On Wed, Mar 11, 2020 at 02:51:10PM +0100, Eric Auger wrote:
->> Detect the presence of an ITS as part of the GICv3 init
->> routine, initialize its base address and read few registers
->> the IIDR, the TYPER to store its dimensioning parameters.
->> Parse the BASER registers. As part of the init sequence we
->> also init all the requested tables.
+
+On 3/11/20 7:29 AM, Igor Mammedov wrote:
+> On Tue, 10 Mar 2020 21:34:39 -0500
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+>> Apicid calculation depends on knowing the total number of numa nodes
+>> for EPYC cpu models. Right now, we are calculating the arch_id while
+>> parsing the numa(parse_numa). At this time, it is not known how many
+>> total numa nodes are configured in the system.
 >>
->> This is our first ITS test, belonging to a new "its" group.
+>> Move the arch_id inside x86_cpus_init. At this time smp parse is already
+>> completed and numa node information is available.
+> 
+> now it's correcting bug introduced by 10/13,
+> which is fine but it leaves bisection broken
+> 
+> perhaps squash this patch in 10/13?
+
+sure.
+
+> 
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
+>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 >> ---
->> v5 -> v6:
->> - fix some GENMASK_ULL and tabs
+>>  hw/i386/x86.c |   17 +++++++++++------
+>>  1 file changed, 11 insertions(+), 6 deletions(-)
 >>
->> v4 -> v5:
->> - Moved test_its_introspection() stub from
->>   lib/arm/asm/gic-v3-its.h back to arm/gic.c
->> - 32b its_init does report_abort()
->> - remove kerneldoc style comment
->> - remove alloc_lpi_tables from its_init()
->>
->> v3 -> v4:
->> - fixed some typos, refine trace msgs
->> - move its files to lib/arm64 instead of lib/arm
->> - create lib/arm/asm/gic-v3-its.h containing stubs
->> - rework gic_get_dt_bases
->> - rework baser parsing
->> - move table allocation to init routine
->> - use get_order()
->>
->> v2 -> v3:
->> - updated dates and changed author
->> - squash "arm/arm64: ITS: Test BASER" into this patch but
->>   removes setup_baser which will be introduced later.
->> - only compile on aarch64
->> - restrict the new test to aarch64
->>
->> v1 -> v2:
->> - clean GITS_TYPER macros and unused fields in typer struct
->> - remove memory attribute related macros
->> - remove everything related to memory attributes
->> - s/dev_baser/coll_baser/ in report_info
->> - add extra line
->> - removed index filed in its_baser
->> ---
->>  arm/Makefile.arm64         |  1 +
->>  arm/gic.c                  | 48 ++++++++++++++++++
->>  arm/unittests.cfg          |  7 +++
->>  lib/arm/asm/gic-v3-its.h   | 22 +++++++++
->>  lib/arm/gic.c              | 34 +++++++++++--
->>  lib/arm64/asm/gic-v3-its.h | 92 +++++++++++++++++++++++++++++++++++
->>  lib/arm64/gic-v3-its.c     | 99 ++++++++++++++++++++++++++++++++++++++
->>  7 files changed, 298 insertions(+), 5 deletions(-)
->>  create mode 100644 lib/arm/asm/gic-v3-its.h
->>  create mode 100644 lib/arm64/asm/gic-v3-its.h
->>  create mode 100644 lib/arm64/gic-v3-its.c
->>
->> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
->> index 6d3dc2c..60182ae 100644
->> --- a/arm/Makefile.arm64
->> +++ b/arm/Makefile.arm64
->> @@ -19,6 +19,7 @@ endef
->>  cstart.o = $(TEST_DIR)/cstart64.o
->>  cflatobjs += lib/arm64/processor.o
->>  cflatobjs += lib/arm64/spinlock.o
->> +cflatobjs += lib/arm64/gic-v3-its.o
+>> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+>> index ad85347142..be93c1fd1b 100644
+>> --- a/hw/i386/x86.c
+>> +++ b/hw/i386/x86.c
+>> @@ -140,6 +140,9 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+>>      MachineState *ms = MACHINE(x86ms);
+>>      MachineClass *mc = MACHINE_GET_CLASS(x86ms);
 >>  
->>  OBJDIRS += lib/arm64
+>> +    /* Check for apicid encoding */
+>> +    x86_check_apic_id_encoding(ms);
+>> +
+>>      x86_cpu_set_default_version(default_cpu_version);
 >>  
->> diff --git a/arm/gic.c b/arm/gic.c
->> index 2f904b0..649ed81 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -16,6 +16,7 @@
->>  #include <asm/processor.h>
->>  #include <asm/delay.h>
->>  #include <asm/gic.h>
->> +#include <asm/gic-v3-its.h>
->>  #include <asm/smp.h>
->>  #include <asm/barrier.h>
->>  #include <asm/io.h>
->> @@ -517,6 +518,49 @@ static void gic_test_mmio(void)
->>  		test_targets(nr_irqs);
+>>      /*
+>> @@ -153,6 +156,12 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+>>      x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+>>                                                        ms->smp.max_cpus - 1) + 1;
+>>      possible_cpus = mc->possible_cpu_arch_ids(ms);
+>> +
+>> +    for (i = 0; i < ms->smp.cpus; i++) {
+>> +        ms->possible_cpus->cpus[i].arch_id =
+>> +            x86_cpu_apic_id_from_index(x86ms, i);
+>> +    }
+>> +
+>>      for (i = 0; i < ms->smp.cpus; i++) {
+>>          x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+>>      }
+>> @@ -177,8 +186,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>>     init_topo_info(&topo_info, x86ms);
+>>  
+>>     assert(idx < ms->possible_cpus->len);
+>> -   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+>> -                               &topo_info, &topo_ids);
+>> +   x86ms->topo_ids_from_idx(&topo_info, idx, &topo_ids);
+>>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
 >>  }
 >>  
->> +#if defined(__arm__)
->> +
->> +static void test_its_introspection(void) {}
->> +
->> +#else /* __aarch64__ */
->> +
->> +static void test_its_introspection(void)
->> +{
->> +	struct its_baser *dev_baser = &its_data.device_baser;
->> +	struct its_baser *coll_baser = &its_data.coll_baser;
->> +	struct its_typer *typer = &its_data.typer;
->> +
->> +	if (!gicv3_its_base()) {
->> +		report_skip("No ITS, skip ...");
->> +		return;
->> +	}
->> +
->> +	/* IIDR */
->> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
->> +	       "GITS_IIDR is read-only"),
->> +
->> +	/* TYPER */
->> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
->> +	       "GITS_TYPER is read-only");
->> +
->> +	report(typer->phys_lpi, "ITS supports physical LPIs");
->> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
->> +	report_info("ITT entry size = 0x%x", typer->ite_size);
->> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
->> +		    typer->eventid_bits, typer->deviceid_bits,
->> +		    typer->collid_bits);
->> +	report(typer->eventid_bits && typer->deviceid_bits &&
->> +	       typer->collid_bits, "ID spaces");
->> +	report_info("Target address format %s",
->> +			typer->pta ? "Redist base address" : "PE #");
->> +
->> +	report(dev_baser && coll_baser, "detect device and collection BASER");
->> +	report_info("device table entry_size = 0x%x", dev_baser->esz);
->> +	report_info("collection table entry_size = 0x%x", coll_baser->esz);
->> +}
->> +
->> +#endif
->> +
->>  int main(int argc, char **argv)
->>  {
->>  	if (!gic_init()) {
->> @@ -548,6 +592,10 @@ int main(int argc, char **argv)
->>  		report_prefix_push(argv[1]);
->>  		gic_test_mmio();
->>  		report_prefix_pop();
->> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
->> +		report_prefix_push(argv[1]);
->> +		test_its_introspection();
->> +		report_prefix_pop();
->>  	} else {
->>  		report_abort("Unknown subtest '%s'", argv[1]);
->>  	}
->> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
->> index 017958d..23d378e 100644
->> --- a/arm/unittests.cfg
->> +++ b/arm/unittests.cfg
->> @@ -122,6 +122,13 @@ smp = $MAX_SMP
->>  extra_params = -machine gic-version=3 -append 'active'
->>  groups = gic
+>> @@ -212,10 +220,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
 >>  
->> +[its-introspection]
->> +file = gic.flat
->> +smp = $MAX_SMP
->> +extra_params = -machine gic-version=3 -append 'its-introspection'
->> +groups = its
->> +arch = arm64
->> +
->>  # Test PSCI emulation
->>  [psci]
->>  file = psci.flat
->> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
->> new file mode 100644
->> index 0000000..2167099
->> --- /dev/null
->> +++ b/lib/arm/asm/gic-v3-its.h
->> @@ -0,0 +1,22 @@
->> +/*
->> + * ITS 32-bit stubs
->> + *
->> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.
->> + */
->> +
->> +#ifndef _ASMARM_GIC_V3_ITS_H_
->> +#define _ASMARM_GIC_V3_ITS_H_
->> +
->> +/* dummy its_data struct to allow gic_get_dt_bases() call */
->> +struct its_data {
->> +	void *base;
->> +};
->> +
->> +static inline void its_init(void)
->> +{
->> +	report_abort("not supported on 32-bit");
+>>          ms->possible_cpus->cpus[i].type = ms->cpu_type;
+>>          ms->possible_cpus->cpus[i].vcpus_count = 1;
+>> -        ms->possible_cpus->cpus[i].arch_id =
+>> -            x86_cpu_apic_id_from_index(x86ms, i);
+>> -        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+>> -                                    &topo_info, &topo_ids);
+>> +        x86ms->topo_ids_from_idx(&topo_info, i, &topo_ids);
+>>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+>>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+>>          if (x86ms->smp_dies > 1) {
+>>
 > 
-> This is supposed to be an assert_msg() (no report_* functions in lib
-> code), but it should never fire anyway, because the test code should
-> just not call its_init() on 32-bit arm. I.e. the assert is there not
-> to report to test runners what's going on, but to stop developers
-> from calling it when they shouldn't.
-> 
-> I can fix stuff like this up myself on merge to arm/queue though.
-OK. Let's see if someone has other comments. In the positive I will respin.
-
-Thanks
-
-Eric
-> 
-
 
