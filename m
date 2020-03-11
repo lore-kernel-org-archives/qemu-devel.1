@@ -2,80 +2,118 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD94C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14046C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 895992146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9F5220727
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OHx0nhjJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895992146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="E7NMBRvS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F5220727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBzsU-0005IS-Q0
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:50:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35021)
+	id 1jBzvc-0006IU-1R
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:53:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jBzrZ-0004Jy-Lx
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:49:27 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jBzux-0005tk-0b
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jBzrX-0005GX-T9
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:49:25 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56325
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jBzrX-0005Fw-Ob
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:49:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583927363;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WPDBD4+BI1TadVNo2YvrTSx1iOGIg2UYezwDjc2e9pI=;
- b=OHx0nhjJ2dp8pDhSc7vI2BEYDoHL4m7U5D7USxiYrsE8GXAAyuokFVfURxY7rja48xF0Ue
- N0fSGnLJdjJ87RrWiPtaf/5rzJ5LYr3DByNv5NSZ3AiwEYGdfOuEDH/whEuOVBo9Ta53fA
- 7/tT1I8BQOz3LFBTdj5JiKdkLfyxIqg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-DODs6VAUM_eDKWL-0gSkyw-1; Wed, 11 Mar 2020 07:49:21 -0400
-X-MC-Unique: DODs6VAUM_eDKWL-0gSkyw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B1408010F2;
- Wed, 11 Mar 2020 11:49:20 +0000 (UTC)
-Received: from localhost (ovpn-200-57.brq.redhat.com [10.40.200.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E499610013A1;
- Wed, 11 Mar 2020 11:49:10 +0000 (UTC)
-Date: Wed, 11 Mar 2020 12:49:08 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v6 08/13] target/i386: Cleanup and use the EPYC mode
- topology functions
-Message-ID: <20200311124908.26fc3bb7@redhat.com>
-In-Reply-To: <158389405195.22020.11480351700004650224.stgit@naples-babu.amd.com>
-References: <158389385028.22020.7608244627303132902.stgit@naples-babu.amd.com>
- <158389405195.22020.11480351700004650224.stgit@naples-babu.amd.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jBzuv-0000Ui-6L
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:52:54 -0400
+Received: from mail-eopbgr60117.outbound.protection.outlook.com
+ ([40.107.6.117]:25930 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jBzuu-0000TD-KH; Wed, 11 Mar 2020 07:52:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cPUYkpovPTH/qKfDm8JeKGRsZrpL0aWtFKrugtmRltz1TXfSJtTmQlVfYd/H7aZj3HO4NVH3A31xS/YtjBZ19PiYqjfFrIOP94gmfm3aIcibSix0IEGPhjBCLBYfmtDlQR0RmR2/T0JzrBcshwKQxd3ueqPVfmg/vpgrdB/e7ekqoSvJklfwz1UpOgmAoRh1WOAR7HgYASHH9+pqd0dk//Kd51h1bDIrWYQoR4XHfLheEvTCb+JvWwhiycoJRpiIGc+/xgNfGn2GpNOEK7Wk3CSvPUtOmWJ7aZ8uapj8F+5qKuDT0xM3XUwM9rJhBTrjMSFQV6JbelT6SFVIfKEIwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aHB6PfWGJVly+WkkNnGFna37wqumW5iA9QGovo+/FMs=;
+ b=BLu6Fb1F5wJHEuxZEg0Acqmjnz7M245jFtgHUFMSwKW73BpcNWAWS2ckkKBVpSc6hXQf2ngLfPPZr+lBry716jkyH0dRyLLqLbiQL9SsFMPuxalAX5YetCYD0uQzpYURzlMD/wSfwSGOuyBQuu6diASReFPzvffJe7h6P30cKDdDKhUQU8jcVjFCCoutMX7w6FJmV45stFWvq1XODrQLLjYyQnQ0l1Z6MJGwCM8gVWV9ze2yMQnK7Yg00f0GOY//RsoE/WPJ6YWj/OoQ38y7NjW3HtkU2I7VxDcwHf2hLFq4fyTo/3bwfwa0S2h5SXqs04Qkp2vtZ1GwOu9RBIMgOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aHB6PfWGJVly+WkkNnGFna37wqumW5iA9QGovo+/FMs=;
+ b=E7NMBRvSzB7lsuoCE+h52TlXwthc6tRv7lYoDc18ApoLQq1IpRL/XZifARAZhwASEI2FY+eFVQu6EKUbrHtURZ2ICjcQUclSpC6KUE4TZf1OeDMUasnp9YSwQxU8H4dUYXotgDPMwc8SkUaClC+btU6X0M/i0EbFB57cQSnJIkw=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4021.eurprd08.prod.outlook.com (20.179.2.78) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.17; Wed, 11 Mar 2020 11:52:50 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2814.007; Wed, 11 Mar 2020
+ 11:52:50 +0000
+Subject: Re: [PATCH v4 0/9] block-copy improvements: part I
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200311103004.7649-1-vsementsov@virtuozzo.com>
+ <ef8eb81d-32be-1360-11f4-743438b4b3e3@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200311145246189
+Message-ID: <4fb7e11c-fbb5-13b8-03e2-e04f80c52cc3@virtuozzo.com>
+Date: Wed, 11 Mar 2020 14:52:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <ef8eb81d-32be-1360-11f4-743438b4b3e3@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1P191CA0006.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::16)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P191CA0006.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.16 via Frontend Transport; Wed, 11 Mar 2020 11:52:49 +0000
+X-Tagtoolbar-Keys: D20200311145246189
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 71e0f28f-5280-49cd-019c-08d7c5b2b92f
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4021:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4021558492B7AE1F1B7CE940C1FC0@AM6PR08MB4021.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
+X-Forefront-PRVS: 0339F89554
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(376002)(366004)(136003)(396003)(39850400004)(346002)(199004)(5660300002)(16526019)(2616005)(956004)(66556008)(31696002)(316002)(8676002)(31686004)(186003)(478600001)(81166006)(36756003)(8936002)(16576012)(66946007)(86362001)(81156014)(66476007)(26005)(966005)(53546011)(6486002)(107886003)(4326008)(2906002)(6666004)(52116002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4021;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kCCf+O/QDiymS6W8VF/hP0xUU/TgxW2Z7MGcRRmG02ZZq2yfF6pFY5IWKKhWTXTEF/u73sJHYVY3YPVpOMx8+mqFvqFAys2Asxk36quUcw39Xx7w2EkQHd/WcJpe/SgWki02dMa6jy4EcBitUw6rYVC/centP33if+7Ry86udT/l6NNXpu/xw5qHzTMStLW55W16A/PyOTJRZXYaOoijx/efLN3mnBLXeHaSQErpoE5/AThbJpnv0c38YYVF2u7eKq4UPKAg5h/lYmhQeCtU199BBQxvuTbOGyGMbvtI2GI6iAHhouIzooR39TfJ6eTiZjLSjqIs2ITAJ6g8LhVs+2NKOK5FpHm7vZ+zDjd81M2H5JgH6cgQR+Ly9NrjRCOgUaGyN1ZO30ndjhUf2D5UKsPUSLH2IwX6NlqHug7aCZrzZqz3xEQLf3v47EeOOXbi/iKBV3BKUFmWOal7ArT5HUkoerYz5ILm97IKAN0f7fvkjWTK+6ingiKhD58jY+utVw5WmL+kz5KUbaoq/7ZuGA==
+X-MS-Exchange-AntiSpam-MessageData: MB+GXzofWw0bdh1/fYMjFct+SwKidCdGPvUvYz8gHROMrte8w/JgHltSpoJQu5G/UG5Gn1VxZ9KcWF2Y7iKrttB53Ziea2pL7l7/ms20OFT0iEc/nqQ4ISQOSE7VF6+beu5GNLYTGnsw8ax7vXeEEg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71e0f28f-5280-49cd-019c-08d7c5b2b92f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 11:52:49.8940 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Yfy9enxirig5wHaA/g8mDNVqzWNterFT5O9ijQdSWbNxqKDj9swfARK7xii9x6zxLiEfvYDq5tyS6Tr6Cwrt9D/rr7r6c5up4fJX3He/0og=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4021
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.117
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,311 +125,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Mar 2020 21:34:11 -0500
-Babu Moger <babu.moger@amd.com> wrote:
+11.03.2020 14:37, Max Reitz wrote:
+> On 11.03.20 11:29, Vladimir Sementsov-Ogievskiy wrote:
+>> v4:
+>>
+>> 01: add Max's r-b
+>> 02: rm ProgressResetCallbackFunc typedef
+>> 03-06: add Max's r-b
+>> 07: fix indentation
+>> 08: update in_flight_bytes in block_copy_inflight_req_shrink
+>>      improve comment above block_copy() definition
+>> 09: add Andrey's and Max's r-b
+>>      drop hunk fixing indentation (merged to 07)
+>>
+>> Vladimir Sementsov-Ogievskiy (9):
+>>    job: refactor progress to separate object
+>>    block/block-copy: fix progress calculation
+>>    block/block-copy: specialcase first copy_range request
+>>    block/block-copy: use block_status
+>>    block/block-copy: factor out find_conflicting_inflight_req
+>>    block/block-copy: refactor interfaces to use bytes instead of end
+>>    block/block-copy: rename start to offset in interfaces
+>>    block/block-copy: reduce intersecting request lock
+>>    block/block-copy: hide structure definitions
+> 
+> Thanks, applied to my block branch:
+> 
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+> 
 
-> Use the new functions from topology.h and delete the unused code. Given t=
-he
-> sockets, nodes, cores and threads, the new functions generate apic id for=
- EPYC
-> mode. Removes all the hardcoded values.
->=20
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Thanks you!
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-PS:
-see minor nitpick below
-
-> ---
->  target/i386/cpu.c |  162 +++++++++++------------------------------------=
-------
->  1 file changed, 35 insertions(+), 127 deletions(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 2e5be37b21..a3051524a2 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -338,68 +338,15 @@ static void encode_cache_cpuid80000006(CPUCacheInfo=
- *l2,
->      }
->  }
-> =20
-> -/*
-> - * Definitions used for building CPUID Leaf 0x8000001D and 0x8000001E
-> - * Please refer to the AMD64 Architecture Programmer=E2=80=99s Manual Vo=
-lume 3.
-> - * Define the constants to build the cpu topology. Right now, TOPOEXT
-> - * feature is enabled only on EPYC. So, these constants are based on
-> - * EPYC supported configurations. We may need to handle the cases if
-> - * these values change in future.
-> - */
-> -/* Maximum core complexes in a node */
-> -#define MAX_CCX 2
-> -/* Maximum cores in a core complex */
-> -#define MAX_CORES_IN_CCX 4
-> -/* Maximum cores in a node */
-> -#define MAX_CORES_IN_NODE 8
-> -/* Maximum nodes in a socket */
-> -#define MAX_NODES_PER_SOCKET 4
-> -
-> -/*
-> - * Figure out the number of nodes required to build this config.
-> - * Max cores in a node is 8
-> - */
-> -static int nodes_in_socket(int nr_cores)
-> -{
-> -    int nodes;
-> -
-> -    nodes =3D DIV_ROUND_UP(nr_cores, MAX_CORES_IN_NODE);
-> -
-> -   /* Hardware does not support config with 3 nodes, return 4 in that ca=
-se */
-> -    return (nodes =3D=3D 3) ? 4 : nodes;
-> -}
-> -
-> -/*
-> - * Decide the number of cores in a core complex with the given nr_cores =
-using
-> - * following set constants MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_NODE =
-and
-> - * MAX_NODES_PER_SOCKET. Maintain symmetry as much as possible
-> - * L3 cache is shared across all cores in a core complex. So, this will =
-also
-> - * tell us how many cores are sharing the L3 cache.
-> - */
-> -static int cores_in_core_complex(int nr_cores)
-> -{
-> -    int nodes;
-> -
-> -    /* Check if we can fit all the cores in one core complex */
-> -    if (nr_cores <=3D MAX_CORES_IN_CCX) {
-> -        return nr_cores;
-> -    }
-> -    /* Get the number of nodes required to build this config */
-> -    nodes =3D nodes_in_socket(nr_cores);
-> -
-> -    /*
-> -     * Divide the cores accros all the core complexes
-> -     * Return rounded up value
-> -     */
-> -    return DIV_ROUND_UP(nr_cores, nodes * MAX_CCX);
-> -}
-> -
->  /* Encode cache info for CPUID[8000001D] */
-> -static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs=
-,
-> -                                uint32_t *eax, uint32_t *ebx,
-> -                                uint32_t *ecx, uint32_t *edx)
-> +static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
-> +                                       X86CPUTopoInfo *topo_info,
-> +                                       uint32_t *eax, uint32_t *ebx,
-> +                                       uint32_t *ecx, uint32_t *edx)
->  {
->      uint32_t l3_cores;
-> +    unsigned nodes =3D MAX(topo_info->nodes_per_pkg, 1);
-> +
->      assert(cache->size =3D=3D cache->line_size * cache->associativity *
->                            cache->partitions * cache->sets);
-> =20
-> @@ -408,10 +355,13 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo=
- *cache, CPUState *cs,
-> =20
->      /* L3 is shared among multiple cores */
->      if (cache->level =3D=3D 3) {
-> -        l3_cores =3D cores_in_core_complex(cs->nr_cores);
-> -        *eax |=3D ((l3_cores * cs->nr_threads) - 1) << 14;
-> +        l3_cores =3D DIV_ROUND_UP((topo_info->dies_per_pkg *
-> +                                 topo_info->cores_per_die *
-> +                                 topo_info->threads_per_core),
-> +                                 nodes);
-> +        *eax |=3D (l3_cores - 1) << 14;
->      } else {
-> -        *eax |=3D ((cs->nr_threads - 1) << 14);
-> +        *eax |=3D ((topo_info->threads_per_core - 1) << 14);
->      }
-> =20
->      assert(cache->line_size > 0);
-> @@ -431,55 +381,17 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo=
- *cache, CPUState *cs,
->             (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
->  }
-> =20
-> -/* Data structure to hold the configuration info for a given core index =
-*/
-> -struct core_topology {
-> -    /* core complex id of the current core index */
-> -    int ccx_id;
-> -    /*
-> -     * Adjusted core index for this core in the topology
-> -     * This can be 0,1,2,3 with max 4 cores in a core complex
-> -     */
-> -    int core_id;
-> -    /* Node id for this core index */
-> -    int node_id;
-> -    /* Number of nodes in this config */
-> -    int num_nodes;
-> -};
-> -
-> -/*
-> - * Build the configuration closely match the EPYC hardware. Using the EP=
-YC
-> - * hardware configuration values (MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_I=
-N_NODE)
-> - * right now. This could change in future.
-> - * nr_cores : Total number of cores in the config
-> - * core_id  : Core index of the current CPU
-> - * topo     : Data structure to hold all the config info for this core i=
-ndex
-> - */
-> -static void build_core_topology(int nr_cores, int core_id,
-> -                                struct core_topology *topo)
-> -{
-> -    int nodes, cores_in_ccx;
-> -
-> -    /* First get the number of nodes required */
-> -    nodes =3D nodes_in_socket(nr_cores);
-> -
-> -    cores_in_ccx =3D cores_in_core_complex(nr_cores);
-> -
-> -    topo->node_id =3D core_id / (cores_in_ccx * MAX_CCX);
-> -    topo->ccx_id =3D (core_id % (cores_in_ccx * MAX_CCX)) / cores_in_ccx=
-;
-> -    topo->core_id =3D core_id % cores_in_ccx;
-> -    topo->num_nodes =3D nodes;
-> -}
-> -
->  /* Encode cache info for CPUID[8000001E] */
-> -static void encode_topo_cpuid8000001e(CPUState *cs, X86CPU *cpu,
-> +static void encode_topo_cpuid8000001e(X86CPUTopoInfo *topo_info, X86CPU =
-*cpu,
->                                         uint32_t *eax, uint32_t *ebx,
->                                         uint32_t *ecx, uint32_t *edx)
->  {
-> -    struct core_topology topo =3D {0};
-> -    unsigned long nodes;
-> +    X86CPUTopoIDs topo_ids =3D {0};
-> +    unsigned long nodes =3D MAX(topo_info->nodes_per_pkg, 1);
->      int shift;
-> =20
-> -    build_core_topology(cs->nr_cores, cpu->core_id, &topo);
-> +    x86_topo_ids_from_apicid_epyc(cpu->apic_id, topo_info, &topo_ids);
-> +
->      *eax =3D cpu->apic_id;
->      /*
->       * CPUID_Fn8000001E_EBX
-> @@ -496,12 +408,8 @@ static void encode_topo_cpuid8000001e(CPUState *cs, =
-X86CPU *cpu,
->       *             3 Core complex id
->       *           1:0 Core id
->       */
-> -    if (cs->nr_threads - 1) {
-> -        *ebx =3D ((cs->nr_threads - 1) << 8) | (topo.node_id << 3) |
-> -                (topo.ccx_id << 2) | topo.core_id;
-> -    } else {
-> -        *ebx =3D (topo.node_id << 4) | (topo.ccx_id << 3) | topo.core_id=
-;
-> -    }
-> +    *ebx =3D ((topo_info->threads_per_core - 1) << 8) | (topo_ids.node_i=
-d << 3) |
-> +            (topo_ids.core_id);
->      /*
->       * CPUID_Fn8000001E_ECX
->       * 31:11 Reserved
-> @@ -510,9 +418,9 @@ static void encode_topo_cpuid8000001e(CPUState *cs, X=
-86CPU *cpu,
->       *         2  Socket id
->       *       1:0  Node id
->       */
-> -    if (topo.num_nodes <=3D 4) {
-> -        *ecx =3D ((topo.num_nodes - 1) << 8) | (cpu->socket_id << 2) |
-> -                topo.node_id;
-> +
-not necessary white-space
-
-> +    if (nodes <=3D 4) {
-> +        *ecx =3D ((nodes - 1) << 8) | (topo_ids.pkg_id << 2) | topo_ids.=
-node_id;
->      } else {
->          /*
->           * Node id fix up. Actual hardware supports up to 4 nodes. But w=
-ith
-> @@ -527,10 +435,10 @@ static void encode_topo_cpuid8000001e(CPUState *cs,=
- X86CPU *cpu,
->           * number of nodes. find_last_bit returns last set bit(0 based).=
- Left
->           * shift(+1) the socket id to represent all the nodes.
->           */
-> -        nodes =3D topo.num_nodes - 1;
-> +        nodes -=3D 1;
->          shift =3D find_last_bit(&nodes, 8);
-> -        *ecx =3D ((topo.num_nodes - 1) << 8) | (cpu->socket_id << (shift=
- + 1)) |
-> -                topo.node_id;
-> +        *ecx =3D (nodes << 8) | (topo_ids.pkg_id << (shift + 1)) |
-> +               topo_ids.node_id;
->      }
->      *edx =3D 0;
->  }
-> @@ -5499,6 +5407,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index=
-, uint32_t count,
->      uint32_t signature[3];
->      X86CPUTopoInfo topo_info;
-> =20
-> +    topo_info.nodes_per_pkg =3D env->nr_nodes;
->      topo_info.dies_per_pkg =3D env->nr_dies;
->      topo_info.cores_per_die =3D cs->nr_cores;
->      topo_info.threads_per_core =3D cs->nr_threads;
-> @@ -5918,20 +5827,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t ind=
-ex, uint32_t count,
->          }
->          switch (count) {
->          case 0: /* L1 dcache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs=
-,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 1: /* L1 icache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs=
-,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 2: /* L2 cache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 3: /* L3 cache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          default: /* end of info */
->              *eax =3D *ebx =3D *ecx =3D *edx =3D 0;
-> @@ -5940,8 +5849,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index=
-, uint32_t count,
->          break;
->      case 0x8000001E:
->          assert(cpu->core_id <=3D 255);
-> -        encode_topo_cpuid8000001e(cs, cpu,
-> -                                  eax, ebx, ecx, edx);
-> +        encode_topo_cpuid8000001e(&topo_info, cpu, eax, ebx, ecx, edx);
->          break;
->      case 0xC0000000:
->          *eax =3D env->cpuid_xlevel2;
->=20
-
+-- 
+Best regards,
+Vladimir
 
