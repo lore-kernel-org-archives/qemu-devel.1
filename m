@@ -2,67 +2,85 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08772C10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0AEC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A41E620727
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E778208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:37:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="cHplOhH0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41E620727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJIS37Iy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E778208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBq1R-0003XD-Qr
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 21:18:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45705)
+	id 1jBqJM-0007jW-D2
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 21:37:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jBq0i-00036s-AZ
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:14 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jBqIV-0006va-I7
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1jBq0f-0001T1-3I
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:12 -0400
-Received: from kylie.crudebyte.com ([5.189.157.229]:59519)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jBq0e-0001QU-Jy
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=UCJhrVzjyJ95bSvh7/+CLTzQZ9eVliGPlETtEZUNTqQ=; b=cHplOhH0RqQFQU50+ZRBYDVbBW
- fdFBNzx2Uh/9n3rZk6NefO/nJwrh4qmLw2YxYNRTBHezjRbWjJSobpZRNgGq7+R1QzYaYm19MHM76
- Efxpdwa/2ra7mKeDM1tkYQpa+K//EwCHfRQDgj9WuZmiAxAYUkg9hST8LdcwWAj408BkcF6nF/8LB
- fwH5NXUiNegsaBCORlAdf9NmdhLjiXT0Lo+TuEDeLYNtt1n+L8hLmR6xLuNwaFco79QeNABlILegC
- F1+TeCkEraj/htBpHaFqJUcazT2P3HiL6uBALLMpL1lK4kBpsOWOUdooj3mPguZnG2Pgd42Q4BzV/
- eoVllOoPb/TjOlDVw3USfFG4h6T2nzC1Bk/XI8EwyYCDd77ytMXNxwc+JpD6fuXLCYoAtv9HLgMTm
- goIERrTbOYKcOiUnlSrBYTcGJ8lXlWpjUEdGhSVOKAj2McF/2PjMclK7Hjskw89V3J9BzG0mmMkg5
- pHU6gSl80DaWg0CZdLc3dtiiyncCw+wko3gOWneMv4Qs1/fzmAG3vmyoNkOlSuM6T3JgD++yR7lks
- e0BPjngyY19n5ZSGmWb3CaUQHOSCg8Y8bT0z9xAaNopM4GTXTHQlwuG6BPUxpNWzCb4lx4rQMXoWj
- msAlczPheaNAqprSukRHf7UfAWBOTTfUIgg/dEkyc=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
-Date: Wed, 11 Mar 2020 02:18:04 +0100
-Message-ID: <2408892.h2sFNKg3ST@silver>
-In-Reply-To: <20200310193336.37029536@bahia.home>
-References: <cover.1579567019.git.qemu_oss@crudebyte.com>
- <1651612.bE1MAdl4rA@silver> <20200310193336.37029536@bahia.home>
+ (envelope-from <alex.williamson@redhat.com>) id 1jBqIT-0002cM-8k
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34326
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jBqIS-0002YY-Uz
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583890591;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S55UM8zjQaZOrfPu31wLQ0+i0bnhTIXv6UYCH2dEoHA=;
+ b=LJIS37IyUxWbAQrQGKFiOixmW6gbIVp+7K25wl7OeUcXGuUwx97na39BYLScTnoBO+CS4k
+ AEcdbarcbAAFNL2WruT7VD6GqV2ED9YTR2dYTjYHPQXFA6U+eeBLQAnb4wT+ev9SHRCmsn
+ VEu8ZMzZDLqdO00U7nTkQqieo0xuG2Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-iX5dq1eJP-6_ejeNiqwKhg-1; Tue, 10 Mar 2020 21:36:29 -0400
+X-MC-Unique: iX5dq1eJP-6_ejeNiqwKhg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D220184C812;
+ Wed, 11 Mar 2020 01:36:28 +0000 (UTC)
+Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C916A5D9C5;
+ Wed, 11 Mar 2020 01:36:24 +0000 (UTC)
+Date: Tue, 10 Mar 2020 19:36:24 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
+ vfio_rom_read
+Message-ID: <20200310193624.402fdb18@x1.home>
+In-Reply-To: <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
+References: <20200224064219.1434-1-longpeng2@huawei.com>
+ <20200224064219.1434-2-longpeng2@huawei.com>
+ <20200224090458.080152c0@w520.home>
+ <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
+ <20200310101108.3377b878@x1.home>
+ <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.189.157.229
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,318 +92,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: weifuqiang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, "Longpeng \(Mike,
+ Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Dienstag, 10. M=E4rz 2020 19:33:36 CET Greg Kurz wrote:
-> > This patch is also too big for my preference, but I don't see a viable =
-way
-> > to split it further into separate patches. I already separated all the
-> > patches I could. If you have suggestions, very much appreciated!
->=20
-> Well, the patch could be split in two or three parts at least:
->=20
-> (1) introduce the new function that reads multiple entries in codir.c
->=20
-> (2) use it from 9p.c
->=20
-> (3) remove unused stuff if anything remains
->=20
-> This doesn't seem to change much but the smaller diffstats
-> for each individual patch make them less scary :) and with
-> (1) applied only it is easier to compare what the old code
-> in 9p.c and the new one in codir.c do.
->=20
-> > The reason for this is that in order to fix these issues with current
-> > T_readdir implementation, it requires to separate what's currently one
-> > task
-> > (i.e. one function) into two separate tasks (i.e. two functions). There=
- is
-> > no sensible way to do that.
->=20
-> Yeah, I won't ask for finer grain.
+On Wed, 11 Mar 2020 00:14:31 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Me confused. Does that mean your split suggestion was just theoretical, or =
-do=20
-you need it?
+> On 03/10/20 17:11, Alex Williamson wrote:
+> 
+> > commit 2088fc1e1f426b98e9ca4d7bcdbe53d886a18c37
+> > Author: Alex Williamson <alex.williamson@redhat.com>
+> > Date:   Tue Mar 10 10:04:36 2020 -0600
+> > 
+> >     vfio/pci: Use defined memcpy() behavior
+> >     
+> >     vfio_rom_read() relies on memcpy() doing the logically correct thing,
+> >     ie. safely copying zero bytes from a NULL pointer when rom_size is
+> >     zero, rather than the spec definition, which is undefined when the
+> >     source or target pointers are NULL.  Resolve this by wrapping the
+> >     call in the condition expressed previously by the ternary.
+> >     
+> >     Additionally, we still use @val to fill data based on the provided
+> >     @size regardless of mempcy(), so we should initialize @val rather
+> >     than @data.
+> >     
+> >     Reported-by: Longpeng <longpeng2@huawei.com>
+> >     Reported-by: Laszlo Ersek <lersek@redhat.com>
+> >     Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > 
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 5e75a95129ac..b0799cdc28ad 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
+> >          uint16_t word;
+> >          uint32_t dword;
+> >          uint64_t qword;
+> > -    } val;
+> > -    uint64_t data = 0;
+> > +    } val = { 0 };
+> > +    uint64_t data;
+> >  
+> >      /* Load the ROM lazily when the guest tries to read it */
+> >      if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
+> >          vfio_pci_load_rom(vdev);
+> >      }
+> >  
+> > -    memcpy(&val, vdev->rom + addr,
+> > -           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr) : 0);
+> > +    if (addr < vdev->rom_size) {
+> > +        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - addr));
+> > +    }
+> >  
+> >      switch (size) {
+> >      case 1:  
+> 
+> Regarding the pre-patch code:
+> 
+> My understanding is that the memcpy() could be reached with a
+> guest-originated "addr" even if "vdev->rom" was NULL. If that's the
+> case, then the pre-patch code invokes undefined behavior regardless of
+> memcpy(), because it performs pointer arithmetic on a null pointer (not
+> to mention that the type of that pointer is (void *)....)
+> 
+> Regarding the proposed change:
+> 
+> (addr < vdev->rom_size) requires that "vdev->rom_size" be positive. In
+> that case, I assume that
+> 
+> - "vdev->rom" is not NULL, and
+> -  MIN(size, vdev->rom_size - addr) bytes are "in range" for the object
+> allocated at "vdev->rom".
+> 
+> So from a memcpy() and range perspective, the patch looks OK. But
+> there's still a wart I dislike: we should never perform pointer
+> arithmetic on a (void*). I suggest casting (vdev->rom) to (uint8_t*) or
+> (unsigned char*) first.
+> 
+> Here's an excerpt from the ISO C99 standard:
+> 
+> -v-
+> 6.5.6 Additive operators
+> 
+> Constraints
+> 
+> 2 For addition, either both operands shall have arithmetic type, or one
+>   operand shall be a pointer to an object type and the other shall have
+>   integer type. [...]
+> -^-
+> 
+> A "pointer-to-void" is not a "pointer to an object type", because "void"
+> is not an object type -- it is an incomplete type that cannot be completed:
+> 
+> -v-
+> 6.2.5 Types
+> 
+> 1 [...] Types are partitioned into object types (types that fully
+>   describe objects), function types (types that describe functions), and
+>   incomplete types (types that describe objects but lack information
+>   needed to determine their sizes).
+> 
+> [...]
+> 
+> 19 The void type comprises an empty set of values; it is an incomplete
+>    type that cannot be completed.
+> -^-
+> 
+> For a different illustration, (vdev->rom + addr) is equivalent to
+> &(vdev->rom[addr]) -- and we clearly can't have an "array of void".
+> 
+> This anti-pattern (of doing pointer arithmetic on (void*)) likely comes
+> from a guarantee that the standard does make, in the same "6.2.5 Types"
+> section:
+> 
+> -v-
+> 27 A pointer to void shall have the same representation and alignment
+>    requirements as a pointer to a character type. 39) [...]
+> 
+> Footnote 39: The same representation and alignment requirements are
+>              meant to imply interchangeability as arguments to
+>              functions, return values from functions, and members of
+>              unions.
+> -^-
+> 
+> It does not extend to the "+" operator.
 
-> > But don't be too scared about this patch; if you look just at the diff
-> > directly then yes, the diff is not very human readable. However if you
-> > apply the patch and look at the resulting code, you'll notice that there
-> > are actually only 2 functions (v9fs_do_readdir() in 9p.c and
-> > do_readdir_lowlat() in codir.c) which require careful reviewing and that
-> > their resulting code is actually very, very straight forward, and not
-> > long either.
->=20
-> These are personal opinions. Careful reviewing can take a lot of time :)
+GNU C specifically allows arithmetic on pointers and defines the size
+of a void as 1.  I'll comply, but this makes me want to stab myself in
+the face :-\  Thanks,
 
-Well, depends on what precisely you mean with opinion. :) That this patch=20
-actually reduces code complexity is a fact (less branches, less locks, less=
-=20
-dispatches, less side effects, less error/cleanup handlers). These are=20
-objectively measurable quantities.
-
-But yes, nevertheless reviewing it costs time.
-
-> > Current code on master is much more tricky and error prone due to the h=
-uge
-> > amount of potential branches, individual error/cleanup handlers, high
-> > amount of thread dispatching and much more. In the patched version all
-> > these code complexities and error sources are removed.
->=20
-> Come on :) The 9pfs code has been a can of worms from the beginning.
-> It produced more than the average amount of security-related bugs,
-> and most sadly, due to the overall lack of interest, it bitrotted
-> and missed a lot of cool improvements like an appropriate support of
-> unlinked files, QOM-ification of fsdev, conversion of proxy fsdev to
-> vhost-user, hot plug/unplug support, live migration support and
-> "much more"... The performance aspect of things is a full time job
-
-No, the performance issues are actually very managable in case of 9pfs.
-I already addressed readdir with this patch (by far the worst performance=20
-issue), and then there would just be one more severe performance issue:=20
-walkdir.
-
-My intention is not to squeeze out the last fractional percent of performan=
-ce=20
-for 9pfs, but you certainly agree that a simple "ls" blocking for more than=
- 1=20
-second is something that should be fixed, and fortunately the amount of=20
-changes involved are far less than I originally feared they would.
-
-> I never had the opportunity to even consider. So yes, your changes
-> are likely beneficial but the code base is still extremely fragile
-> and sensible to huge changes... not breaking things that happen
-> to work, even in a sub-optimal way, is essentially what I care for
-> these days.
-
-And I think I'm also very careful not breaking anything. I carefully consid=
-er=20
-what to touch and what not. I wrote test cases and I am actively testing my=
-=20
-changes with real installations and snapshots as well.
-
-I think the cause of disagreements we have are solely our use cases of 9pfs=
-:=20
-your personal use case does not seem to require any performance considerati=
-ons=20
-or multi-user aspects, whereas my use case requires at least some minimum=20
-performance grade for utilizing 9pfs for server applications.
-
-> > > Oh, so we'd still have the current implementation being used, even
-> > > with this patch applied... This would be okay for a RFC patch but
-> > > in the end I'd really like to merge something that also converts
-> > > v9fs_do_readdir_with_stat().
-> >=20
-> > Yes, I know, but I would not recommend mixing these things at this poin=
-t,
-> > because it would be an entire effort on its own.
-> >=20
-> > v9fs_do_readdir_with_stat() is used for 9P2000.u, while v9fs_do_readdir=
-()
-> > is used for 9P2000.L. They're behaving very differently, so it would not
-> > only require me to update v9fs_do_readdir_with_stat() and v9fs_read(), I
-> > would also need to write their own test cases (plural, since there are
-> > none at all yet) and benchmarks, and of course somebody what need to
-> > review all that additional amount of code, and who would actually test
-> > it? I am actively testing my 9P2000.L changes, but I am not actually
-> > using 9P2000.u, so I could not guarantee for the same quality.
-> >=20
-> > Considering the current commitment situation regarding 9pfs, we can only
-> > bring things forward with compromises. Hence I suggest I concentrate on
-> > fixing the worst performance issues on 9P2000.L side first, and later on
-> > if there are really people interested in seeing these improvements on
-> > 9P2000.u side and willing to at least help out with testing, then I can
-> > definitely also adjust 9P2000.u side accordingly as well.
-> >=20
-> > But to also make this clear: this patch 10 is not introducing any
-> > behaviour
-> > change for 9P2000.u side.
->=20
-> Ok, fair enough to leave 9p2000.U behind for now but I had to ask :)
-> /me is even wondering if we should start deprecating 9p2000.U since
-> most clients can use 9p2000.L now...
-
-I probably wouldn't. On macOS for instance there's only 9p2000.u. In the en=
-d=20
-9p2000.L is Linux specific. By deprecating 9p2000.u that would mean a shift=
-=20
-towards only supporting Linux guests.
-
-> > Mmm... maybe later on, as a cleanup patch or something. Current version=
- is
-> > tested. I would like to avoid to make things more complicated than they
-> > already are (i.e. accidental introduction of some bug just due to this).
->=20
-> It seems we might agree on not breaking things that work ;-)
-
-Of course! All the things I work on 9pfs are just fixes. But that's probabl=
-y=20
-where we start to disagree. :)
-
-> > > > > +static int do_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
-> > > > > +                             struct V9fsDirEnt **entries,
-> > > > > +                             int32_t maxsize, bool dostat)
-> > > > > +{
-> > > > > +    V9fsState *s =3D pdu->s;
-> > > > > +    V9fsString name;
-> > > > > +    int len, err =3D 0;
-> > > > > +    int32_t size =3D 0;
-> > > > > +    off_t saved_dir_pos;
-> > > > > +    struct dirent *dent;
-> > > > > +    struct V9fsDirEnt *e =3D NULL;
-> > > > > +    V9fsPath path;
-> > > > > +    struct stat stbuf;
-> > > > > +
-> > > > > +    *entries =3D NULL;
-> > > > > +    v9fs_path_init(&path);
-> > > > > +
-> > > > > +    /*
-> > > > > +     * TODO: Here should be a warn_report_once() if lock failed.
-> > > > > +     *
-> > > > > +     * With a good 9p client we should not get into concurrency
-> > > > > here,
-> > > > > +     * because a good client would not use the same fid for
-> > > > > concurrent
-> > > > > +     * requests. We do the lock here for safety reasons though.
-> > > > > However
-> > > > > +     * the client would then suffer performance issues, so better
-> > > > > log
-> > > > > that
-> > > > > +     * issue here.
-> > > > > +     */
-> > >=20
-> > > This should probably be done with qemu_mutex_trylock() in a loop
-> > > directly
-> > > in v9fs_readdir_lock().
-> >=20
-> > No definitely not in the loop. That's intentionally *one* lock *outside*
-> > of
->=20
-> Not sure we're talking about the same loop here...
->=20
-> I'm just suggesting that v9fs_readdir_lock() could be something like:
->=20
-> static inline void v9fs_readdir_lock(V9fsDir *dir)
-> {
->     while (qemu_mutex_trylock(&dir->readdir_mutex)) {
->         warn_report_once("blah");
->     }
-> }
-
-Ah yeah, in fact I got you wrong on this one. I thought you meant to move t=
-he=20
-lock within do_readdir_lowlat(). About your actual suggestion above ...
-
-> > the loop. The normal case is not requiring a lock at all, like the comm=
-ent
-> > describes. Doing multiple locks inside the loop unnecessaririly reduces
-> > performance for no reason.
-> >=20
-> > About *_trylock() instead of v9fs_readdir_lock(): might be a candidate =
-to
->=20
-> Hmm... are you suggesting that do_readdir_lowlat() should return if it
-> can't take the lock ?
-
-=2E.. yep, that's what I had in mind for it later on. I would not mind runn=
-ing=20
-trylock in a loop like you suggested; if it fails, log a warning and return.
-Because if the lock fails, then client is buggy. User can read the warning =
-in=20
-the logs and report the bug for client to be fixed. Not worth to handle tha=
-t=20
-case in any fancy way by server.
-
-> > > > > + * Retrieves the requested (max. amount of) directory entries fr=
-om
-> > > > > the
-> > > > > fs
-> > > > > + * driver. This function must only be called by the main IO thre=
-ad
-> > > > > (top
-> > > > > half). + * Internally this function call will be dispatched to a
-> > > > > background
-> > > > > IO thread + * (bottom half) where it is eventually executed by the
-> > > > > fs
-> > > > > driver. + *
-> > > > > + * The old readdir implementation above just retrieves always one
-> > > > > dir
-> > > > > entry + * per call. The problem of that implementation above is t=
-hat
-> > > > > latency is + * added for (retrieval of) each directory entry, whi=
-ch
-> > > > > in
-> > > > > practice lead to + * latencies of several hundred ms for readdir =
-of
-> > > > > only one directory. + * + * This is avoided in this function by
-> > > > > letting
-> > > > > the fs driver retrieve all + * required directory entries with on=
-ly
-> > > > > call of this function and hence with + * only a single fs driver
-> > > > > request.
-> > >=20
-> > > True but these kind of considerations rather belong to the changelog.=
-=2E.
-> > > otherwise, we'll have to not forget to kill these lines when the "old
-> > > readdir implementation" is no more.
-> >=20
-> > Mmm... I do think this overall latency issue should be clarified somewh=
-ere
-> > as
-> The issue itself is best described in a changelog, but...
->=20
-> > a comment. Where exactly is not that important to me. For instance it
-> > could
-> > also be described on v9fs_co_run_in_worker() macro definition in coth.h
-> > instead, as general rule of thumb when dispatching stuff.
->=20
-> ... if you have useful recommendations that don't involve referring to a
-> piece of code that might go away, a comment in coth.h is certainly a good
-> idea.
-
-Ok, I'll move it to coth.h then.
-
-> > The thing is: for >10 years several developers obviously did not realize
-> > the severe negative performance impact of frivolously dispatching tasks
-> > to
-> I won't dare to comment on some people I don't know not doing the obvious
-> right things at the time... what I do know is that for >10 years, nobody
-> cared for this code. Period. You're lucky it is still functional ;-)
-
-This was not about judging individuals, just to express that the latency=20
-impact of dispatching does not seem to be obvious for people, and trying to=
-=20
-avoid similar mistakes by placing appropriate comment(s).
-
-> > > > > +                                        struct V9fsDirEnt
-> > > > > **entries,
-> > > > > +                                        int32_t maxsize, bool
-> > > > > dostat)
-> > >=20
-> > > s/maxsize/max_count since this is the wording use in the caller.
-> >=20
-> > Wouldn't do that. This is the driver side, not the 9p protocol request
-> > handler. As you might have relized before, "max_count" is semantically
-> > completely wrong. This variable does not count integral entries, it is
-> > rather a maximum size (in bytes) of the destination buffer being filled.
-> >=20
-> > On 9p request handler side it is ok to use "max_count" instead, because
-> > the
-> > protocol definition uses exactly this term for the request parameter, b=
-ut
-> > on driver side it's IMO inappropriate.
->=20
-> I agree the max_count wording sucks and I don't care that much to
-> name variables according to protocol definitions, but I do care
-> to use the same name in caller/callee when it makes sense, for a
-> better grep or cscope experience.
-
-So you insist on that max_count change?
-
-Best regards,
-Christian Schoenebeck
-
+Alex
 
 
