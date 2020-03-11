@@ -2,92 +2,84 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE16C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 382C0C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68E0220735
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:30:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68E0220735
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A1DA020735
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:32:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fd/VthLg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1DA020735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC5BH-0006nI-WA
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 13:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59241)
+	id 1jC5D5-0008Hh-9Z
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 13:31:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jC5A8-0004y2-Ty
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:28:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1jC5CG-0007mF-Lo
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jC5A7-0008EY-Ss
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:28:56 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2082 helo=huawei.com)
+ (envelope-from <eblake@redhat.com>) id 1jC5CA-0002Pb-GK
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:31:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25850
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1jC5A5-0008Cn-Ea; Wed, 11 Mar 2020 13:28:53 -0400
-Received: from LHREML713-CAH.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 76FB0670D6B61220C7A;
- Wed, 11 Mar 2020 17:28:51 +0000 (GMT)
-Received: from lhreml702-chm.china.huawei.com (10.201.108.51) by
- LHREML713-CAH.china.huawei.com (10.201.108.36) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 11 Mar 2020 17:28:51 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml702-chm.china.huawei.com (10.201.108.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 11 Mar 2020 17:28:50 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Wed, 11 Mar 2020 17:28:50 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3wgAAIyYCAAR1e4IAAFJiAgAAHflCAADtYAIABo1pQgARLAwCAAABbwIAABn8AgAN5SJCAADkTAIABctiAgAAIuACAAAKygIAXjGswgAAUwYCAEtIIAA==
-Date: Wed, 11 Mar 2020 17:28:50 +0000
-Message-ID: <1f38f5ffe9c140c4b02626ec48992cf4@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200204162320.67e5d353@redhat.com>
- <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
- <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
- <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
- <133f274e-e942-7008-93d2-8edb1bc4d7ae@redhat.com>
- <52fff289cca14874ad493fc25806fe3d@huawei.com>
- <f041380c-afcb-f8d8-89db-8f48c7b46767@redhat.com>
- <e97fa28c653044b8bab66aeca2374682@huawei.com>
- <0ff4d2c1-ebd3-1d2f-07e8-a4f13be07ceb@redhat.com>
- <6bf255ecb88446f1b08ee4ab21a85f02@huawei.com>
- <69848dd3-fac4-ec6b-78a8-a052124f4fc3@redhat.com>
- <49b54eea65cd49ae832cd6ec21eae64a@huawei.com>
- <b4ccf1d9-4514-6b63-5ef9-1d337f539267@redhat.com>
- <fad66252aa8f4b46816f21b5315b6358@huawei.com>
- <8f10dd72-9a19-b910-489c-eacc6a772046@redhat.com>
- <04adb50079bc45888f514721edb3cfa3@huawei.com>
- <69ab2339-f4c3-dbd6-1be7-5d6eef28d027@redhat.com>
- <b78f892f-c917-a3a8-4c6b-8d03af02782d@redhat.com>
- <8f27608fd02147bfb11bdfca38316f4c@huawei.com>
- <01aa6f4a-cfa7-6a35-8a7a-5189b66e2c9e@redhat.com>
-In-Reply-To: <01aa6f4a-cfa7-6a35-8a7a-5189b66e2c9e@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jC5CA-0002PL-D0
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:31:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583947862;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/7/3y1pyU64v8C7S1fpt7aQ/iZ/bva1vEVR3oKK3KIs=;
+ b=fd/VthLg2XefeRlI2/14ff1M/nXaTEDJEAzLwbt0lhbtDXmMzEKHBG0P+ZXO7lQJcsBxYb
+ AVmUR7AKj7eXLtd3Qo6DgyUwuTkh9dwxdUOyBcaX/sQCl+l/r69Jz4CCYlRST8Xq9C4A0l
+ C1pTTKGnV042FUvrZggv/mmQpVfPE/c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-n03VVTVIMdOZZglR_3R0fQ-1; Wed, 11 Mar 2020 13:30:47 -0400
+X-MC-Unique: n03VVTVIMdOZZglR_3R0fQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 628E4805758;
+ Wed, 11 Mar 2020 17:30:46 +0000 (UTC)
+Received: from [10.3.116.177] (ovpn-116-177.phx2.redhat.com [10.3.116.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BE90F9CA3;
+ Wed, 11 Mar 2020 17:30:45 +0000 (UTC)
+Subject: Re: [PATCH v5 0/5] qcow2: Implement zstd cluster compression method
+To: Max Reitz <mreitz@redhat.com>, Denis Plotnikov
+ <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
+ <bbb15291-ffb5-80f1-ed27-583ac3cb98bb@virtuozzo.com>
+ <55afec29-1726-c36a-6d80-3dbd1839f0a6@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d65fcc11-c35d-fbd1-fa77-c36616125813@redhat.com>
+Date: Wed, 11 Mar 2020 12:30:45 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <55afec29-1726-c36a-6d80-3dbd1839f0a6@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,47 +91,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>,
- Juan Jose Quintela Carreira <quintela@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ armbru@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2aWQgSGlsZGVuYnJh
-bmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiBTZW50OiAyOCBGZWJydWFyeSAyMDIwIDE4
-OjAwDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29t
-Pg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21h
-aWwuY29tOw0KPiBtc3RAcmVkaGF0LmNvbTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11
-LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51
-eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgbGVyc2VrQHJlZGhhdC5jb207DQo+IGRnaWxiZXJ0QHJlZGhhdC5j
-b207IEp1YW4gSm9zZSBRdWludGVsYSBDYXJyZWlyYSA8cXVpbnRlbGFAcmVkaGF0LmNvbT4NCj4g
-U3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzddIGV4ZWM6IEZpeCBmb3IgcWVtdV9yYW1fcmVzaXpl
-KCkgY2FsbGJhY2sNCj4gDQoNClsuLi5dDQogDQo+IA0KPiBXZSBzaG91bGQgaW5zdGVhZCB0aGlu
-ayBhYm91dA0KPiANCj4gMS4gTWlncmF0aW5nIHRoZSBhY3R1YWwgc2l6ZSBvZiB0aGUgMyBtZW1v
-cnkgcmVnaW9ucyBzZXBhcmF0ZWx5IGFuZCBzZXR0aW5nDQo+IHRoZW0gdmlhDQo+IG1lbW9yeV9y
-ZWdpb25fcmFtX3Jlc2l6ZSgpIHdoZW4gbG9hZGluZyB0aGUgdm1zdGF0ZS4gVGhpcyB3aWxsIHRy
-aWdnZXINCj4gYW5vdGhlciBGVyBjZmcNCj4gZml4dXAgYW5kIHNob3VsZCBiZSBmaW5lICh3aXRo
-IHRoZSBzYW1lIHFlbXVfcmFtX3Jlc2l6ZSgpIGFib3ZlKS4NCj4gDQo+IDIuIEludHJvZHVjZSBh
-IG5ldyBSQU1fU0FWRV9GTEFHX01FTV9TSVpFXzIsIHRoYXQgZS5nLiwgc3RvcmVzIHRoZQ0KPiBu
-dW1iZXIgb2YgcmFtYmxvY2tzLA0KPiBub3QgdGhlIHRvdGFsIGFtb3VudCBvZiBtZW1vcnkgb2Yg
-dGhlIHJhbSBibG9ja3MuIEJ1dCBpdCdzIGhhY2t5LCBiZWNhdXNlIHdlDQo+IG1pZ3JhdGUNCj4g
-c29tZXRoaW5nIGZvciBSQU0gYmxvY2tzLCB0aGF0IGlzIG5vdCBhIFJBTSBibG9jayBjb25jZXB0
-IChzdWItYmxvY2sgc2l6ZXMpLg0KPiANCj4gSSB0aGluayB5b3Ugc2hvdWxkIGxvb2sgaW50byAx
-LiBTaG91bGRuJ3QgYmUgdG9vIGhhcmQgSSB0aGluay4NCg0KSSBoYXZlIHNlbmQgb3V0IHYzIG9m
-IHRoaXMgc2VyaWVzIChbUEFUQ0ggdjMgMDAvMTBdIEFSTSB2aXJ0OiBBZGQgTlZESU1NIHN1cHBv
-cnQpDQp3aXRoIGFuIGF0dGVtcHQgdG8gbWlncmF0ZSB0aGUgbWVtb3J5IHJlZ2lvbnMgc2VwYXJh
-dGVseS4gSXQgYWxzbyBpbmNsdWRlcw0KeW91ciBwYXRjaCBmb3IgcWVtdV9yYW1fcmVzaXplKCkg
-Y2FsbGJhY2sgZml4LiBQbGVhc2UgdGFrZSBhIGxvb2sgYW5kIGxldCBtZSBrbm93Lg0KDQpUaGFu
-a3MsDQpTaGFtZWVyDQoNCg0K
+On 3/11/20 11:28 AM, Max Reitz wrote:
+> On 11.03.20 08:31, Denis Plotnikov wrote:
+>> ping!
+>>
+>> Is there any other comments/concerns/objections/suggestions according to
+>> the series except the minor ones from Alberto and Vladimir?
+>> If not, please, let me know, so I can resend the series with the minor
+>> changes for applying to the corresponding branch.
+>=20
+> Sounds good to me.
+>=20
+> I=E2=80=99d like to note that most iotests that seem to do something with
+> compression (i.e., where grep finds a 'compress' somewhere; 013, 014,
+> 023, 042, 046, 053, 055, ...) pass with -o compression_type=3Dzstd, too.
+> 060 hangs somewhere.  112 complains about v2 incompatibility; and 214
+> relies on intricacies of zlib, I think.  So that looks good, too.
+>=20
+> Well, one thing I did have to fix for this to work is to quote
+> everything in common.pattern that tries to echo something with brackets
+> (e.g. =E2=80=9CClusters to be compressed [1]=E2=80=9D).  I don=E2=80=99t =
+quite know why the
+> brackets suddenly disappear when I run the tests with -o
+> compression_type, who knows.
+
+That sounds like you have a file named '1' in the directory where the=20
+echo was run.  Unquoted [1] is a shell glob that expands to '1' if that=20
+file exists, otherwise remains unexpanded as '[1]'.
+
+>  But putting quotes around the echo
+> arguments fixes it, so...
+
+Yes.  Figuring out why a file named '1' is being created is also a=20
+useful exercise, but quoting any time you have [ that you want output is=20
+already a good idea.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
