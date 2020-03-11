@@ -2,68 +2,83 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65408C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 239C1C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31FA523A45
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31FA523A45
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E088C2233D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:23:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="AvzTtbmi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E088C2233D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC2Fz-0000Rw-Dg
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43310)
+	id 1jC2Gb-0001a6-2G
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jC2FF-00074f-CC
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:22:02 -0400
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jC1uw-0005UY-2f
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jC2FD-0003ew-IM
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:22:01 -0400
-Resent-Date: Wed, 11 Mar 2020 10:22:01 -0400
-Resent-Message-Id: <E1jC2FD-0003ew-IM@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21182)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jC2FD-0003e7-AA; Wed, 11 Mar 2020 10:21:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1583936157; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=TmhUdsfAq4MD9s0CWsCBsDvX6j47v0rQwroDWmwZp9wvVkLhcbjkXLQAPxMwIfhhtObxiO5G1AWbTAFxp8bA0GiG6Z5kshRzIrVpczKdD3JdmYw403nuZSS5b887jQheu5xTwEbftwcUpo6bv7XxgZ1GRFYKL1W/vipz6vUA4XY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583936157;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=+/K5r6NwAYBq8WIK2gZgF7MHZRm56X31dSdmPF5jo/w=; 
- b=KaYcJnRBqNdrTu7TWTx1dNWQJTyay+sxuy3+8wIJnntryWOW+VyFLfO4kjOTOdDZsH+Hpgu91Yju+iHSyV9HnyvzF+olBib+kixXzl+aMQ+yQXA8nu3sputARsI3LtSTC0Bw8rm6GNEVZRdsg2tgQ5ShaThgsTL4jMMcAp4h1TY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583936154057646.1061055082562;
- Wed, 11 Mar 2020 07:15:54 -0700 (PDT)
-In-Reply-To: <20200311132151.172389-1-frankja@linux.ibm.com>
-Subject: Re: [PATCH v9 00/15] s390x: Protected Virtualization support
-Message-ID: <158393615275.5248.1912374950737499774@39012742ff91>
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jC1ur-0007hn-1K
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:01:01 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:46788)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jC1uq-0007gC-P2
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 10:00:56 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id x5so2019725ywb.13
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 07:00:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HIG716SZxyszUpfHsVm68ZH7oL3O9ksUR8vF/Yefa3A=;
+ b=AvzTtbmiHn0EObZ9sbCe8j4aAL/i/L8EynxtYfnJjarQJlM6OyxnBq7n2o8fyyxVCz
+ tkUesP+KkoJTDbxp9lLIjYcYJlmCtzHdbOWNBMoDFL990BJgyV3Ij+Url41uLShqgVZ9
+ Aqqr6mFLNE1/Wvuzqk06DJr6H5r0117MYA7jC7FQdfBul5UUVXhI0VrHyrGsnLDAxnFw
+ FhpOPd9AJp5RVon8WR25H8M0aMacVMXFXxYgLayqfKuE+xI0tDB6YRiRYJSK1oA4p/zb
+ Tr/YhaW9XJNfLfWr1MxE0JgpWGbgU1K7lYh9mu7pyyWEy8f+YS03nMQUExd98hdU7yR5
+ a+Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HIG716SZxyszUpfHsVm68ZH7oL3O9ksUR8vF/Yefa3A=;
+ b=VghmsNr8+n5XecXeIOZ5c8TDF8wxSDOuezsR0Qpqo+k4ouS0VUd6M6w6N++DoHAl+u
+ xysGT1DldLJxM4F0qdNuX+Xo5q96fI183zvgGfkhOEaV1j8QCwZZU4dH0YSEGOxGUg4U
+ PJOOV8G1UnUBRU16/4IMxNg8mQnlq0WX9uThpNykgQXeGQGJIRmK82kVPXPOoPiZWBxk
+ tYHMpb1Faj80OxqyyUJlPencJ9KIkNB2xdoJgcmD4IP5gg/VdvankYvposekhq49Ubn6
+ zQnitJ1Rc32Ga3OZJQN7n8KkD4hlhUAUpR8wRXaU2VlohuRi+QIomyeBL9WoD024szAY
+ DBrw==
+X-Gm-Message-State: ANhLgQ2G57cIFLPJY+0Vnu4zJL9CWlJ9ePqPGKD2FCTa2IOGPSIRQxei
+ 0ZwIlVIoNt9cjXO4js30Lte6C8uEmBVkyUbdboHbEw==
+X-Google-Smtp-Source: ADFU+vsmFMrvTYIhzFjAkkw/M0KGCwedECtVF4oZVUhqMPxe7iyAK9s0OQT6liUTcbRMkBqLKrS0x5/B4mAnKKbrpeI=
+X-Received: by 2002:a0d:ca4e:: with SMTP id m75mr3402341ywd.36.1583935254760; 
+ Wed, 11 Mar 2020 07:00:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: frankja@linux.ibm.com
-Date: Wed, 11 Mar 2020 07:15:54 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
+ <20200311123518.4025-6-yuri.benditovich@daynix.com>
+ <20200311094706-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200311094706-mutt-send-email-mst@kernel.org>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Wed, 11 Mar 2020 16:00:44 +0200
+Message-ID: <CAOEp5OdjP4XsSkyCU0n1YGvyWwayOH5D6iTP-8RRLYfwSJd=7Q@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] virtio-net: add migration support for RSS and hast
+ report
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000035213305a094aaf4"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,86 +90,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMTEzMjE1MS4xNzIz
-ODktMS1mcmFua2phQGxpbnV4LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2OSAwMC8xNV0gczM5MHg6IFByb3RlY3Rl
-ZCBWaXJ0dWFsaXphdGlvbiBzdXBwb3J0Ck1lc3NhZ2UtaWQ6IDIwMjAwMzExMTMyMTUxLjE3MjM4
-OS0xLWZyYW5ramFAbGludXguaWJtLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0g
-aGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBU
-RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
-NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTA5MTExMSBzMzkw
-eDogQWRkIHVucGFjayBmYWNpbGl0eSBmZWF0dXJlIHRvIEdBMQozMDE3OTQxIGRvY3M6IEFkZCBw
-cm90dmlydCBkb2NzCjg5NzE2MjYgczM5MHg6IHByb3R2aXJ0OiBIYW5kbGUgU0lHUCBzdG9yZSBz
-dGF0dXMgY29ycmVjdGx5CjgwNTM0ZjAgczM5MHg6IHByb3R2aXJ0OiBNb3ZlIElPIGNvbnRyb2wg
-c3RydWN0dXJlcyBvdmVyIFNJREEKNjQ2OWM5ZSBzMzkweDogcHJvdHZpcnQ6IERpc2FibGUgYWRk
-cmVzcyBjaGVja3MgZm9yIFBWIGd1ZXN0IElPIGVtdWxhdGlvbgpmY2YxN2I5IHMzOTB4OiBwcm90
-dmlydDogTW92ZSBkaWFnIDMwOCBkYXRhIG92ZXIgU0lEQQpiYzdjY2YxIHMzOTB4OiBwcm90dmly
-dDogU2V0IGd1ZXN0IElQTCBQU1cKMGRjNjUwOSBzMzkweDogcHJvdHZpcnQ6IFNDTFAgaW50ZXJw
-cmV0YXRpb24KNTViMzNmYiBzMzkweDogcHJvdHZpcnQ6IE1vdmUgU1RTSSBkYXRhIG92ZXIgU0lE
-QUQKY2Q4ODViYyBzMzkweDogQWRkIFNJREEgbWVtb3J5IG9wcwo0MjAxNjFkIHMzOTB4OiBwcm90
-dmlydDogS1ZNIGludGVyY2VwdCBjaGFuZ2VzCmRmMGU3M2YgczM5MHg6IHByb3R2aXJ0OiBJbmhp
-Yml0IGJhbGxvb24gd2hlbiBzd2l0Y2hpbmcgdG8gcHJvdGVjdGVkIG1vZGUKMWE1NzNiYSBzMzkw
-eDogcHJvdHZpcnQ6IEFkZCBtaWdyYXRpb24gYmxvY2tlcgpmMjE0YWE1IHMzOTB4OiBwcm90dmly
-dDogU3VwcG9ydCB1bnBhY2sgZmFjaWxpdHkKOWViMDEyOSBTeW5jIHB2Cgo9PT0gT1VUUFVUIEJF
-R0lOID09PQoxLzE1IENoZWNraW5nIGNvbW1pdCA5ZWIwMTI5NGM3ZDcgKFN5bmMgcHYpCjIvMTUg
-Q2hlY2tpbmcgY29tbWl0IGYyMTRhYTVjODc5NiAoczM5MHg6IHByb3R2aXJ0OiBTdXBwb3J0IHVu
-cGFjayBmYWNpbGl0eSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjc0OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MDA6IEZJTEU6IGluY2x1ZGUv
-aHcvczM5MHgvcHYuaDo0ODoKK3N0YXRpYyBpbmxpbmUgaW50IHMzOTBfcHZfc2V0X3NlY19wYXJt
-cyh1aW50NjRfdCBvcmlnaW4sIHVpbnQ2NF90IGxlbmd0aCkgeyByZXR1cm4gMDsgfQoKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2MDE6IEZJTEU6IGluY2x1ZGUvaHcvczM5MHgvcHYu
-aDo0OToKK3N0YXRpYyBpbmxpbmUgaW50IHMzOTBfcHZfdW5wYWNrKHVpbnQ2NF90IGFkZHIsIHVp
-bnQ2NF90IHNpemUsIHVpbnQ2NF90IHR3ZWFrKSB7IHJldHVybiAwOyB9Cgp0b3RhbDogMSBlcnJv
-cnMsIDIgd2FybmluZ3MsIDY0MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzE1IGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgozLzE1IENoZWNraW5nIGNvbW1pdCAxYTU3M2JhMmI0NDkgKHMzOTB4
-OiBwcm90dmlydDogQWRkIG1pZ3JhdGlvbiBibG9ja2VyKQo0LzE1IENoZWNraW5nIGNvbW1pdCBk
-ZjBlNzNmMzE5MDEgKHMzOTB4OiBwcm90dmlydDogSW5oaWJpdCBiYWxsb29uIHdoZW4gc3dpdGNo
-aW5nIHRvIHByb3RlY3RlZCBtb2RlKQo1LzE1IENoZWNraW5nIGNvbW1pdCA0MjAxNjFkMTQ5MTEg
-KHMzOTB4OiBwcm90dmlydDogS1ZNIGludGVyY2VwdCBjaGFuZ2VzKQpFUlJPUjogc3dpdGNoIGFu
-ZCBjYXNlIHNob3VsZCBiZSBhdCB0aGUgc2FtZSBpbmRlbnQKIzQ4OiBGSUxFOiB0YXJnZXQvczM5
-MHgva3ZtLmM6MTY5NjoKICAgICBzd2l0Y2ggKGljcHRfY29kZSkgewpbLi4uXQorICAgICAgICBj
-YXNlIElDUFRfUFZfSU5TVFI6CisgICAgICAgIGNhc2UgSUNQVF9QVl9JTlNUUl9OT1RJRklDQVRJ
-T046Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDUvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjYvMTUgQ2hlY2tpbmcgY29tbWl0IGNk
-ODg1YmNiNTc1NiAoczM5MHg6IEFkZCBTSURBIG1lbW9yeSBvcHMpCjcvMTUgQ2hlY2tpbmcgY29t
-bWl0IDU1YjMzZmI4MjJiNyAoczM5MHg6IHByb3R2aXJ0OiBNb3ZlIFNUU0kgZGF0YSBvdmVyIFNJ
-REFEKQo4LzE1IENoZWNraW5nIGNvbW1pdCAwZGM2NTA5NzlmNzkgKHMzOTB4OiBwcm90dmlydDog
-U0NMUCBpbnRlcnByZXRhdGlvbikKOS8xNSBDaGVja2luZyBjb21taXQgYmM3Y2NmMWQxZDk5IChz
-MzkweDogcHJvdHZpcnQ6IFNldCBndWVzdCBJUEwgUFNXKQoxMC8xNSBDaGVja2luZyBjb21taXQg
-ZmNmMTdiOTZlN2NjIChzMzkweDogcHJvdHZpcnQ6IE1vdmUgZGlhZyAzMDggZGF0YSBvdmVyIFNJ
-REEpCjExLzE1IENoZWNraW5nIGNvbW1pdCA2NDY5YzllODRkYWIgKHMzOTB4OiBwcm90dmlydDog
-RGlzYWJsZSBhZGRyZXNzIGNoZWNrcyBmb3IgUFYgZ3Vlc3QgSU8gZW11bGF0aW9uKQoxMi8xNSBD
-aGVja2luZyBjb21taXQgODA1MzRmMDMwOWQyIChzMzkweDogcHJvdHZpcnQ6IE1vdmUgSU8gY29u
-dHJvbCBzdHJ1Y3R1cmVzIG92ZXIgU0lEQSkKMTMvMTUgQ2hlY2tpbmcgY29tbWl0IDg5NzE2MjZl
-M2U2OSAoczM5MHg6IHByb3R2aXJ0OiBIYW5kbGUgU0lHUCBzdG9yZSBzdGF0dXMgY29ycmVjdGx5
-KQoxNC8xNSBDaGVja2luZyBjb21taXQgMzAxNzk0MWQ2ZTJjIChkb2NzOiBBZGQgcHJvdHZpcnQg
-ZG9jcykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8xNSBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoxNS8xNSBDaGVja2luZyBjb21taXQgNTA5MTExMTc4OTE4
-IChzMzkweDogQWRkIHVucGFjayBmYWNpbGl0eSBmZWF0dXJlIHRvIEdBMSkKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMTExMzIxNTEuMTcy
-Mzg5LTEtZnJhbmtqYUBsaW51eC5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+--00000000000035213305a094aaf4
+Content-Type: text/plain; charset="UTF-8"
+
+On Wed, Mar 11, 2020 at 3:48 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+
+> On Wed, Mar 11, 2020 at 02:35:17PM +0200, Yuri Benditovich wrote:
+> > Save and restore RSS/hash report configuration.
+> >
+> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > ---
+> >  hw/net/virtio-net.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index 7b6a929e8c..c8d97d45cd 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -2869,6 +2869,13 @@ static int virtio_net_post_load_device(void
+> *opaque, int version_id)
+> >          }
+> >      }
+> >
+> > +    if (n->rss_data.enabled) {
+> > +        trace_virtio_net_rss_enable(n->rss_data.hash_types,
+> > +                                    n->rss_data.indirections_len,
+> > +                                    sizeof(n->rss_data.key));
+> > +    } else {
+> > +        trace_virtio_net_rss_disable();
+> > +    }
+> >      return 0;
+> >  }
+> >
+> > @@ -3094,6 +3101,8 @@ static const VMStateDescription
+> vmstate_virtio_net_device = {
+> >                           vmstate_virtio_net_tx_waiting),
+> >          VMSTATE_UINT64_TEST(curr_guest_offloads, VirtIONet,
+> >                              has_ctrl_guest_offloads),
+> > +        VMSTATE_UINT8_ARRAY(rss_data_migration, VirtIONet,
+> > +                            sizeof(VirtioNetRssData)),
+> >          VMSTATE_END_OF_LIST()
+> >     },
+>
+>
+> I think we should migrate the length too. Avoid arbitrary limits.
+>
+
+The length of what? The structure is fixed-length and the intention is just
+to keep/restore it.
+The length of indirection table and the table itself are part of the
+structure.
+
+
+> Yes this means we should allocate the indirection arrays on the fly.
+> But that's probably a good idea anyway.
+>
+> >  };
+> > --
+> > 2.17.1
+>
+>
+
+--00000000000035213305a094aaf4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Mar 11, 2020 at 3:48 PM Micha=
+el S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">mst@redhat.com</a>&gt; =
+wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
+px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Wed, M=
+ar 11, 2020 at 02:35:17PM +0200, Yuri Benditovich wrote:<br>
+&gt; Save and restore RSS/hash report configuration.<br>
+&gt; <br>
+&gt; Signed-off-by: Yuri Benditovich &lt;<a href=3D"mailto:yuri.benditovich=
+@daynix.com" target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 hw/net/virtio-net.c | 9 +++++++++<br>
+&gt;=C2=A0 1 file changed, 9 insertions(+)<br>
+&gt; <br>
+&gt; diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c<br>
+&gt; index 7b6a929e8c..c8d97d45cd 100644<br>
+&gt; --- a/hw/net/virtio-net.c<br>
+&gt; +++ b/hw/net/virtio-net.c<br>
+&gt; @@ -2869,6 +2869,13 @@ static int virtio_net_post_load_device(void *op=
+aque, int version_id)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; +=C2=A0 =C2=A0 if (n-&gt;rss_data.enabled) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 trace_virtio_net_rss_enable(n-&gt;rss_dat=
+a.hash_types,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 n-&gt;rss_data.ind=
+irections_len,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(n-&gt;rss_d=
+ata.key));<br>
+&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 trace_virtio_net_rss_disable();<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 return 0;<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; @@ -3094,6 +3101,8 @@ static const VMStateDescription vmstate_virtio_n=
+et_device =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0vmstate_virtio_net_tx_waiting),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT64_TEST(curr_guest_offlo=
+ads, VirtIONet,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 has_ctrl_guest_offloads),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT8_ARRAY(rss_data_migration, V=
+irtIONet,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(VirtioNetRssData)),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_END_OF_LIST()<br>
+&gt;=C2=A0 =C2=A0 =C2=A0},<br>
+<br>
+<br>
+I think we should migrate the length too. Avoid arbitrary limits.<br></bloc=
+kquote><div><br></div><div>The length of what? The structure is fixed-lengt=
+h and the intention=C2=A0is just to keep/restore it.</div><div>The length o=
+f indirection table and the table itself are part of the structure.</div><d=
+iv>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+Yes this means we should allocate the indirection arrays on the fly.<br>
+But that&#39;s probably a good idea anyway.<br>
+<br>
+&gt;=C2=A0 };<br>
+&gt; -- <br>
+&gt; 2.17.1<br>
+<br>
+</blockquote></div></div>
+
+--00000000000035213305a094aaf4--
 
