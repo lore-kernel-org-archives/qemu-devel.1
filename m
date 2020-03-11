@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2F4C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3046EC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:19:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4812208C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:19:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4812208C4
+	by mail.kernel.org (Postfix) with ESMTPS id 0C37A208C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:19:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C37A208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBtmb-0001CK-Sv
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 01:19:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58901)
+	id 1jBtme-0001KI-75
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 01:19:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtd8-0006p7-2o
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:10:07 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtdW-0007ME-CH
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtd6-00038u-7a
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:10:05 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43104)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtdU-0003eW-Eh
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:10:30 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57315)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jBtd5-0002y7-OO; Wed, 11 Mar 2020 01:10:04 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1443295|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.466062-0.0104836-0.523454;
- FP=1056070630682377831|1|1|1|0|-1|-1|-1; HT=e02c03291; MF=zhiwei_liu@c-sky.com;
+ id 1jBtdT-00039g-Kw; Wed, 11 Mar 2020 01:10:28 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07440484|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.178559-0.000578178-0.820863;
+ FP=3082690411350301742|1|1|1|0|-1|-1|-1; HT=e02c03297; MF=zhiwei_liu@c-sky.com;
  NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GzWV6Tg_1583903398; 
 Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
  fp:SMTPD_---.GzWV6Tg_1583903398)
  by smtp.aliyun-inc.com(10.147.44.145);
- Wed, 11 Mar 2020 13:09:59 +0800
+ Wed, 11 Mar 2020 13:10:02 +0800
 From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 To: richard.henderson@linaro.org, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v4 20/60] target/riscv: vector single-width integer
- multiply-add instructions
-Date: Wed, 11 Mar 2020 13:06:39 +0800
-Message-Id: <20200311050719.15141-21-zhiwei_liu@c-sky.com>
+Subject: [PATCH v4 27/60] target/riscv: vector single-width scaling shift
+ instructions
+Date: Wed, 11 Mar 2020 13:06:46 +0800
+Message-Id: <20200311050719.15141-28-zhiwei_liu@c-sky.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200311050719.15141-1-zhiwei_liu@c-sky.com>
 References: <20200311050719.15141-1-zhiwei_liu@c-sky.com>
@@ -75,186 +75,187 @@ Sender: "Qemu-devel"
 
 Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- target/riscv/helper.h                   | 33 ++++++++++
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 10 +++
- target/riscv/vector_helper.c            | 88 +++++++++++++++++++++++++
- 4 files changed, 139 insertions(+)
+ target/riscv/helper.h                   |  17 ++++
+ target/riscv/insn32.decode              |   6 ++
+ target/riscv/insn_trans/trans_rvv.inc.c |   8 ++
+ target/riscv/vector_helper.c            | 109 ++++++++++++++++++++++++
+ 4 files changed, 140 insertions(+)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 1704b8c512..098288df76 100644
+index 74c1c695e0..efc84fbd79 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -610,3 +610,36 @@ DEF_HELPER_6(vwmulu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vwmulsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+@@ -755,3 +755,20 @@ DEF_HELPER_6(vwsmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vwsmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
 +
-+DEF_HELPER_6(vmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmacc_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsac_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmadd_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnmsub_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssrl_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssra_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vssrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssrl_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vssra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index ceddfe4b6c..58de888afa 100644
+index 8798919d3e..d6d111e04a 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -384,6 +384,14 @@ vwmulsu_vv      111010 . ..... ..... 010 ..... 1010111 @r_vm
- vwmulsu_vx      111010 . ..... ..... 110 ..... 1010111 @r_vm
- vwmul_vv        111011 . ..... ..... 010 ..... 1010111 @r_vm
- vwmul_vx        111011 . ..... ..... 110 ..... 1010111 @r_vm
-+vmacc_vv        101101 . ..... ..... 010 ..... 1010111 @r_vm
-+vmacc_vx        101101 . ..... ..... 110 ..... 1010111 @r_vm
-+vnmsac_vv       101111 . ..... ..... 010 ..... 1010111 @r_vm
-+vnmsac_vx       101111 . ..... ..... 110 ..... 1010111 @r_vm
-+vmadd_vv        101001 . ..... ..... 010 ..... 1010111 @r_vm
-+vmadd_vx        101001 . ..... ..... 110 ..... 1010111 @r_vm
-+vnmsub_vv       101011 . ..... ..... 010 ..... 1010111 @r_vm
-+vnmsub_vx       101011 . ..... ..... 110 ..... 1010111 @r_vm
+@@ -426,6 +426,12 @@ vwsmacc_vx      111101 . ..... ..... 100 ..... 1010111 @r_vm
+ vwsmaccsu_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
+ vwsmaccsu_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
+ vwsmaccus_vx    111111 . ..... ..... 100 ..... 1010111 @r_vm
++vssrl_vv        101010 . ..... ..... 000 ..... 1010111 @r_vm
++vssrl_vx        101010 . ..... ..... 100 ..... 1010111 @r_vm
++vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
++vssra_vv        101011 . ..... ..... 000 ..... 1010111 @r_vm
++vssra_vx        101011 . ..... ..... 100 ..... 1010111 @r_vm
++vssra_vi        101011 . ..... ..... 011 ..... 1010111 @r_vm
  
  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 990433f866..05f7ae0bc4 100644
+index 68bebd3c37..21f896ea26 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1462,3 +1462,13 @@ GEN_OPIVV_WIDEN_TRANS(vwmulsu_vv, opivv_widen_check)
- GEN_OPIVX_WIDEN_TRANS(vwmul_vx)
- GEN_OPIVX_WIDEN_TRANS(vwmulu_vx)
- GEN_OPIVX_WIDEN_TRANS(vwmulsu_vx)
+@@ -1541,3 +1541,11 @@ GEN_OPIVX_WIDEN_TRANS(vwsmaccu_vx)
+ GEN_OPIVX_WIDEN_TRANS(vwsmacc_vx)
+ GEN_OPIVX_WIDEN_TRANS(vwsmaccsu_vx)
+ GEN_OPIVX_WIDEN_TRANS(vwsmaccus_vx)
 +
-+/* Vector Single-Width Integer Multiply-Add Instructions */
-+GEN_OPIVV_TRANS(vmacc_vv, opivv_check)
-+GEN_OPIVV_TRANS(vnmsac_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmadd_vv, opivv_check)
-+GEN_OPIVV_TRANS(vnmsub_vv, opivv_check)
-+GEN_OPIVX_TRANS(vmacc_vx, opivx_check)
-+GEN_OPIVX_TRANS(vnmsac_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmadd_vx, opivx_check)
-+GEN_OPIVX_TRANS(vnmsub_vx, opivx_check)
++/* Vector Single-Width Scaling Shift Instructions */
++GEN_OPIVV_TRANS(vssrl_vv, opivv_check)
++GEN_OPIVV_TRANS(vssra_vv, opivv_check)
++GEN_OPIVX_TRANS(vssrl_vx,  opivx_check)
++GEN_OPIVX_TRANS(vssra_vx,  opivx_check)
++GEN_OPIVI_TRANS(vssrl_vi, 1, vssrl_vx, opivx_check)
++GEN_OPIVI_TRANS(vssra_vi, 0, vssra_vx, opivx_check)
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index beb84f9674..e5082c8adc 100644
+index 90c19577fa..ec0f822fcf 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -1822,3 +1822,91 @@ GEN_VEXT_VX(vwmulu_vx_w, 4, 8, clearq)
- GEN_VEXT_VX(vwmulsu_vx_b, 1, 2, clearh)
- GEN_VEXT_VX(vwmulsu_vx_h, 2, 4, clearl)
- GEN_VEXT_VX(vwmulsu_vx_w, 4, 8, clearq)
+@@ -2703,3 +2703,112 @@ RVVCALL(OPIVX3_ENV, vwsmaccus_vx_w, WOP_SUS_W, H8, H4, vwsmaccus32)
+ GEN_VEXT_VX_ENV(vwsmaccus_vx_b, 1, 2, clearh)
+ GEN_VEXT_VX_ENV(vwsmaccus_vx_h, 2, 4, clearl)
+ GEN_VEXT_VX_ENV(vwsmaccus_vx_w, 4, 8, clearq)
 +
-+/* Vector Single-Width Integer Multiply-Add Instructions */
-+#define OPIVV3(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)   \
-+static void do_##NAME(void *vd, void *vs1, void *vs2, int i)       \
-+{                                                                  \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
-+    TD d = *((TD *)vd + HD(i));                                    \
-+    *((TD *)vd + HD(i)) = OP(s2, s1, d);                           \
++/* Vector Single-Width Scaling Shift Instructions */
++static uint8_t vssrl8(CPURISCVState *env, uint8_t a, uint8_t b)
++{
++    uint8_t round, shift = b & 0x7;
++    uint8_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
 +}
++static uint16_t vssrl16(CPURISCVState *env, uint16_t a, uint16_t b)
++{
++    uint8_t round, shift = b & 0xf;
++    uint16_t res;
 +
-+#define DO_MACC(N, M, D) (M * N + D)
-+#define DO_NMSAC(N, M, D) (-(M * N) + D)
-+#define DO_MADD(N, M, D) (M * D + N)
-+#define DO_NMSUB(N, M, D) (-(M * D) + N)
-+RVVCALL(OPIVV3, vmacc_vv_b, OP_SSS_B, H1, H1, H1, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_h, OP_SSS_H, H2, H2, H2, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_w, OP_SSS_W, H4, H4, H4, DO_MACC)
-+RVVCALL(OPIVV3, vmacc_vv_d, OP_SSS_D, H8, H8, H8, DO_MACC)
-+RVVCALL(OPIVV3, vnmsac_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSAC)
-+RVVCALL(OPIVV3, vnmsac_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSAC)
-+RVVCALL(OPIVV3, vmadd_vv_b, OP_SSS_B, H1, H1, H1, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_h, OP_SSS_H, H2, H2, H2, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_w, OP_SSS_W, H4, H4, H4, DO_MADD)
-+RVVCALL(OPIVV3, vmadd_vv_d, OP_SSS_D, H8, H8, H8, DO_MADD)
-+RVVCALL(OPIVV3, vnmsub_vv_b, OP_SSS_B, H1, H1, H1, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_h, OP_SSS_H, H2, H2, H2, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_w, OP_SSS_W, H4, H4, H4, DO_NMSUB)
-+RVVCALL(OPIVV3, vnmsub_vv_d, OP_SSS_D, H8, H8, H8, DO_NMSUB)
-+GEN_VEXT_VV(vmacc_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmacc_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmacc_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmacc_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vnmsac_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vnmsac_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vnmsac_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vnmsac_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmadd_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmadd_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmadd_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmadd_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vnmsub_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vnmsub_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vnmsub_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vnmsub_vv_d, 8, 8, clearq)
-+
-+#define OPIVX3(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)         \
-+static void do_##NAME(void *vd, target_ulong s1, void *vs2, int i)  \
-+{                                                                   \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-+    TD d = *((TD *)vd + HD(i));                                     \
-+    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)(target_long)s1, d);      \
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
 +}
++static uint32_t vssrl32(CPURISCVState *env, uint32_t a, uint32_t b)
++{
++    uint8_t round, shift = b & 0x1f;
++    uint32_t res;
 +
-+RVVCALL(OPIVX3, vmacc_vx_b, OP_SSS_B, H1, H1, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_h, OP_SSS_H, H2, H2, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_w, OP_SSS_W, H4, H4, DO_MACC)
-+RVVCALL(OPIVX3, vmacc_vx_d, OP_SSS_D, H8, H8, DO_MACC)
-+RVVCALL(OPIVX3, vnmsac_vx_b, OP_SSS_B, H1, H1, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_h, OP_SSS_H, H2, H2, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_w, OP_SSS_W, H4, H4, DO_NMSAC)
-+RVVCALL(OPIVX3, vnmsac_vx_d, OP_SSS_D, H8, H8, DO_NMSAC)
-+RVVCALL(OPIVX3, vmadd_vx_b, OP_SSS_B, H1, H1, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_h, OP_SSS_H, H2, H2, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_w, OP_SSS_W, H4, H4, DO_MADD)
-+RVVCALL(OPIVX3, vmadd_vx_d, OP_SSS_D, H8, H8, DO_MADD)
-+RVVCALL(OPIVX3, vnmsub_vx_b, OP_SSS_B, H1, H1, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_h, OP_SSS_H, H2, H2, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_w, OP_SSS_W, H4, H4, DO_NMSUB)
-+RVVCALL(OPIVX3, vnmsub_vx_d, OP_SSS_D, H8, H8, DO_NMSUB)
-+GEN_VEXT_VX(vmacc_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmacc_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmacc_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmacc_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vnmsac_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vnmsac_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vnmsac_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vnmsac_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmadd_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmadd_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmadd_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmadd_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vnmsub_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vnmsub_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vnmsub_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vnmsub_vx_d, 8, 8, clearq)
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++static uint64_t vssrl64(CPURISCVState *env, uint64_t a, uint64_t b)
++{
++    uint8_t round, shift = b & 0x3f;
++    uint64_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++RVVCALL(OPIVV2_ENV, vssrl_vv_b, OP_UUU_B, H1, H1, H1, vssrl8)
++RVVCALL(OPIVV2_ENV, vssrl_vv_h, OP_UUU_H, H2, H2, H2, vssrl16)
++RVVCALL(OPIVV2_ENV, vssrl_vv_w, OP_UUU_W, H4, H4, H4, vssrl32)
++RVVCALL(OPIVV2_ENV, vssrl_vv_d, OP_UUU_D, H8, H8, H8, vssrl64)
++GEN_VEXT_VV_ENV(vssrl_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_ENV(vssrl_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_ENV(vssrl_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_ENV(vssrl_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_ENV, vssrl_vx_b, OP_UUU_B, H1, H1, vssrl8)
++RVVCALL(OPIVX2_ENV, vssrl_vx_h, OP_UUU_H, H2, H2, vssrl16)
++RVVCALL(OPIVX2_ENV, vssrl_vx_w, OP_UUU_W, H4, H4, vssrl32)
++RVVCALL(OPIVX2_ENV, vssrl_vx_d, OP_UUU_D, H8, H8, vssrl64)
++GEN_VEXT_VX_ENV(vssrl_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_ENV(vssrl_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_ENV(vssrl_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_ENV(vssrl_vx_d, 8, 8, clearq)
++
++static int8_t vssra8(CPURISCVState *env, int8_t a, int8_t b)
++{
++    uint8_t round, shift = b & 0x7;
++    int8_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++static int16_t vssra16(CPURISCVState *env, int16_t a, int16_t b)
++{
++    uint8_t round, shift = b & 0xf;
++    int16_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++static int32_t vssra32(CPURISCVState *env, int32_t a, int32_t b)
++{
++    uint8_t round, shift = b & 0x1f;
++    int32_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++static int64_t vssra64(CPURISCVState *env, int64_t a, int64_t b)
++{
++    uint8_t round, shift = b & 0x3f;
++    int64_t res;
++
++    round = get_round(env, a, shift);
++    res   = (a >> shift)  + round;
++    return res;
++}
++RVVCALL(OPIVV2_ENV, vssra_vv_b, OP_SSS_B, H1, H1, H1, vssra8)
++RVVCALL(OPIVV2_ENV, vssra_vv_h, OP_SSS_H, H2, H2, H2, vssra16)
++RVVCALL(OPIVV2_ENV, vssra_vv_w, OP_SSS_W, H4, H4, H4, vssra32)
++RVVCALL(OPIVV2_ENV, vssra_vv_d, OP_SSS_D, H8, H8, H8, vssra64)
++GEN_VEXT_VV_ENV(vssra_vv_b, 1, 1, clearb)
++GEN_VEXT_VV_ENV(vssra_vv_h, 2, 2, clearh)
++GEN_VEXT_VV_ENV(vssra_vv_w, 4, 4, clearl)
++GEN_VEXT_VV_ENV(vssra_vv_d, 8, 8, clearq)
++
++RVVCALL(OPIVX2_ENV, vssra_vx_b, OP_SSS_B, H1, H1, vssra8)
++RVVCALL(OPIVX2_ENV, vssra_vx_h, OP_SSS_H, H2, H2, vssra16)
++RVVCALL(OPIVX2_ENV, vssra_vx_w, OP_SSS_W, H4, H4, vssra32)
++RVVCALL(OPIVX2_ENV, vssra_vx_d, OP_SSS_D, H8, H8, vssra64)
++GEN_VEXT_VX_ENV(vssra_vx_b, 1, 1, clearb)
++GEN_VEXT_VX_ENV(vssra_vx_h, 2, 2, clearh)
++GEN_VEXT_VX_ENV(vssra_vx_w, 4, 4, clearl)
++GEN_VEXT_VX_ENV(vssra_vx_d, 8, 8, clearq)
 -- 
 2.23.0
 
