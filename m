@@ -2,89 +2,116 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E04CDC0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 21:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC66C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 21:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEBA720739
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 21:11:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBA720739
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 2A0FA2074D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 21:22:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A0FA2074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC8dh-0005Us-RO
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 17:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50350)
+	id 1jC8o2-0002Ho-Bq
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 17:22:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51673)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jC8ci-0004Br-5n
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 17:10:41 -0400
+ (envelope-from <max@m00nbsd.net>) id 1jC8nU-0001tK-MG
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 17:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jC8cg-000187-S3
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 17:10:40 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:47832
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jC8ce-0000yD-1N; Wed, 11 Mar 2020 17:10:36 -0400
-Received: from host86-177-178-88.range86-177.btcentralplus.com
- ([86.177.178.88] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jC8cq-0004x8-Rb; Wed, 11 Mar 2020 21:10:54 +0000
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <cover.1583867210.git.balaton@eik.bme.hu>
- <6b7af110e1576d6873777673b3e3fa01f4c9839e.1583867210.git.balaton@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <b24001fe-0e20-cf05-6695-518e9972ac2d@ilande.co.uk>
-Date: Wed, 11 Mar 2020 21:10:21 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <max@m00nbsd.net>) id 1jC8nT-00063V-Fb
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 17:21:48 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:46965)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1jC8nT-00061I-A5
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 17:21:47 -0400
+Received: from mxplan6.mail.ovh.net (unknown [10.108.1.214])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 9FE1C26430DB;
+ Wed, 11 Mar 2020 22:21:44 +0100 (CET)
+Received: from m00nbsd.net (37.59.142.95) by DAG3EX2.mxp6.local (172.16.2.22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Wed, 11 Mar
+ 2020 22:21:43 +0100
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200206115731.13552-1-n54@gmx.com>
+ <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
+ <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
+ <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
+ <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
+ <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
+ <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
+ <85e4202d-91dd-0d31-373a-febe566353ab@m00nbsd.net>
+ <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
+ <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
+ <050cacce-41fc-db89-ded9-5cdf6c20a2de@redhat.com>
+From: Maxime Villard <max@m00nbsd.net>
+Autocrypt: addr=max@m00nbsd.net; keydata=
+ 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
+Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
+Message-ID: <cad16d05-13db-cb80-a049-84bb048def23@m00nbsd.net>
+Date: Wed, 11 Mar 2020 22:21:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <6b7af110e1576d6873777673b3e3fa01f4c9839e.1583867210.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <050cacce-41fc-db89-ded9-5cdf6c20a2de@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.177.178.88
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v4 4/4] via-ide: Also emulate non 100% native mode
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG5EX2.mxp6.local (172.16.2.42) To DAG3EX2.mxp6.local
+ (172.16.2.22)
+X-Ovh-Tracer-GUID: 20876c10-5238-446f-ab0c-9fbbf0019623
+X-Ovh-Tracer-Id: 6226226488003792687
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvfedgfeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepvfhfhffukfffgggjtgfgihesthekredttddtjeenucfhrhhomhepofgrgihimhgvucggihhllhgrrhguuceomhgrgiesmhdttdhnsghsugdrnhgvtheqnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnheirdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepmhgrgiesmhdttdhnsghsugdrnhgvthdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhm
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.32.125.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,118 +123,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
+ qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
+ philmd@redhat.com, rth <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/03/2020 19:06, BALATON Zoltan wrote:
+Le 11/03/2020 =C3=A0 21:42, Paolo Bonzini a =C3=A9crit=C2=A0:
+> On 11/03/20 21:14, Maxime Villard wrote:
+>>> The problem is that qcpu->stop is checked _before_ entering the
+>>> hypervisor and not after, so there is a small race window.
+>> Ok. I don't understand what's supposed to be the race here. If we get =
+an
+>> IPI between the check and the call to nvmm_vcpu_run() then we'll just =
+do
+>> one run and stop in the next iteration, because the IPI will have set
+>> qcpu->stop. Is this extra iteration undesired?
+>=20
+> Yes, you don't know how long that run would take.  I don't know about
+> NVMM but for KVM it may even never leave if the guest is in HLT state.
 
-> Some machines operate in "non 100% native mode" where interrupts are
-> fixed at legacy IDE interrupts and some guests expect this behaviour
-> without checking based on knowledge about hardware. Even Linux has
-> arch specific workarounds for this that are activated on such boards
-> so this needs to be emulated as well.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
-> 
-> Notes:
->     v2: Don't use PCI_INTERRUPT_LINE in via_ide_set_irq()
->     v3: Patch pci.c instead of local workaround for PCI reset clearing
->         PCI_INTERRUPT_PIN config reg
-> 
->  hw/ide/via.c | 30 ++++++++++++++++++++++++------
->  1 file changed, 24 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/ide/via.c b/hw/ide/via.c
-> index df0b352b58..1eada23097 100644
-> --- a/hw/ide/via.c
-> +++ b/hw/ide/via.c
-> @@ -1,9 +1,10 @@
->  /*
-> - * QEMU IDE Emulation: PCI VIA82C686B support.
-> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
->   *
->   * Copyright (c) 2003 Fabrice Bellard
->   * Copyright (c) 2006 Openedhand Ltd.
->   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
-> + * Copyright (c) 2019-2020 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -25,6 +26,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "hw/qdev-properties.h"
->  #include "hw/pci/pci.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
-> @@ -111,11 +113,18 @@ static void via_ide_set_irq(void *opaque, int n, int level)
->      } else {
->          d->config[0x70 + n * 8] &= ~0x80;
->      }
-> -
->      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
-> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
-> -    if (n) {
-> -        qemu_set_irq(isa_get_irq(NULL, n), level);
-> +
-> +    /*
-> +     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
-> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
-> +     * Some guest drivers expect this, often without checking.
-> +     */
-> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
-> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
-> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
-> +    } else {
-> +        qemu_set_irq(isa_get_irq(NULL, 14), level);
->      }
->  }
->  
-> @@ -169,7 +178,9 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
->  
->      pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
->      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-> -    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
-> +    /* Bits 0 and 4 of CLASS_PROG select native mode and are writable */
-> +    dev->wmask[PCI_CLASS_PROG] = 5;
-> +    dev->wmask[PCI_INTERRUPT_LINE] = 0;
->  
->      memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_ops,
->                            &d->bus[0], "via-ide0-data", 8);
-> @@ -213,6 +224,12 @@ static void via_ide_exitfn(PCIDevice *dev)
->      }
->  }
->  
-> +static Property via_ide_properties[] = {
-> +    DEFINE_PROP_BIT("legacy-irq", PCIIDEState, flags, PCI_IDE_LEGACY_IRQ,
-> +                    false),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void via_ide_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -225,6 +242,7 @@ static void via_ide_class_init(ObjectClass *klass, void *data)
->      k->device_id = PCI_DEVICE_ID_VIA_IDE;
->      k->revision = 0x06;
->      k->class_id = PCI_CLASS_STORAGE_IDE;
-> +    device_class_set_props(dc, via_ide_properties);
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->  }
+Ok, I see, thanks.
 
-I don't think this (and adding the feature bit) are the right solution here. I'll do
-my best to look at the test cases you've sent off-list over the next couple of days
-and report back.
+In NVMM the runs are short, the syscalls are fast, and pending signals
+cause returns to userland. Therefore, in practice, it's not a big problem=
+,
+because (1) the window is small and (2) if we have a miss it's not going
+to take long to come back to Qemu.
 
+I see a quick kernel change I can make to reduce 95% of the window
+already in the current state. The remaining 5% will need a new
+nvmm_vcpu_kick() function.
 
-ATB,
+For now this issue is unimportant and no Qemu change is required.
 
-Mark.
+Kamil, please also drop the XXX in
+    /* XXX Needed, otherwise infinite loop. */
+It's not a bug.
+
+Thanks,
+Maxime
 
