@@ -6,87 +6,86 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6145C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AE8C10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74F4D2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:31:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91317208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WeMSFRTR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F4D2146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHslxzBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91317208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBuuB-0006xs-Lp
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:31:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54805)
+	id 1jBuvM-0000Du-Md
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:33:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBut6-00068S-5P
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:30:40 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jBusO-00057i-Pe
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBut5-0004FI-74
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:30:40 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36371)
+ (envelope-from <richard.henderson@linaro.org>) id 1jBusN-0002jS-NY
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:29:56 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:50874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBut5-0004EQ-0d
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:30:39 -0400
-Received: by mail-pg1-x542.google.com with SMTP id c7so626076pgw.3
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:30:38 -0700 (PDT)
+ id 1jBusN-0002hH-G6
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:29:55 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id u10so465096pjy.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:29:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/ZFCBzt3mdxUbQN7SJLjCTwX6DUCbWCRyGVoGQqSXtQ=;
- b=WeMSFRTROG5nqHDIV8MCUXTcVB47E2k/md8zOWkz5Pq9KXsZj1Rkw3DuyQCNHBvUwC
- 9NHKOR2kyUw3mPujwUvQjdbodnTv1puWV5TzAxNlcDRxTiHWwRcGbUPIRF+AYfZh/P3a
- TbKWAjAXLCKLRvb/o+jk8D7GcfBwMkrvxCipe0WugMTkf7eDE/Ga//pD8GUQ6syQtWSr
- MHlrNF60bg4BXrxi4DXWacUD+yqEwREfkll8mAryYwblU1IezzO/UWQ1d+W4ytjKcRyI
- vo4Jzq8sEOi0e27sgFY062slQGAZuIuYwFtqLVcp+bICd98u92rnK+NVvLKT+aAegq7x
- /wUw==
+ bh=MlYwl/F03NLK+epooCtA6fGFdPPFDk8TjxphUcUmRCI=;
+ b=MHslxzBdHACIGZ2Zweb/+k/MeRsgh6xgIxaQjB865i53WQNSnKP5v1Gl/5w6l8Y4HQ
+ 7jDdSLEtXFRrHNSGj8+PDSYwOe7O23x3doddFck/+uQ2e/BoY56T2wuZ3hb3it6gSxgi
+ n2EjiIk1mdVqOpitkZTlbRp1BWHZroMY7ew8XEQKKmdmFVbNeQPoi0CX3QJAZrvbgtI5
+ x3oWa4NkKUFp6hw0EaY0sR7AM9PAd/R6EmSjO8KcKnFiXSDWWUIk0sxPsoln3a7lfrte
+ I56mCwLMxglDFKshSgSetVikfMjV/sE6JQoMhjxSeya4hqRglfBkoUuQ8EA1SOomRK1S
+ Xieg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/ZFCBzt3mdxUbQN7SJLjCTwX6DUCbWCRyGVoGQqSXtQ=;
- b=pXENZpzMhKXS94VDvhh/H0sb3KqDeMfYZIwulq0ROVoOZdkW9kLl19RabiJJosGF8Z
- or3VJl0kYeO1P+RViE2BlDW2bq2LkxnSwY2O7wzENsHF23BuxktwLL3gUKZmFetgsJVR
- ps1mKPee+TjhyA+d/AyXqP/3N9KnwXnzxuarFSYNdORSv0QnuejdIDovB4AG8BfEMc41
- Jx2dc8j3JmmsWB6536aYypAYv98ehZJZ0Fdio8vuEbzxHvoMDsG2pCQzv+KpD9TqN0SN
- avL4uklvl3MzJMCXflnMJCK6f2tb8PQ+R/Qk9AbBlM2dDj1Zc2Z5N/Qmtc6VwozcIIqk
- 71tw==
-X-Gm-Message-State: ANhLgQ23FgmkXhDeeRXcOrAiuxbPMiBQ7FCN6pFHVunvWxV+CugsDjtl
- cyOFAVTeo26g1chpb4Q8VHMJTECWH64=
-X-Google-Smtp-Source: ADFU+vuDLff8lSjB6Hk4bC0Od3j8n6iP6v/B3CYx1J3JkKp9Zh2Jrgn4pl2jibT9AQkOI6qpwsi+cw==
-X-Received: by 2002:a63:4e01:: with SMTP id c1mr1334586pgb.435.1583908237978; 
- Tue, 10 Mar 2020 23:30:37 -0700 (PDT)
+ bh=MlYwl/F03NLK+epooCtA6fGFdPPFDk8TjxphUcUmRCI=;
+ b=HIsaK6RvJqWDO91GykfnwJzxEnm+dT41E81HcQAYohnyUI1CK+wVoXCUAK5eo6MDLM
+ Ad8YeNn7B/PhnSwdP8oORjTDGEuFPLymyZk0YCZvl8dP3i7hVzWYGyczJQVCyk5CcRzL
+ iOy7uSZjtJwkn4bYLnFlzugt01gx43N7pbo5YJAIhXUY9kaAIWqJgCFze+8WWFALQt+M
+ eQ2iBYDXUcjLgvb6027jkj9FTj1qQY3ff36ZzDVwskZ0tpV4qBiOidpnZUYcjLdyYo14
+ V5gn142H8emTB+er69fjF+CL1id1ZFKvleD6msZgiVywSlUb7B6fsz4OTXJsXI+7rTj7
+ oAbw==
+X-Gm-Message-State: ANhLgQ0lkn74Dsflez9mxDfxD9ofYBo0svbIhxuH5TnapYkHjKLs0Iwb
+ gNPPH/PHNRtOch87NNvRiD04sQ==
+X-Google-Smtp-Source: ADFU+vvATAFT0CHRC3c1gxeTiP9G1FP+2M0WI02ZHj7pHni1ujYwmTEc6QaHRKq4JldxnR7Od6lbYA==
+X-Received: by 2002:a17:90a:d585:: with SMTP id v5mr1851751pju.4.1583908194501; 
+ Tue, 10 Mar 2020 23:29:54 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- z17sm1329107pff.12.2020.03.10.23.30.36
+ 5sm5535197pfw.98.2020.03.10.23.29.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 23:30:37 -0700 (PDT)
-Subject: Re: [PATCH v4 16/18] Remove Texinfo related files from .gitignore and
- git.orderfile
+ Tue, 10 Mar 2020 23:29:53 -0700 (PDT)
+Subject: Re: [PATCH v4 15/18] scripts/texi2pod: Delete unused script
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
- <20200309154405.13548-17-peter.maydell@linaro.org>
+ <20200309154405.13548-16-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c0d576fb-a769-1189-99a8-0846fef4aaf4@linaro.org>
-Date: Tue, 10 Mar 2020 23:30:35 -0700
+Message-ID: <63fe458f-40b5-bc9d-ab01-6ffaa7002e9b@linaro.org>
+Date: Tue, 10 Mar 2020 23:29:51 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200309154405.13548-17-peter.maydell@linaro.org>
+In-Reply-To: <20200309154405.13548-16-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,15 +106,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/9/20 8:44 AM, Peter Maydell wrote:
-> We don't use Texinfo any more; we can remove the references to the
-> .texi source files and the generated output files from our
-> .gitignore and git.orderfile.
+> We no longer need the texi2pod script, so we can delete it, and
+> the special-casing it had in the checkpatch script.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  .gitignore            | 15 ---------------
->  scripts/git.orderfile |  1 -
->  2 files changed, 16 deletions(-)
+>  scripts/checkpatch.pl |   2 +-
+>  scripts/texi2pod.pl   | 536 ------------------------------------------
+>  2 files changed, 1 insertion(+), 537 deletions(-)
+>  delete mode 100755 scripts/texi2pod.pl
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
