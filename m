@@ -6,87 +6,86 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 663F2C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A94C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:33:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A07520873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:32:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A07520873
+	by mail.kernel.org (Postfix) with ESMTPS id C1DCD20873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:33:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1DCD20873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC1T6-0003k7-F2
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:32:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59193)
+	id 1jC1UB-0005ZA-VF
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:33:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jC1PP-000684-Hn
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:28:28 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jC1N6-000258-1y
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jC1PO-0003Uq-8n
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:28:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52648)
+ (envelope-from <frankja@linux.ibm.com>) id 1jC1N4-0000h7-TI
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:26:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39710)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jC1PO-0003T4-1X
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:28:26 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ id 1jC1N4-0000gG-Lr
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:26:02 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02BDOGxe107185
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:28:25 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yq05utt9u-1
+ 02BDLsKY194041
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:25:59 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yq0hbh95h-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:28:22 -0400
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:25:58 -0400
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 11 Mar 2020 13:22:28 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Wed, 11 Mar 2020 13:22:35 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 11 Mar 2020 13:22:26 -0000
+ Wed, 11 Mar 2020 13:22:32 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
  [9.149.105.232])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02BDMPsk59244564
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02BDMV9153870800
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 11 Mar 2020 13:22:25 GMT
+ Wed, 11 Mar 2020 13:22:31 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 226E952050;
- Wed, 11 Mar 2020 13:22:25 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9020A5204E;
+ Wed, 11 Mar 2020 13:22:31 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.36.208])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C85A352052;
- Wed, 11 Mar 2020 13:22:23 +0000 (GMT)
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4C8325206B;
+ Wed, 11 Mar 2020 13:22:30 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 11/15] s390x: protvirt: Disable address checks for PV guest
- IO emulation
-Date: Wed, 11 Mar 2020 09:21:47 -0400
+Subject: [PATCH v9 15/15] s390x: Add unpack facility feature to GA1
+Date: Wed, 11 Mar 2020 09:21:51 -0400
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200311132151.172389-1-frankja@linux.ibm.com>
 References: <20200311132151.172389-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031113-0008-0000-0000-0000035B92BC
+x-cbid: 20031113-0028-0000-0000-000003E31FEF
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031113-0009-0000-0000-00004A7CD95D
-Message-Id: <20200311132151.172389-12-frankja@linux.ibm.com>
+x-cbparentid: 20031113-0029-0000-0000-000024A8645B
+Message-Id: <20200311132151.172389-16-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-11_05:2020-03-11,
  2020-03-11 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxlogscore=757
- priorityscore=1501 impostorscore=0 phishscore=0 adultscore=0 mlxscore=0
- spamscore=0 malwarescore=0 clxscore=1015 suspectscore=1 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003110085
+ mlxscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=1 spamscore=0
+ mlxlogscore=883 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110085
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,109 +105,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-IO instruction data is routed through SIDAD for protected guests, so
-adresses do not need to be checked, as this is kernel memory.
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+The unpack facility is an indication that diagnose 308 subcodes 8-10
+are available to the guest. That means, that the guest can put itself
+into protected mode.
+
+Once it is in protected mode, the hardware stops any attempt of VM
+introspection by the hypervisor.
+
+Some features are currently not supported in protected mode:
+     * Passthrough devices
+     * Migration
+     * Huge page backings
+
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/ioinst.c | 33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
+ target/s390x/gen-features.c | 1 +
+ target/s390x/kvm.c          | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index c437a1d8c6afed80..481d789de9e09a04 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -16,6 +16,23 @@
- #include "hw/s390x/ioinst.h"
- #include "trace.h"
- #include "hw/s390x/s390-pci-bus.h"
-+#include "hw/s390x/pv.h"
-+
-+static uint64_t get_address_from_regs(CPUS390XState *env, uint32_t ipb,
-+                                      uint8_t *ar)
-+{
-+    /*
-+     * Addresses for protected guests are all offsets into the
-+     * satellite block which holds the IO control structures. Those
-+     * control structures are always aligned and accessible, so we can
-+     * return 0 here which will pass the following address checks.
-+     */
-+    if (s390_is_pv()) {
-+        *ar = 0;
-+        return 0;
-+    }
-+    return decode_basedisp_s(env, ipb, ar);
-+}
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index 6278845b12b8dee8..8ddeebc54419a3e2 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -562,6 +562,7 @@ static uint16_t full_GEN15_GA1[] = {
+     S390_FEAT_GROUP_MSA_EXT_9,
+     S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
+     S390_FEAT_ETOKEN,
++    S390_FEAT_UNPACK,
+ };
  
- int ioinst_disassemble_sch_ident(uint32_t value, int *m, int *cssid, int *ssid,
-                                  int *schid)
-@@ -114,7 +131,7 @@ void ioinst_handle_msch(S390CPU *cpu, uint64_t reg1, uint32_t ipb, uintptr_t ra)
-     CPUS390XState *env = &cpu->env;
-     uint8_t ar;
- 
--    addr = decode_basedisp_s(env, ipb, &ar);
-+    addr = get_address_from_regs(env, ipb, &ar);
-     if (addr & 3) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return;
-@@ -171,7 +188,7 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg1, uint32_t ipb, uintptr_t ra)
-     CPUS390XState *env = &cpu->env;
-     uint8_t ar;
- 
--    addr = decode_basedisp_s(env, ipb, &ar);
-+    addr = get_address_from_regs(env, ipb, &ar);
-     if (addr & 3) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return;
-@@ -203,7 +220,7 @@ void ioinst_handle_stcrw(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
-     CPUS390XState *env = &cpu->env;
-     uint8_t ar;
- 
--    addr = decode_basedisp_s(env, ipb, &ar);
-+    addr = get_address_from_regs(env, ipb, &ar);
-     if (addr & 3) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return;
-@@ -234,7 +251,7 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb,
-     CPUS390XState *env = &cpu->env;
-     uint8_t ar;
- 
--    addr = decode_basedisp_s(env, ipb, &ar);
-+    addr = get_address_from_regs(env, ipb, &ar);
-     if (addr & 3) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return;
-@@ -303,7 +320,7 @@ int ioinst_handle_tsch(S390CPU *cpu, uint64_t reg1, uint32_t ipb, uintptr_t ra)
-         return -EIO;
+ /* Default features (in order of release)
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index ff6027036ec2f14a..e11e895a3d9038bb 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -2403,6 +2403,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+         clear_bit(S390_FEAT_BPB, model->features);
      }
-     trace_ioinst_sch_id("tsch", cssid, ssid, schid);
--    addr = decode_basedisp_s(env, ipb, &ar);
-+    addr = get_address_from_regs(env, ipb, &ar);
-     if (addr & 3) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return -EIO;
-@@ -601,7 +618,7 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
- {
-     ChscReq *req;
-     ChscResp *res;
--    uint64_t addr;
-+    uint64_t addr = 0;
-     int reg;
-     uint16_t len;
-     uint16_t command;
-@@ -610,7 +627,9 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
  
-     trace_ioinst("chsc");
-     reg = (ipb >> 20) & 0x00f;
--    addr = env->regs[reg];
-+    if (!s390_is_pv()) {
-+        addr = env->regs[reg];
++    /* we do have the IPL enhancements */
++    if (cap_protected) {
++        set_bit(S390_FEAT_UNPACK, model->features);
 +    }
-     /* Page boundary? */
-     if (addr & 0xfff) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
++
+     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
+     set_bit(S390_FEAT_ZPCI, model->features);
+     set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
 -- 
 2.25.1
 
