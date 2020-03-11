@@ -6,88 +6,87 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B4EC10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B7EC10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 435CB20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:10:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 944B720873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:10:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CtvVESd3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435CB20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A8tGLJ4k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 944B720873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBuZ5-0002ln-H2
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:09:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47621)
+	id 1jBua0-0003hq-Rm
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48249)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuXm-0001Y9-KJ
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:08:39 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuZQ-0003EA-KQ
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuXl-0004YI-It
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:08:38 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45287)
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuZP-00087x-IF
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:10:20 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:38875)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBuXl-0004XM-C7
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:08:37 -0400
-Received: by mail-pl1-x643.google.com with SMTP id b22so561252pls.12
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:08:37 -0700 (PDT)
+ id 1jBuZP-00084l-BN
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:10:19 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id a16so456266pju.3
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:10:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=p1lIF2kImK0p1JTHV0AhyUMpa3evnQy4rG4CBXktNko=;
- b=CtvVESd3tw0NijHFXXjcu97T7cCnkrVFAWXhSwC7BfkyT06ojgnnPE8hHYLqgVkoeG
- iE303sgMtTeR3PyIIlK5FntOlAoHGbCaDixKdath1U303sGn694+z6c4wVmt68heB47f
- /s8XHlyZPYCDjrYVOCKd+vTCi3ewkE/P8UxoqWLVwyGMJLLI7KNH5X7Vf2Q8XwpUKHBQ
- UIiKZV3MZLuZ9sX35IQMe3YV+Ai12PHNFsnaEKZ7wEWHcCOwxaw6sxF7ZZWOY4+Ts/EJ
- erF1M4uXjCVexrJh/TTUauDGMd84ioKfu19Wo0sO9n3h25n8VwU5uO8lG8TGLo696RMG
- 3NlA==
+ bh=dfS61ghwybS6PalzScu/i5GjsxnAJrYZ04f8gzz4Zgo=;
+ b=A8tGLJ4kAvvxjTzp9bvTyEarz+WK6nBMCz4k+wLyfRRm4V9VYP/XOdRuHxk+ddAHZE
+ h5iWCoS7VUBLhDXwVdYn01ZvBVWl8r4FoRMziY/P7hmn+uoK4F02KgUOtCaqqyNzQAem
+ nkV7e6RHF2gH9cjss0ZWfCH8Z3RnNAiGG71AqTHGCNQAykBZWBtf5SLqgt193TliVIu6
+ 2h8ph87hbZqeeFmkJCjf2C+o/qg8tZvTJcxYnsXhBs0OfLl6E2DD6P9nfeNU2ZB7Eihg
+ Bc61PBgfe1etljYPy3kVlhUWXAVf8fS33LzncNxrHV7XK3/KkIhrzcYRANuzik4ScWEM
+ wX5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=p1lIF2kImK0p1JTHV0AhyUMpa3evnQy4rG4CBXktNko=;
- b=b60peszlXQDmjfS6rG2dVmHZV3omqv1Ct5O77D5v9EH2lfsbqHdQzTibJzUJbXF65d
- cEou3ifgj1+TmbKs8mgh/mC4XjpnvAfWTEA/Pi2qCf72A/mgXf0T108IRPRv7c/xozCh
- gpCQAFm+HKoTLKSa3YmS0ojyZ963wSSSrOdEkxjNxeSHIjQcxKYrqFaeHa9Kd2LfH6QI
- HbmpWwwV/TMe6f9iLL11VqA48g5aH79hF/ChdYNb5N5Ew8pFn1VW7A+FtMMpydhDR2Mc
- cloSRYhQu3rmG14KqLvWlzkNMuOkfCXW4LS5xoFnQGRCMEncPNb6EmoVcgcbgqU6EFkM
- 1jvA==
-X-Gm-Message-State: ANhLgQ2ShRtbODBlLeHgnRDeI0uXOpilGqPAenD1nbAGFIqHieUsnnBm
- 7zLrYwyj3pT1kXwnMYfqoAYd9w==
-X-Google-Smtp-Source: ADFU+vvdkN9hLv/ScXqKtCdkXxiwbt+h0RK/sMMZ8oKN7uhBF05KCSkeP/z+x6eaB1ny2jiyoFGxqA==
-X-Received: by 2002:a17:902:7886:: with SMTP id
- q6mr1597614pll.237.1583906916303; 
- Tue, 10 Mar 2020 23:08:36 -0700 (PDT)
+ bh=dfS61ghwybS6PalzScu/i5GjsxnAJrYZ04f8gzz4Zgo=;
+ b=RmoIAwDeYcYEob/6OkT2+r1aaGPTF9WImzd+4hdQXdnSWJbrpLUGiqr/lEN5fQPF7L
+ QDcOmwbb2vj2fGfsNhC+pQk5YjkQ9RxyueK3ACmGO/ja11bOmnizJ9czSAl4JXUJIDhZ
+ FA17w6UOB/S9J2LsRR2eMh0zeau+I4VGTiPFSGbP59dRypHyj+HpnCYf2/uIqjerpBpl
+ d4+9GHr5Hq1CpNs9D7tcjLhoDtOWltB7HFw6/4lgjH50uvecEIR7GUQB9oasUqTlsars
+ QG4yNPM8romJHNtKL/HAL8TpSAaaCaYulV6UUDA6cUe7LyOQZOmvbaR5h0KqICmfI7P/
+ XmwQ==
+X-Gm-Message-State: ANhLgQ0AhaXTFc0gLzKeTOs0DL40TvPT9SKdEaRKIp1gBZcIvey0Wm1P
+ 9phksrjEYTQZwO7eSV8pVn37gg==
+X-Google-Smtp-Source: ADFU+vsJCTNGtsYj2U1Km6NvQOqg+6NXX6mgNfa7T47U17Qlon6IZXm6Y5lC37AztLO+8VmlbIxIJA==
+X-Received: by 2002:a17:90a:33c1:: with SMTP id
+ n59mr1740513pjb.4.1583907017889; 
+ Tue, 10 Mar 2020 23:10:17 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- y7sm9582675pfq.159.2020.03.10.23.08.35
+ z3sm4106854pjr.46.2020.03.10.23.10.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 23:08:35 -0700 (PDT)
-Subject: Re: [PATCH v4 06/18] scripts/qapi/parser.py: improve doc comment
- indent handling
+ Tue, 10 Mar 2020 23:10:17 -0700 (PDT)
+Subject: Re: [PATCH v4 08/18] docs/interop: Convert qemu-ga-ref to rST
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
- <20200309154405.13548-7-peter.maydell@linaro.org>
+ <20200309154405.13548-9-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <58c7c296-083b-1152-878a-e27199714a33@linaro.org>
-Date: Tue, 10 Mar 2020 23:08:33 -0700
+Message-ID: <88ec680c-078a-42e9-3737-e8a58eaf00b4@linaro.org>
+Date: Tue, 10 Mar 2020 23:10:15 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200309154405.13548-7-peter.maydell@linaro.org>
+In-Reply-To: <20200309154405.13548-9-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,49 +107,31 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/9/20 8:43 AM, Peter Maydell wrote:
-> Make the handling of indentation in doc comments more sophisticated,
-> so that when we see a section like:
+> Convert qemu-ga-ref to rST format. This includes dropping
+> the plain-text, pdf and info format outputs for this document;
+> as with all our other Sphinx-based documentation, we provide
+> HTML and manpage only.
 > 
-> Notes: some text
->        some more text
->           indented line 3
+> The qemu-ga-ref.rst is somewhat more stripped down than
+> the .texi was, because we do not (currently) attempt to
+> generate indexes for the commands, events and data types
+> being documented.
 > 
-> we save it for the doc-comment processing code as:
-> 
-> some text
-> some more text
->    indented line 3
-> 
-> and when we see a section with the heading on its own line:
-> 
-> Notes:
-> 
-> some text
-> some more text
->    indented text
-> 
-> we also accept that and save it in the same form.
-> 
-> The exception is that we always retain indentation as-is for Examples
-> sections, because these are literal text.
-> 
-> If we detect that the comment document text is not indented as much
-> as we expect it to be, we throw a parse error.  (We don't complain
-> about over-indented sections, because for rST this can be legitimate
-> markup.)
-> 
-> The golden reference for the doc comment text is updated to remove
-> the two 'wrong' indents; these now form a test case that we correctly
-> stripped leading whitespace from an indented multi-line argument
-> definition.
+> As the GA ref is now part of the Sphinx 'interop' manual,
+> we can delete the direct link from index.html.in.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> v1->v2: Update doc-good.out as per final para.
-> ---
->  scripts/qapi/parser.py         | 81 +++++++++++++++++++++++++++-------
->  tests/qapi-schema/doc-good.out |  4 +-
->  2 files changed, 67 insertions(+), 18 deletions(-)
+>  Makefile                      | 41 ++++++++----------
+>  MAINTAINERS                   |  2 +-
+>  docs/index.html.in            |  1 -
+>  docs/interop/conf.py          |  2 +
+>  docs/interop/index.rst        |  1 +
+>  docs/interop/qemu-ga-ref.rst  |  4 ++
+>  docs/interop/qemu-ga-ref.texi | 80 -----------------------------------
+>  7 files changed, 25 insertions(+), 106 deletions(-)
+>  create mode 100644 docs/interop/qemu-ga-ref.rst
+>  delete mode 100644 docs/interop/qemu-ga-ref.texi
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
