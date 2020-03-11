@@ -2,63 +2,67 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F39C3F2D0
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08772C10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:18:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F22520727
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A41E620727
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:18:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bEfcrfUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F22520727
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="cHplOhH0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41E620727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBpwV-0001Ns-Kv
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 21:13:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44945)
+	id 1jBq1R-0003XD-Qr
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 21:18:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jBpvj-0000Bw-5B
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:13:05 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jBq0i-00036s-AZ
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jBpvh-0006MW-6j
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:13:02 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47643 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jBpvg-0006Ee-CO; Tue, 10 Mar 2020 21:13:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48cYq86MwHz9s3x; Wed, 11 Mar 2020 12:12:52 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583889172;
- bh=+CszKDr7fO0+FpcSdH7H2y06uqZ8OAFvqPf9hPwHqgo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bEfcrfUBPDtcGf6wqxeXSVWzvu5O9cl4OoAYj0VfbzWsZovTAPy3SEtro0ehH6BU8
- 8wzF4QQrjntAvQeUIBaXd1fL/+gSVvizK6ETTTtNrejYfvjcYc7//UXdZuN3r+/2CO
- p2PLLiPWkvLe8r4NY17Acgd0aKm3LJRDgkRmsgNw=
-Date: Wed, 11 Mar 2020 12:12:47 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: Upstream QEMU guest support policy ? Re: [PATCH v3 0/2] spapr:
- Use vIOMMU translation for virtio by default
-Message-ID: <20200311011247.GT660117@umbus.fritz.box>
-References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
- <20200310114343.GD3234052@redhat.com>
+ (envelope-from <qemu_oss@crudebyte.com>) id 1jBq0f-0001T1-3I
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:12 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:59519)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jBq0e-0001QU-Jy
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:18:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=UCJhrVzjyJ95bSvh7/+CLTzQZ9eVliGPlETtEZUNTqQ=; b=cHplOhH0RqQFQU50+ZRBYDVbBW
+ fdFBNzx2Uh/9n3rZk6NefO/nJwrh4qmLw2YxYNRTBHezjRbWjJSobpZRNgGq7+R1QzYaYm19MHM76
+ Efxpdwa/2ra7mKeDM1tkYQpa+K//EwCHfRQDgj9WuZmiAxAYUkg9hST8LdcwWAj408BkcF6nF/8LB
+ fwH5NXUiNegsaBCORlAdf9NmdhLjiXT0Lo+TuEDeLYNtt1n+L8hLmR6xLuNwaFco79QeNABlILegC
+ F1+TeCkEraj/htBpHaFqJUcazT2P3HiL6uBALLMpL1lK4kBpsOWOUdooj3mPguZnG2Pgd42Q4BzV/
+ eoVllOoPb/TjOlDVw3USfFG4h6T2nzC1Bk/XI8EwyYCDd77ytMXNxwc+JpD6fuXLCYoAtv9HLgMTm
+ goIERrTbOYKcOiUnlSrBYTcGJ8lXlWpjUEdGhSVOKAj2McF/2PjMclK7Hjskw89V3J9BzG0mmMkg5
+ pHU6gSl80DaWg0CZdLc3dtiiyncCw+wko3gOWneMv4Qs1/fzmAG3vmyoNkOlSuM6T3JgD++yR7lks
+ e0BPjngyY19n5ZSGmWb3CaUQHOSCg8Y8bT0z9xAaNopM4GTXTHQlwuG6BPUxpNWzCb4lx4rQMXoWj
+ msAlczPheaNAqprSukRHf7UfAWBOTTfUIgg/dEkyc=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
+Date: Wed, 11 Mar 2020 02:18:04 +0100
+Message-ID: <2408892.h2sFNKg3ST@silver>
+In-Reply-To: <20200310193336.37029536@bahia.home>
+References: <cover.1579567019.git.qemu_oss@crudebyte.com>
+ <1651612.bE1MAdl4rA@silver> <20200310193336.37029536@bahia.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/FJxnyttrH06HRq2"
-Content-Disposition: inline
-In-Reply-To: <20200310114343.GD3234052@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,182 +74,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, mst@redhat.com, aik@ozlabs.ru, groug@kaod.org,
- qemu-devel@nongnu.org, paulus@samba.org, clg@kaod.org, mdroth@us.ibm.com,
- qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Dienstag, 10. M=E4rz 2020 19:33:36 CET Greg Kurz wrote:
+> > This patch is also too big for my preference, but I don't see a viable =
+way
+> > to split it further into separate patches. I already separated all the
+> > patches I could. If you have suggestions, very much appreciated!
+>=20
+> Well, the patch could be split in two or three parts at least:
+>=20
+> (1) introduce the new function that reads multiple entries in codir.c
+>=20
+> (2) use it from 9p.c
+>=20
+> (3) remove unused stuff if anything remains
+>=20
+> This doesn't seem to change much but the smaller diffstats
+> for each individual patch make them less scary :) and with
+> (1) applied only it is easier to compare what the old code
+> in 9p.c and the new one in codir.c do.
+>=20
+> > The reason for this is that in order to fix these issues with current
+> > T_readdir implementation, it requires to separate what's currently one
+> > task
+> > (i.e. one function) into two separate tasks (i.e. two functions). There=
+ is
+> > no sensible way to do that.
+>=20
+> Yeah, I won't ask for finer grain.
 
---/FJxnyttrH06HRq2
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Me confused. Does that mean your split suggestion was just theoretical, or =
+do=20
+you need it?
 
-On Tue, Mar 10, 2020 at 11:43:43AM +0000, Daniel P. Berrang=E9 wrote:
-> On Thu, Mar 05, 2020 at 03:30:07PM +1100, David Gibson wrote:
-> > Upcoming Secure VM support for pSeries machines introduces some
-> > complications for virtio, since the transfer buffers need to be
-> > explicitly shared so that the hypervisor can access them.
+> > But don't be too scared about this patch; if you look just at the diff
+> > directly then yes, the diff is not very human readable. However if you
+> > apply the patch and look at the resulting code, you'll notice that there
+> > are actually only 2 functions (v9fs_do_readdir() in 9p.c and
+> > do_readdir_lowlat() in codir.c) which require careful reviewing and that
+> > their resulting code is actually very, very straight forward, and not
+> > long either.
+>=20
+> These are personal opinions. Careful reviewing can take a lot of time :)
+
+Well, depends on what precisely you mean with opinion. :) That this patch=20
+actually reduces code complexity is a fact (less branches, less locks, less=
+=20
+dispatches, less side effects, less error/cleanup handlers). These are=20
+objectively measurable quantities.
+
+But yes, nevertheless reviewing it costs time.
+
+> > Current code on master is much more tricky and error prone due to the h=
+uge
+> > amount of potential branches, individual error/cleanup handlers, high
+> > amount of thread dispatching and much more. In the patched version all
+> > these code complexities and error sources are removed.
+>=20
+> Come on :) The 9pfs code has been a can of worms from the beginning.
+> It produced more than the average amount of security-related bugs,
+> and most sadly, due to the overall lack of interest, it bitrotted
+> and missed a lot of cool improvements like an appropriate support of
+> unlinked files, QOM-ification of fsdev, conversion of proxy fsdev to
+> vhost-user, hot plug/unplug support, live migration support and
+> "much more"... The performance aspect of things is a full time job
+
+No, the performance issues are actually very managable in case of 9pfs.
+I already addressed readdir with this patch (by far the worst performance=20
+issue), and then there would just be one more severe performance issue:=20
+walkdir.
+
+My intention is not to squeeze out the last fractional percent of performan=
+ce=20
+for 9pfs, but you certainly agree that a simple "ls" blocking for more than=
+ 1=20
+second is something that should be fixed, and fortunately the amount of=20
+changes involved are far less than I originally feared they would.
+
+> I never had the opportunity to even consider. So yes, your changes
+> are likely beneficial but the code base is still extremely fragile
+> and sensible to huge changes... not breaking things that happen
+> to work, even in a sub-optimal way, is essentially what I care for
+> these days.
+
+And I think I'm also very careful not breaking anything. I carefully consid=
+er=20
+what to touch and what not. I wrote test cases and I am actively testing my=
+=20
+changes with real installations and snapshots as well.
+
+I think the cause of disagreements we have are solely our use cases of 9pfs=
+:=20
+your personal use case does not seem to require any performance considerati=
+ons=20
+or multi-user aspects, whereas my use case requires at least some minimum=20
+performance grade for utilizing 9pfs for server applications.
+
+> > > Oh, so we'd still have the current implementation being used, even
+> > > with this patch applied... This would be okay for a RFC patch but
+> > > in the end I'd really like to merge something that also converts
+> > > v9fs_do_readdir_with_stat().
 > >=20
-> > While it's not strictly speaking dependent on it, the fact that virtio
-> > devices bypass normal platform IOMMU translation complicates the issue
-> > on the guest side.  Since there are some significan downsides to
-> > bypassing the vIOMMU anyway, let's just disable that.
+> > Yes, I know, but I would not recommend mixing these things at this poin=
+t,
+> > because it would be an entire effort on its own.
 > >=20
-> > There's already a flag to do this in virtio, just turn it on by
-> > default for forthcoming pseries machine types.
+> > v9fs_do_readdir_with_stat() is used for 9P2000.u, while v9fs_do_readdir=
+()
+> > is used for 9P2000.L. They're behaving very differently, so it would not
+> > only require me to update v9fs_do_readdir_with_stat() and v9fs_read(), I
+> > would also need to write their own test cases (plural, since there are
+> > none at all yet) and benchmarks, and of course somebody what need to
+> > review all that additional amount of code, and who would actually test
+> > it? I am actively testing my 9P2000.L changes, but I am not actually
+> > using 9P2000.u, so I could not guarantee for the same quality.
+> >=20
+> > Considering the current commitment situation regarding 9pfs, we can only
+> > bring things forward with compromises. Hence I suggest I concentrate on
+> > fixing the worst performance issues on 9P2000.L side first, and later on
+> > if there are really people interested in seeing these improvements on
+> > 9P2000.u side and willing to at least help out with testing, then I can
+> > definitely also adjust 9P2000.u side accordingly as well.
+> >=20
+> > But to also make this clear: this patch 10 is not introducing any
+> > behaviour
+> > change for 9P2000.u side.
 >=20
-> Breaking existing guest OS to support a new secure VM feature that
-> may not even be used/wanted doesn't seems like a sensible tradeoff
-> for default out of the box behaviour.
->=20
-> IOW, if Secure VM needs this, can we tie the change in virtio and
-> IOMMU defaults to the machine type flag that enables the use of
-> Secure VM.
+> Ok, fair enough to leave 9p2000.U behind for now but I had to ask :)
+> /me is even wondering if we should start deprecating 9p2000.U since
+> most clients can use 9p2000.L now...
 
-There is no such flag.
+I probably wouldn't. On macOS for instance there's only 9p2000.u. In the en=
+d=20
+9p2000.L is Linux specific. By deprecating 9p2000.u that would mean a shift=
+=20
+towards only supporting Linux guests.
 
-In the POWER secure VM model, the secure mode option isn't something
-that's constructed in when the hypervisor builds the VM.  Instead the
-VM is started normally and transitions itself to secure mode by
-talking directly with the ultravisor (it then uses TPM shenannigans to
-safely get the keys to its real storage backend(s)).
+> > Mmm... maybe later on, as a cleanup patch or something. Current version=
+ is
+> > tested. I would like to avoid to make things more complicated than they
+> > already are (i.e. accidental introduction of some bug just due to this).
+>=20
+> It seems we might agree on not breaking things that work ;-)
 
-> That way the changed virtio defaults only take effect if a user/mgmt
-> app has explicitly opted in to the new Secure VM feature, and existing
-> users won't be broken by a new feature they don't even use.
+Of course! All the things I work on 9pfs are just fixes. But that's probabl=
+y=20
+where we start to disagree. :)
 
-Sure, but qemu has no natural way to know if secure VM is in use,
-until too late.
+> > > > > +static int do_readdir_lowlat(V9fsPDU *pdu, V9fsFidState *fidp,
+> > > > > +                             struct V9fsDirEnt **entries,
+> > > > > +                             int32_t maxsize, bool dostat)
+> > > > > +{
+> > > > > +    V9fsState *s =3D pdu->s;
+> > > > > +    V9fsString name;
+> > > > > +    int len, err =3D 0;
+> > > > > +    int32_t size =3D 0;
+> > > > > +    off_t saved_dir_pos;
+> > > > > +    struct dirent *dent;
+> > > > > +    struct V9fsDirEnt *e =3D NULL;
+> > > > > +    V9fsPath path;
+> > > > > +    struct stat stbuf;
+> > > > > +
+> > > > > +    *entries =3D NULL;
+> > > > > +    v9fs_path_init(&path);
+> > > > > +
+> > > > > +    /*
+> > > > > +     * TODO: Here should be a warn_report_once() if lock failed.
+> > > > > +     *
+> > > > > +     * With a good 9p client we should not get into concurrency
+> > > > > here,
+> > > > > +     * because a good client would not use the same fid for
+> > > > > concurrent
+> > > > > +     * requests. We do the lock here for safety reasons though.
+> > > > > However
+> > > > > +     * the client would then suffer performance issues, so better
+> > > > > log
+> > > > > that
+> > > > > +     * issue here.
+> > > > > +     */
+> > >=20
+> > > This should probably be done with qemu_mutex_trylock() in a loop
+> > > directly
+> > > in v9fs_readdir_lock().
+> >=20
+> > No definitely not in the loop. That's intentionally *one* lock *outside*
+> > of
+>=20
+> Not sure we're talking about the same loop here...
+>=20
+> I'm just suggesting that v9fs_readdir_lock() could be something like:
+>=20
+> static inline void v9fs_readdir_lock(V9fsDir *dir)
+> {
+>     while (qemu_mutex_trylock(&dir->readdir_mutex)) {
+>         warn_report_once("blah");
+>     }
+> }
 
-I am wondering if we have to introduce an "svm=3Don" flag anyway.  It's
-pretty ugly, since all it would be doing is changing defaults here and
-there for compatibilty with a possible future SVM transition, but
-maybe it's the best we can do :/.
+Ah yeah, in fact I got you wrong on this one. I thought you meant to move t=
+he=20
+lock within do_readdir_lowlat(). About your actual suggestion above ...
 
-> > Any opinions on whether dropping support for the older guest kernels
-> > is acceptable at this point?
+> > the loop. The normal case is not requiring a lock at all, like the comm=
+ent
+> > describes. Doing multiple locks inside the loop unnecessaririly reduces
+> > performance for no reason.
+> >=20
+> > About *_trylock() instead of v9fs_readdir_lock(): might be a candidate =
+to
 >=20
->=20
-> I think this question has different answers depending on whether you
-> are considering downstream vendor policy, current upstream policy,
-> and a possible new downstream policy on guest support. IOW a bit of a
-> can of worms...
->=20
->=20
-> In the case of RHEL downstream there is a very narrow matrix for
-> what guest OS are considered supported.
->=20
-> In the case of current upstream, there has essentially never been
-> any documented guest matrix. The unwritten implicit rule upstream
-> has followed is to not change defaults in a way that would break
-> ability to run existing guest OS.
+> Hmm... are you suggesting that do_readdir_lowlat() should return if it
+> can't take the lock ?
 
-Hrm, ok, that's not how I've been treating it for for pseries, though
-previous breakages have been for much older / rarer cases.  We broke
-support for guests that don't call "ibm,client-architecture-support"
-long, long ago (but such guests are really, really ancient).  We broke
-support (without workarounds) for guests with 4kiB standard page size
-more recently, but those are at least a decade old for common
-downstream distros (you can build such kernels today, but
-approximately nobody does).
+=2E.. yep, that's what I had in mind for it later on. I would not mind runn=
+ing=20
+trylock in a loop like you suggested; if it fails, log a warning and return.
+Because if the lock fails, then client is buggy. User can read the warning =
+in=20
+the logs and report the bug for client to be fixed. Not worth to handle tha=
+t=20
+case in any fancy way by server.
 
-> As an example, on x86 upstream defaults to i440fx and thus still
-> uses virtio devices in transitional mode by default, while downstream
-> RHEL used its narrow support matrix as a justification for why it was
-> ok to switch to q35 by default & loose guest support in many cases.
-> Even that was problematic though, because RHEL still needed to support
-> RHEL-6 guest which are broken by default with q35 since they only
-> support legacy mode virtio. Thus we needed work in management apps
-> to enable RHEL-6 to continue working with q35 chipset, by placing
-> the devices onto a PCI bridge, instead of a PCIe root port, or by
-> explicitly using i440fx instead.
+> > > > > + * Retrieves the requested (max. amount of) directory entries fr=
+om
+> > > > > the
+> > > > > fs
+> > > > > + * driver. This function must only be called by the main IO thre=
+ad
+> > > > > (top
+> > > > > half). + * Internally this function call will be dispatched to a
+> > > > > background
+> > > > > IO thread + * (bottom half) where it is eventually executed by the
+> > > > > fs
+> > > > > driver. + *
+> > > > > + * The old readdir implementation above just retrieves always one
+> > > > > dir
+> > > > > entry + * per call. The problem of that implementation above is t=
+hat
+> > > > > latency is + * added for (retrieval of) each directory entry, whi=
+ch
+> > > > > in
+> > > > > practice lead to + * latencies of several hundred ms for readdir =
+of
+> > > > > only one directory. + * + * This is avoided in this function by
+> > > > > letting
+> > > > > the fs driver retrieve all + * required directory entries with on=
+ly
+> > > > > call of this function and hence with + * only a single fs driver
+> > > > > request.
+> > >=20
+> > > True but these kind of considerations rather belong to the changelog.=
+=2E.
+> > > otherwise, we'll have to not forget to kill these lines when the "old
+> > > readdir implementation" is no more.
+> >=20
+> > Mmm... I do think this overall latency issue should be clarified somewh=
+ere
+> > as
+> The issue itself is best described in a changelog, but...
+>=20
+> > a comment. Where exactly is not that important to me. For instance it
+> > could
+> > also be described on v9fs_co_run_in_worker() macro definition in coth.h
+> > instead, as general rule of thumb when dispatching stuff.
+>=20
+> ... if you have useful recommendations that don't involve referring to a
+> piece of code that might go away, a comment in coth.h is certainly a good
+> idea.
 
-Yeah, and here's where x86's visibility with mgmt because a big
-thing.  Most of these changes are easily enough worked around with
-machine type options - and there's no inherent reason those are harder
-to work with than whole machine types, or other config details.  But
-getting mgmt apps to support machine option based workarounds for us
-is a real challenge.
+Ok, I'll move it to coth.h then.
 
-> Thus if we follow our *current* upstream guest support policy, I don't
-> think it is acceptable to break existing guests with the new machine
-> type upstream.  It is reasonable to do it downstream if the downstream
-> is willing to sacrifice these guests, or invest to make any mgmt apps=20
-> add workaround/revert QEMU changes.
->=20
->=20
-> With that all said, I do *NOT* think current upstream practice is good
-> or sustainable long term (though I admit I've argued on the other side
-> in the past).
->=20
-> This policy is why we're still using a machine designed in 1995 on x86
-> by default, in order that we avoid breaking the popular guest OS of the
-> day, like Windows 95.
->=20
-> This is similar to the problem we had with host build platforms, where
-> we afraid to make any change which would break an existing build platform,
-> or on the flipside made arbitrary ad-hoc changes with no consistent
-> approach across different subsystems.
->=20
->=20
-> I think that we should aim define some clearer policy around how we
-> want to support guest OS in upstream. As we did with our host build
-> platforms policy, any guest support policy should aim to move forward
-> at a reasonable pace so that we are not locked at a specific point in
-> time forever.
->=20
-> I can imagine three tiers
->=20
->  1. Recommended. Expected to work well with machine type defaults
->  2. Supported. Should work with QEMU but may need special settings applied
->  3. Unsupported. Will not work with QEMU regardless of settings
->=20
-> I don't have an opinion right now on what guest OS should fall in which
-> category. One possible way to classify them would be to look at whether
-> the vendor themselves still supported the OS.  IOW, to be in the
-> "Recommended" criteria, it must be actively supported by the vendor.
-> Once EOL by the vendor it would be capped at the "Supported" tier.
->=20
-> That definition wouldn't help your pseries issue though, because RHEL-6
-> is still considered a supported OS.
->=20
-> Another possible way to classify guest OS would be to look purely at
-> the original release date, and set a cap of "$TODAY - 5 years" for
-> the "Recommended" tier. That would exclude RHEL-6.
+> > The thing is: for >10 years several developers obviously did not realize
+> > the severe negative performance impact of frivolously dispatching tasks
+> > to
+> I won't dare to comment on some people I don't know not doing the obvious
+> right things at the time... what I do know is that for >10 years, nobody
+> cared for this code. Period. You're lucky it is still functional ;-)
 
-That seems fairly reasonable to me, but it doesn't really help me move
-forward right now.  Right now, we have no sane way of distinguishing
-early enough between a RHEL-6 guest that needs legacy virtio and a
-guest that wants to go to secure mode, and can't have legacy virtio. :(
+This was not about judging individuals, just to express that the latency=20
+impact of dispatching does not seem to be obvious for people, and trying to=
+=20
+avoid similar mistakes by placing appropriate comment(s).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> > > > > +                                        struct V9fsDirEnt
+> > > > > **entries,
+> > > > > +                                        int32_t maxsize, bool
+> > > > > dostat)
+> > >=20
+> > > s/maxsize/max_count since this is the wording use in the caller.
+> >=20
+> > Wouldn't do that. This is the driver side, not the 9p protocol request
+> > handler. As you might have relized before, "max_count" is semantically
+> > completely wrong. This variable does not count integral entries, it is
+> > rather a maximum size (in bytes) of the destination buffer being filled.
+> >=20
+> > On 9p request handler side it is ok to use "max_count" instead, because
+> > the
+> > protocol definition uses exactly this term for the request parameter, b=
+ut
+> > on driver side it's IMO inappropriate.
+>=20
+> I agree the max_count wording sucks and I don't care that much to
+> name variables according to protocol definitions, but I do care
+> to use the same name in caller/callee when it makes sense, for a
+> better grep or cscope experience.
 
---/FJxnyttrH06HRq2
-Content-Type: application/pgp-signature; name="signature.asc"
+So you insist on that max_count change?
 
------BEGIN PGP SIGNATURE-----
+Best regards,
+Christian Schoenebeck
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5oOwwACgkQbDjKyiDZ
-s5LRpxAAyTa9Z/NOZLMmq0ts7NNfh3Afn+RIB0XZElXW8/qPMo83+CAOS92m/dJV
-leCd+dtIFd8ywo54yuczc+MedKmNTTCFEWGKtU2Yrzvfs96iXR1CNc7DUbnldCsf
-6lHd3NzlDjpSHzPObjB96SJ2cJNq0p0q+3vx36f2SkxMQUiRlYPlMPdIHuoBbtKy
-IqM7VjPzdIsDo3Nq2lEcotz4QA0GFR2T9q52OIxpDR/m8isTR9PGK7ZrB8n8AAh1
-Unu1uDc9S44GZla+0l0LH1sJHR40/HFmPid7enLxoV4r0R8Kg+gDoV02KV0FQypU
-1x0sADFfIKceWuNyHfUZOkDukOpAi33HKei7ABQcGDGFpRWNukpRhKyTSVfMSuMz
-qEcYcq6L4jH5UH5pGqHC+lTbFHxYpgUt/gMlbkozmf3g9E/LrnBNGCLaD3XsOwC8
-YSRJLSASYVr4OfcGowbmycp790TQmNeKbrJRcivnSqZyyKjAZY9aTi4aO60Iivy5
-Rnj21XKCNjXeFUX783F3NsmgC61GZNqAWYw5tWG4Lo5QASawwY3UHb8ae7V9pjBJ
-OGicjZ1VCsZabhz/fEWPrxfwoJrLw0GKGlu8jx03W1Om1yha0xCSGqKDEVrOoHIw
-3g9L/XDNnKuOnKi4Y3QF+ClVedDod0lhAsgRdA8OJxfEovqLDaI=
-=0mLd
------END PGP SIGNATURE-----
 
---/FJxnyttrH06HRq2--
 
