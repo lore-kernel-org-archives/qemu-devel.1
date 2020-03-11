@@ -2,68 +2,98 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C049FC10F29
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0EDC10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98F9A20727
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:11:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F9A20727
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DBCB72146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:12:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IvnTevKO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCB72146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBvWG-0007fE-LT
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 03:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
+	id 1jBvXM-0000Vq-4B
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 03:12:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jBvVi-0007G7-Ir
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:10:35 -0400
+ (envelope-from <mst@redhat.com>) id 1jBvWa-0008Jq-3w
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jBvVg-0005AB-P4
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:10:34 -0400
-Resent-Date: Wed, 11 Mar 2020 03:10:34 -0400
-Resent-Message-Id: <E1jBvVg-0005AB-P4@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21187)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jBvVg-00057v-HG; Wed, 11 Mar 2020 03:10:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1583910626; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=m4Dfk9URsEEXZb3ofpA5oLy4GY7A2uqnSoHCFAg6zcNGST8gc3xQ/N5x6TYdCXTMN5UymxOI1lIkbhWiLv4TeUk34ud/riLhMN1y32cWrk6k1mgh58IkvRbwJWvAu6IqmSGXJSN/n6udLsTr1EM0DaXrIZthU9vkWgLEWy9F2RY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583910626;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=xV5BBanb9LkI0C7E5Uax2yILf55RX3wuaAnDjs3Q9zA=; 
- b=QjYTqFYK0nHv/LrbBApEBe26w9ow+87na0KgdGd0eg4f6Cp//zH44RdKTyU8Cr9+wlVDACPq94eCMEp8nJsXltXKDKu4oQyoqm3l0VKSTzaLf8xhCftQCMYn4l3l2SrUClxMDyh1qUFpz1eEfhoE5sA/wnJAaRopc1vM3uT6HQk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583910623147325.54569096200134;
- Wed, 11 Mar 2020 00:10:23 -0700 (PDT)
-In-Reply-To: <20200311064420.30606-1-richard.henderson@linaro.org>
-Subject: Re: [PATCH 00/16] target/arm: sve load/store improvements
-Message-ID: <158391062190.4461.13297013687538092318@39012742ff91>
+ (envelope-from <mst@redhat.com>) id 1jBvWZ-0005nG-8l
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:11:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57791
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jBvWZ-0005mw-5O
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:11:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583910686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K86sjCcsrj3JZLgqEbXg7dRp2slyYmk11vUIV/ZyqOQ=;
+ b=IvnTevKOFLqRUHKctzs4cFrCrz4+SDrTVZAhJqcDOZxN35ZiMbnisnwmET1wJzFH6KOHnN
+ CjJ8nuEJjEOzUuJ5zsjv2lAmKwevuLcxqGH4fyYH9BxRjt5Kim/r2SPLlllTZLcudC/h45
+ wCJ091Ip/e3CUoLZgXyYLuYV9rS4ALg=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-XLkOJSqEMymiTNTb9vE78Q-1; Wed, 11 Mar 2020 03:11:23 -0400
+X-MC-Unique: XLkOJSqEMymiTNTb9vE78Q-1
+Received: by mail-qt1-f198.google.com with SMTP id b10so579417qto.21
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 00:11:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=YmH5wolq5pK+MJrgDi9QJAUA3jnnRoA4qZTnJTdyncw=;
+ b=NOsFANJXEWtDjf/A7ceIWy1TmigVmJOX0bJOA4D36posC227v8hl+iKgZZok+v1sMp
+ F8RD2HJxfCClK/ljzuVSrBX0maqOlgemViq9mzysups9docQHpOiTApKmja8lIGd07Tu
+ JWqRbrbMFsFOztkpYRNpS20jyPFFDyU8dN1QI9V4SoTGYRQ3iRYiLrKNkvW9NBDjFpYC
+ 51znvgKjQf+i5cgBiCPFbjsi93DEFlLBRaFv697dfgaWBmsidQsYH6WhySOaVDbAfX7Y
+ lLBJNRTOukqzgqbEKjX6/tsRmO4LG+lV9uvTh03t+U8+1T0WLE57iMpIFpCbUTStnNKQ
+ O9mQ==
+X-Gm-Message-State: ANhLgQ3mGeMlnz9YMKua7RCs02qJKPkU4NFzL9rFWHmR7ahLlC2/Ne0v
+ 9I6KCkV31kTyyV7Z4srouVkQQCD/mnYqAEPsla3NUv6Yt5n2Tb2PzIT7JKnfi2zu74Q6yxLswTB
+ PPR6cy0Y5UFITKTE=
+X-Received: by 2002:a37:4fc3:: with SMTP id d186mr1543048qkb.100.1583910683423; 
+ Wed, 11 Mar 2020 00:11:23 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvSO6fVv6tB7utTRDkKq0Dv0JhkBSyK1SaSCPskXOmuIaM8k/hRtN8BPjP5CyUO1R+i03adww==
+X-Received: by 2002:a37:4fc3:: with SMTP id d186mr1543034qkb.100.1583910683204; 
+ Wed, 11 Mar 2020 00:11:23 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id p16sm3901542qkj.5.2020.03.11.00.11.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Mar 2020 00:11:22 -0700 (PDT)
+Date: Wed, 11 Mar 2020 03:11:16 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v3 1/2] spapr: Disable legacy virtio devices for
+ pseries-5.0 and later
+Message-ID: <20200311030812-mutt-send-email-mst@kernel.org>
+References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
+ <20200305043009.611636-2-david@gibson.dropbear.id.au>
+ <20200310115611.GE3234052@redhat.com>
+ <20200311005857.GS660117@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Wed, 11 Mar 2020 00:10:23 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20200311005857.GS660117@umbus.fritz.box>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,95 +105,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: pair@us.ibm.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, aik@ozlabs.ru,
+ groug@kaod.org, qemu-devel@nongnu.org, paulus@samba.org, clg@kaod.org,
+ mdroth@us.ibm.com, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMTA2NDQyMC4zMDYw
-Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwMC8xNl0gdGFyZ2V0L2FybTog
-c3ZlIGxvYWQvc3RvcmUgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMjAwMzExMDY0NDIwLjMw
-NjA2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
-dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
-bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
-ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjRjYjRjZmIgdGFyZ2V0L2FybTogUmVtb3ZlIHN2ZV9tZW1vcGlkeAo5YjQzYzRjIHRhcmdl
-dC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBnYXRoZXIgbG9hZHMKMzAzMmE0OSB0YXJn
-ZXQvYXJtOiBSZXVzZSBzdmVfcHJvYmVfcGFnZSBmb3Igc2NhdHRlciBzdG9yZXMKYWJmMTFkNyB0
-YXJnZXQvYXJtOiBSZXVzZSBzdmVfcHJvYmVfcGFnZSBmb3IgZ2F0aGVyIGZpcnN0LWZhdWx0IGxv
-YWRzCjAyMGY4NzQgdGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGZvciBjb250aWd1b3VzIHN0
-b3JlcwpkZTMxYjMwIHRhcmdldC9hcm06IFVwZGF0ZSBjb250aWd1b3VzIGZpcnN0LWZhdWx0IGFu
-ZCBuby1mYXVsdCBsb2Fkcwo2Mjc1MjhjIHRhcmdldC9hcm06IFVzZSBTVkVDb250TGRTdCBmb3Ig
-bXVsdGktcmVnaXN0ZXIgY29udGlndW91cyBsb2Fkcwo2NzhhMmQ3IHRhcmdldC9hcm06IEhhbmRs
-ZSB3YXRjaHBvaW50cyBpbiBzdmVfbGQxX3IKYjY4MjdiYyB0YXJnZXQvYXJtOiBVc2UgU1ZFQ29u
-dExkU3QgaW4gc3ZlX2xkMV9yCmM2ZmE1ZjYgdGFyZ2V0L2FybTogQWRqdXN0IGludGVyZmFjZSBv
-ZiBzdmVfbGQxX2hvc3RfZm4KYmEzZDNjZSB0YXJnZXQvYXJtOiBBZGQgc3ZlIGluZnJhc3RydWN0
-dXJlIGZvciBwYWdlIGxvb2t1cAowY2YzYjMzIHRhcmdldC9hcm06IERyb3AgbWFudWFsIGhhbmRs
-aW5nIG9mIHNldC9jbGVhcl9oZWxwZXJfcmV0YWRkcgo3ZmFmOGZiIHRhcmdldC9hcm06IFVzZSBj
-cHVfKl9kYXRhX3JhIGZvciBzdmVfbGRzdF90bGJfZm4KZDhlZDVjOCBleGVjOiBBZGQgY3B1X3By
-b2JlX3dhdGNocG9pbnQKNGZmNDA5OCBhY2NlbC90Y2c6IEFkZCBwcm9iZV9hY2Nlc3NfZmxhZ3MK
-NGI2YzNkMCBhY2NlbC90Y2c6IEFkZCBibG9jayBjb21tZW50IGZvciBwcm9iZV9hY2Nlc3MKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDRiNmMzZDBlMTBjOSAoYWNj
-ZWwvdGNnOiBBZGQgYmxvY2sgY29tbWVudCBmb3IgcHJvYmVfYWNjZXNzKQoyLzE2IENoZWNraW5n
-IGNvbW1pdCA0ZmY0MDk4MTkwOTkgKGFjY2VsL3RjZzogQWRkIHByb2JlX2FjY2Vzc19mbGFncykK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3MzogRklMRTogYWNjZWwvdGNnL3Vz
-ZXItZXhlYy5jOjIyMDoKKyAgICAgICAgICAgIGNjLT50bGJfZmlsbChjcHUsIGFkZHIsIDAsIGFj
-Y2Vzc190eXBlLCBNTVVfVVNFUl9JRFgsIGZhbHNlLCByZXRhZGRyKTsKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgMzEyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTYgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KMy8xNiBDaGVja2luZyBjb21taXQgZDhlZDVjODVkZWVhIChleGVjOiBB
-ZGQgY3B1X3Byb2JlX3dhdGNocG9pbnQpCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzMTog
-RklMRTogZXhlYy5jOjI3NDc6CisgICAgICAgIGlmICh3YXRjaHBvaW50X2FkZHJlc3NfbWF0Y2hl
-cyh3cCwgYWRkciwgbGVuKSAmJiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ0IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDMvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTYg
-Q2hlY2tpbmcgY29tbWl0IDdmYWY4ZmJiNWE2NyAodGFyZ2V0L2FybTogVXNlIGNwdV8qX2RhdGFf
-cmEgZm9yIHN2ZV9sZHN0X3RsYl9mbikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
-dCAnKicgKGN0eDpXeFYpCiMxNzY6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQxODQ6
-CisgICAgICAgICAgICAgICAgICAgICAgc3ZlX2xkc3QxX3RsYl9mbiAqdGxiX2ZuKQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCA0NzkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xNiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKNS8xNiBDaGVja2luZyBjb21taXQgMGNmM2IzMzk3NTY1ICh0YXJnZXQvYXJtOiBE
-cm9wIG1hbnVhbCBoYW5kbGluZyBvZiBzZXQvY2xlYXJfaGVscGVyX3JldGFkZHIpCjYvMTYgQ2hl
-Y2tpbmcgY29tbWl0IGJhM2QzY2VjODc3MiAodGFyZ2V0L2FybTogQWRkIHN2ZSBpbmZyYXN0cnVj
-dHVyZSBmb3IgcGFnZSBsb29rdXApCjcvMTYgQ2hlY2tpbmcgY29tbWl0IGM2ZmE1ZjZmODJhMyAo
-dGFyZ2V0L2FybTogQWRqdXN0IGludGVyZmFjZSBvZiBzdmVfbGQxX2hvc3RfZm4pCjgvMTYgQ2hl
-Y2tpbmcgY29tbWl0IGI2ODI3YmNkZTE3MSAodGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGlu
-IHN2ZV9sZDFfcikKOS8xNiBDaGVja2luZyBjb21taXQgNjc4YTJkN2RlMjAyICh0YXJnZXQvYXJt
-OiBIYW5kbGUgd2F0Y2hwb2ludHMgaW4gc3ZlX2xkMV9yKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojNTE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQ0MDg6CisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPnBhZ2VbMF0uYXR0cnMs
-IHdwX2FjY2VzcywgcmV0YWRkcik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-NzU6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQ0MzI6CisgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPnBhZ2VbMV0uYXR0cnMsIHdwX2FjY2Vzcywg
-cmV0YWRkcik7Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDg4IGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTYgQ2hlY2tpbmcgY29t
-bWl0IDYyNzUyOGMxMTUzMyAodGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGZvciBtdWx0aS1y
-ZWdpc3RlciBjb250aWd1b3VzIGxvYWRzKQoxMS8xNiBDaGVja2luZyBjb21taXQgZGUzMWIzMDBi
-ODgxICh0YXJnZXQvYXJtOiBVcGRhdGUgY29udGlndW91cyBmaXJzdC1mYXVsdCBhbmQgbm8tZmF1
-bHQgbG9hZHMpCjEyLzE2IENoZWNraW5nIGNvbW1pdCAwMjBmODc0YTQ4YmYgKHRhcmdldC9hcm06
-IFVzZSBTVkVDb250TGRTdCBmb3IgY29udGlndW91cyBzdG9yZXMpCjEzLzE2IENoZWNraW5nIGNv
-bW1pdCBhYmYxMWQ3NzE5MTAgKHRhcmdldC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBn
-YXRoZXIgZmlyc3QtZmF1bHQgbG9hZHMpCjE0LzE2IENoZWNraW5nIGNvbW1pdCAzMDMyYTQ5MWJi
-ZTUgKHRhcmdldC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBzY2F0dGVyIHN0b3JlcykK
-MTUvMTYgQ2hlY2tpbmcgY29tbWl0IDliNDNjNGNjYjMyMiAodGFyZ2V0L2FybTogUmV1c2Ugc3Zl
-X3Byb2JlX3BhZ2UgZm9yIGdhdGhlciBsb2FkcykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0IDRjYjRj
-ZmI0NTY5MSAodGFyZ2V0L2FybTogUmVtb3ZlIHN2ZV9tZW1vcGlkeCkKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMTEwNjQ0MjAuMzA2MDYt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Mar 11, 2020 at 11:58:57AM +1100, David Gibson wrote:
+> Note that several things that I believe are now in the PCIe spec, but
+> really derive more from PC legacy considerations, don't apply at all
+> for PAPR.  e.g. there's no meaningful distinction between integrated
+> and slotted devices, multiple independent host bridges is routine and
+> doesn't require any (virtual) hardware visible domain numbers.
+
+Domain numbers are a Linux thing, not a PCIe thing. On x86 they come
+from ACPI segment numbers. As such they aren't usually hardware
+visible on x86, they are supplied by firmware.
+
+--=20
+MST
+
 
