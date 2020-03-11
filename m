@@ -2,46 +2,48 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A04C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC15C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00DA9208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:32:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00DA9208E4
+	by mail.kernel.org (Postfix) with ESMTPS id A8DFD208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:34:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DFD208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jByf1-0005cb-5o
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:32:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43533)
+	id 1jBygz-0000ig-PP
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:34:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jByd7-0002tK-Ii
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:26 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jByd9-0002v6-8L
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jByd6-0001Wj-JX
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33042)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jByd7-0001XY-N4
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:33066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jByd3-0001RW-IQ; Wed, 11 Mar 2020 06:30:21 -0400
+ id 1jByd3-0001Rf-IA; Wed, 11 Mar 2020 06:30:21 -0400
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1jBycx-0005cJ-As; Wed, 11 Mar 2020 13:30:15 +0300
+ id 1jBycy-0005cJ-Cq; Wed, 11 Mar 2020 13:30:16 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 0/9] block-copy improvements: part I
-Date: Wed, 11 Mar 2020 13:29:55 +0300
-Message-Id: <20200311103004.7649-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 4/9] block/block-copy: use block_status
+Date: Wed, 11 Mar 2020 13:29:59 +0300
+Message-Id: <20200311103004.7649-5-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200311103004.7649-1-vsementsov@virtuozzo.com>
+References: <20200311103004.7649-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
@@ -63,42 +65,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v4:
+Use bdrv_block_status_above to chose effective chunk size and to handle
+zeroes effectively.
 
-01: add Max's r-b
-02: rm ProgressResetCallbackFunc typedef
-03-06: add Max's r-b
-07: fix indentation
-08: update in_flight_bytes in block_copy_inflight_req_shrink
-    improve comment above block_copy() definition
-09: add Andrey's and Max's r-b
-    drop hunk fixing indentation (merged to 07)
+This substitutes checking for just being allocated or not, and drops
+old code path for it. Assistance by backup job is dropped too, as
+caching block-status information is more difficult than just caching
+is-allocated information in our dirty bitmap, and backup job is not
+good place for this caching anyway.
 
-Vladimir Sementsov-Ogievskiy (9):
-  job: refactor progress to separate object
-  block/block-copy: fix progress calculation
-  block/block-copy: specialcase first copy_range request
-  block/block-copy: use block_status
-  block/block-copy: factor out find_conflicting_inflight_req
-  block/block-copy: refactor interfaces to use bytes instead of end
-  block/block-copy: rename start to offset in interfaces
-  block/block-copy: reduce intersecting request lock
-  block/block-copy: hide structure definitions
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/block-copy.c | 73 +++++++++++++++++++++++++++++++++++++---------
+ block/trace-events |  1 +
+ 2 files changed, 61 insertions(+), 13 deletions(-)
 
- include/block/block-copy.h    |  65 +-----
- include/qemu/job.h            |  11 +-
- include/qemu/progress_meter.h |  58 +++++
- block/backup-top.c            |   6 +-
- block/backup.c                |  38 ++--
- block/block-copy.c            | 405 ++++++++++++++++++++++++++--------
- blockjob.c                    |  16 +-
- job-qmp.c                     |   4 +-
- job.c                         |   6 +-
- qemu-img.c                    |   6 +-
- block/trace-events            |   1 +
- 11 files changed, 420 insertions(+), 196 deletions(-)
- create mode 100644 include/qemu/progress_meter.h
-
+diff --git a/block/block-copy.c b/block/block-copy.c
+index ddd61c1652..b075dba206 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -155,7 +155,7 @@ void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
+  */
+ static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
+                                            int64_t start, int64_t end,
+-                                           bool *error_is_read)
++                                           bool zeroes, bool *error_is_read)
+ {
+     int ret;
+     int nbytes = MIN(end, s->len) - start;
+@@ -165,6 +165,18 @@ static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
+     assert(QEMU_IS_ALIGNED(end, s->cluster_size));
+     assert(end < s->len || end == QEMU_ALIGN_UP(s->len, s->cluster_size));
+ 
++    if (zeroes) {
++        ret = bdrv_co_pwrite_zeroes(s->target, start, nbytes, s->write_flags &
++                                    ~BDRV_REQ_WRITE_COMPRESSED);
++        if (ret < 0) {
++            trace_block_copy_write_zeroes_fail(s, start, ret);
++            if (error_is_read) {
++                *error_is_read = false;
++            }
++        }
++        return ret;
++    }
++
+     if (s->use_copy_range) {
+         ret = bdrv_co_copy_range(s->source, start, s->target, start, nbytes,
+                                  0, s->write_flags);
+@@ -230,6 +242,38 @@ out:
+     return ret;
+ }
+ 
++static int block_copy_block_status(BlockCopyState *s, int64_t offset,
++                                   int64_t bytes, int64_t *pnum)
++{
++    int64_t num;
++    BlockDriverState *base;
++    int ret;
++
++    if (s->skip_unallocated && s->source->bs->backing) {
++        base = s->source->bs->backing->bs;
++    } else {
++        base = NULL;
++    }
++
++    ret = bdrv_block_status_above(s->source->bs, base, offset, bytes, &num,
++                                  NULL, NULL);
++    if (ret < 0 || num < s->cluster_size) {
++        /*
++         * On error or if failed to obtain large enough chunk just fallback to
++         * copy one cluster.
++         */
++        num = s->cluster_size;
++        ret = BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_DATA;
++    } else if (offset + num == s->len) {
++        num = QEMU_ALIGN_UP(num, s->cluster_size);
++    } else {
++        num = QEMU_ALIGN_DOWN(num, s->cluster_size);
++    }
++
++    *pnum = num;
++    return ret;
++}
++
+ /*
+  * Check if the cluster starting at offset is allocated or not.
+  * return via pnum the number of contiguous clusters sharing this allocation.
+@@ -308,7 +352,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
+ {
+     int ret = 0;
+     int64_t end = bytes + start; /* bytes */
+-    int64_t status_bytes;
+     BlockCopyInFlightReq req;
+ 
+     /*
+@@ -325,7 +368,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     block_copy_inflight_req_begin(s, &req, start, end);
+ 
+     while (start < end) {
+-        int64_t next_zero, chunk_end;
++        int64_t next_zero, chunk_end, status_bytes;
+ 
+         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
+             trace_block_copy_skip(s, start);
+@@ -343,24 +386,28 @@ int coroutine_fn block_copy(BlockCopyState *s,
+             chunk_end = next_zero;
+         }
+ 
+-        if (s->skip_unallocated) {
+-            ret = block_copy_reset_unallocated(s, start, &status_bytes);
+-            if (ret == 0) {
+-                trace_block_copy_skip_range(s, start, status_bytes);
+-                start += status_bytes;
+-                continue;
+-            }
+-            /* Clamp to known allocated region */
+-            chunk_end = MIN(chunk_end, start + status_bytes);
++        ret = block_copy_block_status(s, start, chunk_end - start,
++                                      &status_bytes);
++        if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
++            bdrv_reset_dirty_bitmap(s->copy_bitmap, start, status_bytes);
++            progress_set_remaining(s->progress,
++                                   bdrv_get_dirty_count(s->copy_bitmap) +
++                                   s->in_flight_bytes);
++            trace_block_copy_skip_range(s, start, status_bytes);
++            start += status_bytes;
++            continue;
+         }
+ 
++        chunk_end = MIN(chunk_end, start + status_bytes);
++
+         trace_block_copy_process(s, start);
+ 
+         bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
+         s->in_flight_bytes += chunk_end - start;
+ 
+         co_get_from_shres(s->mem, chunk_end - start);
+-        ret = block_copy_do_copy(s, start, chunk_end, error_is_read);
++        ret = block_copy_do_copy(s, start, chunk_end, ret & BDRV_BLOCK_ZERO,
++                                 error_is_read);
+         co_put_to_shres(s->mem, chunk_end - start);
+         s->in_flight_bytes -= chunk_end - start;
+         if (ret < 0) {
+diff --git a/block/trace-events b/block/trace-events
+index 1a7329b736..29dff8881c 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -48,6 +48,7 @@ block_copy_process(void *bcs, int64_t start) "bcs %p start %"PRId64
+ block_copy_copy_range_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+ block_copy_read_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+ block_copy_write_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
++block_copy_write_zeroes_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PRId64" ret %d"
+ 
+ # ../blockdev.c
+ qmp_block_job_cancel(void *job) "job %p"
 -- 
 2.21.0
 
