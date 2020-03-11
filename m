@@ -6,86 +6,87 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF64C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DAD7C10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EF2F20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28E5E208C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NzOVUeIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF2F20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i+8DkJg1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E5E208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBuVu-0006rE-KP
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46359)
+	id 1jBuWh-0007vA-9t
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:07:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuVK-0006RX-EF
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuVv-000707-6o
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuVJ-0006TO-E1
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:06 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46924)
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuVu-0007OY-6d
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:43 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37996)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBuVJ-0006R7-70
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:05 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c19so671652pfo.13
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:06:05 -0700 (PDT)
+ id 1jBuVt-0007Le-Vg
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:42 -0400
+Received: by mail-pf1-x443.google.com with SMTP id z5so690618pfn.5
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:06:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ASDSgniHgz0xMZ46uhNAX8WgvFXu8avGhMBYQntMN/E=;
- b=NzOVUeIF8Xz3JJXVpLNywvjgH/+dPF1EeMeTJa1Ee35RHl9yIuX09wfo+ca77wbybQ
- fxhnallbwRhhzOpO6ctmysM86EcR2CSekVYSFtA0djlxnpz/ed9EEzuRBp8afTqQnX9n
- 29iEXn2VUekzR6jkySOJ9+QXBJIM+pqG9NGX86V8W/QvOv53TyB8TPgR9EpFOipeT5EU
- MIoHSmWPVU1J8yWqRE8jeIXWjvXdcFZqGz63CkoIct3+uDPzFP0h5cbA5Zs3mLyJrDYM
- vc8MI2VQ6CnQSEQkfe3A2Riig6tANzlr1pTdLkjEmoCTH+mkIz9ZslKWzj5qz3usmad0
- +4Fg==
+ bh=okAzjBLzfCAaoaDQmsHa0if6HEYySgyRwmd3/BbTFEg=;
+ b=i+8DkJg1/4wLZVZ6sx4I8R5Rc8+vL0T0PUyjEgDc/bhZX77dPPYnQKTLOoiqYitsDQ
+ m5TInRdugdq7nk8LQ8bFYpE0CCoypT7bc1OP+CZwSVpWxVX0qI++tByCkgFZQgwevxWj
+ pTsorf5ZRQmh8zD86KKRmyBXlbM4L2mggiv7V0+d3FNliWsI0jEopXT7cjIIAxw6uDp7
+ SOYKo4zKz1TD+nD7a6nCXXr/XpxLm9zKpxaUZKPVe4odfSWIy2Jh/diBhFejc6fpt97y
+ er7b26PH38xVlQoXUHXxxty0Jn7U16gSGMHld5cbD/IlIAzOs6z8qU32ACEqsH5x4yqd
+ YmkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ASDSgniHgz0xMZ46uhNAX8WgvFXu8avGhMBYQntMN/E=;
- b=P47H92YuLWxJUKNfjYk4pLb2U/VQJw6fqDMcFNlfSH7IL0Js389QhlyVfwanqDqMN5
- 2utZcDECQZLviop6LH6A0KbPxWCQ/nbe3iQ9iLimRCk8zsN92iqOumS3EbnSqw/Mv0Hh
- hyJC1Dr4QQYPP3HZqoXgbvkMVVBNMmAAyiP+kCFXVXUvPyTWbp6/grVmI8M4tt5bn28I
- Iqx4DWaT6vqqdeSy4jjSgs3FcwhC//uRVfSz1Jmy5ribTNrzwEuzIBihG/KD0zY8Y4XN
- S0xUPONmyZGVYJXQMLbUBttyY8ncQpE7Q1oPZRrE0EZ8tBuyI9BGCmRCzPynDCagufSK
- VXuQ==
-X-Gm-Message-State: ANhLgQ1RgM+aqZ6NGwUV3YCTTmr8CNF+P48E6OfWGkbNLEz9nl9eJOLn
- nqwbh+P1tKHzlgUff8Dt4/PtLA==
-X-Google-Smtp-Source: ADFU+vvAv0uXxtG8r+frqCgaIw0kDvfUKPlQC1lw7Y2BhkS2bTTS3hcZgDj+lPVXOvuDdrDnA70bZQ==
-X-Received: by 2002:a63:3103:: with SMTP id x3mr1300483pgx.209.1583906763982; 
- Tue, 10 Mar 2020 23:06:03 -0700 (PDT)
+ bh=okAzjBLzfCAaoaDQmsHa0if6HEYySgyRwmd3/BbTFEg=;
+ b=WYnwigRqPb4MvNra1fAvMmOGVikBms/+r1+BQtwXX+STFwNuXFYpsJf7VlJzZldqgb
+ C3HWIbl4JMkgfl2gfp5t7eQaWVI83JhX/o0eHlONx6edJxVwU+pZsDW1icTEiklKlpXS
+ zjsyhnpdXyQE5JrzmuH6xKkqVGXKfUvUq5Vi3ke2G6Pw3EcMiew6f6lTB0NZs1K7owEm
+ Y9Cxo7Bu5tQD55pn+QE2+SdSeUDauYFLOQZaprsn29moue8x5Sef0nN3k3Bvs275zyTQ
+ PY0p9+tUBpQI+JkbDDDEuw9QbrYbLQ9SCbGfIQOd+SCrOkugD2q2syTeR9nhJam+k5vi
+ VHzQ==
+X-Gm-Message-State: ANhLgQ2B65m4UAU35aCutIEC4E2hDp9gAL5HQGwGShrIDuJA+NPoBE2o
+ 9QfiJciyjZGWdUOL2YYNRChfqw==
+X-Google-Smtp-Source: ADFU+vtZYxPkKqcl5OOY6Jp0w1D+Lbc0G7bteFO84Nmp2NwzR05nvDBjhCzR/6aQck6zmmyzVLsKzw==
+X-Received: by 2002:a63:ce05:: with SMTP id y5mr1285592pgf.155.1583906800984; 
+ Tue, 10 Mar 2020 23:06:40 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- n14sm4308708pjt.36.2020.03.10.23.06.02
+ p9sm4097705pjo.28.2020.03.10.23.06.39
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 23:06:03 -0700 (PDT)
-Subject: Re: [PATCH v4 01/18] qapi/migration.json: Fix indentation
+ Tue, 10 Mar 2020 23:06:40 -0700 (PDT)
+Subject: Re: [PATCH v4 02/18] qapi/qapi-schema.json: Put headers in their own
+ doc-comment blocks
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
- <20200309154405.13548-2-peter.maydell@linaro.org>
+ <20200309154405.13548-3-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <32d385b7-b40f-371e-672b-bcc1214f2844@linaro.org>
-Date: Tue, 10 Mar 2020 23:06:01 -0700
+Message-ID: <811e7f66-96bf-81ab-5139-d1fdd72f549d@linaro.org>
+Date: Tue, 10 Mar 2020 23:06:38 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200309154405.13548-2-peter.maydell@linaro.org>
+In-Reply-To: <20200309154405.13548-3-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,15 +107,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/9/20 8:43 AM, Peter Maydell wrote:
-> Commits 6a9ad1542065ca0bd54c6 and 9004db48c080632aef23 added some
-> new text to qapi/migration.json which doesn't fit the stricter
-> indentation requirements imposed by the rST documentation generator.
-> Reindent those lines to the new standard.
+> Our current QAPI doc-comment markup allows section headers
+> (introduced with a leading '=' or '==') anywhere in any documentation
+> comment.  This works for texinfo because the texi generator simply
+> prints a texinfo heading directive at that point in the output
+> stream.  For rST generation, since we're assembling a tree of
+> docutils nodes, this is awkward because a new section implies
+> starting a new section node at the top level of the tree and
+> generating text into there.
+> 
+> New section headings in the middle of the documentation of a command
+> or event would be pretty nonsensical, and in fact we only ever output
+> new headings using 'freeform' doc comment blocks whose only content
+> is the single line of the heading, with two exceptions, which are in
+> the introductory freeform-doc-block at the top of
+> qapi/qapi-schema.json.
+> 
+> Split that doc-comment up so that the heading lines are in their own
+> doc-comment.  This will allow us to tighten the specification to
+> insist that heading lines are always standalone, rather than
+> requiring the rST document generator to look at every line in a doc
+> comment block and handle headings in odd places.
+> 
+> This change makes no difference to the generated texi.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qapi/migration.json | 60 ++++++++++++++++++++++-----------------------
->  1 file changed, 30 insertions(+), 30 deletions(-)
+>  qapi/qapi-schema.json | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
