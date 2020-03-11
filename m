@@ -2,119 +2,108 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84893C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D503C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F3572071B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:12:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60F49208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:22:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZXIAPbYb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3572071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNQGBsKX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F49208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jByLW-0002U8-G5
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:12:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38203)
+	id 1jByV9-0005n4-DY
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jByKq-0001rt-Rp
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:11:33 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jByUI-0005DT-3i
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jByKp-0004H6-Vf
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:11:32 -0400
-Received: from mail-eopbgr80119.outbound.protection.outlook.com
- ([40.107.8.119]:46979 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jByKm-0004Aj-M1; Wed, 11 Mar 2020 06:11:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l1GdP5E/uPLu9EvbTtPUbcKs93xy5btDUIiw5iA/Sbbe290V5g7Zcir3LB7+4I8BM7VUfpTx0YZIx2+KNNFPQ+D013C7Y/bxFecltUSbLhrwvy/f1KFSinA0/V28f9vlNtiPoud2ZHWCiWhm5j43hS4WcHlgLKmN+TIJ3A/zoA6Lzm5lQ6ZqsI7uMMFaXAlYDcanKilKRP8EDLQlnZeloxS7HnHsCjfB9sB2NHhxCCdJQYamml+tLJ1NOWNXa/46POxNo9bxPaD9l+GZdbXpKKfsqLIy1DIF8yvnJsmHSMX9MUbsna4jVxVnE6osTVJCPHjaFxsQEl6ieYMx4kC8cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KBUQBS8DpUANyAqWYb9+wwAquIITxCdAAluuE0eK6k8=;
- b=TakvO4TAkl0EViwGe74Vn+STXj4GMFHrU1ARZT3x7dvGQKqJR0DrxK3UMFqvcwuO+5LukK4hARLIP2vTUBlI814cZD2yG/Fv3OaZxizMxzOWwhnJf7B1ogxNUDCHmBBKKGNYOxqnFQ8rQmgWIKCzwSUYufoJ1QLC29YopyKQ28T5Duo/Vf/SrT7GeNsGXYuOcG+YRulFmxQ/K3xT+n/QkEEHTR///k0rXwNIi8Pr8aghafobRr4+l0PvwgbJjRX4rIUAzqG2LM2VV/M+b/yv5+FG6kytFOi/nde0yO5l1Lv/ioIB+5fkFEFXSFk6lLfPNeZ1nQS4lKoTl7gjzBtuOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KBUQBS8DpUANyAqWYb9+wwAquIITxCdAAluuE0eK6k8=;
- b=ZXIAPbYbL1zxQF/FwDAV2Z6vH7mNxYyxG5d6u3/JlDMykYpnbLGY9Qm5WzB2qme5Wg57k4i02Erw5BKh6nqO7pB8V+N2WdiO/Hfc0+3v4/myfd2GX3ZoAJ+bt54sVKcqYqsS2eVnBWnH+QQ+WYpX62iJx+JFiGx/opI+NJF8xVw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB2967.eurprd08.prod.outlook.com (52.135.163.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.11; Wed, 11 Mar 2020 10:11:19 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2814.007; Wed, 11 Mar 2020
- 10:11:19 +0000
-Subject: Re: [PATCH v8 02/10] scripts: add coccinelle script to use auto
- propagated errp
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
- <20200306051536.27803-3-vsementsov@virtuozzo.com>
- <87r1xzfc9y.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200311131116572
-Message-ID: <4ebcc5a5-4bc8-022b-8fe4-9ced0de08370@virtuozzo.com>
-Date: Wed, 11 Mar 2020 13:11:16 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <87r1xzfc9y.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR05CA0283.eurprd05.prod.outlook.com
- (2603:10a6:7:93::14) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <mreitz@redhat.com>) id 1jByUF-0000G5-Ec
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:21:17 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34196
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jByUD-0000Dh-Ud
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:21:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583922071;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=PiNfs9YzE7M7N1NiyuAmUw4o9lkdc8gwB4p2L4nj+/g=;
+ b=CNQGBsKXDNvTxDYv5zKLNoUifxYUffssd3WIe7/cv8y5jQe5fxyOBEkZB+n6/zNW9ONw2F
+ KEqiGqDQdXW6aKkNYK2UU6RNJ9QZTXxUmwUOAPp1AkahnhPOy6f/SEROfwTqonUEkHXM/q
+ xlJURYAq915HzXnnmzucgdcB08Iocnw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-3qgkiPItNPKRI9XjxNoFzQ-1; Wed, 11 Mar 2020 06:21:09 -0400
+X-MC-Unique: 3qgkiPItNPKRI9XjxNoFzQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65A80DBAE;
+ Wed, 11 Mar 2020 10:21:08 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-216.ams2.redhat.com
+ [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CA0F92D27;
+ Wed, 11 Mar 2020 10:21:06 +0000 (UTC)
+Subject: Re: [PATCH 1/3] block/file-posix: add raw_getlength_fd
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200130152218.7600-1-vsementsov@virtuozzo.com>
+ <20200130152218.7600-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <067c6030-086e-dcee-7cca-bc84cdba3259@redhat.com>
+Date: Wed, 11 Mar 2020 11:21:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR05CA0283.eurprd05.prod.outlook.com (2603:10a6:7:93::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.14 via Frontend Transport; Wed, 11 Mar 2020 10:11:18 +0000
-X-Tagtoolbar-Keys: D20200311131116572
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8ab26d02-17f9-4da7-a123-08d7c5a48b20
-X-MS-TrafficTypeDiagnostic: AM6PR08MB2967:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB2967463D7823538B6FCF78E6C1FC0@AM6PR08MB2967.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 0339F89554
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(39850400004)(376002)(366004)(396003)(346002)(199004)(956004)(31686004)(316002)(7416002)(26005)(8676002)(2616005)(16576012)(2906002)(6486002)(4326008)(81156014)(81166006)(478600001)(86362001)(52116002)(6916009)(36756003)(66556008)(66476007)(66946007)(5660300002)(8936002)(16526019)(54906003)(186003)(4744005)(31696002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB2967;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UcSgKfWTctJDBguePBhHs+vdhpPWBvGeCBktXe5tzaM6N85LZsSG0jrpySRJHQJmSmtDKna9QQnZ4sc4pIuXTlXl5uOTLNoF16caBphji6wZ5JUesjkeR1dJY0y62EX/znbS3NZadGP5H+BOhH+euS4B4uTLCuZymlC5H5TPNqe2p8Ei8RBpWLd279DOUfdqRPMOQ3w4zJS4aKJfKQGIagI4bpM9SXboo5L3Soa3/tiWIRfilNbxM4101xU9ebCqYPMBIjR5leohmS86V8jD38cexrOTWk+wPjE1lN98YpRFYRALZNGhoy0uHDER5DNMA18LHURAAwnTM2Yw8mcaFDlFKMjnz4bkY5GOpIAt47NFz7XpVUfVCl/pTpIEnVIASIju/FRO+fXg05J7AXc6yJBgn45JJ6wIb/ognWApsrjBN1VOXqZN4sQbstOuKoX0
-X-MS-Exchange-AntiSpam-MessageData: kH7yW781IF4TkQ/MLFgx5sheIzBKBqd/FIL2kVqf36IEGAAtmubJdqCgIf+nETCnsev2YGK0LUzqmJvQqg7foTwY2NOky7fZ+oyKk1uhm01zViPdtQruzOqUYiXFxhll7+xfrws6fRs9DKgsNBsbEg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ab26d02-17f9-4da7-a123-08d7c5a48b20
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 10:11:19.6963 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NOhKeMI4l0c66g2KBpBZs17tLQdCNaCxQO6VNYYvdNAef0qnAiO5Zot4OJ/JFlAXDdMTUD+YVwNyjukTLc/7yKZdWFld+Qd1jPtCQ6kDAsQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2967
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.119
+In-Reply-To: <20200130152218.7600-2-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="65PUT7Xn7iiXqHoC8eshafaHOAJqRNTtY"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,35 +115,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.03.2020 12:53, Markus Armbruster wrote:
-> I think a v9 makes sense now.
-> 
-> If any of the improvement ideas should turn into time sinks for you,
-> let's talk.  We don't need perfection, we only need to get to the point
-> where we trust the script to do what we believe it does, understand its
-> limitations, and know how to compensate for them.
-> 
-> Right now I'm optimistic v9 will be ready for merging, perhaps with some
-> minor tweaking in my tree.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--65PUT7Xn7iiXqHoC8eshafaHOAJqRNTtY
+Content-Type: multipart/mixed; boundary="gfi6Inv3B3ptHrqEzA90K0GcjEcIaYOL3"
 
-Good. I hope, I'll resend today.
+--gfi6Inv3B3ptHrqEzA90K0GcjEcIaYOL3
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Vladimir
+On 30.01.20 16:22, Vladimir Sementsov-Ogievskiy wrote:
+> Add function which can handle separate fd, to be called from
+> raw_probe_alignment in the following commit.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/file-posix.c | 44 +++++++++++++++++++++++---------------------
+>  1 file changed, 23 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 1b805bd938..7f366046c2 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -178,7 +178,21 @@ typedef struct BDRVRawReopenState {
+>  } BDRVRawReopenState;
+> =20
+>  static int fd_open(BlockDriverState *bs);
+> -static int64_t raw_getlength(BlockDriverState *bs);
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd);
+> +
+> +static int64_t raw_getlength(BlockDriverState *bs)
+> +{
+> +    BDRVRawState *s =3D bs->opaque;
+> +    int ret;
+> +
+> +    ret =3D fd_open(bs);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    return raw_getlength_fd(bs, s->fd);
+> +}
+> +
+> =20
+>  typedef struct RawPosixAIOData {
+>      BlockDriverState *bs;
+> @@ -2063,10 +2077,8 @@ static int coroutine_fn raw_co_truncate(BlockDrive=
+rState *bs, int64_t offset,
+>  }
+> =20
+>  #ifdef __OpenBSD__
+> -static int64_t raw_getlength(BlockDriverState *bs)
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd)
+>  {
+> -    BDRVRawState *s =3D bs->opaque;
+> -    int fd =3D s->fd;
+>      struct stat st;
+> =20
+>      if (fstat(fd, &st))
+> @@ -2082,10 +2094,8 @@ static int64_t raw_getlength(BlockDriverState *bs)
+>          return st.st_size;
+>  }
+>  #elif defined(__NetBSD__)
+> -static int64_t raw_getlength(BlockDriverState *bs)
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd)
+>  {
+> -    BDRVRawState *s =3D bs->opaque;
+> -    int fd =3D s->fd;
+>      struct stat st;
+> =20
+>      if (fstat(fd, &st))
+> @@ -2107,22 +2117,16 @@ static int64_t raw_getlength(BlockDriverState *bs=
+)
+>          return st.st_size;
+>  }
+>  #elif defined(__sun__)
+> -static int64_t raw_getlength(BlockDriverState *bs)
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd)
+>  {
+> -    BDRVRawState *s =3D bs->opaque;
+>      struct dk_minfo minfo;
+>      int ret;
+>      int64_t size;
+> =20
+> -    ret =3D fd_open(bs);
+> -    if (ret < 0) {
+> -        return ret;
+> -    }
+> -
+>      /*
+>       * Use the DKIOCGMEDIAINFO ioctl to read the size.
+>       */
+> -    ret =3D ioctl(s->fd, DKIOCGMEDIAINFO, &minfo);
+> +    ret =3D ioctl(fd, DKIOCGMEDIAINFO, &minfo);
+>      if (ret !=3D -1) {
+>          return minfo.dki_lbsize * minfo.dki_capacity;
+>      }
+> @@ -2131,17 +2135,16 @@ static int64_t raw_getlength(BlockDriverState *bs=
+)
+>       * There are reports that lseek on some devices fails, but
+>       * irc discussion said that contingency on contingency was overkill.
+>       */
+> -    size =3D lseek(s->fd, 0, SEEK_END);
+> +    size =3D lseek(fd, 0, SEEK_END);
+>      if (size < 0) {
+>          return -errno;
+>      }
+>      return size;
+>  }
+>  #elif defined(CONFIG_BSD)
+> -static int64_t raw_getlength(BlockDriverState *bs)
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd)
+>  {
+>      BDRVRawState *s =3D bs->opaque;
+
+I think we should also drop this, and the fd_open() call in this function.
+
+> -    int fd =3D s->fd;
+>      int64_t size;
+>      struct stat sb;
+>  #if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+> @@ -2212,9 +2215,8 @@ again:
+>      return size;
+>  }
+>  #else
+> -static int64_t raw_getlength(BlockDriverState *bs)
+> +static int64_t raw_getlength_fd(BlockDriverState *bs, int fd)
+>  {
+> -    BDRVRawState *s =3D bs->opaque;
+>      int ret;
+>      int64_t size;
+> =20
+> @@ -2223,7 +2225,7 @@ static int64_t raw_getlength(BlockDriverState *bs)
+>          return ret;
+>      }
+
+And we can drop the fd_open() call here, too.
+
+> =20
+> -    size =3D lseek(s->fd, 0, SEEK_END);
+> +    size =3D lseek(fd, 0, SEEK_END);
+>      if (size < 0) {
+>          return -errno;
+>      }
+>=20
+
+If we drop those fd_open() calls, there is only one reason we=92d still
+need the @bs parameter anyway, and that=92s the CD-ROM handling code for
+FreeBSD.  Speaking of which: That code is broken after this patch
+because cdrom_reopen() will change s->fd, which, after this patch, is
+completely ignored by raw_getlength_fd().
+
+So I don=92t know.  Should that CD handling code set =93fd =3D s->fd=94 aft=
+er
+cdrom_reopen()?  Or should we just drop it, because I actually can=92t
+imagine it to be that important or used ever?  (I suppose it might do
+something when you change the physical disk while qemu is running and
+the device file is attached to qemu, but I=92m not sure whether such
+passthrough things even work anymore.)
+
+If we dropped it, we could drop the @bs parameter from
+raw_getlength_fd() altogether.  I don=92t know whether that would actually
+have any benefit in practice, though.
+
+Max
+
+
+--gfi6Inv3B3ptHrqEzA90K0GcjEcIaYOL3--
+
+--65PUT7Xn7iiXqHoC8eshafaHOAJqRNTtY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5ou5AACgkQ9AfbAGHV
+z0AmIwf/ZXxxyXzV6+Dae47/pfsgBaNWAj4oL/KhvdT3U78yYu9IzOKh8Hfzhhc8
+xed5brIlrxUnlskU7IkjpMTnxRa8p9wDUL2/ex+TKky28wuMYwiYvO3xxmbI7GRg
+VT54Diz7vipGOx6GahAMCijX3SFCJGgf0GXZmEqPAeUJml20GPKvCsjstus9cDrq
+Gr/wNuuucQ725aSuagOfnA2kNf2IbbS2vJgbEKCDk5KFPJ6yagJRUHeVZodmrMHB
+el1G7OeVJ7pkEVXxWlZwJbW9MdW99/snbTlp9axRXMXwyhRDtATTGd92w7k8gMz1
+8urDZcaVFwXTxN0R9kcwKaZI9qpXEA==
+=8Q4M
+-----END PGP SIGNATURE-----
+
+--65PUT7Xn7iiXqHoC8eshafaHOAJqRNTtY--
+
 
