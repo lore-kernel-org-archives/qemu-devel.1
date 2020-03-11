@@ -2,85 +2,87 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UPPERCASE_50_75,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA26DC10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFDBC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70C0C20828
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:30:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A69B2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:34:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ID3LIYB1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C0C20828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbZomxgp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A69B2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBxhN-00019f-HX
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:30:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50736)
+	id 1jBxkw-0002gG-ID
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jBxgh-0000XO-TR
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:30:04 -0400
+ (envelope-from <armbru@redhat.com>) id 1jBxk9-0002C7-00
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jBxgg-0000WQ-4Y
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:30:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42690
+ (envelope-from <armbru@redhat.com>) id 1jBxk8-00053F-46
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:33:36 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47306
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jBxgg-0000Sy-0N
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:30:02 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBxk8-00051j-1c
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:33:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583918990;
+ s=mimecast20190719; t=1583919214;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ix9LwiKc2VbnbLgLL58Tn9BHzYsE3/SmD8MGOyWV27c=;
- b=ID3LIYB1/By6Iv/cwPtVWV4wPQv5hIW3Ziy6Zul6WO74IdOIrQNvWqFwXm5g5xFkraWAk1
- 3dBPmfXGKLJPAjukq0HUEQNR5/p3x/rIOrVTbEEzidZJmLBG3vb7aF+Q5qmPy38cfnOgU8
- TVGXNRYp9MXzg7jsjG8D3FWCYkrb0TI=
+ bh=FwIuxPbuoqbGBv8xLYtj/yrJTA4MjeatVQEp20ilOpU=;
+ b=gbZomxgpPAFKcv07TRWtOqFiBUrl4iNvHawK+DkzxQGOui2dlKviiFtgr0VfsCe0TpC2fc
+ PvEqsOQheDp5ZurVo1+gYjsChbsiroN5SJIg+LktL9OY2QjqIWQjm8MLY6dr8/Kcdk0n/l
+ +QtcXyw74eSgB5QXYQkm9IFakSzmX84=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-1aNQM2RzMpOmBJtH5jZ7oQ-1; Wed, 11 Mar 2020 05:29:46 -0400
-X-MC-Unique: 1aNQM2RzMpOmBJtH5jZ7oQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-287-DpEE1gz8Og2mXmgyiqa46A-1; Wed, 11 Mar 2020 05:33:32 -0400
+X-MC-Unique: DpEE1gz8Og2mXmgyiqa46A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5543A19057A2;
- Wed, 11 Mar 2020 09:29:44 +0000 (UTC)
-Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61EAD91844;
- Wed, 11 Mar 2020 09:29:38 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v5 06/13] arm/arm64: ITS: Introspection
- tests
-To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-7-eric.auger@redhat.com>
- <83ffda30-e0dc-7fbf-1775-bc45a308acb4@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7fc207fe-b761-6d24-0c14-896154023420@redhat.com>
-Date: Wed, 11 Mar 2020 10:29:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9157107ACC4;
+ Wed, 11 Mar 2020 09:33:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5587B100164D;
+ Wed, 11 Mar 2020 09:33:25 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id DA3A511386A6; Wed, 11 Mar 2020 10:33:23 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v8 02/10] scripts: add coccinelle script to use auto
+ propagated errp
+References: <20200306051536.27803-1-vsementsov@virtuozzo.com>
+ <20200306051536.27803-3-vsementsov@virtuozzo.com>
+ <87lfo997hs.fsf@dusky.pond.sub.org>
+ <83b327b0-34d9-ad71-ba3c-156bd7b82836@virtuozzo.com>
+Date: Wed, 11 Mar 2020 10:33:23 +0100
+In-Reply-To: <83b327b0-34d9-ad71-ba3c-156bd7b82836@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Wed, 11 Mar 2020 11:35:29 +0300")
+Message-ID: <87h7yvgrrw.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <83ffda30-e0dc-7fbf-1775-bc45a308acb4@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,57 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
- thuth@redhat.com, peter.maydell@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zenghui,
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-On 3/11/20 9:37 AM, Zenghui Yu wrote:
-> Hi Eric,
->=20
-> On 2020/3/10 22:54, Eric Auger wrote:
->> +#define GITS_TYPER_PLPIS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT(0)
->> +#define GITS_TYPER_VLPIS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BI=
-T(1)
->> +#define GITS_TYPER_ITT_ENTRY_SIZE=C2=A0=C2=A0=C2=A0 GENMASK_ULL(7, 4)
->> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT=C2=A0=C2=A0=C2=A0 4
->> +#define GITS_TYPER_IDBITS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 G=
-ENMASK_ULL(8, 12)
->=20
-> Note that this should be GENMASK_ULL(12, 8).
-definitively
+> 09.03.2020 12:56, Markus Armbruster wrote:
+>>> +
+>>> +// Convert error clearing functions
+>> Suggest: Ensure @local_err is cleared on free
+>
+> But there is no local_err after conversion
 
-Eric
->=20
->> +#define GITS_TYPER_IDBITS_SHIFT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 8
->> +#define GITS_TYPER_DEVBITS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-GENMASK_ULL(13, 17)
->=20
-> (17, 13)
->=20
->> +#define GITS_TYPER_DEVBITS_SHIFT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 13
->> +#define GITS_TYPER_PTA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT(19)
->> +#define GITS_TYPER_CIDBITS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-GENMASK_ULL(32, 35)
->=20
-> (35, 32)
->=20
->> +#define GITS_TYPER_CIDBITS_SHIFT=C2=A0=C2=A0=C2=A0 32
->> +#define GITS_TYPER_CIL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 BIT(36)
->=20
-> And please use tab for all of them.
->=20
->=20
-> Thanks,
-> Zenghui
->=20
+True.  Hmm.  What about this:
+
+     // Convert calls to error_free(), possibly indirect
+     // In addition to replacing @local_err by *errp, we have to clear *err=
+p
+     // to avoid use-after-free in the automatic error propagation.
+
+>>> +(
+>>> +-    error_free(local_err);
+>>> ++    error_free_errp(errp);
+>>> +|
+>>> +-    error_report_err(local_err);
+>>> ++    error_report_errp(errp);
+>>> +|
+>>> +-    error_reportf_err(local_err, args);
+>>> ++    error_reportf_errp(errp, args);
+>>> +|
+>>> +-    warn_report_err(local_err);
+>>> ++    warn_report_errp(errp);
+>>> +|
+>>> +-    warn_reportf_err(local_err, args);
 
 
