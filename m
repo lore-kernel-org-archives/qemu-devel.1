@@ -2,95 +2,90 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E28E8C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17149C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:25:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC65F20749
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0934120737
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:25:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MkhjWkc3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC65F20749
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvMOv3j9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0934120737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC7rQ-0004ye-Q6
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41083)
+	id 1jC7uk-0007KU-0k
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:25:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jC7qh-0004St-0r
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:21:04 -0400
+ (envelope-from <mst@redhat.com>) id 1jC7u5-0006Nb-0n
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:24:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jC7qf-0000uo-Vq
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:21:02 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56191
+ (envelope-from <mst@redhat.com>) id 1jC7u3-0002Tw-US
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:24:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55914
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jC7qf-0000ui-Rn
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:21:01 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jC7u3-0002Si-QQ
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:24:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583958061;
+ s=mimecast20190719; t=1583958271;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8w75AdQdzA85zlo0503D6bWGmfY3m2f3+ZZ1nSgdUTU=;
- b=MkhjWkc3q24shXjmBN9GULgASQYf7V6AyhT7wDqKbqY61RAdlOcozubc0u+brZWv3jUFu8
- zPaj2EJZzazH7Os7N+/PEMdzBpr+AR/VFzPTiD69JH8sv/lxGqxglUTLIEPP75AIFKuftf
- 0VQYhkuNHTESjtNe4gJGfNiL4erod0Q=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-esPQJbLMMfeSCOewoRz7-w-1; Wed, 11 Mar 2020 16:20:59 -0400
-X-MC-Unique: esPQJbLMMfeSCOewoRz7-w-1
-Received: by mail-qk1-f200.google.com with SMTP id c1so159019qkg.21
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 13:20:59 -0700 (PDT)
+ bh=W6fHQgXgFQUH/PrmauwRb5OBzB5h2g8EoARfbQS9/EY=;
+ b=JvMOv3j9njkJBWqsw29CtK7JmVam/YSfKzxpy/Iz71OrWNrvG0rFB8vcxyi/Jwg8Qr9sEY
+ EKK+myNpa4srjXSgQ68nRLronnV4zWHAqroIXIx0LzswhDz2FAgytTfAa5QaKsCKag173F
+ 8FukT4zifDfvKJedAon/TjDa+TVSQ/w=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-WA6eLTAJMy6O3LqG8h7Pxg-1; Wed, 11 Mar 2020 16:24:26 -0400
+X-MC-Unique: WA6eLTAJMy6O3LqG8h7Pxg-1
+Received: by mail-qt1-f200.google.com with SMTP id g6so2008968qtp.20
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 13:24:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=HJlTrBB/2ZBGIl3iRiUb2Myys1soX8gqFz6FF7/tH4M=;
- b=GL4jg6cF6yZzF7hytzxKatNjJ7p2ywZehUa3971olXxjXOyYE5jJbNkqGZmvmmGF4y
- hObyjawYTuDjxTPS19VcAVt1aRNeiRueXl1Xhmi1VARBHGyT6ysMgWRgK4EMmdWo56OD
- q+VG6svx25E+7rm/OY8Sv59TgKJltngziOvTuKRGP5Nc/XlOqkF7mk6t7Y75Mf5JT389
- UjOCIr6iE+i04iwnbmgNUzpLm5a+jU98NMvSdTSiK0FJj8S+dgNDgQxbbd9s2LKI6zOY
- 3Eq4C9GXwHOcN7HMREfiIumv79+GjMFwkwEBqXr6XHPnufXW23fiJheUq9Ld5LVtQ/eq
- D0IA==
-X-Gm-Message-State: ANhLgQ1Mj69BiCjYOxOfgJzOPfvmKaAcJqLn8y7sFll48ZiQy6D07Fub
- XwDHOAbRgqjowFdgt5HoYjHD4qMMNqlC3hoq43reNT566/QujwFBzce3ucn3GeMdqEyHy//AGxh
- panBwpJkxWieKXvE=
-X-Received: by 2002:a37:27cd:: with SMTP id n196mr4679876qkn.144.1583958059034; 
- Wed, 11 Mar 2020 13:20:59 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs4Eq8Cl885NGo8s+eMa4fSbnmPHMehpQpcugnVjnpOU32xD2v6kxImA6xOkctFxPP2MzY9pQ==
-X-Received: by 2002:a37:27cd:: with SMTP id n196mr4679857qkn.144.1583958058702; 
- Wed, 11 Mar 2020 13:20:58 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=gAv/RxmtSwBPUlBwgHaySWPYxJlNgQyihElRc76ENvg=;
+ b=O0ZrgeKmACjSGVrasOKMHwsq0IlZLLLdgVRAK7fMxEkS89oHuIHeXN0jLcIG+FJhEl
+ eotaTFj1GOXmdLbtm6NhO4Kp8RqbNK3HPCGdUgPZ7BQSdQRf3ked11lZ6+E/LzPREht0
+ As3vdUVdLpMAIWmi9/qp3CJgsax+nEL72rPB4BDdf4cO/rgIWo4HiZohhCSeR2zuCmZ2
+ 4se6y2FlZyNb/jNRY8VDQnVIOxB7cLAw8CvJM821m9yCmY9CUyEV+Xwv+p2Hi5Oe3MAb
+ IKDNXIpYzHM9qhsBa+evLFTJJ5gcBcJLkHm7J/Np8na2mQ6ywdQSCRWZBCbZguuCKxFa
+ dOkQ==
+X-Gm-Message-State: ANhLgQ1/PSH8mC5qzxrGmv2HVlzfdTyrY4B7UXBpDdopM6FiuW7F0pCv
+ QMOwXvDKWE2SOp15zUhfNp/Aa908g7NXfqCQH+5HK3ZtT1znkf3V/v6IXbMWQP/8EDMBUTXC2TY
+ 3HnDGC/+yGjYjhTw=
+X-Received: by 2002:ac8:1345:: with SMTP id f5mr4426608qtj.128.1583958266147; 
+ Wed, 11 Mar 2020 13:24:26 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsbQ4z1t5TT2iygCVid1LoggTNkKuo9hI349cjyStI7FVWURkcQz63kSUMGsbtcTEgYd8UdVg==
+X-Received: by 2002:ac8:1345:: with SMTP id f5mr4426596qtj.128.1583958265900; 
+ Wed, 11 Mar 2020 13:24:25 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id j17sm26764006qth.27.2020.03.11.13.20.56
+ by smtp.gmail.com with ESMTPSA id l18sm824102qke.132.2020.03.11.13.24.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 13:20:57 -0700 (PDT)
-Date: Wed, 11 Mar 2020 16:20:53 -0400
+ Wed, 11 Mar 2020 13:24:25 -0700 (PDT)
+Date: Wed, 11 Mar 2020 16:24:20 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Subject: Re: [PATCH v3 5/6] virtio-net: add migration support for RSS and
- hast report
-Message-ID: <20200311161924-mutt-send-email-mst@kernel.org>
-References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
- <20200311123518.4025-6-yuri.benditovich@daynix.com>
- <20200311094706-mutt-send-email-mst@kernel.org>
- <CAOEp5OdjP4XsSkyCU0n1YGvyWwayOH5D6iTP-8RRLYfwSJd=7Q@mail.gmail.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <20200311162321-mutt-send-email-mst@kernel.org>
+References: <158395315920.8804.12475968769225149761@39012742ff91>
+ <ebb59967-ebd3-374a-a2a6-1f374e4768ad@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOEp5OdjP4XsSkyCU0n1YGvyWwayOH5D6iTP-8RRLYfwSJd=7Q@mail.gmail.com>
+In-Reply-To: <ebb59967-ebd3-374a-a2a6-1f374e4768ad@oracle.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -107,91 +102,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
+ elad.gabay@oracle.com, imammedo@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Mar 11, 2020 at 04:00:44PM +0200, Yuri Benditovich wrote:
+On Wed, Mar 11, 2020 at 09:08:56PM +0200, Liran Alon wrote:
 >=20
+> On 11/03/2020 20:59, no-reply@patchew.org wrote:
+> > Patchew URL: https://urldefense.com/v3/__https://patchew.org/QEMU/20200=
+311170826.79419-1-liran.alon@oracle.com/__;!!GqivPVa7Brio!L4XXKjkDknE86ihbn=
+ytm45vsQI41J-QWVCZRoXEXtPKIAsMmknrGJWVPZpKgLyM$
+> >=20
+> > Hi,
+> >=20
+> > This series failed the docker-quick@centos7 build test. Please find the=
+ testing commands and
+> > their output below. If you have Docker installed, you can probably repr=
+oduce it
+> > locally.
+> >=20
+> > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> > #!/bin/bash
+> > make docker-image-centos7 V=3D1 NETWORK=3D1
+> > time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+> > =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+> >=20
+> > Using expected file 'tests/data/acpi/pc/HPET'
+> > Looking for expected file 'tests/data/acpi/pc/WAET'
+> > **
+> > ERROR:/tmp/qemu-test/src/tests/qtest/bios-tables-test.c:367:load_expect=
+ed_aml: assertion failed: (exp_sdt.aml_file)
+> > ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/qtest/bios-tables-test=
+.c:367:load_expected_aml: assertion failed: (exp_sdt.aml_file)
 >=20
-> On Wed, Mar 11, 2020 at 3:48 PM Michael S. Tsirkin <mst@redhat.com> wrote=
-:
+> My bad. Didn't notice there are tests which verifies ACPI haven't changed
+> and requires update for such patch.
+> Will submit a patch for this test in v2.
 >=20
->     On Wed, Mar 11, 2020 at 02:35:17PM +0200, Yuri Benditovich wrote:
->     > Save and restore RSS/hash report configuration.
->     >
->     > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
->     > ---
->     >=A0 hw/net/virtio-net.c | 9 +++++++++
->     >=A0 1 file changed, 9 insertions(+)
->     >
->     > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->     > index 7b6a929e8c..c8d97d45cd 100644
->     > --- a/hw/net/virtio-net.c
->     > +++ b/hw/net/virtio-net.c
->     > @@ -2869,6 +2869,13 @@ static int virtio_net_post_load_device(void
->     *opaque, int version_id)
->     >=A0 =A0 =A0 =A0 =A0 }
->     >=A0 =A0 =A0 }
->     >=A0
->     > +=A0 =A0 if (n->rss_data.enabled) {
->     > +=A0 =A0 =A0 =A0 trace_virtio_net_rss_enable(n->rss_data.hash_types=
-,
->     > +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 n->rss_data.indirections_len,
->     > +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 sizeof(n->rss_data.key));
->     > +=A0 =A0 } else {
->     > +=A0 =A0 =A0 =A0 trace_virtio_net_rss_disable();
->     > +=A0 =A0 }
->     >=A0 =A0 =A0 return 0;
->     >=A0 }
->     >=A0
->     > @@ -3094,6 +3101,8 @@ static const VMStateDescription
->     vmstate_virtio_net_device =3D {
->     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0vmstate_virti=
-o_net_tx_waiting),
->     >=A0 =A0 =A0 =A0 =A0 VMSTATE_UINT64_TEST(curr_guest_offloads, VirtION=
-et,
->     >=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 has_ctrl=
-_guest_offloads),
->     > +=A0 =A0 =A0 =A0 VMSTATE_UINT8_ARRAY(rss_data_migration, VirtIONet,
->     > +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(Vir=
-tioNetRssData)),
->     >=A0 =A0 =A0 =A0 =A0 VMSTATE_END_OF_LIST()
->     >=A0 =A0 =A0},
+> -Liran
 >=20
->=20
->     I think we should migrate the length too. Avoid arbitrary limits.
->=20
->=20
-> The length of what?
 
-Of the tables.
-> The structure is fixed-length and the intention=A0is just to
-> keep/restore it.
-> The length of indirection table and the table itself are part of the stru=
-cture.
+Notice the process as documented in ./tests/qtest/bios-tables-test.c
 
-
-And that's a problem, because
-1. we are wasting memory for a rarely used feature
-2. if we want to make the table bigger, we'll need to break
-   migration compatibility
-
-Just allocate these dynamically as needed, and migrate length.
-
-
->=20
->     Yes this means we should allocate the indirection arrays on the fly.
->     But that's probably a good idea anyway.
->=20
->     >=A0 };
->     > --
->     > 2.17.1
->=20
->=20
+--=20
+MST
 
 
