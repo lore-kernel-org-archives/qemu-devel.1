@@ -1,88 +1,88 @@
 Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A625BC18E5A
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 15:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 006FEC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 15:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96EEB206C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 15:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 077B1206C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 15:07:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCY2ikmi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96EEB206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9KRItaf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077B1206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC2th-0002BJ-J7
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 11:03:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52659)
+	id 1jC2wo-00047A-Vq
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 11:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jC2sd-0000y2-LI
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:02:44 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jC2wA-0003gn-Ek
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jC2sc-00073T-FT
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:02:43 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52214)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jC2sc-00071S-8M
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:02:42 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a132so2474544wme.1
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 08:02:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Qx5lNT7aIw02/u8GpdYyGy/xlXCFEWtAxHMe6GppCmM=;
- b=XCY2ikmimdsgjXjP2fYw9zgn2HpVRfrclJfpnpMVyiJisk45TlrNXAOykZ7O4Y5l8z
- Yl9WLsrvztghx0lfxJ6YFi9H2OXHp+ACtWICuF8i9QJOofdy3BEQ/WTNG0kcknT8ocog
- du1MQzOf7BdS30xzXxb+qD1o5Tw2KxonHvnfkrej5jys/i9ApP9z8pd44F2tXlmKaHnC
- JxKVwZB2vzORYP2CjTnmH00D8KbkyLotTYGr5g7JuWJ4zXE4zy0bPt2bHs0yOL5ttre1
- O7wmEs1ah98pMgk5UX+bfAcQ1S+SYFCE+xb7gSeIqiImR8zfbZOAIe7tCZmF1RcvDMFW
- U9kQ==
+ (envelope-from <pbonzini@redhat.com>) id 1jC2w8-0001Lr-GC
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:06:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45276
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jC2w8-0001Ks-5y
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 11:06:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583939178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gWo4bbY1JhIe+osJhgXfC1+IqOH1Iig9dRC6HoZa1kE=;
+ b=J9KRItafhvvHkj4ikMKd5cTPvjsbwXWs4kR+UDA+GlETYE/6gUIaSFsbb8Y//4IqxwArC9
+ L0n4zAA/MItNrsiJNYvb0tm6ji95G4tLAK0haoi/cStp5V/bVD/m9phwx8AxMSigktsjyE
+ u4G4M0khQSRfOvOXMhrgU6EU000YFrQ=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-cvfKZNJ0PXaOARTD2CXlvA-1; Wed, 11 Mar 2020 11:06:15 -0400
+X-MC-Unique: cvfKZNJ0PXaOARTD2CXlvA-1
+Received: by mail-ed1-f69.google.com with SMTP id d12so2063203edq.16
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 08:06:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Qx5lNT7aIw02/u8GpdYyGy/xlXCFEWtAxHMe6GppCmM=;
- b=Py/iEAqHRJrEsrXXZavqfiJXq7CkTXjAJhf7swHAnLObTNPFWZNEoPYGaPxMpt0jWt
- m7tkoHhBjqgedx+7ESkjqFkGKZGeRGGDqsSjWpWgUT5pIdHlmacblsVRqmLn9c5KGRtf
- Pz0/1O3WqXNq8nxJBr4SnHafmGlw/EpJTMubIMxgwkpyWBv4/cvbzOUZbJ02q3/1dGvG
- wvxwCVcPEeBbHDTaBu+VHAzsFtjrbewclxV/4iKdbKM5LB4/0VkdIijKlUNt/E+IYuZ9
- ZoPGxP5rbSnQiT3BcTzMgTqtoHQV3hAxvcA/slxpaEDoTFk/QMFzqGlEHDCzShT16B4P
- AHTg==
-X-Gm-Message-State: ANhLgQ2fHeEhp9moC21o/Plv7liEsSHR83+wwormkV82T3w6Kho55l/w
- HORFUBPzxiEHck8M7OY8RByCj+oQs5IkwbA2ydE=
-X-Google-Smtp-Source: ADFU+vtzKPHcsI2kR8rpKfVofRUe3T4Y6pOyszYTG6iVMs1xEAFkoYI7X+8c2d5WX5VIydmpWRmYjsJ8mo4ucbhQFE0=
-X-Received: by 2002:a05:600c:204a:: with SMTP id
- p10mr4186841wmg.55.1583938960503; 
- Wed, 11 Mar 2020 08:02:40 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=e0CwzYllO0O8mu/87AftUlsPdqj8vGf/r08V6Wj7UN4=;
+ b=giosH/oUNJ4bkfyEEPODg6BPr0+I6RHZOXu5YdZnQ/7RbD+NWrdxSEpw/AVfCG6LPe
+ /rhbnwOd6PfU9clnkdJDRuUmoJMJ2BHAsxanVs9HkuoCGbLY1VIq6tA5R60+K5tVnJJw
+ 1b/AW2jOwmsIl7kEo4gCtiKsw90bM7evF/Rg+GctNDW0JJXtn7ecnuQr1P6lmqpXovN6
+ mkbHdGoRcO6kCHTIImGMbdBXSQVurEJ4L+eiTBenOP7jHZA8k4R+AgdK5ZlGTJoSqXr9
+ 6wOJz5+XZ5xcrtK9l4by4GCI3/hx1OhuwKtLuc+XyyDiPjCR//R65gqU0imFdsOsOcBi
+ wAdg==
+X-Gm-Message-State: ANhLgQ1zd/587vOqgoo0sijT45WwTULG8fzZEGNwNhpO2TSu7/iM7mOg
+ cS6ix+e+CI6uEveqNIl1LGV2w/lkJSiawVDbebHX/JjrqhbBxZfhoiO4zNaWRsl9239KZafWNrr
+ miF/qpy2rThwVrENqwscDuRLyH+nIzdM=
+X-Received: by 2002:aa7:cfcc:: with SMTP id r12mr3368489edy.57.1583939174619; 
+ Wed, 11 Mar 2020 08:06:14 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtWxZWEBb4z3NqDmic6tG6z4NBlW3Aa4wGZlJTJi2FapxUbALC+5fhwfPv90RDk1+AokS76Bvv7dfQqhnfgIDU=
+X-Received: by 2002:aa7:cfcc:: with SMTP id r12mr3368460edy.57.1583939174449; 
+ Wed, 11 Mar 2020 08:06:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200224182454.24610-1-sebastien.boeuf@intel.com>
- <20200306123453.GI1335569@stefanha-x1.localdomain>
- <CAJ+F1CJpMzra8VSYWKgtwZJkxvEX_HTqT=Sr9yvmX=NMH=9MSg@mail.gmail.com>
- <717f4005879504627a0bff4dd55ec0e166dfeb88.camel@intel.com>
-In-Reply-To: <717f4005879504627a0bff4dd55ec0e166dfeb88.camel@intel.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 11 Mar 2020 16:02:28 +0100
-Message-ID: <CAJ+F1CJhxQ9Gk15QUhbGV+HGdjr2-9DaR4C0Namw9jcSKwX96A@mail.gmail.com>
-Subject: Re: [PATCH v2] docs: Update vhost-user spec regarding backend program
- conventions
-To: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>,
- Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+References: <20200311123624.277221-1-stefanha@redhat.com>
+ <87d09jx7wm.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d09jx7wm.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 11 Mar 2020 16:06:02 +0100
+Message-ID: <CABgObfaYwZmokcQHF7Hdr-1v4r1jT4cxF0WiHw_Fob-A1AOXkQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] thread: add lock guard macros
+To: Markus Armbruster <armbru@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000d6de5305a09593e2"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,100 +94,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "stefanha@gmail.com" <stefanha@gmail.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+--000000000000d6de5305a09593e2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 11, 2020 at 3:19 PM Boeuf, Sebastien
-<sebastien.boeuf@intel.com> wrote:
+Il mer 11 mar 2020, 15:50 Markus Armbruster <armbru@redhat.com> ha scritto:
+
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
 >
-> Hi!
+> > Lock guards automatically call qemu_(rec_)mutex_unlock() when returning
+> from a
+> > function or leaving leaving a lexical scope.  This simplifies code and
+> > eliminates leaks (especially in error code paths).
+> >
+> > This series adds lock guards for QemuMutex and QemuRecMutex.  It does n=
+ot
+> > convert the entire tree but includes example conversions.
 >
-> On Fri, 2020-03-06 at 13:52 +0100, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Fri, Mar 6, 2020 at 1:35 PM Stefan Hajnoczi <stefanha@gmail.com>
-> > wrote:
-> > > On Mon, Feb 24, 2020 at 07:24:54PM +0100, Sebastien Boeuf wrote:
-> > > > The vhost-user specification is not clearly stating the expected
-> > > > behavior from a backend program whenever the client disconnects.
-> > > >
-> > > > This patch addresses the issue by defining the default behavior
-> > > > and
-> > > > proposing an alternative through a command line option.
-> > > >
-> > > > By default, a backend program will terminate whenever the client
-> > > > disconnects, unless told otherwise through the newly introduced
-> > > > option --keep-listening.
-> > > >
-> > > > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> > > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > ---
-> > > >  docs/interop/vhost-user.rst | 12 ++++++++++++
-> > > >  1 file changed, 12 insertions(+)
-> > >
-> > > Perhaps --keep-listening should be optional?
-> >
-> > I think it should be optional, and flagged by a capability.
+> I support the move towards automatic cleanup, but I'm wary of
+> incremental conversion.  Experience tells that outdated examples
+> invariably get copied / imitated, with incremental conversion struggling
+> to keep up.
 >
-> Could you please elaborate on that? How can I do that?
-
-Some backend options or behavior are optional, and advertised through
---print-capabilities.
-
-Say --foo (optional),
-
---print-capabilities should have something like:
-
-{ ...
-  "features": [
-     "foo",
-     ...
-   ]
-}
-
-The list of capabilities is documented in vhost-user.json,
-VHostUserBackendCapabilities.
-
-We lack common enum such as @VHostUserBackendCommonFeature at this
-point, but it can be added.
-
-Although we don't currently parse this file through qapi, I don't know
-how to express that
-VHostUserBackendGPUFeature/VHostUserBackendCapabilitiesInput inherits
-from another enum. Markus, any idea?
-
-
-
+> Are we resigned to having both kinds of mutex cleanup forever?
 >
-> Thanks,
-> Sebastien
-> >
-> > > If the maintainers are happy with the patch as is then so am I:
-> > >
-> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >
-> >
-> ---------------------------------------------------------------------
-> Intel Corporation SAS (French simplified joint stock company)
-> Registered headquarters: "Les Montalets"- 2, rue de Paris,
-> 92196 Meudon Cedex, France
-> Registration Number:  302 456 199 R.C.S. NANTERRE
-> Capital: 4,572,000 Euros
+
+There are cases where the legibility benefits of guards are debatable, or
+they require more complex functionality in the guards (see my other answer
+to Stefan). So, yes. We don't have that many mutexes so incremental
+conversion should be doable without taking forever.
+
+Paolo
+
+
+> If not, what's the plan to get the job finished, and until when?
 >
-> This e-mail and any attachments may contain confidential material for
-> the sole use of the intended recipient(s). Any review or distribution
-> by others is strictly prohibited. If you are not the intended
-> recipient, please contact the sender and delete all copies.
+>
 
+--000000000000d6de5305a09593e2
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il mer 11 mar 2020, 15:50 Markus Armbruster &lt;<a hre=
+f=3D"mailto:armbru@redhat.com">armbru@redhat.com</a>&gt; ha scritto:<br></d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex">Stefan Hajnoczi &lt;<a href=3D"mailto:ste=
+fanha@redhat.com" target=3D"_blank" rel=3D"noreferrer">stefanha@redhat.com<=
+/a>&gt; writes:<br>
+<br>
+&gt; Lock guards automatically call qemu_(rec_)mutex_unlock() when returnin=
+g from a<br>
+&gt; function or leaving leaving a lexical scope.=C2=A0 This simplifies cod=
+e and<br>
+&gt; eliminates leaks (especially in error code paths).<br>
+&gt;<br>
+&gt; This series adds lock guards for QemuMutex and QemuRecMutex.=C2=A0 It =
+does not<br>
+&gt; convert the entire tree but includes example conversions.<br>
+<br>
+I support the move towards automatic cleanup, but I&#39;m wary of<br>
+incremental conversion.=C2=A0 Experience tells that outdated examples<br>
+invariably get copied / imitated, with incremental conversion struggling<br=
+>
+to keep up.<br>
+<br>
+Are we resigned to having both kinds of mutex cleanup forever?<br></blockqu=
+ote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">There are cas=
+es where the legibility benefits of guards are debatable, or they require m=
+ore complex functionality in the guards (see my other answer to Stefan). So=
+, yes. We don&#39;t have that many mutexes so incremental conversion should=
+ be doable without taking forever.</div><div dir=3D"auto"><br></div><div di=
+r=3D"auto">Paolo</div><div dir=3D"auto"><br></div><div dir=3D"auto"><div cl=
+ass=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
+ .8ex;border-left:1px #ccc solid;padding-left:1ex">
+<br>
+If not, what&#39;s the plan to get the job finished, and until when?<br>
+<br>
+</blockquote></div></div></div>
 
---=20
-Marc-Andr=C3=A9 Lureau
+--000000000000d6de5305a09593e2--
+
 
