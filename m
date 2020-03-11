@@ -2,114 +2,98 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B3AC0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C736DC2BAEE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B07E520736
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:15:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07E520736
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
+	by mail.kernel.org (Postfix) with ESMTPS id C72D420749
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:20:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awg42JVp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C72D420749
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC7la-0000ZM-JN
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:15:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40418)
+	id 1jC7pn-0003Uq-NW
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:20:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <max@m00nbsd.net>) id 1jC7km-0008NN-9o
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:57 -0400
+ (envelope-from <mst@redhat.com>) id 1jC7p2-0002av-NZ
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <max@m00nbsd.net>) id 1jC7kl-0006MI-1V
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:55 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:52325)
+ (envelope-from <mst@redhat.com>) id 1jC7p0-0000Ce-Lz
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:19:19 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50023
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1jC7kk-0006G6-SC
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:54 -0400
-Received: from mxplan6.mail.ovh.net (unknown [10.109.138.217])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 2E8F72640E38;
- Wed, 11 Mar 2020 21:14:45 +0100 (CET)
-Received: from m00nbsd.net (37.59.142.105) by DAG3EX2.mxp6.local (172.16.2.22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Wed, 11 Mar
- 2020 21:14:44 +0100
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20200206115731.13552-1-n54@gmx.com>
- <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
- <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
- <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
- <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
- <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
- <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
- <85e4202d-91dd-0d31-373a-febe566353ab@m00nbsd.net>
- <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
-From: Maxime Villard <max@m00nbsd.net>
-Autocrypt: addr=max@m00nbsd.net; keydata=
- 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
-Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
-Message-ID: <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
-Date: Wed, 11 Mar 2020 21:14:39 +0100
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jC7p0-0000CP-H3
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:19:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583957957;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DY0iOw8aCkXNW03axEMLVxlFRUiQQcw8CASyhZn2Ud4=;
+ b=awg42JVpoX6SaTBL7z4x3hfY6Kth1Xcdy+vGc0lhEs6uitPOWmgR5lKExSqTlmpVE0ZRS1
+ xYjcSc1cF1SIbyHytRfgtJaT6jo4EmCXO3+r3zIfkDg1zgvuEHfhYuHWm7BhVlls+gKXrg
+ 5FjpfaHq3PyOBHQ7rhD31mZus7E+Y4Q=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-wIxlXqCGPN-doZs7N_5smA-1; Wed, 11 Mar 2020 16:19:16 -0400
+X-MC-Unique: wIxlXqCGPN-doZs7N_5smA-1
+Received: by mail-qt1-f200.google.com with SMTP id d2so2016578qtr.9
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 13:19:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=wGirIuTk4cvgmvGoG4Hd4NaK1XJFsEs9Y8K1dZPMK6g=;
+ b=W1cCXpazuqyc+XxG8CIobu9h1xVtdhOYbnGNg80iPUBtd1LPnaRDojzFekTeJr7IyN
+ F/s9rSrlezzdE2izM/7MtyFs4jnNXICvzL9rf7cCSdPBScB3UDO3xATulGIXHo7XFIww
+ x35izKlcD6nED0WOIfaVrB5rQ0Sbi/vXQ535nJR6PAbIoZpSOEMK7NQzxpurbGSLpnX5
+ 3usz8gwn+pmZKyz8Nnac7JdynEQRJGdQmDlsoaBduqTX5EhWx3r57x8G5bA6QBiIo0YO
+ t6s0IJl4vP53sImwPsFC8TMgGYqAPjqMvyU7E7ieXQg4dKngJ+qXIbLcrRXUXgN6yNy4
+ 32eA==
+X-Gm-Message-State: ANhLgQ1FxJwlPrZFsU1e1VtZM7Igt1t7OTDVLCZmKy05sdpa0Qli4sHY
+ 5pcY/Wasgq5BGpfYULT/DQiDj9Umftsinx6IgchMsObaEsw0Aly00wmnuZrz+hrAu9NGr9qUSLL
+ gtR6H1CEfLSCL+nA=
+X-Received: by 2002:ac8:1e08:: with SMTP id n8mr4293395qtl.175.1583957955557; 
+ Wed, 11 Mar 2020 13:19:15 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsU9swn3vGwYAn5pK3cWTbg0khabNng8C4H+6V/ChPiRmx/u8MV54G9cCJuGHuVbj5gPj3qew==
+X-Received: by 2002:ac8:1e08:: with SMTP id n8mr4293368qtl.175.1583957955154; 
+ Wed, 11 Mar 2020 13:19:15 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id x22sm4726402qki.54.2020.03.11.13.19.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Mar 2020 13:19:14 -0700 (PDT)
+Date: Wed, 11 Mar 2020 16:19:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH v3 1/6] virtio-net: introduce RSS and hash report features
+Message-ID: <20200311161819-mutt-send-email-mst@kernel.org>
+References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
+ <20200311123518.4025-2-yuri.benditovich@daynix.com>
+ <20200311094553-mutt-send-email-mst@kernel.org>
+ <CAOEp5OdgDB5u-SeZO3y4iCTjFy6hpNfPA-ADaBbnvx=MHD_dTw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG6EX1.mxp6.local (172.16.2.51) To DAG3EX2.mxp6.local
- (172.16.2.22)
-X-Ovh-Tracer-GUID: d834a286-354c-4710-b549-8c55129c5230
-X-Ovh-Tracer-Id: 5094697080916086575
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvfedgvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepvfhfhffukfffgggjtgfgihesthekredttddtjeenucfhrhhomhepofgrgihimhgvucggihhllhgrrhguuceomhgrgiesmhdttdhnsghsugdrnhgvtheqnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghniedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrgigsehmtddtnhgsshgurdhnvghtpdhrtghpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtghomh
+In-Reply-To: <CAOEp5OdgDB5u-SeZO3y4iCTjFy6hpNfPA-ADaBbnvx=MHD_dTw@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.125.2
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,43 +105,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
- philmd@redhat.com, rth <rth@twiddle.net>
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/03/2020 =C3=A0 19:03, Paolo Bonzini a =C3=A9crit=C2=A0:
-> On 10/03/20 20:14, Maxime Villard wrote:
->> Maybe, whpx_vcpu_kick() causes a WHvRunVpExitReasonCanceled in the
->> WHvRunVirtualProcessor() call that follows, which in turn causes "ret=3D=
-1"
->> to leave the loop. That is, maybe the next WHvRunVirtualProcessor() ac=
-ks
->> the cancellation and leaves without doing anything, even if the
->> cancellation was received when this function wasn't executing. So ther=
-e is
->> no bad effect, given that we still end up leaving the loop, which is t=
-he
->> desired functional behavior.
+On Wed, Mar 11, 2020 at 03:57:58PM +0200, Yuri Benditovich wrote:
 >=20
-> Yes, that's exactly the effect, and it solves the race in the same way
-> as KVM's run->immediate_exit flag.
 >=20
->> Looking at NVMM now, it seems to me there is the same thing. We do a
->> self-kick but we're the calling thread and know the VCPU isn't executi=
-ng.
->> As a result of the self-kick the IPI handler sets
->> 	qcpu->stop =3D true;
->> And in the next iteration of the loop, we break because this bool is s=
-et
+> On Wed, Mar 11, 2020 at 3:47 PM Michael S. Tsirkin <mst@redhat.com> wrote=
+:
 >=20
-> The problem is that qcpu->stop is checked _before_ entering the
-> hypervisor and not after, so there is a small race window.
+>     On Wed, Mar 11, 2020 at 02:35:13PM +0200, Yuri Benditovich wrote:
+>     > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+>     > ---
+>     >=A0 hw/net/virtio-net.c | 95 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>     >=A0 1 file changed, 95 insertions(+)
+>     >
+>     > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>     > index 3627bb1717..9545b0e84f 100644
+>     > --- a/hw/net/virtio-net.c
+>     > +++ b/hw/net/virtio-net.c
+>     > @@ -71,6 +71,101 @@
+>     >=A0 #define VIRTIO_NET_IP6_ADDR_SIZE=A0 =A032=A0 =A0 =A0 /* ipv6 sad=
+dr + daddr */
+>     >=A0 #define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
+>     >=A0
+>     > +/* TODO: remove after virtio-net header update */
+>     > +#if !defined(VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+>     > +#define VIRTIO_NET_F_HASH_REPORT=A0 =A0 57=A0 /* Supports hash rep=
+ort */
+>     > +#define VIRTIO_NET_F_RSS=A0 =A0 =A0 =A0 =A0 =A0 60=A0 /* Supports =
+RSS RX steering */
+>     > +
+>     > +/* supported/enabled hash types */
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4=A0 =A0 =A0 =A0 =A0 (1 << 0)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4=A0 =A0 =A0 =A0 =A0(1 << 1)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4=A0 =A0 =A0 =A0 =A0(1 << 2)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6=A0 =A0 =A0 =A0 =A0 (1 << 3)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6=A0 =A0 =A0 =A0 =A0(1 << 4)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6=A0 =A0 =A0 =A0 =A0(1 << 5)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX=A0 =A0 =A0 =A0 =A0(1 << 6)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX=A0 =A0 =A0 =A0 (1 << 7)
+>     > +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX=A0 =A0 =A0 =A0 (1 << 8)
+>     > +
+>     > +#define __le16 uint16_t
+>     > +#define __le32 uint32_t
+>     > +#define __u8=A0 =A0uint8_t
+>     > +#define __u16=A0 uint16_t
+>     > +#define __u32=A0 uint32_t
+>=20
+>     Let's just use uint16_t etc directly please.
+>=20
+>     > +struct virtio_net_config_with_rss {
+>     > +=A0 =A0 /* The config defining mac address (if VIRTIO_NET_F_MAC) *=
+/
+>     > +=A0 =A0 __u8 mac[ETH_ALEN];
+>     > +=A0 =A0 /* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
+>     > +=A0 =A0 __u16 status;
+>     > +=A0 =A0 /*
+>     > +=A0 =A0 =A0* Maximum number of each of transmit and receive queues=
+;
+>     > +=A0 =A0 =A0* see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
+>     > +=A0 =A0 =A0* Legal values are between 1 and 0x8000
+>     > +=A0 =A0 =A0*/
+>     > +=A0 =A0 __u16 max_virtqueue_pairs;
+>     > +=A0 =A0 /* Default maximum transmit unit advice */
+>     > +=A0 =A0 __u16 mtu;
+>     > +=A0 =A0 /*
+>     > +=A0 =A0 =A0* speed, in units of 1Mb. All values 0 to INT_MAX are l=
+egal.
+>     > +=A0 =A0 =A0* Any other value stands for unknown.
+>     > +=A0 =A0 =A0*/
+>     > +=A0 =A0 __u32 speed;
+>     > +=A0 =A0 /*
+>     > +=A0 =A0 =A0* 0x00 - half duplex
+>     > +=A0 =A0 =A0* 0x01 - full duplex
+>     > +=A0 =A0 =A0* Any other value stands for unknown.
+>     > +=A0 =A0 =A0*/
+>     > +=A0 =A0 __u8 duplex;
+>     > +=A0 =A0 /* maximum size of RSS key */
+>     > +=A0 =A0 __u8 rss_max_key_size;
+>     > +=A0 =A0 /* maximum number of indirection table entries */
+>     > +=A0 =A0 __le16 rss_max_indirection_table_length;
+>     > +=A0 =A0 /* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
+>     > +=A0 =A0 __le32 supported_hash_types;
+>     > +} __attribute__((packed));
+>     > +
+>     > +#define virtio_net_config virtio_net_config_with_rss
+>=20
+>     Do we have to? Let's just tweak code to do the right thing...
+>=20
+>=20
+> Are we going to update the virtio_net some time?
+> If yes, IMO makes sense to do less tweaking in the middle of the code.
+> Then, upon update of virtio_net.h - easily remove all these defines that =
+were
+> added in virtio-net.c=A0
 
-Ok. I don't understand what's supposed to be the race here. If we get an
-IPI between the check and the call to nvmm_vcpu_run() then we'll just do
-one run and stop in the next iteration, because the IPI will have set
-qcpu->stop. Is this extra iteration undesired?
+We'll update it in a month or two. But I'd be reluctant to merge hacks
+since people tend to copy-paste code ...
+
+>=20
+>=20
+>     > +
+>     > +struct virtio_net_hdr_v1_hash {
+>     > +=A0 =A0 struct virtio_net_hdr_v1 hdr;
+>     > +=A0 =A0 __le32 hash_value;
+>     > +#define VIRTIO_NET_HASH_REPORT_NONE=A0 =A0 =A0 =A0 =A0 =A0 0
+>     > +#define VIRTIO_NET_HASH_REPORT_IPv4=A0 =A0 =A0 =A0 =A0 =A0 1
+>     > +#define VIRTIO_NET_HASH_REPORT_TCPv4=A0 =A0 =A0 =A0 =A0 =A02
+>     > +#define VIRTIO_NET_HASH_REPORT_UDPv4=A0 =A0 =A0 =A0 =A0 =A03
+>     > +#define VIRTIO_NET_HASH_REPORT_IPv6=A0 =A0 =A0 =A0 =A0 =A0 4
+>     > +#define VIRTIO_NET_HASH_REPORT_TCPv6=A0 =A0 =A0 =A0 =A0 =A05
+>     > +#define VIRTIO_NET_HASH_REPORT_UDPv6=A0 =A0 =A0 =A0 =A0 =A06
+>     > +#define VIRTIO_NET_HASH_REPORT_IPv6_EX=A0 =A0 =A0 =A0 =A07
+>     > +#define VIRTIO_NET_HASH_REPORT_TCPv6_EX=A0 =A0 =A0 =A0 8
+>     > +#define VIRTIO_NET_HASH_REPORT_UDPv6_EX=A0 =A0 =A0 =A0 9
+>     > +=A0 =A0 __le16 hash_report;
+>     > +=A0 =A0 __le16 padding;
+>     > +};
+>     > +
+>     > +/*
+>     > + * The command VIRTIO_NET_CTRL_MQ_RSS_CONFIG has the same effect a=
+s
+>     > + * VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET does and additionally configure=
+s
+>     > + * the receive steering to use a hash calculated for incoming pack=
+et
+>     > + * to decide on receive virtqueue to place the packet. The command
+>     > + * also provides parameters to calculate a hash and receive virtqu=
+eue.
+>     > + */
+>     > +struct virtio_net_rss_config {
+>     > +=A0 =A0 __le32 hash_types;
+>     > +=A0 =A0 __le16 indirection_table_mask;
+>     > +=A0 =A0 __le16 unclassified_queue;
+>     > +=A0 =A0 __le16 indirection_table[1/* + indirection_table_mask */];
+>     > +=A0 =A0 __le16 max_tx_vq;
+>     > +=A0 =A0 __u8 hash_key_length;
+>     > +=A0 =A0 __u8 hash_key_data[/* hash_key_length */];
+>     > +};
+>     > +
+>     > +#define VIRTIO_NET_CTRL_MQ_RSS_CONFIG=A0 =A0 =A0 =A0 =A0 1
+>     > +#define VIRTIO_NET_CTRL_MQ_HASH_CONFIG=A0 =A0 =A0 =A0 =A02
+>     > +
+>     > +#endif
+>     > +
+>     >=A0 /* Purge coalesced packets timer interval, This value affects th=
+e
+>     performance
+>     >=A0 =A0 =A0a lot, and should be tuned carefully, '300000'(300us) is =
+the
+>     recommended
+>     >=A0 =A0 =A0value to pass the WHQL test, '50000' can gain 2x netperf =
+throughput
+>     with
+>     > --
+>     > 2.17.1
+>=20
+>=20
+
 
