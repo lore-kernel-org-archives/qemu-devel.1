@@ -2,58 +2,89 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B371C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0956EC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20ABD2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:01:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20ABD2146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+	by mail.kernel.org (Postfix) with ESMTPS id C9CDB2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:01:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SrE8GfeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9CDB2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC0zO-0007be-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:01:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51968)
+	id 1jC0zU-0007jp-01
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:01:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51967)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vt@altlinux.org>) id 1jC0yJ-0006Zb-D2
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:00:28 -0400
+ (envelope-from <lersek@redhat.com>) id 1jC0yJ-0006Za-A9
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vt@altlinux.org>) id 1jC0yI-0006U9-1M
+ (envelope-from <lersek@redhat.com>) id 1jC0yE-0006S5-Dj
  for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:00:27 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:60240)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <vt@altlinux.org>)
- id 1jC0yH-0006Sa-Pm; Wed, 11 Mar 2020 09:00:25 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
- by vmicros1.altlinux.org (Postfix) with ESMTP id 1DDC672CCF0;
- Wed, 11 Mar 2020 16:00:23 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
- by imap.altlinux.org (Postfix) with ESMTPSA id 0A4CA4A4A16;
- Wed, 11 Mar 2020 16:00:23 +0300 (MSK)
-Date: Wed, 11 Mar 2020 16:00:22 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] target/ppc: Fix rlwinm on ppc64
-Message-ID: <20200311130022.sswvce3wx3dii4mf@altlinux.org>
-References: <20200309204557.14836-1-vt@altlinux.org>
- <20200310231503.GR660117@umbus.fritz.box>
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29461
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1jC0yE-0006Re-96
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:00:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583931621;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=81ranNgaJ7+QpsDSPTAEq8fKefnUAsd8CB3itcBZlTE=;
+ b=SrE8GfeM5k0qJNQtWGu9/T+ssHUN0GHnAlMJ+owm4AKbCJWBrpyEp3pQguDb3oBu7lQHTf
+ 7MR8d9GOhDmMDiPv1JYo0VrGZWBD8BedavjthLtTjfpEascQLarfzat7+KkaxRwdhb9IdM
+ u5DHCQEL2vDrcCfTJ7FoxvojUklJ/9k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-2DGGhj-GP7ichjKRl3vFUA-1; Wed, 11 Mar 2020 09:00:18 -0400
+X-MC-Unique: 2DGGhj-GP7ichjKRl3vFUA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBDA2477;
+ Wed, 11 Mar 2020 13:00:16 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.119.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E574B100EBA6;
+ Wed, 11 Mar 2020 13:00:02 +0000 (UTC)
+Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
+ vfio_rom_read
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200224064219.1434-1-longpeng2@huawei.com>
+ <20200224064219.1434-2-longpeng2@huawei.com>
+ <20200224090458.080152c0@w520.home>
+ <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
+ <20200310101108.3377b878@x1.home>
+ <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
+ <20200310193624.402fdb18@x1.home>
+ <30f4a52f-a572-8643-1801-95c9fd2cd8a8@redhat.com>
+ <87o8t3ds4a.fsf@dusky.pond.sub.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <1255d677-4c97-c326-890e-2fe132476367@redhat.com>
+Date: Wed, 11 Mar 2020 14:00:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20200310231503.GR660117@umbus.fritz.box>
-User-Agent: NeoMutt/20171215-106-ac61c7
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 194.107.17.57
+In-Reply-To: <87o8t3ds4a.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,83 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: mst@redhat.com, weifuqiang@huawei.com, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, "Longpeng \(Mike,
+ Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David,
+On 03/11/20 12:54, Markus Armbruster wrote:
+> Laszlo Ersek <lersek@redhat.com> writes:
 
-On Wed, Mar 11, 2020 at 10:15:03AM +1100, David Gibson wrote:
-> On Mon, Mar 09, 2020 at 11:45:57PM +0300, Vitaly Chikunov wrote:
-> > rlwinm cannot just AND with Mask if shift value is zero on ppc64 when
-> > Mask Begin is greater than Mask End and high bits are set to 1.
-> > 
-> > Note that PowerISA 3.0B says that for `rlwinm' ROTL32 is used, and
-> > ROTL32 is defined (in 3.3.14) so that rotated value should have two
-> > copies of lower word of the source value.
-> > 
-> > This seems to be another incarnation of the fix from 820724d170
-> > ("target-ppc: Fix rlwimi, rlwinm, rlwnm again"), except I leave
-> > optimization when Mask value is less than 32 bits.
-> > 
-> > Fixes: 7b4d326f47 ("target-ppc: Use the new deposit and extract ops")
-> > Cc: qemu-stable@nongnu.org
-> > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+>> In fact I was about to mention, "I really don't understand why compilers
+>> don't yell upon seeing pointer-to-void arithmetic", but I got distracted
+>> and forgot about that thought. In retrospect, that may have been for the
+>> best! :)
 > 
-> Applied to ppc-for-5.0.
-
-Thanks! FYI, there is at least one real case of this bug:
-  https://github.com/iovisor/bcc/issues/2771
-so this is not theoretical, and, probably, should go to the stable
-too.
-
-Thanks,
-
-
+> You're looking for
 > 
-> > ---
-> >  target/ppc/translate.c | 20 +++++++++++---------
-> >  1 file changed, 11 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > index 36fa27367c..127c82a24e 100644
-> > --- a/target/ppc/translate.c
-> > +++ b/target/ppc/translate.c
-> > @@ -1938,15 +1938,17 @@ static void gen_rlwinm(DisasContext *ctx)
-> >          me += 32;
-> >  #endif
-> >          mask = MASK(mb, me);
-> > -        if (sh == 0) {
-> > -            tcg_gen_andi_tl(t_ra, t_rs, mask);
-> > -        } else if (mask <= 0xffffffffu) {
-> > -            TCGv_i32 t0 = tcg_temp_new_i32();
-> > -            tcg_gen_trunc_tl_i32(t0, t_rs);
-> > -            tcg_gen_rotli_i32(t0, t0, sh);
-> > -            tcg_gen_andi_i32(t0, t0, mask);
-> > -            tcg_gen_extu_i32_tl(t_ra, t0);
-> > -            tcg_temp_free_i32(t0);
-> > +        if (mask <= 0xffffffffu) {
-> > +            if (sh == 0) {
-> > +                tcg_gen_andi_tl(t_ra, t_rs, mask);
-> > +            } else {
-> > +                TCGv_i32 t0 = tcg_temp_new_i32();
-> > +                tcg_gen_trunc_tl_i32(t0, t_rs);
-> > +                tcg_gen_rotli_i32(t0, t0, sh);
-> > +                tcg_gen_andi_i32(t0, t0, mask);
-> > +                tcg_gen_extu_i32_tl(t_ra, t0);
-> > +                tcg_temp_free_i32(t0);
-> > +            }
-> >          } else {
-> >  #if defined(TARGET_PPC64)
-> >              tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
+> '-Wpointer-arith'
+>      Warn about anything that depends on the "size of" a function type
+>      or of 'void'.  GNU C assigns these types a size of 1, for
+>      convenience in calculations with 'void *' pointers and pointers to
+>      functions.  In C++, warn also when an arithmetic operation involves
+>      'NULL'.  This warning is also enabled by '-Wpedantic'.
 > 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
 
+Thanks! It seems like "-Wpedantic" and "-pedantic" are synonymous. And
+the latter used to be part of my standard set of flags, while I worked
+on hosted C programs where I could influence the build flags ;)
+
+Cheers,
+Laszlo
 
 
