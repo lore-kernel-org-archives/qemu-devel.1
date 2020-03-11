@@ -2,64 +2,88 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0575DC10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EF3C18E5A
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:05:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C350820873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:00:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C350820873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42EB1208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:05:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EN0jBoSs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42EB1208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC020-0001t8-RK
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:00:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37151)
+	id 1jC06d-0003GV-Bi
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:04:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuzenghui@huawei.com>) id 1jC01J-0001Kp-5s
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:59:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jC05w-0002pe-Oa
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuzenghui@huawei.com>) id 1jC01H-0000zy-SA
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:59:29 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3276 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
- id 1jC01F-0000ef-1J; Wed, 11 Mar 2020 07:59:25 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 84AEF31DAF8532D5D5B4;
- Wed, 11 Mar 2020 19:59:14 +0800 (CST)
-Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
- 19:59:07 +0800
-Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
- tests
-To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
- <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
- <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-References: <20200310145410.26308-1-eric.auger@redhat.com>
- <20200310145410.26308-11-eric.auger@redhat.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
-Date: Wed, 11 Mar 2020 19:59:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (envelope-from <alex.bennee@linaro.org>) id 1jC05v-0005HA-9d
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:04:16 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36221)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jC05v-0005E1-2Y
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:04:15 -0400
+Received: by mail-wr1-x442.google.com with SMTP id s5so2287293wrg.3
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 05:04:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=VSRoJWl6m1K5BhZwLEZqC+94rud13AIGXS9Ky8qNZI8=;
+ b=EN0jBoSsSCgMalS6IoWkK6PGY3XP0TZt3As5KZWl+7kvmPKseb9Sbkc0JtN13QXOhz
+ oXwffAHbhuP1Ndp0NSAq5Rt7p+mDcd+IZBWwT/hXiYBS30m/kiIaqi8QSUpKHyKsK6z6
+ GlVY/hG8UtmIB8hf2SQHmqrJ4zUbARXahOfCOkG/lA0NIZh/Fas8CwEi+M/pKwpFMWi4
+ tTziRQEFZuUXKasDHPR7hXlW+b2twvEwnKIaajhXXzy/b6O26prnq6WHnktQQLd15e3r
+ 9WNcpS6V6C+Is40irhO6C1HHDFQod/490ks3AXYAXzNaT+2eds1zIs4w+80kdDF58SAV
+ 5FQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=VSRoJWl6m1K5BhZwLEZqC+94rud13AIGXS9Ky8qNZI8=;
+ b=IFKRv1dHirym853KXwzSGhoNtYxVJZwukSH0mTSTHTvMM8LIs7znCBfPNOt5NMJV09
+ s08p97D8q86UdWQbWnhgEeAnleCp6N8oBFagCuoEObDE4tVf1/6CBYEVx3qC3M9ghVKH
+ zYG/K5GrfeISfuCXlnhKM/Fmn7WROszUbY+aAZlkNzslw6w2kSAhGo4fFRegGM6MVJ5a
+ SxKqdTguZQD3kyZB5uYXfi2AOM8oFR+UNTz9y0XMzsfr/3E0kcClY4V1mFam8hEqFtq+
+ tm9uwYnpOlTNpWQEikiTM85PtK28IFpTu9lwjsWqKhY/fPTX1a1ZQg8niaGOHKUgP881
+ 5fUQ==
+X-Gm-Message-State: ANhLgQ0cfkcSFzN4U2oS6esQzPtEzEmZz+tmcgF4XjR1YqqHihit2Hoy
+ xRvcNsOL3zI1RA6zaoFIqoOJkg==
+X-Google-Smtp-Source: ADFU+vuRgJSt/BgUp0fFEkrMblXi0ugXrExvaVvsXzGhmpZnP76l202QLY8aEGMEvIKJ7LaUrmfXxA==
+X-Received: by 2002:a5d:480c:: with SMTP id l12mr4203826wrq.19.1583928253676; 
+ Wed, 11 Mar 2020 05:04:13 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l17sm9149149wmg.23.2020.03.11.05.04.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Mar 2020 05:04:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D31A51FF7E;
+ Wed, 11 Mar 2020 12:04:11 +0000 (GMT)
+References: <20200310182536.11137-1-robert.foley@linaro.org>
+User-agent: mu4e 1.3.9; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v3 00/10] tests/vm: Add support for aarch64 VMs
+In-reply-to: <20200310182536.11137-1-robert.foley@linaro.org>
+Date: Wed, 11 Mar 2020 12:04:11 +0000
+Message-ID: <87pndjgksk.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200310145410.26308-11-eric.auger@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,149 +95,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
- thuth@redhat.com, peter.maydell@linaro.org
+Cc: peter.puhov@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
 
-On 2020/3/10 22:54, Eric Auger wrote:
-> Triggers LPIs through the INT command.
-> 
-> the test checks the LPI hits the right CPU and triggers
-> the right LPI intid, ie. the translation is correct.
-> 
-> Updates to the config table also are tested, along with inv
-> and invall commands.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
+Robert Foley <robert.foley@linaro.org> writes:
 
-[...]
+> This is version 3 of the patch series to=20
+> add support for aarch64 VMs in the vm-build infrastructure.
+>  - Ubuntu 18.04 aarch64 VM
+>  - CentOS 8 aarch64 VM
+>
+> V2:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg05310.html
 
-> +static void test_its_trigger(void)
-> +{
-> +	struct its_collection *col3, *col2;
-> +	struct its_device *dev2, *dev7;
-> +
-> +	if (its_prerequisites(4))
-> +		return;
-> +
-> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
-> +	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
-> +
-> +	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
-> +	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
-> +
-> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
-> +	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
-> +
-> +	its_send_invall(col2);
-> +	its_send_invall(col3);
+Hmm weird - it's broken check-acceptance for me:
 
-These two INVALLs should be issued after col2 and col3 are mapped,
-otherwise this will cause the INVALL command error as per the spec
-(though KVM doesn't complain it at all).
+JOB LOG    : /home/alex/avocado/job-results/job-2020-03-11T12.03-8250144/jo=
+b.log
+ (01/29) ./tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86=
+_64_pc: ERROR: 'ConsoleSocket' object has no attribute 'makefile' (0.35 s)
 
-> +
-> +	report_prefix_push("int");
-> +	/*
-> +	 * dev=2, eventid=20  -> lpi= 8195, col=3
-> +	 * dev=7, eventid=255 -> lpi= 8196, col=2
-> +	 * Trigger dev2, eventid=20 and dev7, eventid=255
-> +	 * Check both LPIs hit
-> +	 */
-> +
-> +	its_send_mapd(dev2, true);
-> +	its_send_mapd(dev7, true);
-> +
-> +	its_send_mapc(col3, true);
-> +	its_send_mapc(col2, true);
-> +
-> +	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
-> +	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
-> +
-> +	lpi_stats_expect(3, 8195);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
-> +
-> +	lpi_stats_expect(2, 8196);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("inv/invall");
-> +
-> +	/*
-> +	 * disable 8195, check dev2/eventid=20 does not trigger the
-> +	 * corresponding LPI
-> +	 */
-> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
-> +	its_send_inv(dev2, 20);
-> +
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
-> +
-> +	/*
-> +	 * re-enable the LPI but willingly do not call invall
-> +	 * so the change in config is not taken into account.
-> +	 * The LPI should not hit
-> +	 */
-> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
-> +
-> +	/* Now call the invall and check the LPI hits */
-> +	its_send_invall(col3);
-> +	lpi_stats_expect(3, 8195);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
-> +
-> +	report_prefix_pop();
-> +
-> +	report_prefix_push("mapd valid=false");
-> +	/*
-> +	 * Unmap device 2 and check the eventid 20 formerly
-> +	 * attached to it does not hit anymore
-> +	 */
-> +
-> +	its_send_mapd(dev2, false);
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev2, 20);
-> +	check_lpi_stats("no LPI after device unmap");
-> +	report_prefix_pop();
-> +
-> +	/* Unmap the collection this time and check no LPI does hit */
-> +	report_prefix_push("mapc valid=false");
-> +	its_send_mapc(col2, false);
-
-And as for the MAPC, the spec says:
-
-" When V is 0:
-Behavior is unpredictable if there are interrupts that are mapped to the
-specified collection, with the restriction that further translation
-requests from that device are ignored. "
-
-So this collection-unmap test may not make sense?
-
-> +	lpi_stats_expect(-1, -1);
-> +	its_send_int(dev7, 255);
-> +	check_lpi_stats("no LPI after collection unmap");
-> +	report_prefix_pop();
-> +}
-
-[...]
-
-Otherwise looks good.
-
-
-Thanks,
-Zenghui
-
+--=20
+Alex Benn=C3=A9e
 
