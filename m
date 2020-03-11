@@ -2,85 +2,71 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0AEC10DCE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC6FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 02:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E778208C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 01:37:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJIS37Iy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E778208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09BC021655
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 02:05:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09BC021655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBqJM-0007jW-D2
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 21:37:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51011)
+	id 1jBqkO-0006kZ-4t
+	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 22:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1jBqIV-0006va-I7
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:37 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jBqjf-0005eK-Bv
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 22:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1jBqIT-0002cM-8k
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:34 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34326
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jBqjd-00066a-S5
+ for qemu-devel@nongnu.org; Tue, 10 Mar 2020 22:04:39 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:54368 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1jBqIS-0002YY-Uz
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 21:36:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583890591;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S55UM8zjQaZOrfPu31wLQ0+i0bnhTIXv6UYCH2dEoHA=;
- b=LJIS37IyUxWbAQrQGKFiOixmW6gbIVp+7K25wl7OeUcXGuUwx97na39BYLScTnoBO+CS4k
- AEcdbarcbAAFNL2WruT7VD6GqV2ED9YTR2dYTjYHPQXFA6U+eeBLQAnb4wT+ev9SHRCmsn
- VEu8ZMzZDLqdO00U7nTkQqieo0xuG2Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-iX5dq1eJP-6_ejeNiqwKhg-1; Tue, 10 Mar 2020 21:36:29 -0400
-X-MC-Unique: iX5dq1eJP-6_ejeNiqwKhg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D220184C812;
- Wed, 11 Mar 2020 01:36:28 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C916A5D9C5;
- Wed, 11 Mar 2020 01:36:24 +0000 (UTC)
-Date: Tue, 10 Mar 2020 19:36:24 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
- vfio_rom_read
-Message-ID: <20200310193624.402fdb18@x1.home>
-In-Reply-To: <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
-References: <20200224064219.1434-1-longpeng2@huawei.com>
- <20200224064219.1434-2-longpeng2@huawei.com>
- <20200224090458.080152c0@w520.home>
- <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
- <20200310101108.3377b878@x1.home>
- <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
-Organization: Red Hat
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jBqjd-00063p-HJ; Tue, 10 Mar 2020 22:04:37 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id B0C4E3FEF1247CDBBA9C;
+ Wed, 11 Mar 2020 10:04:31 +0800 (CST)
+Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 11 Mar 2020 10:04:31 +0800
+Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.115]) by
+ dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0439.000;
+ Wed, 11 Mar 2020 10:04:24 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Laurent Vivier <laurent@vivier.eu>, Kevin Wolf <kwolf@redhat.com>
+Subject: RE: [PATCH v3 02/12] block/iscsi:Remove redundant statement in
+ iscsi_open()
+Thread-Topic: [PATCH v3 02/12] block/iscsi:Remove redundant statement in
+ iscsi_open()
+Thread-Index: AQHV8JOViwMsZBXmC0qleQnSjROZKqhBaHEAgAAKAQCAAT02sA==
+Date: Wed, 11 Mar 2020 02:04:23 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B683E5E@dggemm511-mbx.china.huawei.com>
+References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
+ <20200302130715.29440-4-kuhn.chenqun@huawei.com>
+ <20200310142614.GF6926@linux.fritz.box>
+ <a1ed92ff-4842-c437-4e22-a94c46760cc0@vivier.eu>
+In-Reply-To: <a1ed92ff-4842-c437-4e22-a94c46760cc0@vivier.eu>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.255
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,140 +78,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: weifuqiang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, arei.gonglei@huawei.com,
- huangzhichao@huawei.com, "Longpeng \(Mike,
- Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Peter Lieven <pl@kamp.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Mar 2020 00:14:31 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-> On 03/10/20 17:11, Alex Williamson wrote:
-> 
-> > commit 2088fc1e1f426b98e9ca4d7bcdbe53d886a18c37
-> > Author: Alex Williamson <alex.williamson@redhat.com>
-> > Date:   Tue Mar 10 10:04:36 2020 -0600
-> > 
-> >     vfio/pci: Use defined memcpy() behavior
-> >     
-> >     vfio_rom_read() relies on memcpy() doing the logically correct thing,
-> >     ie. safely copying zero bytes from a NULL pointer when rom_size is
-> >     zero, rather than the spec definition, which is undefined when the
-> >     source or target pointers are NULL.  Resolve this by wrapping the
-> >     call in the condition expressed previously by the ternary.
-> >     
-> >     Additionally, we still use @val to fill data based on the provided
-> >     @size regardless of mempcy(), so we should initialize @val rather
-> >     than @data.
-> >     
-> >     Reported-by: Longpeng <longpeng2@huawei.com>
-> >     Reported-by: Laszlo Ersek <lersek@redhat.com>
-> >     Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> > 
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index 5e75a95129ac..b0799cdc28ad 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwaddr addr, unsigned size)
-> >          uint16_t word;
-> >          uint32_t dword;
-> >          uint64_t qword;
-> > -    } val;
-> > -    uint64_t data = 0;
-> > +    } val = { 0 };
-> > +    uint64_t data;
-> >  
-> >      /* Load the ROM lazily when the guest tries to read it */
-> >      if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
-> >          vfio_pci_load_rom(vdev);
-> >      }
-> >  
-> > -    memcpy(&val, vdev->rom + addr,
-> > -           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr) : 0);
-> > +    if (addr < vdev->rom_size) {
-> > +        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - addr));
-> > +    }
-> >  
-> >      switch (size) {
-> >      case 1:  
-> 
-> Regarding the pre-patch code:
-> 
-> My understanding is that the memcpy() could be reached with a
-> guest-originated "addr" even if "vdev->rom" was NULL. If that's the
-> case, then the pre-patch code invokes undefined behavior regardless of
-> memcpy(), because it performs pointer arithmetic on a null pointer (not
-> to mention that the type of that pointer is (void *)....)
-> 
-> Regarding the proposed change:
-> 
-> (addr < vdev->rom_size) requires that "vdev->rom_size" be positive. In
-> that case, I assume that
-> 
-> - "vdev->rom" is not NULL, and
-> -  MIN(size, vdev->rom_size - addr) bytes are "in range" for the object
-> allocated at "vdev->rom".
-> 
-> So from a memcpy() and range perspective, the patch looks OK. But
-> there's still a wart I dislike: we should never perform pointer
-> arithmetic on a (void*). I suggest casting (vdev->rom) to (uint8_t*) or
-> (unsigned char*) first.
-> 
-> Here's an excerpt from the ISO C99 standard:
-> 
-> -v-
-> 6.5.6 Additive operators
-> 
-> Constraints
-> 
-> 2 For addition, either both operands shall have arithmetic type, or one
->   operand shall be a pointer to an object type and the other shall have
->   integer type. [...]
-> -^-
-> 
-> A "pointer-to-void" is not a "pointer to an object type", because "void"
-> is not an object type -- it is an incomplete type that cannot be completed:
-> 
-> -v-
-> 6.2.5 Types
-> 
-> 1 [...] Types are partitioned into object types (types that fully
->   describe objects), function types (types that describe functions), and
->   incomplete types (types that describe objects but lack information
->   needed to determine their sizes).
-> 
-> [...]
-> 
-> 19 The void type comprises an empty set of values; it is an incomplete
->    type that cannot be completed.
-> -^-
-> 
-> For a different illustration, (vdev->rom + addr) is equivalent to
-> &(vdev->rom[addr]) -- and we clearly can't have an "array of void".
-> 
-> This anti-pattern (of doing pointer arithmetic on (void*)) likely comes
-> from a guarantee that the standard does make, in the same "6.2.5 Types"
-> section:
-> 
-> -v-
-> 27 A pointer to void shall have the same representation and alignment
->    requirements as a pointer to a character type. 39) [...]
-> 
-> Footnote 39: The same representation and alignment requirements are
->              meant to imply interchangeability as arguments to
->              functions, return values from functions, and members of
->              unions.
-> -^-
-> 
-> It does not extend to the "+" operator.
-
-GNU C specifically allows arithmetic on pointers and defines the size
-of a void as 1.  I'll comply, but this makes me want to stab myself in
-the face :-\  Thanks,
-
-Alex
-
+Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogTGF1cmVudCBWaXZpZXIgW21haWx0
+bzpsYXVyZW50QHZpdmllci5ldV0NCj5TZW50OiBUdWVzZGF5LCBNYXJjaCAxMCwgMjAyMCAxMTow
+MiBQTQ0KPlRvOiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPjsgQ2hlbnF1biAoa3VobikN
+Cj48a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+Q2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9y
+ZzsgWmhhbmdoYWlsaWFuZw0KPjx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBxZW11
+LXRyaXZpYWxAbm9uZ251Lm9yZzsgUGV0ZXIgTGlldmVuDQo+PHBsQGthbXAuZGU+OyBxZW11LWRl
+dmVsQG5vbmdudS5vcmc7IE1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+Ow0KPlJvbm5pZSBT
+YWhsYmVyZyA8cm9ubmllc2FobGJlcmdAZ21haWwuY29tPjsgRXVsZXIgUm9ib3QNCj48ZXVsZXIu
+cm9ib3RAaHVhd2VpLmNvbT47IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+DQo+
+U3ViamVjdDogUmU6IFtQQVRDSCB2MyAwMi8xMl0gYmxvY2svaXNjc2k6UmVtb3ZlIHJlZHVuZGFu
+dCBzdGF0ZW1lbnQgaW4NCj5pc2NzaV9vcGVuKCkNCj4NCj5MZSAxMC8wMy8yMDIwIMOgIDE1OjI2
+LCBLZXZpbiBXb2xmIGEgw6ljcml0wqA6DQo+PiBBbSAwMi4wMy4yMDIwIHVtIDE0OjA3IGhhdCBD
+aGVuIFF1biBnZXNjaHJpZWJlbjoNCj4+PiBDbGFuZyBzdGF0aWMgY29kZSBhbmFseXplciBzaG93
+IHdhcm5pbmc6DQo+Pj4gICBibG9jay9pc2NzaS5jOjE5MjA6OTogd2FybmluZzogVmFsdWUgc3Rv
+cmVkIHRvICdmbGFncycgaXMgbmV2ZXIgcmVhZA0KPj4+ICAgICAgICAgZmxhZ3MgJj0gfkJEUlZf
+T19SRFdSOw0KPj4+ICAgICAgICAgXiAgICAgICAgfn5+fn5+fn5+fn5+DQo+Pj4NCj4+PiBSZXBv
+cnRlZC1ieTogRXVsZXIgUm9ib3QgPGV1bGVyLnJvYm90QGh1YXdlaS5jb20+DQo+Pj4gU2lnbmVk
+LW9mZi1ieTogQ2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPj4+IC0tLQ0KPj4+
+IENjOiBSb25uaWUgU2FobGJlcmcgPHJvbm5pZXNhaGxiZXJnQGdtYWlsLmNvbT4NCj4+PiBDYzog
+UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4+PiBDYzogUGV0ZXIgTGlldmVu
+IDxwbEBrYW1wLmRlPg0KPj4+IENjOiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPg0KPj4+
+IENjOiBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPj4+DQo+Pj4gdjEtPnYyOg0KPj4+
+ICBLZWVwIHRoZSAnZmxhZ3MnIHRoZW4gdXNlIGl0KEJhc2Ugb24gS2V2aW4ncyBjb21tZW50cyku
+DQo+Pg0KPj4gSSB0aGluayB0aGlzIHBhdGNoIHdhbnRzIGEgZGlmZmVyZW50IHN1YmplY3QgbGlu
+ZSBub3cuDQo+DQpZZXMsICBpdCBuZWVkcyBhIG1vcmUgYXBwcm9wcmlhdGUgc3ViamVjdC4NCg0K
+Pkl0IG5lZWRzIGFsc28gYSBiZXR0ZXIgZXhwbGFuYXRpb24gaW4gdGhlIGNvbW1pdCBtZXNzYWdl
+IGFuZCBzaG91bGQgbm90IGdvDQo+dGhyb3VnaCB0cml2aWFsIGFzIHRoZSBjaGFuZ2UgaXMgbm90
+IG9idmlvdXMuDQo+DQpPSyAsIEkgd2lsbCB1cGRhdGUgdGhlIGNvbW1pdCBtZXNzYWdlIGJhc2Ug
+b24gZXhpc3RpbmcgY29tbWVudHMuDQoNClRoYW5rcy4NCg0KPlRoYW5rcywNCj5MYXVyZW50DQo+
+DQo+Pg0KPj4+IGRpZmYgLS1naXQgYS9ibG9jay9pc2NzaS5jIGIvYmxvY2svaXNjc2kuYyBpbmRl
+eA0KPj4+IDY4MmFiZDhlMDkuLjUwYmFlNTE3MDAgMTAwNjQ0DQo+Pj4gLS0tIGEvYmxvY2svaXNj
+c2kuYw0KPj4+ICsrKyBiL2Jsb2NrL2lzY3NpLmMNCj4+PiBAQCAtMjAwMiw3ICsyMDAyLDcgQEAg
+c3RhdGljIGludCBpc2NzaV9vcGVuKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRRGljdA0KPipvcHRp
+b25zLCBpbnQgZmxhZ3MsDQo+Pj4gICAgICAgICAgaXNjc2lsdW4tPmNsdXN0ZXJfc2l6ZSA9IGlz
+Y3NpbHVuLT5ibC5vcHRfdW5tYXBfZ3JhbiAqDQo+Pj4gICAgICAgICAgICAgIGlzY3NpbHVuLT5i
+bG9ja19zaXplOw0KPj4+ICAgICAgICAgIGlmIChpc2NzaWx1bi0+bGJwcnopIHsNCj4+PiAtICAg
+ICAgICAgICAgcmV0ID0gaXNjc2lfYWxsb2NtYXBfaW5pdChpc2NzaWx1biwgYnMtPm9wZW5fZmxh
+Z3MpOw0KPj4+ICsgICAgICAgICAgICByZXQgPSBpc2NzaV9hbGxvY21hcF9pbml0KGlzY3NpbHVu
+LCBmbGFncyk7DQo+Pj4gICAgICAgICAgfQ0KPj4+ICAgICAgfQ0KPj4NCj4+IFRoZSBjb2RlIGxv
+b2tzIGdvb2QuDQo+Pg0KPj4gUmV2aWV3ZWQtYnk6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5j
+b20+DQo+Pg0KPj4NCg0K
 
