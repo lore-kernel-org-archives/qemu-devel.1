@@ -2,106 +2,87 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C17C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DCEC0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5405A2074C
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A831920737
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caf5N9mx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5405A2074C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hI8fE/rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A831920737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC8C6-0007CH-Am
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:43:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44513)
+	id 1jC8EB-0000j2-Gw
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:45:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jC8BU-0006hC-9A
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:33 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1jC8Bq-00074d-9F
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jC8BT-0007DT-9R
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25340
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <ehabkost@redhat.com>) id 1jC8Bp-0008S6-91
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20953
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jC8BT-0007Ba-5K
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:31 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1jC8Bp-0008Qa-5K
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:42:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583959350;
+ s=mimecast20190719; t=1583959372;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VQQk9Q7y0NU29jsUZYKM3wrCFGT7iesL1SKUq5KVYr4=;
- b=caf5N9mxpz7D+0WTEtohRHAV3r4XoDZbybYoYOP7+aHIlp7jg9Pnt+mAsTMPoajiUAjZYF
- MOifGd7v0nUUXA2WbqgLGsVtYKAn/SgSJY5wr22zWdxMtlblKOJvOnfSNjfdJe6JQ2b9mI
- sXpgIvk35hUlSsiUCLFfssHlmSEJdgM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-Y8_O9Up-PYGsMxexGwsPdg-1; Wed, 11 Mar 2020 16:42:28 -0400
-X-MC-Unique: Y8_O9Up-PYGsMxexGwsPdg-1
-Received: by mail-wm1-f69.google.com with SMTP id t2so1033335wmj.2
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 13:42:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VQQk9Q7y0NU29jsUZYKM3wrCFGT7iesL1SKUq5KVYr4=;
- b=pQarTOv7dJy56cnFiD/4uVU8tC9lGU8kh9a8WekjNb0glfmbXUwxT3mUKxa2HGGN30
- PkApWoVQnBRX8NvWMvXyE/ehWSAxIYLs4jEYSypw/MkEJDDDEy1lD3PeQ3UFxhu+6ppn
- yYaSKwr7ryPEx2hYzNKZJVyPLsTtQsREvb76iy3CfsGZYejggak/GWqVqUOr0+GrmXlO
- elbRPbUHZKeiWGAdT2fuWzn5a68mAd8o905g2/mhbbfytzBCOCWbp4GOjVte3jhwxIdz
- REBh/u3mwKrDjute+b57ApwQioeS5xDUdJgac2Yldr8ZO5OEaFQn0v9O3MZJ8aMsb3RN
- Zg9g==
-X-Gm-Message-State: ANhLgQ0WKsNPty+ZAfPQFJjV2EpjxOrQJvfVS8pKkLniyNH/iMkF3J7k
- Ma/HN4Z6UnuopdzYg0VPq3u7b5pdZvk98WhEapShW6aPlcArHH1K0pMnm6CZQbfWB1Wq8o3IrRp
- 6r/p8chnbnop1hdg=
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr524184wmi.89.1583959346622;
- Wed, 11 Mar 2020 13:42:26 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvoVsly06psfgOOUKMVpS4CbY+zArS2l8iYMFmU4l0WDnRTEjt0U/69otqpzx6/SAzoypQCFg==
-X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr524119wmi.89.1583959345480;
- Wed, 11 Mar 2020 13:42:25 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id i67sm50400363wri.50.2020.03.11.13.42.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Mar 2020 13:42:24 -0700 (PDT)
-Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
-To: Maxime Villard <max@m00nbsd.net>
-References: <20200206115731.13552-1-n54@gmx.com>
- <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
- <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
- <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
- <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
- <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
- <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
- <85e4202d-91dd-0d31-373a-febe566353ab@m00nbsd.net>
- <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
- <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <050cacce-41fc-db89-ded9-5cdf6c20a2de@redhat.com>
-Date: Wed, 11 Mar 2020 21:42:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=E+wQH7JI9cIqMDoaXgnUKjII6HWlKF0yYYs9GvPHuII=;
+ b=hI8fE/rpvOAyNMrshwEZsD1yV5Zjq2y/Zh/1PB4TFns/EVcJ+88g0uEpmsCnmfg0rXaN6B
+ P8z6ECv54SB4hWBmuJkrtvH63YUZeagcx0pJiEqfbG0jdEPPTnexslM2K6Ocs0xi8IIJ30
+ jPPGEXQuAZkMb8ysdbF0FXdhz6ufWhQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-0nnJjphEMAuGyeaTD_Lh_g-1; Wed, 11 Mar 2020 16:42:50 -0400
+X-MC-Unique: 0nnJjphEMAuGyeaTD_Lh_g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EA0D189D6C0;
+ Wed, 11 Mar 2020 20:42:49 +0000 (UTC)
+Received: from localhost (unused-10-15-17-6.yyz.redhat.com [10.15.17.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7DBB9298D;
+ Wed, 11 Mar 2020 20:42:46 +0000 (UTC)
+Date: Wed, 11 Mar 2020 16:42:46 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] util: fix to get configuration macros in util/mmap-alloc.c
+Message-ID: <20200311204246.GN1187748@habkost.net>
+References: <20200305154142.63070-1-jingqi.liu@intel.com>
+ <20200305161047.GB3627464@lpt>
+ <CAFEAcA-OQncMrU_-DJJ9g5rEcrJvbhTOjOVs0YqO3NS_Y413OQ@mail.gmail.com>
+ <f774652b-5145-1e47-62c4-99a69a037506@intel.com>
+ <CAFEAcA8HMSg8nS27YGPEQsPeGW2UicWRxeJDQf3oKbyHH2TY6Q@mail.gmail.com>
+ <a57d479a-c9d5-0acc-b808-fe4e5a20ae80@intel.com>
+ <20200310051003-mutt-send-email-mst@kernel.org>
+ <16328974-3c7f-0e69-9614-a085c5841a2e@intel.com>
+ <CAFEAcA_B7FYboWR3L=X32ssyKxz2HXD3jxsQXeTinP-oXSBf6Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
-Content-Language: en-US
+In-Reply-To: <CAFEAcA_B7FYboWR3L=X32ssyKxz2HXD3jxsQXeTinP-oXSBf6Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,24 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
- philmd@redhat.com, rth <rth@twiddle.net>
+Cc: "Liu, Jingqi" <jingqi.liu@intel.com>,
+ =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/03/20 21:14, Maxime Villard wrote:
->> The problem is that qcpu->stop is checked _before_ entering the
->> hypervisor and not after, so there is a small race window.
-> Ok. I don't understand what's supposed to be the race here. If we get an
-> IPI between the check and the call to nvmm_vcpu_run() then we'll just do
-> one run and stop in the next iteration, because the IPI will have set
-> qcpu->stop. Is this extra iteration undesired?
+On Wed, Mar 11, 2020 at 12:37:17PM +0000, Peter Maydell wrote:
+> On Wed, 11 Mar 2020 at 00:43, Liu, Jingqi <jingqi.liu@intel.com> wrote:
+> > 1) If '#include <linux/mman.h>' first then '#include qemu/osdep.h', it
+> > should be fine.
+> >
+> > 2) Peter mentioned osdep.h should go first.
+> >
+> > It will  cause redefinitions of other MAP_* macros after '#include
+> > <linux/mman.h>'.
+> >
+> > This is where the conflict lies.
+>=20
+> osdep.h first, always. Other uses of linux-headers headers
+> have presumably already dealt with this issue...
 
-Yes, you don't know how long that run would take.  I don't know about
-NVMM but for KVM it may even never leave if the guest is in HLT state.
+Including linux/mman.h before sys/mman.h is just a workaround to
+the root cause: both headers really redefine each others' macros,
+but gcc hide the warnings if the warnings are generated inside
+system-provided headers.
 
-Paolo
+I believe we should use -isystem for linux-headers insteaad of -I.
+
+--=20
+Eduardo
 
 
