@@ -2,118 +2,91 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14046C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B95DC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:55:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9F5220727
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6117420727
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:55:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="E7NMBRvS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F5220727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvB2/skF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6117420727
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBzvc-0006IU-1R
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:53:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35760)
+	id 1jBzx1-0007KQ-I8
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:55:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jBzux-0005tk-0b
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:52:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jBzwR-0006tQ-6L
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jBzuv-0000Ui-6L
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:52:54 -0400
-Received: from mail-eopbgr60117.outbound.protection.outlook.com
- ([40.107.6.117]:25930 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jBzuu-0000TD-KH; Wed, 11 Mar 2020 07:52:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cPUYkpovPTH/qKfDm8JeKGRsZrpL0aWtFKrugtmRltz1TXfSJtTmQlVfYd/H7aZj3HO4NVH3A31xS/YtjBZ19PiYqjfFrIOP94gmfm3aIcibSix0IEGPhjBCLBYfmtDlQR0RmR2/T0JzrBcshwKQxd3ueqPVfmg/vpgrdB/e7ekqoSvJklfwz1UpOgmAoRh1WOAR7HgYASHH9+pqd0dk//Kd51h1bDIrWYQoR4XHfLheEvTCb+JvWwhiycoJRpiIGc+/xgNfGn2GpNOEK7Wk3CSvPUtOmWJ7aZ8uapj8F+5qKuDT0xM3XUwM9rJhBTrjMSFQV6JbelT6SFVIfKEIwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aHB6PfWGJVly+WkkNnGFna37wqumW5iA9QGovo+/FMs=;
- b=BLu6Fb1F5wJHEuxZEg0Acqmjnz7M245jFtgHUFMSwKW73BpcNWAWS2ckkKBVpSc6hXQf2ngLfPPZr+lBry716jkyH0dRyLLqLbiQL9SsFMPuxalAX5YetCYD0uQzpYURzlMD/wSfwSGOuyBQuu6diASReFPzvffJe7h6P30cKDdDKhUQU8jcVjFCCoutMX7w6FJmV45stFWvq1XODrQLLjYyQnQ0l1Z6MJGwCM8gVWV9ze2yMQnK7Yg00f0GOY//RsoE/WPJ6YWj/OoQ38y7NjW3HtkU2I7VxDcwHf2hLFq4fyTo/3bwfwa0S2h5SXqs04Qkp2vtZ1GwOu9RBIMgOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aHB6PfWGJVly+WkkNnGFna37wqumW5iA9QGovo+/FMs=;
- b=E7NMBRvSzB7lsuoCE+h52TlXwthc6tRv7lYoDc18ApoLQq1IpRL/XZifARAZhwASEI2FY+eFVQu6EKUbrHtURZ2ICjcQUclSpC6KUE4TZf1OeDMUasnp9YSwQxU8H4dUYXotgDPMwc8SkUaClC+btU6X0M/i0EbFB57cQSnJIkw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4021.eurprd08.prod.outlook.com (20.179.2.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.17; Wed, 11 Mar 2020 11:52:50 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2814.007; Wed, 11 Mar 2020
- 11:52:50 +0000
-Subject: Re: [PATCH v4 0/9] block-copy improvements: part I
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200311103004.7649-1-vsementsov@virtuozzo.com>
- <ef8eb81d-32be-1360-11f4-743438b4b3e3@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200311145246189
-Message-ID: <4fb7e11c-fbb5-13b8-03e2-e04f80c52cc3@virtuozzo.com>
-Date: Wed, 11 Mar 2020 14:52:46 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <ef8eb81d-32be-1360-11f4-743438b4b3e3@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P191CA0006.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::16)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <armbru@redhat.com>) id 1jBzwP-00027Y-N4
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52282
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBzwP-000277-Jf
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583927665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kPr97CQr4JWiwPy6mmbExeNtkfVK7bLZjjhRnS+2AgE=;
+ b=YvB2/skF/8Arvc5u4B3PxP5/U1x2vZg+yoy8b4smaIrYZe4ooI0cZK516sQfZlHF1FK/ZR
+ vedFPJnCemQxdhKc02GQr1H8IurIXSoV/OV295SZ0IiGdn58U5TgMfrEOQdJyltg/3Xnrk
+ efr2/se9aGE8ac9knXp7oGhTmf5hUCI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-bVh_HDYTMVycRKBo3_uJbA-1; Wed, 11 Mar 2020 07:54:23 -0400
+X-MC-Unique: bVh_HDYTMVycRKBo3_uJbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D5DB107B118;
+ Wed, 11 Mar 2020 11:54:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 06DE88F37F;
+ Wed, 11 Mar 2020 11:54:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8D06211386A6; Wed, 11 Mar 2020 12:54:13 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
+ vfio_rom_read
+References: <20200224064219.1434-1-longpeng2@huawei.com>
+ <20200224064219.1434-2-longpeng2@huawei.com>
+ <20200224090458.080152c0@w520.home>
+ <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
+ <20200310101108.3377b878@x1.home>
+ <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
+ <20200310193624.402fdb18@x1.home>
+ <30f4a52f-a572-8643-1801-95c9fd2cd8a8@redhat.com>
+Date: Wed, 11 Mar 2020 12:54:13 +0100
+In-Reply-To: <30f4a52f-a572-8643-1801-95c9fd2cd8a8@redhat.com> (Laszlo Ersek's
+ message of "Wed, 11 Mar 2020 11:26:38 +0100")
+Message-ID: <87o8t3ds4a.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P191CA0006.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.16 via Frontend Transport; Wed, 11 Mar 2020 11:52:49 +0000
-X-Tagtoolbar-Keys: D20200311145246189
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 71e0f28f-5280-49cd-019c-08d7c5b2b92f
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4021:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4021558492B7AE1F1B7CE940C1FC0@AM6PR08MB4021.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
-X-Forefront-PRVS: 0339F89554
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(136003)(396003)(39850400004)(346002)(199004)(5660300002)(16526019)(2616005)(956004)(66556008)(31696002)(316002)(8676002)(31686004)(186003)(478600001)(81166006)(36756003)(8936002)(16576012)(66946007)(86362001)(81156014)(66476007)(26005)(966005)(53546011)(6486002)(107886003)(4326008)(2906002)(6666004)(52116002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4021;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kCCf+O/QDiymS6W8VF/hP0xUU/TgxW2Z7MGcRRmG02ZZq2yfF6pFY5IWKKhWTXTEF/u73sJHYVY3YPVpOMx8+mqFvqFAys2Asxk36quUcw39Xx7w2EkQHd/WcJpe/SgWki02dMa6jy4EcBitUw6rYVC/centP33if+7Ry86udT/l6NNXpu/xw5qHzTMStLW55W16A/PyOTJRZXYaOoijx/efLN3mnBLXeHaSQErpoE5/AThbJpnv0c38YYVF2u7eKq4UPKAg5h/lYmhQeCtU199BBQxvuTbOGyGMbvtI2GI6iAHhouIzooR39TfJ6eTiZjLSjqIs2ITAJ6g8LhVs+2NKOK5FpHm7vZ+zDjd81M2H5JgH6cgQR+Ly9NrjRCOgUaGyN1ZO30ndjhUf2D5UKsPUSLH2IwX6NlqHug7aCZrzZqz3xEQLf3v47EeOOXbi/iKBV3BKUFmWOal7ArT5HUkoerYz5ILm97IKAN0f7fvkjWTK+6ingiKhD58jY+utVw5WmL+kz5KUbaoq/7ZuGA==
-X-MS-Exchange-AntiSpam-MessageData: MB+GXzofWw0bdh1/fYMjFct+SwKidCdGPvUvYz8gHROMrte8w/JgHltSpoJQu5G/UG5Gn1VxZ9KcWF2Y7iKrttB53Ziea2pL7l7/ms20OFT0iEc/nqQ4ISQOSE7VF6+beu5GNLYTGnsw8ax7vXeEEg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71e0f28f-5280-49cd-019c-08d7c5b2b92f
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 11:52:49.8940 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Yfy9enxirig5wHaA/g8mDNVqzWNterFT5O9ijQdSWbNxqKDj9swfARK7xii9x6zxLiEfvYDq5tyS6Tr6Cwrt9D/rr7r6c5up4fJX3He/0og=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4021
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.117
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,45 +98,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, andrey.shinkevich@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org
+Cc: mst@redhat.com, weifuqiang@huawei.com, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, "Longpeng \(Mike,
+ Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.03.2020 14:37, Max Reitz wrote:
-> On 11.03.20 11:29, Vladimir Sementsov-Ogievskiy wrote:
->> v4:
->>
->> 01: add Max's r-b
->> 02: rm ProgressResetCallbackFunc typedef
->> 03-06: add Max's r-b
->> 07: fix indentation
->> 08: update in_flight_bytes in block_copy_inflight_req_shrink
->>      improve comment above block_copy() definition
->> 09: add Andrey's and Max's r-b
->>      drop hunk fixing indentation (merged to 07)
->>
->> Vladimir Sementsov-Ogievskiy (9):
->>    job: refactor progress to separate object
->>    block/block-copy: fix progress calculation
->>    block/block-copy: specialcase first copy_range request
->>    block/block-copy: use block_status
->>    block/block-copy: factor out find_conflicting_inflight_req
->>    block/block-copy: refactor interfaces to use bytes instead of end
->>    block/block-copy: rename start to offset in interfaces
->>    block/block-copy: reduce intersecting request lock
->>    block/block-copy: hide structure definitions
-> 
-> Thanks, applied to my block branch:
-> 
-> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-> 
+Laszlo Ersek <lersek@redhat.com> writes:
 
-Thanks you!
+> On 03/11/20 02:36, Alex Williamson wrote:
+>> On Wed, 11 Mar 2020 00:14:31 +0100
+>> Laszlo Ersek <lersek@redhat.com> wrote:
+>>=20
+>>> On 03/10/20 17:11, Alex Williamson wrote:
+>>>
+>>>> commit 2088fc1e1f426b98e9ca4d7bcdbe53d886a18c37
+>>>> Author: Alex Williamson <alex.williamson@redhat.com>
+>>>> Date:   Tue Mar 10 10:04:36 2020 -0600
+>>>>
+>>>>     vfio/pci: Use defined memcpy() behavior
+>>>>    =20
+>>>>     vfio_rom_read() relies on memcpy() doing the logically correct thi=
+ng,
+>>>>     ie. safely copying zero bytes from a NULL pointer when rom_size is
+>>>>     zero, rather than the spec definition, which is undefined when the
+>>>>     source or target pointers are NULL.  Resolve this by wrapping the
+>>>>     call in the condition expressed previously by the ternary.
+>>>>    =20
+>>>>     Additionally, we still use @val to fill data based on the provided
+>>>>     @size regardless of mempcy(), so we should initialize @val rather
+>>>>     than @data.
+>>>>    =20
+>>>>     Reported-by: Longpeng <longpeng2@huawei.com>
+>>>>     Reported-by: Laszlo Ersek <lersek@redhat.com>
+>>>>     Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>>>
+>>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>>>> index 5e75a95129ac..b0799cdc28ad 100644
+>>>> --- a/hw/vfio/pci.c
+>>>> +++ b/hw/vfio/pci.c
+>>>> @@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwad=
+dr addr, unsigned size)
+>>>>          uint16_t word;
+>>>>          uint32_t dword;
+>>>>          uint64_t qword;
+>>>> -    } val;
+>>>> -    uint64_t data =3D 0;
+>>>> +    } val =3D { 0 };
+>>>> +    uint64_t data;
+>>>> =20
+>>>>      /* Load the ROM lazily when the guest tries to read it */
+>>>>      if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
+>>>>          vfio_pci_load_rom(vdev);
+>>>>      }
+>>>> =20
+>>>> -    memcpy(&val, vdev->rom + addr,
+>>>> -           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr)=
+ : 0);
+>>>> +    if (addr < vdev->rom_size) {
+>>>> +        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - add=
+r));
+>>>> +    }
+>>>> =20
+>>>>      switch (size) {
+>>>>      case 1: =20
+>>>
+>>> Regarding the pre-patch code:
+>>>
+>>> My understanding is that the memcpy() could be reached with a
+>>> guest-originated "addr" even if "vdev->rom" was NULL. If that's the
+>>> case, then the pre-patch code invokes undefined behavior regardless of
+>>> memcpy(), because it performs pointer arithmetic on a null pointer (not
+>>> to mention that the type of that pointer is (void *)....)
+>>>
+>>> Regarding the proposed change:
+>>>
+>>> (addr < vdev->rom_size) requires that "vdev->rom_size" be positive. In
+>>> that case, I assume that
+>>>
+>>> - "vdev->rom" is not NULL, and
+>>> -  MIN(size, vdev->rom_size - addr) bytes are "in range" for the object
+>>> allocated at "vdev->rom".
+>>>
+>>> So from a memcpy() and range perspective, the patch looks OK. But
+>>> there's still a wart I dislike: we should never perform pointer
+>>> arithmetic on a (void*). I suggest casting (vdev->rom) to (uint8_t*) or
+>>> (unsigned char*) first.
+>>>
+>>> Here's an excerpt from the ISO C99 standard:
+>>>
+>>> -v-
+>>> 6.5.6 Additive operators
+>>>
+>>> Constraints
+>>>
+>>> 2 For addition, either both operands shall have arithmetic type, or one
+>>>   operand shall be a pointer to an object type and the other shall have
+>>>   integer type. [...]
+>>> -^-
+>>>
+>>> A "pointer-to-void" is not a "pointer to an object type", because "void=
+"
+>>> is not an object type -- it is an incomplete type that cannot be comple=
+ted:
+>>>
+>>> -v-
+>>> 6.2.5 Types
+>>>
+>>> 1 [...] Types are partitioned into object types (types that fully
+>>>   describe objects), function types (types that describe functions), an=
+d
+>>>   incomplete types (types that describe objects but lack information
+>>>   needed to determine their sizes).
+>>>
+>>> [...]
+>>>
+>>> 19 The void type comprises an empty set of values; it is an incomplete
+>>>    type that cannot be completed.
+>>> -^-
+>>>
+>>> For a different illustration, (vdev->rom + addr) is equivalent to
+>>> &(vdev->rom[addr]) -- and we clearly can't have an "array of void".
+>>>
+>>> This anti-pattern (of doing pointer arithmetic on (void*)) likely comes
+>>> from a guarantee that the standard does make, in the same "6.2.5 Types"
+>>> section:
+>>>
+>>> -v-
+>>> 27 A pointer to void shall have the same representation and alignment
+>>>    requirements as a pointer to a character type. 39) [...]
+>>>
+>>> Footnote 39: The same representation and alignment requirements are
+>>>              meant to imply interchangeability as arguments to
+>>>              functions, return values from functions, and members of
+>>>              unions.
+>>> -^-
+>>>
+>>> It does not extend to the "+" operator.
+>>=20
+>> GNU C specifically allows arithmetic on pointers and defines the size
+>> of a void as 1.  I'll comply, but this makes me want to stab myself in
+>> the face :-\  Thanks,
+>
+> Sorry, I didn't want to annoy you. :)
+>
+> In fact I was about to mention, "I really don't understand why compilers
+> don't yell upon seeing pointer-to-void arithmetic", but I got distracted
+> and forgot about that thought. In retrospect, that may have been for the
+> best! :)
 
+You're looking for
 
--- 
-Best regards,
-Vladimir
+'-Wpointer-arith'
+     Warn about anything that depends on the "size of" a function type
+     or of 'void'.  GNU C assigns these types a size of 1, for
+     convenience in calculations with 'void *' pointers and pointers to
+     functions.  In C++, warn also when an arithmetic operation involves
+     'NULL'.  This warning is also enabled by '-Wpedantic'.
+
 
