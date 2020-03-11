@@ -2,142 +2,96 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32030C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD67C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E8A20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:36:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E8A20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF6E920873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:47:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hbo1L8bX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6E920873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC1Wq-0000hg-7g
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:36:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60583)
+	id 1jC1iD-00042x-4v
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:47:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jC1W5-0007yn-BA
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:35:22 -0400
+ (envelope-from <mst@redhat.com>) id 1jC1hU-0003Ph-0G
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jC1W4-0006aB-32
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:35:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7504)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jC1W3-0006Zx-Ss
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:35:20 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02BDYKjQ073096
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:35:19 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ypypha80a-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:35:18 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 11 Mar 2020 13:31:20 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 11 Mar 2020 13:31:17 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02BDVGQ344761286
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 11 Mar 2020 13:31:16 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A6D59A404D;
- Wed, 11 Mar 2020 13:31:16 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 607EDA4040;
- Wed, 11 Mar 2020 13:31:16 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.36.208])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 11 Mar 2020 13:31:16 +0000 (GMT)
-Subject: Re: [PATCH v9 08/15] s390x: protvirt: SCLP interpretation
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-9-frankja@linux.ibm.com>
- <1d78418a-0306-ca1a-aef7-a0095ed17b30@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Wed, 11 Mar 2020 14:31:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <mst@redhat.com>) id 1jC1hR-0005BJ-S4
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:47:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56281
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jC1hR-000595-Nm
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:47:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583934424;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AZ+e/lX1wwunGlLByqSBe8KiqcVIkflaXozg8bWItOs=;
+ b=Hbo1L8bXc6NGXzKT1T0TW8pk0HowsG93YxBdD9L4ZRG3YFMl3nUSN2YCY2TGM3xn+MqBfT
+ w8Z2qVY/w/KJtjyCIXnOHdVX8RnZkBWKdawBVuucsoOHCkw2uITIoD86f+OTUdSafZ8qXd
+ FH6VcShvs7g9gTiwL8+RGdPzGjlAx2M=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-X7MbyohAMnSxWJNRaudnxg-1; Wed, 11 Mar 2020 09:47:03 -0400
+X-MC-Unique: X7MbyohAMnSxWJNRaudnxg-1
+Received: by mail-qv1-f70.google.com with SMTP id e16so1340314qvr.16
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 06:47:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=jRLPiG3NV7cEF1iLac7jF8IzKaCS9PK5dKTHwTFRKpQ=;
+ b=lTaYvk1zDFfR26cDykQhmAwLQt7psp4E/ujmCPwgaKbuEKnLgjd/HewHf7HsqCEZF7
+ GD+yJU5/HuwTyfZMl9wGWoR0zeZNgO/uzZ8NtqSk7eZWyvbmoebjQLrkOr3BPcineLum
+ ySPjSZcAk3IcbV/+qc2rA7iRW6vYPNXfVWteP0sgwnuWipYPRAklRaIqBHzBqaGhjgML
+ Z2qkX1YsRepKJ/A36l8+jdOvmu4myhi9Qyhk5vVwAqJF3yTAO0rEWriNRTuwBaa34CB1
+ fRM7BmdsN3FP5dcAxECG/yydiFYhM+x0e2iYKIDxSId8hD7Ym1oHhGwviPrQxCaz5xrc
+ P9dw==
+X-Gm-Message-State: ANhLgQ1m+ovPsphtQlXWBlajPB90Uno1lioAJWaGKAZPImHKVeH3ZqQJ
+ 5nF52+Nl/twdYcTF4zKQpQwZODsGgnVOgpue/2DEqklg6tZdKqEiwhKCog622OLlrzlOl9mxRQB
+ M+xVEggQMOg7FcS0=
+X-Received: by 2002:a05:6214:11ec:: with SMTP id
+ e12mr2972424qvu.89.1583934422564; 
+ Wed, 11 Mar 2020 06:47:02 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsr8jCH7cAvFNhFdAjcXS3m4PnLInw5WYz3Chf7uVgrEZ2tJ5NueCKZy8D9H722kuq0lF45bQ==
+X-Received: by 2002:a05:6214:11ec:: with SMTP id
+ e12mr2972412qvu.89.1583934422254; 
+ Wed, 11 Mar 2020 06:47:02 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id f3sm15838292qtv.51.2020.03.11.06.46.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Mar 2020 06:47:01 -0700 (PDT)
+Date: Wed, 11 Mar 2020 09:46:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH v3 1/6] virtio-net: introduce RSS and hash report features
+Message-ID: <20200311094553-mutt-send-email-mst@kernel.org>
+References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
+ <20200311123518.4025-2-yuri.benditovich@daynix.com>
 MIME-Version: 1.0
-In-Reply-To: <1d78418a-0306-ca1a-aef7-a0095ed17b30@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nl5LzX2PFjIifYZL7aDFL4EefpJAOWQfV"
-X-TM-AS-GCONF: 00
-x-cbid: 20031113-0012-0000-0000-0000038F69C9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031113-0013-0000-0000-000021CC3888
-Message-Id: <2fcd22f8-db47-8b49-027d-441dfeb77b65@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-11_05:2020-03-11,
- 2020-03-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015
- adultscore=0 suspectscore=0 bulkscore=0 phishscore=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 mlxlogscore=839 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003110086
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20200311123518.4025-2-yuri.benditovich@daynix.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,68 +103,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: yan@daynix.com, jasowang@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nl5LzX2PFjIifYZL7aDFL4EefpJAOWQfV
-Content-Type: multipart/mixed; boundary="QpLD2kAHEffIkpxCJZc4UpF3FHLYOLcbR"
-
---QpLD2kAHEffIkpxCJZc4UpF3FHLYOLcbR
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 3/11/20 2:24 PM, David Hildenbrand wrote:
+On Wed, Mar 11, 2020 at 02:35:13PM +0200, Yuri Benditovich wrote:
+> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> ---
+>  hw/net/virtio-net.c | 95 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 95 insertions(+)
 >=20
->> + * We only need the address to have something valid for the
->> + * service_interrupt call.
->> + */
->> +#define SCLP_PV_DUMMY_ADDR 0x4000
->> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->> +                                uint32_t code)
->> +{
->> +    SCLPDevice *sclp =3D get_sclp_device();
->> +    SCLPDeviceClass *sclp_c =3D SCLP_GET_CLASS(sclp);
->> +    SCCB work_sccb;
->> +    hwaddr sccb_len =3D sizeof(SCCB);
->> +
->> +    /*
->> +     * Only a very limited amount of calls is permitted by the
->=20
-> s/amount/number/ ?
->=20
->=20
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 3627bb1717..9545b0e84f 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -71,6 +71,101 @@
+>  #define VIRTIO_NET_IP6_ADDR_SIZE   32      /* ipv6 saddr + daddr */
+>  #define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
+> =20
+> +/* TODO: remove after virtio-net header update */
+> +#if !defined(VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+> +#define VIRTIO_NET_F_HASH_REPORT    57  /* Supports hash report */
+> +#define VIRTIO_NET_F_RSS            60  /* Supports RSS RX steering */
+> +
+> +/* supported/enabled hash types */
+> +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4          (1 << 0)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4         (1 << 1)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4         (1 << 2)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6          (1 << 3)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6         (1 << 4)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6         (1 << 5)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX         (1 << 6)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX        (1 << 7)
+> +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX        (1 << 8)
+> +
+> +#define __le16 uint16_t
+> +#define __le32 uint32_t
+> +#define __u8   uint8_t
+> +#define __u16  uint16_t
+> +#define __u32  uint32_t
 
-Ack
+Let's just use uint16_t etc directly please.
 
+> +struct virtio_net_config_with_rss {
+> +    /* The config defining mac address (if VIRTIO_NET_F_MAC) */
+> +    __u8 mac[ETH_ALEN];
+> +    /* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
+> +    __u16 status;
+> +    /*
+> +     * Maximum number of each of transmit and receive queues;
+> +     * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
+> +     * Legal values are between 1 and 0x8000
+> +     */
+> +    __u16 max_virtqueue_pairs;
+> +    /* Default maximum transmit unit advice */
+> +    __u16 mtu;
+> +    /*
+> +     * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+> +     * Any other value stands for unknown.
+> +     */
+> +    __u32 speed;
+> +    /*
+> +     * 0x00 - half duplex
+> +     * 0x01 - full duplex
+> +     * Any other value stands for unknown.
+> +     */
+> +    __u8 duplex;
+> +    /* maximum size of RSS key */
+> +    __u8 rss_max_key_size;
+> +    /* maximum number of indirection table entries */
+> +    __le16 rss_max_indirection_table_length;
+> +    /* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
+> +    __le32 supported_hash_types;
+> +} __attribute__((packed));
+> +
+> +#define virtio_net_config virtio_net_config_with_rss
 
---QpLD2kAHEffIkpxCJZc4UpF3FHLYOLcbR--
+Do we have to? Let's just tweak code to do the right thing...
 
---nl5LzX2PFjIifYZL7aDFL4EefpJAOWQfV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5o6CMACgkQ41TmuOI4
-ufhjNBAAuAFrEw5ZV9KtPQ9bOCTycGKDFBahVNKC0KN9t+OuDsEQ1FtdvFxy0c8m
-62jLNrjKjQ9788l92irXo44GAJICQJx+QhORhNE95lOqy2pLcXAUoycRfuogwnOH
-PdweWANnAFkmohFKRS20GQdRexylOwQOKekzEt6cIOtXEqsaH12NpjlqLCb8+p1n
-zo/ggx0IDR2eMlapv+SdDAZLLWAhExid9qsJ4Kmm1u3hl8EKtxI32BzchSNdJH+d
-1iqVzG5k8MYr8EOFK7cfyBEirtP1hr+dmbKeaoZ+r6FbUEo+6wUviqmqqG/XfC1s
-eymr1fO7iFB1JXiMIPnrfJsIW7bScXFb6cEwk73tqznztzhUlxbee2ZowmSiQXeb
-zI2/ZcCkhnGja97Yr23OMVVo4rOTZ4DaayUhzPVSjQ9m5EKikCDXNqkS9/P7MuDO
-OBQ37KoizM26RuedEWCNN7UZdtD/HJqdJGKGD6LlLld4JtbFdMd1ojuIdenv+6mT
-YtyfUwLJHwpRtpWi8lHONtBfGteKHZbk733i/E9dbsXzODja2NCf8wSmtkUNIEtl
-UxicrqWWRegyX850+Rmw+b7LzXZPeXDO1vZbqBJlU0abEIXH/PR1oMPPKvH8rKST
-dT9FiL6qUROOs8K0FDiIqkhrQfKIIg96dv4qrqym+oYelUfAgac=
-=5AVQ
------END PGP SIGNATURE-----
-
---nl5LzX2PFjIifYZL7aDFL4EefpJAOWQfV--
+> +
+> +struct virtio_net_hdr_v1_hash {
+> +    struct virtio_net_hdr_v1 hdr;
+> +    __le32 hash_value;
+> +#define VIRTIO_NET_HASH_REPORT_NONE            0
+> +#define VIRTIO_NET_HASH_REPORT_IPv4            1
+> +#define VIRTIO_NET_HASH_REPORT_TCPv4           2
+> +#define VIRTIO_NET_HASH_REPORT_UDPv4           3
+> +#define VIRTIO_NET_HASH_REPORT_IPv6            4
+> +#define VIRTIO_NET_HASH_REPORT_TCPv6           5
+> +#define VIRTIO_NET_HASH_REPORT_UDPv6           6
+> +#define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
+> +#define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
+> +#define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
+> +    __le16 hash_report;
+> +    __le16 padding;
+> +};
+> +
+> +/*
+> + * The command VIRTIO_NET_CTRL_MQ_RSS_CONFIG has the same effect as
+> + * VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET does and additionally configures
+> + * the receive steering to use a hash calculated for incoming packet
+> + * to decide on receive virtqueue to place the packet. The command
+> + * also provides parameters to calculate a hash and receive virtqueue.
+> + */
+> +struct virtio_net_rss_config {
+> +    __le32 hash_types;
+> +    __le16 indirection_table_mask;
+> +    __le16 unclassified_queue;
+> +    __le16 indirection_table[1/* + indirection_table_mask */];
+> +    __le16 max_tx_vq;
+> +    __u8 hash_key_length;
+> +    __u8 hash_key_data[/* hash_key_length */];
+> +};
+> +
+> +#define VIRTIO_NET_CTRL_MQ_RSS_CONFIG          1
+> +#define VIRTIO_NET_CTRL_MQ_HASH_CONFIG         2
+> +
+> +#endif
+> +
+>  /* Purge coalesced packets timer interval, This value affects the perfor=
+mance
+>     a lot, and should be tuned carefully, '300000'(300us) is the recommen=
+ded
+>     value to pass the WHQL test, '50000' can gain 2x netperf throughput w=
+ith
+> --=20
+> 2.17.1
 
 
