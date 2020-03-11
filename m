@@ -6,86 +6,87 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C9BC10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C669C10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6146920873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38D5720873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:09:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gOKenboG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6146920873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F4Mv0iXA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D5720873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBuXG-0000j2-Is
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46872)
+	id 1jBuYF-0001qo-Et
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:09:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuWV-0007tb-JV
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:20 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuWt-0000Gd-EL
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuWU-0000lj-G9
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:19 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44585)
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuWs-0002U5-AH
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:43 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40261)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBuWU-0000gh-7B
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:18 -0400
-Received: by mail-pf1-x444.google.com with SMTP id b72so678733pfb.11
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:07:18 -0700 (PDT)
+ id 1jBuWs-0002Pu-3w
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:42 -0400
+Received: by mail-pg1-x544.google.com with SMTP id t24so582559pgj.7
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:07:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=klMLPirH7ru2EDINPtWByz+VfotpZS0bqaeR6CMsAtU=;
- b=gOKenboG1TF8LaF3ViRb4WYJXEc0F6CBfi47sa/kznjEP2V3DO9JlrtjB+gYt2MAo7
- aGRg+OeY+mEp8CnPDjbMuTXjCMJ6+FgTO0OKHAA3sqJoqFhKerCQY5s0e+F6f/zu6XcK
- 1rweLWstlXXqbyQaLcDDECQ7TuqMGIQW6AXasFnpqfMkQRxwpRBV+LMPWH3mg5BVkDSD
- xIpmXvytZHev2PzO7p9k9gAVpKGkoFi0d+1RsP0jWI6RGQ6JrjeFypCc0tmJf9tgqx4w
- mwxVRDWw9aiDIiSugQ6N6h9y/n/q4RgNn7x/DTT5Pr1csuWV4GuQ5eUSzymxCCpUnn5a
- eWEQ==
+ bh=ynVFDAVHRMXzjhTETbeEqT6drJLSieuhSrJ0R347rog=;
+ b=F4Mv0iXApd7DbZnymDbmN0rUL5urML6hx3qvbUx5XO5rMSqi0uV0KnVVqIE5Liaszb
+ Jy8+yGtdljSPKdtN3Aruv/Fa3HfUCn4CApkbC6WRxjngEXQYTjEGXtNeJgYyj8ul+A9N
+ /HyBiOw3Sf3+TOS/p2qdEVZ4QjwpaWz4G8L4yh8+gJC+MlsFVWlEnW3ZvrXoLynPijoE
+ 6thlmsFlKQIHwxaeWbhbtEVg/5h/O5eTb21TOZwdRWVl9elWLelttbjBDImYAVN7P49Y
+ 8uDF13zihPWW6AhbKvJZX3ML9omirFOh95s7Ui/iWDhePFf/p3l5CUDOKzGHiOHPY05G
+ NLvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=klMLPirH7ru2EDINPtWByz+VfotpZS0bqaeR6CMsAtU=;
- b=YeeqSre64U10XsUac86LdCv9YpilYEMmXZ9mHSAQCBVKbPS30+biiSPzF9eJZaYWYO
- m9Dsn/kq9guSMRfo9BO3Z0xrvyTCyCNEfxVAcaK02mQML0qhya0au46eaX9ZdNin3Ky7
- tf6pzCP2ogrdMY8sqMPTWAWZCJ7cmQ+qDBunulkO3eWcDe5Y7E6ehRCQN/gnkM77zgNG
- 3Q17x0DSHpCszebIOBrthK4l0Cq1u56Ys73gtcszlltynfxuCvhEg5qQlIa38/zYBK5N
- 7/YxULWxsH44rdBTI7B0Zwxh2iV6X11oG2q4XG2LHF242t2h7JejesVjqZZ79zuS/+5H
- GmoA==
-X-Gm-Message-State: ANhLgQ3GwtkdX/L2KWfBTShX3j+rt7yiw9jz14IYyHGe3JSeNfL8TEyk
- QECSzT1GVkLr834iXzNDh/4iuA==
-X-Google-Smtp-Source: ADFU+vuNcY91EWUjO1jdFXUGVQH2vjPN7xI7CeX4jRAVU78VXA6kACxshZXyAPlVGw5vE7WJFup+1w==
-X-Received: by 2002:aa7:9467:: with SMTP id t7mr1274373pfq.97.1583906837338;
- Tue, 10 Mar 2020 23:07:17 -0700 (PDT)
+ bh=ynVFDAVHRMXzjhTETbeEqT6drJLSieuhSrJ0R347rog=;
+ b=IFADKI8EACoSZA6IWdln2ICRK3OdgZlZI83xID/p5gFl97Gd3G2sTWwdydgYKnJCye
+ qMQM8C6Qx7DwZZdsCJhxqaadPqbsiLwmmpT0hHuxJtdkDuedWBXKCZtdf61ON31prqO2
+ pc7UC4t/jejaQU3hCnUomoCbdYGy6P7UAvorqBtkqIY3BsDpJ2Wf04vqbyUU53Mrvqvs
+ GQCCljklmikXKDB5prVnX5Th9vAP9Y5tM4ODixf/kkM8PSuOg7ba8oL6J/HwsXSGEy+f
+ QxWUeH+wuBPBb9twOFIsZtDNAxrmWvnrcursX327ZQnv1Km8CWZW2TtFEsY/w1lPdm4E
+ 0XDw==
+X-Gm-Message-State: ANhLgQ27abLJJDIpLUGU7Xr6WPbWreSB/FzgFcC/FmjE3/1lz/tMVe1u
+ W3wLckPKUD7ZD1hQiFAMcUDyJw==
+X-Google-Smtp-Source: ADFU+vspIq432Rs1HnAQfAqFg2BhHfNA7szsNtCcgbDnhD70Cfrd1RBC5CNTAfxn4X6vnvNH8yHnnQ==
+X-Received: by 2002:aa7:80d8:: with SMTP id a24mr1336751pfn.140.1583906861007; 
+ Tue, 10 Mar 2020 23:07:41 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- 13sm47835988pgo.13.2020.03.10.23.07.16
+ h12sm33638758pfk.124.2020.03.10.23.07.40
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 23:07:16 -0700 (PDT)
-Subject: Re: [PATCH v4 04/18] tests/qapi/doc-good.json: Clean up markup
+ Tue, 10 Mar 2020 23:07:40 -0700 (PDT)
+Subject: Re: [PATCH v4 05/18] scripts/qapi: Move doc-comment whitespace
+ stripping to doc.py
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
- <20200309154405.13548-5-peter.maydell@linaro.org>
+ <20200309154405.13548-6-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <57ca9623-28b8-8c91-3e65-4f63ce14bae5@linaro.org>
-Date: Tue, 10 Mar 2020 23:07:14 -0700
+Message-ID: <0284e957-1cbd-83f1-e734-1c213e83c044@linaro.org>
+Date: Tue, 10 Mar 2020 23:07:38 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200309154405.13548-5-peter.maydell@linaro.org>
+In-Reply-To: <20200309154405.13548-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,26 +107,40 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/9/20 8:43 AM, Peter Maydell wrote:
-> doc-good.json tests some oddities of markup that we don't want to
-> accept.  Make them match the more restrictive rST syntax:
+> As we accumulate lines from doc comments when parsing the JSON, the
+> QAPIDoc class generally strips leading and trailing whitespace using
+> line.strip() when it calls _append_freeform().  This is fine for
+> texinfo, but for rST leading whitespace is significant.  We'd like to
+> move to having the text in doc comments be rST format rather than a
+> custom syntax, so move the removal of leading whitespace from the
+> QAPIDoc class to the texinfo-specific processing code in
+> texi_format() in qapi/doc.py.
 > 
->  * in a single list the bullet types must all match
->  * lists must have leading and following blank lines
->  * indentation is important
->  * the '|' example syntax is going to go away entirely, so stop
->    testing it
+> (Trailing whitespace will always be stripped by the rstrip() in
+> Section::append regardless.)
 > 
-> This will avoid the tests spuriously breaking when we tighten up the
-> parser code in the following commits.
+> In a followup commit we will make the whitespace in the lines of doc
+> comment sections more consistently follow the input source.
+> 
+> There is no change to the generated .texi files before and after this
+> commit.
+> 
+> Because the qapi-schema test checks the exact values of the
+> documentation comments against a reference, we need to update that
+> reference to match the new whitespace.  In the first four places this
+> is now correctly checking that we did put in the amount of whitespace
+> to pass a rST-formatted list to the backend; in the last two places
+> the extra whitespace is 'wrong' and will go away again in the
+> following commit.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> New patch in v2
+> New in v2: update doc-good.out as noted in final para of commit msg
 > ---
->  tests/qapi-schema/doc-good.json | 25 +++++++++++++------------
->  tests/qapi-schema/doc-good.out  | 12 ++++++------
->  tests/qapi-schema/doc-good.texi | 12 +++---------
->  3 files changed, 22 insertions(+), 27 deletions(-)
+>  scripts/qapi/doc.py            |  1 +
+>  scripts/qapi/parser.py         | 12 ++++--------
+>  tests/qapi-schema/doc-good.out | 12 ++++++------
+>  3 files changed, 11 insertions(+), 14 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
