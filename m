@@ -2,89 +2,109 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24867C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82478C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:07:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3BF52146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D683208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:07:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rfqJPdzW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BF52146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNQ2/OV+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D683208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBz4A-0004gX-5H
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:58:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51065)
+	id 1jBzCW-0007hW-Ad
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:07:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jBz3X-00047G-6w
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:57:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBzBp-0007Gg-Be
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jBz3V-0007gw-S9
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:57:42 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36245)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jBz3V-0007gJ-JX
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:57:41 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g62so1582199wme.1
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 03:57:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=fJ66gpqAlIE9PWKQILLY9GcYiKdMgSqWCLqOY603SY8=;
- b=rfqJPdzWgEhLwHT4BEdsB1sOeCB6MbmZ97cf26wYYt/AGhnewy7pJSmpeYTFfiZOuj
- szfO8ravBNAboO9zbKqbjoJPy8olIatg0UNdn3FEzmokZRI87sdU6j8z3TwB6gtB+kRs
- FpG/L5iw9Ansm1ar9e8QOuwSMWtfHIuRC+N3DXxI//yu4mHtSKwoBspIArPnlpKKcrWu
- 75Cx6h30Hx61hYvMJkL8Hktw9w1ixMGgT9Upl2D3e274ZFh5h23aq/0nX3Ku4DygFuJo
- pxFsAX/a7+WxWQEZsTmBKJ8tdyO4U49XSBxvz+i8m713LOP8Pa5h/Go5xDf+C5R1AHx+
- b9FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fJ66gpqAlIE9PWKQILLY9GcYiKdMgSqWCLqOY603SY8=;
- b=jGYauhzWvQ/p5lIoFO9l6/eUgpEHB+bdFybsY47VFvcTeOHZOPHst+6MQpv6mTi96o
- WkdxJ6D2MvcXTbSY3h0gi3JhkpEaWpFLVf4MEyRcHEgliZ1CYaIFlWORy5c1GEeT35i2
- DhUsww+HwKJ9+dEfInNdBy1eIEzhuy+WTskN+FFCe7BqJFjBty7dpZLiDX0xgt0/EtRt
- UIefvq+5LLx5lYHYPOVTSkrvhjbpshzc+38Iy3IBc3T3UTWk+fAFI7Tw3G63iClvh6gy
- sb1k2UuxT58Suc61bpjxQkATqTvVyJnH/13GJRgZvNelKEVzUojghZ4UdssoBRAihNHJ
- 7RCQ==
-X-Gm-Message-State: ANhLgQ22olZqtQDTNbuG7ZNFAcs/Aff0nan99SfV19rrdlnWeMKcBxEY
- DZhHncQk91djXZnMcZVhS5GYUA==
-X-Google-Smtp-Source: ADFU+vuYGCCMsQhgf95cEJ/Pw6lZdzv5B3fMYEyRAtadySjmvUe5h2EXWLL1W56SCTjBBN4G3HelvA==
-X-Received: by 2002:a1c:2ed2:: with SMTP id u201mr3224756wmu.3.1583924258766; 
- Wed, 11 Mar 2020 03:57:38 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b18sm72439441wrm.86.2020.03.11.03.57.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 03:57:37 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C03B01FF7E;
- Wed, 11 Mar 2020 10:57:36 +0000 (GMT)
-References: <20200310182536.11137-1-robert.foley@linaro.org>
- <20200310182536.11137-2-robert.foley@linaro.org>
-User-agent: mu4e 1.3.9; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v3 01/10] tests/vm: Add validation of target
-In-reply-to: <20200310182536.11137-2-robert.foley@linaro.org>
-Date: Wed, 11 Mar 2020 10:57:36 +0000
-Message-ID: <87sgifgnvj.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1jBzBn-0006jL-OF
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:06:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58073
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBzBn-0006hc-Ic
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:06:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583924774;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=PAdd6FgMFHaG6bT4C0k9Bai/lubrsdOIQ0ByGZmPj3A=;
+ b=LNQ2/OV+JX6liZNDVGnszDOlvCVvZHXosS+8VQPISt/brBxaf76QYUSXB8/pyZ3gP48oBo
+ RYYVGYUrbKnjgLRgs3h4blYb4bz+ZGTFNg1gjfi/IgLmkfOxHVs+3P9nKf0kx5jhGzn4jR
+ YiDdSVwM416UTOy+oVAEyDGh1W/aCuI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-xiCQKsNUPhmD8mWa72iUfw-1; Wed, 11 Mar 2020 07:06:12 -0400
+X-MC-Unique: xiCQKsNUPhmD8mWa72iUfw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AF5B13F7;
+ Wed, 11 Mar 2020 11:06:11 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-216.ams2.redhat.com
+ [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B6FCA73874;
+ Wed, 11 Mar 2020 11:06:08 +0000 (UTC)
+Subject: Re: [PATCH 3/3] block: fail on open when file size is unaligned to
+ request_alignment
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200130152218.7600-1-vsementsov@virtuozzo.com>
+ <20200130152218.7600-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <4fb7d692-4009-c6a7-c765-292ac8073ae3@redhat.com>
+Date: Wed, 11 Mar 2020 12:06:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20200130152218.7600-4-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="tGhqMGp2WInpHVI6afdnORpVNcU4tA8Hu"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,64 +116,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tGhqMGp2WInpHVI6afdnORpVNcU4tA8Hu
+Content-Type: multipart/mixed; boundary="jX0JJ4A08HQ4WKYRqjhHbNI96JiAzFIcY"
 
-Robert Foley <robert.foley@linaro.org> writes:
+--jX0JJ4A08HQ4WKYRqjhHbNI96JiAzFIcY
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> This validation is now useful since some targets
-> may not be valid if their dependencies are not installed.
-> Instead of allowing the scripts to fail with missing dependencies
-> we will fail earlier with a helpful error message.
->
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+On 30.01.20 16:22, Vladimir Sementsov-Ogievskiy wrote:
+> Prior to the commit the following command lead to crash:
+>=20
+>   ./qemu-io --image-opts -c 'write 0 512' \
+>   driver=3Dblkdebug,align=3D4096,image.driver=3Dnull-co,image.size=3D512
+>=20
+> It failes on assertion in bdrv_aligned_pwritev:
+>   "end_sector <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE"
+>=20
+> The problem is obvious: 512 is aligned to 4096 and becomes larger than
+> file size. And the core bad thing is that file size is unaligned to
+> request_alignment.
+>=20
+> Let's catch such case on bdrv_open_driver and fail.
+
+I think we had a discussion on this before, but I can=92t find it right
+now.  (Although I think that had more to do with something in the
+file-posix driver, because it wasn=92t limited to alignments above 512.)
+
+In any case, the file itself is totally valid.  Most importantly, qcow2
+will regularly create files with unaligned file lengths.
+
+So let me create a qcow2 image on a 4k-aligned device:
+
+$ truncate 512M fs.img
+$ sudo losetup -f --show -b 4096 fs.img
+/dev/loop0
+$ sudo mkfs.ext4 /dev/loop0
+[...]
+$ sudo mount /dev/loop0 /mnt/tmp
+
+$ sudo ./qemu-img create -f qcow2 /mnt/tmp/foo.qcow2 64M
+Formatting '/mnt/tmp/foo.qcow2', fmt=3Dqcow2 size=3D67108864
+cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+$ sudo ./qemu-io -t none -c quit /mnt/tmp/foo.qcow2
+qemu-io: can't open device /mnt/tmp/foo.qcow2: File size is unaligned to
+request alignment
+
+Which is too bad.
+
+So the real solution would probably...  Be to align the file size up to
+the alignment?
+
+Max
+
+> Note, that file size and request_alignment may become out of sync
+> later, so this commit is not full fix of the problem, but it's better
+> than nothing.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/vm/Makefile.include | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
->
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 1bf9693d19..835e3f3549 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -2,7 +2,7 @@
->=20=20
->  .PHONY: vm-build-all vm-clean-all
->=20=20
-> -IMAGES :=3D freebsd netbsd openbsd centos fedora
-> +IMAGES :=3D freebsd netbsd openbsd fedora
->  ifneq ($(GENISOIMAGE),)
->  IMAGES +=3D ubuntu.i386 centos
->  endif
-> @@ -49,9 +49,20 @@ vm-build-all: $(addprefix vm-build-, $(IMAGES))
->  vm-clean-all:
->  	rm -f $(IMAGE_FILES)
->=20=20
-> +# Validate the target since some targets will not
-> +# be valid if their software dependencies are not installed.
-> +define validate_target
-> +	@echo $(1) | grep $(2) || \
-> +	(echo "Invalid target ($(2))"; \
-> +	echo "Valid Targets are: $(1)"; \
-> +	echo "See make vm-help for more information."; \
-> +	exit 1;)
-> +endef
+>  block.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/block.c b/block.c
+> index ecd09dbbfd..4cfc6c33a2 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1324,6 +1324,13 @@ static int bdrv_open_driver(BlockDriverState *bs, =
+BlockDriver *drv,
+>      assert(bdrv_min_mem_align(bs) !=3D 0);
+>      assert(is_power_of_2(bs->bl.request_alignment));
+> =20
+> +    if (bs->bl.request_alignment > 512 &&
+> +        !QEMU_IS_ALIGNED(bs->total_sectors, bs->bl.request_alignment / 5=
+12))
+> +    {
+> +        error_setg(errp, "File size is unaligned to request alignment");
+> +        return -EINVAL;
+> +    }
 > +
->  $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
->  			$(SRC_PATH)/tests/vm/basevm.py \
->  			$(SRC_PATH)/tests/vm/Makefile.include
-> +	$(call validate_target,${IMAGES},$*)
+>      for (i =3D 0; i < bs->quiesce_counter; i++) {
+>          if (drv->bdrv_co_drain_begin) {
+>              drv->bdrv_co_drain_begin(bs);
+>=20
 
-This mechanism seems suspect to me. Surely the "make" way is to just
-ensure we don't include the targets when we don't have the dependencies
-like we do above for GENISOIMAGE?
 
-Random side note: I wonder how this sort of problem is solved in a meson
-world? Paolo?
 
---=20
-Alex Benn=C3=A9e
+--jX0JJ4A08HQ4WKYRqjhHbNI96JiAzFIcY--
+
+--tGhqMGp2WInpHVI6afdnORpVNcU4tA8Hu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5oxh4ACgkQ9AfbAGHV
+z0AO8Qf+IaszaaxNUbSh9LDuGVkCaFU7wVU9cBWysIRlV8+V2dLCIb8UmuLdmNIg
+D5NZ4izqCSKENgVu/4GjnRwgbCwrEC2CFvxjTyU75hKiluenH6Fulc4b0o6Izhct
+hh6C0VCVT8PrwvLaSe2vVnNlLHvGas/rrHAfr8QepefrrU+lK/A5xRv9W1S+kJ3t
+ikaCFY+f2JloWXL8B2qeVafivk067jeVySH+FIbSAFp7eeUOZ8iessbpUIA2b+Ig
+a4C31oWqBcvgvngEuVjZaRJ4vbUcVbPuVYfswBbph78zNTraYcL9BtTDJoN4p8If
+FqAq8+s0NHsvXYDngI9f/dHmLGkK3w==
+=/QV4
+-----END PGP SIGNATURE-----
+
+--tGhqMGp2WInpHVI6afdnORpVNcU4tA8Hu--
+
 
