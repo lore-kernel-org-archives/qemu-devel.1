@@ -2,91 +2,64 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B95DC10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0575DC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:00:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6117420727
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 11:55:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YvB2/skF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6117420727
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C350820873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:00:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C350820873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBzx1-0007KQ-I8
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 07:55:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36077)
+	id 1jC020-0001t8-RK
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:00:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jBzwR-0006tQ-6L
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:28 -0400
+ (envelope-from <yuzenghui@huawei.com>) id 1jC01J-0001Kp-5s
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jBzwP-00027Y-N4
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52282
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <yuzenghui@huawei.com>) id 1jC01H-0000zy-SA
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:59:29 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3276 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBzwP-000277-Jf
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 07:54:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583927665;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kPr97CQr4JWiwPy6mmbExeNtkfVK7bLZjjhRnS+2AgE=;
- b=YvB2/skF/8Arvc5u4B3PxP5/U1x2vZg+yoy8b4smaIrYZe4ooI0cZK516sQfZlHF1FK/ZR
- vedFPJnCemQxdhKc02GQr1H8IurIXSoV/OV295SZ0IiGdn58U5TgMfrEOQdJyltg/3Xnrk
- efr2/se9aGE8ac9knXp7oGhTmf5hUCI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-bVh_HDYTMVycRKBo3_uJbA-1; Wed, 11 Mar 2020 07:54:23 -0400
-X-MC-Unique: bVh_HDYTMVycRKBo3_uJbA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D5DB107B118;
- Wed, 11 Mar 2020 11:54:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
- [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 06DE88F37F;
- Wed, 11 Mar 2020 11:54:15 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8D06211386A6; Wed, 11 Mar 2020 12:54:13 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
- vfio_rom_read
-References: <20200224064219.1434-1-longpeng2@huawei.com>
- <20200224064219.1434-2-longpeng2@huawei.com>
- <20200224090458.080152c0@w520.home>
- <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
- <20200310101108.3377b878@x1.home>
- <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
- <20200310193624.402fdb18@x1.home>
- <30f4a52f-a572-8643-1801-95c9fd2cd8a8@redhat.com>
-Date: Wed, 11 Mar 2020 12:54:13 +0100
-In-Reply-To: <30f4a52f-a572-8643-1801-95c9fd2cd8a8@redhat.com> (Laszlo Ersek's
- message of "Wed, 11 Mar 2020 11:26:38 +0100")
-Message-ID: <87o8t3ds4a.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
+ id 1jC01F-0000ef-1J; Wed, 11 Mar 2020 07:59:25 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 84AEF31DAF8532D5D5B4;
+ Wed, 11 Mar 2020 19:59:14 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Wed, 11 Mar 2020
+ 19:59:07 +0800
+Subject: Re: [kvm-unit-tests PATCH v5 10/13] arm/arm64: ITS: INT functional
+ tests
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+References: <20200310145410.26308-1-eric.auger@redhat.com>
+ <20200310145410.26308-11-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <d3f651a0-2344-4d6e-111b-be133db7e068@huawei.com>
+Date: Wed, 11 Mar 2020 19:59:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200310145410.26308-11-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,164 +71,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, weifuqiang@huawei.com, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>, arei.gonglei@huawei.com,
- huangzhichao@huawei.com, "Longpeng \(Mike,
- Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>
+Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
+ thuth@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+Hi Eric,
 
-> On 03/11/20 02:36, Alex Williamson wrote:
->> On Wed, 11 Mar 2020 00:14:31 +0100
->> Laszlo Ersek <lersek@redhat.com> wrote:
->>=20
->>> On 03/10/20 17:11, Alex Williamson wrote:
->>>
->>>> commit 2088fc1e1f426b98e9ca4d7bcdbe53d886a18c37
->>>> Author: Alex Williamson <alex.williamson@redhat.com>
->>>> Date:   Tue Mar 10 10:04:36 2020 -0600
->>>>
->>>>     vfio/pci: Use defined memcpy() behavior
->>>>    =20
->>>>     vfio_rom_read() relies on memcpy() doing the logically correct thi=
-ng,
->>>>     ie. safely copying zero bytes from a NULL pointer when rom_size is
->>>>     zero, rather than the spec definition, which is undefined when the
->>>>     source or target pointers are NULL.  Resolve this by wrapping the
->>>>     call in the condition expressed previously by the ternary.
->>>>    =20
->>>>     Additionally, we still use @val to fill data based on the provided
->>>>     @size regardless of mempcy(), so we should initialize @val rather
->>>>     than @data.
->>>>    =20
->>>>     Reported-by: Longpeng <longpeng2@huawei.com>
->>>>     Reported-by: Laszlo Ersek <lersek@redhat.com>
->>>>     Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
->>>>
->>>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->>>> index 5e75a95129ac..b0799cdc28ad 100644
->>>> --- a/hw/vfio/pci.c
->>>> +++ b/hw/vfio/pci.c
->>>> @@ -859,16 +859,17 @@ static uint64_t vfio_rom_read(void *opaque, hwad=
-dr addr, unsigned size)
->>>>          uint16_t word;
->>>>          uint32_t dword;
->>>>          uint64_t qword;
->>>> -    } val;
->>>> -    uint64_t data =3D 0;
->>>> +    } val =3D { 0 };
->>>> +    uint64_t data;
->>>> =20
->>>>      /* Load the ROM lazily when the guest tries to read it */
->>>>      if (unlikely(!vdev->rom && !vdev->rom_read_failed)) {
->>>>          vfio_pci_load_rom(vdev);
->>>>      }
->>>> =20
->>>> -    memcpy(&val, vdev->rom + addr,
->>>> -           (addr < vdev->rom_size) ? MIN(size, vdev->rom_size - addr)=
- : 0);
->>>> +    if (addr < vdev->rom_size) {
->>>> +        memcpy(&val, vdev->rom + addr, MIN(size, vdev->rom_size - add=
-r));
->>>> +    }
->>>> =20
->>>>      switch (size) {
->>>>      case 1: =20
->>>
->>> Regarding the pre-patch code:
->>>
->>> My understanding is that the memcpy() could be reached with a
->>> guest-originated "addr" even if "vdev->rom" was NULL. If that's the
->>> case, then the pre-patch code invokes undefined behavior regardless of
->>> memcpy(), because it performs pointer arithmetic on a null pointer (not
->>> to mention that the type of that pointer is (void *)....)
->>>
->>> Regarding the proposed change:
->>>
->>> (addr < vdev->rom_size) requires that "vdev->rom_size" be positive. In
->>> that case, I assume that
->>>
->>> - "vdev->rom" is not NULL, and
->>> -  MIN(size, vdev->rom_size - addr) bytes are "in range" for the object
->>> allocated at "vdev->rom".
->>>
->>> So from a memcpy() and range perspective, the patch looks OK. But
->>> there's still a wart I dislike: we should never perform pointer
->>> arithmetic on a (void*). I suggest casting (vdev->rom) to (uint8_t*) or
->>> (unsigned char*) first.
->>>
->>> Here's an excerpt from the ISO C99 standard:
->>>
->>> -v-
->>> 6.5.6 Additive operators
->>>
->>> Constraints
->>>
->>> 2 For addition, either both operands shall have arithmetic type, or one
->>>   operand shall be a pointer to an object type and the other shall have
->>>   integer type. [...]
->>> -^-
->>>
->>> A "pointer-to-void" is not a "pointer to an object type", because "void=
-"
->>> is not an object type -- it is an incomplete type that cannot be comple=
-ted:
->>>
->>> -v-
->>> 6.2.5 Types
->>>
->>> 1 [...] Types are partitioned into object types (types that fully
->>>   describe objects), function types (types that describe functions), an=
-d
->>>   incomplete types (types that describe objects but lack information
->>>   needed to determine their sizes).
->>>
->>> [...]
->>>
->>> 19 The void type comprises an empty set of values; it is an incomplete
->>>    type that cannot be completed.
->>> -^-
->>>
->>> For a different illustration, (vdev->rom + addr) is equivalent to
->>> &(vdev->rom[addr]) -- and we clearly can't have an "array of void".
->>>
->>> This anti-pattern (of doing pointer arithmetic on (void*)) likely comes
->>> from a guarantee that the standard does make, in the same "6.2.5 Types"
->>> section:
->>>
->>> -v-
->>> 27 A pointer to void shall have the same representation and alignment
->>>    requirements as a pointer to a character type. 39) [...]
->>>
->>> Footnote 39: The same representation and alignment requirements are
->>>              meant to imply interchangeability as arguments to
->>>              functions, return values from functions, and members of
->>>              unions.
->>> -^-
->>>
->>> It does not extend to the "+" operator.
->>=20
->> GNU C specifically allows arithmetic on pointers and defines the size
->> of a void as 1.  I'll comply, but this makes me want to stab myself in
->> the face :-\  Thanks,
->
-> Sorry, I didn't want to annoy you. :)
->
-> In fact I was about to mention, "I really don't understand why compilers
-> don't yell upon seeing pointer-to-void arithmetic", but I got distracted
-> and forgot about that thought. In retrospect, that may have been for the
-> best! :)
+On 2020/3/10 22:54, Eric Auger wrote:
+> Triggers LPIs through the INT command.
+> 
+> the test checks the LPI hits the right CPU and triggers
+> the right LPI intid, ie. the translation is correct.
+> 
+> Updates to the config table also are tested, along with inv
+> and invall commands.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
 
-You're looking for
+[...]
 
-'-Wpointer-arith'
-     Warn about anything that depends on the "size of" a function type
-     or of 'void'.  GNU C assigns these types a size of 1, for
-     convenience in calculations with 'void *' pointers and pointers to
-     functions.  In C++, warn also when an arithmetic operation involves
-     'NULL'.  This warning is also enabled by '-Wpedantic'.
+> +static void test_its_trigger(void)
+> +{
+> +	struct its_collection *col3, *col2;
+> +	struct its_device *dev2, *dev7;
+> +
+> +	if (its_prerequisites(4))
+> +		return;
+> +
+> +	dev2 = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+> +	dev7 = its_create_device(7 /* dev id */, 8 /* nb_ites */);
+> +
+> +	col3 = its_create_collection(3 /* col id */, 3/* target PE */);
+> +	col2 = its_create_collection(2 /* col id */, 2/* target PE */);
+> +
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	gicv3_lpi_set_config(8196, LPI_PROP_DEFAULT);
+> +
+> +	its_send_invall(col2);
+> +	its_send_invall(col3);
+
+These two INVALLs should be issued after col2 and col3 are mapped,
+otherwise this will cause the INVALL command error as per the spec
+(though KVM doesn't complain it at all).
+
+> +
+> +	report_prefix_push("int");
+> +	/*
+> +	 * dev=2, eventid=20  -> lpi= 8195, col=3
+> +	 * dev=7, eventid=255 -> lpi= 8196, col=2
+> +	 * Trigger dev2, eventid=20 and dev7, eventid=255
+> +	 * Check both LPIs hit
+> +	 */
+> +
+> +	its_send_mapd(dev2, true);
+> +	its_send_mapd(dev7, true);
+> +
+> +	its_send_mapc(col3, true);
+> +	its_send_mapc(col2, true);
+> +
+> +	its_send_mapti(dev2, 8195 /* lpi id */, 20 /* event id */, col3);
+> +	its_send_mapti(dev7, 8196 /* lpi id */, 255 /* event id */, col2);
+> +
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev=2, eventid=20  -> lpi= 8195, col=3");
+> +
+> +	lpi_stats_expect(2, 8196);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("dev=7, eventid=255 -> lpi= 8196, col=2");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("inv/invall");
+> +
+> +	/*
+> +	 * disable 8195, check dev2/eventid=20 does not trigger the
+> +	 * corresponding LPI
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT & ~LPI_PROP_ENABLED);
+> +	its_send_inv(dev2, 20);
+> +
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 does not trigger any LPI");
+> +
+> +	/*
+> +	 * re-enable the LPI but willingly do not call invall
+> +	 * so the change in config is not taken into account.
+> +	 * The LPI should not hit
+> +	 */
+> +	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 still does not trigger any LPI");
+> +
+> +	/* Now call the invall and check the LPI hits */
+> +	its_send_invall(col3);
+> +	lpi_stats_expect(3, 8195);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+> +
+> +	report_prefix_pop();
+> +
+> +	report_prefix_push("mapd valid=false");
+> +	/*
+> +	 * Unmap device 2 and check the eventid 20 formerly
+> +	 * attached to it does not hit anymore
+> +	 */
+> +
+> +	its_send_mapd(dev2, false);
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev2, 20);
+> +	check_lpi_stats("no LPI after device unmap");
+> +	report_prefix_pop();
+> +
+> +	/* Unmap the collection this time and check no LPI does hit */
+> +	report_prefix_push("mapc valid=false");
+> +	its_send_mapc(col2, false);
+
+And as for the MAPC, the spec says:
+
+" When V is 0:
+Behavior is unpredictable if there are interrupts that are mapped to the
+specified collection, with the restriction that further translation
+requests from that device are ignored. "
+
+So this collection-unmap test may not make sense?
+
+> +	lpi_stats_expect(-1, -1);
+> +	its_send_int(dev7, 255);
+> +	check_lpi_stats("no LPI after collection unmap");
+> +	report_prefix_pop();
+> +}
+
+[...]
+
+Otherwise looks good.
+
+
+Thanks,
+Zenghui
 
 
