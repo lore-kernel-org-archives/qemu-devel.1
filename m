@@ -2,99 +2,69 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C266C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 18:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48089C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 19:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A73D206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 18:39:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrHV5AkD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A73D206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C42F2073E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 19:00:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C42F2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC6GH-00073X-4c
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 14:39:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47472)
+	id 1jC6aZ-000671-7e
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 15:00:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jC6Ff-0006ey-A5
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:38:44 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jC6Zw-0005iF-QC
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jC6Fe-0002WM-9P
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:38:43 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42576
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jC6Fe-0002Vy-6C
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:38:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583951921;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Gl2ra51CpEMH98PeqLqwTeOOX5lyngPRyeYdFFRSSL4=;
- b=hrHV5AkDWCFKQIha4gijdoP5dFOlqWwUiAMoA1n5ujYzFXwonmLNSRiC+dRnO3CtnV3nL6
- GEgOZoZVroQpe8hXty6OiWW2glitWrpXDds14beDVRqseScX7KHmfFnXcuwKFkeZcWuvJD
- QlHhhn+c3jl5mBCurqLkKarFAgNatBA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-bVTiIMDvOH6QW-AouR-odA-1; Wed, 11 Mar 2020 14:38:37 -0400
-X-MC-Unique: bVTiIMDvOH6QW-AouR-odA-1
-Received: by mail-wr1-f72.google.com with SMTP id h14so646440wrv.12
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 11:38:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wPfYCjp+EpdRoDoBHXSP26GKooXEH0epVeo1qfez/u0=;
- b=bOAvku9p5aSPxtIM7LDQm320rctJky+q+MPJNTnIjiRsEYU3juB7pM86KBbrFwWAsK
- cDtWET5IoMnanZPyWAkpBbwAi0wIQfyFKY8pUkP9cfun9RU9CN48Mj5CLVKeVcpD1bLX
- koVVmc5XfxW+iUGlfLG0ThmLsccHG7Tjc9M664k8MbLdpxB4rEgWM9Nl9Mq9rnq5D+ii
- /8VovdSZkicA1DK6HUmot4pojRwG5E5Bt8PUZK5FbFdfBgnl1uXhvRVb3I7JkjpATQaE
- WybwHvOBbLUKTTDph3o77ojcbUyBRftiHx4wJ7Yy8J8/2/5NbQPiNFoUShpNUFBwdFdM
- yedg==
-X-Gm-Message-State: ANhLgQ3nfUebwYXLnGwAtHNjl2uO3oTfpT+CKeHNC8SdiVI6lN9eDpV7
- pvoMapi+PtKmN9LihmWZmWXDjvG7UXmrWq1VgPl5KpXrxmkp5d9V38hRtS+tdSgkVc8fjrcUe7Y
- Y2REVZTTOGEQpbM4=
-X-Received: by 2002:adf:80af:: with SMTP id 44mr5893206wrl.241.1583951916384; 
- Wed, 11 Mar 2020 11:38:36 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvgLEH90ncw/7N+89oSWeuLd6d2ZDyNa5PvMls5FLDI4nooQ38L2eQ106CoGQvJQsthrmzoIA==
-X-Received: by 2002:adf:80af:: with SMTP id 44mr5893186wrl.241.1583951916142; 
- Wed, 11 Mar 2020 11:38:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4887:2313:c0bc:e3a8?
- ([2001:b07:6468:f312:4887:2313:c0bc:e3a8])
- by smtp.gmail.com with ESMTPSA id r3sm9279443wmg.19.2020.03.11.11.38.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Mar 2020 11:38:35 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] buildsys: Fix building with SASL on Windows
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200309122454.22551-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <03e337bb-4533-09de-2ed0-fc0ac83bdf3c@redhat.com>
-Date: Wed, 11 Mar 2020 19:38:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1jC6Zv-00007o-9t
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:59:40 -0400
+Resent-Date: Wed, 11 Mar 2020 14:59:40 -0400
+Resent-Message-Id: <E1jC6Zv-00007o-9t@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21167)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jC6Zv-0008Qp-1W
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 14:59:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1583953163; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=dnxFLSiTixo76qoEIthm+tI73XnoGD4zvsZCM8gbd+fgrKgWLrZgFzD9g+lpk50/MGMjLEY5gQuo3Z9ceMVsvIKwSeBluqytGhzX/Aam5tdHBlEJPmJ51vM27d+w2jFk1NCzLIJ16+lUKVlI52CM2YceKI4oIBuPLS+N9wtkQz8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583953163;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=SgBCbXEpBOtU+5rTPbAo7cd3gDzG0z5C5NEFfo/mrSQ=; 
+ b=ib8bAAkFz5u+641+oooLII+hzgSplqeeJkTcLbCMdNDKxZqK4+KSswv2UbxWQbrwKP1omMtsxGGemTf9gmMtWhBDl46TXO1leroYVwynhGlJx7slm1AycKnD0ZQU5WiLUSj51da+jDZXYyh2xNx7c/7e4Xpowo9zDhL6r56UrzA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583953160591111.03217273272708;
+ Wed, 11 Mar 2020 11:59:20 -0700 (PDT)
+In-Reply-To: <20200311170826.79419-1-liran.alon@oracle.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <158395315920.8804.12475968769225149761@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20200309122454.22551-1-philmd@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: liran.alon@oracle.com
+Date: Wed, 11 Mar 2020 11:59:20 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,37 +76,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?B?0JDQu9C10LrRgdC10Lkg0J/QsNCy0LvQvtCy?= <alexey.pawlow@gmail.com>,
- =?UTF-8?B?0JzQtdGC0LvQuNGG0LrQuNC5INCu0YDQuNC5INCS0LjQutGC0L7RgNC+0LLQuNGH?=
- <winaes@narod.ru>, Biswapriyo Nath <nathbappai@gmail.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ liran.alon@oracle.com, pbonzini@redhat.com, elad.gabay@oracle.com,
+ imammedo@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/03/20 13:24, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fix a bug reported by Youry few months ago:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg625606.html
->=20
-> Since v1:
-> - addressed Daniel review (always define STRUCT_IOVEC_DEFINED)
->=20
-> The Fedora docker image already uses the libsasl since commit
-> 8ea5962f286. Add the similar package to the Debian (host) image.
->=20
-> Philippe Mathieu-Daud=C3=A9 (2):
->   configure: Fix building with SASL on Windows
->   tests/docker: Install SASL library to extend code coverage on amd64
->=20
->  configure                                    | 4 +++-
->  tests/docker/dockerfiles/debian-amd64.docker | 1 +
->  2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-
-Queued, thanks.
-
-Paolo
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMTE3MDgyNi43OTQx
+OS0xLWxpcmFuLmFsb25Ab3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
+IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
+IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVc2luZyBleHBlY3RlZCBm
+aWxlICd0ZXN0cy9kYXRhL2FjcGkvcGMvSFBFVCcKTG9va2luZyBmb3IgZXhwZWN0ZWQgZmlsZSAn
+dGVzdHMvZGF0YS9hY3BpL3BjL1dBRVQnCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
+cy9xdGVzdC9iaW9zLXRhYmxlcy10ZXN0LmM6MzY3OmxvYWRfZXhwZWN0ZWRfYW1sOiBhc3NlcnRp
+b24gZmFpbGVkOiAoZXhwX3NkdC5hbWxfZmlsZSkKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3Rt
+cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2Jpb3MtdGFibGVzLXRlc3QuYzozNjc6bG9hZF9l
+eHBlY3RlZF9hbWw6IGFzc2VydGlvbiBmYWlsZWQ6IChleHBfc2R0LmFtbF9maWxlKQptYWtlOiAq
+KiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5m
+aW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVzdC1idWZmZXJp
+c3plcm8KcWVtdS1zeXN0ZW0tYWFyY2g2NDogLWFjY2VsIGt2bTogaW52YWxpZCBhY2NlbGVyYXRv
+ciBrdm0KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
+cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
+cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTU1OThhNDQ5ODc0
+MjQ5MWM5YmU3NmUxMjI1ZjYwZmU1JywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAn
+c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywg
+J0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywg
+J0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
+Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTov
+dmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZjVn
+OXNkNjUvc3JjL2RvY2tlci1zcmMuMjAyMC0wMy0xMS0xNC40Ny4zNC42MDU1Oi92YXIvdG1wL3Fl
+bXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWlj
+ayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFi
+ZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01NTk4YTQ0OTg3NDI0OTFjOWJlNzZlMTIyNWY2MGZl
+NQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJl
+Y3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1mNWc5c2Q2NS9zcmMnCm1ha2U6ICoq
+KiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTFtNDUu
+MjAzcwp1c2VyICAgIDBtOC43MDZzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
+Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMxMTE3MDgyNi43OTQxOS0xLWxpcmFuLmFsb25Ab3Jh
+Y2xlLmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
+Y29t
 
