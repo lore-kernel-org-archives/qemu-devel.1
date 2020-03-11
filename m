@@ -6,87 +6,86 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E88DC10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C9BC10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:08:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B1DA20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:07:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6146920873
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 06:08:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LVsVp792"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B1DA20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gOKenboG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6146920873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBuWz-0008Uf-BN
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:07:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46678)
+	id 1jBuXG-0000j2-Is
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 02:08:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuW9-0007MD-QZ
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuWV-0007tb-JV
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBuW8-00085u-V4
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:57 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44505)
+ (envelope-from <richard.henderson@linaro.org>) id 1jBuWU-0000lj-G9
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:19 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44585)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBuW8-00084f-OF
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:06:56 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 37so572504pgm.11
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:06:56 -0700 (PDT)
+ id 1jBuWU-0000gh-7B
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 02:07:18 -0400
+Received: by mail-pf1-x444.google.com with SMTP id b72so678733pfb.11
+ for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 23:07:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CytbE9dzD3rJXx061tUzRHbGW/x0HK1aaXwJ3VFdKvk=;
- b=LVsVp792eeJ2rIDGSC8bT1aa2d3v9luY40unA1keAL0nC19Zr3R2rL3IqgSsuh/RwA
- 9WEYHJJjEVhMjD8L22vU8qVGnaJjtbJJOOTIs2cdMSFYBnthKMFIApRoPUzEDO1gFhyG
- iCR5CaMxeXVEfZSPtdAg+Fjm8e40OIFXNpDEgqhyfgaB2i6DcrHzEjFl4wYq8wiGMRn2
- 4vwfdG/TZAtVB/e/42SA+YhDnVpegSxNEOJ4eWF6xJQs7ZBsCWBhTrKEyUtxYQq4Txbb
- iOZm8o+smUrjxGDur2gz/CcTze+DiFnFTUUQhqzpWl3OSO+HJGcLPUaMv1Br3xoQWebD
- peiA==
+ bh=klMLPirH7ru2EDINPtWByz+VfotpZS0bqaeR6CMsAtU=;
+ b=gOKenboG1TF8LaF3ViRb4WYJXEc0F6CBfi47sa/kznjEP2V3DO9JlrtjB+gYt2MAo7
+ aGRg+OeY+mEp8CnPDjbMuTXjCMJ6+FgTO0OKHAA3sqJoqFhKerCQY5s0e+F6f/zu6XcK
+ 1rweLWstlXXqbyQaLcDDECQ7TuqMGIQW6AXasFnpqfMkQRxwpRBV+LMPWH3mg5BVkDSD
+ xIpmXvytZHev2PzO7p9k9gAVpKGkoFi0d+1RsP0jWI6RGQ6JrjeFypCc0tmJf9tgqx4w
+ mwxVRDWw9aiDIiSugQ6N6h9y/n/q4RgNn7x/DTT5Pr1csuWV4GuQ5eUSzymxCCpUnn5a
+ eWEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=CytbE9dzD3rJXx061tUzRHbGW/x0HK1aaXwJ3VFdKvk=;
- b=YDChsegZITvlfCRgGTdqg7NcauHh/ektKzZzVylJ3LZdRjTyTDjdg7vjQtnRiULvtr
- VirhLdl1udTM8xmLCCoidq1n2pOHDCdENDWEYeWj8vdReD14zXYl7xCSz1as9H1x3eDR
- di/VOdcWhQZ7GQuU7HUXV1oBodwNHEo9MZB59h6FiXBmEKGhT14nkhX2FvLmb9woZlFP
- 11GX3wnD5xwa9c7xAWpOhcqPKLOeNJQ4Q7BsrUUQ2/lf4AdEoHajHUwlx2o9UDuDKAni
- yOxeSZCotzXIuoUoPMSysA4GzuNy+5rk52nlksFYmHXZeTQbQbTRZ2YOhUc39TlfXI+i
- 5fZA==
-X-Gm-Message-State: ANhLgQ3eZ8IOIdOKWn8wl019fUB7vlpklnsMb4hGV1Btkp7a/V1lv7VH
- kmLJGCBkWjXh0nbmPH6wMRzyxw==
-X-Google-Smtp-Source: ADFU+vtRiQQX/zFuI9gdKT1rlSs8wp7QaiV3FGt57FzvDrVAUYYyo2sRzs1e+gmeyc6PBiBJWC+2CA==
-X-Received: by 2002:a63:c445:: with SMTP id m5mr1286081pgg.194.1583906815801; 
- Tue, 10 Mar 2020 23:06:55 -0700 (PDT)
+ bh=klMLPirH7ru2EDINPtWByz+VfotpZS0bqaeR6CMsAtU=;
+ b=YeeqSre64U10XsUac86LdCv9YpilYEMmXZ9mHSAQCBVKbPS30+biiSPzF9eJZaYWYO
+ m9Dsn/kq9guSMRfo9BO3Z0xrvyTCyCNEfxVAcaK02mQML0qhya0au46eaX9ZdNin3Ky7
+ tf6pzCP2ogrdMY8sqMPTWAWZCJ7cmQ+qDBunulkO3eWcDe5Y7E6ehRCQN/gnkM77zgNG
+ 3Q17x0DSHpCszebIOBrthK4l0Cq1u56Ys73gtcszlltynfxuCvhEg5qQlIa38/zYBK5N
+ 7/YxULWxsH44rdBTI7B0Zwxh2iV6X11oG2q4XG2LHF242t2h7JejesVjqZZ79zuS/+5H
+ GmoA==
+X-Gm-Message-State: ANhLgQ3GwtkdX/L2KWfBTShX3j+rt7yiw9jz14IYyHGe3JSeNfL8TEyk
+ QECSzT1GVkLr834iXzNDh/4iuA==
+X-Google-Smtp-Source: ADFU+vuNcY91EWUjO1jdFXUGVQH2vjPN7xI7CeX4jRAVU78VXA6kACxshZXyAPlVGw5vE7WJFup+1w==
+X-Received: by 2002:aa7:9467:: with SMTP id t7mr1274373pfq.97.1583906837338;
+ Tue, 10 Mar 2020 23:07:17 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- i5sm31350210pfo.173.2020.03.10.23.06.54
+ 13sm47835988pgo.13.2020.03.10.23.07.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 23:06:54 -0700 (PDT)
-Subject: Re: [PATCH v4 03/18] qapi/machine.json: Escape a literal '*' in doc
- comment
+ Tue, 10 Mar 2020 23:07:16 -0700 (PDT)
+Subject: Re: [PATCH v4 04/18] tests/qapi/doc-good.json: Clean up markup
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200309154405.13548-1-peter.maydell@linaro.org>
- <20200309154405.13548-4-peter.maydell@linaro.org>
+ <20200309154405.13548-5-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <091a8a4c-762a-e699-8e14-217cecf5c58d@linaro.org>
-Date: Tue, 10 Mar 2020 23:06:52 -0700
+Message-ID: <57ca9623-28b8-8c91-3e65-4f63ce14bae5@linaro.org>
+Date: Tue, 10 Mar 2020 23:07:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200309154405.13548-4-peter.maydell@linaro.org>
+In-Reply-To: <20200309154405.13548-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,18 +106,26 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/9/20 8:43 AM, Peter Maydell wrote:
-> For rST, '*' is a kind of inline markup (for emphasis), so
-> "*-softmmu" is a syntax error because of the missing closing '*'.
-> Escape the '*' with a '\'.
+> doc-good.json tests some oddities of markup that we don't want to
+> accept.  Make them match the more restrictive rST syntax:
 > 
-> The texinfo document generator will leave the '\' in the
-> output, which is not ideal, but that generator is going to
-> go away in a subsequent commit.
+>  * in a single list the bullet types must all match
+>  * lists must have leading and following blank lines
+>  * indentation is important
+>  * the '|' example syntax is going to go away entirely, so stop
+>    testing it
+> 
+> This will avoid the tests spuriously breaking when we tighten up the
+> parser code in the following commits.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qapi/machine.json | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> New patch in v2
+> ---
+>  tests/qapi-schema/doc-good.json | 25 +++++++++++++------------
+>  tests/qapi-schema/doc-good.out  | 12 ++++++------
+>  tests/qapi-schema/doc-good.texi | 12 +++---------
+>  3 files changed, 22 insertions(+), 27 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
