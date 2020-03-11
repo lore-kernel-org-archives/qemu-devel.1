@@ -8,72 +8,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB7E3C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 999B6C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:26:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A6BB20575
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61D4720575
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gu422zlC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6BB20575
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZswkFuKD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D4720575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC9nT-0000g0-IQ
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:25:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59333)
+	id 1jC9nw-0001gV-EQ
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:26:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h9-0003td-AV
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:22 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jC9hA-0003vl-0u
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h5-0004zz-FB
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h4-0004wM-FJ
  for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:19 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54465)
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37177)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jC9h5-0004wX-3N; Wed, 11 Mar 2020 18:19:15 -0400
-Received: by mail-wm1-x343.google.com with SMTP id n8so3922698wmc.4;
+ id 1jC9h4-0004tD-35; Wed, 11 Mar 2020 18:19:14 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a141so4017433wme.2;
  Wed, 11 Mar 2020 15:19:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=K0vMJeFubNJLAllMQf+rk639fr7DMooPDXIjSqDsstA=;
- b=Gu422zlCoOukAsqi7iMTOx1T7NVrx97IwbzNHJOv19kIGGXG8rkMRWSpuW3tHLg3C9
- qc/w+VYGAiCIOEXk3QuM3kVEqHPViTyoKfJHd4XWugy5kRBxG1mbNzgi+4FEBO0wZqIO
- qUvRv/AlSVww7ZuKKM44XJMJ2DoLWqYn6nVSO5rF/G+1rBFuhE38okie+qnBgCY1Zyjg
- nRKD+3CQmjUts6cJTK8GqBT/6FAf/ZLFNDiu77Yb1rtsgb6NB+DWghLuWyZ55UME5UdS
- ceOfhWVlUiGm27DG1ql8HCX0WDlFLB0jsKQtIXjA/OsMK0bTd7r0b2iG1QtWdQjRc0hm
- mfDw==
+ bh=WiYiFi074v1xnYOeTo6tgytxMAJAaqXUge6mXjMTva8=;
+ b=ZswkFuKDlf7U7q4cDuuXnwAEDG+IJnT3dI6tWluLrnRr9WQYBLd3MMOmtB7a6tP+0z
+ QxE23GyzvzE4QV6a7AdBKhAD/KmS/RQCpLPXSwd4QBZ8l/7rE1PKdIwzdHJRZLwUqXJB
+ daAtqN128DIvqXgcu8EfGxRilyq6/WWlfrDIisbe8xmtVPkawajOeJPTyJ0d1eT+Yce6
+ bJDWJfScx0QQEhr0HUaRv55gDtTrTTwupXZGtE6yHjP/S3afzXnYGNT18PWJzgYJZeEL
+ eHx48pUquYmRfSjv3D/RN5s06TM60DqR/zrbSL2F0PQX85y+Hlw6ubSVYTPPZ75WYOOg
+ +jrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=K0vMJeFubNJLAllMQf+rk639fr7DMooPDXIjSqDsstA=;
- b=mnracbdUyYSGeoQ/U2znZHPU9lj9bohc5MTNiAQn+7mUci3SA6UdTZDKOLjeD3rkKu
- Q89ljE/4ZD1UNvLjM0wmI8SKNZxfDKAOLgO7aQmW0SEz3rNbAab6TqJuIgiK3DdPrdXc
- xscdn/eMRwL8xp7laooce0w0V6CEN0Ma5GFBmODtV2QwpKUwl/WhcP/2YvOQ6hceoOtB
- e4NosH9B7LbjbfTrEeNaiNaJXeMn/Q+46g2jPBBnkvzI3thdMgVEpg57AAfDYAp654jY
- jYiP1tISCa2TrtmLZtqIcHH3bCeszlLnirzYO1Aqr5GAyRtEHtGd572dBuvx5B0c0Cgq
- mm/A==
-X-Gm-Message-State: ANhLgQ0f3oK2x6qQi8ssEF/ketbVTotH0PovAlj/6GEQf90v6oVLxtDC
- 0qzZKbe0SUNZTAyuKHk3bUdil4SM
-X-Google-Smtp-Source: ADFU+vvqXz85O8WzD0F0s6BPJ+SWjMQUEBTPUSC7HXwDFgSjnq+MtgoZy3EAU5ukN2m9wpOQZL4elA==
-X-Received: by 2002:a05:600c:230e:: with SMTP id
- 14mr873686wmo.42.1583965153380; 
- Wed, 11 Mar 2020 15:19:13 -0700 (PDT)
+ bh=WiYiFi074v1xnYOeTo6tgytxMAJAaqXUge6mXjMTva8=;
+ b=TMfd4VzSKZ9WcYeBIAlftnuUzgEGN+tcqVe1P+zhXYFfEm0yyZsHfVHMIY+rQBQLhp
+ Kfi8I81EJo6CCduKJK8D/AQKdLlPC78IsDDNLa2bltSmFYrruzokZj5hlcI2u6S93awg
+ RPiGwWL0c8we9ArZoFkJ4GS82yuLsWdh4MTc52t91V8KruIpPXkVRLfe1vkxvGcY27J0
+ kp6wgzFqmf22camDiSrhT0mMwra3l1saOLWA10kwF8GVRmMuudeovg+M/exA9bt/PXgG
+ +q1yBnC5hX2PHPVvepH1ddYmVacJ7/7bQFgQWGmXnEs3mugzUVIIWJehRtyn2kzVYtRN
+ knmA==
+X-Gm-Message-State: ANhLgQ0j18ANIHlYxZPIXUZtmRzOZNAhuWBb0gp6Q4hhdq6KZs3yRpL1
+ WZLLSYx+ftfrrfqsOUdvbZk8h7aq
+X-Google-Smtp-Source: ADFU+vuZd7onNErVlBcz3VeA7kopTC1uTyerm6W51aCPrYSTxKtsaYyd+KRBXA7JOXXodZS55ISsbw==
+X-Received: by 2002:a1c:7209:: with SMTP id n9mr811543wmc.188.1583965151800;
+ Wed, 11 Mar 2020 15:19:11 -0700 (PDT)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id q7sm19346796wrd.54.2020.03.11.15.19.12
+ by smtp.gmail.com with ESMTPSA id q7sm19346796wrd.54.2020.03.11.15.19.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 15:19:12 -0700 (PDT)
+ Wed, 11 Mar 2020 15:19:11 -0700 (PDT)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 11/18] hw/arm/allwinner-h3: add SDRAM controller device
-Date: Wed, 11 Mar 2020 23:18:47 +0100
-Message-Id: <20200311221854.30370-12-nieklinnenbank@gmail.com>
+Subject: [PATCH v8 09/18] hw/arm/allwinner-h3: add EMAC ethernet device
+Date: Wed, 11 Mar 2020 23:18:45 +0100
+Message-Id: <20200311221854.30370-10-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200311221854.30370-1-nieklinnenbank@gmail.com>
 References: <20200311221854.30370-1-nieklinnenbank@gmail.com>
@@ -101,64 +100,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the Allwinner H3 SoC the SDRAM controller is responsible
-for interfacing with the external Synchronous Dynamic Random
-Access Memory (SDRAM). Types of memory that the SDRAM controller
-supports are DDR2/DDR3 and capacities of up to 2GiB. This commit
-adds emulation support of the Allwinner H3 SDRAM controller.
+The Allwinner Sun8i System on Chip family includes an Ethernet MAC (EMAC)
+which provides 10M/100M/1000M Ethernet connectivity. This commit
+adds support for the Allwinner EMAC from the Sun8i family (H2+, H3, A33, etc),
+including emulation for the following functionality:
+
+ * DMA transfers
+ * MII interface
+ * Transmit CRC calculation
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/hw/arm/allwinner-h3.h        |   5 +
- include/hw/misc/allwinner-h3-dramc.h | 106 ++++++++
- hw/arm/allwinner-h3.c                |  19 +-
- hw/arm/orangepi.c                    |   6 +
- hw/misc/allwinner-h3-dramc.c         | 358 +++++++++++++++++++++++++++
- hw/misc/Makefile.objs                |   1 +
- hw/misc/trace-events                 |  10 +
- 7 files changed, 502 insertions(+), 3 deletions(-)
- create mode 100644 include/hw/misc/allwinner-h3-dramc.h
- create mode 100644 hw/misc/allwinner-h3-dramc.c
+ include/hw/arm/allwinner-h3.h         |   3 +
+ include/hw/net/allwinner-sun8i-emac.h |  99 +++
+ hw/arm/allwinner-h3.c                 |  16 +-
+ hw/arm/orangepi.c                     |   3 +
+ hw/net/allwinner-sun8i-emac.c         | 871 ++++++++++++++++++++++++++
+ hw/arm/Kconfig                        |   1 +
+ hw/net/Kconfig                        |   3 +
+ hw/net/Makefile.objs                  |   1 +
+ hw/net/trace-events                   |  10 +
+ 9 files changed, 1006 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/net/allwinner-sun8i-emac.h
+ create mode 100644 hw/net/allwinner-sun8i-emac.c
 
 diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index d338003724..065d020c73 100644
+index d71a4917ab..f9b9a02373 100644
 --- a/include/hw/arm/allwinner-h3.h
 +++ b/include/hw/arm/allwinner-h3.h
-@@ -41,6 +41,7 @@
- #include "hw/intc/arm_gic.h"
- #include "hw/misc/allwinner-h3-ccu.h"
- #include "hw/misc/allwinner-cpucfg.h"
-+#include "hw/misc/allwinner-h3-dramc.h"
+@@ -44,6 +44,7 @@
  #include "hw/misc/allwinner-h3-sysctrl.h"
  #include "hw/misc/allwinner-sid.h"
  #include "hw/sd/allwinner-sdhost.h"
-@@ -80,6 +81,9 @@ enum {
++#include "hw/net/allwinner-sun8i-emac.h"
+ #include "target/arm/cpu.h"
+ 
+ /**
+@@ -77,6 +78,7 @@ enum {
+     AW_H3_UART1,
      AW_H3_UART2,
      AW_H3_UART3,
-     AW_H3_EMAC,
-+    AW_H3_DRAMCOM,
-+    AW_H3_DRAMCTL,
-+    AW_H3_DRAMPHY,
++    AW_H3_EMAC,
      AW_H3_GIC_DIST,
      AW_H3_GIC_CPU,
      AW_H3_GIC_HYP,
-@@ -120,6 +124,7 @@ typedef struct AwH3State {
-     AwA10PITState timer;
-     AwH3ClockCtlState ccu;
-     AwCpuCfgState cpucfg;
-+    AwH3DramCtlState dramc;
+@@ -120,6 +122,7 @@ typedef struct AwH3State {
      AwH3SysCtrlState sysctrl;
      AwSidState sid;
      AwSdHostState mmc0;
-diff --git a/include/hw/misc/allwinner-h3-dramc.h b/include/hw/misc/allwinner-h3-dramc.h
++    AwSun8iEmacState emac;
+     GICState gic;
+     MemoryRegion sram_a1;
+     MemoryRegion sram_a2;
+diff --git a/include/hw/net/allwinner-sun8i-emac.h b/include/hw/net/allwinner-sun8i-emac.h
 new file mode 100644
-index 0000000000..bacdf236b7
+index 0000000000..eda034e96b
 --- /dev/null
-+++ b/include/hw/misc/allwinner-h3-dramc.h
-@@ -0,0 +1,106 @@
++++ b/include/hw/net/allwinner-sun8i-emac.h
+@@ -0,0 +1,99 @@
 +/*
-+ * Allwinner H3 SDRAM Controller emulation
++ * Allwinner Sun8i Ethernet MAC emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -176,76 +178,53 @@ index 0000000000..bacdf236b7
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_MISC_ALLWINNER_H3_DRAMC_H
-+#define HW_MISC_ALLWINNER_H3_DRAMC_H
++#ifndef HW_NET_ALLWINNER_SUN8I_EMAC_H
++#define HW_NET_ALLWINNER_SUN8I_EMAC_H
 +
 +#include "qom/object.h"
++#include "net/net.h"
 +#include "hw/sysbus.h"
-+#include "exec/hwaddr.h"
-+
-+/**
-+ * Constants
-+ * @{
-+ */
-+
-+/** Highest register address used by DRAMCOM module */
-+#define AW_H3_DRAMCOM_REGS_MAXADDR  (0x804)
-+
-+/** Total number of known DRAMCOM registers */
-+#define AW_H3_DRAMCOM_REGS_NUM      (AW_H3_DRAMCOM_REGS_MAXADDR / \
-+                                     sizeof(uint32_t))
-+
-+/** Highest register address used by DRAMCTL module */
-+#define AW_H3_DRAMCTL_REGS_MAXADDR  (0x88c)
-+
-+/** Total number of known DRAMCTL registers */
-+#define AW_H3_DRAMCTL_REGS_NUM      (AW_H3_DRAMCTL_REGS_MAXADDR / \
-+                                     sizeof(uint32_t))
-+
-+/** Highest register address used by DRAMPHY module */
-+#define AW_H3_DRAMPHY_REGS_MAXADDR  (0x4)
-+
-+/** Total number of known DRAMPHY registers */
-+#define AW_H3_DRAMPHY_REGS_NUM      (AW_H3_DRAMPHY_REGS_MAXADDR / \
-+                                     sizeof(uint32_t))
-+
-+/** @} */
 +
 +/**
 + * Object model
 + * @{
 + */
 +
-+#define TYPE_AW_H3_DRAMC "allwinner-h3-dramc"
-+#define AW_H3_DRAMC(obj) \
-+    OBJECT_CHECK(AwH3DramCtlState, (obj), TYPE_AW_H3_DRAMC)
++#define TYPE_AW_SUN8I_EMAC "allwinner-sun8i-emac"
++#define AW_SUN8I_EMAC(obj) \
++    OBJECT_CHECK(AwSun8iEmacState, (obj), TYPE_AW_SUN8I_EMAC)
 +
 +/** @} */
 +
 +/**
-+ * Allwinner H3 SDRAM Controller object instance state.
++ * Allwinner Sun8i EMAC object instance state
 + */
-+typedef struct AwH3DramCtlState {
++typedef struct AwSun8iEmacState {
 +    /*< private >*/
-+    SysBusDevice parent_obj;
++    SysBusDevice  parent_obj;
 +    /*< public >*/
 +
-+    /** Physical base address for start of RAM */
-+    hwaddr ram_addr;
++    /** Maps I/O registers in physical memory */
++    MemoryRegion iomem;
 +
-+    /** Total RAM size in megabytes */
-+    uint32_t ram_size;
++    /** Interrupt output signal to notify CPU */
++    qemu_irq     irq;
++
++    /** Generic Network Interface Controller (NIC) for networking API */
++    NICState     *nic;
++
++    /** Generic Network Interface Controller (NIC) configuration */
++    NICConf      conf;
 +
 +    /**
-+     * @name Memory Regions
++     * @name Media Independent Interface (MII)
 +     * @{
 +     */
 +
-+    MemoryRegion row_mirror;       /**< Simulates rows for RAM size detection */
-+    MemoryRegion row_mirror_alias; /**< Alias of the row which is mirrored */
-+    MemoryRegion dramcom_iomem;    /**< DRAMCOM module I/O registers */
-+    MemoryRegion dramctl_iomem;    /**< DRAMCTL module I/O registers */
-+    MemoryRegion dramphy_iomem;    /**< DRAMPHY module I/O registers */
++    uint8_t      mii_phy_addr;  /**< PHY address */
++    uint32_t     mii_cr;        /**< Control */
++    uint32_t     mii_st;        /**< Status */
++    uint32_t     mii_adv;       /**< Advertised Abilities */
 +
 +    /** @} */
 +
@@ -254,91 +233,108 @@ index 0000000000..bacdf236b7
 +     * @{
 +     */
 +
-+    uint32_t dramcom[AW_H3_DRAMCOM_REGS_NUM]; /**< Array of DRAMCOM registers */
-+    uint32_t dramctl[AW_H3_DRAMCTL_REGS_NUM]; /**< Array of DRAMCTL registers */
-+    uint32_t dramphy[AW_H3_DRAMPHY_REGS_NUM] ;/**< Array of DRAMPHY registers */
++    uint32_t     basic_ctl0;    /**< Basic Control 0 */
++    uint32_t     basic_ctl1;    /**< Basic Control 1 */
++    uint32_t     int_en;        /**< Interrupt Enable */
++    uint32_t     int_sta;       /**< Interrupt Status */
++    uint32_t     frm_flt;       /**< Receive Frame Filter */
++
++    uint32_t     rx_ctl0;       /**< Receive Control 0 */
++    uint32_t     rx_ctl1;       /**< Receive Control 1 */
++    uint32_t     rx_desc_head;  /**< Receive Descriptor List Address */
++    uint32_t     rx_desc_curr;  /**< Current Receive Descriptor Address */
++
++    uint32_t     tx_ctl0;       /**< Transmit Control 0 */
++    uint32_t     tx_ctl1;       /**< Transmit Control 1 */
++    uint32_t     tx_desc_head;  /**< Transmit Descriptor List Address */
++    uint32_t     tx_desc_curr;  /**< Current Transmit Descriptor Address */
++    uint32_t     tx_flowctl;    /**< Transmit Flow Control */
++
++    uint32_t     mii_cmd;       /**< Management Interface Command */
++    uint32_t     mii_data;      /**< Management Interface Data */
 +
 +    /** @} */
 +
-+} AwH3DramCtlState;
++} AwSun8iEmacState;
 +
-+#endif /* HW_MISC_ALLWINNER_H3_DRAMC_H */
++#endif /* HW_NET_ALLWINNER_SUN8I_H */
 diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index a9767c70c0..c0a2ecfee8 100644
+index 8c7ac61517..d1245d2b01 100644
 --- a/hw/arm/allwinner-h3.c
 +++ b/hw/arm/allwinner-h3.c
-@@ -56,6 +56,9 @@ const hwaddr allwinner_h3_memmap[] = {
+@@ -54,6 +54,7 @@ const hwaddr allwinner_h3_memmap[] = {
+     [AW_H3_UART1]      = 0x01c28400,
      [AW_H3_UART2]      = 0x01c28800,
      [AW_H3_UART3]      = 0x01c28c00,
-     [AW_H3_EMAC]       = 0x01c30000,
-+    [AW_H3_DRAMCOM]    = 0x01c62000,
-+    [AW_H3_DRAMCTL]    = 0x01c63000,
-+    [AW_H3_DRAMPHY]    = 0x01c65000,
++    [AW_H3_EMAC]       = 0x01c30000,
      [AW_H3_GIC_DIST]   = 0x01c81000,
      [AW_H3_GIC_CPU]    = 0x01c82000,
      [AW_H3_GIC_HYP]    = 0x01c84000,
-@@ -110,9 +113,6 @@ struct AwH3Unimplemented {
+@@ -106,7 +107,6 @@ struct AwH3Unimplemented {
+     { "twi1",      0x01c2b000, 1 * KiB },
+     { "twi2",      0x01c2b400, 1 * KiB },
      { "scr",       0x01c2c400, 1 * KiB },
+-    { "emac",      0x01c30000, 64 * KiB },
      { "gpu",       0x01c40000, 64 * KiB },
      { "hstmr",     0x01c60000, 4 * KiB },
--    { "dramcom",   0x01c62000, 4 * KiB },
--    { "dramctl0",  0x01c63000, 4 * KiB },
--    { "dramphy0",  0x01c65000, 4 * KiB },
-     { "spi0",      0x01c68000, 4 * KiB },
-     { "spi1",      0x01c69000, 4 * KiB },
-     { "csi",       0x01cb0000, 320 * KiB },
-@@ -228,6 +228,13 @@ static void allwinner_h3_init(Object *obj)
+     { "dramcom",   0x01c62000, 4 * KiB },
+@@ -162,6 +162,7 @@ enum {
+     AW_H3_GIC_SPI_OHCI2     = 77,
+     AW_H3_GIC_SPI_EHCI3     = 78,
+     AW_H3_GIC_SPI_OHCI3     = 79,
++    AW_H3_GIC_SPI_EMAC      = 82
+ };
  
-     sysbus_init_child_obj(obj, "emac", &s->emac, sizeof(s->emac),
-                           TYPE_AW_SUN8I_EMAC);
+ /* Allwinner H3 general constants */
+@@ -207,6 +208,9 @@ static void allwinner_h3_init(Object *obj)
+ 
+     sysbus_init_child_obj(obj, "mmc0", &s->mmc0, sizeof(s->mmc0),
+                           TYPE_AW_SDHOST_SUN5I);
 +
-+    sysbus_init_child_obj(obj, "dramc", &s->dramc, sizeof(s->dramc),
-+                          TYPE_AW_H3_DRAMC);
-+    object_property_add_alias(obj, "ram-addr", OBJECT(&s->dramc),
-+                             "ram-addr", &error_abort);
-+    object_property_add_alias(obj, "ram-size", OBJECT(&s->dramc),
-+                              "ram-size", &error_abort);
++    sysbus_init_child_obj(obj, "emac", &s->emac, sizeof(s->emac),
++                          TYPE_AW_SUN8I_EMAC);
  }
  
  static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -412,6 +419,12 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-                    qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART3),
-                    115200, serial_hd(3), DEVICE_NATIVE_ENDIAN);
+@@ -337,6 +341,16 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+     object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
+                               "sd-bus", &error_abort);
  
-+    /* DRAMC */
-+    qdev_init_nofail(DEVICE(&s->dramc));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 0, s->memmap[AW_H3_DRAMCOM]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 1, s->memmap[AW_H3_DRAMCTL]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 2, s->memmap[AW_H3_DRAMPHY]);
++    /* EMAC */
++    if (nd_table[0].used) {
++        qemu_check_nic_model(&nd_table[0], TYPE_AW_SUN8I_EMAC);
++        qdev_set_nic_properties(DEVICE(&s->emac), &nd_table[0]);
++    }
++    qdev_init_nofail(DEVICE(&s->emac));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->emac), 0, s->memmap[AW_H3_EMAC]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->emac), 0,
++                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_EMAC));
 +
-     /* Unimplemented devices */
-     for (i = 0; i < ARRAY_SIZE(unimplemented); i++) {
-         create_unimplemented_device(unimplemented[i].device_name,
+     /* Universal Serial Bus */
+     sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
+                          qdev_get_gpio_in(DEVICE(&s->gic),
 diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-index b8ebcb08b7..181f5badab 100644
+index e7ac7b1d14..d65bbf8a2f 100644
 --- a/hw/arm/orangepi.c
 +++ b/hw/arm/orangepi.c
-@@ -80,6 +80,12 @@ static void orangepi_init(MachineState *machine)
-     /* Setup EMAC properties */
-     object_property_set_int(OBJECT(&h3->emac), 1, "phy-addr", &error_abort);
+@@ -77,6 +77,9 @@ static void orangepi_init(MachineState *machine)
+         warn_report("Security Identifier value does not include H3 prefix");
+     }
  
-+    /* DRAMC */
-+    object_property_set_uint(OBJECT(h3), h3->memmap[AW_H3_SDRAM],
-+                             "ram-addr", &error_abort);
-+    object_property_set_int(OBJECT(h3), machine->ram_size / MiB, "ram-size",
-+                            &error_abort);
++    /* Setup EMAC properties */
++    object_property_set_int(OBJECT(&h3->emac), 1, "phy-addr", &error_abort);
 +
      /* Mark H3 object realized */
      object_property_set_bool(OBJECT(h3), true, "realized", &error_abort);
  
-diff --git a/hw/misc/allwinner-h3-dramc.c b/hw/misc/allwinner-h3-dramc.c
+diff --git a/hw/net/allwinner-sun8i-emac.c b/hw/net/allwinner-sun8i-emac.c
 new file mode 100644
-index 0000000000..2b5260260e
+index 0000000000..3fc5e34640
 --- /dev/null
-+++ b/hw/misc/allwinner-h3-dramc.c
-@@ -0,0 +1,358 @@
++++ b/hw/net/allwinner-sun8i-emac.c
+@@ -0,0 +1,871 @@
 +/*
-+ * Allwinner H3 SDRAM Controller emulation
++ * Allwinner Sun8i Ethernet MAC emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -358,376 +354,914 @@ index 0000000000..2b5260260e
 +
 +#include "qemu/osdep.h"
 +#include "qemu/units.h"
-+#include "qemu/error-report.h"
 +#include "hw/sysbus.h"
 +#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "exec/address-spaces.h"
++#include "net/net.h"
++#include "hw/irq.h"
 +#include "hw/qdev-properties.h"
-+#include "qapi/error.h"
-+#include "hw/misc/allwinner-h3-dramc.h"
++#include "qemu/log.h"
 +#include "trace.h"
++#include "net/checksum.h"
++#include "qemu/module.h"
++#include "exec/cpu-common.h"
++#include "hw/net/allwinner-sun8i-emac.h"
 +
-+#define REG_INDEX(offset)    (offset / sizeof(uint32_t))
-+
-+/* DRAMCOM register offsets */
++/* EMAC register offsets */
 +enum {
-+    REG_DRAMCOM_CR    = 0x0000, /* Control Register */
++    REG_BASIC_CTL_0        = 0x0000, /* Basic Control 0 */
++    REG_BASIC_CTL_1        = 0x0004, /* Basic Control 1 */
++    REG_INT_STA            = 0x0008, /* Interrupt Status */
++    REG_INT_EN             = 0x000C, /* Interrupt Enable */
++    REG_TX_CTL_0           = 0x0010, /* Transmit Control 0 */
++    REG_TX_CTL_1           = 0x0014, /* Transmit Control 1 */
++    REG_TX_FLOW_CTL        = 0x001C, /* Transmit Flow Control */
++    REG_TX_DMA_DESC_LIST   = 0x0020, /* Transmit Descriptor List Address */
++    REG_RX_CTL_0           = 0x0024, /* Receive Control 0 */
++    REG_RX_CTL_1           = 0x0028, /* Receive Control 1 */
++    REG_RX_DMA_DESC_LIST   = 0x0034, /* Receive Descriptor List Address */
++    REG_FRM_FLT            = 0x0038, /* Receive Frame Filter */
++    REG_RX_HASH_0          = 0x0040, /* Receive Hash Table 0 */
++    REG_RX_HASH_1          = 0x0044, /* Receive Hash Table 1 */
++    REG_MII_CMD            = 0x0048, /* Management Interface Command */
++    REG_MII_DATA           = 0x004C, /* Management Interface Data */
++    REG_ADDR_HIGH          = 0x0050, /* MAC Address High */
++    REG_ADDR_LOW           = 0x0054, /* MAC Address Low */
++    REG_TX_DMA_STA         = 0x00B0, /* Transmit DMA Status */
++    REG_TX_CUR_DESC        = 0x00B4, /* Transmit Current Descriptor */
++    REG_TX_CUR_BUF         = 0x00B8, /* Transmit Current Buffer */
++    REG_RX_DMA_STA         = 0x00C0, /* Receive DMA Status */
++    REG_RX_CUR_DESC        = 0x00C4, /* Receive Current Descriptor */
++    REG_RX_CUR_BUF         = 0x00C8, /* Receive Current Buffer */
++    REG_RGMII_STA          = 0x00D0, /* RGMII Status */
 +};
 +
-+/* DRAMCTL register offsets */
++/* EMAC register flags */
 +enum {
-+    REG_DRAMCTL_PIR   = 0x0000, /* PHY Initialization Register */
-+    REG_DRAMCTL_PGSR  = 0x0010, /* PHY General Status Register */
-+    REG_DRAMCTL_STATR = 0x0018, /* Status Register */
-+};
-+
-+/* DRAMCTL register flags */
-+enum {
-+    REG_DRAMCTL_PGSR_INITDONE = (1 << 0),
++    BASIC_CTL0_100Mbps     = (0b11 << 2),
++    BASIC_CTL0_FD          = (1 << 0),
++    BASIC_CTL1_SOFTRST     = (1 << 0),
 +};
 +
 +enum {
-+    REG_DRAMCTL_STATR_ACTIVE  = (1 << 0),
++    INT_STA_RGMII_LINK     = (1 << 16),
++    INT_STA_RX_EARLY       = (1 << 13),
++    INT_STA_RX_OVERFLOW    = (1 << 12),
++    INT_STA_RX_TIMEOUT     = (1 << 11),
++    INT_STA_RX_DMA_STOP    = (1 << 10),
++    INT_STA_RX_BUF_UA      = (1 << 9),
++    INT_STA_RX             = (1 << 8),
++    INT_STA_TX_EARLY       = (1 << 5),
++    INT_STA_TX_UNDERFLOW   = (1 << 4),
++    INT_STA_TX_TIMEOUT     = (1 << 3),
++    INT_STA_TX_BUF_UA      = (1 << 2),
++    INT_STA_TX_DMA_STOP    = (1 << 1),
++    INT_STA_TX             = (1 << 0),
 +};
 +
-+static void allwinner_h3_dramc_map_rows(AwH3DramCtlState *s, uint8_t row_bits,
-+                                        uint8_t bank_bits, uint16_t page_size)
++enum {
++    INT_EN_RX_EARLY        = (1 << 13),
++    INT_EN_RX_OVERFLOW     = (1 << 12),
++    INT_EN_RX_TIMEOUT      = (1 << 11),
++    INT_EN_RX_DMA_STOP     = (1 << 10),
++    INT_EN_RX_BUF_UA       = (1 << 9),
++    INT_EN_RX              = (1 << 8),
++    INT_EN_TX_EARLY        = (1 << 5),
++    INT_EN_TX_UNDERFLOW    = (1 << 4),
++    INT_EN_TX_TIMEOUT      = (1 << 3),
++    INT_EN_TX_BUF_UA       = (1 << 2),
++    INT_EN_TX_DMA_STOP     = (1 << 1),
++    INT_EN_TX              = (1 << 0),
++};
++
++enum {
++    TX_CTL0_TX_EN          = (1 << 31),
++    TX_CTL1_TX_DMA_START   = (1 << 31),
++    TX_CTL1_TX_DMA_EN      = (1 << 30),
++    TX_CTL1_TX_FLUSH       = (1 << 0),
++};
++
++enum {
++    RX_CTL0_RX_EN          = (1 << 31),
++    RX_CTL0_STRIP_FCS      = (1 << 28),
++    RX_CTL0_CRC_IPV4       = (1 << 27),
++};
++
++enum {
++    RX_CTL1_RX_DMA_START   = (1 << 31),
++    RX_CTL1_RX_DMA_EN      = (1 << 30),
++    RX_CTL1_RX_MD          = (1 << 1),
++};
++
++enum {
++    RX_FRM_FLT_DIS_ADDR    = (1 << 31),
++};
++
++enum {
++    MII_CMD_PHY_ADDR_SHIFT = (12),
++    MII_CMD_PHY_ADDR_MASK  = (0xf000),
++    MII_CMD_PHY_REG_SHIFT  = (4),
++    MII_CMD_PHY_REG_MASK   = (0xf0),
++    MII_CMD_PHY_RW         = (1 << 1),
++    MII_CMD_PHY_BUSY       = (1 << 0),
++};
++
++enum {
++    TX_DMA_STA_STOP        = (0b000),
++    TX_DMA_STA_RUN_FETCH   = (0b001),
++    TX_DMA_STA_WAIT_STA    = (0b010),
++};
++
++enum {
++    RX_DMA_STA_STOP        = (0b000),
++    RX_DMA_STA_RUN_FETCH   = (0b001),
++    RX_DMA_STA_WAIT_FRM    = (0b011),
++};
++
++/* EMAC register reset values */
++enum {
++    REG_BASIC_CTL_1_RST    = 0x08000000,
++};
++
++/* EMAC constants */
++enum {
++    AW_SUN8I_EMAC_MIN_PKT_SZ  = 64
++};
++
++/* Transmit/receive frame descriptor */
++typedef struct FrameDescriptor {
++    uint32_t status;
++    uint32_t status2;
++    uint32_t addr;
++    uint32_t next;
++} FrameDescriptor;
++
++/* Frame descriptor flags */
++enum {
++    DESC_STATUS_CTL                 = (1 << 31),
++    DESC_STATUS2_BUF_SIZE_MASK      = (0x7ff),
++};
++
++/* Transmit frame descriptor flags */
++enum {
++    TX_DESC_STATUS_LENGTH_ERR       = (1 << 14),
++    TX_DESC_STATUS2_FIRST_DESC      = (1 << 29),
++    TX_DESC_STATUS2_LAST_DESC       = (1 << 30),
++    TX_DESC_STATUS2_CHECKSUM_MASK   = (0x3 << 27),
++};
++
++/* Receive frame descriptor flags */
++enum {
++    RX_DESC_STATUS_FIRST_DESC       = (1 << 9),
++    RX_DESC_STATUS_LAST_DESC        = (1 << 8),
++    RX_DESC_STATUS_FRM_LEN_MASK     = (0x3fff0000),
++    RX_DESC_STATUS_FRM_LEN_SHIFT    = (16),
++    RX_DESC_STATUS_NO_BUF           = (1 << 14),
++    RX_DESC_STATUS_HEADER_ERR       = (1 << 7),
++    RX_DESC_STATUS_LENGTH_ERR       = (1 << 4),
++    RX_DESC_STATUS_CRC_ERR          = (1 << 1),
++    RX_DESC_STATUS_PAYLOAD_ERR      = (1 << 0),
++    RX_DESC_STATUS2_RX_INT_CTL      = (1 << 31),
++};
++
++/* MII register offsets */
++enum {
++    MII_REG_CR                      = (0x0), /* Control */
++    MII_REG_ST                      = (0x1), /* Status */
++    MII_REG_ID_HIGH                 = (0x2), /* Identifier High */
++    MII_REG_ID_LOW                  = (0x3), /* Identifier Low */
++    MII_REG_ADV                     = (0x4), /* Advertised abilities */
++    MII_REG_LPA                     = (0x5), /* Link partner abilities */
++};
++
++/* MII register flags */
++enum {
++    MII_REG_CR_RESET                = (1 << 15),
++    MII_REG_CR_POWERDOWN            = (1 << 11),
++    MII_REG_CR_10Mbit               = (0),
++    MII_REG_CR_100Mbit              = (1 << 13),
++    MII_REG_CR_1000Mbit             = (1 << 6),
++    MII_REG_CR_AUTO_NEG             = (1 << 12),
++    MII_REG_CR_AUTO_NEG_RESTART     = (1 << 9),
++    MII_REG_CR_FULLDUPLEX           = (1 << 8),
++};
++
++enum {
++    MII_REG_ST_100BASE_T4           = (1 << 15),
++    MII_REG_ST_100BASE_X_FD         = (1 << 14),
++    MII_REG_ST_100BASE_X_HD         = (1 << 13),
++    MII_REG_ST_10_FD                = (1 << 12),
++    MII_REG_ST_10_HD                = (1 << 11),
++    MII_REG_ST_100BASE_T2_FD        = (1 << 10),
++    MII_REG_ST_100BASE_T2_HD        = (1 << 9),
++    MII_REG_ST_AUTONEG_COMPLETE     = (1 << 5),
++    MII_REG_ST_AUTONEG_AVAIL        = (1 << 3),
++    MII_REG_ST_LINK_UP              = (1 << 2),
++};
++
++enum {
++    MII_REG_LPA_10_HD               = (1 << 5),
++    MII_REG_LPA_10_FD               = (1 << 6),
++    MII_REG_LPA_100_HD              = (1 << 7),
++    MII_REG_LPA_100_FD              = (1 << 8),
++    MII_REG_LPA_PAUSE               = (1 << 10),
++    MII_REG_LPA_ASYMPAUSE           = (1 << 11),
++};
++
++/* MII constants */
++enum {
++    MII_PHY_ID_HIGH                 = 0x0044,
++    MII_PHY_ID_LOW                  = 0x1400,
++};
++
++static void allwinner_sun8i_emac_mii_set_link(AwSun8iEmacState *s,
++                                              bool link_active)
 +{
-+    /*
-+     * This function simulates row addressing behavior when bootloader
-+     * software attempts to detect the amount of available SDRAM. In U-Boot
-+     * the controller is configured with the widest row addressing available.
-+     * Then a pattern is written to RAM at an offset on the row boundary size.
-+     * If the value read back equals the value read back from the
-+     * start of RAM, the bootloader knows the amount of row bits.
-+     *
-+     * This function inserts a mirrored memory region when the configured row
-+     * bits are not matching the actual emulated memory, to simulate the
-+     * same behavior on hardware as expected by the bootloader.
-+     */
-+    uint8_t row_bits_actual = 0;
++    if (link_active) {
++        s->mii_st |= MII_REG_ST_LINK_UP;
++    } else {
++        s->mii_st &= ~MII_REG_ST_LINK_UP;
++    }
++}
 +
-+    /* Calculate the actual row bits using the ram_size property */
-+    for (uint8_t i = 8; i < 12; i++) {
-+        if (1 << i == s->ram_size) {
-+            row_bits_actual = i + 3;
++static void allwinner_sun8i_emac_mii_reset(AwSun8iEmacState *s,
++                                           bool link_active)
++{
++    s->mii_cr = MII_REG_CR_100Mbit | MII_REG_CR_AUTO_NEG |
++                MII_REG_CR_FULLDUPLEX;
++    s->mii_st = MII_REG_ST_100BASE_T4 | MII_REG_ST_100BASE_X_FD |
++                MII_REG_ST_100BASE_X_HD | MII_REG_ST_10_FD | MII_REG_ST_10_HD |
++                MII_REG_ST_100BASE_T2_FD | MII_REG_ST_100BASE_T2_HD |
++                MII_REG_ST_AUTONEG_COMPLETE | MII_REG_ST_AUTONEG_AVAIL;
++    s->mii_adv = 0;
++
++    allwinner_sun8i_emac_mii_set_link(s, link_active);
++}
++
++static void allwinner_sun8i_emac_mii_cmd(AwSun8iEmacState *s)
++{
++    uint8_t addr, reg;
++
++    addr = (s->mii_cmd & MII_CMD_PHY_ADDR_MASK) >> MII_CMD_PHY_ADDR_SHIFT;
++    reg = (s->mii_cmd & MII_CMD_PHY_REG_MASK) >> MII_CMD_PHY_REG_SHIFT;
++
++    if (addr != s->mii_phy_addr) {
++        return;
++    }
++
++    /* Read or write a PHY register? */
++    if (s->mii_cmd & MII_CMD_PHY_RW) {
++        trace_allwinner_sun8i_emac_mii_write_reg(reg, s->mii_data);
++
++        switch (reg) {
++        case MII_REG_CR:
++            if (s->mii_data & MII_REG_CR_RESET) {
++                allwinner_sun8i_emac_mii_reset(s, s->mii_st &
++                                                  MII_REG_ST_LINK_UP);
++            } else {
++                s->mii_cr = s->mii_data & ~(MII_REG_CR_RESET |
++                                            MII_REG_CR_AUTO_NEG_RESTART);
++            }
++            break;
++        case MII_REG_ADV:
++            s->mii_adv = s->mii_data;
++            break;
++        case MII_REG_ID_HIGH:
++        case MII_REG_ID_LOW:
++        case MII_REG_LPA:
++            break;
++        default:
++            qemu_log_mask(LOG_UNIMP, "allwinner-h3-emac: write access to "
++                                     "unknown MII register 0x%x\n", reg);
++            break;
++        }
++    } else {
++        switch (reg) {
++        case MII_REG_CR:
++            s->mii_data = s->mii_cr;
++            break;
++        case MII_REG_ST:
++            s->mii_data = s->mii_st;
++            break;
++        case MII_REG_ID_HIGH:
++            s->mii_data = MII_PHY_ID_HIGH;
++            break;
++        case MII_REG_ID_LOW:
++            s->mii_data = MII_PHY_ID_LOW;
++            break;
++        case MII_REG_ADV:
++            s->mii_data = s->mii_adv;
++            break;
++        case MII_REG_LPA:
++            s->mii_data = MII_REG_LPA_10_HD | MII_REG_LPA_10_FD |
++                          MII_REG_LPA_100_HD | MII_REG_LPA_100_FD |
++                          MII_REG_LPA_PAUSE | MII_REG_LPA_ASYMPAUSE;
++            break;
++        default:
++            qemu_log_mask(LOG_UNIMP, "allwinner-h3-emac: read access to "
++                                     "unknown MII register 0x%x\n", reg);
++            s->mii_data = 0;
++            break;
++        }
++
++        trace_allwinner_sun8i_emac_mii_read_reg(reg, s->mii_data);
++    }
++}
++
++static void allwinner_sun8i_emac_update_irq(AwSun8iEmacState *s)
++{
++    qemu_set_irq(s->irq, (s->int_sta & s->int_en) != 0);
++}
++
++static uint32_t allwinner_sun8i_emac_next_desc(FrameDescriptor *desc,
++                                               size_t min_size)
++{
++    uint32_t paddr = desc->next;
++
++    cpu_physical_memory_read(paddr, desc, sizeof(*desc));
++
++    if ((desc->status & DESC_STATUS_CTL) &&
++        (desc->status2 & DESC_STATUS2_BUF_SIZE_MASK) >= min_size) {
++        return paddr;
++    } else {
++        return 0;
++    }
++}
++
++static uint32_t allwinner_sun8i_emac_get_desc(FrameDescriptor *desc,
++                                              uint32_t start_addr,
++                                              size_t min_size)
++{
++    uint32_t desc_addr = start_addr;
++
++    /* Note that the list is a cycle. Last entry points back to the head. */
++    while (desc_addr != 0) {
++        cpu_physical_memory_read(desc_addr, desc, sizeof(*desc));
++
++        if ((desc->status & DESC_STATUS_CTL) &&
++            (desc->status2 & DESC_STATUS2_BUF_SIZE_MASK) >= min_size) {
++            return desc_addr;
++        } else if (desc->next == start_addr) {
++            break;
++        } else {
++            desc_addr = desc->next;
++        }
++    }
++
++    return 0;
++}
++
++static uint32_t allwinner_sun8i_emac_rx_desc(AwSun8iEmacState *s,
++                                             FrameDescriptor *desc,
++                                             size_t min_size)
++{
++    return allwinner_sun8i_emac_get_desc(desc, s->rx_desc_curr, min_size);
++}
++
++static uint32_t allwinner_sun8i_emac_tx_desc(AwSun8iEmacState *s,
++                                             FrameDescriptor *desc,
++                                             size_t min_size)
++{
++    return allwinner_sun8i_emac_get_desc(desc, s->tx_desc_head, min_size);
++}
++
++static void allwinner_sun8i_emac_flush_desc(FrameDescriptor *desc,
++                                            uint32_t phys_addr)
++{
++    cpu_physical_memory_write(phys_addr, desc, sizeof(*desc));
++}
++
++static int allwinner_sun8i_emac_can_receive(NetClientState *nc)
++{
++    AwSun8iEmacState *s = qemu_get_nic_opaque(nc);
++    FrameDescriptor desc;
++
++    return (s->rx_ctl0 & RX_CTL0_RX_EN) &&
++           (allwinner_sun8i_emac_rx_desc(s, &desc, 0) != 0);
++}
++
++static ssize_t allwinner_sun8i_emac_receive(NetClientState *nc,
++                                            const uint8_t *buf,
++                                            size_t size)
++{
++    AwSun8iEmacState *s = qemu_get_nic_opaque(nc);
++    FrameDescriptor desc;
++    size_t bytes_left = size;
++    size_t desc_bytes = 0;
++    size_t pad_fcs_size = 4;
++    size_t padding = 0;
++
++    if (!(s->rx_ctl0 & RX_CTL0_RX_EN)) {
++        return -1;
++    }
++
++    s->rx_desc_curr = allwinner_sun8i_emac_rx_desc(s, &desc,
++                                                   AW_SUN8I_EMAC_MIN_PKT_SZ);
++    if (!s->rx_desc_curr) {
++        s->int_sta |= INT_STA_RX_BUF_UA;
++    }
++
++    /* Keep filling RX descriptors until the whole frame is written */
++    while (s->rx_desc_curr && bytes_left > 0) {
++        desc.status &= ~DESC_STATUS_CTL;
++        desc.status &= ~RX_DESC_STATUS_FRM_LEN_MASK;
++
++        if (bytes_left == size) {
++            desc.status |= RX_DESC_STATUS_FIRST_DESC;
++        }
++
++        if ((desc.status2 & DESC_STATUS2_BUF_SIZE_MASK) <
++            (bytes_left + pad_fcs_size)) {
++            desc_bytes = desc.status2 & DESC_STATUS2_BUF_SIZE_MASK;
++            desc.status |= desc_bytes << RX_DESC_STATUS_FRM_LEN_SHIFT;
++        } else {
++            padding = pad_fcs_size;
++            if (bytes_left < AW_SUN8I_EMAC_MIN_PKT_SZ) {
++                padding += (AW_SUN8I_EMAC_MIN_PKT_SZ - bytes_left);
++            }
++
++            desc_bytes = (bytes_left);
++            desc.status |= RX_DESC_STATUS_LAST_DESC;
++            desc.status |= (bytes_left + padding)
++                            << RX_DESC_STATUS_FRM_LEN_SHIFT;
++        }
++
++        cpu_physical_memory_write(desc.addr, buf, desc_bytes);
++        allwinner_sun8i_emac_flush_desc(&desc, s->rx_desc_curr);
++        trace_allwinner_sun8i_emac_receive(s->rx_desc_curr, desc.addr,
++                                           desc_bytes);
++
++        /* Check if frame needs to raise the receive interrupt */
++        if (!(desc.status2 & RX_DESC_STATUS2_RX_INT_CTL)) {
++            s->int_sta |= INT_STA_RX;
++        }
++
++        /* Increment variables */
++        buf += desc_bytes;
++        bytes_left -= desc_bytes;
++
++        /* Move to the next descriptor */
++        s->rx_desc_curr = allwinner_sun8i_emac_next_desc(&desc, 64);
++        if (!s->rx_desc_curr) {
++            /* Not enough buffer space available */
++            s->int_sta |= INT_STA_RX_BUF_UA;
++            s->rx_desc_curr = s->rx_desc_head;
 +            break;
 +        }
 +    }
 +
-+    if (s->ram_size == (1 << (row_bits - 3))) {
-+        /* When row bits is the expected value, remove the mirror */
-+        memory_region_set_enabled(&s->row_mirror_alias, false);
-+        trace_allwinner_h3_dramc_rowmirror_disable();
++    /* Report receive DMA is finished */
++    s->rx_ctl1 &= ~RX_CTL1_RX_DMA_START;
++    allwinner_sun8i_emac_update_irq(s);
 +
-+    } else if (row_bits_actual) {
-+        /* Row bits not matching ram_size, install the rows mirror */
-+        hwaddr row_mirror = s->ram_addr + ((1 << (row_bits_actual +
-+                                                  bank_bits)) * page_size);
-+
-+        memory_region_set_enabled(&s->row_mirror_alias, true);
-+        memory_region_set_address(&s->row_mirror_alias, row_mirror);
-+
-+        trace_allwinner_h3_dramc_rowmirror_enable(row_mirror);
-+    }
++    return size;
 +}
 +
-+static uint64_t allwinner_h3_dramcom_read(void *opaque, hwaddr offset,
-+                                          unsigned size)
++static void allwinner_sun8i_emac_transmit(AwSun8iEmacState *s)
 +{
-+    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
++    NetClientState *nc = qemu_get_queue(s->nic);
++    FrameDescriptor desc;
++    size_t bytes = 0;
++    size_t packet_bytes = 0;
++    size_t transmitted = 0;
++    static uint8_t packet_buf[2048];
 +
-+    if (idx >= AW_H3_DRAMCOM_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
++    s->tx_desc_curr = allwinner_sun8i_emac_tx_desc(s, &desc, 0);
 +
-+    trace_allwinner_h3_dramcom_read(offset, s->dramcom[idx], size);
++    /* Read all transmit descriptors */
++    while (s->tx_desc_curr != 0) {
 +
-+    return s->dramcom[idx];
-+}
-+
-+static void allwinner_h3_dramcom_write(void *opaque, hwaddr offset,
-+                                       uint64_t val, unsigned size)
-+{
-+    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    trace_allwinner_h3_dramcom_write(offset, val, size);
-+
-+    if (idx >= AW_H3_DRAMCOM_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return;
-+    }
-+
-+    switch (offset) {
-+    case REG_DRAMCOM_CR:   /* Control Register */
-+        allwinner_h3_dramc_map_rows(s, ((val >> 4) & 0xf) + 1,
-+                                       ((val >> 2) & 0x1) + 2,
-+                                       1 << (((val >> 8) & 0xf) + 3));
-+        break;
-+    default:
-+        break;
-+    };
-+
-+    s->dramcom[idx] = (uint32_t) val;
-+}
-+
-+static uint64_t allwinner_h3_dramctl_read(void *opaque, hwaddr offset,
-+                                          unsigned size)
-+{
-+    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    if (idx >= AW_H3_DRAMCTL_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    trace_allwinner_h3_dramctl_read(offset, s->dramctl[idx], size);
-+
-+    return s->dramctl[idx];
-+}
-+
-+static void allwinner_h3_dramctl_write(void *opaque, hwaddr offset,
-+                                       uint64_t val, unsigned size)
-+{
-+    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    trace_allwinner_h3_dramctl_write(offset, val, size);
-+
-+    if (idx >= AW_H3_DRAMCTL_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return;
-+    }
-+
-+    switch (offset) {
-+    case REG_DRAMCTL_PIR:    /* PHY Initialization Register */
-+        s->dramctl[REG_INDEX(REG_DRAMCTL_PGSR)] |= REG_DRAMCTL_PGSR_INITDONE;
-+        s->dramctl[REG_INDEX(REG_DRAMCTL_STATR)] |= REG_DRAMCTL_STATR_ACTIVE;
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    s->dramctl[idx] = (uint32_t) val;
-+}
-+
-+static uint64_t allwinner_h3_dramphy_read(void *opaque, hwaddr offset,
-+                                          unsigned size)
-+{
-+    const AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    if (idx >= AW_H3_DRAMPHY_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    trace_allwinner_h3_dramphy_read(offset, s->dramphy[idx], size);
-+
-+    return s->dramphy[idx];
-+}
-+
-+static void allwinner_h3_dramphy_write(void *opaque, hwaddr offset,
-+                                       uint64_t val, unsigned size)
-+{
-+    AwH3DramCtlState *s = AW_H3_DRAMC(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    trace_allwinner_h3_dramphy_write(offset, val, size);
-+
-+    if (idx >= AW_H3_DRAMPHY_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return;
-+    }
-+
-+    s->dramphy[idx] = (uint32_t) val;
-+}
-+
-+static const MemoryRegionOps allwinner_h3_dramcom_ops = {
-+    .read = allwinner_h3_dramcom_read,
-+    .write = allwinner_h3_dramcom_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static const MemoryRegionOps allwinner_h3_dramctl_ops = {
-+    .read = allwinner_h3_dramctl_read,
-+    .write = allwinner_h3_dramctl_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static const MemoryRegionOps allwinner_h3_dramphy_ops = {
-+    .read = allwinner_h3_dramphy_read,
-+    .write = allwinner_h3_dramphy_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static void allwinner_h3_dramc_reset(DeviceState *dev)
-+{
-+    AwH3DramCtlState *s = AW_H3_DRAMC(dev);
-+
-+    /* Set default values for registers */
-+    memset(&s->dramcom, 0, sizeof(s->dramcom));
-+    memset(&s->dramctl, 0, sizeof(s->dramctl));
-+    memset(&s->dramphy, 0, sizeof(s->dramphy));
-+}
-+
-+static void allwinner_h3_dramc_realize(DeviceState *dev, Error **errp)
-+{
-+    AwH3DramCtlState *s = AW_H3_DRAMC(dev);
-+
-+    /* Only power of 2 RAM sizes from 256MiB up to 2048MiB are supported */
-+    for (uint8_t i = 8; i < 13; i++) {
-+        if (1 << i == s->ram_size) {
++        /* Read from physical memory into packet buffer */
++        bytes = desc.status2 & DESC_STATUS2_BUF_SIZE_MASK;
++        if (bytes + packet_bytes > sizeof(packet_buf)) {
++            desc.status |= TX_DESC_STATUS_LENGTH_ERR;
 +            break;
-+        } else if (i == 12) {
-+            error_report("%s: ram-size %u MiB is not supported",
-+                          __func__, s->ram_size);
-+            exit(1);
 +        }
++        cpu_physical_memory_read(desc.addr, packet_buf + packet_bytes, bytes);
++        packet_bytes += bytes;
++        desc.status &= ~DESC_STATUS_CTL;
++        allwinner_sun8i_emac_flush_desc(&desc, s->tx_desc_curr);
++
++        /* After the last descriptor, send the packet */
++        if (desc.status2 & TX_DESC_STATUS2_LAST_DESC) {
++            if (desc.status2 & TX_DESC_STATUS2_CHECKSUM_MASK) {
++                net_checksum_calculate(packet_buf, packet_bytes);
++            }
++
++            qemu_send_packet(nc, packet_buf, packet_bytes);
++            trace_allwinner_sun8i_emac_transmit(s->tx_desc_curr, desc.addr,
++                                                bytes);
++
++            packet_bytes = 0;
++            transmitted++;
++        }
++        s->tx_desc_curr = allwinner_sun8i_emac_next_desc(&desc, 0);
 +    }
 +
-+    /* Setup row mirror mappings */
-+    memory_region_init_ram(&s->row_mirror, OBJECT(s),
-+                           "allwinner-h3-dramc.row-mirror",
-+                            4 * KiB, &error_abort);
-+    memory_region_add_subregion_overlap(get_system_memory(), s->ram_addr,
-+                                       &s->row_mirror, 10);
-+
-+    memory_region_init_alias(&s->row_mirror_alias, OBJECT(s),
-+                            "allwinner-h3-dramc.row-mirror-alias",
-+                            &s->row_mirror, 0, 4 * KiB);
-+    memory_region_add_subregion_overlap(get_system_memory(),
-+                                        s->ram_addr + 1 * MiB,
-+                                       &s->row_mirror_alias, 10);
-+    memory_region_set_enabled(&s->row_mirror_alias, false);
++    /* Raise transmit completed interrupt */
++    if (transmitted > 0) {
++        s->int_sta |= INT_STA_TX;
++        s->tx_ctl1 &= ~TX_CTL1_TX_DMA_START;
++        allwinner_sun8i_emac_update_irq(s);
++    }
 +}
 +
-+static void allwinner_h3_dramc_init(Object *obj)
++static void allwinner_sun8i_emac_reset(DeviceState *dev)
++{
++    AwSun8iEmacState *s = AW_SUN8I_EMAC(dev);
++    NetClientState *nc = qemu_get_queue(s->nic);
++
++    trace_allwinner_sun8i_emac_reset();
++
++    s->mii_cmd = 0;
++    s->mii_data = 0;
++    s->basic_ctl0 = 0;
++    s->basic_ctl1 = REG_BASIC_CTL_1_RST;
++    s->int_en = 0;
++    s->int_sta = 0;
++    s->frm_flt = 0;
++    s->rx_ctl0 = 0;
++    s->rx_ctl1 = RX_CTL1_RX_MD;
++    s->rx_desc_head = 0;
++    s->rx_desc_curr = 0;
++    s->tx_ctl0 = 0;
++    s->tx_ctl1 = 0;
++    s->tx_desc_head = 0;
++    s->tx_desc_curr = 0;
++    s->tx_flowctl = 0;
++
++    allwinner_sun8i_emac_mii_reset(s, !nc->link_down);
++}
++
++static uint64_t allwinner_sun8i_emac_read(void *opaque, hwaddr offset,
++                                          unsigned size)
++{
++    AwSun8iEmacState *s = AW_SUN8I_EMAC(opaque);
++    uint64_t value = 0;
++    FrameDescriptor desc;
++
++    switch (offset) {
++    case REG_BASIC_CTL_0:       /* Basic Control 0 */
++        value = s->basic_ctl0;
++        break;
++    case REG_BASIC_CTL_1:       /* Basic Control 1 */
++        value = s->basic_ctl1;
++        break;
++    case REG_INT_STA:           /* Interrupt Status */
++        value = s->int_sta;
++        break;
++    case REG_INT_EN:            /* Interupt Enable */
++        value = s->int_en;
++        break;
++    case REG_TX_CTL_0:          /* Transmit Control 0 */
++        value = s->tx_ctl0;
++        break;
++    case REG_TX_CTL_1:          /* Transmit Control 1 */
++        value = s->tx_ctl1;
++        break;
++    case REG_TX_FLOW_CTL:       /* Transmit Flow Control */
++        value = s->tx_flowctl;
++        break;
++    case REG_TX_DMA_DESC_LIST:  /* Transmit Descriptor List Address */
++        value = s->tx_desc_head;
++        break;
++    case REG_RX_CTL_0:          /* Receive Control 0 */
++        value = s->rx_ctl0;
++        break;
++    case REG_RX_CTL_1:          /* Receive Control 1 */
++        value = s->rx_ctl1;
++        break;
++    case REG_RX_DMA_DESC_LIST:  /* Receive Descriptor List Address */
++        value = s->rx_desc_head;
++        break;
++    case REG_FRM_FLT:           /* Receive Frame Filter */
++        value = s->frm_flt;
++        break;
++    case REG_RX_HASH_0:         /* Receive Hash Table 0 */
++    case REG_RX_HASH_1:         /* Receive Hash Table 1 */
++        break;
++    case REG_MII_CMD:           /* Management Interface Command */
++        value = s->mii_cmd;
++        break;
++    case REG_MII_DATA:          /* Management Interface Data */
++        value = s->mii_data;
++        break;
++    case REG_ADDR_HIGH:         /* MAC Address High */
++        value = *(((uint32_t *) (s->conf.macaddr.a)) + 1);
++        break;
++    case REG_ADDR_LOW:          /* MAC Address Low */
++        value = *(uint32_t *) (s->conf.macaddr.a);
++        break;
++    case REG_TX_DMA_STA:        /* Transmit DMA Status */
++        break;
++    case REG_TX_CUR_DESC:       /* Transmit Current Descriptor */
++        value = s->tx_desc_curr;
++        break;
++    case REG_TX_CUR_BUF:        /* Transmit Current Buffer */
++        if (s->tx_desc_curr != 0) {
++            cpu_physical_memory_read(s->tx_desc_curr, &desc, sizeof(desc));
++            value = desc.addr;
++        } else {
++            value = 0;
++        }
++        break;
++    case REG_RX_DMA_STA:        /* Receive DMA Status */
++        break;
++    case REG_RX_CUR_DESC:       /* Receive Current Descriptor */
++        value = s->rx_desc_curr;
++        break;
++    case REG_RX_CUR_BUF:        /* Receive Current Buffer */
++        if (s->rx_desc_curr != 0) {
++            cpu_physical_memory_read(s->rx_desc_curr, &desc, sizeof(desc));
++            value = desc.addr;
++        } else {
++            value = 0;
++        }
++        break;
++    case REG_RGMII_STA:         /* RGMII Status */
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "allwinner-h3-emac: read access to unknown "
++                                 "EMAC register 0x" TARGET_FMT_plx "\n",
++                                  offset);
++    }
++
++    trace_allwinner_sun8i_emac_read(offset, value);
++    return value;
++}
++
++static void allwinner_sun8i_emac_write(void *opaque, hwaddr offset,
++                                       uint64_t value, unsigned size)
++{
++    AwSun8iEmacState *s = AW_SUN8I_EMAC(opaque);
++    NetClientState *nc = qemu_get_queue(s->nic);
++
++    trace_allwinner_sun8i_emac_write(offset, value);
++
++    switch (offset) {
++    case REG_BASIC_CTL_0:       /* Basic Control 0 */
++        s->basic_ctl0 = value;
++        break;
++    case REG_BASIC_CTL_1:       /* Basic Control 1 */
++        if (value & BASIC_CTL1_SOFTRST) {
++            allwinner_sun8i_emac_reset(DEVICE(s));
++            value &= ~BASIC_CTL1_SOFTRST;
++        }
++        s->basic_ctl1 = value;
++        if (allwinner_sun8i_emac_can_receive(nc)) {
++            qemu_flush_queued_packets(nc);
++        }
++        break;
++    case REG_INT_STA:           /* Interrupt Status */
++        s->int_sta &= ~value;
++        allwinner_sun8i_emac_update_irq(s);
++        break;
++    case REG_INT_EN:            /* Interrupt Enable */
++        s->int_en = value;
++        allwinner_sun8i_emac_update_irq(s);
++        break;
++    case REG_TX_CTL_0:          /* Transmit Control 0 */
++        s->tx_ctl0 = value;
++        break;
++    case REG_TX_CTL_1:          /* Transmit Control 1 */
++        s->tx_ctl1 = value;
++        if (value & TX_CTL1_TX_DMA_EN) {
++            allwinner_sun8i_emac_transmit(s);
++        }
++        break;
++    case REG_TX_FLOW_CTL:       /* Transmit Flow Control */
++        s->tx_flowctl = value;
++        break;
++    case REG_TX_DMA_DESC_LIST:  /* Transmit Descriptor List Address */
++        s->tx_desc_head = value;
++        s->tx_desc_curr = value;
++        break;
++    case REG_RX_CTL_0:          /* Receive Control 0 */
++        s->rx_ctl0 = value;
++        break;
++    case REG_RX_CTL_1:          /* Receive Control 1 */
++        s->rx_ctl1 = value | RX_CTL1_RX_MD;
++        if ((value & RX_CTL1_RX_DMA_EN) &&
++             allwinner_sun8i_emac_can_receive(nc)) {
++            qemu_flush_queued_packets(nc);
++        }
++        break;
++    case REG_RX_DMA_DESC_LIST:  /* Receive Descriptor List Address */
++        s->rx_desc_head = value;
++        s->rx_desc_curr = value;
++        break;
++    case REG_FRM_FLT:           /* Receive Frame Filter */
++        s->frm_flt = value;
++        break;
++    case REG_RX_HASH_0:         /* Receive Hash Table 0 */
++    case REG_RX_HASH_1:         /* Receive Hash Table 1 */
++        break;
++    case REG_MII_CMD:           /* Management Interface Command */
++        s->mii_cmd = value & ~MII_CMD_PHY_BUSY;
++        allwinner_sun8i_emac_mii_cmd(s);
++        break;
++    case REG_MII_DATA:          /* Management Interface Data */
++        s->mii_data = value;
++        break;
++    case REG_ADDR_HIGH:         /* MAC Address High */
++        s->conf.macaddr.a[4] = (value & 0xff);
++        s->conf.macaddr.a[5] = (value & 0xff00) >> 8;
++        break;
++    case REG_ADDR_LOW:          /* MAC Address Low */
++        s->conf.macaddr.a[0] = (value & 0xff);
++        s->conf.macaddr.a[1] = (value & 0xff00) >> 8;
++        s->conf.macaddr.a[2] = (value & 0xff0000) >> 16;
++        s->conf.macaddr.a[3] = (value & 0xff000000) >> 24;
++        break;
++    case REG_TX_DMA_STA:        /* Transmit DMA Status */
++    case REG_TX_CUR_DESC:       /* Transmit Current Descriptor */
++    case REG_TX_CUR_BUF:        /* Transmit Current Buffer */
++    case REG_RX_DMA_STA:        /* Receive DMA Status */
++    case REG_RX_CUR_DESC:       /* Receive Current Descriptor */
++    case REG_RX_CUR_BUF:        /* Receive Current Buffer */
++    case REG_RGMII_STA:         /* RGMII Status */
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "allwinner-h3-emac: write access to unknown "
++                                 "EMAC register 0x" TARGET_FMT_plx "\n",
++                                  offset);
++    }
++}
++
++static void allwinner_sun8i_emac_set_link(NetClientState *nc)
++{
++    AwSun8iEmacState *s = qemu_get_nic_opaque(nc);
++
++    trace_allwinner_sun8i_emac_set_link(!nc->link_down);
++    allwinner_sun8i_emac_mii_set_link(s, !nc->link_down);
++}
++
++static const MemoryRegionOps allwinner_sun8i_emac_mem_ops = {
++    .read = allwinner_sun8i_emac_read,
++    .write = allwinner_sun8i_emac_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++    .impl.min_access_size = 4,
++};
++
++static NetClientInfo net_allwinner_sun8i_emac_info = {
++    .type = NET_CLIENT_DRIVER_NIC,
++    .size = sizeof(NICState),
++    .can_receive = allwinner_sun8i_emac_can_receive,
++    .receive = allwinner_sun8i_emac_receive,
++    .link_status_changed = allwinner_sun8i_emac_set_link,
++};
++
++static void allwinner_sun8i_emac_init(Object *obj)
 +{
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwH3DramCtlState *s = AW_H3_DRAMC(obj);
++    AwSun8iEmacState *s = AW_SUN8I_EMAC(obj);
 +
-+    /* DRAMCOM registers */
-+    memory_region_init_io(&s->dramcom_iomem, OBJECT(s),
-+                          &allwinner_h3_dramcom_ops, s,
-+                           TYPE_AW_H3_DRAMC, 4 * KiB);
-+    sysbus_init_mmio(sbd, &s->dramcom_iomem);
-+
-+    /* DRAMCTL registers */
-+    memory_region_init_io(&s->dramctl_iomem, OBJECT(s),
-+                          &allwinner_h3_dramctl_ops, s,
-+                           TYPE_AW_H3_DRAMC, 4 * KiB);
-+    sysbus_init_mmio(sbd, &s->dramctl_iomem);
-+
-+    /* DRAMPHY registers */
-+    memory_region_init_io(&s->dramphy_iomem, OBJECT(s),
-+                          &allwinner_h3_dramphy_ops, s,
-+                          TYPE_AW_H3_DRAMC, 4 * KiB);
-+    sysbus_init_mmio(sbd, &s->dramphy_iomem);
++    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_sun8i_emac_mem_ops,
++                           s, TYPE_AW_SUN8I_EMAC, 64 * KiB);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq);
 +}
 +
-+static Property allwinner_h3_dramc_properties[] = {
-+    DEFINE_PROP_UINT64("ram-addr", AwH3DramCtlState, ram_addr, 0x0),
-+    DEFINE_PROP_UINT32("ram-size", AwH3DramCtlState, ram_size, 256 * MiB),
-+    DEFINE_PROP_END_OF_LIST()
++static void allwinner_sun8i_emac_realize(DeviceState *dev, Error **errp)
++{
++    AwSun8iEmacState *s = AW_SUN8I_EMAC(dev);
++
++    qemu_macaddr_default_if_unset(&s->conf.macaddr);
++    s->nic = qemu_new_nic(&net_allwinner_sun8i_emac_info, &s->conf,
++                           object_get_typename(OBJECT(dev)), dev->id, s);
++    qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
++}
++
++static Property allwinner_sun8i_emac_properties[] = {
++    DEFINE_NIC_PROPERTIES(AwSun8iEmacState, conf),
++    DEFINE_PROP_UINT8("phy-addr", AwSun8iEmacState, mii_phy_addr, 0),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static const VMStateDescription allwinner_h3_dramc_vmstate = {
-+    .name = "allwinner-h3-dramc",
++static int allwinner_sun8i_emac_post_load(void *opaque, int version_id)
++{
++    AwSun8iEmacState *s = opaque;
++
++    allwinner_sun8i_emac_set_link(qemu_get_queue(s->nic));
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_aw_emac = {
++    .name = "allwinner-sun8i-emac",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
++    .post_load = allwinner_sun8i_emac_post_load,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(dramcom, AwH3DramCtlState, AW_H3_DRAMCOM_REGS_NUM),
-+        VMSTATE_UINT32_ARRAY(dramctl, AwH3DramCtlState, AW_H3_DRAMCTL_REGS_NUM),
-+        VMSTATE_UINT32_ARRAY(dramphy, AwH3DramCtlState, AW_H3_DRAMPHY_REGS_NUM),
++        VMSTATE_UINT8(mii_phy_addr, AwSun8iEmacState),
++        VMSTATE_UINT32(mii_cmd, AwSun8iEmacState),
++        VMSTATE_UINT32(mii_data, AwSun8iEmacState),
++        VMSTATE_UINT32(mii_cr, AwSun8iEmacState),
++        VMSTATE_UINT32(mii_st, AwSun8iEmacState),
++        VMSTATE_UINT32(mii_adv, AwSun8iEmacState),
++        VMSTATE_UINT32(basic_ctl0, AwSun8iEmacState),
++        VMSTATE_UINT32(basic_ctl1, AwSun8iEmacState),
++        VMSTATE_UINT32(int_en, AwSun8iEmacState),
++        VMSTATE_UINT32(int_sta, AwSun8iEmacState),
++        VMSTATE_UINT32(frm_flt, AwSun8iEmacState),
++        VMSTATE_UINT32(rx_ctl0, AwSun8iEmacState),
++        VMSTATE_UINT32(rx_ctl1, AwSun8iEmacState),
++        VMSTATE_UINT32(rx_desc_head, AwSun8iEmacState),
++        VMSTATE_UINT32(rx_desc_curr, AwSun8iEmacState),
++        VMSTATE_UINT32(tx_ctl0, AwSun8iEmacState),
++        VMSTATE_UINT32(tx_ctl1, AwSun8iEmacState),
++        VMSTATE_UINT32(tx_desc_head, AwSun8iEmacState),
++        VMSTATE_UINT32(tx_desc_curr, AwSun8iEmacState),
++        VMSTATE_UINT32(tx_flowctl, AwSun8iEmacState),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static void allwinner_h3_dramc_class_init(ObjectClass *klass, void *data)
++static void allwinner_sun8i_emac_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = allwinner_h3_dramc_reset;
-+    dc->vmsd = &allwinner_h3_dramc_vmstate;
-+    dc->realize = allwinner_h3_dramc_realize;
-+    device_class_set_props(dc, allwinner_h3_dramc_properties);
++    dc->realize = allwinner_sun8i_emac_realize;
++    dc->reset = allwinner_sun8i_emac_reset;
++    dc->vmsd = &vmstate_aw_emac;
++    device_class_set_props(dc, allwinner_sun8i_emac_properties);
 +}
 +
-+static const TypeInfo allwinner_h3_dramc_info = {
-+    .name          = TYPE_AW_H3_DRAMC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_h3_dramc_init,
-+    .instance_size = sizeof(AwH3DramCtlState),
-+    .class_init    = allwinner_h3_dramc_class_init,
++static const TypeInfo allwinner_sun8i_emac_info = {
++    .name           = TYPE_AW_SUN8I_EMAC,
++    .parent         = TYPE_SYS_BUS_DEVICE,
++    .instance_size  = sizeof(AwSun8iEmacState),
++    .instance_init  = allwinner_sun8i_emac_init,
++    .class_init     = allwinner_sun8i_emac_class_init,
 +};
 +
-+static void allwinner_h3_dramc_register(void)
++static void allwinner_sun8i_emac_register_types(void)
 +{
-+    type_register_static(&allwinner_h3_dramc_info);
++    type_register_static(&allwinner_sun8i_emac_info);
 +}
 +
-+type_init(allwinner_h3_dramc_register)
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index daa734036e..68aae2eabb 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -30,6 +30,7 @@ common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
++type_init(allwinner_sun8i_emac_register_types)
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index dd22fffdb0..e5a876c8d1 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -300,6 +300,7 @@ config ALLWINNER_A10
+ config ALLWINNER_H3
+     bool
+     select ALLWINNER_A10_PIT
++    select ALLWINNER_SUN8I_EMAC
+     select SERIAL
+     select ARM_TIMER
+     select ARM_GIC
+diff --git a/hw/net/Kconfig b/hw/net/Kconfig
+index 54411d3dcc..e43c96dae0 100644
+--- a/hw/net/Kconfig
++++ b/hw/net/Kconfig
+@@ -79,6 +79,9 @@ config MIPSNET
+ config ALLWINNER_EMAC
+     bool
  
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
- obj-$(CONFIG_ALLWINNER_H3) += allwinner-cpucfg.o
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-dramc.o
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-sid.o
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 4f38328d9c..a5862b2bed 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -5,6 +5,16 @@ allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t reset_addr) "id %u, reset_ad
- allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
- allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
- 
-+# allwinner-h3-dramc.c
-+allwinner_h3_dramc_rowmirror_disable(void) "Disable row mirror"
-+allwinner_h3_dramc_rowmirror_enable(uint64_t addr) "Enable row mirror: addr 0x%" PRIx64
-+allwinner_h3_dramcom_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_h3_dramcom_write(uint64_t offset, uint64_t data, unsigned size) "Write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_h3_dramctl_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_h3_dramctl_write(uint64_t offset, uint64_t data, unsigned size) "Write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_h3_dramphy_read(uint64_t offset, uint64_t data, unsigned size) "Read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-+allwinner_h3_dramphy_write(uint64_t offset, uint64_t data, unsigned size) "write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
++config ALLWINNER_SUN8I_EMAC
++    bool
 +
- # allwinner-sid.c
- allwinner_sid_read(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
- allwinner_sid_write(uint64_t offset, uint64_t data, unsigned size) "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+ config IMX_FEC
+     bool
+ 
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index 991c46c773..af4d194866 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -23,6 +23,7 @@ common-obj-$(CONFIG_XGMAC) += xgmac.o
+ common-obj-$(CONFIG_MIPSNET) += mipsnet.o
+ common-obj-$(CONFIG_XILINX_AXI) += xilinx_axienet.o
+ common-obj-$(CONFIG_ALLWINNER_EMAC) += allwinner_emac.o
++common-obj-$(CONFIG_ALLWINNER_SUN8I_EMAC) += allwinner-sun8i-emac.o
+ common-obj-$(CONFIG_IMX_FEC) += imx_fec.o
+ 
+ common-obj-$(CONFIG_CADENCE) += cadence_gem.o
+diff --git a/hw/net/trace-events b/hw/net/trace-events
+index a1da98a643..e18f883cfd 100644
+--- a/hw/net/trace-events
++++ b/hw/net/trace-events
+@@ -1,5 +1,15 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# allwinner-sun8i-emac.c
++allwinner_sun8i_emac_mii_write_reg(uint32_t reg, uint32_t value) "MII write: reg=0x%" PRIx32 " value=0x%" PRIx32
++allwinner_sun8i_emac_mii_read_reg(uint32_t reg, uint32_t value) "MII read: reg=0x%" PRIx32 " value=0x%" PRIx32
++allwinner_sun8i_emac_receive(uint32_t desc, uint32_t paddr, uint32_t bytes) "RX packet: desc=0x%" PRIx32 " paddr=0x%" PRIx32 " bytes=%" PRIu32
++allwinner_sun8i_emac_transmit(uint32_t desc, uint32_t paddr, uint32_t bytes) "TX packet: desc=0x%" PRIx32 " paddr=0x%" PRIx32 " bytes=%" PRIu32
++allwinner_sun8i_emac_reset(void) "HW reset"
++allwinner_sun8i_emac_set_link(bool active) "Set link: active=%u"
++allwinner_sun8i_emac_read(uint64_t offset, uint64_t val) "MMIO read: offset=0x%" PRIx64 " value=0x%" PRIx64
++allwinner_sun8i_emac_write(uint64_t offset, uint64_t val) "MMIO write: offset=0x%" PRIx64 " value=0x%" PRIx64
++
+ # etraxfs_eth.c
+ mdio_phy_read(int regnum, uint16_t value) "read phy_reg:%d value:0x%04x"
+ mdio_phy_write(int regnum, uint16_t value) "write phy_reg:%d value:0x%04x"
 -- 
 2.17.1
 
