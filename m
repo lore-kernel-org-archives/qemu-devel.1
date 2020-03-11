@@ -2,90 +2,77 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE005C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 03:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9369EC10F25
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 04:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 968D9215A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 03:47:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5724F20578
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 04:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZigIDMAL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 968D9215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zw9miCqv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5724F20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBsLC-0007qd-NS
-	for qemu-devel@archiver.kernel.org; Tue, 10 Mar 2020 23:47:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60464)
+	id 1jBshE-0004C8-Gc
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 00:10:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38333)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jBsKO-0007DJ-Ts
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 23:46:41 -0400
+ (envelope-from <gshan@redhat.com>) id 1jBsgc-0003hV-DD
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 00:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jBsKM-0007UR-Pr
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 23:46:39 -0400
-Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:46029)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jBsKM-0007Rg-IA
- for qemu-devel@nongnu.org; Tue, 10 Mar 2020 23:46:38 -0400
-Received: by mail-pg1-x52e.google.com with SMTP id m15so396609pgv.12
- for <qemu-devel@nongnu.org>; Tue, 10 Mar 2020 20:46:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7aFFhA+otSlffaV4rPfn2s1GH+BPYE0xZYGnj0MMnOg=;
- b=ZigIDMALa88e9tHmJuLYqC1QOk0gCio0sWOG6ggpcu3TX/jYSBQjqnft17CjTKBb3N
- H51EuDC+H8j4Vqdg40qQCOrASIpTUdRHDHQRggvErerfQU+ksosDROZgxkbrRuLV41Fv
- SB7J12T0EwgkJqiu+qc3Sby8Rw/SBhlZl+UOuuLDHh8CaDJ/16eRt1H4TKOIiSJi2oqX
- wWKnbp0yOuypBL1aBhq0atTqR49MYqnzTdZJvfmVCJfTb1KMT33CNycbxcIAYOBTT6rN
- a8tN6NRgzpvLNx/hvaNOgo4DDLKuo9XICLsymO9lyrxswmDHfmG2pTmQo61l84lbTAz/
- 3qqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7aFFhA+otSlffaV4rPfn2s1GH+BPYE0xZYGnj0MMnOg=;
- b=UIcRpFdOm3d/sz9hCEGMthbux7FdDOppeJZeVN0Qakm+5stgZxTR0k4FLJeCws341B
- 3RkSGd5ocENnv/x3uGC7UrrgWhAOFTT7d0JauEm8F8u5zgbvNBxcpqSjVMsBzwxGGmre
- rJLWDOapy4lb65rhePFHK+Bj00z6YWVSAhgK1OOlUh6jN3d8T+3hZ4HL4hEJl3hM4t41
- 0DjJyJN0QMGMEjLeJ1jWDh9uP1NUa1kpouDl0AU6c82FAdQaJG++ShhX2zdUyYoDz7o3
- Kd+7P6oucDuu5VyZa2mmygxS8Q+ogy0AiIRhScZbmUtmbRBS989PDn7G6czRPztZPGdv
- clSw==
-X-Gm-Message-State: ANhLgQ2WPwYo/gmJ+hdLsHDhMa4aEH+7IF1q7o4oXm0N4+QbHs5H/okR
- SOj4JeiGiaY+Fz89tYRkBQ3qLP1Z0UU=
-X-Google-Smtp-Source: ADFU+vt5c3MkyuMB/7Di7ggCIgRVl97+sDr/cpgR4zjpOCX3Q2C0bIC0vsRwZVm9SgWm22/EEXaWQg==
-X-Received: by 2002:a62:446:: with SMTP id 67mr780910pfe.109.1583898395482;
- Tue, 10 Mar 2020 20:46:35 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- h29sm46671572pfk.57.2020.03.10.20.46.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Mar 2020 20:46:34 -0700 (PDT)
-Subject: Re: Questions about pollute the mail list archives
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, Alistair.Francis@wdc.com,
- Palmer Dabbelt <palmer@dabbelt.com>
-References: <a17be147-3e03-b79f-1008-11734c03cfdf@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <528c86c4-aad5-78c2-c710-7a09ddc5230d@linaro.org>
-Date: Tue, 10 Mar 2020 20:46:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <gshan@redhat.com>) id 1jBsgb-0005ry-4r
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 00:09:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45956
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1jBsgb-0005ro-1s
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 00:09:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583899776;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=yS+wEzXMkBQY0dXWQ1w2qDOShiCCvLOOnWkysOKyZ18=;
+ b=Zw9miCqvD+UP9lRsq20jxh9YdlCHnHT95qeqNDEtg3Y5FYPS073SoUgQ/lOuFj8Ii88UXU
+ t7CW/CNGkpjMM2WRqDGa9FDScU2W1xlKWdBxQyrjyef1TrgLl61hqbtXv9BFTKehfYUsBu
+ vG35wpbHKQi6Wwxdo8okCzLfHuH+mFU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-cvemdRrsPKymtZqQ0dmXfA-1; Wed, 11 Mar 2020 00:09:32 -0400
+X-MC-Unique: cvemdRrsPKymtZqQ0dmXfA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFB01800D48;
+ Wed, 11 Mar 2020 04:09:31 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-67.bne.redhat.com
+ [10.64.54.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B0545DA60;
+ Wed, 11 Mar 2020 04:09:27 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH v3] hw/char/pl011: Enable TxFIFO and async transmission
+Date: Wed, 11 Mar 2020 15:09:23 +1100
+Message-Id: <20200311040923.29115-1-gshan@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a17be147-3e03-b79f-1008-11734c03cfdf@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::52e
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,35 +84,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, marcandre.lureau@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/10/20 7:19 PM, LIU Zhiwei wrote:
-> Is it serious?
+The depth of TxFIFO can be 1 or 16 depending on LCR[4]. The TxFIFO is
+disabled when its depth is 1. It's nice to have TxFIFO enabled if
+possible because more characters can be piled and transmitted at once,
+which would have less overhead. Besides, we can be blocked because of
+qemu_chr_fe_write_all(), which isn't nice.
 
-It isn't ideal.  I would eventually try to review via your branch, and find a
-copy of the patch to reply, or send a reply to the cover letter if no copy of
-the patch arrived.
+This enables TxFIFO if possible. On ther other hand, the asynchronous
+transmission is enabled if needed, as we did in hw/char/cadence_uart.c
 
-> Is there any way to clear it in the mail list archives?
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+v3: Use PL011() to do data type conversion
+    Return G_SOURCE_REMOVE when the backend is disconnected in pl011_xmit()
+    Drop parenthesis in the condition validating @size in pl011_write_fifo(=
+)
+---
+ hw/char/pl011.c         | 105 +++++++++++++++++++++++++++++++++++++---
+ include/hw/char/pl011.h |   3 ++
+ 2 files changed, 102 insertions(+), 6 deletions(-)
 
-No.
+diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+index 13e784f9d9..dccb8c42b0 100644
+--- a/hw/char/pl011.c
++++ b/hw/char/pl011.c
+@@ -169,6 +169,73 @@ static void pl011_set_read_trigger(PL011State *s)
+         s->read_trigger =3D 1;
+ }
+=20
++static gboolean pl011_xmit(GIOChannel *chan, GIOCondition cond, void *opaq=
+ue)
++{
++    PL011State *s =3D PL011(opaque);
++    int ret;
++
++    /* Drain FIFO if there is no backend */
++    if (!qemu_chr_fe_backend_connected(&s->chr)) {
++        s->write_count =3D 0;
++        s->flags &=3D ~PL011_FLAG_TXFF;
++        s->flags |=3D PL011_FLAG_TXFE;
++        return G_SOURCE_REMOVE;
++    }
++
++    /* Nothing to do */
++    if (!s->write_count) {
++        return FALSE;
++    }
++
++    ret =3D qemu_chr_fe_write(&s->chr, s->write_fifo, s->write_count);
++    if (ret > 0) {
++        s->write_count -=3D ret;
++        memmove(s->write_fifo, s->write_fifo + ret, s->write_count);
++        s->flags &=3D ~PL011_FLAG_TXFF;
++        if (!s->write_count) {
++            s->flags |=3D PL011_FLAG_TXFE;
++        }
++    }
++
++    if (s->write_count) {
++        s->watch_tag =3D qemu_chr_fe_add_watch(&s->chr, G_IO_OUT | G_IO_HU=
+P,
++                                             pl011_xmit, s);
++        if (!s->watch_tag) {
++            s->write_count =3D 0;
++            s->flags &=3D ~PL011_FLAG_TXFF;
++            s->flags |=3D PL011_FLAG_TXFE;
++            return FALSE;
++        }
++    }
++
++    s->int_level |=3D PL011_INT_TX;
++    pl011_update(s);
++    return FALSE;
++}
++
++static void pl011_write_fifo(void *opaque, const unsigned char *buf, int s=
+ize)
++{
++    PL011State *s =3D PL011(opaque);
++    int depth =3D (s->lcr & 0x10) ? 16 : 1;
++
++    if (size >=3D depth - s->write_count) {
++        size =3D depth - s->write_count;
++    }
++
++    if (size > 0) {
++        memcpy(s->write_fifo + s->write_count, buf, size);
++        s->write_count +=3D size;
++        if (s->write_count >=3D depth) {
++            s->flags |=3D PL011_FLAG_TXFF;
++        }
++        s->flags &=3D ~PL011_FLAG_TXFE;
++    }
++
++    if (!s->watch_tag) {
++        pl011_xmit(NULL, G_IO_OUT, s);
++    }
++}
++
+ static void pl011_write(void *opaque, hwaddr offset,
+                         uint64_t value, unsigned size)
+ {
+@@ -179,13 +246,8 @@ static void pl011_write(void *opaque, hwaddr offset,
+=20
+     switch (offset >> 2) {
+     case 0: /* UARTDR */
+-        /* ??? Check if transmitter is enabled.  */
+         ch =3D value;
+-        /* XXX this blocks entire thread. Rewrite to use
+-         * qemu_chr_fe_write and background I/O callbacks */
+-        qemu_chr_fe_write_all(&s->chr, &ch, 1);
+-        s->int_level |=3D PL011_INT_TX;
+-        pl011_update(s);
++        pl011_write_fifo(opaque, &ch, 1);
+         break;
+     case 1: /* UARTRSR/UARTECR */
+         s->rsr =3D 0;
+@@ -207,7 +269,16 @@ static void pl011_write(void *opaque, hwaddr offset,
+         if ((s->lcr ^ value) & 0x10) {
+             s->read_count =3D 0;
+             s->read_pos =3D 0;
++
++            if (s->watch_tag) {
++                g_source_remove(s->watch_tag);
++                s->watch_tag =3D 0;
++            }
++            s->write_count =3D 0;
++            s->flags &=3D ~PL011_FLAG_TXFF;
++            s->flags |=3D PL011_FLAG_TXFE;
+         }
++
+         s->lcr =3D value;
+         pl011_set_read_trigger(s);
+         break;
+@@ -292,6 +363,24 @@ static const MemoryRegionOps pl011_ops =3D {
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+ };
+=20
++static bool pl011_write_fifo_needed(void *opaque)
++{
++    PL011State *s =3D PL011(opaque);
++    return s->write_count > 0;
++}
++
++static const VMStateDescription vmstate_pl011_write_fifo =3D {
++    .name =3D "pl011/write_fifo",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .needed =3D pl011_write_fifo_needed,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_INT32(write_count, PL011State),
++        VMSTATE_UINT8_ARRAY(write_fifo, PL011State, 16),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_pl011 =3D {
+     .name =3D "pl011",
+     .version_id =3D 2,
+@@ -314,6 +403,10 @@ static const VMStateDescription vmstate_pl011 =3D {
+         VMSTATE_INT32(read_count, PL011State),
+         VMSTATE_INT32(read_trigger, PL011State),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections =3D (const VMStateDescription * []) {
++        &vmstate_pl011_write_fifo,
++        NULL
+     }
+ };
+=20
+diff --git a/include/hw/char/pl011.h b/include/hw/char/pl011.h
+index 14187165c6..9d1c24db48 100644
+--- a/include/hw/char/pl011.h
++++ b/include/hw/char/pl011.h
+@@ -38,6 +38,7 @@ typedef struct PL011State {
+     uint32_t int_enabled;
+     uint32_t int_level;
+     uint32_t read_fifo[16];
++    uint8_t  write_fifo[16];
+     uint32_t ilpr;
+     uint32_t ibrd;
+     uint32_t fbrd;
+@@ -45,6 +46,8 @@ typedef struct PL011State {
+     int read_pos;
+     int read_count;
+     int read_trigger;
++    int write_count;
++    guint watch_tag;
+     CharBackend chr;
+     qemu_irq irq[6];
+     const unsigned char *id;
+--=20
+2.23.0
 
-> Can I send it again to the mail list?
-
-Yes.
-
-To avoid confusion I would label it v4, even if there are no changes since v3.
-
-I would recommend using the --batch-size and --relogin-delay options to
-git-send-email.  I don't know exactly what parameters you need, but choosing
-small batches and long-ish delays should mean that the whole patch set trickles
-out over the course of an hour or two.  Patience is something that computers
-are good at.  :-)
-
-
-r~
 
