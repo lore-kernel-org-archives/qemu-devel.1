@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1866C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB319C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:24:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A104220575
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B875820575
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:24:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GepmYt+u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A104220575
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LrobzSVP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B875820575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC9mC-00065L-Ks
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:24:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59307)
+	id 1jC9mT-0006dV-Py
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:24:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h8-0003ro-Gm
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:20 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jC9hB-0003yI-QP
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h6-00052h-Jo
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:18 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:54375)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jC9h9-00056Z-1T
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:19:21 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33532)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jC9h6-00050O-9f; Wed, 11 Mar 2020 18:19:16 -0400
-Received: by mail-wm1-x330.google.com with SMTP id n8so3922726wmc.4;
- Wed, 11 Mar 2020 15:19:16 -0700 (PDT)
+ id 1jC9h8-00055J-QM; Wed, 11 Mar 2020 18:19:18 -0400
+Received: by mail-wr1-x443.google.com with SMTP id a25so4824897wrd.0;
+ Wed, 11 Mar 2020 15:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BNmvso5x8nTOJnini/wgwMirZMhQdKYkX1ewKwcN6IY=;
- b=GepmYt+uTmGHdZHfA7FEAFsQ7G4++PVDpkzPVToFsXKSTy2gmQXhVIQTSwUZCmtPZY
- syHnMjyoFbbpbMss5cXxjFDJXZYz2QE7MyZxeRuMUWCy/5eR0E53zcqZ8sW3S+9Lu18e
- sGI/Hg+nWUfEpI/wlkUMjNzNOhgU4oafMOxB16SH3abYoclNyf1gNJxghtTNeppaDnMd
- JAMMQ6BY8rIwVqLTTgmfmMDiFqZElZ8mAeGbS8bBAHQUofjn0D2Bo7TUkahWvja+485N
- ddquMYGE93svsI0wJadrluOE6/dHIu/fQlqAG9szXZW+2flPBGAvn9i/deFheQCYPxTY
- hFEA==
+ bh=G5wjrF/YkAUi/o2rwHfv8Ap4gQVbTnbSWvgNI4iZVKg=;
+ b=LrobzSVP/6aRkLqcjDZWn6cau6TJF3eRIB1rbsQK4dZ1m3OiK2ba3ybkI28Rs8wHN6
+ WayVUq3YSbZewnucmZza0/GPATmGLmT0qcpVJUIRyB0rFpRGPbo2VItp0m1aqwNe8hGR
+ ubJrFc9M05bbh4KJo5Xz5vjfDJTYYi99vC594PVkywr96s+/hapdYc35/aVuGX7CU8LA
+ ng4f0WbIhiPSq/XdOMn63GDA25pfir6P3f0FrQRHbM18dXiQN07GsNKyzLdoZ0p9mt8W
+ zrj4kRYZ6OzsWGB/o3H0TZeTEu1HYNhVtdgTkPWroNxcjjUaQNQ6gXavNsGwnx9O1LGL
+ eFKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BNmvso5x8nTOJnini/wgwMirZMhQdKYkX1ewKwcN6IY=;
- b=RBzBUjebvxhO3xa7b5mLoA/tS8l1JCAW/1QLh+73cqL0jLGI+E235Tp6UYYldfgP/v
- Gz/e730gpAuzIqgDyMGokZMWxrU65Bvwqq4ARdlxo7aDnuKjcKp/xX1eIN1CojqtLJQb
- OIK1iAP5XbL3d6Ffe1Dpr0lZxBGSqGKbxRnpBHasnYWrVNEgBFuUFPHNgBjdlMiViHfD
- EWG8cTBWlJVswm9diYb4oqD9x+6ljXywUcScR1yY/Hso3UKxyOLiZq0kokaOVTzlUPX+
- VDQEuf06WVE4LqZNgnWaBvO5vM7XPTm47vUkiv8JGFJnfl/eaBtAHb8+Ixe59hdiGWOz
- AC+Q==
-X-Gm-Message-State: ANhLgQ0+mX7AI2mWcbYSdQ9SoOmW1ggJVJtpCS4SmFSBFrcWA5i35LLH
- TJ6e9jhNMxbCg/5rIfSuwpCIm6HZ
-X-Google-Smtp-Source: ADFU+vuLZHdGA45Fk04luHLmKh8k/Uaz1HtF9+Qa9B4XYzBHAlWUzpYl96lD8OF8aWFPYpORh06ZQQ==
-X-Received: by 2002:a1c:5443:: with SMTP id p3mr767026wmi.149.1583965154889;
- Wed, 11 Mar 2020 15:19:14 -0700 (PDT)
+ bh=G5wjrF/YkAUi/o2rwHfv8Ap4gQVbTnbSWvgNI4iZVKg=;
+ b=jQjq6yCn5zzf8KbkcXSpGXVUVvDP034h42JhkK8TAbwZ8fIguI41GB6DNdwfTLxuDQ
+ piQZu3YEVaHN1LBfaHQkJFFf//ez7kSOns7yIJu9qEErYUVn6+tEfiTrSf481VgGALs6
+ dJsZedaZtH3eP/c20nnQ/Nk9u68I+kPU9bG1wSAId4ALrt0VdRxqDk+K9ZYJduO6/qRj
+ SFupFheWpDto/mcss/pufoA2ZWsyu6nlDMpBRcUAoxZ2g+I4eBPEg4Kif4EaMuoYjMET
+ /ijVTwctjqkCa/z9sI+MCoXjwcc9Z6qXvf0K5mOFnz3Z4c0z299pDGHhfaS2bXE85KPS
+ UGkA==
+X-Gm-Message-State: ANhLgQ3XRc3cjIsRT9LlM5xZhUY8p5Rfp6Dlb+58PbfaNIPDiSFhYe95
+ H/togJe9plw3Bea1ezqzcH/qpa0O
+X-Google-Smtp-Source: ADFU+vsgnY4brf1zhYZTqy6xsI/SWMOr2GeT+I88Xf9H7FGTPg3HwrYPtqWbDy9sol1cOPxpcakGdQ==
+X-Received: by 2002:a5d:4d10:: with SMTP id z16mr6968966wrt.271.1583965157371; 
+ Wed, 11 Mar 2020 15:19:17 -0700 (PDT)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id q7sm19346796wrd.54.2020.03.11.15.19.14
+ by smtp.gmail.com with ESMTPSA id q7sm19346796wrd.54.2020.03.11.15.19.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 15:19:14 -0700 (PDT)
+ Wed, 11 Mar 2020 15:19:16 -0700 (PDT)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 13/18] tests/boot_linux_console: Add a quick test for the
- OrangePi PC board
-Date: Wed, 11 Mar 2020 23:18:49 +0100
-Message-Id: <20200311221854.30370-14-nieklinnenbank@gmail.com>
+Subject: [PATCH v8 16/18] tests/boot_linux_console: Add a SLOW test booting
+ Ubuntu on OrangePi PC
+Date: Wed, 11 Mar 2020 23:18:52 +0100
+Message-Id: <20200311221854.30370-17-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200311221854.30370-1-nieklinnenbank@gmail.com>
 References: <20200311221854.30370-1-nieklinnenbank@gmail.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,85 +104,126 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This test boots a Linux kernel on a OrangePi PC board and verify
-the serial output is working.
+This test boots Ubuntu Bionic on a OrangePi PC board.
+
+As it requires 1GB of storage, and is slow, this test is disabled
+on automatic CI testing.
+
+It is useful for workstation testing. Currently Avocado timeouts too
+quickly, so we can't run userland commands.
 
 The kernel image and DeviceTree blob are built by the Armbian
 project (based on Debian):
 https://www.armbian.com/orange-pi-pc/
 
-If ARM is a target being built, "make check-acceptance" will
-automatically include this test by the use of the "arch:arm" tags.
+The Ubuntu image is downloaded from:
+https://dl.armbian.com/orangepipc/Bionic_current
 
-Alternatively, this test can be run using:
+This test can be run using:
 
-  $ make check-venv
-  $ ./tests/venv/bin/avocado --show=console,app run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
-  JOB ID     : 2e4d15eceb13c33672af406f08171e6e9de1414a
-  JOB LOG    : ~/job-results/job-2019-12-17T05.46-2e4d15e/job.log
-  (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi:
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
+  console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
+  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi PC
+  console: DRAM:  1 GiB
+  console: MMC:   mmc@1c0f000: 0
+  [...]
   console: Uncompressing Linux... done, booting the kernel.
   console: Booting Linux on physical CPU 0x0
-  console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
+  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
   console: CPU: div instructions available: patching division code
   console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
   console: OF: fdt: Machine model: Xunlong Orange Pi PC
-  console: Memory policy: Data cache writealloc
-  console: OF: reserved mem: failed to allocate memory for node 'cma@4a000000'
-  console: cma: Failed to reserve 128 MiB
-  console: psci: probing for conduit method from DT.
-  console: psci: PSCIv0.2 detected in firmware.
-  console: psci: Using standard PSCI v0.2 function IDs
-  console: psci: Trusted OS migration not required
-  console: random: get_random_bytes called from start_kernel+0x8d/0x3c2 with crng_init=0
-  console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308 u73728
-  console: Built 1 zonelists, mobility grouping on.  Total pages: 32480
-  console: Kernel command line: printk.time=0 console=ttyS0,115200
-  PASS (8.59 s)
-  JOB TIME   : 8.81 s
+  [...]
+  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+  console: done.
+  console: Begin: Running /scripts/local-bottom ... done.
+  console: Begin: Running /scripts/init-bottom ... done.
+  console: systemd[1]: systemd 237 running in system mode. (...)
+  console: systemd[1]: Detected architecture arm.
+  console: Welcome to Ubuntu 18.04.3 LTS!
+  console: systemd[1]: Set hostname to <orangepipc>.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
 [NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
+[NL: changed test to boot from SD card via BootROM, added check for 7z]
 ---
- tests/acceptance/boot_linux_console.py | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 34d37eba3b..6f5af582f3 100644
+index 0762dbe83a..e035c88b07 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -507,6 +507,31 @@ class BootLinuxConsole(Test):
+@@ -19,7 +19,13 @@ from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
++from avocado.utils.path import find_command, CmdNotFoundError
+ 
++P7ZIP_AVAILABLE = True
++try:
++    find_command('7z')
++except CmdNotFoundError:
++    P7ZIP_AVAILABLE = False
+ 
+ class BootLinuxConsole(Test):
+     """
+@@ -619,6 +625,48 @@ class BootLinuxConsole(Test):
          exec_command_and_wait_for_pattern(self, 'reboot',
                                                  'reboot: Restarting system')
  
-+    def test_arm_orangepi(self):
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
++    def test_arm_orangepi_bionic(self):
 +        """
 +        :avocado: tags=arch:arm
 +        :avocado: tags=machine:orangepi-pc
 +        """
-+        deb_url = ('https://apt.armbian.com/pool/main/l/'
-+                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-+        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        kernel_path = self.extract_from_deb(deb_path,
-+                                            '/boot/vmlinuz-4.20.7-sunxi')
-+        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-+        dtb_path = self.extract_from_deb(deb_path, dtb_path)
++
++        # This test download a 196MB compressed image and expand it to 932MB...
++        image_url = ('https://dl.armbian.com/orangepipc/archive/'
++                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
++        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
++        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
++        image_path = os.path.join(self.workdir, image_name)
++        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
 +
 +        self.vm.set_console()
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200n8 '
-+                               'earlycon=uart,mmio32,0x1c28000')
-+        self.vm.add_args('-kernel', kernel_path,
-+                         '-dtb', dtb_path,
-+                         '-append', kernel_command_line)
++        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
++                         '-nic', 'user',
++                         '-no-reboot')
 +        self.vm.launch()
-+        console_pattern = 'Kernel command line: %s' % kernel_command_line
-+        self.wait_for_console_pattern(console_pattern)
++
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'loglevel=7 '
++                               'nosmp '
++                               'systemd.default_timeout_start_sec=9000 '
++                               'systemd.mask=armbian-zram-config.service '
++                               'systemd.mask=armbian-ramlog.service')
++
++        self.wait_for_console_pattern('U-Boot SPL')
++        self.wait_for_console_pattern('Autoboot in ')
++        exec_command_and_wait_for_pattern(self, ' ', '=>')
++        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
++                                                kernel_command_line + "'", '=>')
++        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++
++        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
++                                      'to <orangepipc>')
++        self.wait_for_console_pattern('Starting Load Kernel Modules...')
 +
      def test_s390x_s390_ccw_virtio(self):
          """
