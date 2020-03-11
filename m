@@ -2,89 +2,68 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50598C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C049FC10F29
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E166208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:09:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsM3K0n+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E166208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98F9A20727
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 07:11:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98F9A20727
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBvUL-0006Af-Ab
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 03:09:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40612)
+	id 1jBvWG-0007fE-LT
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 03:11:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jBvTi-0005Xr-CH
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:08:31 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jBvVi-0007G7-Ir
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:10:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jBvTh-0002zy-AN
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:08:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30216
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jBvTh-0002zu-6P
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:08:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583910508;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9368dyM5HaeqtOch05Zmbcpy1rqScEOaBOvr0mRwwAQ=;
- b=RsM3K0n+daBQqpgBNRsqqtylaNZ18k7ebodfBKE/YOGAHEG0P+87vI27MW78DdZeSwJy1A
- BrOfKrXLXr+VEXOgGQ86iy5RQA0KwOchJLAy1f8k+Awr+Jj1im9TZlw6qzUrRwCzkkYF8W
- sJFW4GmHMaqwFz8cl6u5x/2RvA4BX0I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-udjxVVM7Nwe0uwHSCtChFg-1; Wed, 11 Mar 2020 03:08:25 -0400
-X-MC-Unique: udjxVVM7Nwe0uwHSCtChFg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD134800D50;
- Wed, 11 Mar 2020 07:08:23 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
- [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB40A8F365;
- Wed, 11 Mar 2020 07:08:17 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3A54811386A6; Wed, 11 Mar 2020 08:08:16 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH RESEND 1/3] vfio/pci: fix a null pointer reference in
- vfio_rom_read
-References: <20200224064219.1434-1-longpeng2@huawei.com>
- <20200224064219.1434-2-longpeng2@huawei.com>
- <20200224090458.080152c0@w520.home>
- <5b6a9b3c-0efe-8f57-d61e-731e9fd51470@huawei.com>
- <20200310101108.3377b878@x1.home>
- <467b2253-a065-91c3-5b0c-4f03ee236d0c@redhat.com>
- <20200310193624.402fdb18@x1.home>
-Date: Wed, 11 Mar 2020 08:08:16 +0100
-In-Reply-To: <20200310193624.402fdb18@x1.home> (Alex Williamson's message of
- "Tue, 10 Mar 2020 19:36:24 -0600")
-Message-ID: <87ftefl673.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <no-reply@patchew.org>) id 1jBvVg-0005AB-P4
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 03:10:34 -0400
+Resent-Date: Wed, 11 Mar 2020 03:10:34 -0400
+Resent-Message-Id: <E1jBvVg-0005AB-P4@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21187)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jBvVg-00057v-HG; Wed, 11 Mar 2020 03:10:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1583910626; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=m4Dfk9URsEEXZb3ofpA5oLy4GY7A2uqnSoHCFAg6zcNGST8gc3xQ/N5x6TYdCXTMN5UymxOI1lIkbhWiLv4TeUk34ud/riLhMN1y32cWrk6k1mgh58IkvRbwJWvAu6IqmSGXJSN/n6udLsTr1EM0DaXrIZthU9vkWgLEWy9F2RY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583910626;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=xV5BBanb9LkI0C7E5Uax2yILf55RX3wuaAnDjs3Q9zA=; 
+ b=QjYTqFYK0nHv/LrbBApEBe26w9ow+87na0KgdGd0eg4f6Cp//zH44RdKTyU8Cr9+wlVDACPq94eCMEp8nJsXltXKDKu4oQyoqm3l0VKSTzaLf8xhCftQCMYn4l3l2SrUClxMDyh1qUFpz1eEfhoE5sA/wnJAaRopc1vM3uT6HQk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583910623147325.54569096200134;
+ Wed, 11 Mar 2020 00:10:23 -0700 (PDT)
+In-Reply-To: <20200311064420.30606-1-richard.henderson@linaro.org>
+Subject: Re: [PATCH 00/16] target/arm: sve load/store improvements
+Message-ID: <158391062190.4461.13297013687538092318@39012742ff91>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Wed, 11 Mar 2020 00:10:23 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,78 +75,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, weifuqiang@huawei.com, qemu-devel@nongnu.org,
- arei.gonglei@huawei.com, huangzhichao@huawei.com, "Longpeng \(Mike,
- Cloud Infrastructure Service Product Dept.\)" <longpeng2@huawei.com>,
- Laszlo Ersek <lersek@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Williamson <alex.williamson@redhat.com> writes:
-
-> On Wed, 11 Mar 2020 00:14:31 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
-[...]
->> So from a memcpy() and range perspective, the patch looks OK. But
->> there's still a wart I dislike: we should never perform pointer
->> arithmetic on a (void*). I suggest casting (vdev->rom) to (uint8_t*) or
->> (unsigned char*) first.
->>=20
->> Here's an excerpt from the ISO C99 standard:
->>=20
->> -v-
->> 6.5.6 Additive operators
->>=20
->> Constraints
->>=20
->> 2 For addition, either both operands shall have arithmetic type, or one
->>   operand shall be a pointer to an object type and the other shall have
->>   integer type. [...]
->> -^-
->>=20
->> A "pointer-to-void" is not a "pointer to an object type", because "void"
->> is not an object type -- it is an incomplete type that cannot be complet=
-ed:
->>=20
->> -v-
->> 6.2.5 Types
->>=20
->> 1 [...] Types are partitioned into object types (types that fully
->>   describe objects), function types (types that describe functions), and
->>   incomplete types (types that describe objects but lack information
->>   needed to determine their sizes).
->>=20
->> [...]
->>=20
->> 19 The void type comprises an empty set of values; it is an incomplete
->>    type that cannot be completed.
->> -^-
->>=20
->> For a different illustration, (vdev->rom + addr) is equivalent to
->> &(vdev->rom[addr]) -- and we clearly can't have an "array of void".
->>=20
->> This anti-pattern (of doing pointer arithmetic on (void*)) likely comes
->> from a guarantee that the standard does make, in the same "6.2.5 Types"
->> section:
->>=20
->> -v-
->> 27 A pointer to void shall have the same representation and alignment
->>    requirements as a pointer to a character type. 39) [...]
->>=20
->> Footnote 39: The same representation and alignment requirements are
->>              meant to imply interchangeability as arguments to
->>              functions, return values from functions, and members of
->>              unions.
->> -^-
->>=20
->> It does not extend to the "+" operator.
->
-> GNU C specifically allows arithmetic on pointers and defines the size
-> of a void as 1.  I'll comply, but this makes me want to stab myself in
-> the face :-\  Thanks,
-
-We rely on GNU C extensions all over theplace.  Making the code uglier
-to avoid relying on this one here makes no sense to me.
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMTA2NDQyMC4zMDYw
+Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwMC8xNl0gdGFyZ2V0L2FybTog
+c3ZlIGxvYWQvc3RvcmUgaW1wcm92ZW1lbnRzCk1lc3NhZ2UtaWQ6IDIwMjAwMzExMDY0NDIwLjMw
+NjA2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjRjYjRjZmIgdGFyZ2V0L2FybTogUmVtb3ZlIHN2ZV9tZW1vcGlkeAo5YjQzYzRjIHRhcmdl
+dC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBnYXRoZXIgbG9hZHMKMzAzMmE0OSB0YXJn
+ZXQvYXJtOiBSZXVzZSBzdmVfcHJvYmVfcGFnZSBmb3Igc2NhdHRlciBzdG9yZXMKYWJmMTFkNyB0
+YXJnZXQvYXJtOiBSZXVzZSBzdmVfcHJvYmVfcGFnZSBmb3IgZ2F0aGVyIGZpcnN0LWZhdWx0IGxv
+YWRzCjAyMGY4NzQgdGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGZvciBjb250aWd1b3VzIHN0
+b3JlcwpkZTMxYjMwIHRhcmdldC9hcm06IFVwZGF0ZSBjb250aWd1b3VzIGZpcnN0LWZhdWx0IGFu
+ZCBuby1mYXVsdCBsb2Fkcwo2Mjc1MjhjIHRhcmdldC9hcm06IFVzZSBTVkVDb250TGRTdCBmb3Ig
+bXVsdGktcmVnaXN0ZXIgY29udGlndW91cyBsb2Fkcwo2NzhhMmQ3IHRhcmdldC9hcm06IEhhbmRs
+ZSB3YXRjaHBvaW50cyBpbiBzdmVfbGQxX3IKYjY4MjdiYyB0YXJnZXQvYXJtOiBVc2UgU1ZFQ29u
+dExkU3QgaW4gc3ZlX2xkMV9yCmM2ZmE1ZjYgdGFyZ2V0L2FybTogQWRqdXN0IGludGVyZmFjZSBv
+ZiBzdmVfbGQxX2hvc3RfZm4KYmEzZDNjZSB0YXJnZXQvYXJtOiBBZGQgc3ZlIGluZnJhc3RydWN0
+dXJlIGZvciBwYWdlIGxvb2t1cAowY2YzYjMzIHRhcmdldC9hcm06IERyb3AgbWFudWFsIGhhbmRs
+aW5nIG9mIHNldC9jbGVhcl9oZWxwZXJfcmV0YWRkcgo3ZmFmOGZiIHRhcmdldC9hcm06IFVzZSBj
+cHVfKl9kYXRhX3JhIGZvciBzdmVfbGRzdF90bGJfZm4KZDhlZDVjOCBleGVjOiBBZGQgY3B1X3By
+b2JlX3dhdGNocG9pbnQKNGZmNDA5OCBhY2NlbC90Y2c6IEFkZCBwcm9iZV9hY2Nlc3NfZmxhZ3MK
+NGI2YzNkMCBhY2NlbC90Y2c6IEFkZCBibG9jayBjb21tZW50IGZvciBwcm9iZV9hY2Nlc3MKCj09
+PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcgY29tbWl0IDRiNmMzZDBlMTBjOSAoYWNj
+ZWwvdGNnOiBBZGQgYmxvY2sgY29tbWVudCBmb3IgcHJvYmVfYWNjZXNzKQoyLzE2IENoZWNraW5n
+IGNvbW1pdCA0ZmY0MDk4MTkwOTkgKGFjY2VsL3RjZzogQWRkIHByb2JlX2FjY2Vzc19mbGFncykK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3MzogRklMRTogYWNjZWwvdGNnL3Vz
+ZXItZXhlYy5jOjIyMDoKKyAgICAgICAgICAgIGNjLT50bGJfZmlsbChjcHUsIGFkZHIsIDAsIGFj
+Y2Vzc190eXBlLCBNTVVfVVNFUl9JRFgsIGZhbHNlLCByZXRhZGRyKTsKCnRvdGFsOiAwIGVycm9y
+cywgMSB3YXJuaW5ncywgMzEyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMTYgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KMy8xNiBDaGVja2luZyBjb21taXQgZDhlZDVjODVkZWVhIChleGVjOiBB
+ZGQgY3B1X3Byb2JlX3dhdGNocG9pbnQpCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMzMTog
+RklMRTogZXhlYy5jOjI3NDc6CisgICAgICAgIGlmICh3YXRjaHBvaW50X2FkZHJlc3NfbWF0Y2hl
+cyh3cCwgYWRkciwgbGVuKSAmJiAkCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ0IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDMvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQvMTYg
+Q2hlY2tpbmcgY29tbWl0IDdmYWY4ZmJiNWE2NyAodGFyZ2V0L2FybTogVXNlIGNwdV8qX2RhdGFf
+cmEgZm9yIHN2ZV9sZHN0X3RsYl9mbikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhh
+dCAnKicgKGN0eDpXeFYpCiMxNzY6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQxODQ6
+CisgICAgICAgICAgICAgICAgICAgICAgc3ZlX2xkc3QxX3RsYl9mbiAqdGxiX2ZuKQogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA0NzkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xNiBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKNS8xNiBDaGVja2luZyBjb21taXQgMGNmM2IzMzk3NTY1ICh0YXJnZXQvYXJtOiBE
+cm9wIG1hbnVhbCBoYW5kbGluZyBvZiBzZXQvY2xlYXJfaGVscGVyX3JldGFkZHIpCjYvMTYgQ2hl
+Y2tpbmcgY29tbWl0IGJhM2QzY2VjODc3MiAodGFyZ2V0L2FybTogQWRkIHN2ZSBpbmZyYXN0cnVj
+dHVyZSBmb3IgcGFnZSBsb29rdXApCjcvMTYgQ2hlY2tpbmcgY29tbWl0IGM2ZmE1ZjZmODJhMyAo
+dGFyZ2V0L2FybTogQWRqdXN0IGludGVyZmFjZSBvZiBzdmVfbGQxX2hvc3RfZm4pCjgvMTYgQ2hl
+Y2tpbmcgY29tbWl0IGI2ODI3YmNkZTE3MSAodGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGlu
+IHN2ZV9sZDFfcikKOS8xNiBDaGVja2luZyBjb21taXQgNjc4YTJkN2RlMjAyICh0YXJnZXQvYXJt
+OiBIYW5kbGUgd2F0Y2hwb2ludHMgaW4gc3ZlX2xkMV9yKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojNTE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQ0MDg6CisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPnBhZ2VbMF0uYXR0cnMs
+IHdwX2FjY2VzcywgcmV0YWRkcik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+NzU6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjQ0MzI6CisgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGluZm8tPnBhZ2VbMV0uYXR0cnMsIHdwX2FjY2Vzcywg
+cmV0YWRkcik7Cgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDg4IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDkvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTAvMTYgQ2hlY2tpbmcgY29t
+bWl0IDYyNzUyOGMxMTUzMyAodGFyZ2V0L2FybTogVXNlIFNWRUNvbnRMZFN0IGZvciBtdWx0aS1y
+ZWdpc3RlciBjb250aWd1b3VzIGxvYWRzKQoxMS8xNiBDaGVja2luZyBjb21taXQgZGUzMWIzMDBi
+ODgxICh0YXJnZXQvYXJtOiBVcGRhdGUgY29udGlndW91cyBmaXJzdC1mYXVsdCBhbmQgbm8tZmF1
+bHQgbG9hZHMpCjEyLzE2IENoZWNraW5nIGNvbW1pdCAwMjBmODc0YTQ4YmYgKHRhcmdldC9hcm06
+IFVzZSBTVkVDb250TGRTdCBmb3IgY29udGlndW91cyBzdG9yZXMpCjEzLzE2IENoZWNraW5nIGNv
+bW1pdCBhYmYxMWQ3NzE5MTAgKHRhcmdldC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBn
+YXRoZXIgZmlyc3QtZmF1bHQgbG9hZHMpCjE0LzE2IENoZWNraW5nIGNvbW1pdCAzMDMyYTQ5MWJi
+ZTUgKHRhcmdldC9hcm06IFJldXNlIHN2ZV9wcm9iZV9wYWdlIGZvciBzY2F0dGVyIHN0b3JlcykK
+MTUvMTYgQ2hlY2tpbmcgY29tbWl0IDliNDNjNGNjYjMyMiAodGFyZ2V0L2FybTogUmV1c2Ugc3Zl
+X3Byb2JlX3BhZ2UgZm9yIGdhdGhlciBsb2FkcykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0IDRjYjRj
+ZmI0NTY5MSAodGFyZ2V0L2FybTogUmVtb3ZlIHN2ZV9tZW1vcGlkeCkKPT09IE9VVFBVVCBFTkQg
+PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMTEwNjQ0MjAuMzA2MDYt
+MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
