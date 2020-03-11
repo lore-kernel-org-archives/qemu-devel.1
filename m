@@ -2,97 +2,98 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3E4C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5484C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 967A72074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6BFF2074D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:56:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="IE7TZZj2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967A72074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="dljKEq7v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6BFF2074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCAGp-0003sV-KD
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:56:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36288)
+	id 1jCAHa-0005kE-O4
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:56:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1jCAEo-0000RG-O9
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:08 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jCAEx-0000fM-Rk
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1jCAEn-0006KH-AI
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:06 -0400
-Received: from mail-eopbgr750049.outbound.protection.outlook.com
- ([40.107.75.49]:45878 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (envelope-from <Babu.Moger@amd.com>) id 1jCAEv-0006Z9-V2
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:15 -0400
+Received: from mail-eopbgr750048.outbound.protection.outlook.com
+ ([40.107.75.48]:50407 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jCAEn-0006JE-4i
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:05 -0400
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jCAEu-0006UQ-9i
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:54:12 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q+Di4R4p+DpoO1siUaMLztprq+/1zDGsELcNH2j0gEaDzjB+V8seMcCUvgbVXlCRm9Xd1wOHWUoPCaFBPkKYBydOPdWyUDzpgWYp8bHGBBt2+LnPFODvxK3H+gl1kfAtSjibPhSp3qSSYoLmlxAJw7N2eEoM2qvfYu40Az2ePXlH5SAP8VL4RL4o7OQAVX0kz1HVUQBDLctWz1bFSXvPSVbSbkz31YcQ+kMoVd+w51CjLun+KcQMD/vYYDVXk+eN422syUFZ3hEr6ml1YvJ3j/84Z2XV2+kK7MhWtDhq/Dqlf2p4J7N0LLKM96uN7FU2Nj1OR4/TwszcVpWNyJB6aw==
+ b=HQ2lub62RgeKyRaxG5jNDcfJtW9zbd4KZVlJrwnpaByY0vRqYJ7kQHOxkP04loBz/7cGy2UqlvOVhWLy4LbN65ZvzyJMhV4zsZCNaxVsxuudvavK3NZpA7/MLzMqdEDzkP+PjjkLm4n/4zHXuRksuCsQJ+rM62ODXOAwmjyiBBOpCQ2Ud1giqUskuX4nR5GXxVQxeNxwhLlDPN+2IjB/jqw3DN1vxztBcdUOktjD/XFxaFeD7XFdohKfhgPI4LlCzONZ34cWkWpx6jrTVic1i9/AmUTcRT6+8GRWc6ZD+BqX7g95u4T975bjFQ1HIakVbVq+CzsOdr3OnxQLUiTgjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iBK7AhF4nsw2ytXwGEO6Z6sgbh4u7psNTW9Tt3Bkf6U=;
- b=ThLiwHF+pYXVO5fVxaKMc3fGkoM6aul7tSMTARhUxOJIBTFsg2ruc0L2lAZMlvc/KeyUDHptSl7BA+HCrk1RJQuriqlDaTlR5T9w5bGTVKf2Kd7Fg6GCxf8+32ku46IBInEgsiBHGQ0VjN5iq3TKGFLLEJT8B4Jly+eumfjO8y6LAXkP9IwCYginhuYsEbtDzFkf09v9KIaQd0D+UHBnJZAHSx/lOqyqGhCjr2zkJj07vZkP6UiF/Td5MamaeUDqnA8QB8EcKIXPJltapwcDxhW6c8VQ7/4eQd/wNqgJvRapBhnQ+6TYsv0gr3rwVb/3CCs6gre+crEQTUxRkxl+Mg==
+ bh=8utAM5Lmyyaq5dc2jSANleQyZJsJgNRe0ihae4QBGM0=;
+ b=R69+WDy9+5i9ewVorn/hbUZ9vYqHLtE8XMHftRmOqrw4eFWzlQtpuifvy7032bCBZYNY474Xt+3PvZMRi4H9eSStOzOSUcuomUfjNG/5sg03N2YuIvIJnTatgc227n27sXGXWpWTn1h2lu9ls1SQO7jRty8GSKnWOmzbZFDo5CQDdBSHcMPIIfN6axc9SAm9it1EErXXA12yvbpNx+uwTApml691mfeEHcjASESqe1Jh1t/7Srm2336XERHQWE42ri81S5z5abAKdotLV9txGfBci7PKeYSTzb7lCUUuwAcNmZt/ed1SPD97aXGatShugcCf+3oqC3TQW4zGTvNauQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iBK7AhF4nsw2ytXwGEO6Z6sgbh4u7psNTW9Tt3Bkf6U=;
- b=IE7TZZj2DT66r3tB4GEg7lJLntDArrxF18DliGOZ44OxyiP+f9Uw1Aciyxc/IEP845MsIMVGhekEHPw+GET1Tdc+8AA5lRnuLaP0Gz5Fc0YXy8tRUeQt2pCioWF962CcNG/k4ktThfFdmtpWHFhsHowf0rQJIWqgT7JpuedAp+0=
+ bh=8utAM5Lmyyaq5dc2jSANleQyZJsJgNRe0ihae4QBGM0=;
+ b=dljKEq7vownNURcaGWRk8VNo8j0FSMEekTX9yeHpTKp8QNscwooXuH3B0TTuV8NKtD2Tzd8fqZxIYv8oJMD2htFMOVYYKFSIGgwdBtXjBMcKjkFrVDOPHfwBa4EdvackTxfDwv+UOtgoFAF2fAU1RF6D88rYh2ladHQXRgZwL6Y=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Babu.Moger@amd.com; 
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
  by SN1PR12MB2349.namprd12.prod.outlook.com (2603:10b6:802:2a::13)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.17; Wed, 11 Mar
- 2020 22:54:04 +0000
+ 2020 22:54:10 +0000
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Wed, 11 Mar 2020
- 22:54:04 +0000
-Subject: [PATCH v7 11/13] hw/i386: Move arch_id decode inside x86_cpus_init
+ 22:54:10 +0000
+Subject: [PATCH v7 12/13] target/i386: Enable new apic id encoding for EPYC
+ based cpus models
 From: Babu Moger <babu.moger@amd.com>
 To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
  rth@twiddle.net, mst@redhat.com, imammedo@redhat.com
-Date: Wed, 11 Mar 2020 17:54:02 -0500
-Message-ID: <158396724217.58170.12256158354204870716.stgit@naples-babu.amd.com>
+Date: Wed, 11 Mar 2020 17:54:09 -0500
+Message-ID: <158396724913.58170.3539083528095710811.stgit@naples-babu.amd.com>
 In-Reply-To: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
 References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
 User-Agent: StGit/unknown-version
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR20CA0036.namprd20.prod.outlook.com
- (2603:10b6:3:13d::22) To SN1PR12MB2560.namprd12.prod.outlook.com
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: DM6PR14CA0064.namprd14.prod.outlook.com
+ (2603:10b6:5:18f::41) To SN1PR12MB2560.namprd12.prod.outlook.com
  (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from naples-babu.amd.com (165.204.78.2) by
- DM5PR20CA0036.namprd20.prod.outlook.com (2603:10b6:3:13d::22) with Microsoft
+ DM6PR14CA0064.namprd14.prod.outlook.com (2603:10b6:5:18f::41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.15 via Frontend Transport; Wed, 11 Mar 2020 22:54:03 +0000
+ 15.20.2793.17 via Frontend Transport; Wed, 11 Mar 2020 22:54:09 +0000
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8ee0ab38-1052-4cc7-0a57-08d7c60f18af
+X-MS-Office365-Filtering-Correlation-Id: 334a5991-6483-4034-1c32-08d7c60f1cbd
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2349:|SN1PR12MB2349:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB234948E154244407D1B6053895FC0@SN1PR12MB2349.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2349FCA2F9DC23C013FE8BD495FC0@SN1PR12MB2349.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-Forefront-PRVS: 0339F89554
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(199004)(44832011)(478600001)(55016002)(5660300002)(956004)(81166006)(8676002)(7696005)(81156014)(86362001)(103116003)(4326008)(52116002)(16526019)(186003)(66556008)(66946007)(316002)(8936002)(2906002)(66476007)(26005);
+ SFS:(10009020)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(199004)(44832011)(478600001)(55016002)(5660300002)(956004)(966005)(81166006)(8676002)(7696005)(81156014)(86362001)(103116003)(4326008)(52116002)(16526019)(186003)(66556008)(66946007)(316002)(8936002)(2906002)(66476007)(26005)(170073001);
  DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2349;
  H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; A:1; 
@@ -100,18 +101,18 @@ Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q/8Q8cUmBhx5/pyK39TbCe0VJB3ImVfcr96DvXEUm64Ogazp05yrFUcCYul7OuXaFI2dmP53wo4qfPJZ6YAq2gyb1IHM/gcndC3+eINZKYF3nyom1y8/J6R/766dHe+sSmMp9DIY2XT9PJpNPI9XhQQkwo6P13jR/IqlDQTCQH2jtGdL89qdrgfTzskE7KuvyBs9p1mWmh4gCKRHQzdWbqwIHze5UeCmpR5o9736FdTG3mM1BzJqBOvJFHMcDfKWxvO8stqjDsjwJk+ricn4MQrjhCadpJ55/bgbsU+h9wFfrRPjnjWOH1JJgop6/wxl81ZR7TIQKLw4A/Fpo1j7Wwo9f5RLVrtxxje6vNw5Mlb48uUHz99Ma5wlIGwrPbjb8zX0cCLf4Bp3OI+dDUvz/9X1Y2cJYOl0f7eNaoLfrYnmvSvaXtjPYiCwlYixoEuD
-X-MS-Exchange-AntiSpam-MessageData: rsc15e2mdlHPDkaDyYiwBGgsK1Sk6Kp787l4e3JVudX26oVFpkipFkI2gBJAIW7+ECJ1IsmaoefUjvkr1xwtQD9vGuO9rvvJnY6BSk0ieCQCj1jDliptaKv5LjdsumJ5FLB9EqT9CEFXXzQBMg19Cw==
+X-Microsoft-Antispam-Message-Info: f3M+kyxomXhQPnqWG+1JDWFFZip5SqQ0wTFX9yeZ5ST9V77apdsxsTv/DG5/xZG/D1aqPoCrDmzYpUIsppyGiKbv+mJtayKHklX8tmEOQmiW/26DTdL593sFq9jooYETA10NoOiae+VtWcMAkETF+oVdFnrzNWBJ12g+vCXdmFIANU5yaDIR/hwJZL2xb31wVICpUDFuI7iz1DEJmkSLxbQQE2EoHnR6LOSaStbo9BHiER3jCKf5PdNHfcM3sGcYwvKRhhW0LkjvJZKVk5G7qEbOtaXoqbEGcnGwm0A+QBL3IPJGGalBZfNpoOb4i/Vj7sMQu7SIgz5eZgMpkZFlRG6i3s4/bPH4w1o58WHgsRXLOguRSLKuVJfZo9OYqAeHOadIJRYAcWFBRv+Ysose9s6FNuzoNCdQ0Xl22uK+Rizz+jAWC7LZGAV7dDI1Hjh7MQ0FzWD7A2Jc+McnuFffF3GwClq/6oo25En8/lrJICggIYQre3d+m5tLPphA0tnjhT577oA7G37ZZiqG9dy4Cl62fKXGl+ZlKzI4/HdcojKbRZ9A+LyGuNvVKjX9JoE3
+X-MS-Exchange-AntiSpam-MessageData: QhC8utAL1PWLH2CTOYfVzIHTeaGn9lzMXYImqJt/J/YUp5NYEcY+BLz51h4OfGTooH5pKb42Kc5dZReLhorEtLZyq+Ou+SacQxZ5XtRHNK66psbAxJzXjUUz8onVv5g0BT/SryH5YBGPO28UbIuaJg==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ee0ab38-1052-4cc7-0a57-08d7c60f18af
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 22:54:03.8917 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 334a5991-6483-4034-1c32-08d7c60f1cbd
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 22:54:10.6628 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MNGVHagJ4jkz4tvTMocSLzO35O8WmUcsJ0YaF+ib1unptpgMnfxRNo7xrMDSGqAa
+X-MS-Exchange-CrossTenant-UserPrincipalName: hEF/ZugntUa6N4k0ZLfpnvryuWdeSYvFbdfT/KUl8wHD3oqwvTBdDfF1QXtHzLC2
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2349
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.75.49
+X-Received-From: 40.107.75.48
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,138 +129,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Apicid calculation depends on knowing the total number of numa nodes
-for EPYC cpu models. Right now, we are calculating the arch_id while
-parsing the numa(parse_numa). At this time, it is not known how many
-total numa nodes are configured in the system.
+The APIC ID is decoded based on the sequence sockets->dies->cores->threads.
+This works fine for most standard AMD and other vendors' configurations,
+but this decoding sequence does not follow that of AMD's APIC ID enumeratio=
+n
+strictly. In some cases this can cause CPU topology inconsistency.
 
-Move the arch_id calculation inside x86_cpus_init. At this time, smp
-parse is already completed and numa node information is available.
+When booting a guest VM, the kernel tries to validate the topology, and fin=
+ds
+it inconsistent with the enumeration of EPYC cpu models. The more details a=
+re
+in the bug https://bugzilla.redhat.com/show_bug.cgi?id=3D1728166.
 
-Override the handlers if use_epyc_apic_id_encoding is enabled in
-cpu model definition.
+To fix the problem we need to build the topology as per the Processor
+Programming Reference (PPR) for AMD Family 17h Model 01h, Revision B1
+Processors. The documentation is available from the bugzilla Link below.
 
-Also replace the calling convention to use handlers from
-X86MachineState.
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
+It is also available at
+https://www.amd.com/system/files/TechDocs/55570-B1_PUB.zip
+
+Here is the text from the PPR.
+Operating systems are expected to use Core::X86::Cpuid::SizeId[ApicIdSize],=
+ the
+number of least significant bits in the Initial APIC ID that indicate core =
+ID
+within a processor, in constructing per-core CPUID masks.
+Core::X86::Cpuid::SizeId[ApicIdSize] determines the maximum number of cores
+(MNC) that the processor could theoretically support, not the actual number=
+ of
+cores that are actually implemented or enabled on the processor, as indicat=
+ed
+by Core::X86::Cpuid::SizeId[NC].
+Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
+=E2=80=A2 ApicId[6] =3D Socket ID.
+=E2=80=A2 ApicId[5:4] =3D Node ID.
+=E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
+=E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} : {1'b0,Logi=
+calCoreID[1:0]}
+
+The new apic id encoding is enabled for EPYC and EPYC-Rome models.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/pc.c  |    6 +++---
- hw/i386/x86.c |   37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 33 insertions(+), 10 deletions(-)
+ target/i386/cpu.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 98ee763f68..2d7d611184 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1580,14 +1580,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-         topo_ids.die_id = cpu->die_id;
-         topo_ids.core_id = cpu->core_id;
-         topo_ids.smt_id = cpu->thread_id;
--        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
-+        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
-     }
- 
-     cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
-     if (!cpu_slot) {
-         MachineState *ms = MACHINE(pcms);
- 
--        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
-+        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
-         error_setg(errp,
-             "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
-             " APIC ID %" PRIu32 ", valid index range 0:%d",
-@@ -1608,7 +1608,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
-      * once -smp refactoring is complete and there will be CPU private
-      * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
--    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
-+    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
-     if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
-         error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
-             " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 0a81ab5151..023dce1dbd 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -68,6 +68,22 @@ inline void init_topo_info(X86CPUTopoInfo *topo_info,
-     topo_info->threads_per_core = ms->smp.threads;
- }
- 
-+/*
-+ * Set up with the new EPYC topology handlers
-+ *
-+ * AMD uses different apic id encoding for EPYC based cpus. Override
-+ * the default topo handlers with EPYC encoding handlers.
-+ */
-+static void x86_set_epyc_topo_handlers(MachineState *machine)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(machine);
-+
-+    x86ms->apicid_from_cpu_idx = x86_apicid_from_cpu_idx_epyc;
-+    x86ms->topo_ids_from_apicid = x86_topo_ids_from_apicid_epyc;
-+    x86ms->apicid_from_topo_ids = x86_apicid_from_topo_ids_epyc;
-+    x86ms->apicid_pkg_offset = apicid_pkg_offset_epyc;
-+}
-+
- /*
-  * Calculates initial APIC ID for a specific CPU index
-  *
-@@ -86,7 +102,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
- 
-     init_topo_info(&topo_info, x86ms);
- 
--    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
-+    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
-     if (x86mc->compat_apic_id_mode) {
-         if (cpu_index != correct_id && !warned && !qtest_enabled()) {
-             error_report("APIC IDs set in compatibility mode, "
-@@ -121,6 +137,11 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-     MachineState *ms = MACHINE(x86ms);
-     MachineClass *mc = MACHINE_GET_CLASS(x86ms);
- 
-+    /* Check for apicid encoding */
-+    if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
-+        x86_set_epyc_topo_handlers(ms);
-+    }
-+
-     x86_cpu_set_default_version(default_cpu_version);
- 
-     /*
-@@ -134,6 +155,12 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
-                                                       ms->smp.max_cpus - 1) + 1;
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-+
-+    for (i = 0; i < ms->smp.cpus; i++) {
-+        ms->possible_cpus->cpus[i].arch_id =
-+            x86_cpu_apic_id_from_index(x86ms, i);
-+    }
-+
-     for (i = 0; i < ms->smp.cpus; i++) {
-         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-     }
-@@ -158,8 +185,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
-    init_topo_info(&topo_info, x86ms);
- 
-    assert(idx < ms->possible_cpus->len);
--   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
--                            &topo_info, &topo_ids);
-+   x86_topo_ids_from_idx(&topo_info, idx, &topo_ids);
-    return topo_ids.pkg_id % ms->numa_state->num_nodes;
- }
- 
-@@ -190,10 +216,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
- 
-         ms->possible_cpus->cpus[i].type = ms->cpu_type;
-         ms->possible_cpus->cpus[i].vcpus_count = 1;
--        ms->possible_cpus->cpus[i].arch_id =
--            x86_cpu_apic_id_from_index(x86ms, i);
--        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
--                                 &topo_info, &topo_ids);
-+        x86_topo_ids_from_idx(&topo_info, i, &topo_ids);
-         ms->possible_cpus->cpus[i].props.has_socket_id = true;
-         ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
-         if (x86ms->smp_dies > 1) {
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1e4400df7a..9ffaf5e2a0 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3925,6 +3925,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+         .xlevel =3D 0x8000001E,
+         .model_id =3D "AMD EPYC Processor",
+         .cache_info =3D &epyc_cache_info,
++        .use_epyc_apic_id_encoding =3D 1,
+         .versions =3D (X86CPUVersionDefinition[]) {
+             { .version =3D 1 },
+             {
+@@ -4052,6 +4053,7 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+         .xlevel =3D 0x8000001E,
+         .model_id =3D "AMD EPYC-Rome Processor",
+         .cache_info =3D &epyc_rome_cache_info,
++        .use_epyc_apic_id_encoding =3D 1,
+     },
+ };
+=20
 
 
