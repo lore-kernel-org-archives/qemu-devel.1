@@ -2,82 +2,114 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33704C0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B3AC0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:15:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 201BF20739
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:12:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WlGxnEiM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 201BF20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B07E520736
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 20:15:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07E520736
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC7hw-0007IO-4F
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:12:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40031)
+	id 1jC7la-0000ZM-JN
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 16:15:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC7h1-0006kU-AL
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:11:05 -0400
+ (envelope-from <max@m00nbsd.net>) id 1jC7km-0008NN-9o
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jC7gy-0004Qs-Pw
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:11:03 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40774)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jC7gy-0004QU-In; Wed, 11 Mar 2020 16:11:00 -0400
-Received: by mail-io1-xd44.google.com with SMTP id d8so3281516ion.7;
- Wed, 11 Mar 2020 13:11:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WGPUTz38LZ8Yvpkb9MLMc7216znWiN82xnXVfo3G7X4=;
- b=WlGxnEiMSqcKU0aZp3IkL0ctQdyZxGvlpubd0r9cAQwR43NByZgOdFsKI+wWKxTYtO
- ocj9e1w4bIyWTvcS0jckuVG/Kgbbi3ZdGZzr5BkIiTT0hicqhSm7Grxv2/oTU3lC5yjV
- Qy5zkVXr6pR94R0tH2Ezz1msxh7Q0bRCBnd2aaHVh/YJAr5qBXhDS1e2KWWojibEo/yl
- isFHN4zleruQJCDgKkv6kE3L5G6+lwyWEu7ULnwfPtt6YK11RpwMY6urptoT9HKWFHVC
- l4ZtgcgeaNT97JJhSpbpjsTcb2mUYRFXkFo3CmtO0LQG8TH9vkfQNA+7UMdlzs8J7duY
- 0j1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WGPUTz38LZ8Yvpkb9MLMc7216znWiN82xnXVfo3G7X4=;
- b=RL/Q9+9IIrBVhckAaUxnvmDeAtgRFdL+2oBPmGOnQXc5NdW9Ex7/3rzHe/xtW+qfQJ
- sbSv35qQl8vlnwtkPVD3aMkjTjWXPdCnaBzd1unODcwPwzczfWHuCa1BMBEQi/DOlyaR
- eMKwOIKA1jPAfed+2D3WKvnq3L1no6h6S4lQKZ5yk5yaWwG6xCeGmVD/KOOFYY5YU/PG
- l+0xv2cFxto4DoPsBKmQuyl9cqvHoLkFigGOzbP+/tbwC/5AqQvjI3Yhk1Fvtsb9AGnj
- lIfaPrcGpGfZ3Hryol+HKAycfPa2TjPNtB2udUYoazGtr0XSiIo9GlSMeNgGhzDv7Jz+
- NOfA==
-X-Gm-Message-State: ANhLgQ1DF1DGx6yLYSU8Mmm8NBi9ZM2DG2R5rJAlPe1u8+NpEy0lUFNZ
- SVQCXe9q/AQrWU29MvHNf7/1ZEVcaAH/glh9Y2I=
-X-Google-Smtp-Source: ADFU+vvA7DTBfFq0CyqfU+N+/ob3F5dINgNBd6wFthJfxOeOesxryFKFRp8r7ouyTiSPGh24ZXRBuX3ptNilkJ27DzA=
-X-Received: by 2002:a5d:9707:: with SMTP id h7mr4416887iol.112.1583957459732; 
- Wed, 11 Mar 2020 13:10:59 -0700 (PDT)
+ (envelope-from <max@m00nbsd.net>) id 1jC7kl-0006MI-1V
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:55 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:52325)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1jC7kk-0006G6-SC
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 16:14:54 -0400
+Received: from mxplan6.mail.ovh.net (unknown [10.109.138.217])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 2E8F72640E38;
+ Wed, 11 Mar 2020 21:14:45 +0100 (CET)
+Received: from m00nbsd.net (37.59.142.105) by DAG3EX2.mxp6.local (172.16.2.22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Wed, 11 Mar
+ 2020 21:14:44 +0100
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200206115731.13552-1-n54@gmx.com>
+ <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
+ <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
+ <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
+ <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
+ <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
+ <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
+ <85e4202d-91dd-0d31-373a-febe566353ab@m00nbsd.net>
+ <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
+From: Maxime Villard <max@m00nbsd.net>
+Autocrypt: addr=max@m00nbsd.net; keydata=
+ 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
+Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
+Message-ID: <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
+Date: Wed, 11 Mar 2020 21:14:39 +0100
 MIME-Version: 1.0
-References: <20200310213203.18730-1-nieklinnenbank@gmail.com>
- <20200310213203.18730-8-nieklinnenbank@gmail.com> <87k13rgfqe.fsf@linaro.org>
- <CAPan3WrXM=bc33rEndzYeN5-xX7WpR1D5wbVBf8Yx=P3cTx5tA@mail.gmail.com>
- <87fteefykt.fsf@linaro.org>
-In-Reply-To: <87fteefykt.fsf@linaro.org>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Wed, 11 Mar 2020 21:10:48 +0100
-Message-ID: <CAPan3WrqXoWzFU07b1-2N111NNqawyPUAvCuumx5EA6nFpnnFQ@mail.gmail.com>
-Subject: Re: [PATCH v7 07/18] hw/arm/allwinner: add Security Identifier device
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000ba108605a099d55b"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
+In-Reply-To: <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG6EX1.mxp6.local (172.16.2.51) To DAG3EX2.mxp6.local
+ (172.16.2.22)
+X-Ovh-Tracer-GUID: d834a286-354c-4710-b549-8c55129c5230
+X-Ovh-Tracer-Id: 5094697080916086575
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvfedgvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepvfhfhffukfffgggjtgfgihesthekredttddtjeenucfhrhhomhepofgrgihimhgvucggihhllhgrrhguuceomhgrgiesmhdttdhnsghsugdrnhgvtheqnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghniedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrgigsehmtddtnhgsshgurdhnvghtpdhrtghpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtghomh
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.32.125.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,592 +121,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
+ qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
+ philmd@redhat.com, rth <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ba108605a099d55b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Le 11/03/2020 =C3=A0 19:03, Paolo Bonzini a =C3=A9crit=C2=A0:
+> On 10/03/20 20:14, Maxime Villard wrote:
+>> Maybe, whpx_vcpu_kick() causes a WHvRunVpExitReasonCanceled in the
+>> WHvRunVirtualProcessor() call that follows, which in turn causes "ret=3D=
+1"
+>> to leave the loop. That is, maybe the next WHvRunVirtualProcessor() ac=
+ks
+>> the cancellation and leaves without doing anything, even if the
+>> cancellation was received when this function wasn't executing. So ther=
+e is
+>> no bad effect, given that we still end up leaving the loop, which is t=
+he
+>> desired functional behavior.
+>=20
+> Yes, that's exactly the effect, and it solves the race in the same way
+> as KVM's run->immediate_exit flag.
+>=20
+>> Looking at NVMM now, it seems to me there is the same thing. We do a
+>> self-kick but we're the calling thread and know the VCPU isn't executi=
+ng.
+>> As a result of the self-kick the IPI handler sets
+>> 	qcpu->stop =3D true;
+>> And in the next iteration of the loop, we break because this bool is s=
+et
+>=20
+> The problem is that qcpu->stop is checked _before_ entering the
+> hypervisor and not after, so there is a small race window.
 
-On Wed, Mar 11, 2020 at 9:04 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-
->
-> Niek Linnenbank <nieklinnenbank@gmail.com> writes:
->
-> > On Wed, Mar 11, 2020 at 2:53 PM Alex Benn=C3=A9e <alex.bennee@linaro.or=
-g>
-> wrote:
-> >
-> >>
-> >> Niek Linnenbank <nieklinnenbank@gmail.com> writes:
-> >>
-> >> > The Security Identifier device found in various Allwinner System on
-> Chip
-> >> > designs gives applications a per-board unique identifier. This commi=
-t
-> >> > adds support for the Allwinner Security Identifier using a 128-bit
-> >> > UUID value as input.
-> >> >
-> >> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> >> > ---
-> >> >  include/hw/arm/allwinner-h3.h   |   3 +
-> >> >  include/hw/misc/allwinner-sid.h |  60 ++++++++++++
-> >> >  hw/arm/allwinner-h3.c           |  11 ++-
-> >> >  hw/arm/orangepi.c               |   9 ++
-> >> >  hw/misc/allwinner-sid.c         | 168
-> ++++++++++++++++++++++++++++++++
-> >> >  hw/misc/Makefile.objs           |   1 +
-> >> >  hw/misc/trace-events            |   4 +
-> >> >  7 files changed, 255 insertions(+), 1 deletion(-)
-> >> >  create mode 100644 include/hw/misc/allwinner-sid.h
-> >> >  create mode 100644 hw/misc/allwinner-sid.c
-> >> >
-> >> > diff --git a/include/hw/arm/allwinner-h3.h
-> >> b/include/hw/arm/allwinner-h3.h
-> >> > index dc729176ab..85416d9d64 100644
-> >> > --- a/include/hw/arm/allwinner-h3.h
-> >> > +++ b/include/hw/arm/allwinner-h3.h
-> >> > @@ -42,6 +42,7 @@
-> >> >  #include "hw/misc/allwinner-h3-ccu.h"
-> >> >  #include "hw/misc/allwinner-cpucfg.h"
-> >> >  #include "hw/misc/allwinner-h3-sysctrl.h"
-> >> > +#include "hw/misc/allwinner-sid.h"
-> >> >  #include "target/arm/cpu.h"
-> >> >
-> >> >  /**
-> >> > @@ -59,6 +60,7 @@ enum {
-> >> >      AW_H3_SRAM_A2,
-> >> >      AW_H3_SRAM_C,
-> >> >      AW_H3_SYSCTRL,
-> >> > +    AW_H3_SID,
-> >> >      AW_H3_EHCI0,
-> >> >      AW_H3_OHCI0,
-> >> >      AW_H3_EHCI1,
-> >> > @@ -114,6 +116,7 @@ typedef struct AwH3State {
-> >> >      AwH3ClockCtlState ccu;
-> >> >      AwCpuCfgState cpucfg;
-> >> >      AwH3SysCtrlState sysctrl;
-> >> > +    AwSidState sid;
-> >> >      GICState gic;
-> >> >      MemoryRegion sram_a1;
-> >> >      MemoryRegion sram_a2;
-> >> > diff --git a/include/hw/misc/allwinner-sid.h
-> >> b/include/hw/misc/allwinner-sid.h
-> >> > new file mode 100644
-> >> > index 0000000000..4c1fa4762b
-> >> > --- /dev/null
-> >> > +++ b/include/hw/misc/allwinner-sid.h
-> >> > @@ -0,0 +1,60 @@
-> >> > +/*
-> >> > + * Allwinner Security ID emulation
-> >> > + *
-> >> > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-> >> > + *
-> >> > + * This program is free software: you can redistribute it and/or
-> modify
-> >> > + * it under the terms of the GNU General Public License as publishe=
-d
-> by
-> >> > + * the Free Software Foundation, either version 2 of the License, o=
-r
-> >> > + * (at your option) any later version.
-> >> > + *
-> >> > + * This program is distributed in the hope that it will be useful,
-> >> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >> > + * GNU General Public License for more details.
-> >> > + *
-> >> > + * You should have received a copy of the GNU General Public Licens=
-e
-> >> > + * along with this program.  If not, see <
-> http://www.gnu.org/licenses/
-> >> >.
-> >> > + */
-> >> > +
-> >> > +#ifndef HW_MISC_ALLWINNER_SID_H
-> >> > +#define HW_MISC_ALLWINNER_SID_H
-> >> > +
-> >> > +#include "qom/object.h"
-> >> > +#include "hw/sysbus.h"
-> >> > +#include "qemu/uuid.h"
-> >> > +
-> >> > +/**
-> >> > + * Object model
-> >> > + * @{
-> >> > + */
-> >> > +
-> >> > +#define TYPE_AW_SID    "allwinner-sid"
-> >> > +#define AW_SID(obj) \
-> >> > +    OBJECT_CHECK(AwSidState, (obj), TYPE_AW_SID)
-> >> > +
-> >> > +/** @} */
-> >> > +
-> >> > +/**
-> >> > + * Allwinner Security ID object instance state
-> >> > + */
-> >> > +typedef struct AwSidState {
-> >> > +    /*< private >*/
-> >> > +    SysBusDevice parent_obj;
-> >> > +    /*< public >*/
-> >> > +
-> >> > +    /** Maps I/O registers in physical memory */
-> >> > +    MemoryRegion iomem;
-> >> > +
-> >> > +    /** Control register defines how and what to read */
-> >> > +    uint32_t control;
-> >> > +
-> >> > +    /** RdKey register contains the data retrieved by the device */
-> >> > +    uint32_t rdkey;
-> >> > +
-> >> > +    /** Stores the emulated device identifier */
-> >> > +    QemuUUID identifier;
-> >> > +
-> >> > +} AwSidState;
-> >> > +
-> >> > +#endif /* HW_MISC_ALLWINNER_SID_H */
-> >> > diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-> >> > index b9a5597f2a..deeea63f5f 100644
-> >> > --- a/hw/arm/allwinner-h3.c
-> >> > +++ b/hw/arm/allwinner-h3.c
-> >> > @@ -38,6 +38,7 @@ const hwaddr allwinner_h3_memmap[] =3D {
-> >> >      [AW_H3_SRAM_A2]    =3D 0x00044000,
-> >> >      [AW_H3_SRAM_C]     =3D 0x00010000,
-> >> >      [AW_H3_SYSCTRL]    =3D 0x01c00000,
-> >> > +    [AW_H3_SID]        =3D 0x01c14000,
-> >> >      [AW_H3_EHCI0]      =3D 0x01c1a000,
-> >> >      [AW_H3_OHCI0]      =3D 0x01c1a400,
-> >> >      [AW_H3_EHCI1]      =3D 0x01c1b000,
-> >> > @@ -78,7 +79,6 @@ struct AwH3Unimplemented {
-> >> >      { "mmc0",      0x01c0f000, 4 * KiB },
-> >> >      { "mmc1",      0x01c10000, 4 * KiB },
-> >> >      { "mmc2",      0x01c11000, 4 * KiB },
-> >> > -    { "sid",       0x01c14000, 1 * KiB },
-> >> >      { "crypto",    0x01c15000, 4 * KiB },
-> >> >      { "msgbox",    0x01c17000, 4 * KiB },
-> >> >      { "spinlock",  0x01c18000, 4 * KiB },
-> >> > @@ -198,6 +198,11 @@ static void allwinner_h3_init(Object *obj)
-> >> >
-> >> >      sysbus_init_child_obj(obj, "cpucfg", &s->cpucfg,
-> sizeof(s->cpucfg),
-> >> >                            TYPE_AW_CPUCFG);
-> >> > +
-> >> > +    sysbus_init_child_obj(obj, "sid", &s->sid, sizeof(s->sid),
-> >> > +                          TYPE_AW_SID);
-> >> > +    object_property_add_alias(obj, "identifier", OBJECT(&s->sid),
-> >> > +                              "identifier", &error_abort);
-> >> >  }
-> >> >
-> >> >  static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-> >> > @@ -315,6 +320,10 @@ static void allwinner_h3_realize(DeviceState
-> *dev,
-> >> Error **errp)
-> >> >      qdev_init_nofail(DEVICE(&s->cpucfg));
-> >> >      sysbus_mmio_map(SYS_BUS_DEVICE(&s->cpucfg), 0,
-> >> s->memmap[AW_H3_CPUCFG]);
-> >> >
-> >> > +    /* Security Identifier */
-> >> > +    qdev_init_nofail(DEVICE(&s->sid));
-> >> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sid), 0,
-> s->memmap[AW_H3_SID]);
-> >> > +
-> >> >      /* Universal Serial Bus */
-> >> >      sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
-> >> >                           qdev_get_gpio_in(DEVICE(&s->gic),
-> >> > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-> >> > index 3fcec1944e..c92fab3eac 100644
-> >> > --- a/hw/arm/orangepi.c
-> >> > +++ b/hw/arm/orangepi.c
-> >> > @@ -65,6 +65,15 @@ static void orangepi_init(MachineState *machine)
-> >> >      object_property_set_int(OBJECT(h3), 24 * 1000 * 1000,
-> "clk1-freq",
-> >> >                              &error_abort);
-> >> >
-> >> > +    /* Setup SID properties. Currently using a default fixed SID
-> >> identifier. */
-> >> > +    if (qemu_uuid_is_null(&h3->sid.identifier)) {
-> >> > +        qdev_prop_set_string(DEVICE(h3), "identifier",
-> >> > +                             "02c00081-1111-2222-3333-000044556677"=
-);
-> >> > +    } else if (ldl_be_p(&h3->sid.identifier.data[0]) !=3D 0x02c0008=
-1) {
-> >> > +        fprintf(stderr, "WARNING: Security Identifier value does "
-> >> > +                        "not include H3 prefix\n");
-> >> > +    }
-> >> > +
-> >>
-> >> Should this be a LOG_GUEST_ERROR?
-> >>
-> >
-> > Hi Alex,
-> >
-> > This warning is basically to inform the user when overriding the SID
-> > identifier manually with -global,
-> > that the identifier specified by the user does not contain the H3 SoC
-> > prefix. Real hardware always has
-> > that particular prefix in its identifier value, and it might be so that
-> > software running on the emulated hardware
-> > depends on it. So its basically a proactive warning to inform the user,
-> and
-> > not an error of wrong behavior caused by the guest software.
->
-> Ahh in that case I would suggest warn_report instead of a plain printf.
-> That should come out in all the right places but won't error out like
-> error_report.
->
-
-OK, that makes sense. I wasnt' aware of warn_report. Sure, I'll change it
-to use warn_report instead.
-
-Regards,
-Niek
-
-
-> >
-> >
-> >>
-> >> Otherwise:
-> >>
-> >> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >>
-> >
-> > Assuming the above explanation is sufficient, I'll add your review tag,
-> > thanks!
->
-> Using warn_report instead will be fine.
->
-> --
-> Alex Benn=C3=A9e
->
-
-
---=20
-Niek Linnenbank
-
---000000000000ba108605a099d55b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Mar 11, 2020 at 9:04 PM Alex =
-Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linar=
-o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex"><br>
-Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" target=3D"_=
-blank">nieklinnenbank@gmail.com</a>&gt; writes:<br>
-<br>
-&gt; On Wed, Mar 11, 2020 at 2:53 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto=
-:alex.bennee@linaro.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt; w=
-rote:<br>
-&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" ta=
-rget=3D"_blank">nieklinnenbank@gmail.com</a>&gt; writes:<br>
-&gt;&gt;<br>
-&gt;&gt; &gt; The Security Identifier device found in various Allwinner Sys=
-tem on Chip<br>
-&gt;&gt; &gt; designs gives applications a per-board unique identifier. Thi=
-s commit<br>
-&gt;&gt; &gt; adds support for the Allwinner Security Identifier using a 12=
-8-bit<br>
-&gt;&gt; &gt; UUID value as input.<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinn=
-enbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt;&gt; &gt; ---<br>
-&gt;&gt; &gt;=C2=A0 include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0|=C2=A0 =C2=
-=A03 +<br>
-&gt;&gt; &gt;=C2=A0 include/hw/misc/allwinner-sid.h |=C2=A0 60 ++++++++++++=
-<br>
-&gt;&gt; &gt;=C2=A0 hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0|=C2=A0 11 ++-<br>
-&gt;&gt; &gt;=C2=A0 hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A09 ++<br>
-&gt;&gt; &gt;=C2=A0 hw/misc/allwinner-sid.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| 168 ++++++++++++++++++++++++++++++++<br>
-&gt;&gt; &gt;=C2=A0 hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0|=C2=A0 =C2=A01 +<br>
-&gt;&gt; &gt;=C2=A0 hw/misc/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A04 +<br>
-&gt;&gt; &gt;=C2=A0 7 files changed, 255 insertions(+), 1 deletion(-)<br>
-&gt;&gt; &gt;=C2=A0 create mode 100644 include/hw/misc/allwinner-sid.h<br>
-&gt;&gt; &gt;=C2=A0 create mode 100644 hw/misc/allwinner-sid.c<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; diff --git a/include/hw/arm/allwinner-h3.h<br>
-&gt;&gt; b/include/hw/arm/allwinner-h3.h<br>
-&gt;&gt; &gt; index dc729176ab..85416d9d64 100644<br>
-&gt;&gt; &gt; --- a/include/hw/arm/allwinner-h3.h<br>
-&gt;&gt; &gt; +++ b/include/hw/arm/allwinner-h3.h<br>
-&gt;&gt; &gt; @@ -42,6 +42,7 @@<br>
-&gt;&gt; &gt;=C2=A0 #include &quot;hw/misc/allwinner-h3-ccu.h&quot;<br>
-&gt;&gt; &gt;=C2=A0 #include &quot;hw/misc/allwinner-cpucfg.h&quot;<br>
-&gt;&gt; &gt;=C2=A0 #include &quot;hw/misc/allwinner-h3-sysctrl.h&quot;<br>
-&gt;&gt; &gt; +#include &quot;hw/misc/allwinner-sid.h&quot;<br>
-&gt;&gt; &gt;=C2=A0 #include &quot;target/arm/cpu.h&quot;<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt;=C2=A0 /**<br>
-&gt;&gt; &gt; @@ -59,6 +60,7 @@ enum {<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_SRAM_A2,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_SRAM_C,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_SYSCTRL,<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 AW_H3_SID,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_EHCI0,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_OHCI0,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AW_H3_EHCI1,<br>
-&gt;&gt; &gt; @@ -114,6 +116,7 @@ typedef struct AwH3State {<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AwH3ClockCtlState ccu;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AwCpuCfgState cpucfg;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 AwH3SysCtrlState sysctrl;<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 AwSidState sid;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 GICState gic;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 MemoryRegion sram_a1;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 MemoryRegion sram_a2;<br>
-&gt;&gt; &gt; diff --git a/include/hw/misc/allwinner-sid.h<br>
-&gt;&gt; b/include/hw/misc/allwinner-sid.h<br>
-&gt;&gt; &gt; new file mode 100644<br>
-&gt;&gt; &gt; index 0000000000..4c1fa4762b<br>
-&gt;&gt; &gt; --- /dev/null<br>
-&gt;&gt; &gt; +++ b/include/hw/misc/allwinner-sid.h<br>
-&gt;&gt; &gt; @@ -0,0 +1,60 @@<br>
-&gt;&gt; &gt; +/*<br>
-&gt;&gt; &gt; + * Allwinner Security ID emulation<br>
-&gt;&gt; &gt; + *<br>
-&gt;&gt; &gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:=
-nieklinnenbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt=
-;<br>
-&gt;&gt; &gt; + *<br>
-&gt;&gt; &gt; + * This program is free software: you can redistribute it an=
-d/or modify<br>
-&gt;&gt; &gt; + * it under the terms of the GNU General Public License as p=
-ublished by<br>
-&gt;&gt; &gt; + * the Free Software Foundation, either version 2 of the Lic=
-ense, or<br>
-&gt;&gt; &gt; + * (at your option) any later version.<br>
-&gt;&gt; &gt; + *<br>
-&gt;&gt; &gt; + * This program is distributed in the hope that it will be u=
-seful,<br>
-&gt;&gt; &gt; + * but WITHOUT ANY WARRANTY; without even the implied warran=
-ty of<br>
-&gt;&gt; &gt; + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=
-=A0 See the<br>
-&gt;&gt; &gt; + * GNU General Public License for more details.<br>
-&gt;&gt; &gt; + *<br>
-&gt;&gt; &gt; + * You should have received a copy of the GNU General Public=
- License<br>
-&gt;&gt; &gt; + * along with this program.=C2=A0 If not, see &lt;<a href=3D=
-"http://www.gnu.org/licenses/" rel=3D"noreferrer" target=3D"_blank">http://=
-www.gnu.org/licenses/</a><br>
-&gt;&gt; &gt;.<br>
-&gt;&gt; &gt; + */<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +#ifndef HW_MISC_ALLWINNER_SID_H<br>
-&gt;&gt; &gt; +#define HW_MISC_ALLWINNER_SID_H<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +#include &quot;qom/object.h&quot;<br>
-&gt;&gt; &gt; +#include &quot;hw/sysbus.h&quot;<br>
-&gt;&gt; &gt; +#include &quot;qemu/uuid.h&quot;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +/**<br>
-&gt;&gt; &gt; + * Object model<br>
-&gt;&gt; &gt; + * @{<br>
-&gt;&gt; &gt; + */<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +#define TYPE_AW_SID=C2=A0 =C2=A0 &quot;allwinner-sid&quot;<b=
-r>
-&gt;&gt; &gt; +#define AW_SID(obj) \<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 OBJECT_CHECK(AwSidState, (obj), TYPE_AW_SID)<b=
-r>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +/** @} */<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +/**<br>
-&gt;&gt; &gt; + * Allwinner Security ID object instance state<br>
-&gt;&gt; &gt; + */<br>
-&gt;&gt; &gt; +typedef struct AwSidState {<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /*&lt; private &gt;*/<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 SysBusDevice parent_obj;<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /*&lt; public &gt;*/<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /** Maps I/O registers in physical memory */<b=
-r>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 MemoryRegion iomem;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /** Control register defines how and what to r=
-ead */<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 uint32_t control;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /** RdKey register contains the data retrieved=
- by the device */<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 uint32_t rdkey;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /** Stores the emulated device identifier */<b=
-r>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 QemuUUID identifier;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +} AwSidState;<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +#endif /* HW_MISC_ALLWINNER_SID_H */<br>
-&gt;&gt; &gt; diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c<br=
->
-&gt;&gt; &gt; index b9a5597f2a..deeea63f5f 100644<br>
-&gt;&gt; &gt; --- a/hw/arm/allwinner-h3.c<br>
-&gt;&gt; &gt; +++ b/hw/arm/allwinner-h3.c<br>
-&gt;&gt; &gt; @@ -38,6 +38,7 @@ const hwaddr allwinner_h3_memmap[] =3D {<br=
->
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_SRAM_A2]=C2=A0 =C2=A0 =3D 0x000440=
-00,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_SRAM_C]=C2=A0 =C2=A0 =C2=A0=3D 0x0=
-0010000,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_SYSCTRL]=C2=A0 =C2=A0 =3D 0x01c000=
-00,<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 [AW_H3_SID]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0=
-1c14000,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_EHCI0]=C2=A0 =C2=A0 =C2=A0 =3D 0x0=
-1c1a000,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_OHCI0]=C2=A0 =C2=A0 =C2=A0 =3D 0x0=
-1c1a400,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 [AW_H3_EHCI1]=C2=A0 =C2=A0 =C2=A0 =3D 0x0=
-1c1b000,<br>
-&gt;&gt; &gt; @@ -78,7 +79,6 @@ struct AwH3Unimplemented {<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;mmc0&quot;,=C2=A0 =C2=A0 =C2=A0 0=
-x01c0f000, 4 * KiB },<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;mmc1&quot;,=C2=A0 =C2=A0 =C2=A0 0=
-x01c10000, 4 * KiB },<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;mmc2&quot;,=C2=A0 =C2=A0 =C2=A0 0=
-x01c11000, 4 * KiB },<br>
-&gt;&gt; &gt; -=C2=A0 =C2=A0 { &quot;sid&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=A00=
-x01c14000, 1 * KiB },<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;crypto&quot;,=C2=A0 =C2=A0 0x01c1=
-5000, 4 * KiB },<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;msgbox&quot;,=C2=A0 =C2=A0 0x01c1=
-7000, 4 * KiB },<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 { &quot;spinlock&quot;,=C2=A0 0x01c18000,=
- 4 * KiB },<br>
-&gt;&gt; &gt; @@ -198,6 +198,11 @@ static void allwinner_h3_init(Object *ob=
-j)<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 sysbus_init_child_obj(obj, &quot;cpucfg&q=
-uot;, &amp;s-&gt;cpucfg, sizeof(s-&gt;cpucfg),<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE_AW_CPUCFG);<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 sysbus_init_child_obj(obj, &quot;sid&quot;, &a=
-mp;s-&gt;sid, sizeof(s-&gt;sid),<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE_AW_SID);<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 object_property_add_alias(obj, &quot;identifie=
-r&quot;, OBJECT(&amp;s-&gt;sid),<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;identifier&quot;, &amp;=
-error_abort);<br>
-&gt;&gt; &gt;=C2=A0 }<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt;=C2=A0 static void allwinner_h3_realize(DeviceState *dev, Erro=
-r **errp)<br>
-&gt;&gt; &gt; @@ -315,6 +320,10 @@ static void allwinner_h3_realize(DeviceS=
-tate *dev,<br>
-&gt;&gt; Error **errp)<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 qdev_init_nofail(DEVICE(&amp;s-&gt;cpucfg=
-));<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt=
-;cpucfg), 0,<br>
-&gt;&gt; s-&gt;memmap[AW_H3_CPUCFG]);<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /* Security Identifier */<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(&amp;s-&gt;sid));<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;sid)=
-, 0, s-&gt;memmap[AW_H3_SID]);<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 /* Universal Serial Bus */<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 sysbus_create_simple(TYPE_AW_H3_EHCI, s-&=
-gt;memmap[AW_H3_EHCI0],<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_get_gpio_in(DEVICE(&amp;s-&gt;gic),=
-<br>
-&gt;&gt; &gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
-&gt;&gt; &gt; index 3fcec1944e..c92fab3eac 100644<br>
-&gt;&gt; &gt; --- a/hw/arm/orangepi.c<br>
-&gt;&gt; &gt; +++ b/hw/arm/orangepi.c<br>
-&gt;&gt; &gt; @@ -65,6 +65,15 @@ static void orangepi_init(MachineState *ma=
-chine)<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 object_property_set_int(OBJECT(h3), 24 * =
-1000 * 1000, &quot;clk1-freq&quot;,<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_abort);<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 /* Setup SID properties. Currently using a def=
-ault fixed SID<br>
-&gt;&gt; identifier. */<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 if (qemu_uuid_is_null(&amp;h3-&gt;sid.identifi=
-er)) {<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_string(DEVICE(h3),=
- &quot;identifier&quot;,<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;02c00081-1111-2222-3333-=
-000044556677&quot;);<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 } else if (ldl_be_p(&amp;h3-&gt;sid.identifier=
-.data[0]) !=3D 0x02c00081) {<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;WARNING: S=
-ecurity Identifier value does &quot;<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 &quot;not include H3 prefix\n&quot;);<br>
-&gt;&gt; &gt; +=C2=A0 =C2=A0 }<br>
-&gt;&gt; &gt; +<br>
-&gt;&gt;<br>
-&gt;&gt; Should this be a LOG_GUEST_ERROR?<br>
-&gt;&gt;<br>
-&gt;<br>
-&gt; Hi Alex,<br>
-&gt;<br>
-&gt; This warning is basically to inform the user when overriding the SID<b=
-r>
-&gt; identifier manually with -global,<br>
-&gt; that the identifier specified by the user does not contain the H3 SoC<=
-br>
-&gt; prefix. Real hardware always has<br>
-&gt; that particular prefix in its identifier value, and it might be so tha=
-t<br>
-&gt; software running on the emulated hardware<br>
-&gt; depends on it. So its basically a proactive warning to inform the user=
-, and<br>
-&gt; not an error of wrong behavior caused by the guest software.<br>
-<br>
-Ahh in that case I would suggest warn_report instead of a plain printf.<br>
-That should come out in all the right places but won&#39;t error out like<b=
-r>
-error_report.<br></blockquote><div><br></div><div>OK, that makes sense. I w=
-asnt&#39; aware of warn_report. Sure, I&#39;ll change it to use warn_report=
- instead.<br></div><div>=C2=A0</div><div>Regards,</div><div>Niek<br></div><=
-div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
- 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt;<br>
-&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; Otherwise:<br>
-&gt;&gt;<br>
-&gt;&gt; Reviewed-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@li=
-naro.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
-&gt;&gt;<br>
-&gt;<br>
-&gt; Assuming the above explanation is sufficient, I&#39;ll add your review=
- tag,<br>
-&gt; thanks!<br>
-<br>
-Using warn_report instead will be fine.<br>
-<br>
--- <br>
-Alex Benn=C3=A9e<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---000000000000ba108605a099d55b--
+Ok. I don't understand what's supposed to be the race here. If we get an
+IPI between the check and the call to nvmm_vcpu_run() then we'll just do
+one run and stop in the next iteration, because the IPI will have set
+qcpu->stop. Is this extra iteration undesired?
 
