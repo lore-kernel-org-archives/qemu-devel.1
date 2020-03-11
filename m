@@ -2,52 +2,109 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64126C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B709C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B269208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:36:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B269208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBA7F20848
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 10:47:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tfgtx57J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA7F20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jByij-0004M1-F0
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:36:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43655)
+	id 1jBytL-0000Wk-42
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 06:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48113)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jBydC-0002zs-K9
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jBysk-0008U3-5M
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jBydB-0001Zp-0c
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:30:30 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33074)
+ (envelope-from <mreitz@redhat.com>) id 1jBysi-0003GV-L4
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:46:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27682
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jByd3-0001Ro-Hu; Wed, 11 Mar 2020 06:30:21 -0400
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1jBycx-0005cJ-TW; Wed, 11 Mar 2020 13:30:16 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 2/9] block/block-copy: fix progress calculation
-Date: Wed, 11 Mar 2020 13:29:57 +0300
-Message-Id: <20200311103004.7649-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200311103004.7649-1-vsementsov@virtuozzo.com>
-References: <20200311103004.7649-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jBysi-0003Fu-Da
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 06:46:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583923591;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=LAyzrN3aeTMVNnXZmXRdlrX4iGkmLYWyAgpIEqxgmoI=;
+ b=Tfgtx57Jk30WBmAqnStYnbzSe0R10cXsGVg2BgKDAHsK6NWVjzPtsSi2ki8D5iyAX75OWI
+ CsoR8xXBIp+uQhpCGc4xkLDTYq1oZsFIybiKCTM1XAq8qax2EfMsNPONR3joAx/xuXPLz4
+ mC+J4tDD4mRxXNGDpBU7vHTAjWSEra0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-T7Qp4QooNauBO9Y7IsnlPw-1; Wed, 11 Mar 2020 06:46:29 -0400
+X-MC-Unique: T7Qp4QooNauBO9Y7IsnlPw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39564800D54;
+ Wed, 11 Mar 2020 10:46:28 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-216.ams2.redhat.com
+ [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD9D25D9C9;
+ Wed, 11 Mar 2020 10:46:25 +0000 (UTC)
+Subject: Re: [PATCH 2/3] block/file-posix: consider file size when fallback to
+ max_align
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200130152218.7600-1-vsementsov@virtuozzo.com>
+ <20200130152218.7600-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1924575b-22d6-8ab7-c38b-4bb8dd10181f@redhat.com>
+Date: Wed, 11 Mar 2020 11:46:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20200130152218.7600-3-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="L1Z9oEXCecp5fwZzFiSePy6lBakbZShvK"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,200 +116,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, andrey.shinkevich@virtuozzo.com,
- jsnow@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Assume we have two regions, A and B, and region B is in-flight now,
-region A is not yet touched, but it is unallocated and should be
-skipped.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--L1Z9oEXCecp5fwZzFiSePy6lBakbZShvK
+Content-Type: multipart/mixed; boundary="Q3rqbGIM0BxwsuRAaEfW1zOiXlIQNAqzN"
 
-Correspondingly, as progress we have
+--Q3rqbGIM0BxwsuRAaEfW1zOiXlIQNAqzN
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-  total = A + B
-  current = 0
+On 30.01.20 16:22, Vladimir Sementsov-Ogievskiy wrote:
+> If we failed to probe request_align, we fallback to max_align. But
+> this is wrong, if file size is not aligned to our max_align. Let's
+> instead chose alignment so that file size is a multiple of it.
 
-If we reset unallocated region A and call progress_reset_callback,
-it will calculate 0 bytes dirty in the bitmap and call
-job_progress_set_remaining, which will set
+It=92s entirely possible that the file size is not aligned to the request
+alignment, though.  If so, this patch will make the whole file inaccessible=
+.
 
-   total = current + 0 = 0 + 0 = 0
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/file-posix.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 7f366046c2..e9c4e509f6 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -385,11 +385,25 @@ static void raw_probe_alignment(BlockDriverState *b=
+s, int fd, Error **errp)
+>              align =3D alignments[i];
+>              if (raw_is_io_aligned(fd, buf, align)) {
+>                  /* Fallback to safe value. */
+> -                bs->bl.request_alignment =3D (align !=3D 1) ? align : ma=
+x_align;
+> +                bs->bl.request_alignment =3D align;
 
-So, B bytes are actually removed from total accounting. When job
-finishes we'll have
+The comment above is now outdated.
 
-   total = 0
-   current = B
+Max
 
-, which doesn't sound good.
+>                  break;
+>              }
+>          }
+>          qemu_vfree(buf);
+> +
+> +        if (bs->bl.request_alignment =3D=3D 1) {
+> +            /*
+> +             * Succeed to read with alignment =3D 1. But it may be unall=
+ocated
+> +             * area on XFS, and we'll fail later if keep request_alignme=
+nt =3D 1.
+> +             *
+> +             * Chose safer alignment, keeping in mind file size if possi=
+ble.
+> +             */
+> +
+> +            int64_t len =3D raw_getlength_fd(bs, fd);
+> +
+> +            bs->bl.request_alignment =3D
+> +                    len <=3D 0 ? max_align : MIN(max_align, len & ~(len =
+- 1));
+> +        }
+>      }
+> =20
+>      if (!s->buf_align) {
+>=20
 
-This is because we didn't considered in-flight bytes, actually when
-calculating remaining, we should have set (in_flight + dirty_bytes)
-as remaining, not only dirty_bytes.
 
-To fix it, let's refactor progress calculation, moving it to block-copy
-itself instead of fixing callback. And, of course, track in_flight
-bytes count.
 
-We still have to keep one callback, to maintain backup job bytes_read
-calculation, but it will go on soon, when we turn the whole backup
-process into one block_copy call.
+--Q3rqbGIM0BxwsuRAaEfW1zOiXlIQNAqzN--
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- include/block/block-copy.h | 15 +++++----------
- block/backup.c             | 13 ++-----------
- block/block-copy.c         | 16 ++++++++++++----
- 3 files changed, 19 insertions(+), 25 deletions(-)
+--L1Z9oEXCecp5fwZzFiSePy6lBakbZShvK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 0a161724d7..9def00068c 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -26,7 +26,6 @@ typedef struct BlockCopyInFlightReq {
- } BlockCopyInFlightReq;
- 
- typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
--typedef void (*ProgressResetCallbackFunc)(void *opaque);
- typedef struct BlockCopyState {
-     /*
-      * BdrvChild objects are not owned or managed by block-copy. They are
-@@ -36,6 +35,7 @@ typedef struct BlockCopyState {
-     BdrvChild *source;
-     BdrvChild *target;
-     BdrvDirtyBitmap *copy_bitmap;
-+    int64_t in_flight_bytes;
-     int64_t cluster_size;
-     bool use_copy_range;
-     int64_t copy_size;
-@@ -60,15 +60,9 @@ typedef struct BlockCopyState {
-      */
-     bool skip_unallocated;
- 
-+    ProgressMeter *progress;
-     /* progress_bytes_callback: called when some copying progress is done. */
-     ProgressBytesCallbackFunc progress_bytes_callback;
--
--    /*
--     * progress_reset_callback: called when some bytes reset from copy_bitmap
--     * (see @skip_unallocated above). The callee is assumed to recalculate how
--     * many bytes remain based on the dirty bit count of copy_bitmap.
--     */
--    ProgressResetCallbackFunc progress_reset_callback;
-     void *progress_opaque;
- 
-     SharedResource *mem;
-@@ -79,12 +73,13 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-                                      BdrvRequestFlags write_flags,
-                                      Error **errp);
- 
--void block_copy_set_callbacks(
-+void block_copy_set_progress_callback(
-         BlockCopyState *s,
-         ProgressBytesCallbackFunc progress_bytes_callback,
--        ProgressResetCallbackFunc progress_reset_callback,
-         void *progress_opaque);
- 
-+void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm);
-+
- void block_copy_state_free(BlockCopyState *s);
- 
- int64_t block_copy_reset_unallocated(BlockCopyState *s,
-diff --git a/block/backup.c b/block/backup.c
-index 1383e219f5..8694e0394b 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -57,15 +57,6 @@ static void backup_progress_bytes_callback(int64_t bytes, void *opaque)
-     BackupBlockJob *s = opaque;
- 
-     s->bytes_read += bytes;
--    job_progress_update(&s->common.job, bytes);
--}
--
--static void backup_progress_reset_callback(void *opaque)
--{
--    BackupBlockJob *s = opaque;
--    uint64_t estimate = bdrv_get_dirty_count(s->bcs->copy_bitmap);
--
--    job_progress_set_remaining(&s->common.job, estimate);
- }
- 
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-@@ -464,8 +455,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->cluster_size = cluster_size;
-     job->len = len;
- 
--    block_copy_set_callbacks(bcs, backup_progress_bytes_callback,
--                             backup_progress_reset_callback, job);
-+    block_copy_set_progress_callback(bcs, backup_progress_bytes_callback, job);
-+    block_copy_set_progress_meter(bcs, &job->common.job.progress);
- 
-     /* Required permissions are already taken by backup-top target */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 79798a1567..e2d7b3b887 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -127,17 +127,20 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-     return s;
- }
- 
--void block_copy_set_callbacks(
-+void block_copy_set_progress_callback(
-         BlockCopyState *s,
-         ProgressBytesCallbackFunc progress_bytes_callback,
--        ProgressResetCallbackFunc progress_reset_callback,
-         void *progress_opaque)
- {
-     s->progress_bytes_callback = progress_bytes_callback;
--    s->progress_reset_callback = progress_reset_callback;
-     s->progress_opaque = progress_opaque;
- }
- 
-+void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
-+{
-+    s->progress = pm;
-+}
-+
- /*
-  * block_copy_do_copy
-  *
-@@ -269,7 +272,9 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
- 
-     if (!ret) {
-         bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
--        s->progress_reset_callback(s->progress_opaque);
-+        progress_set_remaining(s->progress,
-+                               bdrv_get_dirty_count(s->copy_bitmap) +
-+                               s->in_flight_bytes);
-     }
- 
-     *count = bytes;
-@@ -331,15 +336,18 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         trace_block_copy_process(s, start);
- 
-         bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-+        s->in_flight_bytes += chunk_end - start;
- 
-         co_get_from_shres(s->mem, chunk_end - start);
-         ret = block_copy_do_copy(s, start, chunk_end, error_is_read);
-         co_put_to_shres(s->mem, chunk_end - start);
-+        s->in_flight_bytes -= chunk_end - start;
-         if (ret < 0) {
-             bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-             break;
-         }
- 
-+        progress_work_done(s->progress, chunk_end - start);
-         s->progress_bytes_callback(chunk_end - start, s->progress_opaque);
-         start = chunk_end;
-         ret = 0;
--- 
-2.21.0
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5owYAACgkQ9AfbAGHV
+z0AdMgf8CGsKhOZZED+o4THxV58+sXZpXYY7imMvpjkQPKcSgE6qRQiinQHXQnpw
+bUhioR6v/Ivm3Q0+VJJM3lJYSp9wPZgjndJw0U3S1pYVQ3xLxGkaT9fmm3PAYACb
+K1uDTPJ57hnjcCubPUK/RQz0odoogx1nEvAC6CDLmbsQJNl2zBRbD9pbty+MHYiO
+XLkTzsWWpczDU10ddqK2HvLT6Oz+a9uzONkm51jER/cRSswClbLJud20Ov1KASI3
+EHPv1NhQgGaifTmgTUQz9jl4Np4fi/FhKMk3SW414kup7Qe+qvWuGyv/0eowxmDr
+CvuhIoFT4bZdARlIeUCd/39/GfVUyw==
+=Xhsj
+-----END PGP SIGNATURE-----
+
+--L1Z9oEXCecp5fwZzFiSePy6lBakbZShvK--
 
 
