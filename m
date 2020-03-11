@@ -2,63 +2,56 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC70C10F25
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A0DC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4C25208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:04:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gIgUMutf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C25208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 16224208C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 05:08:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16224208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBtY1-0001X8-M6
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 01:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56974)
+	id 1jBtbz-0004DK-Mb
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 01:08:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jBtXD-00011e-EN
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:04:00 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtal-0002XN-3b
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:07:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jBtXB-0001mn-IV
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:03:59 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:60021 helo=ozlabs.org)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jBtai-0007y9-TK
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 01:07:38 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57058)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jBtXB-0001aY-4z; Wed, 11 Mar 2020 01:03:57 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48cfxg22yzz9sPk; Wed, 11 Mar 2020 16:03:51 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583903031;
- bh=k6CnEYuTU51Ggb6MOf6AUCJmMA6Xw9yN1elNkzxobmo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gIgUMutfdPkVqzF/tQ5pTj9F39CNOWB6aZBr9TydPtMLMtfSiG6Sy5FUk7S0802LM
- OYl0jFoOh2UQesCf1ieH6JBjWDyw4hNMzwFXTpVrBft8iYdsVE1a1cBH2D/ZsnfcBW
- DAnV3AvnVDpF8796angUhU8yAXM/UulEc+7B3Ae4=
-Date: Wed, 11 Mar 2020 16:03:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: Program counter stuck at 0xFFFFFFFC when emulating e5500
- processor on T4240-RDB board
-Message-ID: <20200311050346.GZ660117@umbus.fritz.box>
-References: <CAM2K0npCdHfCeMCKO9TX_ifQGDZFFNyMEKH2qByYL9SnXnaPmw@mail.gmail.com>
- <838be9cf-2d3c-f807-7f1d-6a50f95a5228@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jBtai-0007tD-Dw; Wed, 11 Mar 2020 01:07:36 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07499221|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.03378-0.000359325-0.965861;
+ FP=1650948229378442837|1|1|1|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com;
+ NM=1; PH=DS; RN=10; RT=10; SR=0; TI=SMTPD_---.GzWPNs6_1583903247; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GzWPNs6_1583903247)
+ by smtp.aliyun-inc.com(10.147.44.118);
+ Wed, 11 Mar 2020 13:07:28 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v4 00/60] target/riscv: support vector extension v0.7.1
+Date: Wed, 11 Mar 2020 13:06:19 +0800
+Message-Id: <20200311050719.15141-1-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UNifc18z8z6e1QHx"
-Content-Disposition: inline
-In-Reply-To: <838be9cf-2d3c-f807-7f1d-6a50f95a5228@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,100 +63,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wayne Li <waynli329@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patchset implements the vector extension for RISC-V on QEMU.
 
---UNifc18z8z6e1QHx
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You can also find the patchset and all *test cases* in
+my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v3).
+All the test cases are in the directory qemu/tests/riscv/vector/. They are
+riscv64 linux user mode programs.
 
-On Thu, Feb 20, 2020 at 09:44:13AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Hello,
->=20
-> On 2/20/20 6:40 AM, Wayne Li wrote:
-> > Dear QEMU list members,
->=20
-> No subject: it is unlikely your question get noticed...
->=20
-> Also you didn't Cc'ed the people who might help you (doing that for you):
->=20
-> ./scripts/get_maintainer.pl -f target/ppc/cpu-models.c
-> David Gibson <david@gibson.dropbear.id.au> (maintainer:PowerPC TCG CPUs)
-> qemu-ppc@nongnu.org (open list:PowerPC TCG CPUs)
-> qemu-devel@nongnu.org (open list:All patches CC here)
+You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
 
-Right.  Unfortunately the embedded cpu support is barely maintained,
-so there's only a little bit of help I can give.
+Features:
+  * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
+  * support basic vector extension.
+  * support Zvlsseg.
+  * support Zvamo.
+  * not support Zvediv as it is changing.
+  * SLEN always equals VLEN.
+  * element width support 8bit, 16bit, 32bit, 64bit.
 
-> > This will kind of be a repost but I'd like to post my question again
-> > because I've gained some more knowledge that makes me feel that my
-> > question would be easier to answer.=A0 So we developed a custom-made QE=
-MU
-> > VM that emulates a custom machine that has an e5500 processor.=A0 I'm
-> > running this VM on a T4240-RDB board which has an e6500 processor and
-> > I'm trying to get the VM running with KVM enabled.=A0 The problem I'm
-> > having is the program counter refuses to increment at all.=A0 It just
-> > stays at the address 0xFFFFFFFC.=A0 On a run without KVM enabled, the VM
-> > will also start executing at this same address but the program counter
-> > beings to increment immediately.=A0 I know this is a custom QEMU VM and
-> > maybe some of the startup stuff we do could be causing problems, but
-> > what could possibly stop the program counter from incrementing
-> > altogether?
-> >=20
-> > Also, I do have another side question.=A0 When running with KVM enabled=
-, I
-> > see the kernel-level ioctl call KVM_RUN running and then returning over
-> > and over again (by the way before the VM kinda grinds to a halt I only
-> > see QEMU make the KVM_RUN call twice, but the kernel-level ioctl
-> > function is being called over and over again for some reason).=A0 And e=
-ach
-> > time the KVM_RUN call returns, the return-from-interrupt takes the VM to
-> > the address 0xFFFFFFFC.=A0 What is the KVM_RUN ioctl call used for?=A0 =
-Why
-> > is it being called over and over again?=A0 Maybe if I understood this
-> > better I'd be able to figure out what's stopping my program counter from
-> > incrementing.
+Changelog:
+v4
+  * no change
+v3
+  * move check code from execution-time to translation-time
+  * use a continous memory block for vector register description.
+  * vector registers as direct fields in RISCVCPUState.
+  * support VLEN configure from qemu command line.
+  * support ELEN configure from qemu command line.
+  * support vector specification version configure from qemu command line.
+  * probe pages before real load or store access.
+  * use probe_page_check for no-fault operations in linux user mode.
+  * generation atomic exit exception when in parallel environment.
+  * fixup a lot of concrete bugs.
 
-I don't really know if KVM even attempts to support e5500 cpus.  We'd
-need to at least know what your host kernel is and what KVM variant it
-is using.  What's the instruction at 0xfffffffc which seems not to be
-handled here properly?  It sounds like you might be getting some sort
-of rolling trap, because KVM isn't handling that instruction correctly.
+V2
+  * use float16_compare{_quiet}
+  * only use GETPC() in outer most helper
+  * add ctx.ext_v Property
 
-The KVM_RUN is what causes KVM to actual enter the guest and execute
-instructions.  It returns when something triggers a guest exit - a
-trap or various other events can do this.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+LIU Zhiwei (60):
+  target/riscv: add vector extension field in CPURISCVState
+  target/riscv: implementation-defined constant parameters
+  target/riscv: support vector extension csr
+  target/riscv: add vector configure instruction
+  target/riscv: add vector stride load and store instructions
+  target/riscv: add vector index load and store instructions
+  target/riscv: add fault-only-first unit stride load
+  target/riscv: add vector amo operations
+  target/riscv: vector single-width integer add and subtract
+  target/riscv: vector widening integer add and subtract
+  target/riscv: vector integer add-with-carry / subtract-with-borrow
+    instructions
+  target/riscv: vector bitwise logical instructions
+  target/riscv: vector single-width bit shift instructions
+  target/riscv: vector narrowing integer right shift instructions
+  target/riscv: vector integer comparison instructions
+  target/riscv: vector integer min/max instructions
+  target/riscv: vector single-width integer multiply instructions
+  target/riscv: vector integer divide instructions
+  target/riscv: vector widening integer multiply instructions
+  target/riscv: vector single-width integer multiply-add instructions
+  target/riscv: vector widening integer multiply-add instructions
+  target/riscv: vector integer merge and move instructions
+  target/riscv: vector single-width saturating add and subtract
+  target/riscv: vector single-width averaging add and subtract
+  target/riscv: vector single-width fractional multiply with rounding
+    and saturation
+  target/riscv: vector widening saturating scaled multiply-add
+  target/riscv: vector single-width scaling shift instructions
+  target/riscv: vector narrowing fixed-point clip instructions
+  target/riscv: vector single-width floating-point add/subtract
+    instructions
+  target/riscv: vector widening floating-point add/subtract instructions
+  target/riscv: vector single-width floating-point multiply/divide
+    instructions
+  target/riscv: vector widening floating-point multiply
+  target/riscv: vector single-width floating-point fused multiply-add
+    instructions
+  target/riscv: vector widening floating-point fused multiply-add
+    instructions
+  target/riscv: vector floating-point square-root instruction
+  target/riscv: vector floating-point min/max instructions
+  target/riscv: vector floating-point sign-injection instructions
+  target/riscv: vector floating-point compare instructions
+  target/riscv: vector floating-point classify instructions
+  target/riscv: vector floating-point merge instructions
+  target/riscv: vector floating-point/integer type-convert instructions
+  target/riscv: widening floating-point/integer type-convert
+    instructions
+  target/riscv: narrowing floating-point/integer type-convert
+    instructions
+  target/riscv: vector single-width integer reduction instructions
+  target/riscv: vector wideing integer reduction instructions
+  target/riscv: vector single-width floating-point reduction
+    instructions
+  target/riscv: vector widening floating-point reduction instructions
+  target/riscv: vector mask-register logical instructions
+  target/riscv: vector mask population count vmpopc
+  target/riscv: vmfirst find-first-set mask bit
+  target/riscv: set-X-first mask bit
+  target/riscv: vector iota instruction
+  target/riscv: vector element index instruction
+  target/riscv: integer extract instruction
+  target/riscv: integer scalar move instruction
+  target/riscv: floating-point scalar move instructions
+  target/riscv: vector slide instructions
+  target/riscv: vector register gather instruction
+  target/riscv: vector compress instruction
+  target/riscv: configure and turn on vector extension from command line
 
---UNifc18z8z6e1QHx
-Content-Type: application/pgp-signature; name="signature.asc"
+ target/riscv/Makefile.objs              |    2 +-
+ target/riscv/cpu.c                      |   49 +
+ target/riscv/cpu.h                      |   89 +-
+ target/riscv/cpu_bits.h                 |   15 +
+ target/riscv/csr.c                      |   75 +-
+ target/riscv/helper.h                   | 1075 +++++
+ target/riscv/insn32-64.decode           |   11 +
+ target/riscv/insn32.decode              |  366 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 2386 ++++++++++++
+ target/riscv/translate.c                |   24 +-
+ target/riscv/vector_helper.c            | 4745 +++++++++++++++++++++++
+ 11 files changed, 8824 insertions(+), 13 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+ create mode 100644 target/riscv/vector_helper.c
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.23.0
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5ocTIACgkQbDjKyiDZ
-s5J97A//TaDPrFZNBz/HipR3NS86e1Ly5coZ2TS57+nfLgYt9Cu5nVKDxhs+p3qX
-0Qp4aNQ84EPbvZ572oETZACDNCCQjg5dMFR6SighiJos4NJjFiK+WqQ6ESZf6KWy
-TRhi/H3xckcCEZEcE+CRGiplZ6NB74VqLq08ru44FtSYltJ9a47dj/OZMTPHj93I
-voB5uTZ56BEgxYMDy5hrm7FNRecPGy/RLak8mcypxaKJG2xCtTVYUqDXxEyGWj7Z
-xQfggR/Sb5nUesLzBZ4RVagyOynDTvdbhbcS1B2hhBH4iuvx6C2+BKGMejhEC9Vl
-ivVsu+lLUT5FKz4iDuoaevZUENwdH09Fvzjay+qANLwl9PM0wF6SIZuSNObXUJaU
-MflFXe+9H3EwiGLX99rM9M8NfR6aaW+IdGWkPB/HCNf3Igp9wxd9UG1VIksocsdG
-S3mp9O8EEpn0e5P5q7J+LWU9NEej00eo/Z/FnBkHqOYij04SEMgUTVh1pDKd96w4
-Y8QO5x/W91t107hkilEbz7SNLGCLIep+JORkXcvH3puHr4At4Ej4/FY3hCGc27lm
-P+Vhu7hIl6fvpylq/Isn2/VQe0L9Onh2TInjEwZygn5aG7IiNwEekVK7fSMOjZ0x
-rXB86j5gjaFc8HxfZttC2t1mKzJDOm2+8B9rf8lZo3/2KDIR24c=
-=vsI4
------END PGP SIGNATURE-----
-
---UNifc18z8z6e1QHx--
 
