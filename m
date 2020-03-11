@@ -1,90 +1,83 @@
 Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDD1C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC4AC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5736B2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:53:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C6412146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXlRkfb5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5736B2146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpL24qL/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C6412146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC0rb-0003S7-I1
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:53:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49892)
+	id 1jC0ua-0004jU-I9
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jC0r0-00033J-7G
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:52:55 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jC0tx-0004B4-JN
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jC0qy-0003oL-RR
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:52:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53722
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1jC0tw-0002Cl-71
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:55:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31013
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jC0qy-0003nq-KQ
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:52:52 -0400
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jC0tw-0002BI-3N
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:55:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583931171;
+ s=mimecast20190719; t=1583931355;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N985ATgBdgYMsbfgyxenchAdHFv5CHfRN1M7N2DMhSw=;
- b=BXlRkfb5v81UF9g3LLKaJb/JEKE0qqY5ulvzAWHyoUUziuWjjTbnVh45E9/scuyDWw+HNP
- dpFQx7pL0m1rdVTyyte94DnuAvGi0WtgZXk7+s7QnoZtZhVVb3GaMo7xtssmVTHWGztBnF
- wkUxFzZXIJZgf4lH6brF5AOdK8p/MyA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-w3GsJRNGMrmP6Nj-Pozgbg-1; Wed, 11 Mar 2020 08:52:48 -0400
-X-MC-Unique: w3GsJRNGMrmP6Nj-Pozgbg-1
-Received: by mail-ed1-f72.google.com with SMTP id ck15so1765620edb.6
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 05:52:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1w5IoF3s0+h3QQNTvXQshUYFeWsO2hMd7d7CFxL3wng=;
- b=eVme5uv1zbYCaxi4C9Z5LlQ6hrQKASQhbJMbm7fRPa1qOyobTKUHlmPFtMwU/tviyL
- emdTONBB3T7wkhtKE99S091WpJKCtR2qQY8dSS4kz79pJioU5TaGrK9uwNhcrVYpP42e
- emzL3Z4u0zOl66U3E6C4Q+R3pn5oXDde0XRCoEnysJG+8VPLC0TVxpDyntSNbH1P8FJb
- FhwsPVntUKywxcnmWPDuSW0l7qeqYUJTFBAv2iqdQUNaSyFFA6eELn0Hhx1Jt+MpnSep
- I68evkRHCfOLfSf93RPxujymNoXubiXD1dIc0rxsG476mptsgGtHIR8JDbmVGcraTUmA
- sOow==
-X-Gm-Message-State: ANhLgQ2qnuuMYfscixdWXyYtSfRnNmn3MJrtJbvcIs+MQw4tjhIxu9wl
- gCJV9dT3+DKX2Y0qWEKyqwGPdQFcSFzaeedZ3MluDiF6DlPLpgeLr/4+TEEvnMFQDVCpFidruwO
- aqtjL5tF63OVyC0u0vzKfwehYnwNuwb4=
-X-Received: by 2002:a17:906:70c9:: with SMTP id
- g9mr2228520ejk.243.1583931167562; 
- Wed, 11 Mar 2020 05:52:47 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtbKyR4ESpoaM+6Qa4ocSqnLsqqCKaActQ7+X+Ph0scfQHh2WiZ/AWq2R/q4rQHvcnFcHoZ2YD9x8Z8B9P2vww=
-X-Received: by 2002:a17:906:70c9:: with SMTP id
- g9mr2228507ejk.243.1583931167342; 
- Wed, 11 Mar 2020 05:52:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200311123624.277221-1-stefanha@redhat.com>
-In-Reply-To: <20200311123624.277221-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Mar 2020 13:52:35 +0100
-Message-ID: <CABgObfat-zQziF1EoJTjCO6zJBEYu074PZUCQOrgpeuC2uzFuw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] thread: add lock guard macros
-To: Stefan Hajnoczi <stefanha@redhat.com>
+ bh=f2YBxrNItJzCtGmaCYxp7rYRIESZbi7Ci/p0Cqj/Wb8=;
+ b=CpL24qL/19Z+iXPswQM5B4wb8GrnuBSF+VETRpQovqJBoChtZRX38v9YSxvJaZatUu0Kn+
+ +UWXxMmToqEZUzk+rZx4mLG1CGY7FO31spD8ySpSWy4Cv9vurkDuSgzj612wziu1ENXqTv
+ a50beayMC06Q7IVnnEheGd6rJfHXwpE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-eQhWnAwCNd-CGQ6PfdXtzA-1; Wed, 11 Mar 2020 08:55:53 -0400
+X-MC-Unique: eQhWnAwCNd-CGQ6PfdXtzA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07531100726A;
+ Wed, 11 Mar 2020 12:55:53 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D31F828981;
+ Wed, 11 Mar 2020 12:55:50 +0000 (UTC)
+Message-ID: <3c174977e2e28ec31d3e6e9980ba1f4be93a54f2.camel@redhat.com>
+Subject: Re: [PATCH v2 02/14] qcrypto/luks: implement encryption key management
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 11 Mar 2020 14:55:49 +0200
+In-Reply-To: <d24c41cc125f3d9295dc40825878ef7fc62c289e.camel@redhat.com>
+References: <20200308151903.25941-1-mlevitsk@redhat.com>
+ <20200308151903.25941-3-mlevitsk@redhat.com>
+ <704e841b-a5e1-2bea-0a1f-1b6fe1058a17@redhat.com>
+ <5f1390648d98ac52928985185522cb58f1bc7253.camel@redhat.com>
+ <20200310115926.GC6926@linux.fritz.box>
+ <d24c41cc125f3d9295dc40825878ef7fc62c289e.camel@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000094165f05a093b65b"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,100 +89,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000094165f05a093b65b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, 2020-03-10 at 14:02 +0200, Maxim Levitsky wrote:
+> On Tue, 2020-03-10 at 12:59 +0100, Kevin Wolf wrote:
+> > Am 10.03.2020 um 12:05 hat Maxim Levitsky geschrieben:
+> > > On Tue, 2020-03-10 at 11:58 +0100, Max Reitz wrote:
+> > > > On 08.03.20 16:18, Maxim Levitsky wrote:
+> > > > > Next few patches will expose that functionality
+> > > > > to the user.
+> > > > >=20
+> > > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > > ---
+> > > > >  crypto/block-luks.c | 398 ++++++++++++++++++++++++++++++++++++++=
++++++-
+> > > > >  qapi/crypto.json    |  61 ++++++-
+> > > > >  2 files changed, 455 insertions(+), 4 deletions(-)
+> > > >=20
+> > > > [...]
+> > > >=20
+> > > > > +##
+> > > > > +# @QCryptoBlockAmendOptionsLUKS:
+> > > > > +#
+> > > > > +# This struct defines the update parameters that activate/de-act=
+ivate set
+> > > > > +# of keyslots
+> > > > > +#
+> > > > > +# @state: the desired state of the keyslots
+> > > > > +#
+> > > > > +# @new-secret:    The ID of a QCryptoSecret object providing the=
+ password to be
+> > > > > +#                 written into added active keyslots
+> > > > > +#
+> > > > > +# @old-secret:    Optional (for deactivation only)
+> > > > > +#                 If given will deactive all keyslots that
+> > > > > +#                 match password located in QCryptoSecret with t=
+his ID
+> > > > > +#
+> > > > > +# @iter-time:     Optional (for activation only)
+> > > > > +#                 Number of milliseconds to spend in
+> > > > > +#                 PBKDF passphrase processing for the newly acti=
+vated keyslot.
+> > > > > +#                 Currently defaults to 2000.
+> > > > > +#
+> > > > > +# @keyslot:       Optional. ID of the keyslot to activate/deacti=
+vate.
+> > > > > +#                 For keyslot activation, keyslot should not be =
+active already
+> > > > > +#                 (this is unsafe to update an active keyslot),
+> > > > > +#                 but possible if 'force' parameter is given.
+> > > > > +#                 If keyslot is not given, first free keyslot wi=
+ll be written.
+> > > > > +#
+> > > > > +#                 For keyslot deactivation, this parameter speci=
+fies the exact
+> > > > > +#                 keyslot to deactivate
+> > > > > +#
+> > > > > +# @unlock-secret: Optional. The ID of a QCryptoSecret object pro=
+viding the
+> > > > > +#                 password to use to retrive current master key.
+> > > > > +#                 Defaults to the same secret that was used to o=
+pen the image
+> > > >=20
+> > > > So this matches Markus=E2=80=99 proposal except everything is flatt=
+ened (because
+> > > > we don=E2=80=99t support nested unions, AFAIU).  Sounds OK to me.  =
+The only
+> > > > difference is @unlock-secret, which did not appear in his proposal.=
+  Why
+> > > > do we need it again?
+> > >=20
+> > > That a little undocumented hack that will disappear one day.
+> >=20
+> > It is very much documented (just a few lines above this one), and even
+> > if it weren't documented, that wouldn't make it an unstable ABI.
+> >=20
+> > If you don't want to make it to become stable ABI, you either need to
+> > drop it or it needs an x- prefix, and its documentation should specify
+> > what prevents it from being a stable ABI.
+> >=20
+> > > Its because the driver currently doesn't keep a copy of the master ke=
+y,
+> > > and instead only keeps ciper objects, often from outside libraries,
+> > > and in theory these objects might even be implemented in hardware so =
+that
+> > > master key might be not in memory at all, so I kind of don't want yet
+> > > to keep it in memory.
+> > > Thus when doing the key management, I need to retrieve the master key=
+ again,
+> > > similar to how it is done on image opening. I use the same secret as =
+was used for opening,
+> > > but in case the keys were changed already, that secret might not work=
+ anymore.
+> > > Thus I added this parameter to specify basically the old password, wh=
+ich is reasonable
+> > > when updating passwords.
+> > > I usually omit this hack in the discussions as it is orthogonal to th=
+e rest of the API.
+> >=20
+> > How will this requirement disappear one day?
+>=20
+> If I cave in and keep a copy of the master key in the memory :-)
+>=20
+> Best regards,
+> =09Maxim Levitsky
+>=20
+> >=20
+> > Kevin
+>=20
+>=20
+OK folks, besides this hack (which I can remove if you insist, although I d=
+on't
+think it matters), what else should I do to move forward to get this accept=
+ed?
 
-Il mer 11 mar 2020, 13:38 Stefan Hajnoczi <stefanha@redhat.com> ha scritto:
-
-> Lock guards automatically call qemu_(rec_)mutex_unlock() when returning
-> from a
-> function or leaving leaving a lexical scope.  This simplifies code and
-> eliminates leaks (especially in error code paths).
->
-> This series adds lock guards for QemuMutex and QemuRecMutex.  It does not
-> convert the entire tree but includes example conversions.
->
-
-Thanks for picking this up! It should be possible to use QemuLockable to
-introduce a single set of lock guard macros that work for mutexes,
-spinlocks and CoMutexes. Would you look into that?
-
-(C++ also has unique_lock, a kind of lock guard that can be unlocked early
-and won't cause a double unlock, and also can be created unlocked. However
-it makes sense to not implement that unless one has a killer application of
-it in the tree).
-
-Paolo
-
-
-> Stefan Hajnoczi (2):
->   thread: add QemuRecMutex lock guards
->   thread: add QemuMutex lock guards
->
->  include/qemu/thread.h | 52 +++++++++++++++++++++++++++++++++++++++++++
->  plugins/core.c        |  6 ++---
->  plugins/loader.c      | 15 ++++++-------
->  util/qemu-timer.c     | 22 +++++++++---------
->  4 files changed, 71 insertions(+), 24 deletions(-)
->
-> --
-> 2.24.1
->
->
-
---00000000000094165f05a093b65b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il mer 11 mar 2020, 13:38 Stefan Hajnoczi &lt;<a href=
-=3D"mailto:stefanha@redhat.com">stefanha@redhat.com</a>&gt; ha scritto:<br>=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex">Lock guards automatically call qemu_(r=
-ec_)mutex_unlock() when returning from a<br>
-function or leaving leaving a lexical scope.=C2=A0 This simplifies code and=
-<br>
-eliminates leaks (especially in error code paths).<br>
-<br>
-This series adds lock guards for QemuMutex and QemuRecMutex.=C2=A0 It does =
-not<br>
-convert the entire tree but includes example conversions.<br></blockquote><=
-/div></div><div dir=3D"auto"><br></div><div dir=3D"auto">Thanks for picking=
- this up! It should be possible to use QemuLockable to introduce a single s=
-et of lock guard macros that work for mutexes, spinlocks and CoMutexes. Wou=
-ld you look into that?</div><div dir=3D"auto"><br></div><div dir=3D"auto">(=
-C++ also has unique_lock, a kind of lock guard that can be unlocked early a=
-nd won&#39;t cause a double unlock, and also can be created unlocked. Howev=
-er it makes sense to not implement that unless one has a killer application=
- of it in the tree).</div><div dir=3D"auto"><br></div><div dir=3D"auto">Pao=
-lo</div><div dir=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_q=
-uote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex">
-<br>
-Stefan Hajnoczi (2):<br>
-=C2=A0 thread: add QemuRecMutex lock guards<br>
-=C2=A0 thread: add QemuMutex lock guards<br>
-<br>
-=C2=A0include/qemu/thread.h | 52 ++++++++++++++++++++++++++++++++++++++++++=
-+<br>
-=C2=A0plugins/core.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 6 ++---<br>
-=C2=A0plugins/loader.c=C2=A0 =C2=A0 =C2=A0 | 15 ++++++-------<br>
-=C2=A0util/qemu-timer.c=C2=A0 =C2=A0 =C2=A0| 22 +++++++++---------<br>
-=C2=A04 files changed, 71 insertions(+), 24 deletions(-)<br>
-<br>
--- <br>
-2.24.1<br>
-<br>
-</blockquote></div></div></div>
-
---00000000000094165f05a093b65b--
+Best regards,
+=09Maxim Levitsky
 
 
