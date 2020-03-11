@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 545D8C10F29
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A776C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D4602192A
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4602192A
+	by mail.kernel.org (Postfix) with ESMTPS id 6305921D56
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6305921D56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBxKV-00063E-DU
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:07:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44285)
+	id 1jBxLU-0007pY-J1
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBxJU-0004mu-KI
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:05 -0400
+ (envelope-from <bounces@canonical.com>) id 1jBxJb-0004uG-Vy
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBxJS-0003TT-Dr
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50280)
+ (envelope-from <bounces@canonical.com>) id 1jBxJV-0003Xl-O1
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50412)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBxJS-0003S4-84
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:02 -0400
+ id 1jBxJV-0003Vf-Gv
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBxJR-0008WK-1O
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:01 +0000
+ id 1jBxJU-00009C-GD
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F28BE2E80D0
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:00 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 758962E80C7
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:04 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Mar 2020 08:51:01 -0000
+Date: Wed, 11 Mar 2020 08:52:15 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -58,7 +58,7 @@ X-Launchpad-Bug-Reporter: tstrike (tstrike34)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158391666121.26092.3081469104681067044.malone@gac.canonical.com>
+Message-Id: <158391673566.11731.5730699102491344137.malone@wampee.canonical.com>
 Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -66,7 +66,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: aa28d0a9e4d317329d834cffed8415dd51d7d9ef
+X-Launchpad-Hash: fe884fcce8f990061719a13fc4c9d3bfff774b0e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,17 +84,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Copied here from the other bug about the system setup that is in use:
+@tstrike - can you trigger the same issue with all your guests?
+You list Windows and Centos guests, does it triggers with Centos as well or=
+ only the Windows guests?
+Also if you have a chance (just to be sure) does it trigger with an Ubuntu =
+guest as well? This would help for people retrying not using a case that do=
+esn't even trigger in your setup.
 
-L0 DistroRelease: Ubuntu 20.04 on Kernel Linux 5.4.0-14-generic x86_64
-L1 3 guests Windows 10, Centos 8
-No L2s
-No guests are enabled for UEFI Boot
+@tstrike - you seem to hit this while starting your guest through libvirt.
+Could you please attach your guest XML so that we can try to recreate this =
+case?
+  $ virsh dumpxml <guestname>
+That will help when trying to recreate your case.
 
-libvirt: 6.0.0-0ubuntu4
-qemu 1:4.2-3ubuntu1
+@tstrike
+It would also be helpful to get your qemu commandline as well as any furthe=
+r messages qemu might have reported.
+You'll find that in the per guest log file at:
+ $ cat /var/log/libvirt/qemu/<guestname>.log
 
-Issue triggers without nesting (ensured via modprobe kvm_intel nested=3D)
+If you could report all that here that should be useful for everyone
+tracking this bug.
+
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Incomplete
 
 -- =
 
