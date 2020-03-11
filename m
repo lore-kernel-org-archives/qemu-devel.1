@@ -2,95 +2,98 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1155C4CECE
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2624C0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:54:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA0D20749
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9016920749
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 22:54:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="by+/9n9I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA0D20749
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ucYQXrpA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9016920749
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCAEs-0008Qk-Lt
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:54:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35806)
+	id 1jCAFS-0000qk-Ko
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 18:54:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1jCADb-0006Uu-1C
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:52:54 -0400
+ (envelope-from <Babu.Moger@amd.com>) id 1jCAEG-0007ZI-Dq
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1jCADZ-0003vS-7q
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:52:50 -0400
-Received: from mail-eopbgr750079.outbound.protection.outlook.com
- ([40.107.75.79]:18145 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (envelope-from <Babu.Moger@amd.com>) id 1jCAEF-0005Ez-B5
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:53:32 -0400
+Received: from mail-mw2nam10on2053.outbound.protection.outlook.com
+ ([40.107.94.53]:15297 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jCADY-0003tc-Th
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:52:49 -0400
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1jCAEF-0005DB-3I
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 18:53:31 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RQc8sMvuthwdgJzkLUmipbp+JK0Lx9k/eIUsUrkQcH/lLl+kco2kFl84E/ULTeIEQyXSyE/3m+W3D8vm5QyrACv8mslQr2HwZPCHWepj/6m79Di07Y4xsT9RX1tSaSlbt1ZmZQp5yAsK5eZsikc5HkYnS5nQNiCyE1TC4Z0Tgd/M62XM8cc71rdDuEwYKu3Gm6m701dxL3OvCNrkrDED6vgiUx6t+cZnCuOFuIILlsL5zNmrL1aHk2ydk40HFbid6B1JAe/yU8eu4B2CPYukYDdjb91vtWJi+a/YESMdx8X4esI1zSDkS0IbsOjlGypVkEfGnyRA/7IB0U3S6UCbmw==
+ b=i97Cb0r1Giya38r+/H7NoSxyieRQTecRqTZ7qFyONm8U80FMEat4yzH0I1SsLjPtHefvcirnnPu2Jc7dbrnF+IJLvmE0hEQEzpzEklGBjpei+XsDAF4dscbyLR6qnrYOFjVhR+2sxkKidkgNhHVR6QpE0VqLgTY67kpc9oKCfUJ1ZrqWResgQaDq+q6H0EaOSM7w8Ary7w8mLzTpCRgAkyq5Yk551gAqkkxFsSexDtP3eoEMUjKxNh4XpYPxHoe37vw6qtGIM1S4W5TebGHyvn52OZGAO2+RXX5uX+M+6pDsmzOm/v/US+ji1XEyvXc3EGP7xiXzMoCBvjQZat4+hA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UUK/y7PzQ204Pw1EOR4hfKTiskRopBRTaK8mGxA2Iro=;
- b=CtqzeMSaAZ/TW4tPZCwarYbQjwdwnlK20afshk0Ql84B++Mf4gAD6U0nHeaLwWyQlymO3dHoW2fzA/euuxDhp5aHMHmPqyhKRuBnZiNaWTBElvJFQanoKUxrSBua2NS/5jrESkWFdNR7xQ5hVm9Zqb8ofM3s6BQAH8x1SvkMYxLPMnpCur3ovz8/Wz5iTX+ligbX6xoZP5VqRt6syyEA34KVU/t38KUR+i1I+BAB/cb3mLdkNq+vkb7xXh26FK4LttnYEbEitljT9yROWBU9vlQIs5P7evQxTEnOItZf81jIDYtv8aTz9Hn6u+M7quV2p6NWEHOfLxpFfgS+IYhIpg==
+ bh=63ptB0mKqDmSMUHMoADzA/hAHfnxKvcuZJ9bKTT+BsA=;
+ b=G2pmTDz+hl3fFUQWrftX+AuNgyx/fs5DPGXCM91M9dRJDZVEowbvBgDWzdu3lhiV6RMYO+BxtKWcDIXzKOJih9vQ/FbOFlpOaK+BDIRzyPtxPLH64iDvoFjp8DEUfVMQJamF++5LR+YsU1RfSBeaLZKiMn4VamZ8j0eZyDO+RugLZAvHmy1BBe9GMtBttSI0vfHhzZExF0a69giec4ZWphbtfuxSTpwMSaWAqc7gP2hJZKZM1lv8rWLo9IQGr0+y9Jw06T1fFF8CUvEPkIgg/XR+bwGnqt/8Cr5oVxjtNcRTmXBt6KVUuoXwSJubT0a/VTUGf1rM+EoYB5I0puupkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UUK/y7PzQ204Pw1EOR4hfKTiskRopBRTaK8mGxA2Iro=;
- b=by+/9n9I1HLZ7SKpKKLRqpuW7WM2mgZCuIwQjimDqrXgRLrJ3xNIIPUCLfPftlo3mpahr6ZfIpkzufV9WpPMLzGws83HLOkfo1+6eFPvo0xCVYVOUIGx89qPIiRMI5+weoP6iRrbXFMveVAhYI4dv/EfN4JFwsSATa6lK5bgw44=
+ bh=63ptB0mKqDmSMUHMoADzA/hAHfnxKvcuZJ9bKTT+BsA=;
+ b=ucYQXrpAcX7ebeccrwa4EFsrxxnUUeB+pGG7+Uq+hCaGUIWHgyI/vZYhqaKeY1KSNMFScwC49JrA50y8LTpY/kpTkzGjWlIYmSccytzFyWILqVNSipL8J5mcHmNfZV8K1B8UK4WD5ZBcnN3So1+2WvGTOr1EpTJ4lC+yVYMbytQ=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Babu.Moger@amd.com; 
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
  by SN1PR12MB2349.namprd12.prod.outlook.com (2603:10b6:802:2a::13)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.17; Wed, 11 Mar
- 2020 22:52:47 +0000
+ 2020 22:53:29 +0000
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2793.013; Wed, 11 Mar 2020
- 22:52:47 +0000
-Subject: [PATCH v7 00/13] APIC ID fixes for AMD EPYC CPU model
+ 22:53:29 +0000
+Subject: [PATCH v7 06/13] hw/i386: Rename apicid_from_topo_ids to
+ x86_apicid_from_topo_ids
 From: Babu Moger <babu.moger@amd.com>
 To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
  rth@twiddle.net, mst@redhat.com, imammedo@redhat.com
-Date: Wed, 11 Mar 2020 17:52:45 -0500
-Message-ID: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
+Date: Wed, 11 Mar 2020 17:53:27 -0500
+Message-ID: <158396720748.58170.5335409429390890145.stgit@naples-babu.amd.com>
+In-Reply-To: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
+References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
 User-Agent: StGit/unknown-version
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: DM5PR21CA0023.namprd21.prod.outlook.com
- (2603:10b6:3:ac::33) To SN1PR12MB2560.namprd12.prod.outlook.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR11CA0055.namprd11.prod.outlook.com
+ (2603:10b6:5:14c::32) To SN1PR12MB2560.namprd12.prod.outlook.com
  (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from naples-babu.amd.com (165.204.78.2) by
- DM5PR21CA0023.namprd21.prod.outlook.com (2603:10b6:3:ac::33) with Microsoft
+ DM6PR11CA0055.namprd11.prod.outlook.com (2603:10b6:5:14c::32) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2835.4 via Frontend Transport; Wed, 11 Mar 2020 22:52:46 +0000
+ 15.20.2793.17 via Frontend Transport; Wed, 11 Mar 2020 22:53:28 +0000
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d7dec6f9-8cb7-431c-a39a-08d7c60eeb08
+X-MS-Office365-Filtering-Correlation-Id: 25591e6d-bd03-476e-1511-08d7c60f03ee
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2349:|SN1PR12MB2349:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2349AE8765D9534EE1AA5C3995FC0@SN1PR12MB2349.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB234909686633BA5314D4BAE195FC0@SN1PR12MB2349.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:534;
 X-Forefront-PRVS: 0339F89554
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(199004)(44832011)(478600001)(55016002)(5660300002)(956004)(966005)(81166006)(8676002)(7696005)(81156014)(86362001)(103116003)(4326008)(52116002)(16526019)(186003)(66556008)(66946007)(316002)(8936002)(2906002)(66476007)(26005);
+ SFS:(10009020)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(199004)(44832011)(478600001)(55016002)(5660300002)(956004)(81166006)(8676002)(7696005)(81156014)(86362001)(103116003)(4326008)(52116002)(16526019)(186003)(66556008)(66946007)(316002)(8936002)(2906002)(66476007)(26005);
  DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2349;
  H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; A:1; 
@@ -98,18 +101,18 @@ Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /9b+mpMx6+GGQv3LK+7KOWzXVswB3Ze9vlvPt1Aqpkf7IRtrgLipUO5ofSBQ4v1bGCTwObui6GYurDAR//CDuxV6urPQx0FaUuH+87pQmN2y8J85RWICwIp5LXGiIYqSX2qtchseEDAMrSx11qrvCX30/pYyOBO55/tZdKrTiHCOFh2cPS2bqcdnmFHMi1pYc3Ke5PDEiN7vyVlUlrvmr+4s/OQv2EBQzKL8S9MZUek9eTNHuOyjOyliuXzzDfgvgsQ+g70pjbWI8QXhk1UFe0C/nWOjcwncJSWfgyHT96XtFkKc2Cv0KAdRtaCAnIiCFgI7aaQnCLGhJun9ekNRPdbx3ec3CD3xIpt5gOYSSA/zTEONQDDs7YN2rAJJIvNi+2XTxqDev3hotyKv2OZ8AtJ/CROPxMDempePsf+tTaLjE4PYeQkKIKIlyEr8ymR566SFaAVRBbsqm6KbLRVi9Jgmu9qxvW7UjN05xto4EoSlDsizCYoCZDszE8xBMzLU+Bm9EUAJ3fkWXruX4x5Sbg==
-X-MS-Exchange-AntiSpam-MessageData: hb4hczUsVaE1+5bVzDizhuiB/FxyV8sKs612RE9XnQFzhwqMwAq7Som1qQbd5si/z/m9+8sBP0T4wxthUztl3OwJALl12XyY1EGumymiBvYC1IKxueoyGQvOBbcpyuJt2r9FY0I9JBcs3J8fB/Siyg==
+X-Microsoft-Antispam-Message-Info: XEMZkGBmF3pU1muxKRBbRsLlN5FzqhRZF/qNEOPjWfXlKizCynPn2MWjHGohF/hztc5x4nsn1DRdP6xU1p4T+FEurBCQOHAjqGbuwTp9PiTXFIz/1HmUZ6c+J1QmC6K1VAhBxGQtwQhwmHwmfaFshjuE3aNXIqEh0sXoXeDIg1voxL+0ObjLgxbIwllLGHg2O9mJe9+ssKDkc5q8to8Ss3Is5lRR0HG8e2vRXqLdF341rczVTk+qjSDoXrrUKAoBgH7P3aoA2jrMR3iTZDvHD9lqSIr+SWnVJU8Hz4Y4GVJO8fDkQrQNrZ9in3rg060vqXgwFBpwePOiuroQr2rCSQhZWC5QTZ50SIxxsl3flhi1YkApJJ+/CGscze5s92oizkN9Uqsy0RPDb4o9Ph6/oVeTKuybgXCnjFKkb8mrVx8mQuT2EEtP+GaA/2iA/hMs
+X-MS-Exchange-AntiSpam-MessageData: GBp2OOP7N2x5gvhR8mmfO5jXeStin2pk6frR7/38Mm3aGMhNC7W9M6MEwhfAxXtQgVgy1iHVNyydZg5c2zkIlVXFR3/lzCsODeOeA2Yvh8TrCgLZb5iFs677owTLH7DBZRBNamsnw3AFQS2M/xsQSA==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7dec6f9-8cb7-431c-a39a-08d7c60eeb08
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 22:52:47.2697 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25591e6d-bd03-476e-1511-08d7c60f03ee
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2020 22:53:29.0337 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z6IfAy3oxdaUwhFR+rDrVrYbJy/vsCDNFpfOxvEHg0ECi3CoZTtDYh/5GsdzMPmn
+X-MS-Exchange-CrossTenant-UserPrincipalName: fMJrCpMtISLZfTrSXpUWbT6IdJiMJ0KfSbpeuNSCt89sYwGTtpKuC52tsxWK7LfK
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2349
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.75.79
+X-Received-From: 40.107.94.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,174 +129,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fixes APIC ID encoding problem reported on AMD EPYC cpu models.
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1728166
+For consistency rename apicid_from_topo_ids to x86_apicid_from_topo_ids.
+No functional change.
 
-Currently, the APIC ID is decoded based on the sequence
-sockets->dies->cores->threads. This works for most standard AMD and other
-vendors' configurations, but this decoding sequence does not follow that of
-AMD's APIC ID enumeration strictly. In some cases this can cause CPU topolo=
-gy
-inconsistency.  When booting a guest VM, the kernel tries to validate the
-topology, and finds it inconsistent with the enumeration of EPYC cpu models=
-.
-
-To fix the problem we need to build the topology as per the Processor
-Programming Reference (PPR) for AMD Family 17h Model 01h, Revision B1
-Processors. The documentation is available from the bugzilla Link below.
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D206537
-
-Here is the text from the PPR.
-Operating systems are expected to use Core::X86::Cpuid::SizeId[ApicIdSize],=
- the
-number of least significant bits in the Initial APIC ID that indicate core =
-ID
-within a processor, in constructing per-core CPUID masks.
-Core::X86::Cpuid::SizeId[ApicIdSize] determines the maximum number of cores
-(MNC) that the processor could theoretically support, not the actual number=
- of
-cores that are actually implemented or enabled on the processor, as indicat=
-ed
-by Core::X86::Cpuid::SizeId[NC].
-Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
-=E2=80=A2 ApicId[6] =3D Socket ID.
-=E2=80=A2 ApicId[5:4] =3D Node ID.
-=E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
-=E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} : {1'b0,Logi=
-calCoreID[1:0]}
-
-v7:
- Generated the patches on top of git://github.com/ehabkost/qemu.git (x86-ne=
-xt).
- Changes from v6.
- 1. Added new function x86_set_epyc_topo_handlers to override the apic id
-    encoding handlers.
- 2. Separated the code to set use_epyc_apic_id_encoding and added as a new =
-patch
-    as it looked more logical.
- 3. Fixed minor typos.
-
-v6:
- https://lore.kernel.org/qemu-devel/158389385028.22020.7608244627303132902.=
-stgit@naples-babu.amd.com/
- Generated the patches on top of git://github.com/ehabkost/qemu.git (x86-ne=
-xt).
- Changes from v5.
- 1. Eduardo has already queued couple of patches, submitting the rest here.
- 2. Major change is how the EPYC mode apic id encoding handlers are loaded.
-    Added a boolean variable use_epyc_apic_id_encoding in X86CPUDefinition.=
-=20
-    The variable is will be used to tell if we need to use EPYC mode encodi=
-ng.
- 3. Eduardo reported bysectability problem with x86 unit test code.
-    Quashed the patches in 1 and 2 to resolve it. Problem was change in cal=
-ling
-    conventions of topology related functions.
- 4. Also set the use_epyc_apic_id_encoding for EPYC-Rome. This model is
-    added recently to the cpu table.
-
-v5:
- https://lore.kernel.org/qemu-devel/158326531474.40452.11433722850425537745=
-.stgit@naples-babu.amd.com/
- Generated the patches on top of git://github.com/ehabkost/qemu.git (x86-ne=
-xt).
- Changes from v4.
- 1. Re-arranged the patches 2 and 4 as suggested by Igor.
- 2. Kept the apicid handler functions inside X86MachineState as discussed.
-    These handlers are loaded from X86CPUDefinitions.
- 3. Removed unnecessary X86CPUstate initialization from x86_cpu_new. Sugges=
-ted
-    by Igor.
- 4. And other minor changes related to patch format.
-
-v4:
- https://lore.kernel.org/qemu-devel/158161767653.48948.10578064482878399556=
-.stgit@naples-babu.amd.com/
- Changes from v3.
- 1. Moved the arch_id calculation inside the function x86_cpus_init. With t=
-his change,
-    we dont need to change common numa code.(suggested by Igor)
- 2. Introduced the model specific handlers inside X86CPUDefinitions.
-    These handlers are loaded into X86MachineState during the init.
- 3. Removed llc_id from x86CPU.
- 4. Removed init_apicid_fn hanlder from MachineClass. Kept all the code cha=
-nges
-    inside the x86.
- 5. Added new handler function apicid_pkg_offset for pkg_offset calculation=
-.
- 6. And some Other minor changes.
-
-v3:
-  https://lore.kernel.org/qemu-devel/157541968844.46157.1799491814253379131=
-3.stgit@naples-babu.amd.com/=20
-  1. Consolidated the topology information in structure X86CPUTopoInfo.
-  2. Changed the ccx_id to llc_id as commented by upstream.
-  3. Generalized the apic id decoding. It is mostly similar to current apic=
- id
-     except that it adds new field llc_id when numa configured. Removes all=
- the
-     hardcoded values.
-  4. Removed the earlier parse_numa split. And moved the numa node initiali=
-zation
-     inside the numa_complete_configuration. This is bit cleaner as comment=
-ed by=20
-     Eduardo.
-  5. Added new function init_apicid_fn inside machine_class structure. This
-     will be used to update the apic id handler specific to cpu model.
-  6. Updated the cpuid unit tests.
-  7. TODO : Need to figure out how to dynamically update the handlers using=
- cpu models.
-     I might some guidance on that.
-
-v2:
-  https://lore.kernel.org/qemu-devel/156779689013.21957.1631551572950676212=
-.stgit@localhost.localdomain/
-  1. Introduced the new property epyc to enable new epyc mode.
-  2. Separated the epyc mode and non epyc mode function.
-  3. Introduced function pointers in PCMachineState to handle the
-     differences.
-  4. Mildly tested different combinations to make things are working as exp=
-ected.
-  5. TODO : Setting the epyc feature bit needs to be worked out. This featu=
-re is
-     supported only on AMD EPYC models. I may need some guidance on that.
-
-v1:
-  https://lore.kernel.org/qemu-devel/20190731232032.51786-1-babu.moger@amd.=
-com/
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
+ hw/i386/pc.c               |    2 +-
+ include/hw/i386/topology.h |    6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Babu Moger (13):
-      hw/i386: Introduce X86CPUTopoInfo to contain topology info
-      hw/i386: Consolidate topology functions
-      machine: Add SMP Sockets in CpuTopology
-      hw/i386: Remove unnecessary initialization in x86_cpu_new
-      hw/i386: Update structures to save the number of nodes per package
-      hw/i386: Rename apicid_from_topo_ids to x86_apicid_from_topo_ids
-      hw/386: Add EPYC mode topology decoding functions
-      target/i386: Cleanup and use the EPYC mode topology functions
-      hw/i386: Introduce apicid functions inside X86MachineState
-      i386: Introduce use_epyc_apic_id_encoding in X86CPUDefinition
-      hw/i386: Move arch_id decode inside x86_cpus_init
-      target/i386: Enable new apic id encoding for EPYC based cpus models
-      i386: Fix pkg_id offset for EPYC cpu models
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index ee89fcd1c3..98ee763f68 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1580,7 +1580,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+         topo_ids.die_id = cpu->die_id;
+         topo_ids.core_id = cpu->core_id;
+         topo_ids.smt_id = cpu->thread_id;
+-        cpu->apic_id = apicid_from_topo_ids(&topo_info, &topo_ids);
++        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
+     }
+ 
+     cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+index 04f01e2a09..b9593b9905 100644
+--- a/include/hw/i386/topology.h
++++ b/include/hw/i386/topology.h
+@@ -112,8 +112,8 @@ static inline unsigned apicid_pkg_offset(X86CPUTopoInfo *topo_info)
+  *
+  * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
+  */
+-static inline apic_id_t apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
+-                                             const X86CPUTopoIDs *topo_ids)
++static inline apic_id_t x86_apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
++                                                 const X86CPUTopoIDs *topo_ids)
+ {
+     return (topo_ids->pkg_id  << apicid_pkg_offset(topo_info)) |
+            (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+@@ -165,7 +165,7 @@ static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
+ {
+     X86CPUTopoIDs topo_ids;
+     x86_topo_ids_from_idx(topo_info, cpu_index, &topo_ids);
+-    return apicid_from_topo_ids(topo_info, &topo_ids);
++    return x86_apicid_from_topo_ids(topo_info, &topo_ids);
+ }
+ 
+ #endif /* HW_I386_TOPOLOGY_H */
 
-
- hw/core/machine.c          |    1=20
- hw/i386/pc.c               |   15 ++-
- hw/i386/x86.c              |   73 ++++++++++++----
- include/hw/boards.h        |    2=20
- include/hw/i386/topology.h |  195 ++++++++++++++++++++++++++++++----------=
---
- include/hw/i386/x86.h      |   12 +++
- softmmu/vl.c               |    1=20
- target/i386/cpu.c          |  203 ++++++++++++++--------------------------=
-----
- target/i386/cpu.h          |    3 +
- tests/test-x86-cpuid.c     |  116 +++++++++++++++----------
- 10 files changed, 358 insertions(+), 263 deletions(-)
-
---
-Signature
 
