@@ -4,73 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D00C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DD7C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D5A21D56
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6FF621D56
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VMubJKur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D5A21D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8cQXhKJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6FF621D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC1qp-0003hs-0m
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35631)
+	id 1jC1rM-00051S-RD
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jC1ly-0002LA-Tx
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:51:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1jC1ma-0003VX-Hn
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jC1lx-0001JF-RK
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:51:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40671
+ (envelope-from <mreitz@redhat.com>) id 1jC1mY-00028S-Pw
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:52:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28149
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jC1lx-0001J3-NW
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:51:45 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jC1mY-00026x-Kh
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:52:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583934705;
+ s=mimecast20190719; t=1583934742;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S1He/Rpf4JLCiKi93YfAGw3px9JkkCyAWLJbg5rNbYc=;
- b=VMubJKurYFAQ9di2nCg5uxKUnmvO0v3P1fk5CbKdhuH1eQg24C0heqLW3bVckHBJECwjPl
- /elMgFmRun9c4dRn3fNGed/SeJXQcuc2NR7lv25tzzRODjkKnzyFHqvXEXQI1H9GqxnSA8
- aYkauyn6o7rhR9IUJo/EPqUzq1Ypw0c=
+ bh=wkGyBa3TCP/ROrIoB7buEWTEbozhrYymF2lO25Imo80=;
+ b=Y8cQXhKJCDfSoN+zNH2Z1MPyfC4Rzi7lbOw7i8gExfsdaD03KJSPRvSuQ3U4XPVxtA3F9K
+ tYMuPjLP5r7Sw+Ek43zOXF90xsIALcMYGy1MRcOBp7C0pL6mBpL9oAczATEG6QnFHGV/5K
+ RC4m03V5q+bxOU1ZgH/mVtJrRJ3wDy4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-Y8tlArngP2eITKWtybUnnQ-1; Wed, 11 Mar 2020 09:51:43 -0400
-X-MC-Unique: Y8tlArngP2eITKWtybUnnQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-40-gXzoG7wPOaSqt3J9GrnNDg-1; Wed, 11 Mar 2020 09:52:20 -0400
+X-MC-Unique: gXzoG7wPOaSqt3J9GrnNDg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B410E6A6;
- Wed, 11 Mar 2020 13:51:41 +0000 (UTC)
-Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 265CE5C13D;
- Wed, 11 Mar 2020 13:51:36 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v6 03/13] arm/arm64: gic: Introduce setup_irq()
- helper
-Date: Wed, 11 Mar 2020 14:51:07 +0100
-Message-Id: <20200311135117.9366-4-eric.auger@redhat.com>
-In-Reply-To: <20200311135117.9366-1-eric.auger@redhat.com>
-References: <20200311135117.9366-1-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 162E6107ACC4;
+ Wed, 11 Mar 2020 13:52:19 +0000 (UTC)
+Received: from localhost (ovpn-117-216.ams2.redhat.com [10.36.117.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F0FB393;
+ Wed, 11 Mar 2020 13:52:18 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 01/19] luks: extract qcrypto_block_calculate_payload_offset()
+Date: Wed, 11 Mar 2020 14:51:55 +0100
+Message-Id: <20200311135213.1242028-2-mreitz@redhat.com>
+In-Reply-To: <20200311135213.1242028-1-mreitz@redhat.com>
+References: <20200311135213.1242028-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -85,101 +84,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
- thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ipi_enable() code would be reusable for other interrupts
-than IPI. Let's rename it setup_irq() and pass an interrupt
-handler pointer.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The qcow2 .bdrv_measure() code calculates the crypto payload offset.
+This logic really belongs in crypto/block.c where it can be reused by
+other image formats.
 
+The "luks" block driver will need this same logic in order to implement
+.bdrv_measure(), so extract the qcrypto_block_calculate_payload_offset()
+function now.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200221112522.1497712-2-stefanha@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
+ block/qcow2.c          | 74 +++++++++++-------------------------------
+ crypto/block.c         | 36 ++++++++++++++++++++
+ include/crypto/block.h | 22 +++++++++++++
+ 3 files changed, 77 insertions(+), 55 deletions(-)
 
-v4 -> v5:
-- s/handler_t/irq_handler_t
-- also add irq_handler_fn in lib/arm/asm/processor.h
-
-v2 -> v3:
-- do not export setup_irq anymore
----
- arm/gic.c               | 19 ++++++-------------
- lib/arm/asm/processor.h |  2 ++
- 2 files changed, 8 insertions(+), 13 deletions(-)
-
-diff --git a/arm/gic.c b/arm/gic.c
-index fcf4c1f..2f904b0 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -215,20 +215,20 @@ static void ipi_test_smp(void)
- 	report_prefix_pop();
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 3640e8c07d..f667349e50 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4608,60 +4608,6 @@ static coroutine_fn int qcow2_co_flush_to_os(BlockDr=
+iverState *bs)
+     return ret;
  }
 =20
--static void ipi_enable(void)
-+static void setup_irq(irq_handler_fn handler)
- {
- 	gic_enable_defaults();
- #ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_handler);
-+	install_exception_handler(EXCPTN_IRQ, handler);
- #else
--	install_irq_handler(EL1H_IRQ, ipi_handler);
-+	install_irq_handler(EL1H_IRQ, handler);
- #endif
- 	local_irq_enable();
- }
-=20
- static void ipi_send(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -238,7 +238,7 @@ static void ipi_send(void)
-=20
- static void ipi_recv(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -295,14 +295,7 @@ static void ipi_clear_active_handler(struct pt_regs =
-*regs __unused)
- static void run_active_clear_test(void)
- {
- 	report_prefix_push("active");
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
--#endif
--	local_irq_enable();
+-static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
+-        size_t headerlen, void *opaque, Error **errp)
+-{
+-    size_t *headerlenp =3D opaque;
 -
-+	setup_irq(ipi_clear_active_handler);
- 	ipi_test_self();
- 	report_prefix_pop();
- }
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index 1e1132d..e26ef89 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -26,7 +26,9 @@ enum vector {
- 	EXCPTN_MAX,
- };
+-    /* Stash away the payload size */
+-    *headerlenp =3D headerlen;
+-    return 0;
+-}
+-
+-static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
+-        size_t offset, const uint8_t *buf, size_t buflen,
+-        void *opaque, Error **errp)
+-{
+-    /* Discard the bytes, we're not actually writing to an image */
+-    return buflen;
+-}
+-
+-/* Determine the number of bytes for the LUKS payload */
+-static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
+-                                         Error **errp)
+-{
+-    QDict *opts_qdict;
+-    QDict *cryptoopts_qdict;
+-    QCryptoBlockCreateOptions *cryptoopts;
+-    QCryptoBlock *crypto;
+-
+-    /* Extract "encrypt." options into a qdict */
+-    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
+-    qobject_unref(opts_qdict);
+-
+-    /* Build QCryptoBlockCreateOptions object from qdict */
+-    qdict_put_str(cryptoopts_qdict, "format", "luks");
+-    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp);
+-    qobject_unref(cryptoopts_qdict);
+-    if (!cryptoopts) {
+-        return false;
+-    }
+-
+-    /* Fake LUKS creation in order to determine the payload size */
+-    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
+-                                  qcow2_measure_crypto_hdr_init_func,
+-                                  qcow2_measure_crypto_hdr_write_func,
+-                                  len, errp);
+-    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
+-    if (!crypto) {
+-        return false;
+-    }
+-
+-    qcrypto_block_free(crypto);
+-    return true;
+-}
+-
+ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *i=
+n_bs,
+                                        Error **errp)
+ {
+@@ -4712,9 +4658,27 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opt=
+s, BlockDriverState *in_bs,
+     g_free(optstr);
 =20
-+typedef void (*irq_handler_fn)(struct pt_regs *regs);
- typedef void (*exception_fn)(struct pt_regs *);
+     if (has_luks) {
++        g_autoptr(QCryptoBlockCreateOptions) create_opts =3D NULL;
++        QDict *opts_qdict;
++        QDict *cryptoopts;
+         size_t headerlen;
+=20
+-        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err)) {
++        opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
++        qdict_extract_subqdict(opts_qdict, &cryptoopts, "encrypt.");
++        qobject_unref(opts_qdict);
 +
- extern void install_exception_handler(enum vector v, exception_fn fn);
++        qdict_put_str(cryptoopts, "format", "luks");
++
++        create_opts =3D block_crypto_create_opts_init(cryptoopts, errp);
++        qobject_unref(cryptoopts);
++        if (!create_opts) {
++            goto err;
++        }
++
++        if (!qcrypto_block_calculate_payload_offset(create_opts,
++                                                    "encrypt.",
++                                                    &headerlen,
++                                                    &local_err)) {
+             goto err;
+         }
 =20
- extern void show_regs(struct pt_regs *regs);
+diff --git a/crypto/block.c b/crypto/block.c
+index 325752871c..6f42b32f1e 100644
+--- a/crypto/block.c
++++ b/crypto/block.c
+@@ -115,6 +115,42 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateO=
+ptions *options,
+ }
+=20
+=20
++static ssize_t qcrypto_block_headerlen_hdr_init_func(QCryptoBlock *block,
++        size_t headerlen, void *opaque, Error **errp)
++{
++    size_t *headerlenp =3D opaque;
++
++    /* Stash away the payload size */
++    *headerlenp =3D headerlen;
++    return 0;
++}
++
++
++static ssize_t qcrypto_block_headerlen_hdr_write_func(QCryptoBlock *block,
++        size_t offset, const uint8_t *buf, size_t buflen,
++        void *opaque, Error **errp)
++{
++    /* Discard the bytes, we're not actually writing to an image */
++    return buflen;
++}
++
++
++bool
++qcrypto_block_calculate_payload_offset(QCryptoBlockCreateOptions *create_o=
+pts,
++                                       const char *optprefix,
++                                       size_t *len,
++                                       Error **errp)
++{
++    /* Fake LUKS creation in order to determine the payload size */
++    g_autoptr(QCryptoBlock) crypto =3D
++        qcrypto_block_create(create_opts, optprefix,
++                             qcrypto_block_headerlen_hdr_init_func,
++                             qcrypto_block_headerlen_hdr_write_func,
++                             len, errp);
++    return crypto !=3D NULL;
++}
++
++
+ QCryptoBlockInfo *qcrypto_block_get_info(QCryptoBlock *block,
+                                          Error **errp)
+ {
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index d49d2c2da9..c77ccaf9c0 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -145,6 +145,26 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateO=
+ptions *options,
+                                    Error **errp);
+=20
+=20
++/**
++ * qcrypto_block_calculate_payload_offset:
++ * @create_opts: the encryption options
++ * @optprefix: name prefix for options
++ * @len: output for number of header bytes before payload
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Calculate the number of header bytes before the payload in an encrypted
++ * storage volume.  The header is an area before the payload that is reser=
+ved
++ * for encryption metadata.
++ *
++ * Returns: true on success, false on error
++ */
++bool
++qcrypto_block_calculate_payload_offset(QCryptoBlockCreateOptions *create_o=
+pts,
++                                       const char *optprefix,
++                                       size_t *len,
++                                       Error **errp);
++
++
+ /**
+  * qcrypto_block_get_info:
+  * @block: the block encryption object
+@@ -269,5 +289,7 @@ uint64_t qcrypto_block_get_sector_size(QCryptoBlock *bl=
+ock);
+ void qcrypto_block_free(QCryptoBlock *block);
+=20
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlock, qcrypto_block_free)
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlockCreateOptions,
++                              qapi_free_QCryptoBlockCreateOptions)
+=20
+ #endif /* QCRYPTO_BLOCK_H */
 --=20
-2.20.1
+2.24.1
 
 
