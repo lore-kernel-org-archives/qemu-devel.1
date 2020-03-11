@@ -2,92 +2,128 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C17DCC0044D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480CEC0044D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:46:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41E462073E
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:42:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C297120734
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 17:46:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A5BxG3pL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41E462073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecQiEMbF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C297120734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC5Mw-0007X3-QS
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 13:42:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34460)
+	id 1jC5R0-0001bp-7F
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 13:46:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jC5ML-00077A-Iz
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:41:34 -0400
+ (envelope-from <david@redhat.com>) id 1jC5Q9-0000qr-Tx
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:45:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jC5MK-0005FM-Fu
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:41:33 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jC5MK-0005C2-7m
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:41:32 -0400
-Received: by mail-pg1-x544.google.com with SMTP id c7so1592790pgw.3
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 10:41:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=eO1Z640DwGhjBrTEsVNXQChPDN/Zxd6MZsDIz0CFT2w=;
- b=A5BxG3pLEGe8e0TeN07B0iyvE9Gan0Wt6qK6Je3xcDa3yOiZpiJH+RInEZTHCadO8H
- Q3tfNx8y46bOCCkkglUc59E7eibSS1f+rlsP49jYUH2tb6SWg6Z6X5aCWuw4EbhnJy3p
- WOC53qZoOmI9WegbFXSs6lLC47XKaJRpLKTSZo9NMgDDaC4t45yxz72UPCw5wVHccbN1
- wjBNIdYED22bcNF6SJiftLc2DFbEVGsxDKvAgcVutm3bh7U3YJletCt6+4VPNheMjXYN
- /gHAUKkIUBnW7e4+sasWqNKxuDu+fq1S3BPUF9QZolto+dV+3ZIx1Fuo52wJLfucpg2M
- 0+8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eO1Z640DwGhjBrTEsVNXQChPDN/Zxd6MZsDIz0CFT2w=;
- b=RG/nNyy3uu4w9dVb9xeKgD09XoJf66KOSZhbwFt66V0UiZbX0qrvXT1OAQ2r0Lav2b
- DUCS0gVu+4IEX+LAMzJwrFuQbIhgQrtDml6IlJemBf6x1NoZDcUQpeJfbAJX4Qh6uFIk
- rER2T+VAO6jBqvKtkSxIkVYBJZSS5KXCkthkQpv6RMzFVQHBbEK3LZldQPVsrW8MiMsP
- Lklwrg4A4jPEQl3I+20ZbOZ1N+K7ZhjVHb7L2MKOuEurYMtlpZMV/NJ7P5b4DupCfVSj
- 8UF07ziLdvovqV4Vs9CFHbeTwcdYD729m3Sb+TUjsD7/ITd2wGB3GaNDvlobX0TtylCb
- VpLQ==
-X-Gm-Message-State: ANhLgQ3T1faCth8DbiiKDAFWjiYuTiN4X8ulnC6M2GwFoP8QMPJbDtfc
- E8iUFVRVPk1l5WL0rqSlk9kIew==
-X-Google-Smtp-Source: ADFU+vvLiCEkFpzZuLsl4Eyw2KPFc9KGMSOZHscRAI3Cmn9wHoz1Ex+zqTYp9kaTDAPe2xN3EDiBAw==
-X-Received: by 2002:a62:aa19:: with SMTP id e25mr4075786pff.202.1583948490975; 
- Wed, 11 Mar 2020 10:41:30 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- h2sm50112840pgv.40.2020.03.11.10.41.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Mar 2020 10:41:30 -0700 (PDT)
-Subject: Re: [PATCH v4 18/21] linux-user,scripts: add a script to update
- syscall.tbl
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200310103403.3284090-1-laurent@vivier.eu>
- <20200310103403.3284090-19-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e86372fb-0729-0b44-0969-150ef6060600@linaro.org>
-Date: Wed, 11 Mar 2020 10:41:28 -0700
+ (envelope-from <david@redhat.com>) id 1jC5Q8-0002Me-D7
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:45:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35936
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jC5Q8-0002MF-8N
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 13:45:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583948727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=coAu7zOV/G+w6eI2UOEuhPg6QGAW82ncZIE+YByvV/4=;
+ b=ecQiEMbF3iDju7p8NkMzTkBYz8c++mK6u0iCDwgtbAgQ9wU434+zAwXorbO0FB7fOeiZac
+ LjckmQrXJRvIRjNJ4leU8M236CwMJrJRaZ2fLuhOj4XKKKF7zhIELVZs2bpXqLF/hX1Vbl
+ vCitK62AuNIMetHyrjZWBP9dyW6u3UE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-7J5KRl0dPTSI3azR_YKM0w-1; Wed, 11 Mar 2020 13:45:22 -0400
+X-MC-Unique: 7J5KRl0dPTSI3azR_YKM0w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36ADF8024E8;
+ Wed, 11 Mar 2020 17:45:20 +0000 (UTC)
+Received: from [10.36.116.132] (ovpn-116-132.ams2.redhat.com [10.36.116.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C79928999;
+ Wed, 11 Mar 2020 17:45:00 +0000 (UTC)
+Subject: Re: [PATCH v3 03/10] exec: Fix for qemu_ram_resize() callback
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, eric.auger@redhat.com,
+ imammedo@redhat.com
+References: <20200311172014.33052-1-shameerali.kolothum.thodi@huawei.com>
+ <20200311172014.33052-4-shameerali.kolothum.thodi@huawei.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <f8c158b5-8236-e842-25d2-e64d57525146@redhat.com>
+Date: Wed, 11 Mar 2020 18:44:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200310103403.3284090-19-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200311172014.33052-4-shameerali.kolothum.thodi@huawei.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,28 +135,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Taylor Simpson <tsimpson@quicinc.com>, qemu-s390x@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+ linuxarm@huawei.com, xuwei5@hisilicon.com, shannon.zhaosl@gmail.com,
+ lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/10/20 3:34 AM, Laurent Vivier wrote:
-> scripts/update-syscalltbl.sh has the list of syscall.tbl to update and
-> can copy them from the linux source directory
+On 11.03.20 18:20, Shameer Kolothum wrote:
+> From: David Hildenbrand <david@redhat.com>
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
+> Summarizing the issue:
+> 1. Memory regions contain ram blocks with a different size,  if the
+>    size is  not properly aligned. While memory regions can have an
+>    unaligned size, ram blocks can't. This is true when creating
+>    resizable memory region with  an unaligned size.
+> 2. When resizing a ram block/memory region, the size of the memory
+>    region  is set to the aligned size. The callback is called with
+>    the aligned size. The unaligned piece is lost.
+> 
+> Because of the above, if ACPI blob length modifications happens
+> after the initial virt_acpi_build() call, and the changed blob
+> length is within the PAGE size boundary, then the revised size
+> is not seen by the firmware on Guest reboot.
+> 
+> Hence make sure callback is called if memory region size is changed,
+> irrespective of aligned or not.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> [Shameer: added commit log]
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  MAINTAINERS                  |  1 +
->  scripts/update-syscalltbl.sh | 49 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
->  create mode 100755 scripts/update-syscalltbl.sh
+> Please find the discussion here,
+> https://patchwork.kernel.org/patch/11339591/
+> ---
+>  exec.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 0cc500d53a..f8974cd303 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2073,11 +2073,21 @@ static int memory_try_enable_merging(void *addr, size_t len)
+>   */
+>  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
+>  {
+> +    const ram_addr_t unaligned_size = newsize;
+> +
+>      assert(block);
+>  
+>      newsize = HOST_PAGE_ALIGN(newsize);
+>  
+>      if (block->used_length == newsize) {
+> +        /*
+> +         * We don't have to resize the ram block (which only knows aligned
+> +         * sizes), however, we have to notify if the unaligned size changed.
+> +         */
+> +        if (block->resized && unaligned_size != memory_region_size(block->mr)) {
+> +            block->resized(block->idstr, unaligned_size, block->host);
+> +            memory_region_set_size(block->mr, unaligned_size);
+> +        }
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I guess we should do
 
-r~
+if (unaligned_size != memory_region_size(block->mr)) {
+    memory_region_set_size(block->mr, unaligned_size);
+    if (block->resized) {
+        block->resized(block->idstr, unaligned_size, block->host);
+    }
+}
+
+Instead - like in the case below.
+
+
+Note: This is not completely clean, the RAM block code should'n have to
+care about unaligned stuff. Also, the resized() callback for the RAM
+block is ugly, it should be a resized callback for the memory region.
+But these things imply requires bigger refactorings, so I guess this is
+good and simple enough for now.
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
