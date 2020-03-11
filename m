@@ -2,87 +2,79 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72650C10F29
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD29C10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:39:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43278208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:38:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FA7B208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 12:39:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="qHWMv3w/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43278208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bJL0lfY6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FA7B208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC0d6-00016d-F8
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:38:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45189)
+	id 1jC0dt-00031d-Di
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 08:39:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jC0aE-0004T5-EI
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:35:35 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jC0cy-0001IJ-E8
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jC0aD-0002q0-2Z
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:35:34 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40048)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jC0aC-0002o4-Rz
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:35:33 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p2so2391376wrw.7
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 05:35:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=zArtgZUYsJa+PnubPQn1wsJ3yIzET/oT3p8qfcQh/w4=;
- b=qHWMv3w/NCuc2N5snbqHo2yLzgBfJwgPAkn5FxTn53Zf8927/i+Is4OVkJ0RWCp4E9
- y13ZeNHy5ZKj20pAaZO6ZX4yWc60zDWsLjJS0U59Z2DF+f0NXTJrKG2RIouPrW0+Zn1k
- urNf+yYw5jSd2o9g4nfKarPM9JEDN0f650YH0D8BzPBH/hxblnpw4yvVKe+qyNtou9WD
- 8+C8Yj3YUcgVOhZyq/XrTX7lxrp7jd4jqwPLQgk+sK5xZu2pmspokxQGVGpu3GVYIgiK
- rnka/c1+k6F1ZDnWYJA/WoP61XLnKiBUbSSGr04qUDctxoBr1W2BPJ3K10EJTKopejtZ
- 5nNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=zArtgZUYsJa+PnubPQn1wsJ3yIzET/oT3p8qfcQh/w4=;
- b=ejyMn/10es3fg9GvDbNnZBhGS0vGhd3Oj1WtrLWA0Wu9w5eGpK63UEjXHcGT/gO2W6
- 3K/U6G5/9N1CBMmCI7+w93Hq0RtzSygZAo/oS2GKVL1x1+otgJ2LiorVKO3ASRxHV3lS
- qPtrraGefXlzNl81SQ0xSKzvsrlktoi3TfT/qbGrHSHwSZGeUKcZmkZJQMPdVsgDfUMm
- a5s3Oo9fCE+SPeO/0f1QibV6GB/LIBmJ5hwdpcGQ4Zc0rSiyoRWRp17vgOT+Ut8UHIiA
- 0MxO6YTztycd6NTGfliWzIi9Mk9Ch3V3qdTO+TYqBZemfvCqu9yl5Oa6zEHyTjJAmBQa
- r8tw==
-X-Gm-Message-State: ANhLgQ1c2aUzyqx1QI8rWbkDi7DadBTPPdukwmCkfnS2ldKxU+i4ksD+
- LayKeFZ0kS2Gq+8gyVKpNAWedERgcuRJYA==
-X-Google-Smtp-Source: ADFU+vuMP9l5tPVqgaTgmUpLNj1nnjvYdjW2+5dgp8INuMCqlMAxf4PxLo3tKkenWltr397OzZ6ZZQ==
-X-Received: by 2002:a05:6000:12d2:: with SMTP id
- l18mr4175837wrx.240.1583930131534; 
- Wed, 11 Mar 2020 05:35:31 -0700 (PDT)
-Received: from f2.redhat.com (bzq-79-183-43-120.red.bezeqint.net.
- [79.183.43.120])
- by smtp.gmail.com with ESMTPSA id o11sm61480696wrn.6.2020.03.11.05.35.30
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 11 Mar 2020 05:35:31 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH v3 3/6] virtio-net: implement RX RSS processing
-Date: Wed, 11 Mar 2020 14:35:15 +0200
-Message-Id: <20200311123518.4025-4-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200311123518.4025-1-yuri.benditovich@daynix.com>
-References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <stefanha@redhat.com>) id 1jC0cx-0004i3-7V
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:38:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35257
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jC0cx-0004Uu-2U
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 08:38:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583930301;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5nh15vDTrDF7YqOGEJcfqFZtZYBVL088KNsl1qKAeQ4=;
+ b=bJL0lfY6yifpawgh5yi7+GA59vHztvvFv5iJDjkjQptLyKu4FwnlOjmeYokE3XcGVJjDZM
+ ZsDTSv/3GAI08fAMLPkkvIKHC7Ms+bE+FIa5mNRO9uxRrlrUVWGWLrpBkLAcUT3XiPT0v0
+ /2dBGHk3draql8zXaPpjsGiJmgxBEeg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-8cb4jjRxM2y74-WD7T16kA-1; Wed, 11 Mar 2020 08:38:17 -0400
+X-MC-Unique: 8cb4jjRxM2y74-WD7T16kA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1CF98017CC;
+ Wed, 11 Mar 2020 12:38:16 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC16E8F377;
+ Wed, 11 Mar 2020 12:38:13 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] thread: add QemuRecMutex lock guards
+Date: Wed, 11 Mar 2020 12:36:23 +0000
+Message-Id: <20200311123624.277221-2-stefanha@redhat.com>
+In-Reply-To: <20200311123624.277221-1-stefanha@redhat.com>
+References: <20200311123624.277221-1-stefanha@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,169 +86,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If VIRTIO_NET_F_RSS negotiated and RSS is enabled, process
-incoming packets, calculate packet's hash and place the
-packet into respective RX virtqueue.
-
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c            | 88 +++++++++++++++++++++++++++++++++-
- include/hw/virtio/virtio-net.h |  1 +
- 2 files changed, 87 insertions(+), 2 deletions(-)
-
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 1747b8dca7..b9654cce91 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -42,6 +42,7 @@
- #include "trace.h"
- #include "monitor/qdev.h"
- #include "hw/pci/pci.h"
-+#include "net_rx_pkt.h"
- 
- #define VIRTIO_NET_VM_VERSION    11
- 
-@@ -1620,8 +1621,80 @@ static int receive_filter(VirtIONet *n, const uint8_t *buf, int size)
-     return 0;
- }
- 
-+static uint8_t virtio_net_get_hash_type(bool isip4,
-+                                        bool isip6,
-+                                        bool isudp,
-+                                        bool istcp,
-+                                        uint32_t types)
-+{
-+    if (isip4) {
-+        if (istcp && (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4)) {
-+            return NetPktRssIpV4Tcp;
-+        }
-+        if (isudp && (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4)) {
-+            return NetPktRssIpV4Udp;
-+        }
-+        if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4) {
-+            return NetPktRssIpV4;
-+        }
-+    } else if (isip6) {
-+        uint32_t mask = VIRTIO_NET_RSS_HASH_TYPE_TCP_EX |
-+                        VIRTIO_NET_RSS_HASH_TYPE_TCPv6;
-+
-+        if (istcp && (types & mask)) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_TCP_EX) ?
-+                NetPktRssIpV6TcpEx : NetPktRssIpV6Tcp;
-+        }
-+        mask = VIRTIO_NET_RSS_HASH_TYPE_UDP_EX | VIRTIO_NET_RSS_HASH_TYPE_UDPv6;
-+        if (isudp && (types & mask)) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_UDP_EX) ?
-+                NetPktRssIpV6UdpEx : NetPktRssIpV6Udp;
-+        }
-+        mask = VIRTIO_NET_RSS_HASH_TYPE_IP_EX | VIRTIO_NET_RSS_HASH_TYPE_IPv6;
-+        if (types & mask) {
-+            return (types & VIRTIO_NET_RSS_HASH_TYPE_IP_EX) ?
-+                NetPktRssIpV6Ex : NetPktRssIpV6;
-+        }
-+    }
-+    return 0xff;
-+}
-+
-+static int virtio_net_process_rss(NetClientState *nc, const uint8_t *buf,
-+                                  size_t size)
-+{
-+    VirtIONet *n = qemu_get_nic_opaque(nc);
-+    unsigned int index = nc->queue_index, new_index;
-+    struct NetRxPkt *pkt = n->rx_pkt;
-+    uint8_t net_hash_type;
-+    uint32_t hash;
-+    bool isip4, isip6, isudp, istcp;
-+
-+    net_rx_pkt_set_protocols(pkt, buf + n->host_hdr_len,
-+                             size - n->host_hdr_len);
-+    net_rx_pkt_get_protocols(pkt, &isip4, &isip6, &isudp, &istcp);
-+    if (isip4 && (net_rx_pkt_get_ip4_info(pkt)->fragment)) {
-+        istcp = isudp = false;
-+    }
-+    if (isip6 && (net_rx_pkt_get_ip6_info(pkt)->fragment)) {
-+        istcp = isudp = false;
-+    }
-+    net_hash_type = virtio_net_get_hash_type(isip4, isip6, isudp, istcp,
-+                                             n->rss_data.hash_types);
-+    if (net_hash_type > NetPktRssIpV6UdpEx) {
-+        return n->rss_data.default_queue;
-+    }
-+
-+    hash = net_rx_pkt_calc_rss_hash(pkt, net_hash_type, n->rss_data.key);
-+    new_index = hash & (n->rss_data.indirections_len - 1);
-+    new_index = n->rss_data.indirections[new_index];
-+    if (index == new_index) {
-+        return -1;
-+    }
-+    return new_index;
-+}
-+
- static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
--                                      size_t size)
-+                                      size_t size, bool no_rss)
- {
-     VirtIONet *n = qemu_get_nic_opaque(nc);
-     VirtIONetQueue *q = virtio_net_get_subqueue(nc);
-@@ -1635,6 +1708,14 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
-         return -1;
-     }
- 
-+    if (!no_rss && n->rss_data.enabled) {
-+        int index = virtio_net_process_rss(nc, buf, size);
-+        if (index >= 0) {
-+            NetClientState *nc2 = qemu_get_subqueue(n->nic, index);
-+            return virtio_net_receive_rcu(nc2, buf, size, true);
-+        }
-+    }
-+
-     /* hdr_len refers to the header we supply to the guest */
-     if (!virtio_net_has_buffers(q, size + n->guest_hdr_len - n->host_hdr_len)) {
-         return 0;
-@@ -1729,7 +1810,7 @@ static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t *buf,
- {
-     RCU_READ_LOCK_GUARD();
- 
--    return virtio_net_receive_rcu(nc, buf, size);
-+    return virtio_net_receive_rcu(nc, buf, size, false);
- }
- 
- static void virtio_net_rsc_extract_unit4(VirtioNetRscChain *chain,
-@@ -3305,6 +3386,8 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
- 
-     QTAILQ_INIT(&n->rsc_chains);
-     n->qdev = dev;
-+
-+    net_rx_pkt_init(&n->rx_pkt, false);
- }
- 
- static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-@@ -3341,6 +3424,7 @@ static void virtio_net_device_unrealize(DeviceState *dev, Error **errp)
-     g_free(n->vqs);
-     qemu_del_nic(n->nic);
-     virtio_net_rsc_cleanup(n);
-+    net_rx_pkt_uninit(n->rx_pkt);
-     virtio_cleanup(vdev);
- }
- 
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index ebd81e29eb..0fd960b1a0 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -215,6 +215,7 @@ struct VirtIONet {
-         VirtioNetRssData rss_data;
-         uint8_t rss_data_migration[sizeof(VirtioNetRssData)];
-     };
-+    struct NetRxPkt *rx_pkt;
- };
- 
- void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
--- 
-2.17.1
+VGhpcyBwYXRjaCBpbnRyb2R1Y2VzIHR3byBsb2NrIGd1YXJkIG1hY3JvcyB0aGF0IGF1dG9tYXRp
+Y2FsbHkgdW5sb2NrIGEKUWVtdVJlY011dGV4OgoKICB2b2lkIGYodm9pZCkgewogICAgICBRRU1V
+X1JFQ19NVVRFWF9MT0NLX0dVQVJEKCZtdXRleCk7CiAgICAgIGlmICghbWF5X2ZhaWwoKSkgewog
+ICAgICAgICAgcmV0dXJuOyAvKiBhdXRvbWF0aWNhbGx5IHVubG9ja3MgbXV0ZXggKi8KICAgICAg
+fQogICAgICAuLi4KICB9CgphbmQ6CgogIFdJVEhfUUVNVV9SRUNfTVVURVhfTE9DS19HVUFSRCgm
+bXV0ZXgpIHsKICAgICAgaWYgKCFtYXlfZmFpbCgpKSB7CiAgICAgICAgICByZXR1cm47IC8qIGF1
+dG9tYXRpY2FsbHkgdW5sb2NrcyBtdXRleCAqLwogICAgICB9CiAgfQogIC8qIGF1dG9tYXRpY2Fs
+bHkgdW5sb2NrcyBtdXRleCBoZXJlICovCiAgLi4uCgpDb252ZXJ0IFRDRyBwbHVnaW5zIGZ1bmN0
+aW9ucyB0aGF0IGJlbmVmaXQgZnJvbSB0aGVzZSBtYWNyb3MuICBNYW51YWwKcWVtdV9yZWNfbXV0
+ZXhfbG9jay91bmxvY2soKSBjYWxsZXJzIGFyZSBsZWZ0IHVubW9kaWZpZWQgaW4gY2FzZXMgd2hl
+cmUKY2xhcml0eSB3b3VsZCBub3QgaW1wcm92ZSBieSBzd2l0Y2hpbmcgdG8gdGhlIG1hY3Jvcy4K
+ClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0t
+CiBpbmNsdWRlL3FlbXUvdGhyZWFkLmggfCAyNiArKysrKysrKysrKysrKysrKysrKysrKysrKwog
+cGx1Z2lucy9jb3JlLmMgICAgICAgIHwgIDYgKystLS0tCiBwbHVnaW5zL2xvYWRlci5jICAgICAg
+fCAxNSArKysrKysrLS0tLS0tLS0KIDMgZmlsZXMgY2hhbmdlZCwgMzUgaW5zZXJ0aW9ucygrKSwg
+MTIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xZW11L3RocmVhZC5oIGIvaW5j
+bHVkZS9xZW11L3RocmVhZC5oCmluZGV4IDA0N2RiMDMwN2UuLjM5OTNhYjdiMjUgMTAwNjQ0Ci0t
+LSBhL2luY2x1ZGUvcWVtdS90aHJlYWQuaAorKysgYi9pbmNsdWRlL3FlbXUvdGhyZWFkLmgKQEAg
+LTEzMiw2ICsxMzIsMzIgQEAgc3RhdGljIGlubGluZSBpbnQgKHFlbXVfcmVjX211dGV4X3RyeWxv
+Y2spKFFlbXVSZWNNdXRleCAqbXV0ZXgpCiAvKiBQcm90b3R5cGVzIGZvciBvdGhlciBmdW5jdGlv
+bnMgYXJlIGluIHRocmVhZC1wb3NpeC5oL3RocmVhZC13aW4zMi5oLiAgKi8KIHZvaWQgcWVtdV9y
+ZWNfbXV0ZXhfaW5pdChRZW11UmVjTXV0ZXggKm11dGV4KTsKIAorc3RhdGljIGlubGluZSBRZW11
+UmVjTXV0ZXggKnFlbXVfcmVjX211dGV4X2F1dG9fbG9jayhRZW11UmVjTXV0ZXggKm11dGV4KQor
+eworICAgIHFlbXVfcmVjX211dGV4X2xvY2sobXV0ZXgpOworICAgIHJldHVybiBtdXRleDsKK30K
+Kworc3RhdGljIGlubGluZSB2b2lkIHFlbXVfcmVjX211dGV4X2F1dG9fdW5sb2NrKFFlbXVSZWNN
+dXRleCAqbXV0ZXgpCit7CisgICAgaWYgKG11dGV4KSB7CisgICAgICAgIHFlbXVfcmVjX211dGV4
+X3VubG9jayhtdXRleCk7CisgICAgfQorfQorCitHX0RFRklORV9BVVRPUFRSX0NMRUFOVVBfRlVO
+QyhRZW11UmVjTXV0ZXgsIHFlbXVfcmVjX211dGV4X2F1dG9fdW5sb2NrKQorCisjZGVmaW5lIFdJ
+VEhfUUVNVV9SRUNfTVVURVhfTE9DS19HVUFSRF8obXV0ZXgsIHZhcikgXAorICAgIGZvciAoZ19h
+dXRvcHRyKFFlbXVSZWNNdXRleCkgdmFyID0gcWVtdV9yZWNfbXV0ZXhfYXV0b19sb2NrKChtdXRl
+eCkpOyBcCisgICAgICAgICB2YXI7IHFlbXVfcmVjX211dGV4X2F1dG9fdW5sb2NrKHZhciksIHZh
+ciA9IE5VTEwpCisKKyNkZWZpbmUgV0lUSF9RRU1VX1JFQ19NVVRFWF9MT0NLX0dVQVJEKG11dGV4
+KSBcCisgICAgV0lUSF9RRU1VX1JFQ19NVVRFWF9MT0NLX0dVQVJEXygobXV0ZXgpLCBxZW11X3Jl
+Y19tdXRleF9hdXRvIyNfX0NPVU5URVJfXykKKworI2RlZmluZSBRRU1VX1JFQ19NVVRFWF9MT0NL
+X0dVQVJEKG11dGV4KSBcCisgICAgZ19hdXRvcHRyKFFlbXVSZWNNdXRleCkgcWVtdV9yZWNfbXV0
+ZXhfYXV0byMjX19DT1VOVEVSX18gPSBcCisgICAgICAgICAgICBxZW11X3JlY19tdXRleF9hdXRv
+X2xvY2soKG11dGV4KSkKKwogdm9pZCBxZW11X2NvbmRfaW5pdChRZW11Q29uZCAqY29uZCk7CiB2
+b2lkIHFlbXVfY29uZF9kZXN0cm95KFFlbXVDb25kICpjb25kKTsKIApkaWZmIC0tZ2l0IGEvcGx1
+Z2lucy9jb3JlLmMgYi9wbHVnaW5zL2NvcmUuYwppbmRleCBlZDg2MzAxMWJhLi5jZjhjODVkZTlj
+IDEwMDY0NAotLS0gYS9wbHVnaW5zL2NvcmUuYworKysgYi9wbHVnaW5zL2NvcmUuYwpAQCAtMTUw
+LDExICsxNTAsMTEgQEAgZG9fcGx1Z2luX3JlZ2lzdGVyX2NiKHFlbXVfcGx1Z2luX2lkX3QgaWQs
+IGVudW0gcWVtdV9wbHVnaW5fZXZlbnQgZXYsCiB7CiAgICAgc3RydWN0IHFlbXVfcGx1Z2luX2N0
+eCAqY3R4OwogCi0gICAgcWVtdV9yZWNfbXV0ZXhfbG9jaygmcGx1Z2luLmxvY2spOworICAgIFFF
+TVVfUkVDX01VVEVYX0xPQ0tfR1VBUkQoJnBsdWdpbi5sb2NrKTsKICAgICBjdHggPSBwbHVnaW5f
+aWRfdG9fY3R4X2xvY2tlZChpZCk7CiAgICAgLyogaWYgdGhlIHBsdWdpbiBpcyBvbiBpdHMgd2F5
+IG91dCwgaWdub3JlIHRoaXMgcmVxdWVzdCAqLwogICAgIGlmICh1bmxpa2VseShjdHgtPnVuaW5z
+dGFsbGluZykpIHsKLSAgICAgICAgZ290byBvdXRfdW5sb2NrOworICAgICAgICByZXR1cm47CiAg
+ICAgfQogICAgIGlmIChmdW5jKSB7CiAgICAgICAgIHN0cnVjdCBxZW11X3BsdWdpbl9jYiAqY2Ig
+PSBjdHgtPmNhbGxiYWNrc1tldl07CkBAIC0xNzgsOCArMTc4LDYgQEAgZG9fcGx1Z2luX3JlZ2lz
+dGVyX2NiKHFlbXVfcGx1Z2luX2lkX3QgaWQsIGVudW0gcWVtdV9wbHVnaW5fZXZlbnQgZXYsCiAg
+ICAgfSBlbHNlIHsKICAgICAgICAgcGx1Z2luX3VucmVnaXN0ZXJfY2JfX2xvY2tlZChjdHgsIGV2
+KTsKICAgICB9Ci0gb3V0X3VubG9jazoKLSAgICBxZW11X3JlY19tdXRleF91bmxvY2soJnBsdWdp
+bi5sb2NrKTsKIH0KIAogdm9pZCBwbHVnaW5fcmVnaXN0ZXJfY2IocWVtdV9wbHVnaW5faWRfdCBp
+ZCwgZW51bSBxZW11X3BsdWdpbl9ldmVudCBldiwKZGlmZiAtLWdpdCBhL3BsdWdpbnMvbG9hZGVy
+LmMgYi9wbHVnaW5zL2xvYWRlci5jCmluZGV4IDE1ZmM3ZTU1MTUuLjk3NDJjOGQ0MWQgMTAwNjQ0
+Ci0tLSBhL3BsdWdpbnMvbG9hZGVyLmMKKysrIGIvcGx1Z2lucy9sb2FkZXIuYwpAQCAtMzY3LDE1
+ICszNjcsMTQgQEAgdm9pZCBwbHVnaW5fcmVzZXRfdW5pbnN0YWxsKHFlbXVfcGx1Z2luX2lkX3Qg
+aWQsCiAgICAgc3RydWN0IHFlbXVfcGx1Z2luX3Jlc2V0X2RhdGEgKmRhdGE7CiAgICAgc3RydWN0
+IHFlbXVfcGx1Z2luX2N0eCAqY3R4OwogCi0gICAgcWVtdV9yZWNfbXV0ZXhfbG9jaygmcGx1Z2lu
+LmxvY2spOwotICAgIGN0eCA9IHBsdWdpbl9pZF90b19jdHhfbG9ja2VkKGlkKTsKLSAgICBpZiAo
+Y3R4LT51bmluc3RhbGxpbmcgfHwgKHJlc2V0ICYmIGN0eC0+cmVzZXR0aW5nKSkgewotICAgICAg
+ICBxZW11X3JlY19tdXRleF91bmxvY2soJnBsdWdpbi5sb2NrKTsKLSAgICAgICAgcmV0dXJuOwor
+ICAgIFdJVEhfUUVNVV9SRUNfTVVURVhfTE9DS19HVUFSRCgmcGx1Z2luLmxvY2spIHsKKyAgICAg
+ICAgY3R4ID0gcGx1Z2luX2lkX3RvX2N0eF9sb2NrZWQoaWQpOworICAgICAgICBpZiAoY3R4LT51
+bmluc3RhbGxpbmcgfHwgKHJlc2V0ICYmIGN0eC0+cmVzZXR0aW5nKSkgeworICAgICAgICAgICAg
+cmV0dXJuOworICAgICAgICB9CisgICAgICAgIGN0eC0+cmVzZXR0aW5nID0gcmVzZXQ7CisgICAg
+ICAgIGN0eC0+dW5pbnN0YWxsaW5nID0gIXJlc2V0OwogICAgIH0KLSAgICBjdHgtPnJlc2V0dGlu
+ZyA9IHJlc2V0OwotICAgIGN0eC0+dW5pbnN0YWxsaW5nID0gIXJlc2V0OwotICAgIHFlbXVfcmVj
+X211dGV4X3VubG9jaygmcGx1Z2luLmxvY2spOwogCiAgICAgZGF0YSA9IGdfbmV3KHN0cnVjdCBx
+ZW11X3BsdWdpbl9yZXNldF9kYXRhLCAxKTsKICAgICBkYXRhLT5jdHggPSBjdHg7Ci0tIAoyLjI0
+LjEKCg==
 
 
