@@ -2,48 +2,48 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68239C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 545D8C10F29
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D9F0208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D9F0208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 2D4602192A
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 09:07:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4602192A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jBxKT-00060g-Ek
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:07:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44247)
+	id 1jBxKV-00063E-DU
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 05:07:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jBxJR-0004jR-5W
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:02 -0400
+ (envelope-from <bounces@canonical.com>) id 1jBxJU-0004mu-KI
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jBxJP-0003RR-Ol
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50142)
+ (envelope-from <bounces@canonical.com>) id 1jBxJS-0003TT-Dr
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50280)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jBxJP-0003R0-I7
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:05:59 -0400
+ id 1jBxJS-0003S4-84
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 05:06:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jBxJO-0008KF-Ej
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:05:58 +0000
+ id 1jBxJR-0008WK-1O
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 671AE2E80CB
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:05:58 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id F28BE2E80D0
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:06:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Mar 2020 08:50:45 -0000
+Date: Wed, 11 Mar 2020 08:51:01 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1866870@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -58,7 +58,7 @@ X-Launchpad-Bug-Reporter: tstrike (tstrike34)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158391664561.12393.1493673542331710592.malone@soybean.canonical.com>
+Message-Id: <158391666121.26092.3081469104681067044.malone@gac.canonical.com>
 Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -66,7 +66,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bd7e9a835a5846a2bd060d423995688aee076630
+X-Launchpad-Hash: aa28d0a9e4d317329d834cffed8415dd51d7d9ef
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,48 +84,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I first checked the related known fixes from the old case that is linked.
-Just in case if we might miss one in Ubuntu 20.04 that you are using.
+Copied here from the other bug about the system setup that is in use:
 
+L0 DistroRelease: Ubuntu 20.04 on Kernel Linux 5.4.0-14-generic x86_64
+L1 3 guests Windows 10, Centos 8
+No L2s
+No guests are enabled for UEFI Boot
 
-Kernel:
-=3D> https://marc.info/?l=3Dkvm&m=3D155085391830663&w=3D2
-Tested and verified https://bugs.launchpad.net/qemu/+bug/1813165/comments/13
-This got upstream and is in:
-$ git describe --contains ad7dc69aeb231
-v5.0-rc8~1^2~2
-That we'd clearly have in Focal being on 5.4
+libvirt: 6.0.0-0ubuntu4
+qemu 1:4.2-3ubuntu1
 
-qemu
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D9c1f8f4493e8355d0e48f7d1e=
-ebdf86893ba082d
-Other fixes related to the topic are in qemu 2.8
-
-On seabios disabling of SMM
-- https://bugzilla.redhat.com/show_bug.cgi?id=3D1378006
-- https://bugzilla.redhat.com/show_bug.cgi?id=3D1464654#c21
-The following is from >=3D1.12.0-1 (was enabled by default before)
-There is a small (for old qemu) and large binary (new qemu):
- 42 build/bios.bin:                                                        =
-          =
-
- 43 # A stripped-down version of bios, to fit in 128Kb, for qemu <=3D 1.7  =
-            =
-
- 44 =C2=BB=C2=B7=C2=B7=C2=B7$(call build-bios,bios,QEMU=3Dy ROM_SIZE=3D128 =
-PVSCSI=3Dn BOOTSPLASH=3Dn XEN=3Dn USB_OHCI=3Dn USB_XHCI=3Dn USB_UAS=3Dn SDC=
-ARD=3Dn TCGBIOS=3Dn MPT_SCSI=3Dn NVME=3Dn USE_SMM=3Dn VGAHOOKS=3Dn)
- 45 build/bios-256k.bin:                                                   =
-          =
-
- 46 =C2=BB=C2=B7=C2=B7=C2=B7$(call build-bios,bios,QEMU=3Dy ROM_SIZE=3D256)
-
-Note: if we are out of options we could try testing to set USE_SMM=3Dn
-here, but lets check other details first.
-
-But as already explained on the linked bug 1813165:
-"If you're seeing "KVM internal error. Suberror: 1" it can be multiple thin=
-gs, not necessarily the same bug."
+Issue triggers without nesting (ensured via modprobe kvm_intel nested=3D)
 
 -- =
 
