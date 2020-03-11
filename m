@@ -2,69 +2,90 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC90C10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E9BC10F29
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:23:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70DF322464
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:23:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70DF322464
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3CBBE222C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 13:23:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CBBE222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC1Kc-0005Vi-LM
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:23:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57870)
+	id 1jC1Kl-0005ki-Em
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 09:23:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jC1Jr-0004fq-Fh
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:44 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jC1Ju-0004g1-RC
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jC1Jq-0005Bq-9B
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:43 -0400
-Resent-Date: Wed, 11 Mar 2020 09:22:43 -0400
-Resent-Message-Id: <E1jC1Jq-0005Bq-9B@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21178)
+ (envelope-from <frankja@linux.ibm.com>) id 1jC1Jt-0005Ci-IU
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4380)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jC1Jq-0005Be-0x
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1583932953; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=FKbYQH381xCd70lNJhSeare2nd3poD3HFl777VLeYb77A9zNPWm1T/JCn+wCjtn9IWoPWtsTZSnsYAreOiZlKpkuwXy90zHdlSDYdBm9i+j+X2fWDfc4L61DgM3ZchAHbVAiGG8K0BagJhVWXv38MMgdEzQK6ft2/01BNo7ph1M=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583932953;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=OpHkv7MkU4/HUlA2IJ0TnlcNRLj30fzKvPdmWia51us=; 
- b=dIhZhlE+Gk4WUdKd/9C1Q7KJvARFWJ5E/Ab5J4du/e3PamuVxy3a5hs9bu8QPhMM2trOk+o0+dwHQnfy9ETHQqvOM2cbNKNvxwfsv/kCb75TgJSmIsUt2tI7LHSpQdllMcmOwDJa+4xrVCN4kvuEMzMj15R9gdhoQ0j4YYTNWho=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 15839329511951002.1353014033504;
- Wed, 11 Mar 2020 06:22:31 -0700 (PDT)
-In-Reply-To: <20200311123624.277221-1-stefanha@redhat.com>
-Subject: Re: [PATCH 0/2] thread: add lock guard macros
-Message-ID: <158393294992.5248.13775226604855408879@39012742ff91>
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jC1Jt-0005CP-Ar
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:22:45 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02BDLu5N194222
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:22:44 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yq0hbh7e3-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 09:22:42 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 11 Mar 2020 13:22:11 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 11 Mar 2020 13:22:08 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 02BDL7e850135522
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 11 Mar 2020 13:21:07 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4609E5204F;
+ Wed, 11 Mar 2020 13:22:07 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.36.208])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E60AA5204E;
+ Wed, 11 Mar 2020 13:22:05 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v9 00/15] s390x: Protected Virtualization support
+Date: Wed, 11 Mar 2020 09:21:36 -0400
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: stefanha@redhat.com
-Date: Wed, 11 Mar 2020 06:22:31 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031113-0016-0000-0000-000002EF6B6A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031113-0017-0000-0000-00003352D4C2
+Message-Id: <20200311132151.172389-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-11_05:2020-03-11,
+ 2020-03-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=1 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003110085
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,51 +97,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, dgilbert@redhat.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMTEyMzYyNC4yNzcy
-MjEtMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
-LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
-ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICB1
-dGlsL3VyaS5vCiAgQ0MgICAgICB1dGlsL25vdGlmeS5vCi90bXAvcWVtdS10ZXN0L3NyYy91dGls
-L3FlbXUtdGltZXIuYzogSW4gZnVuY3Rpb24gJ3RpbWVybGlzdF9leHBpcmVkJzoKL3RtcC9xZW11
-LXRlc3Qvc3JjL3V0aWwvcWVtdS10aW1lci5jOjE5NjoyNDogZXJyb3I6ICdleHBpcmVfdGltZScg
-bWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJl
-LXVuaW5pdGlhbGl6ZWRdCiAgICAgcmV0dXJuIGV4cGlyZV90aW1lIDw9IHFlbXVfY2xvY2tfZ2V0
-X25zKHRpbWVyX2xpc3QtPmNsb2NrLT50eXBlKTsKICAgICAgICAgICAgfn5+fn5+fn5+fn5+Xn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5p
-bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3Jj
-L3J1bGVzLm1hazo2OTogdXRpbC9xZW11LXRpbWVyLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
-bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxh
-c3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9k
-dWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnBy
-b2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2Vy
-JywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YmJlN2VjMzYxOWUy
-NDAxYTk3MDYwZDVkOWFiNTViYWMnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdz
-ZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAn
-RVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAn
-REVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2Nj
-YWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92
-YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1qZHRu
-d2tzYS9zcmMvZG9ja2VyLXNyYy4yMDIwLTAzLTExLTA5LjIwLjU0LjI4NTQ6L3Zhci90bXAvcWVt
-dTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cn
-XScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVs
-PWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YmJlN2VjMzYxOWUyNDAxYTk3MDYwZDVkOWFiNTViYWMK
-bWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0
-b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtamR0bndrc2Evc3JjJwptYWtlOiAqKiog
-W2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMW0zNi42NTRz
-CnVzZXIgICAgMG03Ljg1NnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzExMTIzNjI0LjI3NzIyMS0xLXN0ZWZhbmhhQHJlZGhhdC5j
-b20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
+
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
+
+v9:
+	* Moved pv.h into include/hw/s390x/
+	* Replaced cmd strings with macro
+	* Moved s390_is_pv() to pv.h
+	* Added new copyright dates and authors
+v8:
+	* Removed the iplb_valid changes as they are picked
+	* Checkpatch fixes
+	* Review fixes
+	* Replaced env/ms->pv with s390_is_pv()
+v7:
+	* Merged the diag 308 subcode patches and the unpack
+	* Moved the SIDA memops into the sync patch
+	* Bailout for the none machien and fencing of CONFIG_USER_ONLY
+	* Changes due to review
+
+v6:
+	* diag308 rc numbers were changed by architecture
+	* IPL pv block received one more reserved field by architecture
+	* Officially added the bios patch to the series
+	* Dropped picked constant rename patch
+
+v5:
+	* Moved docs into docs/system
+	* Some more enable/disable changes
+	* Moved enablement/disablement of pv in separate functions
+	* Some review fixes
+
+v4:
+	* Sync with KVM changes
+	* Review changes
+
+V3:
+	* Use dedicated functions to access SIDA
+	* Smaller cleanups and segfault fixes
+	* Error reporting for Ultravisor calls
+	* Inject of RC of diag308 subcode 10 fails
+
+V2:
+	* Split out cleanups
+	* Internal PV state tracking
+	* Review feedback
+
+Christian Borntraeger (1):
+  s390x: Add unpack facility feature to GA1
+
+Janosch Frank (14):
+  Sync pv
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Add migration blocker
+  s390x: protvirt: Inhibit balloon when switching to protected mode
+  s390x: protvirt: KVM intercept changes
+  s390x: Add SIDA memory ops
+  s390x: protvirt: Move STSI data over SIDAD
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDA
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Move IO control structures over SIDA
+  s390x: protvirt: Handle SIGP store status correctly
+  docs: Add protvirt docs
+
+ docs/system/index.rst               |   1 +
+ docs/system/protvirt.rst            |  56 +++++++++++
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  56 ++++++++++-
+ hw/s390x/ipl.h                      |  79 ++++++++++++++++
+ hw/s390x/pv.c                       |  98 ++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c          | 139 +++++++++++++++++++++++++++-
+ hw/s390x/sclp.c                     |  30 ++++++
+ include/hw/s390x/pv.h               |  57 ++++++++++++
+ include/hw/s390x/s390-virtio-ccw.h  |   1 +
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/linux/kvm.h           |  45 ++++++++-
+ target/s390x/cpu.c                  |  24 +++--
+ target/s390x/cpu.h                  |   7 +-
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 |  58 ++++++++++--
+ target/s390x/gen-features.c         |   1 +
+ target/s390x/helper.c               |   6 ++
+ target/s390x/ioinst.c               | 120 +++++++++++++++++-------
+ target/s390x/kvm.c                  |  69 ++++++++++++--
+ target/s390x/kvm_s390x.h            |   2 +
+ target/s390x/mmu_helper.c           |  14 +++
+ 22 files changed, 803 insertions(+), 64 deletions(-)
+ create mode 100644 docs/system/protvirt.rst
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 include/hw/s390x/pv.h
+
+-- 
+2.25.1
+
 
