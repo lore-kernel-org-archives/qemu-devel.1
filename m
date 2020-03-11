@@ -2,77 +2,82 @@ Return-Path: <SRS0=QLzr=44=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E7EC10F27
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0BBC10F27
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:10:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37EC620726
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66B8720726
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Mar 2020 14:10:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ERJG/wPU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37EC620726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="gTbWFTvJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66B8720726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jC233-0003yK-Cf
-	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:09:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36550)
+	id 1jC23k-0006Lj-Hk
+	for qemu-devel@archiver.kernel.org; Wed, 11 Mar 2020 10:10:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1jC1nD-0004kV-S2
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:53:05 -0400
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jC1sC-00081p-R3
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1jC1nC-0002rU-9p
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:53:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57634
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1jC1nC-0002qq-4U
- for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:53:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583934781;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MLI4CO0lYmsE3HMfdKwXPXoJGri25UffaJPnJtC3324=;
- b=ERJG/wPUQdCnno4eqB7ASMtKPOg9nZaeO8IlsBv5U124amk3qTHc0jSIZbxMtqzeJysOe/
- eLpi3fEf3VeU4VyJCNjwdjYKwmj3r8GjRoBBJzHgaidvHMROcmPdYvYxg+TZ3Gj78ZF9UE
- /TDWB4NS1qyhg95q5g7uZ9rkM9oFeao=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-70-nKzPK9ABP3-Sj6r77mz_lw-1; Wed, 11 Mar 2020 09:52:59 -0400
-X-MC-Unique: nKzPK9ABP3-Sj6r77mz_lw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D583B1005510;
- Wed, 11 Mar 2020 13:52:58 +0000 (UTC)
-Received: from localhost (ovpn-117-216.ams2.redhat.com [10.36.117.216])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5091F91D9B;
- Wed, 11 Mar 2020 13:52:57 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 14/19] block/block-copy: use block_status
-Date: Wed, 11 Mar 2020 14:52:08 +0100
-Message-Id: <20200311135213.1242028-15-mreitz@redhat.com>
-In-Reply-To: <20200311135213.1242028-1-mreitz@redhat.com>
-References: <20200311135213.1242028-1-mreitz@redhat.com>
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jC1sA-00042J-SU
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:58:12 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:33142)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jC1sA-000413-E1
+ for qemu-devel@nongnu.org; Wed, 11 Mar 2020 09:58:10 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id j186so2078815ywe.0
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 06:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=k7A/UzDRc2+Rz5Rkwg1QAmtJW+ybq7G8OUMVidky5H0=;
+ b=gTbWFTvJ0ft+5vzupDw1hLjzBTmfSHj5ALYCVphYsTf66FiiW/3Zwdvcs0ibxtWoGO
+ kyUsBgGDq37QyZ35XpIe/Aes6tY+yXVuWTuAxZoJ/RFyLsthBySH6wb1p8AJWq0TzQ8f
+ M1m9b7ZYKEB+UZjng0JFUvqevelJ2KfQMwYcBAYZvcqeundetqZ7rar8wuJrHZaN0OHG
+ 7n2iQLnsyP5x0vQdhO8hUaZF50WAaArJdFo1/PLkvdlC+SQYIUvQtqKV9+xL/i+3pwxf
+ UJMfKjZW0sG4goFpeZhCfGkI5P9nI+aanoHsPy7J0KWgGrznqqV++elipQqEkQB8fIfu
+ tGLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=k7A/UzDRc2+Rz5Rkwg1QAmtJW+ybq7G8OUMVidky5H0=;
+ b=F1+2FNGugNovM98N2svldxlqwGWpg91h+0XZb5Ku9XGfCHqQmK71BJIfLaGYZpgJ6x
+ 9RcNA2z9ylU4wV5Ok7L7BbhfoddVeLk8xpspYEom3/+nSs4D1uRmr1NQBfNS0zCTg0u3
+ 1e9duub2QXUDcrzlGd/ynsMiTvofUFn3buJKxOKNQ8RK8SXDOSvP9RUlLLOPvyrnj01N
+ v8iABZvccFYkiHR5vZTlOOp4x64hBgv7pmQhTfLJDBy4HtIPOuAeXW1WfPvffGunJPaP
+ rqG/A+pEsFIBwWXyM9jnf75g0gkR60Teju6rzyLSHZ/llsaZecTEM8K1mzTCQsSaLGHW
+ pt6g==
+X-Gm-Message-State: ANhLgQ24ujmkWnsuTtoMkxnNiEN/0njOx0hFAO09dordOjVmKNiAk3l3
+ 2wv384SgTmEK7oINuv7dDV7RQ3uFKNBVRCwSE/IRmA==
+X-Google-Smtp-Source: ADFU+vu9e2WxZh9wEtzhF0w1CCrMutP1KzS8o/F2eXc2uXGyleCZvqI9vNGRzOMN6HrDwCky/jO1IKMQ4qPwfkbnp3M=
+X-Received: by 2002:a25:6811:: with SMTP id d17mr3031531ybc.265.1583935089413; 
+ Wed, 11 Mar 2020 06:58:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
+ <20200311123518.4025-2-yuri.benditovich@daynix.com>
+ <20200311094553-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200311094553-mutt-send-email-mst@kernel.org>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Wed, 11 Mar 2020 15:57:58 +0200
+Message-ID: <CAOEp5OdgDB5u-SeZO3y4iCTjFy6hpNfPA-ADaBbnvx=MHD_dTw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/6] virtio-net: introduce RSS and hash report features
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000005a253b05a094a03f"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,188 +89,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+--0000000000005a253b05a094a03f
+Content-Type: text/plain; charset="UTF-8"
 
-Use bdrv_block_status_above to chose effective chunk size and to handle
-zeroes effectively.
+On Wed, Mar 11, 2020 at 3:47 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 
-This substitutes checking for just being allocated or not, and drops
-old code path for it. Assistance by backup job is dropped too, as
-caching block-status information is more difficult than just caching
-is-allocated information in our dirty bitmap, and backup job is not
-good place for this caching anyway.
+> On Wed, Mar 11, 2020 at 02:35:13PM +0200, Yuri Benditovich wrote:
+> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > ---
+> >  hw/net/virtio-net.c | 95 +++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 95 insertions(+)
+> >
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index 3627bb1717..9545b0e84f 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -71,6 +71,101 @@
+> >  #define VIRTIO_NET_IP6_ADDR_SIZE   32      /* ipv6 saddr + daddr */
+> >  #define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD
+> >
+> > +/* TODO: remove after virtio-net header update */
+> > +#if !defined(VIRTIO_NET_RSS_HASH_TYPE_IPv4)
+> > +#define VIRTIO_NET_F_HASH_REPORT    57  /* Supports hash report */
+> > +#define VIRTIO_NET_F_RSS            60  /* Supports RSS RX steering */
+> > +
+> > +/* supported/enabled hash types */
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4          (1 << 0)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4         (1 << 1)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4         (1 << 2)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6          (1 << 3)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6         (1 << 4)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6         (1 << 5)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX         (1 << 6)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX        (1 << 7)
+> > +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX        (1 << 8)
+> > +
+> > +#define __le16 uint16_t
+> > +#define __le32 uint32_t
+> > +#define __u8   uint8_t
+> > +#define __u16  uint16_t
+> > +#define __u32  uint32_t
+>
+> Let's just use uint16_t etc directly please.
+>
+> > +struct virtio_net_config_with_rss {
+> > +    /* The config defining mac address (if VIRTIO_NET_F_MAC) */
+> > +    __u8 mac[ETH_ALEN];
+> > +    /* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */
+> > +    __u16 status;
+> > +    /*
+> > +     * Maximum number of each of transmit and receive queues;
+> > +     * see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.
+> > +     * Legal values are between 1 and 0x8000
+> > +     */
+> > +    __u16 max_virtqueue_pairs;
+> > +    /* Default maximum transmit unit advice */
+> > +    __u16 mtu;
+> > +    /*
+> > +     * speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+> > +     * Any other value stands for unknown.
+> > +     */
+> > +    __u32 speed;
+> > +    /*
+> > +     * 0x00 - half duplex
+> > +     * 0x01 - full duplex
+> > +     * Any other value stands for unknown.
+> > +     */
+> > +    __u8 duplex;
+> > +    /* maximum size of RSS key */
+> > +    __u8 rss_max_key_size;
+> > +    /* maximum number of indirection table entries */
+> > +    __le16 rss_max_indirection_table_length;
+> > +    /* bitmask of supported VIRTIO_NET_RSS_HASH_ types */
+> > +    __le32 supported_hash_types;
+> > +} __attribute__((packed));
+> > +
+> > +#define virtio_net_config virtio_net_config_with_rss
+>
+> Do we have to? Let's just tweak code to do the right thing...
+>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200311103004.7649-5-vsementsov@virtuozzo.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/block-copy.c | 73 +++++++++++++++++++++++++++++++++++++---------
- block/trace-events |  1 +
- 2 files changed, 61 insertions(+), 13 deletions(-)
+Are we going to update the virtio_net some time?
+If yes, IMO makes sense to do less tweaking in the middle of the code.
+Then, upon update of virtio_net.h - easily remove all these defines that
+were added in virtio-net.c
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index ddd61c1652..b075dba206 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -155,7 +155,7 @@ void block_copy_set_progress_meter(BlockCopyState *s, P=
-rogressMeter *pm)
-  */
- static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
-                                            int64_t start, int64_t end,
--                                           bool *error_is_read)
-+                                           bool zeroes, bool *error_is_rea=
-d)
- {
-     int ret;
-     int nbytes =3D MIN(end, s->len) - start;
-@@ -165,6 +165,18 @@ static int coroutine_fn block_copy_do_copy(BlockCopySt=
-ate *s,
-     assert(QEMU_IS_ALIGNED(end, s->cluster_size));
-     assert(end < s->len || end =3D=3D QEMU_ALIGN_UP(s->len, s->cluster_siz=
-e));
-=20
-+    if (zeroes) {
-+        ret =3D bdrv_co_pwrite_zeroes(s->target, start, nbytes, s->write_f=
-lags &
-+                                    ~BDRV_REQ_WRITE_COMPRESSED);
-+        if (ret < 0) {
-+            trace_block_copy_write_zeroes_fail(s, start, ret);
-+            if (error_is_read) {
-+                *error_is_read =3D false;
-+            }
-+        }
-+        return ret;
-+    }
-+
-     if (s->use_copy_range) {
-         ret =3D bdrv_co_copy_range(s->source, start, s->target, start, nby=
-tes,
-                                  0, s->write_flags);
-@@ -230,6 +242,38 @@ out:
-     return ret;
- }
-=20
-+static int block_copy_block_status(BlockCopyState *s, int64_t offset,
-+                                   int64_t bytes, int64_t *pnum)
-+{
-+    int64_t num;
-+    BlockDriverState *base;
-+    int ret;
-+
-+    if (s->skip_unallocated && s->source->bs->backing) {
-+        base =3D s->source->bs->backing->bs;
-+    } else {
-+        base =3D NULL;
-+    }
-+
-+    ret =3D bdrv_block_status_above(s->source->bs, base, offset, bytes, &n=
-um,
-+                                  NULL, NULL);
-+    if (ret < 0 || num < s->cluster_size) {
-+        /*
-+         * On error or if failed to obtain large enough chunk just fallbac=
-k to
-+         * copy one cluster.
-+         */
-+        num =3D s->cluster_size;
-+        ret =3D BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_DATA;
-+    } else if (offset + num =3D=3D s->len) {
-+        num =3D QEMU_ALIGN_UP(num, s->cluster_size);
-+    } else {
-+        num =3D QEMU_ALIGN_DOWN(num, s->cluster_size);
-+    }
-+
-+    *pnum =3D num;
-+    return ret;
-+}
-+
- /*
-  * Check if the cluster starting at offset is allocated or not.
-  * return via pnum the number of contiguous clusters sharing this allocati=
-on.
-@@ -308,7 +352,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
- {
-     int ret =3D 0;
-     int64_t end =3D bytes + start; /* bytes */
--    int64_t status_bytes;
-     BlockCopyInFlightReq req;
-=20
-     /*
-@@ -325,7 +368,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
-     block_copy_inflight_req_begin(s, &req, start, end);
-=20
-     while (start < end) {
--        int64_t next_zero, chunk_end;
-+        int64_t next_zero, chunk_end, status_bytes;
-=20
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
-             trace_block_copy_skip(s, start);
-@@ -343,24 +386,28 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             chunk_end =3D next_zero;
-         }
-=20
--        if (s->skip_unallocated) {
--            ret =3D block_copy_reset_unallocated(s, start, &status_bytes);
--            if (ret =3D=3D 0) {
--                trace_block_copy_skip_range(s, start, status_bytes);
--                start +=3D status_bytes;
--                continue;
--            }
--            /* Clamp to known allocated region */
--            chunk_end =3D MIN(chunk_end, start + status_bytes);
-+        ret =3D block_copy_block_status(s, start, chunk_end - start,
-+                                      &status_bytes);
-+        if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
-+            bdrv_reset_dirty_bitmap(s->copy_bitmap, start, status_bytes);
-+            progress_set_remaining(s->progress,
-+                                   bdrv_get_dirty_count(s->copy_bitmap) +
-+                                   s->in_flight_bytes);
-+            trace_block_copy_skip_range(s, start, status_bytes);
-+            start +=3D status_bytes;
-+            continue;
-         }
-=20
-+        chunk_end =3D MIN(chunk_end, start + status_bytes);
-+
-         trace_block_copy_process(s, start);
-=20
-         bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-         s->in_flight_bytes +=3D chunk_end - start;
-=20
-         co_get_from_shres(s->mem, chunk_end - start);
--        ret =3D block_copy_do_copy(s, start, chunk_end, error_is_read);
-+        ret =3D block_copy_do_copy(s, start, chunk_end, ret & BDRV_BLOCK_Z=
-ERO,
-+                                 error_is_read);
-         co_put_to_shres(s->mem, chunk_end - start);
-         s->in_flight_bytes -=3D chunk_end - start;
-         if (ret < 0) {
-diff --git a/block/trace-events b/block/trace-events
-index 1a7329b736..29dff8881c 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -48,6 +48,7 @@ block_copy_process(void *bcs, int64_t start) "bcs %p star=
-t %"PRId64
- block_copy_copy_range_fail(void *bcs, int64_t start, int ret) "bcs %p star=
-t %"PRId64" ret %d"
- block_copy_read_fail(void *bcs, int64_t start, int ret) "bcs %p start %"PR=
-Id64" ret %d"
- block_copy_write_fail(void *bcs, int64_t start, int ret) "bcs %p start %"P=
-RId64" ret %d"
-+block_copy_write_zeroes_fail(void *bcs, int64_t start, int ret) "bcs %p st=
-art %"PRId64" ret %d"
-=20
- # ../blockdev.c
- qmp_block_job_cancel(void *job) "job %p"
---=20
-2.24.1
 
+>
+> > +
+> > +struct virtio_net_hdr_v1_hash {
+> > +    struct virtio_net_hdr_v1 hdr;
+> > +    __le32 hash_value;
+> > +#define VIRTIO_NET_HASH_REPORT_NONE            0
+> > +#define VIRTIO_NET_HASH_REPORT_IPv4            1
+> > +#define VIRTIO_NET_HASH_REPORT_TCPv4           2
+> > +#define VIRTIO_NET_HASH_REPORT_UDPv4           3
+> > +#define VIRTIO_NET_HASH_REPORT_IPv6            4
+> > +#define VIRTIO_NET_HASH_REPORT_TCPv6           5
+> > +#define VIRTIO_NET_HASH_REPORT_UDPv6           6
+> > +#define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
+> > +#define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
+> > +#define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
+> > +    __le16 hash_report;
+> > +    __le16 padding;
+> > +};
+> > +
+> > +/*
+> > + * The command VIRTIO_NET_CTRL_MQ_RSS_CONFIG has the same effect as
+> > + * VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET does and additionally configures
+> > + * the receive steering to use a hash calculated for incoming packet
+> > + * to decide on receive virtqueue to place the packet. The command
+> > + * also provides parameters to calculate a hash and receive virtqueue.
+> > + */
+> > +struct virtio_net_rss_config {
+> > +    __le32 hash_types;
+> > +    __le16 indirection_table_mask;
+> > +    __le16 unclassified_queue;
+> > +    __le16 indirection_table[1/* + indirection_table_mask */];
+> > +    __le16 max_tx_vq;
+> > +    __u8 hash_key_length;
+> > +    __u8 hash_key_data[/* hash_key_length */];
+> > +};
+> > +
+> > +#define VIRTIO_NET_CTRL_MQ_RSS_CONFIG          1
+> > +#define VIRTIO_NET_CTRL_MQ_HASH_CONFIG         2
+> > +
+> > +#endif
+> > +
+> >  /* Purge coalesced packets timer interval, This value affects the
+> performance
+> >     a lot, and should be tuned carefully, '300000'(300us) is the
+> recommended
+> >     value to pass the WHQL test, '50000' can gain 2x netperf throughput
+> with
+> > --
+> > 2.17.1
+>
+>
+
+--0000000000005a253b05a094a03f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Mar 11, 2020 at 3:47 PM Micha=
+el S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">mst@redhat.com</a>&gt; =
+wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
+px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Wed, M=
+ar 11, 2020 at 02:35:13PM +0200, Yuri Benditovich wrote:<br>
+&gt; Signed-off-by: Yuri Benditovich &lt;<a href=3D"mailto:yuri.benditovich=
+@daynix.com" target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 hw/net/virtio-net.c | 95 +++++++++++++++++++++++++++++++++++++++=
+++++++<br>
+&gt;=C2=A0 1 file changed, 95 insertions(+)<br>
+&gt; <br>
+&gt; diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c<br>
+&gt; index 3627bb1717..9545b0e84f 100644<br>
+&gt; --- a/hw/net/virtio-net.c<br>
+&gt; +++ b/hw/net/virtio-net.c<br>
+&gt; @@ -71,6 +71,101 @@<br>
+&gt;=C2=A0 #define VIRTIO_NET_IP6_ADDR_SIZE=C2=A0 =C2=A032=C2=A0 =C2=A0 =C2=
+=A0 /* ipv6 saddr + daddr */<br>
+&gt;=C2=A0 #define VIRTIO_NET_MAX_IP6_PAYLOAD VIRTIO_NET_MAX_TCP_PAYLOAD<br=
+>
+&gt;=C2=A0 <br>
+&gt; +/* TODO: remove after virtio-net header update */<br>
+&gt; +#if !defined(VIRTIO_NET_RSS_HASH_TYPE_IPv4)<br>
+&gt; +#define VIRTIO_NET_F_HASH_REPORT=C2=A0 =C2=A0 57=C2=A0 /* Supports ha=
+sh report */<br>
+&gt; +#define VIRTIO_NET_F_RSS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 60=
+=C2=A0 /* Supports RSS RX steering */<br>
+&gt; +<br>
+&gt; +/* supported/enabled hash types */<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_IPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 (1 &lt;&lt; 0)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(1 &lt;&lt; 1)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(1 &lt;&lt; 2)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_IPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 (1 &lt;&lt; 3)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_TCPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(1 &lt;&lt; 4)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_UDPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(1 &lt;&lt; 5)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_IP_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(1 &lt;&lt; 6)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_TCP_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 (1=
+ &lt;&lt; 7)<br>
+&gt; +#define VIRTIO_NET_RSS_HASH_TYPE_UDP_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 (1=
+ &lt;&lt; 8)<br>
+&gt; +<br>
+&gt; +#define __le16 uint16_t<br>
+&gt; +#define __le32 uint32_t<br>
+&gt; +#define __u8=C2=A0 =C2=A0uint8_t<br>
+&gt; +#define __u16=C2=A0 uint16_t<br>
+&gt; +#define __u32=C2=A0 uint32_t<br>
+<br>
+Let&#39;s just use uint16_t etc directly please.<br>
+<br>
+&gt; +struct virtio_net_config_with_rss {<br>
+&gt; +=C2=A0 =C2=A0 /* The config defining mac address (if VIRTIO_NET_F_MAC=
+) */<br>
+&gt; +=C2=A0 =C2=A0 __u8 mac[ETH_ALEN];<br>
+&gt; +=C2=A0 =C2=A0 /* See VIRTIO_NET_F_STATUS and VIRTIO_NET_S_* above */<=
+br>
+&gt; +=C2=A0 =C2=A0 __u16 status;<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Maximum number of each of transmit and receive =
+queues;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* see VIRTIO_NET_F_MQ and VIRTIO_NET_CTRL_MQ.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Legal values are between 1 and 0x8000<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 __u16 max_virtqueue_pairs;<br>
+&gt; +=C2=A0 =C2=A0 /* Default maximum transmit unit advice */<br>
+&gt; +=C2=A0 =C2=A0 __u16 mtu;<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* speed, in units of 1Mb. All values 0 to INT_MAX=
+ are legal.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Any other value stands for unknown.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 __u32 speed;<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* 0x00 - half duplex<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* 0x01 - full duplex<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Any other value stands for unknown.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 __u8 duplex;<br>
+&gt; +=C2=A0 =C2=A0 /* maximum size of RSS key */<br>
+&gt; +=C2=A0 =C2=A0 __u8 rss_max_key_size;<br>
+&gt; +=C2=A0 =C2=A0 /* maximum number of indirection table entries */<br>
+&gt; +=C2=A0 =C2=A0 __le16 rss_max_indirection_table_length;<br>
+&gt; +=C2=A0 =C2=A0 /* bitmask of supported VIRTIO_NET_RSS_HASH_ types */<b=
+r>
+&gt; +=C2=A0 =C2=A0 __le32 supported_hash_types;<br>
+&gt; +} __attribute__((packed));<br>
+&gt; +<br>
+&gt; +#define virtio_net_config virtio_net_config_with_rss<br>
+<br>
+Do we have to? Let&#39;s just tweak code to do the right thing...<br></bloc=
+kquote><div><br></div><div>Are we going to update the virtio_net some time?=
+</div><div>If yes, IMO makes sense to do less tweaking in the middle of the=
+ code.</div><div>Then, upon update of virtio_net.h - easily remove all thes=
+e defines that were added in virtio-net.c=C2=A0</div><div>=C2=A0<br></div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
+eft:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+&gt; +<br>
+&gt; +struct virtio_net_hdr_v1_hash {<br>
+&gt; +=C2=A0 =C2=A0 struct virtio_net_hdr_v1 hdr;<br>
+&gt; +=C2=A0 =C2=A0 __le32 hash_value;<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_NONE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 0<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_IPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 1<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_TCPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A02<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_UDPv4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A03<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_IPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 4<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_TCPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A05<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_UDPv6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A06<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_IPv6_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A07<br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_TCPv6_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 8<=
+br>
+&gt; +#define VIRTIO_NET_HASH_REPORT_UDPv6_EX=C2=A0 =C2=A0 =C2=A0 =C2=A0 9<=
+br>
+&gt; +=C2=A0 =C2=A0 __le16 hash_report;<br>
+&gt; +=C2=A0 =C2=A0 __le16 padding;<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +/*<br>
+&gt; + * The command VIRTIO_NET_CTRL_MQ_RSS_CONFIG has the same effect as<b=
+r>
+&gt; + * VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET does and additionally configures<b=
+r>
+&gt; + * the receive steering to use a hash calculated for incoming packet<=
+br>
+&gt; + * to decide on receive virtqueue to place the packet. The command<br=
+>
+&gt; + * also provides parameters to calculate a hash and receive virtqueue=
+.<br>
+&gt; + */<br>
+&gt; +struct virtio_net_rss_config {<br>
+&gt; +=C2=A0 =C2=A0 __le32 hash_types;<br>
+&gt; +=C2=A0 =C2=A0 __le16 indirection_table_mask;<br>
+&gt; +=C2=A0 =C2=A0 __le16 unclassified_queue;<br>
+&gt; +=C2=A0 =C2=A0 __le16 indirection_table[1/* + indirection_table_mask *=
+/];<br>
+&gt; +=C2=A0 =C2=A0 __le16 max_tx_vq;<br>
+&gt; +=C2=A0 =C2=A0 __u8 hash_key_length;<br>
+&gt; +=C2=A0 =C2=A0 __u8 hash_key_data[/* hash_key_length */];<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +#define VIRTIO_NET_CTRL_MQ_RSS_CONFIG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 1<br>
+&gt; +#define VIRTIO_NET_CTRL_MQ_HASH_CONFIG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A02<br>
+&gt; +<br>
+&gt; +#endif<br>
+&gt; +<br>
+&gt;=C2=A0 /* Purge coalesced packets timer interval, This value affects th=
+e performance<br>
+&gt;=C2=A0 =C2=A0 =C2=A0a lot, and should be tuned carefully, &#39;300000&#=
+39;(300us) is the recommended<br>
+&gt;=C2=A0 =C2=A0 =C2=A0value to pass the WHQL test, &#39;50000&#39; can ga=
+in 2x netperf throughput with<br>
+&gt; -- <br>
+&gt; 2.17.1<br>
+<br>
+</blockquote></div></div>
+
+--0000000000005a253b05a094a03f--
 
