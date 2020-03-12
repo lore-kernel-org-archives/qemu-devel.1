@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D753FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8500EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91867206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D5DA206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="euoNpR0z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91867206FA
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l9zOXcWB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5DA206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCREp-0003wx-NB
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:03:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35903)
+	id 1jCRF6-0004rC-DB
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:03:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxq-0000lz-DD
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxp-0000iN-2F
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxo-0005Ie-Rs
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:42 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:35242)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxn-0005Hs-1a
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:40 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:46739)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxo-0005IR-K8
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:40 -0400
-Received: by mail-wm1-x333.google.com with SMTP id m3so7127477wmi.0
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:40 -0700 (PDT)
+ id 1jCQxl-0005HD-NK
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:38 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id n15so8334088wrw.13
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=LW+uhVLtDVUYFrSt24tGGyA8LHnhD06A1jm/O2Dydpk=;
- b=euoNpR0zJ0xaOGfQPCASYBml2PVfr0s3neeidYkZzOs9iQycoiqyi9JxKT+QIEjds/
- ENPGz2w18J0t0/VcDvUD2/WgVcuyOmFXjvLAWw9YXDRYJHg3AmgLKc8EUQb5z0obBdpA
- XoEvC8YhU9ymOkgRcVSvMGBQeKiau7A70E9L0vXzmb3Y9NUALr+movcDgKCDEsaTsbHV
- 8+YoJy2QwoVHWS0bc/ytahcQi8k41xUzZ/rmg3OlXERcguFE0Lz9a/lstjVjRyf1RLP5
- qoMnMLVhxjejPWr0/xGtZzEtAZxuW67Q9Pxwoh7omXa8+s8QomH6L1WyC7zfZU89NsLf
- ngzA==
+ bh=wZ6qU24NMx+uWtsg/jdbylB5gJZWFv8tnsBEfFNk6VY=;
+ b=l9zOXcWB7UlbmE14mKEqADMRp7XAk9ZCeRnFNzW87VFdD50k1iP7qNy0/FPMLjEbKe
+ lyftoHPpRRXfjE0RHx+FnjjMLdPkXPnOEPPoqnhcltJyR6WqcD/6OZnwdCVwTRXBjhpp
+ st0+AuUS5+zlHzSiRg/QSQCb7PXuODOJlv9w7U7fUXc6/hVLXbrFO1WCIvnBwTn4QzvO
+ 4ELxrstCPRMwLPVWNnjU2BRTAfPjP0MPx7mf4bLT7IFK89pcabh5AAFB6fMW846UnbN4
+ 22MuCfmH17CfHnQE4fN9EI4KJvfYo3nZslWm0H1xKPTXvmDS9hCzay22d54sQT5MGjg8
+ Xlyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LW+uhVLtDVUYFrSt24tGGyA8LHnhD06A1jm/O2Dydpk=;
- b=KXnzPE+fQXNSpTjVcaAkXwCcead187WAYNAu0aq/yD8IuvLfE99dc/gct+CtZk3gOS
- xc4dR19G/0MHoNiC6JjuCFN6utIee8dQR79WMf0lGJeKECrWR8KwjQDfy8zspVsQHqb3
- KjPdMi4cyeWg4K4cQKaUlz9NpOSEXSNmB13kXqTqZfqQdPKrTRQRSOFtMnKP75eT887g
- 4wO2oviyv6qh/HMqE/Wb6WrEgctqP1H6Wi5dFi/ge4Ypl2gCzji2X3SJx89Ad5eySwn8
- WxOCw/r+h23YEFHTQhuqjEDPBcAt6CF7HDRW04alAZvA38UeiG5NQ8K+Or9KxgfOqECv
- OqzA==
-X-Gm-Message-State: ANhLgQ0ouO0vjuOHJcjeKzvqJ27MlGeDtxQr3Ev7OU4gGhPhyKyEn2/d
- 2rs7LewWvAzDh7CfhSXYJhZ4uROd0+vz7Q==
-X-Google-Smtp-Source: ADFU+vvik/FlM3IXtJ9k3iyLgKslKazyKDJDOtUq4OGNS1saa/KpDx9nX+yvnQpagX7K0wTqvQcRpg==
-X-Received: by 2002:a7b:c7cd:: with SMTP id z13mr5401096wmk.97.1584031539304; 
- Thu, 12 Mar 2020 09:45:39 -0700 (PDT)
+ bh=wZ6qU24NMx+uWtsg/jdbylB5gJZWFv8tnsBEfFNk6VY=;
+ b=c/R9KPTK2vPGrPW6QrZKw/1IsGqRsJTkYlS0diAqiXKeZc/uZM9H2utHbqfL6AOgCD
+ HoaUvgKQHRUl8WqKnkj8qCQUmQRheqQu8ZLUk7f8wMAfyAYnYLDyTbYu+2/gUAL7A3kx
+ rQ+XEpDo5zy3AI5i/hEBUq6ATBlvt+9/Bet976wzd1Ei5bm7DbFBijLhpvXoCMbUmyaA
+ T4fcZ77KeTEyXc5VGF/QZtg5+s+5dm3qezjlKFZvdqLAMlBXf+/ulLhikGC+vk7OUumT
+ Wafy8MTXnld77LX8biiweXXkackWURkeKrR3y0CeyV+kwZTDuDIgFG1qNedvlH666Rct
+ ZbBA==
+X-Gm-Message-State: ANhLgQ2yx8DlOsGSRXDkXxM9EM8ESPY+RvURUpa+q2EqJeTruZttNKCW
+ Ra3d4vDlNA28q3IqzjeOVy7AKHg9wk5yJQ==
+X-Google-Smtp-Source: ADFU+vskKTnb80XG1/cCqpedNXnlF6JIsh5GUqyR7gc5GbQj6Jrbux+1u8wOBAckgSddlesBcrZqkg==
+X-Received: by 2002:adf:9307:: with SMTP id 7mr11754728wro.171.1584031536213; 
+ Thu, 12 Mar 2020 09:45:36 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.38
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.35
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:38 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:35 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/36] hw/arm/virt: Introduce VirtGICType enum type
-Date: Thu, 12 Mar 2020 16:44:54 +0000
-Message-Id: <20200312164459.25924-32-peter.maydell@linaro.org>
+Subject: [PULL 28/36] tests/boot_linux_console: Test booting NetBSD via U-Boot
+ on OrangePi PC
+Date: Thu, 12 Mar 2020 16:44:51 +0000
+Message-Id: <20200312164459.25924-29-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,165 +99,177 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-We plan to introduce yet another value for the gic version (nosel).
-As we already use exotic values such as 0 and -1, let's introduce
-a dedicated enum type and let vms->gic_version take this
-type.
+This test boots U-Boot then NetBSD (stored on a SD card) on
+a OrangePi PC board.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Message-id: 20200311131618.7187-3-eric.auger@redhat.com
+As it requires ~1.3GB of storage, it is disabled by default.
+
+U-Boot is built by the Debian project [1], and the SD card image
+is provided by the NetBSD organization [2].
+
+Once the compressed SD card image is downloaded (304MB) and
+extracted, this test is fast:
+
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
+  console: DRAM: 1024 MiB
+  console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: scanning bus usb@1c1b000 for devices... 1 USB Device(s) found
+  console: scanning bus usb@1c1d000 for devices... 1 USB Device(s) found
+  console: scanning usb for storage devices... 0 Storage Device(s) found
+  console: Hit any key to stop autoboot:  0
+  console: => setenv bootargs root=ld0a
+  console: => setenv kernel netbsd-GENERIC.ub
+  console: => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
+  console: => boot
+  console: ## Booting kernel from Legacy Image at 42000000 ...
+  console: Image Name:   NetBSD/earmv7hf 9.0_RC1
+  console: Image Type:   ARM Linux Kernel Image (no loading done) (uncompressed)
+  console: XIP Kernel Image (no loading done)
+  console: Loading Device Tree to 49ff6000, end 49fffe01 ... OK
+  console: Starting kernel ...
+  console: [   1.0000000] NetBSD/evbarm (fdt) booting ...
+  console: [   1.0000000] NetBSD 9.0 (GENERIC) #0: Fri Feb 14 00:06:28 UTC 2020
+  console: [   1.0000000]         mkrepro@mkrepro.NetBSD.org:/usr/src/sys/arch/evbarm/compile/GENERIC
+  console: [   1.0000000] total memory = 1024 MB
+  console: [   1.0000000] avail memory = 1003 MB
+  console: [   1.0000000] armfdt0 (root)
+  console: [   1.0000000] simplebus0 at armfdt0: Xunlong Orange Pi PC
+  console: [   1.0000000] cpu0 at cpus0: Cortex-A7 r0p5 (Cortex V7A core)
+  console: [   1.0000000] cpu0: DC enabled IC enabled WB enabled LABT branch prediction enabled
+  console: [   1.0000000] cpu0: 32KB/64B 2-way L1 VIPT Instruction cache
+  console: [   1.0000000] cpu0: 32KB/64B 2-way write-back-locking-C L1 PIPT Data cache
+  console: [   1.0000000] cpu0: 2304KB/64B 16-way write-through L2 PIPT Unified cache
+  console: [   1.0000000] vfp0 at cpu0: NEON MPE (VFP 3.0+), rounding, NaN propagation, denormals
+  ...
+  console: [   2.3812082] sdmmc0: SD card status: 4-bit, C0
+  console: [   2.3812082] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
+  console: [   2.4012856] ld0: 1226 MB, 622 cyl, 64 head, 63 sec, 512 bytes/sect x 2511872 sectors
+  console: [   2.5321222] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
+  console: [   3.1068718] WARNING: 4 errors while detecting hardware; check system log.
+  console: [   3.1179868] boot device: ld0
+  console: [   3.1470623] root on ld0a dumps on ld0b
+  console: [   3.2464436] root file system type: ffs
+  console: [   3.2897123] kern.module.path=/stand/evbarm/9.0/modules
+  console: Mon Feb 17 20:33:35 UTC 2020
+  console: Starting root file system check:
+  PASS (35.96 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 36.09 s
+
+Note, this test only took ~65 seconds to run on Travis-CI, see: [3].
+
+This test is based on a description from Niek Linnenbank from [4].
+
+[1] https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable_SD_Card_with_u-boot
+[2] https://wiki.netbsd.org/ports/evbarm/allwinner/
+[3] https://travis-ci.org/philmd/qemu/jobs/638823612#L3778
+[4] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669347.html
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20200311221854.30370-18-nieklinnenbank@gmail.com
+[NL: changed test to use NetBSD 9.0 final release and -global allwinner-rtc.base-year]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/virt.h | 11 +++++++++--
- hw/arm/virt.c         | 30 +++++++++++++++---------------
- 2 files changed, 24 insertions(+), 17 deletions(-)
+ tests/acceptance/boot_linux_console.py | 70 ++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 02f500cb8e2..c0827cacdf3 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -95,6 +95,13 @@ typedef enum VirtIOMMUType {
-     VIRT_IOMMU_VIRTIO,
- } VirtIOMMUType;
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index e035c88b078..f825cd9ef55 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -16,6 +16,7 @@ import shutil
+ from avocado import skipUnless
+ from avocado_qemu import Test
+ from avocado_qemu import exec_command_and_wait_for_pattern
++from avocado_qemu import interrupt_interactive_console_until_pattern
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
+@@ -667,6 +668,75 @@ class BootLinuxConsole(Test):
+                                       'to <orangepipc>')
+         self.wait_for_console_pattern('Starting Load Kernel Modules...')
  
-+typedef enum VirtGICType {
-+    VIRT_GIC_VERSION_MAX,
-+    VIRT_GIC_VERSION_HOST,
-+    VIRT_GIC_VERSION_2,
-+    VIRT_GIC_VERSION_3,
-+} VirtGICType;
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    def test_arm_orangepi_uboot_netbsd9(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:orangepi-pc
++        """
++        # This test download a 304MB compressed image and expand it to 1.3GB...
++        deb_url = ('http://snapshot.debian.org/archive/debian/'
++                   '20200108T145233Z/pool/main/u/u-boot/'
++                   'u-boot-sunxi_2020.01%2Bdfsg-1_armhf.deb')
++        deb_hash = 'f67f404a80753ca3d1258f13e38f2b060e13db99'
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        # We use the common OrangePi PC 'plus' build of U-Boot for our secondary
++        # program loader (SPL). We will then set the path to the more specific
++        # OrangePi "PC" device tree blob with 'setenv fdtfile' in U-Boot prompt,
++        # before to boot NetBSD.
++        uboot_path = '/usr/lib/u-boot/orangepi_plus/u-boot-sunxi-with-spl.bin'
++        uboot_path = self.extract_from_deb(deb_path, uboot_path)
++        image_url = ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/'
++                     'evbarm-earmv7hf/binary/gzimg/armv7.img.gz')
++        image_hash = '2babb29d36d8360adcb39c09e31060945259917a'
++        image_path_gz = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_path = os.path.join(self.workdir, 'armv7.img')
++        image_drive_args = 'if=sd,format=raw,snapshot=on,file=' + image_path
++        archive.gzip_uncompress(image_path_gz, image_path)
 +
- typedef struct MemMapEntry {
-     hwaddr base;
-     hwaddr size;
-@@ -123,7 +130,7 @@ typedef struct {
-     bool highmem_ecam;
-     bool its;
-     bool virt;
--    int32_t gic_version;
-+    VirtGICType gic_version;
-     VirtIOMMUType iommu;
-     uint16_t virtio_iommu_bdf;
-     struct arm_boot_info bootinfo;
-@@ -162,7 +169,7 @@ static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
-     uint32_t redist0_capacity =
-                 vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
- 
--    assert(vms->gic_version == 3);
-+    assert(vms->gic_version == VIRT_GIC_VERSION_3);
- 
-     return vms->smp_cpus > redist0_capacity ? 2 : 1;
- }
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 7c38c6c7f91..4ed1f0cb2e5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -299,7 +299,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
-         irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
-     }
- 
--    if (vms->gic_version == 2) {
-+    if (vms->gic_version == VIRT_GIC_VERSION_2) {
-         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
-                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
-                              (1 << vms->smp_cpus) - 1);
-@@ -440,7 +440,7 @@ static void fdt_add_gic_node(VirtMachineState *vms)
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 0x2);
-     qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 0x2);
-     qemu_fdt_setprop(vms->fdt, nodename, "ranges", NULL, 0);
--    if (vms->gic_version == 3) {
-+    if (vms->gic_version == VIRT_GIC_VERSION_3) {
-         int nb_redist_regions = virt_gicv3_redist_region_count(vms);
- 
-         qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-@@ -519,7 +519,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
-         }
-     }
- 
--    if (vms->gic_version == 2) {
-+    if (vms->gic_version == VIRT_GIC_VERSION_2) {
-         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
-                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
-                              (1 << vms->smp_cpus) - 1);
-@@ -1470,7 +1470,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
-          * purposes are to make TCG consistent (with 64-bit KVM hosts)
-          * and to improve SGI efficiency.
-          */
--        if (vms->gic_version == 3) {
-+        if (vms->gic_version == VIRT_GIC_VERSION_3) {
-             clustersz = GICV3_TARGETLIST_BITS;
-         } else {
-             clustersz = GIC_TARGETLIST_BITS;
-@@ -1561,15 +1561,15 @@ static void machvirt_init(MachineState *machine)
-     /* We can probe only here because during property set
-      * KVM is not available yet
-      */
--    if (vms->gic_version <= 0) {
--        /* "host" or "max" */
-+    if (vms->gic_version == VIRT_GIC_VERSION_HOST ||
-+        vms->gic_version == VIRT_GIC_VERSION_MAX) {
-         if (!kvm_enabled()) {
--            if (vms->gic_version == 0) {
-+            if (vms->gic_version == VIRT_GIC_VERSION_HOST) {
-                 error_report("gic-version=host requires KVM");
-                 exit(1);
-             } else {
-                 /* "max": currently means 3 for TCG */
--                vms->gic_version = 3;
-+                vms->gic_version = VIRT_GIC_VERSION_3;
-             }
-         } else {
-             vms->gic_version = kvm_arm_vgic_probe();
-@@ -1628,7 +1628,7 @@ static void machvirt_init(MachineState *machine)
-     /* The maximum number of CPUs depends on the GIC version, or on how
-      * many redistributors we can fit into the memory map.
-      */
--    if (vms->gic_version == 3) {
-+    if (vms->gic_version == VIRT_GIC_VERSION_3) {
-         virt_max_cpus =
-             vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
-         virt_max_cpus +=
-@@ -1856,7 +1856,7 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
- static char *virt_get_gic_version(Object *obj, Error **errp)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
--    const char *val = vms->gic_version == 3 ? "3" : "2";
-+    const char *val = vms->gic_version == VIRT_GIC_VERSION_3 ? "3" : "2";
- 
-     return g_strdup(val);
- }
-@@ -1866,13 +1866,13 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-     VirtMachineState *vms = VIRT_MACHINE(obj);
- 
-     if (!strcmp(value, "3")) {
--        vms->gic_version = 3;
-+        vms->gic_version = VIRT_GIC_VERSION_3;
-     } else if (!strcmp(value, "2")) {
--        vms->gic_version = 2;
-+        vms->gic_version = VIRT_GIC_VERSION_2;
-     } else if (!strcmp(value, "host")) {
--        vms->gic_version = 0; /* Will probe later */
-+        vms->gic_version = VIRT_GIC_VERSION_HOST; /* Will probe later */
-     } else if (!strcmp(value, "max")) {
--        vms->gic_version = -1; /* Will probe later */
-+        vms->gic_version = VIRT_GIC_VERSION_MAX; /* Will probe later */
-     } else {
-         error_setg(errp, "Invalid gic-version value");
-         error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
-@@ -2141,7 +2141,7 @@ static void virt_instance_init(Object *obj)
-                                     "physical address space above 32 bits",
-                                     NULL);
-     /* Default GIC type is v2 */
--    vms->gic_version = 2;
-+    vms->gic_version = VIRT_GIC_VERSION_2;
-     object_property_add_str(obj, "gic-version", virt_get_gic_version,
-                         virt_set_gic_version, NULL);
-     object_property_set_description(obj, "gic-version",
++        # dd if=u-boot-sunxi-with-spl.bin of=armv7.img bs=1K seek=8 conv=notrunc
++        with open(uboot_path, 'rb') as f_in:
++            with open(image_path, 'r+b') as f_out:
++                f_out.seek(8 * 1024)
++                shutil.copyfileobj(f_in, f_out)
++
++                # Extend image, to avoid that NetBSD thinks the partition
++                # inside the image is larger than device size itself
++                f_out.seek(0, 2)
++                f_out.seek(64 * 1024 * 1024, 1)
++                f_out.write(bytearray([0x00]))
++
++        self.vm.set_console()
++        self.vm.add_args('-nic', 'user',
++                         '-drive', image_drive_args,
++                         '-global', 'allwinner-rtc.base-year=2000',
++                         '-no-reboot')
++        self.vm.launch()
++        wait_for_console_pattern(self, 'U-Boot 2020.01+dfsg-1')
++        interrupt_interactive_console_until_pattern(self,
++                                       'Hit any key to stop autoboot:',
++                                       'switch to partitions #0, OK')
++
++        exec_command_and_wait_for_pattern(self, '', '=>')
++        cmd = 'setenv bootargs root=ld0a'
++        exec_command_and_wait_for_pattern(self, cmd, '=>')
++        cmd = 'setenv kernel netbsd-GENERIC.ub'
++        exec_command_and_wait_for_pattern(self, cmd, '=>')
++        cmd = 'setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb'
++        exec_command_and_wait_for_pattern(self, cmd, '=>')
++        cmd = ("setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; "
++               "fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; "
++               "fdt addr ${fdt_addr_r}; "
++               "bootm ${kernel_addr_r} - ${fdt_addr_r}'")
++        exec_command_and_wait_for_pattern(self, cmd, '=>')
++
++        exec_command_and_wait_for_pattern(self, 'boot',
++                                          'Booting kernel from Legacy Image')
++        wait_for_console_pattern(self, 'Starting kernel ...')
++        wait_for_console_pattern(self, 'NetBSD 9.0 (GENERIC)')
++        # Wait for user-space
++        wait_for_console_pattern(self, 'Starting root file system check')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.20.1
 
