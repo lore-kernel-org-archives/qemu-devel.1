@@ -2,58 +2,87 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9C3C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA57C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EE0B206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:00:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE0B206F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8DC3206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:01:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p+HrIuEZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8DC3206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRBu-00032S-DA
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:00:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36386)
+	id 1jCRCw-0005sS-4a
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:01:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR0R-0006Li-9C
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:48:24 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxo-0000i1-TV
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR0P-0006AS-Tz
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:48:23 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54610)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCR0P-00067h-FJ; Thu, 12 Mar 2020 12:48:21 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07810162|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.482373-0.000284395-0.517343;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-QGAAB_1584031686; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-QGAAB_1584031686)
- by smtp.aliyun-inc.com(10.147.41.120);
- Fri, 13 Mar 2020 00:48:07 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 54/60] target/riscv: integer extract instruction
-Date: Thu, 12 Mar 2020 22:58:54 +0800
-Message-Id: <20200312145900.2054-55-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxn-0005IL-RY
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:40 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39678)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCQxn-0005Hm-K5
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:39 -0400
+Received: by mail-wr1-x430.google.com with SMTP id r15so8375108wrx.6
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=nS/aDfnl92D82KTfGKjjCWslOmck/fORd79XKsoQXJY=;
+ b=p+HrIuEZdgWIPu5cpkPGzDMxTUDBF9b88V1Xo45LkVofoQIMgnThviF+pTxwZCDzJQ
+ o2Pld5tlDvxKvnvGhmvEn79P/oSrLj0I0HuqT/K0LXu/8/SuG09DwrAIysDyAKQDjtgs
+ yZCedUIIndS5Scxb1LN4vCrB6XKKYY0PXnKSUU5V52L9iaWfVOwkOtnrzsZ6o92b28Bh
+ xUka0wJWkK9FYdktou5uz1sE9MXBOkj+n7OVP8YVExRh1YH4mWVrtS3B9XdKzZX3S5uc
+ Q70DZqekbXD+LzmqCXxkAxAso85kIrB8vBQ4w2/MaPsj1m1yxTME1Lfi8V1VcNhWwHG/
+ 5wsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=nS/aDfnl92D82KTfGKjjCWslOmck/fORd79XKsoQXJY=;
+ b=mgCVD6/8T8jIZYoRtQcntlSlrWfBygueC4xN5N6vRvDqhTok4JFVS9pKw1KTmxSAZm
+ wcbZ9SviiiFHrpMTe7MXPLoiROTLJJWeNI99Wxeu04ewrEjj/MIKF2ijlcmJShhCl5Or
+ zHqHkhtTTgz2LoOamkvmrvBJJ3iHJfbseQ++q2EvPivGAIESy5p5PNwIOaFduv1+dGam
+ FZYvBB49KERob3A2+Mj/PiW40ocCbRMaMMdCeFBKBFzDwU2Q+sFxP5120j+R2q5/ToOQ
+ 20C9oCXQCb9Rc4Bma+jeRKuXNf8PAiYot9ZWR3ocQgKy37TsGEjTGEKwbb8/4zcJAcuK
+ nioQ==
+X-Gm-Message-State: ANhLgQ2tHBlINEQY8gEZhV3xZRpCpyK5uPN38CAy0DWR7UID/m6ElsWs
+ IQCKWgsZOgfj+XsFb1RefJvLHyIU/DNYFA==
+X-Google-Smtp-Source: ADFU+vtF1WHQwLXMX++mhB4LHyszuza/npE08IDiOyLPkv8aIiEOaIwj4kvKen7Y50eB+WiVujJF6A==
+X-Received: by 2002:adf:f503:: with SMTP id q3mr12526107wro.363.1584031538324; 
+ Thu, 12 Mar 2020 09:45:38 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.37
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 09:45:37 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 30/36] hw/arm/virt: Document 'max' value in gic-version
+ property description
+Date: Thu, 12 Mar 2020 16:44:53 +0000
+Message-Id: <20200312164459.25924-31-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
+References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,116 +94,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  5 ++++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 33 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 20 +++++++++++++++
- 4 files changed, 59 insertions(+)
+From: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index e3f2970221..d94347a9a5 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1101,3 +1101,8 @@ DEF_HELPER_4(vid_v_b, void, ptr, ptr, env, i32)
- DEF_HELPER_4(vid_v_h, void, ptr, ptr, env, i32)
- DEF_HELPER_4(vid_v_w, void, ptr, ptr, env, i32)
- DEF_HELPER_4(vid_v_d, void, ptr, ptr, env, i32)
-+
-+DEF_HELPER_3(vext_x_v_b, tl, ptr, tl, env)
-+DEF_HELPER_3(vext_x_v_h, tl, ptr, tl, env)
-+DEF_HELPER_3(vext_x_v_w, tl, ptr, tl, env)
-+DEF_HELPER_3(vext_x_v_d, tl, ptr, tl, env)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 1504059415..c26a186d6a 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -555,6 +555,7 @@ vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
-+vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+Mention 'max' value in the gic-version property description.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Message-id: 20200311131618.7187-2-eric.auger@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/virt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 32d865a4886..7c38c6c7f91 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2146,7 +2146,8 @@ static void virt_instance_init(Object *obj)
+                         virt_set_gic_version, NULL);
+     object_property_set_description(obj, "gic-version",
+                                     "Set GIC version. "
+-                                    "Valid values are 2, 3 and host", NULL);
++                                    "Valid values are 2, 3, host and max",
++                                    NULL);
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 1ff72a6406..46651dfb10 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2210,3 +2210,36 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
-     }
-     return false;
- }
-+
-+/*
-+ *** Vector Permutation Instructions
-+ */
-+/* Integer Extract Instruction */
-+typedef void (* gen_helper_vext_x_v)(TCGv, TCGv_ptr, TCGv, TCGv_env);
-+static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-+{
-+    if (vext_check_isa_ill(s, RVV)) {
-+        TCGv_ptr src2;
-+        TCGv dest, src1;
-+        gen_helper_vext_x_v fns[4] = {
-+            gen_helper_vext_x_v_b, gen_helper_vext_x_v_h,
-+            gen_helper_vext_x_v_w, gen_helper_vext_x_v_d
-+        };
-+
-+        dest = tcg_temp_new();
-+        src1 = tcg_temp_new();
-+        src2 = tcg_temp_new_ptr();
-+
-+        gen_get_gpr(src1, a->rs1);
-+        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
-+
-+        fns[s->sew](dest, src2, src1, cpu_env);
-+        gen_set_gpr(a->rd, dest);
-+
-+        tcg_temp_free(dest);
-+        tcg_temp_free(src1);
-+        tcg_temp_free_ptr(src2);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index ff3b60e9c8..8704ee120f 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4440,3 +4440,23 @@ GEN_VEXT_VID_V(vid_v_b, uint8_t, H1, clearb)
- GEN_VEXT_VID_V(vid_v_h, uint16_t, H2, clearh)
- GEN_VEXT_VID_V(vid_v_w, uint32_t, H4, clearl)
- GEN_VEXT_VID_V(vid_v_d, uint64_t, H8, clearq)
-+
-+/*
-+ *** Vector Permutation Instructions
-+ */
-+/* Integer Extract Instruction */
-+#define GEN_VEXT_X_V(NAME, ETYPE, H)                    \
-+target_ulong HELPER(NAME)(void *vs2, target_ulong s1,   \
-+        CPURISCVState *env)                             \
-+{                                                       \
-+    uint32_t vlen = env_archcpu(env)->cfg.vlen / 8;     \
-+                                                        \
-+    if (s1 >= vlen / sizeof(ETYPE)) {                   \
-+        return 0;                                       \
-+    }                                                   \
-+    return *((ETYPE *)vs2 + s1);                        \
-+}
-+GEN_VEXT_X_V(vext_x_v_b, uint8_t, H1)
-+GEN_VEXT_X_V(vext_x_v_h, uint16_t, H2)
-+GEN_VEXT_X_V(vext_x_v_w, uint32_t, H4)
-+GEN_VEXT_X_V(vext_x_v_d, uint64_t, H8)
+     vms->highmem_ecam = !vmc->no_highmem_ecam;
+ 
 -- 
-2.23.0
+2.20.1
 
 
