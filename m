@@ -2,67 +2,61 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E67C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB07C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 22:01:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC2D5206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC2D5206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5921206CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 22:01:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5921206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCVfa-0007B9-01
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 17:47:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35800)
+	id 1jCVtk-0008J2-SN
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 18:01:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jCVei-0006hu-Ub
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:46:18 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCVsa-0007pE-1i
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 18:00:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jCVeh-0008SG-4M
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:46:16 -0400
-Resent-Date: Thu, 12 Mar 2020 17:46:16 -0400
-Resent-Message-Id: <E1jCVeh-0008SG-4M@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jCVef-0008RY-Fw; Thu, 12 Mar 2020 17:46:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584049569; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=RUmhN0w17zuNNi/dBiNGTRJw84l8kMfCKnQAa/ah3A3YTrVL7bwDx3nFOW30yNpvdGfvfthrNcEucYYXXLpqpw4JnCoQ7BoKTAx0zS/2d8g0KIQVi4x+IxKRJaKw66T3PaEeqsHlDHLFhmNrl32Q4WqoML7+ejN2tVg59dq22m0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584049569;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=2h2tSdE4ML46jWm87oDQQxkeDw6+PuhL8P4BcMAONkE=; 
- b=VU8ea0kJfxclTFBPydnOo0/S1Gsk5iqeBjcE/g+0bwbga/HdJV6sOJm22v7jw9I06rIL7BqnKhHYR9IPJo2y1pOJ9UUWbiN/46TFsuPPexHDAPSCpd4LEluFBRpxZFYsBV72CMPeCl4R/sTYRy8otJkDutdFNROga9ih2kVwcSM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584049567379850.1016084489432;
- Thu, 12 Mar 2020 14:46:07 -0700 (PDT)
-In-Reply-To: <20200312192822.3739399-1-eblake@redhat.com>
-Subject: Re: [PATCH v4 0/7] Tighten qemu-img rules on missing backing format
-Message-ID: <158404956602.16773.18303783925074765228@39012742ff91>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCVsX-0005gj-EY
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 18:00:35 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34483)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCVsW-0005ZR-SC; Thu, 12 Mar 2020 18:00:33 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_alarm|0.642478-0.00142911-0.356093; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03300; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=9; RT=9; SR=0;
+ TI=SMTPD_---.H-WI-va_1584050425; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-WI-va_1584050425) by smtp.aliyun-inc.com(10.147.40.2);
+ Fri, 13 Mar 2020 06:00:25 +0800
+Subject: Re: [PATCH v5 04/60] target/riscv: add vector configure instruction
+To: Alistair Francis <alistair23@gmail.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-5-zhiwei_liu@c-sky.com>
+ <CAKmqyKOA2xH+wCZ2L1TGDoL+3kfdEVGFKcqARua_e7GdN_iTuQ@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <ae6e17bd-bd61-2365-1451-da4a05b82ee1@c-sky.com>
+Date: Fri, 13 Mar 2020 06:00:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eblake@redhat.com
-Date: Thu, 12 Mar 2020 14:46:07 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+In-Reply-To: <CAKmqyKOA2xH+wCZ2L1TGDoL+3kfdEVGFKcqARua_e7GdN_iTuQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,54 +68,383 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
- libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMjE5MjgyMi4zNzM5
-Mzk5LTEtZWJsYWtlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
-b2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXIt
-aW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZl
-ZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKSW4gZmlsZSBpbmNs
-dWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FhcGkvcW1wL3FkaWN0Lmg6MTYs
-CiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svc2hlZXBkb2cu
-YzoyMDoKL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6IEluIGZ1bmN0aW9uICdz
-ZF9jb19jcmVhdGVfb3B0cyc6Ci90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL3FhcGkvcW1wL3Fv
-YmplY3QuaDo5OToxMzogZXJyb3I6ICdxZGljdCcgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBp
-biB0aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdCiAgICAgaWYgKG9i
-aiAmJiAtLW9iai0+YmFzZS5yZWZjbnQgPT0gMCkgewogICAgICAgICB+fn5+Xn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3NoZWVwZG9nLmM6MjE2NDox
-Mjogbm90ZTogJ3FkaWN0JyB3YXMgZGVjbGFyZWQgaGVyZQogICAgIFFEaWN0ICpxZGljdCwgKmxv
-Y2F0aW9uX3FkaWN0OwogICAgICAgICAgICBefn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0
-cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6
-Njk6IGJsb2NrL3NoZWVwZG9nLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmlu
-aXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUg
-Ii4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgotLS0KICAg
-IHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVk
-UHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICct
-LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MmJjNDU1N2ZlY2YwNGFhZTg4YTY1NDMz
-YjE2ZDc3NzMnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
-ZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
-VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
-JywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdics
-ICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNo
-ZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15cW9sOXVqei9zcmMvZG9j
-a2VyLXNyYy4yMDIwLTAzLTEyLTE3LjQ0LjEyLjI4MjA3Oi92YXIvdG1wL3FlbXU6eixybycsICdx
-ZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVk
-IG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5p
-bnN0YW5jZS51dWlkPTJiYzQ1NTdmZWNmMDRhYWU4OGE2NTQzM2IxNmQ3NzczCm1ha2VbMV06ICoq
-KiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXlxb2w5dWp6L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVu
-LXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDFtNTQuNzkwcwp1c2VyICAgIDBt
-OC4zMDRzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDIwMDMxMjE5MjgyMi4zNzM5Mzk5LTEtZWJsYWtlQHJlZGhhdC5jb20vdGVzdGluZy5k
-b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+
+On 2020/3/13 5:23, Alistair Francis wrote:
+> On Thu, Mar 12, 2020 at 8:07 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>> vsetvl and vsetvli are two configure instructions for vl, vtype. TB flags
+>> should update after configure instructions. The (ill, lmul, sew ) of vtype
+>> and the bit of (VSTART == 0 && VL == VLMAX) will be placed within tb_flags.
+>>
+>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+>> ---
+>>   target/riscv/Makefile.objs              |  2 +-
+>>   target/riscv/cpu.h                      | 63 ++++++++++++++++++----
+>>   target/riscv/helper.h                   |  2 +
+>>   target/riscv/insn32.decode              |  5 ++
+>>   target/riscv/insn_trans/trans_rvv.inc.c | 69 +++++++++++++++++++++++++
+>>   target/riscv/translate.c                | 17 +++++-
+>>   target/riscv/vector_helper.c            | 53 +++++++++++++++++++
+>>   7 files changed, 199 insertions(+), 12 deletions(-)
+>>   create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+>>   create mode 100644 target/riscv/vector_helper.c
+>>
+>> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+>> index ff651f69f6..ff38df6219 100644
+>> --- a/target/riscv/Makefile.objs
+>> +++ b/target/riscv/Makefile.objs
+>> @@ -1,4 +1,4 @@
+>> -obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
+>> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o vector_helper.o gdbstub.o
+>>   obj-$(CONFIG_SOFTMMU) += pmp.o
+>>
+>>   ifeq ($(CONFIG_SOFTMMU),y)
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index 603715f849..505d1a8515 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -21,6 +21,7 @@
+>>   #define RISCV_CPU_H
+>>
+>>   #include "hw/core/cpu.h"
+>> +#include "hw/registerfields.h"
+>>   #include "exec/cpu-defs.h"
+>>   #include "fpu/softfloat-types.h"
+>>
+>> @@ -99,6 +100,12 @@ typedef struct CPURISCVState CPURISCVState;
+>>
+>>   #define RV_VLEN_MAX 512
+>>
+>> +FIELD(VTYPE, VLMUL, 0, 2)
+>> +FIELD(VTYPE, VSEW, 2, 3)
+>> +FIELD(VTYPE, VEDIV, 5, 2)
+>> +FIELD(VTYPE, RESERVED, 7, sizeof(target_ulong) * 8 - 9)
+>> +FIELD(VTYPE, VILL, sizeof(target_ulong) * 8 - 2, 1)
+>> +
+>>   struct CPURISCVState {
+>>       target_ulong gpr[32];
+>>       uint64_t fpr[32]; /* assume both F and D extensions */
+>> @@ -358,19 +365,62 @@ void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
+>>   #define TB_FLAGS_MMU_MASK   3
+>>   #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
+>>
+>> +typedef CPURISCVState CPUArchState;
+>> +typedef RISCVCPU ArchCPU;
+>> +#include "exec/cpu-all.h"
+>> +
+>> +FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
+>> +FIELD(TB_FLAGS, LMUL, 3, 2)
+>> +FIELD(TB_FLAGS, SEW, 5, 3)
+>> +FIELD(TB_FLAGS, VILL, 8, 1)
+>> +
+>> +/*
+>> + * A simplification for VLMAX
+>> + * = (1 << LMUL) * VLEN / (8 * (1 << SEW))
+>> + * = (VLEN << LMUL) / (8 << SEW)
+>> + * = (VLEN << LMUL) >> (SEW + 3)
+>> + * = VLEN >> (SEW + 3 - LMUL)
+>> + */
+>> +static inline uint32_t vext_get_vlmax(RISCVCPU *cpu, target_ulong vtype)
+>> +{
+>> +    uint8_t sew, lmul;
+>> +
+>> +    sew = FIELD_EX64(vtype, VTYPE, VSEW);
+>> +    lmul = FIELD_EX64(vtype, VTYPE, VLMUL);
+>> +    return cpu->cfg.vlen >> (sew + 3 - lmul);
+>> +}
+>> +
+>>   static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>> -                                        target_ulong *cs_base, uint32_t *flags)
+>> +                                        target_ulong *cs_base, uint32_t *pflags)
+>>   {
+>> +    uint32_t flags = 0;
+>> +
+>>       *pc = env->pc;
+>>       *cs_base = 0;
+>> +
+>> +    if (env->misa & RVV) {
+> Can you use: riscv_has_ext(env, RVV) instead?
+Yes. It will be clearer.
+>
+>> +        uint32_t vlmax = vext_get_vlmax(env_archcpu(env), env->vtype);
+>> +        bool vl_eq_vlmax = (env->vstart == 0) && (vlmax == env->vl);
+>> +        flags = FIELD_DP32(flags, TB_FLAGS, VILL,
+>> +                    FIELD_EX64(env->vtype, VTYPE, VILL));
+>> +        flags = FIELD_DP32(flags, TB_FLAGS, SEW,
+>> +                    FIELD_EX64(env->vtype, VTYPE, VSEW));
+>> +        flags = FIELD_DP32(flags, TB_FLAGS, LMUL,
+>> +                    FIELD_EX64(env->vtype, VTYPE, VLMUL));
+>> +        flags = FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
+>> +    } else {
+>> +        flags = FIELD_DP32(flags, TB_FLAGS, VILL, 1);
+>> +    }
+>> +
+>>   #ifdef CONFIG_USER_ONLY
+>> -    *flags = TB_FLAGS_MSTATUS_FS;
+>> +    flags |= TB_FLAGS_MSTATUS_FS;
+>>   #else
+>> -    *flags = cpu_mmu_index(env, 0);
+>> +    flags |= cpu_mmu_index(env, 0);
+>>       if (riscv_cpu_fp_enabled(env)) {
+>> -        *flags |= env->mstatus & MSTATUS_FS;
+>> +        flags |= env->mstatus & MSTATUS_FS;
+>>       }
+>>   #endif
+>> +    *pflags = flags;
+>>   }
+>>
+>>   int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>> @@ -411,9 +461,4 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
+>>
+>>   void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
+>>
+>> -typedef CPURISCVState CPUArchState;
+>> -typedef RISCVCPU ArchCPU;
+>> -
+>> -#include "exec/cpu-all.h"
+>> -
+>>   #endif /* RISCV_CPU_H */
+>> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+>> index debb22a480..3c28c7e407 100644
+>> --- a/target/riscv/helper.h
+>> +++ b/target/riscv/helper.h
+>> @@ -76,3 +76,5 @@ DEF_HELPER_2(mret, tl, env, tl)
+>>   DEF_HELPER_1(wfi, void, env)
+>>   DEF_HELPER_1(tlb_flush, void, env)
+>>   #endif
+>> +/* Vector functions */
+>> +DEF_HELPER_3(vsetvl, tl, env, tl, tl)
+>> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+>> index b883672e63..53340bdbc4 100644
+>> --- a/target/riscv/insn32.decode
+>> +++ b/target/riscv/insn32.decode
+>> @@ -62,6 +62,7 @@
+>>   @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
+>>   @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
+>>   @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+>> +@r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
+>>
+>>   @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+>>   @hfence_bvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+>> @@ -207,3 +208,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011 @r2_rm
+>>   fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
+>>   fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
+>>   fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
+>> +
+>> +# *** RV32V Extension ***
+>> +vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>> +vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+>> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+>> new file mode 100644
+>> index 0000000000..da82c72bbf
+>> --- /dev/null
+>> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+>> @@ -0,0 +1,69 @@
+>> +/*
+>> + * RISC-V translation routines for the RVV Standard Extension.
+>> + *
+>> + * Copyright (c) 2020 C-SKY Limited. All rights reserved.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify it
+>> + * under the terms and conditions of the GNU General Public License,
+>> + * version 2 or later, as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope it will be useful, but WITHOUT
+>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+>> + * more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License along with
+>> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
+>> +{
+>> +    TCGv s1, s2, dst;
+>> +    s2 = tcg_temp_new();
+>> +    dst = tcg_temp_new();
+>> +
+>> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
+>> +    if (a->rs1 == 0) {
+>> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
+>> +        s1 = tcg_const_tl(RV_VLEN_MAX);
+>> +    } else {
+>> +        s1 = tcg_temp_new();
+>> +        gen_get_gpr(s1, a->rs1);
+>> +    }
+>> +    gen_get_gpr(s2, a->rs2);
+>> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
+>> +    gen_set_gpr(a->rd, dst);
+>> +    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
+>> +    exit_tb(ctx);
+> Why does this
+As the vsetvl will change vtype, the tb flags of the instructions next 
+to the vsetvl
+will change(some tb flags  are from vtype, like LMUL).
+>
+>> +    ctx->base.is_jmp = DISAS_NORETURN;
+>> +
+>> +    tcg_temp_free(s1);
+>> +    tcg_temp_free(s2);
+>> +    tcg_temp_free(dst);
+>> +    return true;
+>> +}
+>> +
+>> +static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
+>> +{
+>> +    TCGv s1, s2, dst;
+>> +    s2 = tcg_const_tl(a->zimm);
+>> +    dst = tcg_temp_new();
+>> +
+>> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
+>> +    if (a->rs1 == 0) {
+>> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
+>> +        s1 = tcg_const_tl(RV_VLEN_MAX);
+>> +    } else {
+>> +        s1 = tcg_temp_new();
+>> +        gen_get_gpr(s1, a->rs1);
+>> +    }
+>> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
+>> +    gen_set_gpr(a->rd, dst);
+>> +    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
+> Need to be different to this?
+Although vsetvli will also change vtype, the vtype will be a constant. 
+So the tb flags of  the instruction(A) next to
+it will always be same with the tb flags at first translation of A. 
+That's why gen_goto_tb is enough.
+
+Zhiwei
+>
+> Alistair
+>
+>> +    ctx->base.is_jmp = DISAS_NORETURN;
+>> +
+>> +    tcg_temp_free(s1);
+>> +    tcg_temp_free(s2);
+>> +    tcg_temp_free(dst);
+>> +    return true;
+>> +}
+>> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+>> index 43bf7e39a6..af07ac4160 100644
+>> --- a/target/riscv/translate.c
+>> +++ b/target/riscv/translate.c
+>> @@ -56,6 +56,12 @@ typedef struct DisasContext {
+>>          to reset this known value.  */
+>>       int frm;
+>>       bool ext_ifencei;
+>> +    /* vector extension */
+>> +    bool vill;
+>> +    uint8_t lmul;
+>> +    uint8_t sew;
+>> +    uint16_t vlen;
+>> +    bool vl_eq_vlmax;
+>>   } DisasContext;
+>>
+>>   #ifdef TARGET_RISCV64
+>> @@ -711,6 +717,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>>   #include "insn_trans/trans_rva.inc.c"
+>>   #include "insn_trans/trans_rvf.inc.c"
+>>   #include "insn_trans/trans_rvd.inc.c"
+>> +#include "insn_trans/trans_rvv.inc.c"
+>>   #include "insn_trans/trans_privileged.inc.c"
+>>
+>>   /* Include the auto-generated decoder for 16 bit insn */
+>> @@ -745,10 +752,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>>       DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>>       CPURISCVState *env = cs->env_ptr;
+>>       RISCVCPU *cpu = RISCV_CPU(cs);
+>> +    uint32_t tb_flags = ctx->base.tb->flags;
+>>
+>>       ctx->pc_succ_insn = ctx->base.pc_first;
+>> -    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+>> -    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
+>> +    ctx->mem_idx = tb_flags & TB_FLAGS_MMU_MASK;
+>> +    ctx->mstatus_fs = tb_flags & TB_FLAGS_MSTATUS_FS;
+>>       ctx->priv_ver = env->priv_ver;
+>>   #if !defined(CONFIG_USER_ONLY)
+>>       if (riscv_has_ext(env, RVH)) {
+>> @@ -772,6 +780,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>>       ctx->misa = env->misa;
+>>       ctx->frm = -1;  /* unknown rounding mode */
+>>       ctx->ext_ifencei = cpu->cfg.ext_ifencei;
+>> +    ctx->vlen = cpu->cfg.vlen;
+>> +    ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
+>> +    ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
+>> +    ctx->lmul = FIELD_EX32(tb_flags, TB_FLAGS, LMUL);
+>> +    ctx->vl_eq_vlmax = FIELD_EX32(tb_flags, TB_FLAGS, VL_EQ_VLMAX);
+>>   }
+>>
+>>   static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+>> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+>> new file mode 100644
+>> index 0000000000..2afe716f2a
+>> --- /dev/null
+>> +++ b/target/riscv/vector_helper.c
+>> @@ -0,0 +1,53 @@
+>> +/*
+>> + * RISC-V Vector Extension Helpers for QEMU.
+>> + *
+>> + * Copyright (c) 2020 C-SKY Limited. All rights reserved.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify it
+>> + * under the terms and conditions of the GNU General Public License,
+>> + * version 2 or later, as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope it will be useful, but WITHOUT
+>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+>> + * more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License along with
+>> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "cpu.h"
+>> +#include "exec/exec-all.h"
+>> +#include "exec/helper-proto.h"
+>> +#include <math.h>
+>> +
+>> +target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
+>> +    target_ulong s2)
+>> +{
+>> +    int vlmax, vl;
+>> +    RISCVCPU *cpu = env_archcpu(env);
+>> +    uint16_t sew = 8 << FIELD_EX64(s2, VTYPE, VSEW);
+>> +    uint8_t ediv = FIELD_EX64(s2, VTYPE, VEDIV);
+>> +    bool vill = FIELD_EX64(s2, VTYPE, VILL);
+>> +    target_ulong reserved = FIELD_EX64(s2, VTYPE, RESERVED);
+>> +
+>> +    if ((sew > cpu->cfg.elen) || vill || (ediv != 0) || (reserved != 0)) {
+>> +        /* only set vill bit. */
+>> +        env->vtype = FIELD_DP64(0, VTYPE, VILL, 1);
+>> +        env->vl = 0;
+>> +        env->vstart = 0;
+>> +        return 0;
+>> +    }
+>> +
+>> +    vlmax = vext_get_vlmax(cpu, s2);
+>> +    if (s1 <= vlmax) {
+>> +        vl = s1;
+>> +    } else {
+>> +        vl = vlmax;
+>> +    }
+>> +    env->vl = vl;
+>> +    env->vtype = s2;
+>> +    env->vstart = 0;
+>> +    return vl;
+>> +}
+>> --
+>> 2.23.0
+>>
+
 
