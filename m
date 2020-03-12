@@ -4,74 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4DAC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 385DAC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF71A20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC43020724
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:18:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LIPsZ84j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF71A20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqE63U5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC43020724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQVa-0001nO-4y
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:16:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57328)
+	id 1jCQXA-0005er-34
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:18:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1jCQTF-0003fD-N2
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:07 -0400
+ (envelope-from <david@redhat.com>) id 1jCQTE-0003do-92
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1jCQTC-0008VK-Nv
+ (envelope-from <david@redhat.com>) id 1jCQTC-0008V8-JF
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41933
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37590
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1jCQTC-0008Uj-Je
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jCQTC-0008UC-Fo
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584029642;
+ s=mimecast20190719; t=1584029641;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aUmlo8MrH4gk71Z4QNFrQL6GEhldMh1YHNoBnWn6ApQ=;
- b=LIPsZ84jMGJXs8m5JNvnN8x056rUiTf4pymEBnN5CvQq0A6c4Zem58Avli8P3TI29S8lCi
- rruqMH6vsOrgsr0Apk7aq9IJ3ulTuUP8Dg8kwy2S5Oq7koYuN4+ViSahY4BOL17P0Mcv2C
- rNoY3tt+xNzeYOK5Ye5K3iPwgCEncUk=
+ bh=Z7Ux+hft2bjNmRhZXzv82rPU0Rif6f5eByKMYnOSff8=;
+ b=RqE63U5of2v5diiwBTFXraDE1Sb8gNn6WXhMiKPc9LWXbifh0TfanPO0uoYv0/7PsLV9q+
+ olXWwYzfuU/I403zSM2bzN5Ro5g7ohnI8xoEk9nGFKSgwobXXrNiNexbwKJUgGYfEEWdEV
+ fImBbK/dOB3GhKxbpzLacYdYi9RK+KI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-dmC-x3q7M-Wm-r0xaaxhTA-1; Thu, 12 Mar 2020 12:14:00 -0400
-X-MC-Unique: dmC-x3q7M-Wm-r0xaaxhTA-1
+ us-mta-224-3x4XsIjyO7-VY86DMSwXEQ-1; Thu, 12 Mar 2020 12:13:54 -0400
+X-MC-Unique: 3x4XsIjyO7-VY86DMSwXEQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 322E68017CC;
- Thu, 12 Mar 2020 16:13:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA464109A5B1;
+ Thu, 12 Mar 2020 16:13:53 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-131.ams2.redhat.com [10.36.117.131])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B507A5C1B5;
- Thu, 12 Mar 2020 16:13:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD55B5C1B5;
+ Thu, 12 Mar 2020 16:13:34 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFCv2 4/4] kvm: Implement atomic memory region resizes via
- region_resize()
-Date: Thu, 12 Mar 2020 17:12:17 +0100
-Message-Id: <20200312161217.3590-5-david@redhat.com>
+Subject: [PATCH RFCv2 3/4] memory: Add region_resize() callback to memory
+ notifier
+Date: Thu, 12 Mar 2020 17:12:16 +0100
+Message-Id: <20200312161217.3590-4-david@redhat.com>
 In-Reply-To: <20200312161217.3590-1-david@redhat.com>
 References: <20200312161217.3590-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,8 +85,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
  qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
@@ -92,52 +93,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-virtio-mem wants to resize (esp. grow) ram memory regions while the guest
-is already aware of them and makes use of them. Resizing a KVM slot can
-only currently be done by removing it and re-adding it. While the kvm slo=
-t
-is temporarily removed, VCPUs that try to access memory on these slots (v=
-ia
-KVM_RUN) will fault. But also, other ioctls might depend on all slots bei=
-ng
-in place.
+Let's provide a way for memory notifiers to get notified about a resize.
+If the region_resize() callback is not implemented by a notifier, we
+mimic the old behavior by removing the old section and adding the
+new, resized section.
 
-Let's inhibit most KVM ioctls while performing the resize. Once we have a=
-n
-ioctl that can perform atomic resizes (e.g., KVM_SET_USER_MEMORY_REGION
-extensions), we can make inhibiting optional at runtime.
+This callback is helpful when backends (like KVM) want to implement
+atomic resizes of memory sections (e.g., resize while VCPUs are running and
+using the section).
 
-To minimize cache-line bouncing, use separate indicators (in_ioctl) and
-locks (ioctl_mutex) per CPU.  Also, make sure to hold the kvm_slots_lock
-while performing both actions (removing+re-adding).
-
-We have to wait until all IOCTLs were exited and block new ones from
-getting executed. Kick all CPUs, so they will exit the KVM_RUN ioctl.
-
-This approach cannot result in a deadlock as long as the inhibitor does
-not hold any locks that might hinder an IOCTL from getting finished and
-exited - something fairly unusual. The inhibitor will always hold the BQL=
-.
-
-AFAIKs, one possible candidate would be userfaultfd. If a page cannot be
-placed (e.g., during postcopy), because we're waiting for a lock, or if t=
-he
-userfaultfd thread cannot process a fault, because it is waiting for a
-lock, there could be a deadlock. However, the BQL is not applicable here,
-because any other guest memory access while holding the BQL would already
-result in a deadlock.
-
-Nothing else in the kernel should block forever and wait for userspace
-intervention.
-
-Note1: Resizes of memory regions currently seems to happen during bootup
-only, so I don't think any existing RT users should be affected.
-
-Note2: pause_all_vcpus()/resume_all_vcpus() or
-start_exclusive()/end_exclusive() cannot be used, as they either drop
-the BQL or require to be called without the BQL - something inhibitors
-cannot handle. We need a low-level locking mechanism that is
-deadlock-free even when not releasing the BQL.
+For now, we won't bother about a resize() callback for coalesced MMIO
+regions. The main future use case is for virtio-mem to resize ram memory
+regions while the guest is running.
 
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
@@ -145,304 +112,148 @@ Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: kvm@vger.kernel.org
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c   | 129 +++++++++++++++++++++++++++++++++++++++---
- hw/core/cpu.c         |   2 +
- include/hw/core/cpu.h |   4 ++
- 3 files changed, 128 insertions(+), 7 deletions(-)
+ include/exec/memory.h | 18 +++++++++++
+ memory.c              | 72 ++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 85 insertions(+), 5 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 439a4efe52..be159a2f78 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -149,6 +149,21 @@ bool kvm_msi_use_devid;
- static bool kvm_immediate_exit;
- static hwaddr kvm_max_slot_size =3D ~0;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 74805dd448..704eb64d75 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -492,6 +492,24 @@ struct MemoryListener {
+      */
+     void (*region_nop)(MemoryListener *listener, MemoryRegionSection *sect=
+ion);
 =20
-+/*
-+ * While holding kvm_ioctl_mutex and all cpu->ioctl_mutex, no new KVM io=
-ctls
-+ * can be started, but kvm ioctl inhibitors will have to wait for existi=
-ng ones
-+ * to finish (indicated by cpu->in_ioctl and kvm_in_ioctl, both updated =
-with
-+ * kvm_ioctl_mutex or under the cpu->ioctl_mutex when entering the ioctl=
-).
-+ */
-+QemuMutex kvm_ioctl_mutex;
-+/*
-+ * Atomic counter of active KVM ioctls except
-+ * - The KVM ioctl inhibitor is doing an ioctl
-+ * - kvm_ioctl(): Harmless and not interesting for inhibitors.
-+ * - kvm_vcpu_ioctl(): Tracked via cpu->in_ioctl.
-+ */
-+static int kvm_in_ioctl;
-+
- static const KVMCapabilityInfo kvm_required_capabilites[] =3D {
-     KVM_CAP_INFO(USER_MEMORY),
-     KVM_CAP_INFO(DESTROY_MEMORY_REGION_WORKS),
-@@ -1023,6 +1038,7 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
-     kvm_max_slot_size =3D max_slot_size;
- }
-=20
-+/* Called with KVMMemoryListener.slots_lock held */
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
- {
-@@ -1052,14 +1068,12 @@ static void kvm_set_phys_mem(KVMMemoryListener *k=
-ml,
-     ram =3D memory_region_get_ram_ptr(mr) + section->offset_within_regio=
-n +
-           (start_addr - section->offset_within_address_space);
-=20
--    kvm_slots_lock(kml);
--
-     if (!add) {
-         do {
-             slot_size =3D MIN(kvm_max_slot_size, size);
-             mem =3D kvm_lookup_matching_slot(kml, start_addr, slot_size)=
-;
-             if (!mem) {
--                goto out;
-+                return;
-             }
-             if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-                 kvm_physical_sync_dirty_bitmap(kml, section);
-@@ -1079,7 +1093,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
-,
-             start_addr +=3D slot_size;
-             size -=3D slot_size;
-         } while (size);
--        goto out;
-+        return;
-     }
-=20
-     /* register the new slot */
-@@ -1108,9 +1122,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
-,
-         ram +=3D slot_size;
-         size -=3D slot_size;
-     } while (size);
--
--out:
--    kvm_slots_unlock(kml);
- }
-=20
- static void kvm_region_add(MemoryListener *listener,
-@@ -1119,7 +1130,9 @@ static void kvm_region_add(MemoryListener *listener=
-,
-     KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
- listener);
-=20
-     memory_region_ref(section->mr);
-+    kvm_slots_lock(kml);
-     kvm_set_phys_mem(kml, section, true);
-+    kvm_slots_unlock(kml);
- }
-=20
- static void kvm_region_del(MemoryListener *listener,
-@@ -1127,10 +1140,76 @@ static void kvm_region_del(MemoryListener *listen=
-er,
- {
-     KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
- listener);
-=20
-+    kvm_slots_lock(kml);
-     kvm_set_phys_mem(kml, section, false);
-+    kvm_slots_unlock(kml);
-     memory_region_unref(section->mr);
- }
-=20
-+/*
-+ * Certain updates (e.g., resizing memory regions) require temporarily r=
-emoving
-+ * kvm memory slots. Make sure any ioctl sees a consistent memory slot s=
-tate.
-+ */
-+static void kvm_ioctl_inhibit_begin(void)
-+{
-+    CPUState *cpu;
-+
-+    /*
-+     * We allow to inhibit only when holding the BQL, so we can identify
-+     * when an inhibitor wants to issue an ioctl easily.
++    /**
++     * @region_resize:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that is in the same place in the
++     * address space as in the last transaction, however, the size changed=
+.
++     * Dirty memory logging can change as well.
++     *
++     * Note: If this callback is not implemented, the resize is communicat=
+ed
++     *       via a region_del(), followed by a region_add() instead.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The old #MemoryRegionSection.
++     * @new: The new size.
 +     */
-+    g_assert(qemu_mutex_iothread_locked());
++    void (*region_resize)(MemoryListener *listener,
++                          MemoryRegionSection *section, Int128 new);
 +
-+    CPU_FOREACH(cpu) {
-+        qemu_mutex_lock(&cpu->ioctl_mutex);
-+    }
-+    qemu_mutex_lock(&kvm_ioctl_mutex);
+     /**
+      * @log_start:
+      *
+diff --git a/memory.c b/memory.c
+index 09be40edd2..097b0db0e4 100644
+--- a/memory.c
++++ b/memory.c
+@@ -246,6 +246,17 @@ static bool flatrange_equal(FlatRange *a, FlatRange *b=
+)
+         && a->nonvolatile =3D=3D b->nonvolatile;
+ }
+=20
++static bool flatrange_resized(FlatRange *a, FlatRange *b)
++{
++    return a->mr =3D=3D b->mr
++        && int128_eq(a->addr.start, b->addr.start)
++        && int128_ne(a->addr.size, b->addr.size)
++        && a->offset_in_region =3D=3D b->offset_in_region
++        && a->romd_mode =3D=3D b->romd_mode
++        && a->readonly =3D=3D b->readonly
++        && a->nonvolatile =3D=3D b->nonvolatile;
++}
 +
-+    /* Inhibiting happens rarely, we can keep things simple and spin her=
-e. */
-+    while (true) {
-+        bool any_cpu_in_ioctl =3D false;
+ static FlatView *flatview_new(MemoryRegion *mr_root)
+ {
+     FlatView *view;
+@@ -887,6 +898,45 @@ static void flat_range_coalesced_io_add(FlatRange *fr,=
+ AddressSpace *as)
+     }
+ }
+=20
++static void memory_listener_resize_region(FlatRange *fr, AddressSpace *as,
++                                          Int128 new, bool adding)
++{
++    FlatView *as_view =3D address_space_to_flatview(as);
++    MemoryRegionSection old_mrs =3D section_from_flat_range(fr, as_view);
++    MemoryRegionSection new_mrs =3D old_mrs;
++    MemoryListener *listener;
 +
-+        CPU_FOREACH(cpu) {
-+            if (atomic_read(&cpu->in_ioctl)) {
-+                any_cpu_in_ioctl =3D true;
-+                qemu_cpu_kick(cpu);
++    new_mrs.size =3D new;
++
++    if (adding) {
++        QTAILQ_FOREACH(listener, &as->listeners, link_as) {
++            if (listener->region_resize) {
++                /* Grow in the adding phase. */
++                if (int128_lt(fr->addr.size, new)) {
++                    listener->region_resize(listener, &old_mrs, new);
++                }
++                continue;
++            }
++            if (listener->region_add) {
++                listener->region_add(listener, &new_mrs);
 +            }
 +        }
-+        if (!any_cpu_in_ioctl && !atomic_read(&kvm_in_ioctl)) {
-+            break;
++    } else {
++        QTAILQ_FOREACH_REVERSE(listener, &as->listeners, link_as) {
++            if (listener->region_resize) {
++                /* Shrink in the removal phase. */
++                if (int128_gt(fr->addr.size, new)) {
++                    listener->region_resize(listener, &old_mrs, new);
++                }
++                continue;
++            }
++            if (listener->region_del) {
++                listener->region_del(listener, &old_mrs);
++            }
 +        }
-+        g_usleep(100);
 +    }
 +}
 +
-+static void kvm_ioctl_inhibit_end(void)
-+{
-+    CPUState *cpu;
+ static void address_space_update_topology_pass(AddressSpace *as,
+                                                const FlatView *old_view,
+                                                const FlatView *new_view,
+@@ -911,11 +961,23 @@ static void address_space_update_topology_pass(Addres=
+sSpace *as,
+             frnew =3D NULL;
+         }
+=20
+-        if (frold
+-            && (!frnew
+-                || int128_lt(frold->addr.start, frnew->addr.start)
+-                || (int128_eq(frold->addr.start, frnew->addr.start)
+-                    && !flatrange_equal(frold, frnew)))) {
++        if (frold && frnew && flatrange_resized(frold, frnew)) {
++            /* In both and only the size (+ eventually logging) changed. *=
+/
 +
-+    qemu_mutex_unlock(&kvm_ioctl_mutex);
-+    CPU_FOREACH(cpu) {
-+        qemu_mutex_unlock(&cpu->ioctl_mutex);
-+    }
-+}
++            memory_listener_resize_region(frold, as, frnew->addr.size,
++                                          adding);
++            if (adding) {
++                flat_range_coalesced_io_add(frnew, as);
++            } else {
++                flat_range_coalesced_io_del(frold, as);
++            }
 +
-+static void kvm_region_resize(MemoryListener *listener,
-+                              MemoryRegionSection *section, Int128 new)
-+{
-+    KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,
-+                                          listener);
-+    MemoryRegionSection new_section =3D *section;
-+
-+    new_section.size =3D new;
-+
-+    kvm_slots_lock(kml);
-+    /* Inhibit KVM ioctls while temporarily removing slots. */
-+    kvm_ioctl_inhibit_begin();
-+    kvm_set_phys_mem(kml, section, false);
-+    kvm_set_phys_mem(kml, &new_section, true);
-+    kvm_ioctl_inhibit_end();
-+    kvm_slots_unlock(kml);
-+}
-+
- static void kvm_log_sync(MemoryListener *listener,
-                          MemoryRegionSection *section)
- {
-@@ -1249,6 +1328,7 @@ void kvm_memory_listener_register(KVMState *s, KVMM=
-emoryListener *kml,
++            ++iold;
++            ++inew;
++        } else if (frold && (!frnew
++                             || int128_lt(frold->addr.start, frnew->addr.s=
+tart)
++                             || (int128_eq(frold->addr.start, frnew->addr.=
+start)
++                                 && !flatrange_equal(frold, frnew)))) {
+             /* In old but not in new, or in both but attributes changed. *=
+/
 =20
-     kml->listener.region_add =3D kvm_region_add;
-     kml->listener.region_del =3D kvm_region_del;
-+    kml->listener.region_resize =3D kvm_region_resize;
-     kml->listener.log_start =3D kvm_log_start;
-     kml->listener.log_stop =3D kvm_log_stop;
-     kml->listener.log_sync =3D kvm_log_sync;
-@@ -1894,6 +1974,7 @@ static int kvm_init(MachineState *ms)
-     assert(TARGET_PAGE_SIZE <=3D qemu_real_host_page_size);
-=20
-     s->sigmask_len =3D 8;
-+    qemu_mutex_init(&kvm_ioctl_mutex);
-=20
- #ifdef KVM_CAP_SET_GUEST_DEBUG
-     QTAILQ_INIT(&s->kvm_sw_breakpoints);
-@@ -2304,6 +2385,34 @@ static void kvm_eat_signals(CPUState *cpu)
-     } while (sigismember(&chkset, SIG_IPI));
- }
-=20
-+static void kvm_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl)
-+{
-+    if (unlikely(qemu_mutex_iothread_locked())) {
-+        return;
-+    }
-+    if (in_ioctl) {
-+        qemu_mutex_lock(&cpu->ioctl_mutex);
-+        cpu->in_ioctl =3D true;
-+        qemu_mutex_unlock(&cpu->ioctl_mutex);
-+    } else {
-+        atomic_set(&cpu->in_ioctl, false);
-+    }
-+}
-+
-+static void kvm_set_in_ioctl(bool in_ioctl)
-+{
-+    if (likely(qemu_mutex_iothread_locked())) {
-+        return;
-+    }
-+    if (in_ioctl) {
-+        qemu_mutex_lock(&kvm_ioctl_mutex);
-+        kvm_in_ioctl++;
-+        qemu_mutex_unlock(&kvm_ioctl_mutex);
-+    } else {
-+        atomic_dec(&kvm_in_ioctl);
-+    }
-+}
-+
- int kvm_cpu_exec(CPUState *cpu)
- {
-     struct kvm_run *run =3D cpu->kvm_run;
-@@ -2488,7 +2597,9 @@ int kvm_vm_ioctl(KVMState *s, int type, ...)
-     va_end(ap);
-=20
-     trace_kvm_vm_ioctl(type, arg);
-+    kvm_set_in_ioctl(true);
-     ret =3D ioctl(s->vmfd, type, arg);
-+    kvm_set_in_ioctl(false);
-     if (ret =3D=3D -1) {
-         ret =3D -errno;
-     }
-@@ -2506,7 +2617,9 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...)
-     va_end(ap);
-=20
-     trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
-+    kvm_cpu_set_in_ioctl(cpu, true);
-     ret =3D ioctl(cpu->kvm_fd, type, arg);
-+    kvm_cpu_set_in_ioctl(cpu, false);
-     if (ret =3D=3D -1) {
-         ret =3D -errno;
-     }
-@@ -2524,7 +2637,9 @@ int kvm_device_ioctl(int fd, int type, ...)
-     va_end(ap);
-=20
-     trace_kvm_device_ioctl(fd, type, arg);
-+    kvm_set_in_ioctl(true);
-     ret =3D ioctl(fd, type, arg);
-+    kvm_set_in_ioctl(false);
-     if (ret =3D=3D -1) {
-         ret =3D -errno;
-     }
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index fe65ca62ac..3591dc3874 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -379,6 +379,7 @@ static void cpu_common_initfn(Object *obj)
-     cpu->nr_threads =3D 1;
-=20
-     qemu_mutex_init(&cpu->work_mutex);
-+    qemu_mutex_init(&cpu->ioctl_mutex);
-     QTAILQ_INIT(&cpu->breakpoints);
-     QTAILQ_INIT(&cpu->watchpoints);
-=20
-@@ -389,6 +390,7 @@ static void cpu_common_finalize(Object *obj)
- {
-     CPUState *cpu =3D CPU(obj);
-=20
-+    qemu_mutex_destroy(&cpu->ioctl_mutex);
-     qemu_mutex_destroy(&cpu->work_mutex);
- }
-=20
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 73e9a869a4..3abf251037 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -431,6 +431,10 @@ struct CPUState {
-     /* shared by kvm, hax and hvf */
-     bool vcpu_dirty;
-=20
-+    /* kvm only for now: CPU is in kvm_vcpu_ioctl() (esp. KVM_RUN) */
-+    bool in_ioctl;
-+    QemuMutex ioctl_mutex;
-+
-     /* Used to keep track of an outstanding cpu throttle thread for migr=
-ation
-      * autoconverge
-      */
+             if (!adding) {
 --=20
 2.24.1
 
