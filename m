@@ -2,86 +2,86 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DDCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00339C1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C7ED206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C464E206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m7qubbLx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7ED206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cz7O+I0B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C464E206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR0E-0005G7-3s
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:48:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35649)
+	id 1jCR0G-0005Ry-TR
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:48:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35529)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxQ-0008Jg-E5
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:17 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxG-00084z-Lh
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxO-00056w-VO
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:16 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41362)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxF-0004z9-3X
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36491)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxO-00056D-OT
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:14 -0400
-Received: by mail-wr1-x429.google.com with SMTP id s14so8372171wrt.8
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:14 -0700 (PDT)
+ id 1jCQxE-0004yx-Qb
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:05 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s5so8400717wrg.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=en5/ehXOAmbdpuPeqqCQ5CpQm+7ZLZrY9Fmfjm5xj+0=;
- b=m7qubbLxEx3BQ/ZXv/7yU1SepiJKufWcBUW8cBIacEhvVexLFVDXHhpLAggF6AzZMZ
- qp4z0EY0t48H2rDc5m55w6dAlqKHiid5Pk1vvc+QmrCxwCBEuEfNPf1b2GVmQIUiwYwh
- 2CHu92zcbEo8okvkcqry7sLO+hMcQOSKSBSfXF8xcZI+Hezj79XMIYMfK1zBDTQodi4h
- OngSJpa9ol3Z9V/pwLFLjoK5xNGNpJIdKO/4KZab1mbiKAnaxskUbt7lRGA3zV2kYgQz
- e7Ri0YjsqrURkt4v9v3ffFhSL25IGdH01/5svrh0ZIw5YRt2/aMMZ5tpzcqq1zggrMNJ
- i3Cg==
+ bh=rEt+o6axUSgPhmQ9zyoFb+qAnPQkRxDH3mh/1eRedds=;
+ b=cz7O+I0B63n8u+WbBD2Ec9LfEAqV7cbtVMK2d0Dtc50twVFw0rpNZ8VS8mGLZ14AYp
+ zWM0+wDCcXbjN70/8NSeW5u/Zb01uUoXQv+q63C25bD1oyz0NaqYFs8kQpHL5aRCOElV
+ BiIXt18ME27m9eM4Mkr3SQxDiDm/gB+fxKBKbUTyB1zq40QGbQohJ40EyD0eHXjgrwZu
+ 8QYGreUEdJHlrqPWiidMJ1xMRDrgwzs9IEYJyQPrsCEelHAZ7YBfaPA/rriQDY/gbiak
+ XXnC+dtPe6yxKK4TQJQHf9e7ASn1pnUDsbny4P5c4mFncXDdTL2/DLz34mtTUybkECfD
+ qGRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=en5/ehXOAmbdpuPeqqCQ5CpQm+7ZLZrY9Fmfjm5xj+0=;
- b=A5AT2xQyDKOwQPDwogh8GyQ1TfhO+xZx1VtDsiYj6DunCTsSpswwNrezW/fqFhefm/
- gjx6mKeunaXtIZWfHixlx47Er9cULENpTA0qmaEelJmkclVBSDp3E3a3Tla3WC1mBnLS
- /DrPE+aX5Jvfk5JgM6/DJZUtybFhLbZta3vfJtpM/6le4S+PabBkyITXO1XedqxsdvC8
- 1h7B04Tdj7rDm0VPNsB6y1c4LXRrz3e+GBtLSUE3/g1kABaUyiIm17Vh0C24OwaRHMDE
- iPBh9vTfjewMR775XPtwwShPBypvPMIziVwNes4ynNXHopZnq2321NZf1g4437C5xaoo
- DwLA==
-X-Gm-Message-State: ANhLgQ2vWb42K9kkGs17RdT8O5fwFKqn5ZtBONSHhpF3aaHaVkbNis/e
- QUrlMGl9sYtA/9ou5UzuvYVGoYNSMQVfgg==
-X-Google-Smtp-Source: ADFU+vs8bVY+6KT0rOTGe/DQ65+V0EK1Sg4t2+uJvCbmQTmcNlqgoiImFEqpb0o4szKWjCxmVP2/aw==
-X-Received: by 2002:adf:e911:: with SMTP id f17mr11382196wrm.87.1584031513315; 
- Thu, 12 Mar 2020 09:45:13 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rEt+o6axUSgPhmQ9zyoFb+qAnPQkRxDH3mh/1eRedds=;
+ b=Wvggyf20zo4BMcVhIoU0/QzbgLL9ACJnTOCjH9sNdtrZmXQlFp21detSznP31KYWU6
+ jqF29hMWN5gZdwycNO3VzejK7lqa+c9yqXVpeWfJKvh26ccLyGsY9lcmxaqwxc5RUYsL
+ ZTqcstU0WziIGvtfYeaCSNYkU4SpU7fDZZLETUReXFfXcU5KYjoYM3z/PO/TJ749+1XO
+ o7fbWgbh6JQhKfL0C4TtTGameX/X4o4IBWWkNWex+Qm6/EZa1iq3eTaqokbsbUVY2ho7
+ xht5qw7HLF/2+zFj9fvmjOTqCdasVTBeJKRMUghTXiqvuswze1egPhy6FbDGadp86fDp
+ NDWw==
+X-Gm-Message-State: ANhLgQ3DsRgn933WBSoEfhnbJzbmH6PNOqFh6zXYIS1xVN+laVnVB/pF
+ Fs4HwOMGUnVqMOjOisY6VPUPzvCOyX+YnA==
+X-Google-Smtp-Source: ADFU+vt0HEGB1QhQNkj6WcEZfO/Wq9ifAJA8bUaFLnqEz/H/5mslKEfQUpggbM12MAUYQpgwKxfdbg==
+X-Received: by 2002:a05:6000:12c3:: with SMTP id
+ l3mr11811756wrx.70.1584031502480; 
+ Thu, 12 Mar 2020 09:45:02 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.12
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.01
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:12 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:01 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/36] hw/arm/fsl-imx25: Wire up eSDHC controllers
-Date: Thu, 12 Mar 2020 16:44:33 +0000
-Message-Id: <20200312164459.25924-11-peter.maydell@linaro.org>
+Subject: [PULL 00/36] target-arm queue
+Date: Thu, 12 Mar 2020 16:44:23 +0000
+Message-Id: <20200312164459.25924-1-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
-References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,163 +97,173 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+arm queue; dunno if this will be the last before softfreeze
+or not, but anyway probably the last large one. New orangepi-pc
+board model is the big item here.
 
-Wire up eSDHC controllers in fsl-imx25. For imx25-pdk, connect drives
-provided on the command line to available eSDHC controllers.
+thanks
+-- PMM
 
-This patch enables booting the imx25-pdk emulation from SD card.
+The following changes since commit 67d9ef7d541c3d21a25796c51c26da096a433565:
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Message-id: 20200310215146.19688-2-linux@roeck-us.net
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: made commit subject consistent with other patch]
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/arm/fsl-imx25.h |  9 +++++++++
- hw/arm/fsl-imx25.c         | 32 ++++++++++++++++++++++++++++++++
- hw/arm/imx25_pdk.c         | 16 ++++++++++++++++
- 3 files changed, 57 insertions(+)
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20200312' into staging (2020-03-12 15:20:52 +0000)
 
-diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
-index 1c86bb55fbd..4e2d4868cda 100644
---- a/include/hw/arm/fsl-imx25.h
-+++ b/include/hw/arm/fsl-imx25.h
-@@ -27,6 +27,7 @@
- #include "hw/misc/imx_rngc.h"
- #include "hw/i2c/imx_i2c.h"
- #include "hw/gpio/imx_gpio.h"
-+#include "hw/sd/sdhci.h"
- #include "exec/memory.h"
- #include "target/arm/cpu.h"
- 
-@@ -38,6 +39,7 @@
- #define FSL_IMX25_NUM_EPITS 2
- #define FSL_IMX25_NUM_I2CS 3
- #define FSL_IMX25_NUM_GPIOS 4
-+#define FSL_IMX25_NUM_ESDHCS 2
- 
- typedef struct FslIMX25State {
-     /*< private >*/
-@@ -54,6 +56,7 @@ typedef struct FslIMX25State {
-     IMXRNGCState   rngc;
-     IMXI2CState    i2c[FSL_IMX25_NUM_I2CS];
-     IMXGPIOState   gpio[FSL_IMX25_NUM_GPIOS];
-+    SDHCIState     esdhc[FSL_IMX25_NUM_ESDHCS];
-     MemoryRegion   rom[2];
-     MemoryRegion   iram;
-     MemoryRegion   iram_alias;
-@@ -215,6 +218,10 @@ typedef struct FslIMX25State {
- #define FSL_IMX25_GPIO3_SIZE    0x4000
- #define FSL_IMX25_RNGC_ADDR     0x53FB0000
- #define FSL_IMX25_RNGC_SIZE     0x4000
-+#define FSL_IMX25_ESDHC1_ADDR   0x53FB4000
-+#define FSL_IMX25_ESDHC1_SIZE   0x4000
-+#define FSL_IMX25_ESDHC2_ADDR   0x53FB8000
-+#define FSL_IMX25_ESDHC2_SIZE   0x4000
- #define FSL_IMX25_GPIO1_ADDR    0x53FCC000
- #define FSL_IMX25_GPIO1_SIZE    0x4000
- #define FSL_IMX25_GPIO2_ADDR    0x53FD0000
-@@ -250,5 +257,7 @@ typedef struct FslIMX25State {
- #define FSL_IMX25_GPIO2_IRQ     51
- #define FSL_IMX25_GPIO3_IRQ     16
- #define FSL_IMX25_GPIO4_IRQ     23
-+#define FSL_IMX25_ESDHC1_IRQ    9
-+#define FSL_IMX25_ESDHC2_IRQ    8
- 
- #endif /* FSL_IMX25_H */
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index da3471b3953..f977c42426b 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -31,6 +31,8 @@
- #include "hw/qdev-properties.h"
- #include "chardev/char.h"
- 
-+#define IMX25_ESDHC_CAPABILITIES     0x07e20000
-+
- static void fsl_imx25_init(Object *obj)
- {
-     FslIMX25State *s = FSL_IMX25(obj);
-@@ -74,6 +76,11 @@ static void fsl_imx25_init(Object *obj)
-         sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
-                               TYPE_IMX_GPIO);
-     }
-+
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        sysbus_init_child_obj(obj, "sdhc[*]", &s->esdhc[i], sizeof(s->esdhc[i]),
-+                              TYPE_IMX_USDHC);
-+    }
- }
- 
- static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-@@ -246,6 +253,31 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
-                                             gpio_table[i].irq));
-     }
- 
-+    /* Initialize all SDHC */
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        static const struct {
-+            hwaddr addr;
-+            unsigned int irq;
-+        } esdhc_table[FSL_IMX25_NUM_ESDHCS] = {
-+            { FSL_IMX25_ESDHC1_ADDR, FSL_IMX25_ESDHC1_IRQ },
-+            { FSL_IMX25_ESDHC2_ADDR, FSL_IMX25_ESDHC2_IRQ },
-+        };
-+
-+        object_property_set_uint(OBJECT(&s->esdhc[i]), 2, "sd-spec-version",
-+                                 &err);
-+        object_property_set_uint(OBJECT(&s->esdhc[i]), IMX25_ESDHC_CAPABILITIES,
-+                                 "capareg", &err);
-+        object_property_set_bool(OBJECT(&s->esdhc[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->esdhc[i]), 0, esdhc_table[i].addr);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->esdhc[i]), 0,
-+                           qdev_get_gpio_in(DEVICE(&s->avic),
-+                                            esdhc_table[i].irq));
-+    }
-+
-     /* initialize 2 x 16 KB ROM */
-     memory_region_init_rom(&s->rom[0], NULL,
-                            "imx25.rom0", FSL_IMX25_ROM0_SIZE, &err);
-diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-index 26713d9a7e7..b3ca82bafa7 100644
---- a/hw/arm/imx25_pdk.c
-+++ b/hw/arm/imx25_pdk.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
-+#include "hw/qdev-properties.h"
- #include "hw/arm/fsl-imx25.h"
- #include "hw/boards.h"
- #include "qemu/error-report.h"
-@@ -120,6 +121,21 @@ static void imx25_pdk_init(MachineState *machine)
-     imx25_pdk_binfo.board_id = 1771,
-     imx25_pdk_binfo.nb_cpus = 1;
- 
-+    for (i = 0; i < FSL_IMX25_NUM_ESDHCS; i++) {
-+        BusState *bus;
-+        DeviceState *carddev;
-+        DriveInfo *di;
-+        BlockBackend *blk;
-+
-+        di = drive_get_next(IF_SD);
-+        blk = di ? blk_by_legacy_dinfo(di) : NULL;
-+        bus = qdev_get_child_bus(DEVICE(&s->soc.esdhc[i]), "sd-bus");
-+        carddev = qdev_create(bus, TYPE_SD_CARD);
-+        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-+        object_property_set_bool(OBJECT(carddev), true,
-+                                 "realized", &error_fatal);
-+    }
-+
-     /*
-      * We test explicitly for qtest here as it is not done (yet?) in
-      * arm_load_kernel(). Without this the "make check" command would
--- 
-2.20.1
+are available in the Git repository at:
 
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200312
+
+for you to fetch changes up to aca53be34ac3e7cac5f39396a51a338860a5a837:
+
+  target/arm: kvm: Inject events at the last stage of sync (2020-03-12 16:31:10 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * Fix various bugs that might result in an assert() due to
+   incorrect hflags for M-profile CPUs
+ * Fix Aspeed SMC Controller user-mode select handling
+ * Report correct (with-tag) address in fault address register
+   when TBI is enabled
+ * cubieboard: make sure SOC object isn't leaked
+ * fsl-imx25: Wire up eSDHC controllers
+ * fsl-imx25: Wire up USB controllers
+ * New board model: orangepi-pc (OrangePi PC)
+ * ARM/KVM: if user doesn't select GIC version and the
+   host kernel can only provide GICv3, use that, rather
+   than defaulting to "fail because GICv2 isn't possible"
+ * kvm: Only do KVM_SET_VCPU_EVENTS at the last stage of sync
+
+----------------------------------------------------------------
+Beata Michalska (1):
+      target/arm: kvm: Inject events at the last stage of sync
+
+Cédric Le Goater (2):
+      aspeed/smc: Add some tracing
+      aspeed/smc: Fix User mode select/unselect scheme
+
+Eric Auger (6):
+      hw/arm/virt: Document 'max' value in gic-version property description
+      hw/arm/virt: Introduce VirtGICType enum type
+      hw/arm/virt: Introduce finalize_gic_version()
+      target/arm/kvm: Let kvm_arm_vgic_probe() return a bitmap
+      hw/arm/virt: kvm: Restructure finalize_gic_version()
+      hw/arm/virt: kvm: allow gicv3 by default if v2 cannot work
+
+Guenter Roeck (2):
+      hw/arm/fsl-imx25: Wire up eSDHC controllers
+      hw/arm/fsl-imx25: Wire up USB controllers
+
+Igor Mammedov (1):
+      hw/arm/cubieboard: make sure SOC object isn't leaked
+
+Niek Linnenbank (13):
+      hw/arm: add Allwinner H3 System-on-Chip
+      hw/arm: add Xunlong Orange Pi PC machine
+      hw/arm/allwinner-h3: add Clock Control Unit
+      hw/arm/allwinner-h3: add USB host controller
+      hw/arm/allwinner-h3: add System Control module
+      hw/arm/allwinner: add CPU Configuration module
+      hw/arm/allwinner: add Security Identifier device
+      hw/arm/allwinner: add SD/MMC host controller
+      hw/arm/allwinner-h3: add EMAC ethernet device
+      hw/arm/allwinner-h3: add Boot ROM support
+      hw/arm/allwinner-h3: add SDRAM controller device
+      hw/arm/allwinner: add RTC device support
+      docs: add Orange Pi PC document
+
+Peter Maydell (4):
+      hw/intc/armv7m_nvic: Rebuild hflags on reset
+      target/arm: Update hflags in trans_CPS_v7m()
+      target/arm: Recalculate hflags correctly after writes to CONTROL
+      target/arm: Fix some comment typos
+
+Philippe Mathieu-Daudé (5):
+      tests/boot_linux_console: Add a quick test for the OrangePi PC board
+      tests/boot_linux_console: Add initrd test for the Orange Pi PC board
+      tests/boot_linux_console: Add a SD card test for the OrangePi PC board
+      tests/boot_linux_console: Add a SLOW test booting Ubuntu on OrangePi PC
+      tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi PC
+
+Richard Henderson (2):
+      target/arm: Check addresses for disabled regimes
+      target/arm: Disable clean_data_tbi for system mode
+
+ Makefile.objs                          |   1 +
+ hw/arm/Makefile.objs                   |   1 +
+ hw/misc/Makefile.objs                  |   5 +
+ hw/net/Makefile.objs                   |   1 +
+ hw/rtc/Makefile.objs                   |   1 +
+ hw/sd/Makefile.objs                    |   1 +
+ hw/usb/hcd-ehci.h                      |   1 +
+ include/hw/arm/allwinner-a10.h         |   4 +
+ include/hw/arm/allwinner-h3.h          | 161 ++++++
+ include/hw/arm/fsl-imx25.h             |  18 +
+ include/hw/arm/virt.h                  |  12 +-
+ include/hw/misc/allwinner-cpucfg.h     |  52 ++
+ include/hw/misc/allwinner-h3-ccu.h     |  66 +++
+ include/hw/misc/allwinner-h3-dramc.h   | 106 ++++
+ include/hw/misc/allwinner-h3-sysctrl.h |  67 +++
+ include/hw/misc/allwinner-sid.h        |  60 +++
+ include/hw/net/allwinner-sun8i-emac.h  |  99 ++++
+ include/hw/rtc/allwinner-rtc.h         | 134 +++++
+ include/hw/sd/allwinner-sdhost.h       | 135 +++++
+ target/arm/helper.h                    |   1 +
+ target/arm/kvm_arm.h                   |   3 +
+ hw/arm/allwinner-a10.c                 |  19 +
+ hw/arm/allwinner-h3.c                  | 465 ++++++++++++++++++
+ hw/arm/cubieboard.c                    |  18 +
+ hw/arm/fsl-imx25.c                     |  56 +++
+ hw/arm/imx25_pdk.c                     |  16 +
+ hw/arm/orangepi.c                      | 130 +++++
+ hw/arm/virt.c                          | 145 ++++--
+ hw/intc/armv7m_nvic.c                  |   6 +
+ hw/misc/allwinner-cpucfg.c             | 282 +++++++++++
+ hw/misc/allwinner-h3-ccu.c             | 242 +++++++++
+ hw/misc/allwinner-h3-dramc.c           | 358 ++++++++++++++
+ hw/misc/allwinner-h3-sysctrl.c         | 140 ++++++
+ hw/misc/allwinner-sid.c                | 168 +++++++
+ hw/net/allwinner-sun8i-emac.c          | 871 +++++++++++++++++++++++++++++++++
+ hw/rtc/allwinner-rtc.c                 | 411 ++++++++++++++++
+ hw/sd/allwinner-sdhost.c               | 854 ++++++++++++++++++++++++++++++++
+ hw/ssi/aspeed_smc.c                    |  56 ++-
+ hw/usb/hcd-ehci-sysbus.c               |  17 +
+ target/arm/helper.c                    |  49 +-
+ target/arm/kvm.c                       |  14 +-
+ target/arm/kvm32.c                     |  15 +-
+ target/arm/kvm64.c                     |  15 +-
+ target/arm/translate-a64.c             |  11 +
+ target/arm/translate.c                 |  14 +-
+ MAINTAINERS                            |   9 +
+ default-configs/arm-softmmu.mak        |   1 +
+ docs/system/arm/orangepi.rst           | 253 ++++++++++
+ docs/system/target-arm.rst             |   2 +
+ hw/arm/Kconfig                         |  12 +
+ hw/misc/trace-events                   |  19 +
+ hw/net/Kconfig                         |   3 +
+ hw/net/trace-events                    |  10 +
+ hw/rtc/trace-events                    |   4 +
+ hw/sd/trace-events                     |   7 +
+ hw/ssi/trace-events                    |  10 +
+ tests/acceptance/boot_linux_console.py | 230 +++++++++
+ 57 files changed, 5787 insertions(+), 74 deletions(-)
+ create mode 100644 include/hw/arm/allwinner-h3.h
+ create mode 100644 include/hw/misc/allwinner-cpucfg.h
+ create mode 100644 include/hw/misc/allwinner-h3-ccu.h
+ create mode 100644 include/hw/misc/allwinner-h3-dramc.h
+ create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
+ create mode 100644 include/hw/misc/allwinner-sid.h
+ create mode 100644 include/hw/net/allwinner-sun8i-emac.h
+ create mode 100644 include/hw/rtc/allwinner-rtc.h
+ create mode 100644 include/hw/sd/allwinner-sdhost.h
+ create mode 100644 hw/arm/allwinner-h3.c
+ create mode 100644 hw/arm/orangepi.c
+ create mode 100644 hw/misc/allwinner-cpucfg.c
+ create mode 100644 hw/misc/allwinner-h3-ccu.c
+ create mode 100644 hw/misc/allwinner-h3-dramc.c
+ create mode 100644 hw/misc/allwinner-h3-sysctrl.c
+ create mode 100644 hw/misc/allwinner-sid.c
+ create mode 100644 hw/net/allwinner-sun8i-emac.c
+ create mode 100644 hw/rtc/allwinner-rtc.c
+ create mode 100644 hw/sd/allwinner-sdhost.c
+ create mode 100644 docs/system/arm/orangepi.rst
+ create mode 100644 hw/ssi/trace-events
 
