@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E08C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5597C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF612206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:08:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81FA4206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:08:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tAeKQReQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF612206F1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="c0+ij1QG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81FA4206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRJw-00050a-NR
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:08:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37122)
+	id 1jCRKF-0005iL-Ks
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:08:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36857)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4v-0003MM-Vy
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:53:06 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jCR4T-00020a-UO
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4u-0000nb-VN
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:53:01 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:38142)
+ (envelope-from <liran.alon@oracle.com>) id 1jCR4S-0008Ur-QK
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:33 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:57006)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jCR4u-0000mY-Og
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:53:00 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGn1I8177998;
- Thu, 12 Mar 2020 16:52:58 GMT
+ id 1jCR4S-0008UE-EN
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:32 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGmth9012070;
+ Thu, 12 Mar 2020 16:52:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=g6qY4i4vgHefsZSdoW4iuGQifGKkSLq71edUG4ox0Vk=;
- b=tAeKQReQzOnJXrcp9gL8dxdPtFUk/MhJ9+WLTMPfveiH2M2tAoH0PXVbmUD4wKDn6iDt
- b/uihJCv01PGM2sRn6AMjT2s8QELuF7wOmLFLz0ht+o+68yPeDbqsrnyjc7TOJPFXGOt
- d4W9fHetSAltU+P+HR8pQ16eoWeEjFhzaLwTR/cem4wk3c3vHThSi2kqqYUG0ysIIyAg
- AyR0URSfvMDpgMgl1+58UjXz6LeHHSFk8r1a/N27fHtLf0Ik14v8lZqfHNNbgd0HDU3S
- NZXMHse7xdA5HJUKswf4yb+tyd2zQ95JIFKYSAKx/V64VfvxdDEP8w12BjAKHEkjy/EA 8Q== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2yp9v6dw5w-1
+ bh=+BXmdGn6wJnDS/Tu+W1NPSIaXx/YetQwn0v9FuEsv2E=;
+ b=c0+ij1QGYkKY7q2l+3IrTe0vSNEzOHi+RlvFQ2MhumnQVwdPvnSGQ9YcIzSNq5nR0AiF
+ ZGyQgdQyicJfs2/6xqP+10fVnLC4MSnx/qgC1po42s0mXGuyQA6lQOqq7N2USIasmCx4
+ Ozp2N7prhreiLKlBc6pYvArt8scHIt98UKpLzd01Htbp4Fj0r+s04Wpnwa+VxnofW4hd
+ jgpicMiBT8qWqZ0G5NawrspjlV8dKwAcJCmRiJHOccbPKStTe7C1D0ZozCeLbw4zGmpo
+ SJnuFFXi4BFYvuxCo9mUjansR8WYHiYjHp+FG5L/Z27lrg2nvv7wqsCe6P4Sg704t2Dc CA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2ym31utt2h-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:58 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGoHv4122238;
- Thu, 12 Mar 2020 16:52:57 GMT
+ Thu, 12 Mar 2020 16:52:30 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGo7tn005903;
+ Thu, 12 Mar 2020 16:52:29 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 2yp8r0snxx-1
+ by aserp3020.oracle.com with ESMTP id 2yp8p7ypj3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:57 +0000
+ Thu, 12 Mar 2020 16:52:29 +0000
 Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CGquRS032444;
- Thu, 12 Mar 2020 16:52:56 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CGqSN9032151;
+ Thu, 12 Mar 2020 16:52:28 GMT
 Received: from spark.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 12 Mar 2020 09:52:55 -0700
+ with ESMTP ; Thu, 12 Mar 2020 09:52:27 -0700
 From: Liran Alon <liran.alon@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 13/16] hw/i386/vmport: Allow x2apic without IR
-Date: Thu, 12 Mar 2020 18:54:28 +0200
-Message-Id: <20200312165431.82118-14-liran.alon@oracle.com>
+Subject: [PATCH v3 02/16] hw/i386/vmport: Add device properties
+Date: Thu, 12 Mar 2020 18:54:17 +0200
+Message-Id: <20200312165431.82118-3-liran.alon@oracle.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312165431.82118-1-liran.alon@oracle.com>
 References: <20200312165431.82118-1-liran.alon@oracle.com>
@@ -78,21 +78,21 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- malwarescore=0 mlxscore=0
- adultscore=0 suspectscore=1 bulkscore=0 spamscore=0 mlxlogscore=784
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 adultscore=0 suspectscore=1 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
  definitions=main-2003120085
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- spamscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=848
- phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ lowpriorityscore=0
+ spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=1
+ phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
  definitions=main-2003120085
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,40 +111,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signal to guest that hypervisor supports x2apic without VT-d/IOMMU
-Interrupt-Remapping support. This allows guest to use x2apic in
-case all APIC IDs fits in 8-bit (i.e. Max APIC ID < 255).
+No functional change.
 
-See Linux kernel commit 4cca6ea04d31 ("x86/apic: Allow x2apic
-without IR on VMware platform") and Linux try_to_enable_x2apic()
-function.
+This is done as a preparation for the following patches that will
+introduce several device properties.
 
 Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
 Signed-off-by: Liran Alon <liran.alon@oracle.com>
 ---
- hw/i386/vmport.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/i386/vmport.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 2ce78aaf7b4c..1664a6b97332 100644
+index b4c5a57bb0e9..6ed110ef71a6 100644
 --- a/hw/i386/vmport.c
 +++ b/hw/i386/vmport.c
-@@ -208,7 +208,14 @@ static uint32_t vmport_cmd_time_full(void *opaque, uint32_t addr)
- 
- static uint32_t vmport_cmd_get_vcpu_info(void *opaque, uint32_t addr)
- {
--    return 1 << VCPU_INFO_RESERVED_BIT;
-+    X86CPU *cpu = X86_CPU(current_cpu);
-+    uint32_t ret = 0;
-+
-+    if (cpu->env.features[FEAT_1_ECX] & CPUID_EXT_X2APIC) {
-+        ret |= 1 << VCPU_INFO_LEGACY_X2APIC_BIT;
-+    }
-+
-+    return ret;
+@@ -32,6 +32,7 @@
+ #include "hw/isa/isa.h"
+ #include "hw/i386/pc.h"
+ #include "hw/input/i8042.h"
++#include "hw/qdev-properties.h"
+ #include "sysemu/hw_accel.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+@@ -161,6 +162,10 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
+     vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
  }
  
- /* vmmouse helpers */
++static Property vmport_properties[] = {
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void vmport_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -168,6 +173,7 @@ static void vmport_class_initfn(ObjectClass *klass, void *data)
+     dc->realize = vmport_realizefn;
+     /* Reason: realize sets global port_state */
+     dc->user_creatable = false;
++    device_class_set_props(dc, vmport_properties);
+ }
+ 
+ static const TypeInfo vmport_info = {
 -- 
 2.20.1
 
