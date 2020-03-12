@@ -2,143 +2,85 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2EFC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7D9C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5706E2074C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:40:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5706E2074C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FD8C20735
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:49:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJECxjS0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD8C20735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCKKP-0000Tm-LI
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59442)
+	id 1jCKSh-0002NP-Lb
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:49:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jCKJh-0008HW-ON
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:39:50 -0400
+ (envelope-from <berrange@redhat.com>) id 1jCKS4-0001qu-Jd
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jCKJg-0000tg-Mx
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:39:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8350)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jCKJg-0000tZ-Hh
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:39:48 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02C9XJd6017414
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:39:47 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yqe67pqx0-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:39:43 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 12 Mar 2020 09:34:43 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 09:34:40 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02C9Yeme56819856
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 09:34:40 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E7D34AE045;
- Thu, 12 Mar 2020 09:34:39 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ADFE8AE057;
- Thu, 12 Mar 2020 09:34:39 +0000 (GMT)
-Received: from dyn-9-152-224-122.boeblingen.de.ibm.com (unknown
- [9.152.224.122])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Mar 2020 09:34:39 +0000 (GMT)
-Subject: Re: [PATCH v9 03/15] s390x: protvirt: Add migration blocker
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-4-frankja@linux.ibm.com>
- <f303ca0e-aaf8-4e6a-b7fa-a2d2bfe9cefd@de.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 12 Mar 2020 10:34:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <berrange@redhat.com>) id 1jCKS2-0004J5-DV
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:48:27 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24663
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jCKS2-0004GU-4n
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:48:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584006504;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=U3RKS+DaVgYvU07VWRj73NpfZRT38EgKbPDYE5P8lkM=;
+ b=TJECxjS0r9AzLQfSTbUxsGaSJwq9Y7l7iWoTpegBL594zw8oGm+lwoPrDvA04AOphV6V/U
+ 6yaKKjVbuVFA8WGbzfDy55S9pnvH/9xZBVeHjTN4i1B6p4PXxwAKOi2JDanY6mqBkbTNK9
+ 9eYeppGXr26pieSuBRI/i6MRGpaVb1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-_Jt4NFavMfSpiVKABE8gsg-1; Thu, 12 Mar 2020 05:47:56 -0400
+X-MC-Unique: _Jt4NFavMfSpiVKABE8gsg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBA8C800D5A;
+ Thu, 12 Mar 2020 09:47:54 +0000 (UTC)
+Received: from redhat.com (ovpn-112-64.ams2.redhat.com [10.36.112.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 310938AC34;
+ Thu, 12 Mar 2020 09:47:48 +0000 (UTC)
+Date: Thu, 12 Mar 2020 09:47:46 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: Upstream QEMU guest support policy ? Re: [PATCH v3 0/2] spapr:
+ Use vIOMMU translation for virtio by default
+Message-ID: <20200312094746.GA4089516@redhat.com>
+References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
+ <20200310114343.GD3234052@redhat.com>
+ <20200311011247.GT660117@umbus.fritz.box>
+ <20200311100127.GC3614859@redhat.com>
+ <20200312010847.GA711223@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <f303ca0e-aaf8-4e6a-b7fa-a2d2bfe9cefd@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="sEygDRDIcqOK9Fpx6zfsUF96cc4CqYMaV"
-X-TM-AS-GCONF: 00
-x-cbid: 20031209-0028-0000-0000-000003E38D5A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031209-0029-0000-0000-000024A8D461
-Message-Id: <ccada344-6196-a894-509f-c90def76cd67@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-12_01:2020-03-11,
- 2020-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0
- suspectscore=11 mlxscore=0 malwarescore=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003120051
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20200312010847.GA711223@umbus.fritz.box>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,117 +92,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: pair@us.ibm.com, mst@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
+ groug@kaod.org, paulus@samba.org, clg@kaod.org, mdroth@us.ibm.com,
+ qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sEygDRDIcqOK9Fpx6zfsUF96cc4CqYMaV
-Content-Type: multipart/mixed; boundary="Cwq736f6a21GUF6CqB2QGWUxBkTXWVpBv"
-
---Cwq736f6a21GUF6CqB2QGWUxBkTXWVpBv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 3/12/20 9:42 AM, Christian Borntraeger wrote:
+On Thu, Mar 12, 2020 at 12:08:47PM +1100, David Gibson wrote:
+> On Wed, Mar 11, 2020 at 10:01:27AM +0000, Daniel P. Berrang=C3=A9 wrote:
+> 65;5803;1c> On Wed, Mar 11, 2020 at 12:12:47PM +1100, David Gibson wrote:
+> > > On Tue, Mar 10, 2020 at 11:43:43AM +0000, Daniel P. Berrang=C3=A9 wro=
+te:
+> > > > On Thu, Mar 05, 2020 at 03:30:07PM +1100, David Gibson wrote:
+> > > > > Upcoming Secure VM support for pSeries machines introduces some
+> > > > > complications for virtio, since the transfer buffers need to be
+> > > > > explicitly shared so that the hypervisor can access them.
+> > > > >=20
+> > > > > While it's not strictly speaking dependent on it, the fact that v=
+irtio
+> > > > > devices bypass normal platform IOMMU translation complicates the =
+issue
+> > > > > on the guest side.  Since there are some significan downsides to
+> > > > > bypassing the vIOMMU anyway, let's just disable that.
+> > > > >=20
+> > > > > There's already a flag to do this in virtio, just turn it on by
+> > > > > default for forthcoming pseries machine types.
+> > > >=20
+> > > > Breaking existing guest OS to support a new secure VM feature that
+> > > > may not even be used/wanted doesn't seems like a sensible tradeoff
+> > > > for default out of the box behaviour.
+> > > >=20
+> > > > IOW, if Secure VM needs this, can we tie the change in virtio and
+> > > > IOMMU defaults to the machine type flag that enables the use of
+> > > > Secure VM.
+> > >=20
+> > > There is no such flag.
+> > >=20
+> > > In the POWER secure VM model, the secure mode option isn't something
+> > > that's constructed in when the hypervisor builds the VM.  Instead the
+> > > VM is started normally and transitions itself to secure mode by
+> > > talking directly with the ultravisor (it then uses TPM shenannigans t=
+o
+> > > safely get the keys to its real storage backend(s)).
+> >=20
+> > This is pretty suprising to me. The ability to use secure VM mode surel=
+y
+> > depends on host hardware features. We would need to be able to block th=
+e
+> > use of this, in order to allow VMs to be live migrated to hosts which
+> > lack the feature. Automatically & silently enabling a feature that
+> > has a hardware dependancy is something we aim to avoid, unless the user
+> > has opted in via some flag (such as -cpu host, or a -cpu $NAME, that
+> > implies the feature).
 >=20
+> That is an excellent point, which I had not previously considered.
 >=20
-> On 11.03.20 14:21, Janosch Frank wrote:
->> Migration is not yet supported.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 18 ++++++++++++++++++
->>  1 file changed, 18 insertions(+)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 9569b777a0e1abd6..deb31e060052d279 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -42,6 +42,9 @@
->>  #include "hw/s390x/tod.h"
->>  #include "sysemu/sysemu.h"
->>  #include "hw/s390x/pv.h"
->> +#include "migration/blocker.h"
->> +
->> +static Error *pv_mig_blocker;
->> =20
->>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>  {
->> @@ -321,15 +324,30 @@ static void s390_machine_unprotect(S390CcwMachin=
-eState *ms)
->>  {
->>      s390_pv_vm_disable();
->>      ms->pv =3D false;
->> +    migrate_del_blocker(pv_mig_blocker);
->> +    error_free_or_abort(&pv_mig_blocker);
->>  }
->> =20
->>  static int s390_machine_protect(S390CcwMachineState *ms)
->>  {
->> +    Error *local_err =3D NULL;
->>      int rc;
->> =20
->> +    error_setg(&pv_mig_blocker,
->> +               "protected VMs are currently not migrateable.");
->> +    rc =3D migrate_add_blocker(pv_mig_blocker, &local_err);
->> +    if (local_err) {
+> I have confirmed that there is indeed not, at present, a way to
+> disable the secure transition.  But, it looks like it's not too late
+> to fix it.
 >=20
-> Shall we rather use rc here? local_err should also work I guess.
+> I've discussed with Paul Mackerras, and early in the secure transition
+> apparently the UV makes a call to the HV, which is allowed to fail.
 >=20
-> Anyway
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> So, we're looking at adding another KVM capability for secure mode.
+> It will default to disabled, and until it is explicitly enabled, KVM
+> will always fail that call from the UV, effectively preventing guests
+> from going into secure mode.
 >=20
+> We can then wire that up to a new spapr cap in qemu, which we can also
+> use to configure these virtio defaults.
 
-Hmm, yeah I guess that would make more sense.
-Thanks!
+Great, that sounds viable to me.
 
->=20
->> +        error_report_err(local_err);
->> +        error_free_or_abort(&pv_mig_blocker);
->> +        return rc;
->> +    }
->> +
->>      /* Create SE VM */
->>      rc =3D s390_pv_vm_enable();
->>      if (rc) {
->> +        error_report_err(local_err);
->> +        migrate_del_blocker(pv_mig_blocker);
->> +        error_free_or_abort(&pv_mig_blocker);
->>          return rc;
->>      }
->> =20
->>
-
-
-
---Cwq736f6a21GUF6CqB2QGWUxBkTXWVpBv--
-
---sEygDRDIcqOK9Fpx6zfsUF96cc4CqYMaV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5qAi8ACgkQ41TmuOI4
-ufhYjA//bQ2HNZ4Eq/4wL7dqIdwXQve1RfIuF2KPMfaHv2Kek5eyyw9FpZPfuMPQ
-OZuAparpnPOHi6LctXjmWysITDKFMW6ctL1V/frw236efFJDQ0lwovipn8dv1XS1
-WJjY0Lj6N3J4P6l6zZAkWitIxZWjjIhMwAOGnKIt/m3pEuwtumuStpeIu43nTO3I
-ws9KfGhq/Ynnw7eVNgknrEwy8BuEZa86jgXtJcwXySd33G34MJLoGIqfU9mAII4c
-XcbSKKjhdDnWj3ASFGBWs/44Y49TaBuSALbrlvxXAxSX2NNf4LKbz/IV623xlKmD
-MtofkylP50FDD6oeHD9csl3JF5mSVvraIhDRIcMyalN9rAEqoKhEHMcqzA6Pj38e
-aBDkXGX5dp9CLcyvIen+S7rqXkCE/l8H7O9uHoGIEDBfhf3DHDx1YaxPqXhyTUjn
-B3sR01QUivlUsTZVS+pvtBjRK4k1oeLVjvAqVgOPnGN2ew+cCzzofXq4SEo9KPHF
-n0yXPPK3m8+wrChDj14WK/n3ZVLB0X8kP3RuJDnVT2Xp69Ol5fo4o5WViSto5kA/
-uE3TWdxkYAeS0M9oLFr+wEYkXZ9SJ0a4Ruo+FTSJzbsONGbX9UdFGw4zJnrIXJBM
-+E1R0WG9m7caOegJ+/KrIBKi7SExa6EggsWSYN4HMCg/v/BX5/c=
-=XLuA
------END PGP SIGNATURE-----
-
---sEygDRDIcqOK9Fpx6zfsUF96cc4CqYMaV--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
