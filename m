@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F1FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AEAC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:48:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B388E206E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:47:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5CDC20637
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:48:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wYhN8mA6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B388E206E9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ynJQy5vD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CDC20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49277 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTnq-0002N7-R8
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45526)
+	id 1jCTpC-0006H3-Uv
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:48:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45264)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjI-0005cH-7k
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:53 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTj4-0005A5-Ev
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjG-0002AE-WA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:52 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40647)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTj3-0001s9-3A
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:38 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:39596)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTjG-00029c-RE
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:50 -0400
-Received: by mail-pl1-x643.google.com with SMTP id h11so3063744plk.7
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:50 -0700 (PDT)
+ id 1jCTj2-0001qG-TL
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:37 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id d8so3072410pje.4
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KKlja8O+mQ8iXiIKMzNB9d94+lPcoNwMRA3J2mjKmq8=;
- b=wYhN8mA6uSPm/Tx4/2l4L5fu4AxfqE+D69Qh2Mv9sNEgcEPsjyvSVG7yT4lP3WoeqS
- lIPWEZi5xhy+6/NtpLZ82XQocewuKlNS93sBMktampoMCIfv2XEHmeusiVpowLEi9l8e
- xScvoOeYkM7xU3yBTNJnrBdcTlBJ4nCoTrMcSe0S72GesaHL71yeELFRDODhqDR5v4y5
- qQ3wVOZH57QeVzzR0mLHGUxs5JLlM1F0rcY7VOeUiftZuS9PdCmxxQe19fQrxea1nQc2
- 3GoTibt0QglDQMcWrbgJrVAINinOpL7N+pflPQSrfv2WevPKI+RkW7TQ+t0tgTjAsSWY
- y/CQ==
+ bh=KVh1PjkTSIf81i4jFeoQokSOAEnUoVWj3KgKbBOigI0=;
+ b=ynJQy5vDLRaZntNHzQOfrRyhzJ5y6MEh/m47daaScFtiG+Cx8Qd+xhsrdwBt6LWY/4
+ liUKM+3buVV8Pfa7dWDihHItMZhrmAlfKhl9j/rmTV0gYUWYkb431LQPmsAMB1L4PT4C
+ MIAcrqTGhFwWRP6u9wAdw2MJVbFs71yc/lhpKsBKgaGVdqjkJRe9U6oZNsHVnt9bJyoO
+ OMnjcHRsuYcl8SWpnQ4OHUaLIcxfSR3Qsh1C6SY+y0TMwuqN2LgKTKH5+b+3zITrvoLJ
+ eiuDBwGZ+ktFoGA4cgLlOGaqf5r2KTRZCFiN2DuHp5Ado7XMojKa2d6qZhgqwXUoEQJi
+ 7rlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KKlja8O+mQ8iXiIKMzNB9d94+lPcoNwMRA3J2mjKmq8=;
- b=MsV/N4/kuVk9xFuSz4GJBY0gmlW7Q544YrEoVRxxNfKHjlJ97uFvmSpOkUBjPcHvYj
- QWV3z0HhzdbQzae8cryVkublak2VqTW4sq4NciARhql9AkP8ETUoLC7ROfjfSAGhTveQ
- xUMyyIXZa1jzdShFfuitxGe4XTZtVvW7bJGDVxZx1LZbR1TdH56NjRoq1Tr8ZXUd3XXG
- bZ6grUaOkhXWX84JM4zuggkF3bI1N/mSw6Hp1dH2R9z2upFoZSBFO8N6DIMyOCPX462o
- KdJbhqFjQMINM7EWQa5k/jiE2yffX8ObQCgpHrH8rPtCf0tm0OK53KKzUarZmh8vwg3T
- i6ZA==
-X-Gm-Message-State: ANhLgQ0++jrlzeEaoEmTO3O5tUlcMZptJrOmM3huxrNLqz6wfgJ9m7fZ
- 2GIR+6FiDTT1nW3jsU6FZ2lp1BL+SdQ=
-X-Google-Smtp-Source: ADFU+vs6zUp6jh3jMdvmlgJr5UGtJgbToN8tyNH1VixeWHlIFRPisZjfbENGdKrsHyZFU5xeh4WrBw==
-X-Received: by 2002:a17:90a:7348:: with SMTP id
- j8mr4584415pjs.63.1584042169514; 
- Thu, 12 Mar 2020 12:42:49 -0700 (PDT)
+ bh=KVh1PjkTSIf81i4jFeoQokSOAEnUoVWj3KgKbBOigI0=;
+ b=XxbDjST2wO4LSUDp04FwWG08wMLWLI5uDxYGQKZvlq++A6C6Uzybfj6nokNVSeMj5u
+ Ri/LGw5jDebW4V2uNngw8S6sDwR0MdIKgZuE18xZ9smxAf6G0wfX6hH6oEfCW6aNQUfg
+ dOJDCB+YiOz4ITBcIdhffrX1uJthUHm8/50XNlv6t2d1qoFKB4xMKoH5ju95xxC5OCFu
+ /z4buPx7e2sxPI7wUUEvZjsDGNno0t5c8KDAhdBjrF6uFT0YJdK9hGow3LPz1PtXNZEl
+ E+vWePUOQckB6Z7gCyai0EdsiEa1FLIGJ32ypwI1+t1c1nU6hgESjzjKZojHET0d37Lt
+ +OQg==
+X-Gm-Message-State: ANhLgQ1kl2hsqgMA6sZ4peHVgisZcFJHW5gMbXGrOWpZ18ml+kAD0Wkn
+ X0CexjEOvPE4G0oh/A3xj0fNhuYLgVw=
+X-Google-Smtp-Source: ADFU+vvqQW/uUnDRVKu4GBHb6aqY9uNq3D9AsmmHp/s4eH6CTIhYSt1hkYlaSAk8Vuz9oXzRhRqk1w==
+X-Received: by 2002:a17:902:7298:: with SMTP id
+ d24mr9598358pll.134.1584042154568; 
+ Thu, 12 Mar 2020 12:42:34 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.48
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:42:48 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 21/42] target/arm: Move regime_el to internals.h
-Date: Thu, 12 Mar 2020 12:41:58 -0700
-Message-Id: <20200312194219.24406-22-richard.henderson@linaro.org>
+Subject: [PATCH v6 10/42] target/arm: Implement the ADDG, SUBG instructions
+Date: Thu, 12 Mar 2020 12:41:47 -0700
+Message-Id: <20200312194219.24406-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,108 +99,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will shortly need this in mte_helper.c as well.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h | 36 ++++++++++++++++++++++++++++++++++++
- target/arm/helper.c    | 36 ------------------------------------
- 2 files changed, 36 insertions(+), 36 deletions(-)
+v2: Shift offset in translate; use extract32.
+v6: Implement inline for !ATA.
+---
+ target/arm/helper-a64.h    |  1 +
+ target/arm/internals.h     |  9 +++++++++
+ target/arm/mte_helper.c    | 10 ++++++++++
+ target/arm/translate-a64.c | 36 ++++++++++++++++++++++++++++++++++--
+ 4 files changed, 54 insertions(+), 2 deletions(-)
 
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 587ccbe42f..6c116481e8 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -105,3 +105,4 @@ DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ 
+ DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
++DEF_HELPER_FLAGS_4(addsubg, TCG_CALL_NO_RWG_SE, i64, env, i64, s32, i32)
 diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 3190fc40fc..f091891312 100644
+index e4450302a6..3190fc40fc 100644
 --- a/target/arm/internals.h
 +++ b/target/arm/internals.h
-@@ -912,6 +912,42 @@ static inline bool regime_is_pan(CPUARMState *env, ARMMMUIdx mmu_idx)
-     }
- }
+@@ -1257,6 +1257,15 @@ void arm_log_exception(int idx);
+  */
+ #define GMID_EL1_BS  6
  
-+/* Return the exception level which controls this address translation regime */
-+static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
++/* We associate one allocation tag per 16 bytes, the minimum.  */
++#define LOG2_TAG_GRANULE 4
++#define TAG_GRANULE      (1 << LOG2_TAG_GRANULE)
++
++static inline int allocation_tag_from_addr(uint64_t ptr)
 +{
-+    switch (mmu_idx) {
-+    case ARMMMUIdx_E20_0:
-+    case ARMMMUIdx_E20_2:
-+    case ARMMMUIdx_E20_2_PAN:
-+    case ARMMMUIdx_Stage2:
-+    case ARMMMUIdx_E2:
-+        return 2;
-+    case ARMMMUIdx_SE3:
-+        return 3;
-+    case ARMMMUIdx_SE10_0:
-+        return arm_el_is_aa64(env, 3) ? 1 : 3;
-+    case ARMMMUIdx_SE10_1:
-+    case ARMMMUIdx_SE10_1_PAN:
-+    case ARMMMUIdx_Stage1_E0:
-+    case ARMMMUIdx_Stage1_E1:
-+    case ARMMMUIdx_Stage1_E1_PAN:
-+    case ARMMMUIdx_E10_0:
-+    case ARMMMUIdx_E10_1:
-+    case ARMMMUIdx_E10_1_PAN:
-+    case ARMMMUIdx_MPrivNegPri:
-+    case ARMMMUIdx_MUserNegPri:
-+    case ARMMMUIdx_MPriv:
-+    case ARMMMUIdx_MUser:
-+    case ARMMMUIdx_MSPrivNegPri:
-+    case ARMMMUIdx_MSUserNegPri:
-+    case ARMMMUIdx_MSPriv:
-+    case ARMMMUIdx_MSUser:
-+        return 1;
-+    default:
-+        g_assert_not_reached();
-+    }
++    return extract64(ptr, 56, 4);
 +}
 +
- /* Return the FSR value for a debug exception (watchpoint, hardware
-  * breakpoint or BKPT insn) targeting the specified exception level.
-  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f9daeec1f4..2a50d4e9a2 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9753,42 +9753,6 @@ void arm_cpu_do_interrupt(CPUState *cs)
- }
- #endif /* !CONFIG_USER_ONLY */
- 
--/* Return the exception level which controls this address translation regime */
--static uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
--{
--    switch (mmu_idx) {
--    case ARMMMUIdx_E20_0:
--    case ARMMMUIdx_E20_2:
--    case ARMMMUIdx_E20_2_PAN:
--    case ARMMMUIdx_Stage2:
--    case ARMMMUIdx_E2:
--        return 2;
--    case ARMMMUIdx_SE3:
--        return 3;
--    case ARMMMUIdx_SE10_0:
--        return arm_el_is_aa64(env, 3) ? 1 : 3;
--    case ARMMMUIdx_SE10_1:
--    case ARMMMUIdx_SE10_1_PAN:
--    case ARMMMUIdx_Stage1_E0:
--    case ARMMMUIdx_Stage1_E1:
--    case ARMMMUIdx_Stage1_E1_PAN:
--    case ARMMMUIdx_E10_0:
--    case ARMMMUIdx_E10_1:
--    case ARMMMUIdx_E10_1_PAN:
--    case ARMMMUIdx_MPrivNegPri:
--    case ARMMMUIdx_MUserNegPri:
--    case ARMMMUIdx_MPriv:
--    case ARMMMUIdx_MUser:
--    case ARMMMUIdx_MSPrivNegPri:
--    case ARMMMUIdx_MSUserNegPri:
--    case ARMMMUIdx_MSPriv:
--    case ARMMMUIdx_MSUser:
--        return 1;
--    default:
--        g_assert_not_reached();
--    }
--}
--
- uint64_t arm_sctlr(CPUARMState *env, int el)
+ static inline uint64_t address_with_allocation_tag(uint64_t ptr, int rtag)
  {
-     /* Only EL0 needs to be adjusted for EL1&0 or EL2&0. */
+     return deposit64(ptr, 56, 4, rtag);
+diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+index 539a04de84..9ab9ed749d 100644
+--- a/target/arm/mte_helper.c
++++ b/target/arm/mte_helper.c
+@@ -70,3 +70,13 @@ uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
+ 
+     return address_with_allocation_tag(rn, rtag);
+ }
++
++uint64_t HELPER(addsubg)(CPUARMState *env, uint64_t ptr,
++                         int32_t offset, uint32_t tag_offset)
++{
++    int start_tag = allocation_tag_from_addr(ptr);
++    uint16_t exclude = extract32(env->cp15.gcr_el1, 0, 16);
++    int rtag = choose_nonexcluded_tag(start_tag, tag_offset, exclude);
++
++    return address_with_allocation_tag(ptr + offset, rtag);
++}
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index f1e2fe0060..02f31d5948 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3807,17 +3807,20 @@ static void disas_pc_rel_adr(DisasContext *s, uint32_t insn)
+  *    sf: 0 -> 32bit, 1 -> 64bit
+  *    op: 0 -> add  , 1 -> sub
+  *     S: 1 -> set flags
+- * shift: 00 -> LSL imm by 0, 01 -> LSL imm by 12
++ * shift: 00 -> LSL imm by 0,
++ *        01 -> LSL imm by 12
++ *        10 -> ADDG, SUBG
+  */
+ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
+ {
+     int rd = extract32(insn, 0, 5);
+     int rn = extract32(insn, 5, 5);
+-    uint64_t imm = extract32(insn, 10, 12);
++    int imm = extract32(insn, 10, 12);
+     int shift = extract32(insn, 22, 2);
+     bool setflags = extract32(insn, 29, 1);
+     bool sub_op = extract32(insn, 30, 1);
+     bool is_64bit = extract32(insn, 31, 1);
++    bool is_tag = false;
+ 
+     TCGv_i64 tcg_rn = cpu_reg_sp(s, rn);
+     TCGv_i64 tcg_rd = setflags ? cpu_reg(s, rd) : cpu_reg_sp(s, rd);
+@@ -3829,11 +3832,40 @@ static void disas_add_sub_imm(DisasContext *s, uint32_t insn)
+     case 0x1:
+         imm <<= 12;
+         break;
++    case 0x2:
++        /* ADDG, SUBG */
++        if (!is_64bit || setflags || (imm & 0x30) ||
++            !dc_isar_feature(aa64_mte_insn_reg, s)) {
++            goto do_unallocated;
++        }
++        is_tag = true;
++        break;
+     default:
++    do_unallocated:
+         unallocated_encoding(s);
+         return;
+     }
+ 
++    if (is_tag) {
++        imm = (imm >> 6) << LOG2_TAG_GRANULE;
++        if (sub_op) {
++            imm = -imm;
++        }
++
++        if (s->ata) {
++            TCGv_i32 tag_offset = tcg_const_i32(imm & 15);
++            TCGv_i32 offset = tcg_const_i32(imm);
++
++            gen_helper_addsubg(tcg_rd, cpu_env, tcg_rn, offset, tag_offset);
++            tcg_temp_free_i32(tag_offset);
++            tcg_temp_free_i32(offset);
++        } else {
++            tcg_gen_addi_i64(tcg_rd, tcg_rn, imm);
++            gen_address_with_allocation_tag0(tcg_rd, tcg_rd);
++        }
++        return;
++    }
++
+     tcg_result = tcg_temp_new_i64();
+     if (!setflags) {
+         if (sub_op) {
 -- 
 2.20.1
 
