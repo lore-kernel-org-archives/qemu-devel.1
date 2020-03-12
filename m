@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6E1C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D5C8C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC481206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:50:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E1F8206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:50:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PRuEC7/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC481206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ni3ilxQG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E1F8206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR2a-00037Y-Rn
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:50:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35555)
+	id 1jCR2c-0003Hi-UT
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:50:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxI-00086d-6l
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:09 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxO-0008Gj-T8
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxH-000505-0X
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:08 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45176)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxN-00055z-Ne
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:14 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34589)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxG-0004zl-Qx
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:06 -0400
-Received: by mail-wr1-x441.google.com with SMTP id m9so8335355wro.12
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:06 -0700 (PDT)
+ id 1jCQxN-00054U-GQ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:13 -0400
+Received: by mail-wr1-x443.google.com with SMTP id z15so8381010wrl.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ZDzXTbj3Kw0VgoD1DocT1IFxe6z/Gv28taLlkqSSY/U=;
- b=PRuEC7/edkiJsdXwpeDJtSXKcWVYp5olEGh9yBc9wMLpkK/zgWBaYP1oXti/76n4qD
- riupAACdZeiC99shMS6UVryeeGque6iR67/EK3QvFmz9AaTd0Pg5gukTbETFZRmVPVvT
- qMkimTmw7mHMxLkmCl1dg/kHBTXw3oKu1Au4kz71+J8/8KG95POx2eTAidp/kJ26exLB
- M24+TombE/uWQeTlo63Y01PVCPBPnOh9Ifju5nA6Y84satB3Ab5WZo1eIKxC1YekTtoj
- 47rdwmPTOwrbl4vO1BL3EubLhxiEJ319miHv/6Vd/3DxOfVYWNy7R9tgVqC86gd6SUZ4
- 72LA==
+ bh=tWA33XZa/cz9PUChiNWS4Z6nrgn0YwL/7Lfi/vyfbzE=;
+ b=Ni3ilxQGB1VEPlSVkK4tN3ruWhMW+q1BmovcUd1KvoWFP7++vx8aJ9iuc/qV0Euz3g
+ E7USbpbyTmmd+LRMuP8bOwN2H/L7qnjxEDCGQhZrWS2T3AXgpTx0Gw7Bhd00QtvgA2sq
+ BbN1oylQYL8/Nxy750eiyUOlvcnD43yanfjhcW8D26BR+X/k88PKeUDgjeTgyQASAgZT
+ SbbQjAo1kmzN6SbdTHxMDyscZ151ce/OeWS/pRI3HrucQUTfKuPV9CMuBBcIe0yQbrbh
+ elKZlk1bKUcGUKS3ixDIpt/XowIqwvwBE61TgwO0SchDwdA1F1wJZCDxVVb2I09b1hPE
+ KCJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZDzXTbj3Kw0VgoD1DocT1IFxe6z/Gv28taLlkqSSY/U=;
- b=KK8w1gcjexa+HHrdlVXX8MwlE5ajjiCQf5g1G/ioN9ZdCYo8aqlkyYQ7dD/PWtVlMq
- wm8DR7l8rptMJQVwU6xkEXHC9jZhsarLLj1PcLWjUy0HJ8Edqo/oGdkbgFqZqL9d4rr1
- v0lQ46YBFm0nni87d62Hz+WjmyIFDY/AThP518bA86lgCtT7wnnXL941EA+qe5Aoinzv
- XU7TBxJ4ylWDAP2TNwR1sj/QV3DK8UekD4UHID8VxrRok6j6oPr9DNBbduiWDQCo+5Yb
- L0VO9gc0KhEu5M4JhXQlyRo0L5/YRdC+KM339Kfd3h4aXiGRPCkPeTfRRuLjslCI8Dvs
- lA3A==
-X-Gm-Message-State: ANhLgQ1l2h/hFP1W6GxPLCE+3WEllUve2vjZ20/CQAFXrDP4zZrUPyN5
- KdpEsvDVjNDy/nugiJiDVmW6yqy12rMhkQ==
-X-Google-Smtp-Source: ADFU+vtFmm2hmtVGUSYTQ8HefUCbxEf/0dXT5olI4sbJ5C1hgR6bSgCH53Ytw2slC5j/HaOJR4jE7A==
-X-Received: by 2002:adf:e911:: with SMTP id f17mr11381689wrm.87.1584031505649; 
- Thu, 12 Mar 2020 09:45:05 -0700 (PDT)
+ bh=tWA33XZa/cz9PUChiNWS4Z6nrgn0YwL/7Lfi/vyfbzE=;
+ b=BEMC4cyJYtQGvX83IgUpvg4BQTl9z6oCQ0Hlohkl8GbMTJK9q/nB71vfFg6vJPOVrC
+ wxu6jRm698pTeS4QpegRTUoorfCF9nsTaPr1KeRCLYT5tITeGiDzToiPfaUDtUkHBZOx
+ nC9QMTzDzWHn05sCAcupBwdG/2bFsSI66RuH0nE6GlIwa78eRHrKzI8Y9jahLdKmVRAk
+ /HDab4ESqoRrCMR6ySu1hxyfzWYsYrMxAB6udldtBFcjmZ3i4K/gVCFM8FUplI/dVy9P
+ 9rrqC7ePzEuLr09+gmox9Cq0lvbtXKt8jiYjiicrfkcONrA1Zvtdegj1ktK8cDj8mMQB
+ qTJw==
+X-Gm-Message-State: ANhLgQ0Y780/8BAkuPajffpPrLTvulPnqyKadNgC6QYT3Kwbl2it+WDF
+ zznZCwMWLNIvZwOHXUF0eAeAJy35aw4W2w==
+X-Google-Smtp-Source: ADFU+vuXQDW4lN8Bmy1b4iBQ6rde0MsKRi1SXg7JeW40zhKEF3RIVsoa+R7iTOA+2grud1rIZFvaZg==
+X-Received: by 2002:a05:6000:1206:: with SMTP id
+ e6mr7822223wrx.339.1584031511140; 
+ Thu, 12 Mar 2020 09:45:11 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.04
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.10
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:05 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:10 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/36] target/arm: Recalculate hflags correctly after writes to
- CONTROL
-Date: Thu, 12 Mar 2020 16:44:26 +0000
-Message-Id: <20200312164459.25924-4-peter.maydell@linaro.org>
+Subject: [PULL 08/36] target/arm: Disable clean_data_tbi for system mode
+Date: Thu, 12 Mar 2020 16:44:31 +0000
+Message-Id: <20200312164459.25924-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,87 +98,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A write to the CONTROL register can change our current EL (by
-writing to the nPRIV bit). That means that we can't assume
-that s->current_el is still valid in trans_MSR_v7m() when
-we try to rebuild the hflags.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add a new helper rebuild_hflags_m32_newel() which, like the
-existing rebuild_hflags_a32_newel(), recalculates the current
-EL from scratch, and use it in trans_MSR_v7m().
+We must include the tag in the FAR_ELx register when raising
+an addressing exception.  Which means that we should not clear
+out the tag during translation.
 
-This fixes an assertion about an hflags mismatch when the
-guest changes privilege by writing to CONTROL.
+We cannot at present comply with this for user mode, so we
+retain the clean_data_tbi function for the moment, though it
+no longer does what it says on the tin for system mode.  This
+function is to be replaced with MTE, so don't worry about the
+slight misnaming.
 
+Buglink: https://bugs.launchpad.net/qemu/+bug/1867072
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200308012946.16303-3-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200303174950.3298-4-peter.maydell@linaro.org
 ---
- target/arm/helper.h    |  1 +
- target/arm/helper.c    | 12 ++++++++++++
- target/arm/translate.c |  7 +++----
- 3 files changed, 16 insertions(+), 4 deletions(-)
+ target/arm/translate-a64.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 72eb9e6a1a5..f37b8670a55 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -90,6 +90,7 @@ DEF_HELPER_4(msr_banked, void, env, i32, i32, i32)
- DEF_HELPER_2(get_user_reg, i32, env, i32)
- DEF_HELPER_3(set_user_reg, void, env, i32, i32)
- 
-+DEF_HELPER_FLAGS_1(rebuild_hflags_m32_newel, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_2(rebuild_hflags_m32, TCG_CALL_NO_RWG, void, env, int)
- DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f91e5d5345f..bc64077ec7c 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -12468,6 +12468,18 @@ void arm_rebuild_hflags(CPUARMState *env)
-     env->hflags = rebuild_hflags_internal(env);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fefe8af7f52..8fffb52203d 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -228,7 +228,18 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+ static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
+ {
+     TCGv_i64 clean = new_tmp_a64(s);
++    /*
++     * In order to get the correct value in the FAR_ELx register,
++     * we must present the memory subsystem with the "dirty" address
++     * including the TBI.  In system mode we can make this work via
++     * the TLB, dropping the TBI during translation.  But for user-only
++     * mode we don't have that option, and must remove the top byte now.
++     */
++#ifdef CONFIG_USER_ONLY
+     gen_top_byte_ignore(s, clean, addr, s->tbid);
++#else
++    tcg_gen_mov_i64(clean, addr);
++#endif
+     return clean;
  }
  
-+/*
-+ * If we have triggered a EL state change we can't rely on the
-+ * translator having passed it to us, we need to recompute.
-+ */
-+void HELPER(rebuild_hflags_m32_newel)(CPUARMState *env)
-+{
-+    int el = arm_current_el(env);
-+    int fp_el = fp_exception_el(env, el);
-+    ARMMMUIdx mmu_idx = arm_mmu_idx_el(env, el);
-+    env->hflags = rebuild_hflags_m32(env, fp_el, mmu_idx);
-+}
-+
- void HELPER(rebuild_hflags_m32)(CPUARMState *env, int el)
- {
-     int fp_el = fp_exception_el(env, el);
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 7f0154194cf..4715ca0d2ad 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -8551,7 +8551,7 @@ static bool trans_MRS_v7m(DisasContext *s, arg_MRS_v7m *a)
- 
- static bool trans_MSR_v7m(DisasContext *s, arg_MSR_v7m *a)
- {
--    TCGv_i32 addr, reg, el;
-+    TCGv_i32 addr, reg;
- 
-     if (!arm_dc_feature(s, ARM_FEATURE_M)) {
-         return false;
-@@ -8561,9 +8561,8 @@ static bool trans_MSR_v7m(DisasContext *s, arg_MSR_v7m *a)
-     gen_helper_v7m_msr(cpu_env, addr, reg);
-     tcg_temp_free_i32(addr);
-     tcg_temp_free_i32(reg);
--    el = tcg_const_i32(s->current_el);
--    gen_helper_rebuild_hflags_m32(cpu_env, el);
--    tcg_temp_free_i32(el);
-+    /* If we wrote to CONTROL, the EL might have changed */
-+    gen_helper_rebuild_hflags_m32_newel(cpu_env);
-     gen_lookup_tb(s);
-     return true;
- }
 -- 
 2.20.1
 
