@@ -2,59 +2,109 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90BEC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13618C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 910A42071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:57:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 910A42071C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id CFE8F2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:58:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KzVqf0gw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFE8F2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQDZ-0008N4-QD
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51471)
+	id 1jCQEX-0001Ih-UR
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:58:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQ7f-0001Wz-Vt
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:51:50 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jCQ8E-0002Oe-GL
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:52:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQ7e-0006l5-69
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:51:47 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34442)
+ (envelope-from <pbonzini@redhat.com>) id 1jCQ8D-0007DG-8j
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:52:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59719
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCQ7d-0006hw-7V; Thu, 12 Mar 2020 11:51:46 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436293|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.377255-0.00325374-0.619491;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03295; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-OtqX9_1584028298; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-OtqX9_1584028298)
- by smtp.aliyun-inc.com(10.147.40.233);
- Thu, 12 Mar 2020 23:51:39 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 26/60] target/riscv: vector widening saturating scaled
- multiply-add
-Date: Thu, 12 Mar 2020 22:58:26 +0800
-Message-Id: <20200312145900.2054-27-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jCQ8D-0007C3-3K
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:52:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584028340;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z7GOpK3/gyjplTCGGtQYiZFql9ANjhE63p4+WcIgY14=;
+ b=KzVqf0gwXpDuSlFgE3IvLZ2CrUhOAexPZTrAEFQKlsEy2pAq/FF3HOosEAztw+9sMZHBg2
+ YP6pPqyHUQ3ht5v+QGyy/JqjEC4PZUgzraziNNHx0L/2lmNyxH/s9+MjYO/7cHlQYwc1wp
+ wYaa9FpAG9EBdejhD7c0WyZGIKJvXiA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-F4wouPLFOfKVxiTmB9q7rw-1; Thu, 12 Mar 2020 11:52:19 -0400
+X-MC-Unique: F4wouPLFOfKVxiTmB9q7rw-1
+Received: by mail-wr1-f71.google.com with SMTP id c6so2794175wrm.18
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 08:52:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Z7GOpK3/gyjplTCGGtQYiZFql9ANjhE63p4+WcIgY14=;
+ b=Rbxhylh0x4oOJ2LqFMCsrJehcuixakSg8uP7CVXFLmm+eEzZ7B+YdXyKdngoFqYsdo
+ c6q/H4EugzPU9aAe9vVHu1YiQGQ2S5BvzLSVd1GabggUaJYaZayi6YBDQ7+stc0TmVgb
+ 6iRj6ftqOGKBOsQTLHwcEvBpsRZs5dPiUgWfoTh11oaRQZkH4iFX0eFTfrikRU5lTsCh
+ eTQ1L2bNwUwvZ9qzAqXTViJX3G0H2qTPHKZpHJ2yBlMG3kAEadau2y6TBhSkcE1G6E3L
+ NkXIH2VinXb/XlrcTnWrTl++/+FRDuwCGvVaNEE0PWeTS/ykafWwkNHMZXJhud9olP1J
+ mzQw==
+X-Gm-Message-State: ANhLgQ1Cf4bLCorLpbvFQzlGa8h1A7fJZdYHUJNrv99tqI+FCKTy7yut
+ WeX//A3jzRpgyrC4M1uPTEPP8hLwpXMMHWTYKQdUq1JKgmWCYSAj7/9/4kkf4F0qZoV77i6CIar
+ WygxM8S3jt9BsruU=
+X-Received: by 2002:a1c:e91a:: with SMTP id q26mr5485412wmc.103.1584028337224; 
+ Thu, 12 Mar 2020 08:52:17 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsCB4IXIDEhxar8Nb6NRpNZ/9568Qi4VFBhv1JUV41YF+jN+PqM80FqtB6PUu1KSCayE1Zkdw==
+X-Received: by 2002:a1c:e91a:: with SMTP id q26mr5485392wmc.103.1584028336983; 
+ Thu, 12 Mar 2020 08:52:16 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.173.186])
+ by smtp.gmail.com with ESMTPSA id 133sm13626490wmd.5.2020.03.12.08.52.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 12 Mar 2020 08:52:16 -0700 (PDT)
+Subject: Re: [PATCH V4 0/5] Introduce Advanced Watch Dog module
+To: "Zhang, Chen" <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-dev <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>
+References: <20191217124554.30818-1-chen.zhang@intel.com>
+ <fa1ed6cb-63d7-ee83-a5a0-b099b662fef2@intel.com>
+ <0502a0db0a17484c9220b3a63c40b397@intel.com>
+ <08a1a225-52c1-4e6c-85f7-fcf6612b5383@redhat.com>
+ <3049425105b94f6cb9cd846c84c95a84@intel.com>
+ <783bac16-0e4d-f027-3e4a-b6fff500c244@redhat.com>
+ <c6564993-ec06-7fe1-137d-956f3d554e74@intel.com>
+ <679426098de74479a19c2287c68785c4@intel.com>
+ <029efd6f-f461-da09-c6b6-1acf67818b64@redhat.com>
+ <c16e2cda-a498-4913-2811-6c6ea6b0b0df@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <460ee5fb-fd36-0da3-0f81-22d9be12814b@redhat.com>
+Date: Thu, 12 Mar 2020 16:52:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <c16e2cda-a498-4913-2811-6c6ea6b0b0df@intel.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,275 +116,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  22 +++
- target/riscv/insn32.decode              |   7 +
- target/riscv/insn_trans/trans_rvv.inc.c |   9 ++
- target/riscv/vector_helper.c            | 180 ++++++++++++++++++++++++
- 4 files changed, 218 insertions(+)
+On 09/03/20 10:32, Zhang, Chen wrote:
+> 4. Implementation issue.
+> 
+> The AWD script as an optional feature is OK for me.
+> 
+> And report the triggering of the watchdog via QMP events is enough for
+> current usage.
+> 
+> But it looks have limitation to notify outside Qemu. I don't know which
+> is better choice.
+> 
+> If the QMP events solution is better, I will fix it in next version.
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 333eccca57..74c1c695e0 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -733,3 +733,25 @@ DEF_HELPER_6(vsmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vwsmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vwsmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 99f70924d6..8798919d3e 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -419,6 +419,13 @@ vasub_vv        100110 . ..... ..... 000 ..... 1010111 @r_vm
- vasub_vx        100110 . ..... ..... 100 ..... 1010111 @r_vm
- vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
- vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
-+vwsmaccu_vv     111100 . ..... ..... 000 ..... 1010111 @r_vm
-+vwsmaccu_vx     111100 . ..... ..... 100 ..... 1010111 @r_vm
-+vwsmacc_vv      111101 . ..... ..... 000 ..... 1010111 @r_vm
-+vwsmacc_vx      111101 . ..... ..... 100 ..... 1010111 @r_vm
-+vwsmaccsu_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
-+vwsmaccsu_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
-+vwsmaccus_vx    111111 . ..... ..... 100 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 60e1e63b7b..68bebd3c37 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1532,3 +1532,12 @@ GEN_OPIVI_TRANS(vaadd_vi, 0, vaadd_vx, opivx_check)
- /* Vector Single-Width Fractional Multiply with Rounding and Saturation */
- GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
- GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
-+
-+/* Vector Widening Saturating Scaled Multiply-Add */
-+GEN_OPIVV_WIDEN_TRANS(vwsmaccu_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwsmacc_vv, opivv_widen_check)
-+GEN_OPIVV_WIDEN_TRANS(vwsmaccsu_vv, opivv_widen_check)
-+GEN_OPIVX_WIDEN_TRANS(vwsmaccu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwsmacc_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwsmaccsu_vx)
-+GEN_OPIVX_WIDEN_TRANS(vwsmaccus_vx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 74ad07743c..90c19577fa 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -2523,3 +2523,183 @@ GEN_VEXT_VX_ENV(vsmul_vx_b, 1, 1, clearb)
- GEN_VEXT_VX_ENV(vsmul_vx_h, 2, 2, clearh)
- GEN_VEXT_VX_ENV(vsmul_vx_w, 4, 4, clearl)
- GEN_VEXT_VX_ENV(vsmul_vx_d, 8, 8, clearq)
-+
-+/* Vector Widening Saturating Scaled Multiply-Add */
-+static uint16_t vwsmaccu8(CPURISCVState *env, uint8_t a, uint8_t b,
-+    uint16_t c)
-+{
-+    uint8_t round;
-+    uint16_t res = (uint16_t)a * (uint16_t)b;
-+
-+    round = get_round(env, res, 4);
-+    res   = (res >> 4) + round;
-+    return saddu16(env, c, res);
-+}
-+static uint32_t vwsmaccu16(CPURISCVState *env, uint16_t a, uint16_t b,
-+    uint32_t c)
-+{
-+    uint8_t round;
-+    uint32_t res = (uint32_t)a * (uint32_t)b;
-+
-+    round = get_round(env, res, 8);
-+    res   = (res >> 8) + round;
-+    return saddu32(env, c, res);
-+}
-+static uint64_t vwsmaccu32(CPURISCVState *env, uint32_t a, uint32_t b,
-+    uint64_t c)
-+{
-+    uint8_t round;
-+    uint64_t res = (uint64_t)a * (uint64_t)b;
-+
-+    round = get_round(env, res, 16);
-+    res   = (res >> 16) + round;
-+    return saddu64(env, c, res);
-+}
-+
-+#define OPIVV3_ENV(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)   \
-+static void do_##NAME(void *vd, void *vs1, void *vs2, int i,       \
-+        CPURISCVState *env)                                        \
-+{                                                                  \
-+    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
-+    TD d = *((TD *)vd + HD(i));                                    \
-+    *((TD *)vd + HD(i)) = OP(env, s2, s1, d);                      \
-+}
-+RVVCALL(OPIVV3_ENV, vwsmaccu_vv_b, WOP_UUU_B, H2, H1, H1, vwsmaccu8)
-+RVVCALL(OPIVV3_ENV, vwsmaccu_vv_h, WOP_UUU_H, H4, H2, H2, vwsmaccu16)
-+RVVCALL(OPIVV3_ENV, vwsmaccu_vv_w, WOP_UUU_W, H8, H4, H4, vwsmaccu32)
-+GEN_VEXT_VV_ENV(vwsmaccu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV_ENV(vwsmaccu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vwsmaccu_vv_w, 4, 8, clearq)
-+
-+#define OPIVX3_ENV(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)            \
-+static void do_##NAME(void *vd, target_ulong s1, void *vs2, int i,     \
-+        CPURISCVState *env)                                            \
-+{                                                                      \
-+    TX2 s2 = *((T2 *)vs2 + HS2(i));                                    \
-+    TD d = *((TD *)vd + HD(i));                                        \
-+    *((TD *)vd + HD(i)) = OP(env, s2, (TX1)(T1)(target_long)s1, d);    \
-+}
-+RVVCALL(OPIVX3_ENV, vwsmaccu_vx_b, WOP_UUU_B, H2, H1, vwsmaccu8)
-+RVVCALL(OPIVX3_ENV, vwsmaccu_vx_h, WOP_UUU_H, H4, H2, vwsmaccu16)
-+RVVCALL(OPIVX3_ENV, vwsmaccu_vx_w, WOP_UUU_W, H8, H4, vwsmaccu32)
-+GEN_VEXT_VX_ENV(vwsmaccu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX_ENV(vwsmaccu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX_ENV(vwsmaccu_vx_w, 4, 8, clearq)
-+
-+static int16_t vwsmacc8(CPURISCVState *env, int8_t a, int8_t b, int16_t c)
-+{
-+    uint8_t round;
-+    int16_t res = (int16_t)a * (int16_t)b;
-+
-+    round = get_round(env, res, 4);
-+    res   = (res >> 4) + round;
-+    return sadd16(env, c, res);
-+}
-+static int32_t vwsmacc16(CPURISCVState *env, int16_t a, int16_t b, int32_t c)
-+{
-+    uint8_t round;
-+    int32_t res = (int32_t)a * (int32_t)b;
-+
-+    round = get_round(env, res, 8);
-+    res   = (res >> 8) + round;
-+    return sadd32(env, c, res);
-+
-+}
-+static int64_t vwsmacc32(CPURISCVState *env, int32_t a, int32_t b, int64_t c)
-+{
-+    uint8_t round;
-+    int64_t res = (int64_t)a * (int64_t)b;
-+
-+    round = get_round(env, res, 16);
-+    res   = (res >> 16) + round;
-+    return sadd64(env, c, res);
-+}
-+RVVCALL(OPIVV3_ENV, vwsmacc_vv_b, WOP_SSS_B, H2, H1, H1, vwsmacc8)
-+RVVCALL(OPIVV3_ENV, vwsmacc_vv_h, WOP_SSS_H, H4, H2, H2, vwsmacc16)
-+RVVCALL(OPIVV3_ENV, vwsmacc_vv_w, WOP_SSS_W, H8, H4, H4, vwsmacc32)
-+GEN_VEXT_VV_ENV(vwsmacc_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV_ENV(vwsmacc_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vwsmacc_vv_w, 4, 8, clearq)
-+RVVCALL(OPIVX3_ENV, vwsmacc_vx_b, WOP_SSS_B, H2, H1, vwsmacc8)
-+RVVCALL(OPIVX3_ENV, vwsmacc_vx_h, WOP_SSS_H, H4, H2, vwsmacc16)
-+RVVCALL(OPIVX3_ENV, vwsmacc_vx_w, WOP_SSS_W, H8, H4, vwsmacc32)
-+GEN_VEXT_VX_ENV(vwsmacc_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX_ENV(vwsmacc_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX_ENV(vwsmacc_vx_w, 4, 8, clearq)
-+
-+static int16_t vwsmaccsu8(CPURISCVState *env, uint8_t a, int8_t b, int16_t c)
-+{
-+    uint8_t round;
-+    int16_t res = (uint16_t)a * (int16_t)b;
-+
-+    round = get_round(env, res, 4);
-+    res   = (res >> 4) + round;
-+    return ssub16(env, c, res);
-+}
-+static int32_t vwsmaccsu16(CPURISCVState *env, uint16_t a, int16_t b,
-+    uint32_t c)
-+{
-+    uint8_t round;
-+    int32_t res = (uint32_t)a * (int32_t)b;
-+
-+    round = get_round(env, res, 8);
-+    res   = (res >> 8) + round;
-+    return ssub32(env, c, res);
-+}
-+static int64_t vwsmaccsu32(CPURISCVState *env, uint32_t a, int32_t b,
-+    int64_t c)
-+{
-+    uint8_t round;
-+    int64_t res = (uint64_t)a * (int64_t)b;
-+
-+    round = get_round(env, res, 16);
-+    res   = (res >> 16) + round;
-+    return ssub64(env, c, res);
-+}
-+RVVCALL(OPIVV3_ENV, vwsmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, vwsmaccsu8)
-+RVVCALL(OPIVV3_ENV, vwsmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, vwsmaccsu16)
-+RVVCALL(OPIVV3_ENV, vwsmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, vwsmaccsu32)
-+GEN_VEXT_VV_ENV(vwsmaccsu_vv_b, 1, 2, clearh)
-+GEN_VEXT_VV_ENV(vwsmaccsu_vv_h, 2, 4, clearl)
-+GEN_VEXT_VV_ENV(vwsmaccsu_vv_w, 4, 8, clearq)
-+RVVCALL(OPIVX3_ENV, vwsmaccsu_vx_b, WOP_SSU_B, H2, H1, vwsmaccsu8)
-+RVVCALL(OPIVX3_ENV, vwsmaccsu_vx_h, WOP_SSU_H, H4, H2, vwsmaccsu16)
-+RVVCALL(OPIVX3_ENV, vwsmaccsu_vx_w, WOP_SSU_W, H8, H4, vwsmaccsu32)
-+GEN_VEXT_VX_ENV(vwsmaccsu_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX_ENV(vwsmaccsu_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX_ENV(vwsmaccsu_vx_w, 4, 8, clearq)
-+
-+static int16_t vwsmaccus8(CPURISCVState *env, int8_t a, uint8_t b, int16_t c)
-+{
-+    uint8_t round;
-+    int16_t res = (int16_t)a * (uint16_t)b;
-+
-+    round = get_round(env, res, 4);
-+    res   = (res >> 4) + round;
-+    return ssub16(env, c, res);
-+}
-+static int32_t vwsmaccus16(CPURISCVState *env, int16_t a, uint16_t b, int32_t c)
-+{
-+    uint8_t round;
-+    int32_t res = (int32_t)a * (uint32_t)b;
-+
-+    round = get_round(env, res, 8);
-+    res   = (res >> 8) + round;
-+    return ssub32(env, c, res);
-+}
-+static int64_t vwsmaccus32(CPURISCVState *env, int32_t a, uint32_t b, int64_t c)
-+{
-+    uint8_t round;
-+    int64_t res = (int64_t)a * (uint64_t)b;
-+
-+    round = get_round(env, res, 16);
-+    res   = (res >> 16) + round;
-+    return ssub64(env, c, res);
-+}
-+RVVCALL(OPIVX3_ENV, vwsmaccus_vx_b, WOP_SUS_B, H2, H1, vwsmaccus8)
-+RVVCALL(OPIVX3_ENV, vwsmaccus_vx_h, WOP_SUS_H, H4, H2, vwsmaccus16)
-+RVVCALL(OPIVX3_ENV, vwsmaccus_vx_w, WOP_SUS_W, H8, H4, vwsmaccus32)
-+GEN_VEXT_VX_ENV(vwsmaccus_vx_b, 1, 2, clearh)
-+GEN_VEXT_VX_ENV(vwsmaccus_vx_h, 2, 4, clearl)
-+GEN_VEXT_VX_ENV(vwsmaccus_vx_w, 4, 8, clearq)
--- 
-2.23.0
+Good, thanks.
+
+Naming-wise, it's ugly that we already have a WATCHDOG event for guest
+watchdog devices.  The following design however should allow setting up
+multiple watchdogs
+
+- Creating a watchdog from the command line:
+
+-object watchdog,id=STR,timeout=NNN,chardev=CHR
+
+and object_add/object-add can also be used for HMP and QMP.
+
+- Reporting a watchdog timeout via QMP:
+
+{ 'event': 'WATCHDOG_TIMEOUT',
+  'data': { 'id': 'str' } }
+
+- Protocol: the data sent on the chardev to QEMU must be
+
+WATCHDOG=1
+
+optionally followed by exactly one \n character.  All other data is ignored.
+
+Paolo
 
 
