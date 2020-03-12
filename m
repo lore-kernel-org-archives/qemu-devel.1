@@ -6,94 +6,96 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D539DC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023B1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:42:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B939F20575
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9AB2206F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9XzgCwZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B939F20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FV79owcc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9AB2206F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCHP6-0006fS-SU
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 02:33:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57857)
+	id 1jCHXq-0000W7-0X
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 02:42:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59448)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jCHOP-0005Vw-W2
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:32:31 -0400
+ (envelope-from <mst@redhat.com>) id 1jCHWy-0008RV-SJ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jCHOO-0007Fa-MJ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:32:29 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52466
+ (envelope-from <mst@redhat.com>) id 1jCHWx-0002ML-9P
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:41:20 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31176
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCHOO-0007D4-Fr
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:32:28 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCHWx-0002LE-5V
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:41:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583994748;
+ s=mimecast20190719; t=1583995278;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AYPlNWIvtGK61J24nOshJuoxiaAAfsYVurK3NYsF3C8=;
- b=Y9XzgCwZ4ldb2jxH+lbZj/ddzd8CE1RMI3ZEuqaLCqo5b3dNxsttA6oeOovmjDHVbw+O2y
- rw8PhDwSIR8veMFXZuHF8PML9o4RWgd7S5TBMz1lN3NZTdeSZ01aVcX8jSXQowRiwYamir
- RPHebKC84brJztG3jt3x55pjsy9MrDA=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-Nq0oYPgdO66J5EbJNm79LA-1; Thu, 12 Mar 2020 02:32:18 -0400
-X-MC-Unique: Nq0oYPgdO66J5EbJNm79LA-1
-Received: by mail-qk1-f200.google.com with SMTP id z185so3172404qkc.17
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 23:32:18 -0700 (PDT)
+ bh=GxroZQBHyIguzjnBuOxds9BaNUaG43cA6twYedD1sXc=;
+ b=FV79owcc9yAIkscC+gwviDtTSpoLu+ySwKVn5chjitw5Bq8quCpikQvBa8BwsZcaCKBZeg
+ ttaMXjLN4rbUk94q4WPy1al20tFG/H3ucdsmjbIQRZA5wXbdG5HrWt2nx17kT9F7ZMACQ9
+ EWb+J8U5+HPDS5WSSeAo+4XWeqiiv7Y=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-8U-r3jt1Nim2mexpK81C3w-1; Thu, 12 Mar 2020 02:41:16 -0400
+X-MC-Unique: 8U-r3jt1Nim2mexpK81C3w-1
+Received: by mail-qt1-f200.google.com with SMTP id w3so2849943qtc.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 23:41:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=1jFnIPA9wpJqutkLIu7VzJdYLS2n+sxvNDTkBAMNSN0=;
- b=MZ7WHUYGWvNooiIR/IgF9e3BlUvyCfdMnqzH/A+QAMUgNcdE2TkRuo6hy+O2dmeHzT
- lks13D08kKT621zcQxw0nyQoyleQamXxA1X5e9tIKWx8zfGTrt6+bjfdoHDptJPMh5l5
- rJvCrixFBPnzMbzQNp7rpqUh2CA0QHocUbn6a90ZbdxPQ5OswqWqAXPJCWiLMGpX3P/R
- L6nlBGmmojzMravEMcNhazDw7GErS83lEKrMMieX6NIKRUIiXGbCNCIqKRcWiyMwPMTG
- QhpkU2hEfEnijrbx1Q5jIpOkhQkhNdt//yIByIphliIioVxtW4A0siygRORxcI7k/g3Q
- EwIg==
-X-Gm-Message-State: ANhLgQ3+XK5bEXGVlKe4bxr6doROD6VEQrZXOODjv3efdfty8rHaCQZB
- 2bZpcM/mfCTZNzE3144sZILYc3OjBqsZKs/7nxhhIluVhEnZb3VOd0ZeEOypgRSZVVbLfaIAihE
- 48qL7ecBs1TP+b1o=
-X-Received: by 2002:a37:2d04:: with SMTP id t4mr6292710qkh.105.1583994738003; 
- Wed, 11 Mar 2020 23:32:18 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuohpVusm3oImKIGFAKPuSXuU0os3uq32DKX8lX+gVzfxG3mgNmzfNdfQtkEnlKbqcZ8FpgDQ==
-X-Received: by 2002:a37:2d04:: with SMTP id t4mr6292689qkh.105.1583994737727; 
- Wed, 11 Mar 2020 23:32:17 -0700 (PDT)
+ bh=ihtsBa6/PJ/vqqD3FWYFeopF0KNgqc0SdH2mU5Pjc5A=;
+ b=jmu2R8em/3KGvazeCFQ3odJS/WzaLbr5fdwjEHdCwPoj36s/MMx35fKERwmncu3/Mi
+ BjAvvGsDsMWXodjeriWbvA9rAeKYEPlww3h6S+LLccHSdwyNh8uoPQoVzBkhuUMWLDoq
+ U/E16z6VBoWTEaMRgcMqjpQXZPBzXcGyhR1jZsW/7WY5zAO2vd3zcjQvBrsJoIBc0DD4
+ HJ9CnuQ7pu0JYbWEA+FC3aIfA2GXPkzTZ1yQpQqNvmzAeBr16bWv0EmcBL9qYT1g5RLZ
+ f4C0e6fQU8f1sQfRYicQQSAcySpwCOCGK0WyZKyWM9wL7pTvrAjpLIhuCUj19mu9BLZ5
+ +wJA==
+X-Gm-Message-State: ANhLgQ3SCjlyYN9JNKYtW37jcuxTFpc60KNpPqj8RiQleRmpaWGzTJe9
+ q4yKYmJCx2iLMO6Te1UAtd4LzOpEhuSbWzjWf41rfeDQB0ubQhsaEoOSRQZXgton2WuVwB/kWmd
+ /a4BV8Y4cauR7qG8=
+X-Received: by 2002:ac8:6615:: with SMTP id c21mr612984qtp.191.1583995275712; 
+ Wed, 11 Mar 2020 23:41:15 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsilI+miayL+HQxEtVKVPX1H00hAg302DZrbTOwjQu+FfLxVgDtmcRdMV57CuTIbVderm+LKQ==
+X-Received: by 2002:ac8:6615:: with SMTP id c21mr612974qtp.191.1583995275445; 
+ Wed, 11 Mar 2020 23:41:15 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id g2sm26365424qkb.27.2020.03.11.23.32.13
+ by smtp.gmail.com with ESMTPSA id g15sm23059476qtq.71.2020.03.11.23.41.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 23:32:17 -0700 (PDT)
-Date: Thu, 12 Mar 2020 02:32:11 -0400
+ Wed, 11 Mar 2020 23:41:14 -0700 (PDT)
+Date: Thu, 12 Mar 2020 02:41:09 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: Upstream QEMU guest support policy ? Re: [PATCH v3 0/2] spapr:
- Use vIOMMU translation for virtio by default
-Message-ID: <20200312023041-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v3 1/2] spapr: Disable legacy virtio devices for
+ pseries-5.0 and later
+Message-ID: <20200312023328-mutt-send-email-mst@kernel.org>
 References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
- <20200310114343.GD3234052@redhat.com>
- <20200311011247.GT660117@umbus.fritz.box>
- <20200311031202-mutt-send-email-mst@kernel.org>
- <20200312011049.GC711223@umbus.fritz.box>
+ <20200305043009.611636-2-david@gibson.dropbear.id.au>
+ <20200310115611.GE3234052@redhat.com>
+ <20200311005857.GS660117@umbus.fritz.box>
+ <20200311030812-mutt-send-email-mst@kernel.org>
+ <20200312011420.GD711223@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200312011049.GC711223@umbus.fritz.box>
+In-Reply-To: <20200312011420.GD711223@umbus.fritz.box>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,38 +115,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 12:10:49PM +1100, David Gibson wrote:
-> On Wed, Mar 11, 2020 at 03:33:59AM -0400, Michael S. Tsirkin wrote:
-> > On Wed, Mar 11, 2020 at 12:12:47PM +1100, David Gibson wrote:
-> > > I am wondering if we have to introduce an "svm=3Don" flag anyway.  It=
-'s
-> > > pretty ugly, since all it would be doing is changing defaults here an=
-d
-> > > there for compatibilty with a possible future SVM transition, but
-> > > maybe it's the best we can do :/.
+On Thu, Mar 12, 2020 at 12:14:20PM +1100, David Gibson wrote:
+> On Wed, Mar 11, 2020 at 03:11:16AM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Mar 11, 2020 at 11:58:57AM +1100, David Gibson wrote:
+> > > Note that several things that I believe are now in the PCIe spec, but
+> > > really derive more from PC legacy considerations, don't apply at all
+> > > for PAPR.  e.g. there's no meaningful distinction between integrated
+> > > and slotted devices, multiple independent host bridges is routine and
+> > > doesn't require any (virtual) hardware visible domain numbers.
 > >=20
-> > Frankly I'm surprised there's no way for the hypervisor to block VM
-> > transition to secure mode. To me an inability to disable DRM looks like
-> > a security problem.
+> > Domain numbers are a Linux thing, not a PCIe thing. On x86 they come
+> > from ACPI segment numbers. As such they aren't usually hardware
+> > visible on x86, they are supplied by firmware.
 >=20
-> Uh.. I don't immediately see how it's a security problem, though I'm
-> certainly convinced it's a problem in other ways.
+> Oh, ok.  I thought that at least on the standard IO 0xcf8 host bridge
+> controller the domain number was written into certain registers to
+> select the relevant root bus.
 
-Well for one it breaks introspection, allowing guests to hide
-malicious code from hypervisors.
+standard 0xcf8 can only access 256 bus numbers. software does not
+much care on which root bus these are though.
 
-> > Does not the ultravisor somehow allow
-> > enabling/disabling this functionality from the hypervisor?
+> On POWER the domain numbers are arbitrarily assigned within Linux.
+> "Hardware" (well, the firmware/hypervisor) uses a different
+> identifier, called the BUID (generally a large, 64-bit pseudo-address)
+> in the device tree and hypercalls.
 >=20
-> Not at present, but as mentioned on the other thread, Paul and I came
-> up with a tentative plan to change that.
->=20
-> > It would be
-> > even better if the hypervisor could block the guest from poking at the
-> > ultravisor completely but I guess that would be too much to hope for.
->=20
-> Yeah, probably :/.
->=20
+> [As an aside, this means the use of domain numbers in libvirt XML is
+> complete bogosity]
+
+For fun, they aren't actually used either. And of course using the word
+"domain" in a domain XML format means you can't search for it anywhere
+without getting a million unrelated hits.
+
+
+
 > --=20
 > David Gibson=09=09=09| I'll have my music baroque, and my code
 > david AT gibson.dropbear.id.au=09| minimalist, thank you.  NOT _the_ _oth=
