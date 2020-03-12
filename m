@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3553C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63BEC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69891206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90328206BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:50:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V8oOSdcp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69891206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RIRiZ34y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90328206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQ6G-0007WJ-In
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:50:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49965)
+	id 1jCQ6P-0007q6-Lu
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:50:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jCQ0u-0006Bu-T8
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:50 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jCQ0T-00050v-UG
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jCQ0t-0002BL-8R
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:48 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41662
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jCQ0R-00012a-KZ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37059
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jCQ0t-00028h-1Y
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:47 -0400
+ id 1jCQ0P-00011H-Kc
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:44:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584027885;
+ s=mimecast20190719; t=1584027855;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XarQ6PV/N2BikZiOVzMV46m8k60fx8JOioXu8+pZywQ=;
- b=V8oOSdcpLhNIBWTH8ETvN+3/DJf/zR7drQ18HFHtp0nTtAs8jfHIF8s76b/6H0m7CRc8aq
- D0QfSNdeNqD7ZIhbnq+CVaddQXZkO4EK86+bsBhegciw2+A2fmv6Up0lGpGn5EkNtB4cks
- ST2d7GcvbSV4P3FmGwdx6+3NVpCJfeA=
+ bh=cuxQzZymJ+j/hsy41QQY4o/LcnKvlePF7LiNjbaBNOQ=;
+ b=RIRiZ34yCqonrcx9EDEdHKKZEan5DKrDVPewIEProO1cnWdqDZDjogBbeRW84UCUMVZskY
+ YA1U5X8wIRDUp2+RGw4JXGiJezxixHGLBLYo4Cv10pCLbWzjSTCsDZCDmJRhw4hPtpIWld
+ kj4r6Avy+qSSQkAJiGvML8zc8hxbbkY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-UAZ-rGDKN1ODer1zvlhl9w-1; Thu, 12 Mar 2020 11:44:41 -0400
-X-MC-Unique: UAZ-rGDKN1ODer1zvlhl9w-1
+ us-mta-63-AJPpjciKMoi2g3raFBCVRw-1; Thu, 12 Mar 2020 11:44:12 -0400
+X-MC-Unique: AJPpjciKMoi2g3raFBCVRw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2165F19251D1;
- Thu, 12 Mar 2020 15:44:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45DBE8A20D0;
+ Thu, 12 Mar 2020 15:44:10 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A2775C1B5;
- Thu, 12 Mar 2020 15:44:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 953935C1D8;
+ Thu, 12 Mar 2020 15:43:59 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v3 10/12] arm: pmu: test 32-bit <-> 64-bit
- transitions
-Date: Thu, 12 Mar 2020 16:42:59 +0100
-Message-Id: <20200312154301.9130-11-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v3 06/12] arm: pmu: Check Required Event Support
+Date: Thu, 12 Mar 2020 16:42:55 +0100
+Message-Id: <20200312154301.9130-7-eric.auger@redhat.com>
 In-Reply-To: <20200312154301.9130-1-eric.auger@redhat.com>
 References: <20200312154301.9130-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,215 +91,195 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test configurations where we transit from 32b to 64b
-counters and conversely. Also tests configuration where
-chain counters are configured but only one counter is
-enabled.
+If event counters are implemented check the common events
+required by the PMUv3 are implemented.
+
+Some are unconditionally required (SW_INCR, CPU_CYCLES,
+either INST_RETIRED or INST_SPEC). Some others only are
+required if the implementation implements some other features.
+
+Check those wich are unconditionally required.
+
+This test currently fails on TCG as neither INST_RETIRED
+or INST_SPEC are supported.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v2 -> v3:
+- use 0x%x instead %d in trace
+- pmu.version >=3D ID_DFR0_PMU_v3_8_1
 - added prefix pop
+- assert instead of abort, inverse assert and test
+- add defines for used events and common events
+- given the changes I did not apply Andre's R-b
+- introduce and use upper_32_bits()/lower_32_bits()
+- added pmu prefix to the test name
+
+v1 -> v2:
+- fix is_event_supported()
+- fix boolean condition for PMU v4
+- fix PMCEID0 definition
+
+RFC ->v1:
+- add a comment to explain the PMCEID0/1 splits
 ---
- arm/pmu.c         | 138 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |   6 ++
- 2 files changed, 144 insertions(+)
+ arm/pmu.c         | 77 +++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  6 ++++
+ lib/bitops.h      |  3 ++
+ 3 files changed, 86 insertions(+)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-index ccca31b..79c2a0f 100644
+index a04588a..8c49e50 100644
 --- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -57,6 +57,7 @@
- #define ALL_SET			0xFFFFFFFF
- #define ALL_CLEAR		0x0
- #define PRE_OVERFLOW		0xFFFFFFF0
-+#define PRE_OVERFLOW2		0xFFFFFFDC
+@@ -18,6 +18,7 @@
+ #include "asm/barrier.h"
+ #include "asm/sysreg.h"
+ #include "asm/processor.h"
++#include <bitops.h>
 =20
+ #define PMU_PMCR_E         (1 << 0)
+ #define PMU_PMCR_C         (1 << 2)
+@@ -33,6 +34,19 @@
+=20
+ #define NR_SAMPLES 10
+=20
++/* Some PMU events */
++#define SW_INCR			0x0
++#define INST_RETIRED		0x8
++#define CPU_CYCLES		0x11
++#define INST_PREC		0x1B
++#define STALL_FRONTEND		0x23
++#define STALL_BACKEND		0x24
++
++#define COMMON_EVENTS_LOW	0x0
++#define COMMON_EVENTS_HIGH	0x3F
++#define EXT_COMMON_EVENTS_LOW	0x4000
++#define EXT_COMMON_EVENTS_HIGH	0x403F
++
  struct pmu {
  	unsigned int version;
-@@ -144,6 +145,7 @@ static void test_mem_access(void) {}
- static void test_sw_incr(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
-+static void test_chain_promotion(void) {}
-=20
+ 	unsigned int nb_implemented_counters;
+@@ -110,6 +124,10 @@ static inline void precise_instrs_loop(int loop, uin=
+t32_t pmcr)
+ 	: [pmcr] "r" (pmcr), [z] "r" (0)
+ 	: "cc");
+ }
++
++/* event counter tests only implemented for aarch64 */
++static void test_event_introspection(void) {}
++
  #elif defined(__aarch64__)
  #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -596,6 +598,138 @@ static void test_chained_sw_incr(void)
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+ #define ID_AA64DFR0_PERFMON_MASK  0xf
+@@ -155,6 +173,61 @@ static inline void precise_instrs_loop(int loop, uin=
+t32_t pmcr)
+ 	: [pmcr] "r" (pmcr)
+ 	: "cc");
  }
-=20
-+static void test_chain_promotion(void)
++
++#define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
++
++static bool is_event_supported(uint32_t n, bool warn)
 +{
-+	uint32_t events[] =3D {MEM_ACCESS, CHAIN};
-+	void *addr =3D malloc(PAGE_SIZE);
++	uint64_t pmceid0 =3D read_sysreg(pmceid0_el0);
++	uint64_t pmceid1 =3D read_sysreg_s(PMCEID1_EL0);
++	bool supported;
++	uint64_t reg;
 +
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
++	/*
++	 * The low 32-bits of PMCEID0/1 respectively describe
++	 * event support for events 0-31/32-63. Their High
++	 * 32-bits describe support for extended events
++	 * starting at 0x4000, using the same split.
++	 */
++	assert((n >=3D COMMON_EVENTS_LOW  && n <=3D COMMON_EVENTS_HIGH) ||
++	       (n >=3D EXT_COMMON_EVENTS_LOW && n <=3D EXT_COMMON_EVENTS_HIGH))=
+;
++
++	if (n <=3D COMMON_EVENTS_HIGH)
++		reg =3D lower_32_bits(pmceid0) | ((u64)lower_32_bits(pmceid1) << 32);
++	else
++		reg =3D upper_32_bits(pmceid0) | ((u64)upper_32_bits(pmceid1) << 32);
++
++	supported =3D  reg & (1UL << (n & 0x3F));
++
++	if (!supported && warn)
++		report_info("event 0x%x is not supported", n);
++	return supported;
++}
++
++static void test_event_introspection(void)
++{
++	bool required_events;
++
++	if (!pmu.nb_implemented_counters) {
++		report_skip("No event counter, skip ...");
 +		return;
++	}
 +
-+	/* Only enable CHAIN counter */
-+	pmu_reset();
-+	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x2, PMCNTENSET_EL0);
-+	isb();
++	/* PMUv3 requires an implementation includes some common events */
++	required_events =3D is_event_supported(SW_INCR, true) &&
++			  is_event_supported(CPU_CYCLES, true) &&
++			  (is_event_supported(INST_RETIRED, true) ||
++			   is_event_supported(INST_PREC, true));
 +
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(!read_regn_el0(pmevcntr, 0),
-+		"chain counter not counting if even counter is disabled");
++	if (pmu.version >=3D ID_DFR0_PMU_V3_8_1) {
++		required_events =3D required_events &&
++				  is_event_supported(STALL_FRONTEND, true) &&
++				  is_event_supported(STALL_BACKEND, true);
++	}
 +
-+	/* Only enable even counter */
-+	pmu_reset();
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_sysreg_s(0x1, PMCNTENSET_EL0);
-+	isb();
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) =3D=3D=
- 0x1),
-+		"odd counter did not increment on overflow if disabled");
-+	report_info("MEM_ACCESS counter #0 has value %ld",
-+		    read_regn_el0(pmevcntr, 0));
-+	report_info("CHAIN counter #1 has value %ld",
-+		    read_regn_el0(pmevcntr, 1));
-+	report_info("overflow counter %ld", read_sysreg(pmovsclr_el0));
-+
-+	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled=
- */
-+	pmu_reset();
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
-+	isb();
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+
-+	/* disable the CHAIN event */
-+	write_sysreg_s(0x2, PMCNTENCLR_EL0);
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+	report(read_sysreg(pmovsclr_el0) =3D=3D 0x1,
-+		"should have triggered an overflow on #0");
-+	report(!read_regn_el0(pmevcntr, 1),
-+		"CHAIN counter #1 shouldn't have incremented");
-+
-+	/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled=
- */
-+
-+	pmu_reset();
-+	write_sysreg_s(0x1, PMCNTENSET_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
-+	isb();
-+	report_info("counter #0 =3D 0x%lx, counter #1 =3D 0x%lx overflow=3D0x%l=
-x",
-+		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
-+		    read_sysreg(pmovsclr_el0));
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+
-+	/* enable the CHAIN event */
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	isb();
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+
-+	report((read_regn_el0(pmevcntr, 1) =3D=3D 1) && !read_sysreg(pmovsclr_e=
-l0),
-+		"CHAIN counter #1 should have incremented and no overflow expected");
-+
-+	report_info("CHAIN counter #1 =3D 0x%lx, overflow=3D0x%lx",
-+		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-+
-+	/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
-+	pmu_reset();
-+	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
-+	isb();
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+
-+	/* 0 becomes CHAINED */
-+	write_sysreg_s(0x0, PMCNTENSET_EL0);
-+	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	write_regn_el0(pmevcntr, 1, 0x0);
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-+		    read_regn_el0(pmevcntr, 0));
-+
-+	report((read_regn_el0(pmevcntr, 1) =3D=3D 1) && !read_sysreg(pmovsclr_e=
-l0),
-+		"CHAIN counter #1 should have incremented and no overflow expected");
-+
-+	report_info("CHAIN counter #1 =3D 0x%lx, overflow=3D0x%lx",
-+		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-+
-+	/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
-+	pmu_reset();
-+	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW2);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("counter #0=3D0x%lx, counter #1=3D0x%lx",
-+			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-+
-+	write_sysreg_s(0x0, PMCNTENSET_EL0);
-+	write_regn_el0(pmevtyper, 1, CPU_CYCLES | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(read_sysreg(pmovsclr_el0) =3D=3D 1,
-+		"overflow is expected on counter 0");
-+	report_info("counter #0=3D0x%lx, counter #1=3D0x%lx overflow=3D0x%lx",
-+			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
-+			read_sysreg(pmovsclr_el0));
++	report(required_events, "Check required events are implemented");
 +}
 +
  #endif
 =20
  /*
-@@ -794,6 +928,10 @@ int main(int argc, char *argv[])
- 		report_prefix_push(argv[1]);
- 		test_chained_sw_incr();
+@@ -325,6 +398,10 @@ int main(int argc, char *argv[])
+ 		report(check_cpi(cpi), "Cycle/instruction ratio");
+ 		pmccntr64_test();
  		report_prefix_pop();
-+	} else if (strcmp(argv[1], "pmu-chain-promotion") =3D=3D 0) {
++	} else if (strcmp(argv[1], "pmu-event-introspection") =3D=3D 0) {
 +		report_prefix_push(argv[1]);
-+		test_chain_promotion();
++		test_event_introspection();
 +		report_prefix_pop();
  	} else {
  		report_abort("Unknown sub-test '%s'", argv[1]);
  	}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index d31dcbf..1b0c8c8 100644
+index fe6515c..f993548 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -108,6 +108,12 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'pmu-chained-sw-incr'
+@@ -66,6 +66,12 @@ file =3D pmu.flat
+ groups =3D pmu
+ extra_params =3D -append 'cycle-counter 0'
 =20
-+[pmu-chain-promotion]
++[pmu-event-introspection]
 +file =3D pmu.flat
 +groups =3D pmu
 +arch =3D arm64
-+extra_params =3D -append 'pmu-chain-promotion'
++extra_params =3D -append 'pmu-event-introspection'
 +
  # Test PMU support (TCG) with -icount IPC=3D1
  #[pmu-tcg-icount-1]
  #file =3D pmu.flat
+diff --git a/lib/bitops.h b/lib/bitops.h
+index 636064c..b310a22 100644
+--- a/lib/bitops.h
++++ b/lib/bitops.h
+@@ -33,6 +33,9 @@
+ #define GENMASK_ULL(h, l) \
+ 	(((~0ULL) << (l)) & (~0ULL >> (BITS_PER_LONG_LONG - 1 - (h))))
+=20
++#define upper_32_bits(n) ((u32)(((n) >> 16) >> 16))
++#define lower_32_bits(n) ((u32)(n))
++
+ #ifndef HAVE_BUILTIN_FLS
+ static inline unsigned long fls(unsigned long word)
+ {
 --=20
 2.20.1
 
