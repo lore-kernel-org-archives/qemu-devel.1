@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 854DEC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1F0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:00:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5173D205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BDA8205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:00:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XIfuiFZ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5173D205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zyEfpJzC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BDA8205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCU0C-00025L-EP
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46020)
+	id 1jCU0O-0002VD-IC
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:00:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjf-0006o7-C0
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjJ-0005hI-JF
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTje-0002PR-B7
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:15 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41421)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjI-0002Be-Al
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:53 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34521)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTje-0002OJ-5u
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:14 -0400
-Received: by mail-pl1-x644.google.com with SMTP id t14so3062757plr.8
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:43:13 -0700 (PDT)
+ id 1jCTjI-0002AZ-3R
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:52 -0400
+Received: by mail-pl1-x641.google.com with SMTP id a23so3080278plm.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=oOGWU6CgcAFRrNmaOEFHGDGiBotip/Vn0ZaQb6OYup4=;
- b=XIfuiFZ9PHJ4tysbW3FlEDZ2Xh95aeYAhuZENQ24XBKqj5QSbeCqRThREz4xNNPfwC
- OuOQshhKfD9w/ihwmca91rKdZlJjtLjr0u2watMO5q+nidjEBkDAk1zUixjab788ukYy
- FcBrJorCllZ3hCEmNFFT8DAkQRpY4LcjMuBN+Fm/zmR9mS6MUOJ6hkrUzDrNnkHL54Fo
- r9+nO8k8s2bXrhBbNEUNkGrVVNADYYvKx5j91C92Js7B5He7JBjAvHQxq3gV3NcS3VQK
- Wtu49cww+eY2627Um5nD2oe0uuCE6oKN0uvs0Amoln26FxYYEsRwAxHUDFqH685KGsHX
- l0bg==
+ bh=Kqb/ekSCjd3NGP5caJeLUqYBI+D5wVD+00pKBar9ftg=;
+ b=zyEfpJzC8n0DGsJTLkFv4XBCHbl7Zo7VXBxw7FUjt7ig0XTgV0zZJtXk/twPg74NT5
+ 5cEvY/xbiDelwu4lgRDkdNvKtFBaO1ugk8iATZP0zKWiaFl7pCE337961lxalS6EfH0Q
+ Z+q0Y8pfDuxPPwWXnOfVUsZujR8MTSUxnLoKpXiTXWKelldFLDB7aHHBTd6yKwHuqvth
+ dB0qmlW1cOJ+jO2FI4zfFEOx+cLiZx/P5YQ/4KqM8WyD0i+yA61iHlUE1oNLtXsPCUlL
+ M27efZ9wMZmM9ysa71WhsKYa4SOe0nDnXCKbrPfLLiCzl2Kk4JIwhv0xgg5HCebs+oyZ
+ Zhkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oOGWU6CgcAFRrNmaOEFHGDGiBotip/Vn0ZaQb6OYup4=;
- b=n3GXOWmr5Neemwfm5h7MG5uzJgiV7IM1g7KRRZAefTFCZ7Ho6uL0OiLJ3GPfewdzJ6
- r4TJQaqcW7HK9u3/8/qRAh2sGZpZlaEvK1rnqIymj4F/q9IFO5NBUpx1Z5kvCzJwozZd
- +MB+ADEABM1J19zRARfnDUTsxIyqmPudATmAKoI4UI2K6ln7Qfy1bkN3gcQvYlVykx2L
- t83hmasXPfhwngHZerNggbN1uxffYz6P7F3GoL2bFHQRgIOSz0rtuTMDJowg/gR709a2
- aJrpsjBm68nF5ppBFeuMxR3S+kS7QPnH6MC6WlvIDwLXqDVp8+loXT/zY+UrDqr2Ihr8
- 4eDw==
-X-Gm-Message-State: ANhLgQ0fiOlXC8Yd/iOcpmUOMsKbhLZ1p9+iZQgjah1boTQOtFzOuQ5b
- 1oLE7+t/fMy8lmqdPnAkqCbIBbsaTKI=
-X-Google-Smtp-Source: ADFU+vuWHgkNs53qyBi4Yd0+s7L0YajE/N4Of0z3hs9u8THPwvTpIwFhVoFz5odzND5UvS5USYGYWg==
-X-Received: by 2002:a17:902:9886:: with SMTP id
- s6mr9716875plp.100.1584042191976; 
- Thu, 12 Mar 2020 12:43:11 -0700 (PDT)
+ bh=Kqb/ekSCjd3NGP5caJeLUqYBI+D5wVD+00pKBar9ftg=;
+ b=IihpDwZHyVBExxqH51K9DJ89qDFCS7J7Xw3wCGFaY19Kk5elEeJ6bB4RdXoczDHOjI
+ B0XAGlyjYzS0hwUnW0JbhVmoi58pCvmkO8N62JXHlxQTBEJIhMmliFTnFxMv2On3SXmT
+ YnQ3LQf1ULfQrJ/HLmB1o/+xSwR2RTqkolM1MS5easNkQJe6i7s1w9qLh8GL1juexuBc
+ R//giQgP7ycIiH0kIcYddveEl0MGHSSMFQRFZxS5ZJp8bvFQkF6SJn1kugQdIiMjCSSV
+ mXKPoSQAz+srHngJ2VQ6j9dfv5vE2sBhyNauaNTSe7g5XCwwpsqz3kUe0sMjvCw+28dd
+ YWFg==
+X-Gm-Message-State: ANhLgQ2/+WkhPHiZZVZFzSIN6J4YA0nQCiF7WHMT9o+wpY3Y8YMmoqQ0
+ mO69BrEypnR5ca6XiHEA2otoB5WG6gA=
+X-Google-Smtp-Source: ADFU+vtrnEhf0fLWU8QylZUW37j6GCE4vArUjqWs9aYbiiagDuVpeKYPlSQzx9kFmEanihj93RcDgw==
+X-Received: by 2002:a17:902:7794:: with SMTP id
+ o20mr9505928pll.312.1584042170835; 
+ Thu, 12 Mar 2020 12:42:50 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.43.10
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:43:11 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:50 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 38/42] target/arm: Set PSTATE.TCO on exception entry
-Date: Thu, 12 Mar 2020 12:42:15 -0700
-Message-Id: <20200312194219.24406-39-richard.henderson@linaro.org>
+Subject: [PATCH v6 22/42] target/arm: Move regime_tcr to internals.h
+Date: Thu, 12 Mar 2020 12:41:59 -0700
+Message-Id: <20200312194219.24406-23-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,30 +99,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-D1.10 specifies that exception handlers begin with tag checks overridden.
+We will shortly need this in mte_helper.c as well.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Only set if MTE feature present.
----
- target/arm/helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+ target/arm/internals.h | 9 +++++++++
+ target/arm/helper.c    | 9 ---------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index f091891312..56fb07f2b6 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -948,6 +948,15 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
+     }
+ }
+ 
++/* Return the TCR controlling this translation regime */
++static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
++{
++    if (mmu_idx == ARMMMUIdx_Stage2) {
++        return &env->cp15.vtcr_el2;
++    }
++    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
++}
++
+ /* Return the FSR value for a debug exception (watchpoint, hardware
+  * breakpoint or BKPT insn) targeting the specified exception level.
+  */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 44e7c0d19b..b38dc74733 100644
+index 2a50d4e9a2..e4b4366af7 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -9664,6 +9664,9 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-             break;
-         }
-     }
-+    if (cpu_isar_feature(aa64_mte, cpu)) {
-+        new_mode |= PSTATE_TCO;
-+    }
+@@ -9835,15 +9835,6 @@ static inline uint64_t regime_ttbr(CPUARMState *env, ARMMMUIdx mmu_idx,
  
-     pstate_write(env, PSTATE_DAIF | new_mode);
-     env->aarch64 = 1;
+ #endif /* !CONFIG_USER_ONLY */
+ 
+-/* Return the TCR controlling this translation regime */
+-static inline TCR *regime_tcr(CPUARMState *env, ARMMMUIdx mmu_idx)
+-{
+-    if (mmu_idx == ARMMMUIdx_Stage2) {
+-        return &env->cp15.vtcr_el2;
+-    }
+-    return &env->cp15.tcr_el[regime_el(env, mmu_idx)];
+-}
+-
+ /* Convert a possible stage1+2 MMU index into the appropriate
+  * stage 1 MMU index
+  */
 -- 
 2.20.1
 
