@@ -2,59 +2,87 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B1EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8ECC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37F8A2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F8A2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 325E12067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qxj8Px8l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 325E12067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRTV-0005pD-Fe
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:18:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38233)
+	id 1jCRTo-0006Ou-6C
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRC8-0004JI-3K
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:00:30 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jCR7C-0001VD-7I
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:55:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRC5-0007dB-59
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:00:26 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60490)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCRC3-0007Yi-0d; Thu, 12 Mar 2020 13:00:23 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0743909|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.0358285-0.000344232-0.963827;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-QJ.qU_1584032412; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-QJ.qU_1584032412)
- by smtp.aliyun-inc.com(10.147.40.233);
- Fri, 13 Mar 2020 01:00:13 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 60/60] target/riscv: configure and turn on vector extension
- from command line
-Date: Thu, 12 Mar 2020 22:59:00 +0800
-Message-Id: <20200312145900.2054-61-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (envelope-from <groeck7@gmail.com>) id 1jCR79-0003EP-2m
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:55:22 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39335)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1jCR76-0003B8-HV; Thu, 12 Mar 2020 12:55:16 -0400
+Received: by mail-pf1-x444.google.com with SMTP id w65so3541526pfb.6;
+ Thu, 12 Mar 2020 09:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=GXGrQMuSPuWRxxUAmh9Tg77oMP4Uo6B+0hy9wrgNx8o=;
+ b=Qxj8Px8ldKKrd8gIZdiXJTZR3wr+I1t7cPG0CJiNHfZn71OLzGjtQMWc3ZuXjQroGw
+ 32X1uTWgvUBZPux2FEAeVpvnOAiNFzCOTV9GcPv7TTL8qv9szsGvBvHSKqTM/F0/76VY
+ v3vxTaU7iS7yY/2t41i0BcUC58x2E3DmetoFQXrdC3i3PBZ3KsJmwUGxETq0fIJJ25Yh
+ UO1yGi+jnnRvBH494b97XRdCfyPYhnE8J3zVEN/joinGIeg07YTQWXPsTZqxZhKSFIZv
+ PUkdgudeNLWXiBLojaot5sS3NV72DoQ4eqbgyQq5oOW4zxNuMRh+wldy6pNAvXgkxhM/
+ qlaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=GXGrQMuSPuWRxxUAmh9Tg77oMP4Uo6B+0hy9wrgNx8o=;
+ b=uScsFmqoyiT16rk6oCUuiBAYy1gT8FCN6/AbeuPms0w+U0f5AoNG52dScgr0DMWPAk
+ h1tNaPKgkVVsms+WlcZ3NgZaJYSym+68uYpmVNE/K7z5N1fIvBm8mEDTbWHOpfnU5q2J
+ dXP/+RPAh90lskPC4GqoIOVD5uW6HgIRa0GC9vMnXpRHp/OBlvn394Ge6++vyVJ2bN9h
+ jwXVVe4BFs839ZpUbl9eibEc7OhqwZML1HQBke93ZbaJl43HCwUWAQ7OQ5OfxaujmSOe
+ pGDrFmF84pmM1zT7om63f2MTjXfaWUsefLGjQDhFi/7CyvP3DoJfjghSFqdwj5uVLSFj
+ JY3g==
+X-Gm-Message-State: ANhLgQ1hsomiy/J02IA7PzBOH9uAAACxjDRgj4q7VGriHDrpICETMlop
+ ajsMwM6qkrJ3/ojnJz5YqIc=
+X-Google-Smtp-Source: ADFU+vvQ9KIXBI3OyZhmK+afPl8u6/1uhELsLmb6yLS2HuWUVSwcegRCYjtP9UXye800LbkRLKTmIQ==
+X-Received: by 2002:a63:df15:: with SMTP id u21mr8008518pgg.95.1584032114160; 
+ Thu, 12 Mar 2020 09:55:14 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id e20sm2677449pfi.171.2020.03.12.09.55.12
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 12 Mar 2020 09:55:13 -0700 (PDT)
+Date: Thu, 12 Mar 2020 09:55:11 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 2/3] hw/arm/fsl-imx6ul: Wire up USB controllers
+Message-ID: <20200312165511.GA16719@roeck-us.net>
+References: <20200310210434.31544-1-linux@roeck-us.net>
+ <20200310210434.31544-3-linux@roeck-us.net>
+ <CAFEAcA811Zo6JjCait2G467oQo-nL0RTYVdqE-ofmDSxWPcuCQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA811Zo6JjCait2G467oQo-nL0RTYVdqE-ofmDSxWPcuCQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,122 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vector extension is default off. The only way to use vector extension is
-1. use cpu rv32 or rv64
-2. turn on it by command line
-"-cpu rv64,v=true,vlen=128,elen=64,vext_spec=v0.7.1".
+On Thu, Mar 12, 2020 at 01:19:41PM +0000, Peter Maydell wrote:
+> On Tue, 10 Mar 2020 at 21:04, Guenter Roeck <linux@roeck-us.net> wrote:
+> >
+> > IMX6UL USB controllers are quite similar to IMX7 USB controllers.
+> > Wire them up the same way.
+> >
+> > The only real difference is that wiring up phy devices is necessary
+> > to avoid phy reset timeouts in the Linux kernel.
+> >
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> > v2: Use USB PHY emulation
+> >
+> >  hw/arm/fsl-imx6ul.c         | 33 +++++++++++++++++++++++++++++++++
+> >  include/hw/arm/fsl-imx6ul.h |  9 +++++++++
+> >  2 files changed, 42 insertions(+)
+> >
+> > diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+> > @@ -456,6 +467,28 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+> >                                              FSL_IMX6UL_ENETn_TIMER_IRQ[i]));
+> >      }
+> >
+> > +    /* USB */
+> > +    for (i = 0; i < FSL_IMX6UL_NUM_USBS; i++) {
+> > +        static const int FSL_IMX6UL_USBn_IRQ[] = {
+> > +            FSL_IMX6UL_USB2_IRQ,
+> > +            FSL_IMX6UL_USB1_IRQ,
+> > +        };
+> 
+> Do we really want to wire up USB1 to USB2_IRQ and USB2 to USB1_IRQ ?
+> If so, a comment explaining that it is deliberate would be useful.
+> 
+Yes. I think the definitions may be incorrect (or the Linux dts files are
+incorrect, but that seems unlikely). I tried the other way but then I get
+unhandled interrupt errors when trying to access a USB flash drive.
 
-vlen is the vector register length, default value is 128 bit.
-elen is the max operator size in bits, default value is 64 bit.
-vext_spec is the vector specification version, default value is v0.7.1.
-These properties can be specified with other values.
+> Side note: not used here, but in the header file we define:
+>     FSL_IMX6UL_USB1_IRQ     = 42,
+>     FSL_IMX6UL_USB2_IRQ     = 43,
+>     FSL_IMX6UL_USB_PHY1_IRQ = 44,
+>     FSL_IMX6UL_USB_PHY2_IRQ = 44,
+> 
+> Is that last one correct, or a cut-n-paste error that should be "45" ?
+> 
+From Linux devicetree files:
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/cpu.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
- target/riscv/cpu.h |  2 ++
- 2 files changed, 45 insertions(+), 1 deletion(-)
+	usbphy1: usbphy@20c9000 {
+        	compatible = "fsl,imx6ul-usbphy", "fsl,imx23-usbphy";
+                reg = <0x020c9000 0x1000>;
+                interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+	usbphy2: usbphy@20ca000 {
+                compatible = "fsl,imx6ul-usbphy", "fsl,imx23-usbphy";
+                reg = <0x020ca000 0x1000>;
+                interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
+	usbotg1: usb@2184000 {
+                compatible = "fsl,imx6ul-usb", "fsl,imx27-usb";
+                reg = <0x02184000 0x200>;
+                interrupts = <GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>;
+	usbotg2: usb@2184200 {
+                compatible = "fsl,imx6ul-usb", "fsl,imx27-usb";
+                reg = <0x02184200 0x200>;
+                interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 6e4135583d..5f1cdd4f2b 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -395,7 +395,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-     }
- 
-     set_priv_version(env, priv_version);
--    set_vext_version(env, vext_version);
-     set_resetvec(env, DEFAULT_RSTVEC);
- 
-     if (cpu->cfg.mmu) {
-@@ -463,6 +462,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-         if (cpu->cfg.ext_h) {
-             target_misa |= RVH;
-         }
-+        if (cpu->cfg.ext_v) {
-+            target_misa |= RVV;
-+            if (!is_power_of_2(cpu->cfg.vlen)) {
-+                error_setg(errp,
-+                        "Vector extension VLEN must be power of 2");
-+                return;
-+            }
-+            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
-+                error_setg(errp,
-+                        "Vector extension implementation only supports VLEN "
-+                        "in the range [128, %d]", RV_VLEN_MAX);
-+                return;
-+            }
-+            if (!is_power_of_2(cpu->cfg.elen)) {
-+                error_setg(errp,
-+                        "Vector extension ELEN must be power of 2");
-+                return;
-+            }
-+            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
-+                error_setg(errp,
-+                        "Vector extension implementation only supports ELEN "
-+                        "in the range [8, 64]");
-+                return;
-+            }
-+            if (cpu->cfg.vext_spec) {
-+                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
-+                    vext_version = VEXT_VERSION_0_07_1;
-+                } else {
-+                    error_setg(errp,
-+                           "Unsupported vector spec version '%s'",
-+                           cpu->cfg.vext_spec);
-+                    return;
-+                }
-+            } else {
-+                qemu_log("vector verison is not specified, "
-+                        "use the default value v0.7.1\n");
-+            }
-+            set_vext_version(env, vext_version);
-+        }
- 
-         set_misa(env, RVXLEN | target_misa);
-     }
-@@ -500,10 +538,14 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     /* This is experimental so mark with 'x-' */
-     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
-+    DEFINE_PROP_BOOL("v", RISCVCPU, cfg.ext_v, false),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
-     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
-+    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
-+    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
-+    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
-     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index e069e55e81..36ead8d6d5 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -285,12 +285,14 @@ typedef struct RISCVCPU {
-         bool ext_s;
-         bool ext_u;
-         bool ext_h;
-+        bool ext_v;
-         bool ext_counters;
-         bool ext_ifencei;
-         bool ext_icsr;
- 
-         char *priv_spec;
-         char *user_spec;
-+        char *vext_spec;
-         uint16_t vlen;
-         uint16_t elen;
-         bool mmu;
--- 
-2.23.0
+Should I maybe fix the definitions in a separate patch ?
 
+Thanks,
+Guenter
 
