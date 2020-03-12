@@ -2,98 +2,58 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F629C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5EFC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:10:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC01B206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:09:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UUWTIaie"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC01B206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00379206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:09:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00379206F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRKV-0006KL-0V
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:09:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36868)
+	id 1jCRLL-0008JA-3U
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:09:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4V-00025h-AR
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:37 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR8H-0003jD-Af
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:56:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4T-0008Vk-TH
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:35 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:57028)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jCR4T-0008V3-Km
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:33 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGmrS8012063;
- Thu, 12 Mar 2020 16:52:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=jarRDdGyUEFzZbIrAkQVmM0Aonew4+OkRAXfo84g+Fg=;
- b=UUWTIaiejOGN6PvlaltR4TNpT9xDa5vA2VlQyKSMEUMXfVVNhVc/y4oPkmpBMdIxJtop
- 4mLqFynoinN7pkI4ioz16NPNtgEPbiH0M+WPSgMUklmAZYKH8VFA9/IpSebY4fwuGvl6
- cdXRx1UxXJbG19y9lCzr+OA7Mi/ZV4SMhMUBgiQaLU+KEwtbJadsyDBp/JHQPWbzPDO6
- a5LslrRKnw7ex0DLtDMecVxoUqzPLdJ5hk57b/BcXyUEKkePlChajOHVNL332W77oS7k
- jTRGp3tTGn95ny7tij7jPwzN0caOzeo5CjL57rpHrDCOc+BDCDoqiL2V/fpqQfDYc0wx 2A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 2ym31utt2m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGnSaT003724;
- Thu, 12 Mar 2020 16:52:31 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 2yp8p7ypnd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:31 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CGqUVo000768;
- Thu, 12 Mar 2020 16:52:30 GMT
-Received: from spark.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 12 Mar 2020 09:52:30 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 03/16] hw/i386/vmport: Propagate IOPort read to vCPU EAX
- register
-Date: Thu, 12 Mar 2020 18:54:18 +0200
-Message-Id: <20200312165431.82118-4-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200312165431.82118-1-liran.alon@oracle.com>
-References: <20200312165431.82118-1-liran.alon@oracle.com>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR8E-00045p-T4
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:56:29 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:59717)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCR8E-0003wk-Cn; Thu, 12 Mar 2020 12:56:26 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07740129|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.557137-0.00132985-0.441533;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-QLCae_1584032170; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-QLCae_1584032170)
+ by smtp.aliyun-inc.com(10.147.44.129);
+ Fri, 13 Mar 2020 00:56:11 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 58/60] target/riscv: vector register gather instruction
+Date: Thu, 12 Mar 2020 22:58:58 +0800
+Message-Id: <20200312145900.2054-59-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=1 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- lowpriorityscore=0
- spamscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=1
- phishscore=0 mlxlogscore=999 mlxscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120085
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,116 +65,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, Liran Alon <liran.alon@oracle.com>,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmport_ioport_read() returns the value that should propagate to vCPU EAX
-register when guest reads VMPort IOPort (i.e. By x86 IN instruction).
-
-However, because vmport_ioport_read() calls cpu_synchronize_state(), the
-returned value gets overridden by the value in QEMU vCPU EAX register.
-i.e. cpu->env.regs[R_EAX].
-
-To fix this issue, change vmport_ioport_read() to explicitly override
-cpu->env.regs[R_EAX] with the value it wish to propagate to vCPU EAX
-register.
-
-Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- hw/core/machine.c |  1 +
- hw/i386/vmport.c  | 32 +++++++++++++++++++++++++++++---
- 2 files changed, 30 insertions(+), 3 deletions(-)
+ target/riscv/helper.h                   |  9 ++++
+ target/riscv/insn32.decode              |  3 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 23 +++++++++
+ target/riscv/vector_helper.c            | 68 +++++++++++++++++++++++++
+ 4 files changed, 103 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 9e8c06036faf..0496112b741c 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -39,6 +39,7 @@ GlobalProperty hw_compat_4_2[] = {
-     { "usb-redir", "suppress-remote-wake", "off" },
-     { "qxl", "revision", "4" },
-     { "qxl-vga", "revision", "4" },
-+    { "vmport", "x-read-set-eax", "off" },
- };
- const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
- 
-diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index 6ed110ef71a6..72f09ef5cba3 100644
---- a/hw/i386/vmport.c
-+++ b/hw/i386/vmport.c
-@@ -43,6 +43,11 @@
- #define VMPORT_ENTRIES 0x2c
- #define VMPORT_MAGIC   0x564D5868
- 
-+/* Compatibility flags for migration */
-+#define VMPORT_COMPAT_READ_SET_EAX_BIT      0
-+#define VMPORT_COMPAT_READ_SET_EAX          \
-+    (1 << VMPORT_COMPAT_READ_SET_EAX_BIT)
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index e86df5b9e4..b9ec0a4efc 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1137,3 +1137,12 @@ DEF_HELPER_6(vslide1down_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vslide1down_vx_d, void, ptr, ptr, tl, ptr, env, i32)
 +
- #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
++DEF_HELPER_6(vrgather_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e6ade9c68e..d92861a334 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -566,6 +566,9 @@ vslide1up_vx    001110 . ..... ..... 110 ..... 1010111 @r_vm
+ vslidedown_vx   001111 . ..... ..... 100 ..... 1010111 @r_vm
+ vslidedown_vi   001111 . ..... ..... 011 ..... 1010111 @r_vm
+ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
++vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
++vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
++vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
  
- typedef struct VMPortState {
-@@ -51,6 +56,8 @@ typedef struct VMPortState {
-     MemoryRegion io;
-     VMPortReadFunc *func[VMPORT_ENTRIES];
-     void *opaque[VMPORT_ENTRIES];
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index ef5960ba39..f3b08919b9 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2333,3 +2333,26 @@ GEN_OPIVI_TRANS(vslideup_vi, 1, vslideup_vx, slideup_check)
+ GEN_OPIVX_TRANS(vslidedown_vx, opivx_check)
+ GEN_OPIVX_TRANS(vslide1down_vx, opivx_check)
+ GEN_OPIVI_TRANS(vslidedown_vi, 1, vslidedown_vx, opivx_check)
 +
-+    uint32_t compat_flags;
- } VMPortState;
- 
- static VMPortState *port_state;
-@@ -80,17 +87,33 @@ static uint64_t vmport_ioport_read(void *opaque, hwaddr addr,
- 
-     eax = env->regs[R_EAX];
-     if (eax != VMPORT_MAGIC) {
--        return eax;
-+        goto out;
-     }
- 
-     command = env->regs[R_ECX];
-     trace_vmport_command(command);
-     if (command >= VMPORT_ENTRIES || !s->func[command]) {
-         qemu_log_mask(LOG_UNIMP, "vmport: unknown command %x\n", command);
--        return eax;
-+        goto out;
-     }
- 
--    return s->func[command](s->opaque[command], addr);
-+    eax = s->func[command](s->opaque[command], addr);
++/* Vector Register Gather Instruction */
++static bool vrgather_vv_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs1, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (a->rd != a->rs2) && (a->rd != a->rs1));
++}
++GEN_OPIVV_TRANS(vrgather_vv, vrgather_vv_check)
 +
-+out:
-+    /*
-+     * The call above to cpu_synchronize_state() gets vCPU registers values
-+     * to QEMU but also cause QEMU to write QEMU vCPU registers values to
-+     * vCPU implementation (e.g. Accelerator such as KVM) just before
-+     * resuming guest.
-+     *
-+     * Therefore, in order to make IOPort return value propagate to
-+     * guest EAX, we need to explicitly update QEMU EAX register value.
-+     */
-+    if (s->compat_flags & VMPORT_COMPAT_READ_SET_EAX) {
-+        cpu->env.regs[R_EAX] = eax;
-+    }
++static bool vrgather_vx_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            (a->rd != a->rs2));
++}
++GEN_OPIVX_TRANS(vrgather_vx, vrgather_vx_check)
++GEN_OPIVI_TRANS(vrgather_vi, 1, vrgather_vx, vrgather_vx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 2219fdd6c5..5788e46dcf 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4647,3 +4647,71 @@ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_b, uint8_t, H1, clearb)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_h, uint16_t, H2, clearh)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_w, uint32_t, H4, clearl)
+ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_d, uint64_t, H8, clearq)
 +
-+    return eax;
- }
- 
- static void vmport_ioport_write(void *opaque, hwaddr addr,
-@@ -163,6 +186,9 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
- }
- 
- static Property vmport_properties[] = {
-+    /* Used to enforce compatibility for migration */
-+    DEFINE_PROP_BIT("x-read-set-eax", VMPortState, compat_flags,
-+                    VMPORT_COMPAT_READ_SET_EAX_BIT, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
++/* Vector Register Gather Instruction */
++#define GEN_VEXT_VRGATHER_VV(NAME, ETYPE, H, CLEAR_FN)                    \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
++        CPURISCVState *env, uint32_t desc)                                \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t index, i;                                                    \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        index = *((ETYPE *)vs1 + H(i));                                   \
++        if (index >= vlmax) {                                             \
++            *((ETYPE *)vd + H(i)) = 0;                                    \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(index));           \
++        }                                                                 \
++    }                                                                     \
++    if (i == 0) {                                                         \
++        return;                                                           \
++    }                                                                     \
++    for (; i < vlmax; i++) {                                              \
++        CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));      \
++    }                                                                     \
++}
++/* vd[i] = (vs1[i] >= VLMAX) ? 0 : vs2[vs1[i]]; */
++GEN_VEXT_VRGATHER_VV(vrgather_vv_b, uint8_t, H1, clearb)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_h, uint16_t, H2, clearh)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_w, uint32_t, H4, clearl)
++GEN_VEXT_VRGATHER_VV(vrgather_vv_d, uint64_t, H8, clearq)
++
++#define GEN_VEXT_VRGATHER_VX(NAME, ETYPE, H, CLEAR_FN)                    \
++void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,         \
++        CPURISCVState *env, uint32_t desc)                                \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vm = vext_vm(desc);                                          \
++    uint32_t vl = env->vl;                                                \
++    uint32_t index = s1, i;                                               \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
++            continue;                                                     \
++        }                                                                 \
++        if (index >= vlmax) {                                             \
++            *((ETYPE *)vd + H(i)) = 0;                                    \
++        } else {                                                          \
++            *((ETYPE *)vd + H(i)) = *((ETYPE *)vs2 + H(index));           \
++        }                                                                 \
++    }                                                                     \
++    if (i == 0) {                                                         \
++        return;                                                           \
++    }                                                                     \
++    for (; i < vlmax; i++) {                                              \
++        CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));      \
++    }                                                                     \
++}
++/* vd[i] = (x[rs1] >= VLMAX) ? 0 : vs2[rs1] */
++GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
++GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
 -- 
-2.20.1
+2.23.0
 
 
