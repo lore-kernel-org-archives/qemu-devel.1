@@ -2,139 +2,95 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC14C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC9DC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:48:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38450206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:43:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38450206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03C7420650
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:48:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NaFqQoBh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C7420650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCJRS-0007CX-FT
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 04:43:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49161)
+	id 1jCJW1-0000i0-7s
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 04:48:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCJQq-0006cC-25
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:43:09 -0400
+ (envelope-from <mst@redhat.com>) id 1jCJUz-0000GK-Aj
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCJQo-0007V5-PP
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:43:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jCJQo-0007Ru-GR
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:43:06 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02C8cj7A129191
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:43:05 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yqhaq1acr-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:43:04 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 12 Mar 2020 08:42:59 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 08:42:56 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02C8gtSf47972510
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 08:42:55 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C2B2B52050;
- Thu, 12 Mar 2020 08:42:55 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8EA785204F;
- Thu, 12 Mar 2020 08:42:55 +0000 (GMT)
-Subject: Re: [PATCH v9 03/15] s390x: protvirt: Add migration blocker
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-4-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Thu, 12 Mar 2020 09:42:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <mst@redhat.com>) id 1jCJUy-0003FZ-4p
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:47:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59857
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCJUx-0003FJ-Vh
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:47:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584002843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pXPfPIIIQAut8UkWcjgt+9CNPzKPDBbyxrORjLogus4=;
+ b=NaFqQoBhQZX1krMfajf1qBOhq/cANC7luMCgXACqIB3li73mHLNBcjYfYT9pa+xS16QEIH
+ X49pRid2wgHwOtfkeAxPsnqXbQAIeSsrHW3jYZqJpVAqmsdTHXTI/NwWGpnAwZymz8G2om
+ M3kOnggCVWvhSdVwyQd7LGMs7cOmkhs=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-YlbIafYGOPCu1NLphVzuzg-1; Thu, 12 Mar 2020 04:47:19 -0400
+X-MC-Unique: YlbIafYGOPCu1NLphVzuzg-1
+Received: by mail-qt1-f197.google.com with SMTP id d6so3027125qtn.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 01:47:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CMGY5NDRnQ6tpPW4NbzkE3whOpE1haBikjv6YCfDFio=;
+ b=XwxcD90HgX7vHv48pchgSnC2qCNXbK9ztqRg9X70rHK+uF9Eg6AE5jmpiOX7K4K7U7
+ PRk7zZ6g+x7pYTaxqfIV0dnFgPIJanQt1ZLXnwkwGgLG3ScTA3XNpIV2i4YZzlPSDAWL
+ rNJtTwhwWN12of6XxN/3z8A8IM7tBJN4urYaSCq0x4OaE2F0wFCjj8kv1Tnc7nO0WU38
+ /oMg5yDMeJ5gROwF9loboWVqYyxT2TP9ZAChQfhx1tTX84N0fAyy/Ezc3TQWxjukY7DP
+ S9dBm7MmYwcaNYo+eTH3HuePBranYhxTljhcPBocomMZDyUnUrvzWpL0L6Le7GBb0Tnu
+ A1ug==
+X-Gm-Message-State: ANhLgQ3LwItFgVFc+chHUFeQTxEw6bVhGFPmDQkiTmyE+YROdLMn8QMh
+ WXSi0I4fsS5HmKRUf+mSuITf2wesjYCQO8SBmGNS8dxgQSKFlEDXmqENyKhQRx6f8+e5A/TNrYu
+ MMw9FwTEASn3tjuQ=
+X-Received: by 2002:ac8:70d4:: with SMTP id g20mr6375494qtp.146.1584002838848; 
+ Thu, 12 Mar 2020 01:47:18 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsV2vB8jgT9lPTI6/rXChnARxotlD8arZEu0o0XGFcCreqdYk31/Dsq3r3lSxfUv0vOD7Pnvw==
+X-Received: by 2002:ac8:70d4:: with SMTP id g20mr6375478qtp.146.1584002838612; 
+ Thu, 12 Mar 2020 01:47:18 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id c190sm5213470qkb.80.2020.03.12.01.47.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 01:47:17 -0700 (PDT)
+Date: Thu, 12 Mar 2020 04:47:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [RFC for Linux] virtio_balloon: Add VIRTIO_BALLOON_F_THP_ORDER
+ to handle THP spilt issue
+Message-ID: <20200312043859-mutt-send-email-mst@kernel.org>
+References: <1583999395-9131-1-git-send-email-teawater@gmail.com>
+ <3e1373f4-6ade-c651-ddde-6f04e78382f9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200311132151.172389-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031208-0008-0000-0000-0000035BFAB5
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031208-0009-0000-0000-00004A7D43A5
-Message-Id: <f303ca0e-aaf8-4e6a-b7fa-a2d2bfe9cefd@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-12_01:2020-03-11,
- 2020-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 lowpriorityscore=0
- malwarescore=0 mlxlogscore=845 priorityscore=1501 impostorscore=0
- adultscore=0 clxscore=1015 spamscore=0 bulkscore=0 phishscore=0
- suspectscore=2 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003120046
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <3e1373f4-6ade-c651-ddde-6f04e78382f9@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,74 +102,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: pagupta@redhat.com, Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+ qemu-devel@nongnu.org, mojha@codeaurora.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, namit@vmware.com,
+ Hui Zhu <teawaterz@linux.alibaba.com>, akpm@linux-foundation.org,
+ jasowang@redhat.com, Hui Zhu <teawater@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Mar 12, 2020 at 09:37:32AM +0100, David Hildenbrand wrote:
+> 2. You are essentially stealing THPs in the guest. So the fastest
+> mapping (THP in guest and host) is gone. The guest won't be able to make
+> use of THP where it previously was able to. I can imagine this implies a
+> performance degradation for some workloads. This needs a proper
+> performance evaluation.
+
+I think the problem is more with the alloc_pages API.
+That gives you exactly the given order, and if there's
+a larger chunk available, it will split it up.
+
+But for balloon - I suspect lots of other users,
+we do not want to stress the system but if a large
+chunk is available anyway, then we could handle
+that more optimally by getting it all in one go.
 
 
-On 11.03.20 14:21, Janosch Frank wrote:
-> Migration is not yet supported.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 9569b777a0e1abd6..deb31e060052d279 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -42,6 +42,9 @@
->  #include "hw/s390x/tod.h"
->  #include "sysemu/sysemu.h"
->  #include "hw/s390x/pv.h"
-> +#include "migration/blocker.h"
-> +
-> +static Error *pv_mig_blocker;
->  
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -321,15 +324,30 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
->  {
->      s390_pv_vm_disable();
->      ms->pv = false;
-> +    migrate_del_blocker(pv_mig_blocker);
-> +    error_free_or_abort(&pv_mig_blocker);
->  }
->  
->  static int s390_machine_protect(S390CcwMachineState *ms)
->  {
-> +    Error *local_err = NULL;
->      int rc;
->  
-> +    error_setg(&pv_mig_blocker,
-> +               "protected VMs are currently not migrateable.");
-> +    rc = migrate_add_blocker(pv_mig_blocker, &local_err);
-> +    if (local_err) {
+So if we want to address this, IMHO this calls for a new API.
+Along the lines of
 
-Shall we rather use rc here? local_err should also work I guess.
+=09struct page *alloc_page_range(gfp_t gfp, unsigned int min_order,
+=09=09=09=09=09unsigned int max_order, unsigned int *order)
 
-Anyway
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+the idea would then be to return at a number of pages in the given
+range.
 
+What do you think? Want to try implementing that?
 
-> +        error_report_err(local_err);
-> +        error_free_or_abort(&pv_mig_blocker);
-> +        return rc;
-> +    }
-> +
->      /* Create SE VM */
->      rc = s390_pv_vm_enable();
->      if (rc) {
-> +        error_report_err(local_err);
-> +        migrate_del_blocker(pv_mig_blocker);
-> +        error_free_or_abort(&pv_mig_blocker);
->          return rc;
->      }
->  
-> 
+--=20
+MST
 
 
