@@ -2,84 +2,101 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1343CC1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CBDC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:32:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE1B7206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3E22067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AI8YIRvI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE1B7206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFdQ01/p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3E22067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCUGk-000611-VX
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:17:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53495)
+	id 1jCUVQ-0006mA-Jt
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:32:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55643)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCUG5-0005cK-4J
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:16:46 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCUUh-0005dA-JM
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCUG3-0008VR-Ls
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:16:44 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33603)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCUG3-0008V3-F9
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:16:43 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a25so9206224wrd.0
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 13:16:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8Tro1z7uTIp12iQuDnwssQFro2Zzq8+IX8DXdBO8SLQ=;
- b=AI8YIRvIjbVTY7oDAMagQPOfSx5jEK2SnxmcDtTszUGceWT9+scIBaU5dOugoZIirE
- uPuscEaLPslrVICKx9MIImg6roh8kF0QrSzt4ixjxBWjBZjgjv0x0MgNesXYP20+EN0P
- P1zZlTGFKD1Uj4LFCBKBwXV8hLEA/0xgq+B6QUxiTePfgyhVDfxAhQO+sL3H7nhuR0nO
- WB022es1Ukuq7LBGaiB7SvcC1M2s936fy4Wx2pIXtbD+D7A6so3OTvTFUEPvh7YeRKkR
- PWmgjXWX3WaPe+yk1QEQhIB67Q6L0kwCSkLepo0a/MSZE+cATR6Ws4E6pERbPd8HOGoq
- DxDw==
+ (envelope-from <philmd@redhat.com>) id 1jCUUf-0000Id-PU
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:31:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21593
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCUUf-0000Ho-Lp
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:31:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584045108;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u8msJzzfUVkGEWWvppJCKIUTCaamh8XEzorFJLbMUlw=;
+ b=RFdQ01/py98f0efLX0SA9mYe2ReNhDpCJxQFSHfSWkd8wxlI1TiUvqveMLuwAGHTNeR28/
+ 4dI1HFUcsetm6qHvFbFQJXZdkzdAJJopkRSDyNZbw9SUJc7gdqnJywy9N6q7inPKO+Sxb1
+ CGvrJ1Ynq7wGkQIpQ4AiyfafliH6sa4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-72G8PlpVNQ-cQolhtZDu4Q-1; Thu, 12 Mar 2020 16:31:45 -0400
+X-MC-Unique: 72G8PlpVNQ-cQolhtZDu4Q-1
+Received: by mail-ed1-f71.google.com with SMTP id p17so6004206edt.20
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 13:31:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8Tro1z7uTIp12iQuDnwssQFro2Zzq8+IX8DXdBO8SLQ=;
- b=ixcSFJAH/GjdU0Qs+Dsf3giluUFkwlQN/SUDZO66STY0OoimQaUPP9ucLBgIdCHmHn
- rotvE+Yhx5+KvFKUju8uYtyqokffgkxKAQwIvCjH82rWhfT9DtBnPAx9hlvUVKemS3GX
- RHZk85St7AvxzB1D4GlPWh5cKvTfW5MgK5UB4zfOPGagTW29UlCBggqyjhDlKANGUTTt
- Ir6xPeRSRWkCn8dsW7eKEt4hW4CyFH1mOm0bhq8w6bFIh/tddi2+K04x59y2vri6vHkz
- YqU2rcVZoeGwofYyF6jCpUgl1PqEvBngMHRZfNyj40lh8k1a8qcoBjdJ2nP9pTN8W4eR
- ggZg==
-X-Gm-Message-State: ANhLgQ22MlJ+TPLNJdkpCmKzuLOxnedEKj7M983QhBagxALCiWKsbcj2
- yICX3swVOL7Krp3FcJVImSWIIff28qjoWA==
-X-Google-Smtp-Source: ADFU+vthCeejKzA61MkXfTHxhSvXKUVR9Y+eQmmNY/uwaxTRr41gM6/JDzzUUHymmbo9KnHD0LShWA==
-X-Received: by 2002:a5d:6150:: with SMTP id y16mr12915859wrt.352.1584044201685; 
- Thu, 12 Mar 2020 13:16:41 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p16sm4401554wmg.22.2020.03.12.13.16.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 13:16:40 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/net/i82596.c: Avoid reading off end of buffer in
- i82596_receive()
-Date: Thu, 12 Mar 2020 20:16:38 +0000
-Message-Id: <20200312201638.6375-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ bh=N2Wm2nvXguR8tKjYXQcfC7omrHC6KB9F8VxSTzJ/zIM=;
+ b=S5ysbC3ZXr7Xm0jU8YRlGnc3vkoiWir6IR9ZHcaAkfEeZUzVZ1Y2yNcvecPM2jrF1k
+ BI5G+eEu1X8MTwPiiLgpMMahGk7dapNgzDvknKUI5jMmkj2UMIMSTfugxUxabyFHtu2r
+ Jt3uvLvFK6QOC7RNHh3e1mFt8rTyQwi/9zl8hdKegCEbemt9ztOmaxBgoocWfgvdZO9y
+ akIpxx3XJYs0tW6CpJQukwAjBrayMk385BC6k/OinWWPIdFiPt+GrJwPoQNTytwGGapz
+ gym5L70MvxYiBgi6lEcR1YLZLE3fOyhgjqNmMn/RlH+Ly5SC9QH7FYoEAVPSi4Cnu982
+ Zuiw==
+X-Gm-Message-State: ANhLgQ3PF6TpYK97w3/Pq/02FrJFgWEBtuICDOg9Y/RMfb5G+cgHgDfe
+ i3/FF2AWjBhPRcgd2VYBvqWfLOuyUH+oA5dbYo67KKuZqsC3l2Y9f+tyJd5DBd+r67O4If/JJLi
+ +DFT6pk0VNQBSU8I=
+X-Received: by 2002:a05:6402:3047:: with SMTP id
+ bu7mr9660393edb.44.1584045104772; 
+ Thu, 12 Mar 2020 13:31:44 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvBvpQUoa40fWbD87TT9em07eiq5Y2lXeByzDK1ZpgbBQUX8wf3O08KziJykV7rgnA2IGVzpw==
+X-Received: by 2002:a05:6402:3047:: with SMTP id
+ bu7mr9660374edb.44.1584045104484; 
+ Thu, 12 Mar 2020 13:31:44 -0700 (PDT)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id i15sm3442885ejh.56.2020.03.12.13.31.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 12 Mar 2020 13:31:43 -0700 (PDT)
+Subject: Re: [PATCH v2] linux-user: fix socket() strace
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200312165530.53450-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <198c31d3-7047-6f14-c7c4-b6090c23fb8e@redhat.com>
+Date: Thu, 12 Mar 2020 21:31:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <20200312165530.53450-1-laurent@vivier.eu>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,119 +108,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Jason Wang <jasowang@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The i82596_receive() function attempts to pass the guest a buffer
-which is effectively the concatenation of the data it is passed and a
-4 byte CRC value.  However, rather than implementing this as "write
-the data; then write the CRC" it instead bumps the length value of
-the data by 4, and writes 4 extra bytes from beyond the end of the
-buffer, which it then overwrites with the CRC.  It also assumed that
-we could always fit all four bytes of the CRC into the final receive
-buffer, which might not be true if the CRC needs to be split over two
-receive buffers.
+On 3/12/20 5:55 PM, Laurent Vivier wrote:
+> print_socket_type() doesn't manage flags and the correct type cannot
+> be displayed
+>=20
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>=20
+> Notes:
+>      v2: replace gemu_log() by qemu_log() as it has been removed from qem=
+u
+>=20
+>   linux-user/strace.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 4f7130b2ff63..69232f7e27b8 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -444,7 +444,7 @@ print_socket_domain(int domain)
+>   static void
+>   print_socket_type(int type)
+>   {
+> -    switch (type) {
+> +    switch (type & TARGET_SOCK_TYPE_MASK) {
+>       case TARGET_SOCK_DGRAM:
+>           qemu_log("SOCK_DGRAM");
+>           break;
+> @@ -464,6 +464,12 @@ print_socket_type(int type)
+>           qemu_log("SOCK_PACKET");
+>           break;
+>       }
+> +    if (type & TARGET_SOCK_CLOEXEC) {
+> +        qemu_log("|SOCK_CLOEXEC");
+> +    }
+> +    if (type & TARGET_SOCK_NONBLOCK) {
+> +        qemu_log("|SOCK_NONBLOCK");
+> +    }
+>   }
+>  =20
+>   static void
+>=20
 
-Calculate separately how many bytes we need to transfer into the
-guest's receive buffer from the source buffer, and how many we need
-to transfer from the CRC work.
-
-We add a count 'bufsz' of the number of bytes left in the source
-buffer, which we use purely to assert() that we don't overrun.
-
-Spotted by Coverity (CID 1419396) for the specific case when we end
-up using a local array as the source buffer.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I know Helge has some significant rework of this device planned, but
-for 5.0 we need to fix the buffer overrun.
-
-Tested with 'make check' only.
----
- hw/net/i82596.c | 44 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 35 insertions(+), 9 deletions(-)
-
-diff --git a/hw/net/i82596.c b/hw/net/i82596.c
-index fe9f2390a94..2bd5d310367 100644
---- a/hw/net/i82596.c
-+++ b/hw/net/i82596.c
-@@ -501,7 +501,8 @@ ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
-     uint32_t rfd_p;
-     uint32_t rbd;
-     uint16_t is_broadcast = 0;
--    size_t len = sz;
-+    size_t len = sz; /* length of data for guest (including CRC) */
-+    size_t bufsz = sz; /* length of data in buf */
-     uint32_t crc;
-     uint8_t *crc_ptr;
-     uint8_t buf1[MIN_BUF_SIZE + VLAN_HLEN];
-@@ -595,6 +596,7 @@ ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
-         if (len < MIN_BUF_SIZE) {
-             len = MIN_BUF_SIZE;
-         }
-+        bufsz = len;
-     }
- 
-     /* Calculate the ethernet checksum (4 bytes) */
-@@ -627,6 +629,7 @@ ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
-         while (len) {
-             uint16_t buffer_size, num;
-             uint32_t rba;
-+            size_t bufcount, crccount;
- 
-             /* printf("Receive: rbd is %08x\n", rbd); */
-             buffer_size = get_uint16(rbd + 12);
-@@ -639,14 +642,37 @@ ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
-             }
-             rba = get_uint32(rbd + 8);
-             /* printf("rba is 0x%x\n", rba); */
--            address_space_write(&address_space_memory, rba,
--                                MEMTXATTRS_UNSPECIFIED, buf, num);
--            rba += num;
--            buf += num;
--            len -= num;
--            if (len == 0) { /* copy crc */
--                address_space_write(&address_space_memory, rba - 4,
--                                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4);
-+            /*
-+             * Calculate how many bytes we want from buf[] and how many
-+             * from the CRC.
-+             */
-+            if ((len - num) >= 4) {
-+                /* The whole guest buffer, we haven't hit the CRC yet */
-+                bufcount = num;
-+            } else {
-+                /* All that's left of buf[] */
-+                bufcount = len - 4;
-+            }
-+            crccount = num - bufcount;
-+
-+            if (bufcount > 0) {
-+                /* Still some of the actual data buffer to transfer */
-+                bufsz -= bufcount;
-+                assert(bufsz >= 0);
-+                address_space_write(&address_space_memory, rba,
-+                                    MEMTXATTRS_UNSPECIFIED, buf, bufcount);
-+                rba += bufcount;
-+                buf += bufcount;
-+                len -= bufcount;
-+            }
-+
-+            /* Write as much of the CRC as fits */
-+            if (crccount > 0) {
-+                address_space_write(&address_space_memory, rba,
-+                                    MEMTXATTRS_UNSPECIFIED, crc_ptr, crccount);
-+                rba += crccount;
-+                crc_ptr += crccount;
-+                len -= crccount;
-             }
- 
-             num |= 0x4000; /* set F BIT */
--- 
-2.20.1
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
