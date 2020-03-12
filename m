@@ -1,80 +1,89 @@
 Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF71AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A1BC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78644205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2757C206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kAcqgkax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78644205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M6k0qLR7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2757C206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCU6b-0005Qh-LL
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:06:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50686)
+	id 1jCU7e-0001as-B3
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:08:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45859)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jCU2C-0005B0-CT
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:02:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjY-0006Rk-98
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1jCU2B-0005Mg-7W
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:02:24 -0400
-Received: from mail-io1-xd2a.google.com ([2607:f8b0:4864:20::d2a]:36764)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjV-0002KL-Tv
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:08 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33154)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1jCU2B-0005IF-1q; Thu, 12 Mar 2020 16:02:23 -0400
-Received: by mail-io1-xd2a.google.com with SMTP id d15so7014787iog.3;
- Thu, 12 Mar 2020 13:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iEExUs14yIhTspSpMTZEiP0XS6fhKXstB4RbOjXMcI8=;
- b=kAcqgkax3VsBgHjQ/4y69SlZ1Wq95HihuANakTA4nSOEPI0bYWsiqAt4LxCmyxjsok
- Osuj8BudukDevJ+O6y+7UKdDtkZYAgvXr51xFNISG5vHVfimofOJQbWi6b0zJN2eidpg
- 6ytMLZVqz2xLmPC3afvyDObHxvua1NQdcPX20gdrfk0z2XunefVaTavFj/lxLTJnF8Uk
- 676JqleQ0ICjAAQ9Wo/kBPd+DSOi6+QYYpra9iXi6bl4ltursirehS39kJacP/Pw3OEF
- IFC15iyk/ZzRfd1DOA3/hGEbfyv8H9OWOztk6zDehCFDWWYm6rDtkA8S7S7zrVGtHRao
- XYig==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jCTjV-0002Js-Ma
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:05 -0400
+Received: by mail-pl1-x642.google.com with SMTP id ay11so3082980plb.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:43:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=8T6BAPTYerDhEKgrzNZE4db0OCIj9s9aznenJNc+c5c=;
+ b=M6k0qLR7ObhqR3X80b34xjeqDYhTFxcxpVUXOVaxXXgokUIEGz8Y4hbJM4sJRrH/Ia
+ yQCEdAcLmSWE5OSaeoCLZ8NXHZEK4kCENFXnBS5w+H4H2o3qyr/sHBCw2x72khAuJc8D
+ Rvoajx8QhI1w+3MTfKHUdyCDzTG7zXGPlKBGmqa+9GPYCIMW6kl6CvobBbTCky4ngTEE
+ UatQtjZ32pv9id5Kt/c96H2er1NQp45Cwj3BW/63mJmMdryTCyQSKRoeg1S2ZJ9nX5AV
+ 4ZCkYUyLjkjc86mRke43MUG8FriCQj+RaP9MXnARhEaqizHUTvQEq4/gU3+pLIIWy41v
+ PD0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iEExUs14yIhTspSpMTZEiP0XS6fhKXstB4RbOjXMcI8=;
- b=C9J2CnDbXJxujt9omtjT+UrH8t1hkHD9QHSvO723VISgpjVCYRPaS6+FywRvcRbxuC
- A3G/JuFZum6Ln1DI1o8bIOxtH5KtOGiL9sFv1vqte4Htg9//go0unMm+e9CtU7wEPZXU
- gq6OmrAFsodKGQaHKY3NtjFJg4YOGOgenstf2kTl/mXRh0uL/zllbl15lrP/jMWCgdGy
- 1qSJvcmnrVqGYc7rBaz+4wdqOaj2WRkiVWIfE+ldsIrQadwB7EOyvMF8B/Sk+rQ2nu9t
- hnW3l1bG0aNIAxNrz1r3JP+Yneu4z8JIrA3uBS2qsoTaDa4PPdI7wM/UdU+uYRL88v/s
- pPfw==
-X-Gm-Message-State: ANhLgQ0RZeKVu3+0sx4sRMpN1IJ+LEJ47ZFvfJWkRMNL3a26waMfNYu5
- FY03r//oIfCl25pi4H0Gj3GuDzcAYN/8MH2FAeU=
-X-Google-Smtp-Source: ADFU+vsZ+8dqR3Tlma42xnqtUmTMantE6dZEz8LVB+6IIJEMvyVz4NMKgWny3j4gp5QLi3vWQkZ/UbUPmyA636srTN0=
-X-Received: by 2002:a6b:5406:: with SMTP id i6mr9248179iob.188.1584043339648; 
- Thu, 12 Mar 2020 13:02:19 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=8T6BAPTYerDhEKgrzNZE4db0OCIj9s9aznenJNc+c5c=;
+ b=PJMxLHCL1SYoHqe0oxUkjg0nvO9ZEwWmsuVYtSIg+bARB9+cpbvf4HmRanywCIRbxg
+ CvAtGHhjgPJ/DzIHek52koQJOU5lcQaT+Jqa844Y0w7aVJhUboPyWlkObgM221RZXBUj
+ MX26nHOhiWsZWMJz8Xhc5c4VPGdNMXxrtkEF8sJ7CX99djJOn5SsyQ5TNYZaSIwye6n/
+ r66CaodTkGaeZIe4u4Sph9m6ki1RJjIIri/drSr3ERr25FlZoQ/E4kvUhEe41DPA47yH
+ 5U4jh3xu5v6/k7JkLJ17KkS8LGkKIVDe41tgSkZfbCh4zGRSgBkgGszkCvVn2kvancF/
+ 5DWw==
+X-Gm-Message-State: ANhLgQ3HSQ3WE3eNxQqzmIA8xWnEekRbAoiDnPq1ZhZRAwA2YuC/Yxif
+ wVCNr5E3oUCSWD3flhgd+DJV1tFSKAc=
+X-Google-Smtp-Source: ADFU+vt5g/LpGkpVG/ZS9ofwyQosx12VGoEpkdvmjYxOzmScmRceEYC5uwIffARpy0mVHsLXC1OzYQ==
+X-Received: by 2002:a17:90b:2390:: with SMTP id
+ mr16mr5788196pjb.149.1584042184205; 
+ Thu, 12 Mar 2020 12:43:04 -0700 (PDT)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.43.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 12:43:03 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 32/42] target/arm: Add mte helpers for sve scalar + int
+ stores
+Date: Thu, 12 Mar 2020 12:42:09 -0700
+Message-Id: <20200312194219.24406-33-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
+References: <20200312194219.24406-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200311221854.30370-1-nieklinnenbank@gmail.com>
- <CAFEAcA9UqDRT-32Qnap8n3uYh8hyK_89KhsTwceHDRiTzihyJg@mail.gmail.com>
-In-Reply-To: <CAFEAcA9UqDRT-32Qnap8n3uYh8hyK_89KhsTwceHDRiTzihyJg@mail.gmail.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Thu, 12 Mar 2020 21:02:08 +0100
-Message-ID: <CAPan3WpgoCnnQCqxeYC3vPJ692TxFkLxs3dnD1xv9HfCukr7NA@mail.gmail.com>
-Subject: Re: [PATCH v8 00/18] Add Allwinner H3 SoC and Orange Pi PC Machine
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000009195a605a0add438"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d2a
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,120 +95,388 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009195a605a0add438
-Content-Type: text/plain; charset="UTF-8"
+Because the elements are sequential, we can eliminate many tests all
+at once when the tag hits TCMA, or if the page(s) are not Tagged.
 
-On Thu, Mar 12, 2020 at 5:22 PM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper-sve.h    |  47 +++++++++++
+ target/arm/sve_helper.c    |  95 ++++++++++++++++------
+ target/arm/translate-sve.c | 162 ++++++++++++++++++++++++-------------
+ 3 files changed, 226 insertions(+), 78 deletions(-)
 
-> On Wed, 11 Mar 2020 at 22:19, Niek Linnenbank <nieklinnenbank@gmail.com>
-> wrote:
-> >
-> > Dear QEMU developers,
-> >
-> > Hereby I would like to contribute the following set of patches to QEMU
-> > which add support for the Allwinner H3 System on Chip and the
-> > Orange Pi PC machine. The following features and devices are supported:
-> >
-> >  * SMP (Quad Core Cortex A7)
-> >  * Generic Interrupt Controller configuration
-> >  * SRAM mappings
-> >  * SDRAM controller
-> >  * Real Time Clock
-> >  * Timer device (re-used from Allwinner A10)
-> >  * UART
-> >  * SD/MMC storage controller
-> >  * EMAC ethernet
-> >  * USB 2.0 interfaces
-> >  * Clock Control Unit
-> >  * System Control module
-> >  * Security Identifier device
->
->
->
-> Applied to target-arm.next, thanks.
-
-
-Great news! And thanks for your support as well Peter!
-
-
-> (I moved
-> the doc into the its new location now that the split-out
-> of the arm board docs into separate files has landed.)
->
-> Yeah sure, indeed, that makes sense.
-
-Regards,
-Niek
-
-
-> -- PMM
->
-
-
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index af1c6967a6..e81d06b27c 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -1351,6 +1351,53 @@ DEF_HELPER_FLAGS_4(sve_st1hd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_st1sd_le_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_st1sd_be_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ 
++DEF_HELPER_FLAGS_4(sve_st1bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4bb_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1hh_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2hh_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3hh_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4hh_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1hh_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2hh_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3hh_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4hh_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1ss_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2ss_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3ss_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4ss_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1ss_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2ss_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3ss_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4ss_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1dd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2dd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3dd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4dd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1dd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st2dd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st3dd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st4dd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1bh_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1bs_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1bd_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1hs_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1hd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1hs_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1hd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
++DEF_HELPER_FLAGS_4(sve_st1sd_le_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_4(sve_st1sd_be_r_mte, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++
+ DEF_HELPER_FLAGS_6(sve_ldbsu_zsu, TCG_CALL_NO_WG,
+                    void, env, ptr, ptr, ptr, tl, i32)
+ DEF_HELPER_FLAGS_6(sve_ldhsu_le_zsu, TCG_CALL_NO_WG,
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 0fbf331742..0b8522ff01 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -5187,11 +5187,12 @@ DO_LDFF1_LDNF1_2(dd,  MO_64, MO_64)
+  */
+ 
+ static inline QEMU_ALWAYS_INLINE
+-void sve_stN_r(CPUARMState *env, uint64_t *vg, target_ulong addr, uint32_t desc,
+-               const uintptr_t retaddr, const int esz,
+-               const int msz, const int N,
++void sve_stN_r(CPUARMState *env, uint64_t *vg, target_ulong addr,
++               uint32_t desc, const uintptr_t retaddr,
++               const int esz, const int msz, const int N, uint32_t mtedesc,
+                sve_ldst1_host_fn *host_fn,
+-               sve_ldst1_tlb_fn *tlb_fn)
++               sve_ldst1_tlb_fn *tlb_fn,
++               sve_cont_ldst_mte_check_fn *mte_check_fn)
+ {
+     const unsigned rd = simd_data(desc);
+     const intptr_t reg_max = simd_oprsz(desc);
+@@ -5213,7 +5214,14 @@ void sve_stN_r(CPUARMState *env, uint64_t *vg, target_ulong addr, uint32_t desc,
+     sve_cont_ldst_watchpoints(&info, env, vg, addr, 1 << esz, N << msz,
+                               BP_MEM_WRITE, retaddr);
+ 
+-    /* TODO: MTE check. */
++    /*
++     * Handle mte checks for all active elements.
++     * Since TBI must be set for MTE, !mtedesc => !mte_active.
++     */
++    if (mte_check_fn && mtedesc) {
++        mte_check_fn(&info, env, vg, addr, 1 << esz, N << msz,
++                     mtedesc, retaddr);
++    }
+ 
+     flags = info.page[0].flags | info.page[1].flags;
+     if (unlikely(flags != 0)) {
+@@ -5307,26 +5315,67 @@ void sve_stN_r(CPUARMState *env, uint64_t *vg, target_ulong addr, uint32_t desc,
+     }
+ }
+ 
+-#define DO_STN_1(N, NAME, ESZ) \
+-void HELPER(sve_st##N##NAME##_r)(CPUARMState *env, void *vg,        \
+-                                 target_ulong addr, uint32_t desc)  \
+-{                                                                   \
+-    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, N,           \
+-              sve_st1##NAME##_host, sve_st1##NAME##_tlb);           \
++static inline QEMU_ALWAYS_INLINE
++void sve_stN_r_mte(CPUARMState *env, uint64_t *vg, target_ulong addr,
++                   uint32_t desc, const uintptr_t ra,
++                   const int esz, const int msz, const int N,
++                   sve_ldst1_host_fn *host_fn,
++                   sve_ldst1_tlb_fn *tlb_fn)
++{
++    uint32_t mtedesc = desc >> (SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
++    int bit55 = extract64(addr, 55, 1);
++
++    /* Remove mtedesc from the normal sve descriptor. */
++    desc = extract32(desc, 0, SIMD_DATA_SHIFT + SVE_MTEDESC_SHIFT);
++
++    /* Perform gross MTE suppression early. */
++    if (!tbi_check(desc, bit55) ||
++        tcma_check(desc, bit55, allocation_tag_from_addr(addr))) {
++        mtedesc = 0;
++    }
++
++    sve_stN_r(env, vg, addr, desc, ra, esz, msz, N, mtedesc, host_fn, tlb_fn,
++              N == 1 ? sve_cont_ldst_mte_check1 : sve_cont_ldst_mte_checkN);
+ }
+ 
+-#define DO_STN_2(N, NAME, ESZ, MSZ) \
+-void HELPER(sve_st##N##NAME##_le_r)(CPUARMState *env, void *vg,       \
+-                                    target_ulong addr, uint32_t desc) \
+-{                                                                     \
+-    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, N,              \
+-              sve_st1##NAME##_le_host, sve_st1##NAME##_le_tlb);       \
+-}                                                                     \
+-void HELPER(sve_st##N##NAME##_be_r)(CPUARMState *env, void *vg,       \
+-                                    target_ulong addr, uint32_t desc) \
+-{                                                                     \
+-    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, N,              \
+-              sve_st1##NAME##_be_host, sve_st1##NAME##_be_tlb);       \
++#define DO_STN_1(N, NAME, ESZ)                                          \
++void HELPER(sve_st##N##NAME##_r)(CPUARMState *env, void *vg,            \
++                                 target_ulong addr, uint32_t desc)      \
++{                                                                       \
++    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MO_8, N, 0,            \
++              sve_st1##NAME##_host, sve_st1##NAME##_tlb, NULL);         \
++}                                                                       \
++void HELPER(sve_st##N##NAME##_r_mte)(CPUARMState *env, void *vg,        \
++                                     target_ulong addr, uint32_t desc)  \
++{                                                                       \
++    sve_stN_r_mte(env, vg, addr, desc, GETPC(), ESZ, MO_8, N,           \
++                  sve_st1##NAME##_host, sve_st1##NAME##_tlb);           \
++}
++
++#define DO_STN_2(N, NAME, ESZ, MSZ)                                     \
++void HELPER(sve_st##N##NAME##_le_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
++{                                                                       \
++    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, N, 0,             \
++              sve_st1##NAME##_le_host, sve_st1##NAME##_le_tlb, NULL);   \
++}                                                                       \
++void HELPER(sve_st##N##NAME##_be_r)(CPUARMState *env, void *vg,         \
++                                    target_ulong addr, uint32_t desc)   \
++{                                                                       \
++    sve_stN_r(env, vg, addr, desc, GETPC(), ESZ, MSZ, N, 0,             \
++              sve_st1##NAME##_be_host, sve_st1##NAME##_be_tlb, NULL);   \
++}                                                                       \
++void HELPER(sve_st##N##NAME##_le_r_mte)(CPUARMState *env, void *vg,     \
++                                        target_ulong addr, uint32_t desc) \
++{                                                                       \
++    sve_stN_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, N,            \
++                  sve_st1##NAME##_le_host, sve_st1##NAME##_le_tlb);     \
++}                                                                       \
++void HELPER(sve_st##N##NAME##_be_r_mte)(CPUARMState *env, void *vg,     \
++                                        target_ulong addr, uint32_t desc) \
++{                                                                       \
++    sve_stN_r_mte(env, vg, addr, desc, GETPC(), ESZ, MSZ, N,            \
++                  sve_st1##NAME##_be_host, sve_st1##NAME##_be_tlb);     \
+ }
+ 
+ DO_STN_1(1, bb, MO_8)
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index e8b9873a4c..8d2a93e7d9 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4983,73 +4983,125 @@ static bool trans_LD1R_zpri(DisasContext *s, arg_rpri_load *a)
+ static void do_st_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
+                       int msz, int esz, int nreg)
+ {
+-    static gen_helper_gvec_mem * const fn_single[2][4][4] = {
+-        { { gen_helper_sve_st1bb_r,
+-            gen_helper_sve_st1bh_r,
+-            gen_helper_sve_st1bs_r,
+-            gen_helper_sve_st1bd_r },
+-          { NULL,
+-            gen_helper_sve_st1hh_le_r,
+-            gen_helper_sve_st1hs_le_r,
+-            gen_helper_sve_st1hd_le_r },
+-          { NULL, NULL,
+-            gen_helper_sve_st1ss_le_r,
+-            gen_helper_sve_st1sd_le_r },
+-          { NULL, NULL, NULL,
+-            gen_helper_sve_st1dd_le_r } },
+-        { { gen_helper_sve_st1bb_r,
+-            gen_helper_sve_st1bh_r,
+-            gen_helper_sve_st1bs_r,
+-            gen_helper_sve_st1bd_r },
+-          { NULL,
+-            gen_helper_sve_st1hh_be_r,
+-            gen_helper_sve_st1hs_be_r,
+-            gen_helper_sve_st1hd_be_r },
+-          { NULL, NULL,
+-            gen_helper_sve_st1ss_be_r,
+-            gen_helper_sve_st1sd_be_r },
+-          { NULL, NULL, NULL,
+-            gen_helper_sve_st1dd_be_r } },
++    static gen_helper_gvec_mem * const fn_single[2][2][4][4] = {
++        { { { gen_helper_sve_st1bb_r,
++              gen_helper_sve_st1bh_r,
++              gen_helper_sve_st1bs_r,
++              gen_helper_sve_st1bd_r },
++            { NULL,
++              gen_helper_sve_st1hh_le_r,
++              gen_helper_sve_st1hs_le_r,
++              gen_helper_sve_st1hd_le_r },
++            { NULL, NULL,
++              gen_helper_sve_st1ss_le_r,
++              gen_helper_sve_st1sd_le_r },
++            { NULL, NULL, NULL,
++              gen_helper_sve_st1dd_le_r } },
++          { { gen_helper_sve_st1bb_r,
++              gen_helper_sve_st1bh_r,
++              gen_helper_sve_st1bs_r,
++              gen_helper_sve_st1bd_r },
++            { NULL,
++              gen_helper_sve_st1hh_be_r,
++              gen_helper_sve_st1hs_be_r,
++              gen_helper_sve_st1hd_be_r },
++            { NULL, NULL,
++              gen_helper_sve_st1ss_be_r,
++              gen_helper_sve_st1sd_be_r },
++            { NULL, NULL, NULL,
++              gen_helper_sve_st1dd_be_r } } },
++
++        { { { gen_helper_sve_st1bb_r_mte,
++              gen_helper_sve_st1bh_r_mte,
++              gen_helper_sve_st1bs_r_mte,
++              gen_helper_sve_st1bd_r_mte },
++            { NULL,
++              gen_helper_sve_st1hh_le_r_mte,
++              gen_helper_sve_st1hs_le_r_mte,
++              gen_helper_sve_st1hd_le_r_mte },
++            { NULL, NULL,
++              gen_helper_sve_st1ss_le_r_mte,
++              gen_helper_sve_st1sd_le_r_mte },
++            { NULL, NULL, NULL,
++              gen_helper_sve_st1dd_le_r_mte } },
++          { { gen_helper_sve_st1bb_r_mte,
++              gen_helper_sve_st1bh_r_mte,
++              gen_helper_sve_st1bs_r_mte,
++              gen_helper_sve_st1bd_r_mte },
++            { NULL,
++              gen_helper_sve_st1hh_be_r_mte,
++              gen_helper_sve_st1hs_be_r_mte,
++              gen_helper_sve_st1hd_be_r_mte },
++            { NULL, NULL,
++              gen_helper_sve_st1ss_be_r_mte,
++              gen_helper_sve_st1sd_be_r_mte },
++            { NULL, NULL, NULL,
++              gen_helper_sve_st1dd_be_r_mte } } },
+     };
+-    static gen_helper_gvec_mem * const fn_multiple[2][3][4] = {
+-        { { gen_helper_sve_st2bb_r,
+-            gen_helper_sve_st2hh_le_r,
+-            gen_helper_sve_st2ss_le_r,
+-            gen_helper_sve_st2dd_le_r },
+-          { gen_helper_sve_st3bb_r,
+-            gen_helper_sve_st3hh_le_r,
+-            gen_helper_sve_st3ss_le_r,
+-            gen_helper_sve_st3dd_le_r },
+-          { gen_helper_sve_st4bb_r,
+-            gen_helper_sve_st4hh_le_r,
+-            gen_helper_sve_st4ss_le_r,
+-            gen_helper_sve_st4dd_le_r } },
+-        { { gen_helper_sve_st2bb_r,
+-            gen_helper_sve_st2hh_be_r,
+-            gen_helper_sve_st2ss_be_r,
+-            gen_helper_sve_st2dd_be_r },
+-          { gen_helper_sve_st3bb_r,
+-            gen_helper_sve_st3hh_be_r,
+-            gen_helper_sve_st3ss_be_r,
+-            gen_helper_sve_st3dd_be_r },
+-          { gen_helper_sve_st4bb_r,
+-            gen_helper_sve_st4hh_be_r,
+-            gen_helper_sve_st4ss_be_r,
+-            gen_helper_sve_st4dd_be_r } },
++    static gen_helper_gvec_mem * const fn_multiple[2][2][3][4] = {
++        { { { gen_helper_sve_st2bb_r,
++              gen_helper_sve_st2hh_le_r,
++              gen_helper_sve_st2ss_le_r,
++              gen_helper_sve_st2dd_le_r },
++            { gen_helper_sve_st3bb_r,
++              gen_helper_sve_st3hh_le_r,
++              gen_helper_sve_st3ss_le_r,
++              gen_helper_sve_st3dd_le_r },
++            { gen_helper_sve_st4bb_r,
++              gen_helper_sve_st4hh_le_r,
++              gen_helper_sve_st4ss_le_r,
++              gen_helper_sve_st4dd_le_r } },
++          { { gen_helper_sve_st2bb_r,
++              gen_helper_sve_st2hh_be_r,
++              gen_helper_sve_st2ss_be_r,
++              gen_helper_sve_st2dd_be_r },
++            { gen_helper_sve_st3bb_r,
++              gen_helper_sve_st3hh_be_r,
++              gen_helper_sve_st3ss_be_r,
++              gen_helper_sve_st3dd_be_r },
++            { gen_helper_sve_st4bb_r,
++              gen_helper_sve_st4hh_be_r,
++              gen_helper_sve_st4ss_be_r,
++              gen_helper_sve_st4dd_be_r } } },
++        { { { gen_helper_sve_st2bb_r_mte,
++              gen_helper_sve_st2hh_le_r_mte,
++              gen_helper_sve_st2ss_le_r_mte,
++              gen_helper_sve_st2dd_le_r_mte },
++            { gen_helper_sve_st3bb_r_mte,
++              gen_helper_sve_st3hh_le_r_mte,
++              gen_helper_sve_st3ss_le_r_mte,
++              gen_helper_sve_st3dd_le_r_mte },
++            { gen_helper_sve_st4bb_r_mte,
++              gen_helper_sve_st4hh_le_r_mte,
++              gen_helper_sve_st4ss_le_r_mte,
++              gen_helper_sve_st4dd_le_r_mte } },
++          { { gen_helper_sve_st2bb_r_mte,
++              gen_helper_sve_st2hh_be_r_mte,
++              gen_helper_sve_st2ss_be_r_mte,
++              gen_helper_sve_st2dd_be_r_mte },
++            { gen_helper_sve_st3bb_r_mte,
++              gen_helper_sve_st3hh_be_r_mte,
++              gen_helper_sve_st3ss_be_r_mte,
++              gen_helper_sve_st3dd_be_r_mte },
++            { gen_helper_sve_st4bb_r_mte,
++              gen_helper_sve_st4hh_be_r_mte,
++              gen_helper_sve_st4ss_be_r_mte,
++              gen_helper_sve_st4dd_be_r_mte } } },
+     };
+     gen_helper_gvec_mem *fn;
+     int be = s->be_data == MO_BE;
+ 
+     if (nreg == 0) {
+         /* ST1 */
+-        fn = fn_single[be][msz][esz];
++        fn = fn_single[s->mte_active[0]][be][msz][esz];
++        nreg = 1;
+     } else {
+         /* ST2, ST3, ST4 -- msz == esz, enforced by encoding */
+         assert(msz == esz);
+-        fn = fn_multiple[be][nreg - 1][msz];
++        fn = fn_multiple[s->mte_active[0]][be][nreg - 1][msz];
+     }
+     assert(fn != NULL);
+-    do_mem_zpa(s, zt, pg, addr, msz_dtype(s, msz), 0, true, fn);
++    do_mem_zpa(s, zt, pg, addr, msz_dtype(s, msz), nreg, true, fn);
+ }
+ 
+ static bool trans_ST_zprr(DisasContext *s, arg_rprr_store *a)
 -- 
-Niek Linnenbank
+2.20.1
 
---0000000000009195a605a0add438
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Mar 12, 2020 at 5:22 PM Peter=
- Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lina=
-ro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">On Wed, 11 Mar 2020 at 22:19, Niek Linnenbank &lt;<a href=3D"mailto:n=
-ieklinnenbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;=
- wrote:<br>
-&gt;<br>
-&gt; Dear QEMU developers,<br>
-&gt;<br>
-&gt; Hereby I would like to contribute the following set of patches to QEMU=
-<br>
-&gt; which add support for the Allwinner H3 System on Chip and the<br>
-&gt; Orange Pi PC machine. The following features and devices are supported=
-:<br>
-&gt;<br>
-&gt;=C2=A0 * SMP (Quad Core Cortex A7)<br>
-&gt;=C2=A0 * Generic Interrupt Controller configuration<br>
-&gt;=C2=A0 * SRAM mappings<br>
-&gt;=C2=A0 * SDRAM controller<br>
-&gt;=C2=A0 * Real Time Clock<br>
-&gt;=C2=A0 * Timer device (re-used from Allwinner A10)<br>
-&gt;=C2=A0 * UART<br>
-&gt;=C2=A0 * SD/MMC storage controller<br>
-&gt;=C2=A0 * EMAC ethernet<br>
-&gt;=C2=A0 * USB 2.0 interfaces<br>
-&gt;=C2=A0 * Clock Control Unit<br>
-&gt;=C2=A0 * System Control module<br>
-&gt;=C2=A0 * Security Identifier device<br>
-<br>
-<br>
-<br>
-Applied to target-arm.next, thanks. </blockquote><div><br></div><div>Great =
-news! And thanks for your support as well Peter!<br></div><div>=C2=A0</div>=
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left:1px solid rgb(204,204,204);padding-left:1ex">(I moved<br>
-the doc into the its new location now that the split-out<br>
-of the arm board docs into separate files has landed.)<br>
-<br></blockquote><div>Yeah sure, indeed, that makes sense.</div><div><br></=
-div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
-gb(204,204,204);padding-left:1ex">
--- PMM<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---0000000000009195a605a0add438--
 
