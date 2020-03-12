@@ -2,97 +2,94 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2F5C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67F3C1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:15:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4BA02067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 922532067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:15:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Hbbyynu8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4BA02067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTSJGA64"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 922532067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRPi-0003o4-UJ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37090)
+	id 1jCRQM-0006qP-Ng
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:15:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40539)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4r-0003A3-P3
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:58 -0400
+ (envelope-from <mst@redhat.com>) id 1jCRLg-0000pz-F0
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:10:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jCR4p-0000ho-HZ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:56 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60490)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jCR4p-0000gG-9M
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:55 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGnL9Y189371;
- Thu, 12 Mar 2020 16:52:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=CJX0wXT6ama/s82l6lvlfrAh3F5DjKdESQjYU/CyJcw=;
- b=Hbbyynu8qKEcec9GYy7KC0QukP1j0jiZ2Qjc2/vz0cA6UbdizFUgtDAv7/dP6WKqQsID
- WrrK3MHx/NR3iHOLS82B2cvXog6vOMDNGHYS1LVD2q2hlWcbJrgZGlZEWdJmqxdPmyxb
- U0rIejbazFPtKjn3CEY/hHyoH4Upnx0aunI69qjney6KYh2vIV/TxZnQECs0ZIDXXQ5a
- ivBJ6+xlQhcNtzHPQ1LhMXrAhmqhziBkhtwmGNJC7HxD0etj4ONTDo/SDYv5Ayp6iWnz
- iVA52288cv2pMo2R3znLTguvZbGz+vPFurAh5bhe/a65YqDU/c/8PJrnY198UJ5zz1Hy QA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2yqkg8a03u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:53 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CGnKVe003220;
- Thu, 12 Mar 2020 16:52:52 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2yp8p7yqrg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:52:52 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CGqpn6032412;
- Thu, 12 Mar 2020 16:52:51 GMT
-Received: from spark.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 12 Mar 2020 09:52:50 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 11/16] hw/i386/vmport: Add support for CMD_GETTIMEFULL
-Date: Thu, 12 Mar 2020 18:54:26 +0200
-Message-Id: <20200312165431.82118-12-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200312165431.82118-1-liran.alon@oracle.com>
-References: <20200312165431.82118-1-liran.alon@oracle.com>
+ (envelope-from <mst@redhat.com>) id 1jCRLd-0003L5-VR
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:10:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26300
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCRLd-0003KO-Oj
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:10:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584033017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RgtMrHAQ/+GbDZ2xzfbDPaO4QwWBRFdbKyUO6d2H7+g=;
+ b=LTSJGA643OY05nFWvudjjr1nOf3J1wVyG/AdPEIJRzMUKt51SjuqWHtpSPUXDRk82QYxMo
+ DCH8Zjf6OsdqP9mG+Zy5psfMpJELrL0cmyWS8lw2CvJjGowLkf4DC6kGgXElJXIkz4nC86
+ RO/AXaWOO74RNMtav/cAIvqMKlZr7nQ=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-FUMsz8AtOG6P9CYiyTElTA-1; Thu, 12 Mar 2020 13:09:59 -0400
+X-MC-Unique: FUMsz8AtOG6P9CYiyTElTA-1
+Received: by mail-qt1-f200.google.com with SMTP id e21so4357656qts.14
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 10:09:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Lo0yrIzPvCEzlDM2nQC+VsthWiHMcCUQf5ZgpSXcgD8=;
+ b=T56LCAeR+KU2QJb3p0MPNiAj1al7ur9TTMNgVJexPKJauutBySZTdSttcEKiItXcTT
+ WcgpBy+pCBWtbTOxf/YTQ1Z+9+wCmP9JlkhaUdyLH3T0KR6wImEUay/pEEwuZ9iayOti
+ A1AOj3ceHHTaRjvpMIIATjEHVtQd2TtbomQLPDgM3fCRJTfWin5bUtrv3G0PGp35HplS
+ qMr3sHGImg0B+pGEvprmlFiQx3MEs4RRlaY820vjq3gsmWIG4sGps5na3pPNA/YAqKez
+ maJFQkb/5LRlzkoNDiVbWuloASIkYWyZfqy3rPuT79NfrBnVKSGDDs8iYCK/kNq5iXS4
+ JQag==
+X-Gm-Message-State: ANhLgQ1VsCCt/WQU/wLAFRPJcS1yr2tSOrNuAqCbq29RaYQYJBn7eZFK
+ mPNOiNYAooZ9wiSjMbZcyCICCkhCT+iYzb6nv0eHtSCmSQClm+CuSYTx4dPttVXzaXQNy8p4ZoN
+ lMxKOBHygqm0b0X8=
+X-Received: by 2002:ac8:3148:: with SMTP id h8mr8368931qtb.341.1584032998701; 
+ Thu, 12 Mar 2020 10:09:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsNHOoJivFILMwo7z83jxE6vAL7sf5bw6uO/2qbEA8jxAWsdXaLYSlN/ldycjQxw1C7g393kg==
+X-Received: by 2002:ac8:3148:: with SMTP id h8mr8368891qtb.341.1584032998244; 
+ Thu, 12 Mar 2020 10:09:58 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id h24sm20742633qkk.3.2020.03.12.10.09.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 10:09:56 -0700 (PDT)
+Date: Thu, 12 Mar 2020 13:09:51 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <20200312130854-mutt-send-email-mst@kernel.org>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200312172745.1b7b2222@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=1 mlxlogscore=884
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120085
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
- lowpriorityscore=0
- mlxlogscore=930 spamscore=0 phishscore=0 adultscore=0 impostorscore=0
- malwarescore=0 priorityscore=1501 suspectscore=1 bulkscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120085
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+In-Reply-To: <20200312172745.1b7b2222@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,71 +101,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, Liran Alon <liran.alon@oracle.com>,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Liran Alon <liran.alon@oracle.com>, Elad Gabay <elad.gabay@oracle.com>,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similar to CMD_GETTIME but lacks the 136-year overflow issue,
-by returning full 64-bit of host uSeconds.
+On Thu, Mar 12, 2020 at 05:27:45PM +0100, Igor Mammedov wrote:
+> On Wed, 11 Mar 2020 19:08:26 +0200
+> Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+> > From: Elad Gabay <elad.gabay@oracle.com>
+> >=20
+> > Microsoft introduced this ACPI table to avoid Windows guests performing
+> > various workarounds for device erratas. As the virtual device emulated
+> > by VMM may not have the errata.
+> >=20
+> > Currently, WAET allows hypervisor to inform guest about two
+> > specific behaviors: One for RTC and the other for ACPI PM Timer.
+> >=20
+> > Support for WAET have been introduced since Windows Vista. This ACPI
+> > table is also exposed by other hypervisors, such as VMware, by default.
+> >=20
+> > This patch adds WAET ACPI Table to QEMU. It also makes sure to introduc=
+e
+> > the new ACPI table only for new machine-types.
+>=20
+> in addition to comments made by Michael ...
+>=20
+> >=20
+> > Signed-off-by: Elad Gabay <elad.gabay@oracle.com>
+> > Co-developed-by: Liran Alon <liran.alon@oracle.com>
+> > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > ---
+> >  hw/i386/acpi-build.c        | 18 ++++++++++++++++++
+> >  hw/i386/pc_piix.c           |  2 ++
+> >  hw/i386/pc_q35.c            |  2 ++
+> >  include/hw/acpi/acpi-defs.h | 25 +++++++++++++++++++++++++
+> >  include/hw/i386/pc.h        |  1 +
+> >  5 files changed, 48 insertions(+)
+> >=20
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 9c4e46fa7466..29f70741cd96 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -2512,6 +2512,19 @@ build_dmar_q35(GArray *table_data, BIOSLinker *l=
+inker)
+> >      build_header(linker, table_data, (void *)(table_data->data + dmar_=
+start),
+> >                   "DMAR", table_data->len - dmar_start, 1, NULL, NULL);
+> >  }
+> > +
+> > +static void
+> > +build_waet(GArray *table_data, BIOSLinker *linker)
+> see build_hmat_lb() for example how to doc comment for such function
+> should look like. Use earliest spec version where table was introduced.
+>=20
+> > +{
+> > +    AcpiTableWaet *waet;
+> > +
+> > +    waet =3D acpi_data_push(table_data, sizeof(*waet));
+> > +    waet->emulated_device_flags =3D cpu_to_le32(ACPI_WAET_PM_TIMER_GOO=
+D);
+>=20
+> we don't use packed structures for building ACPI tables anymore (there is
+> old code that still does but that's being converted when we touch it)
+>=20
+> pls use build_append_int_noprefix() api instead, see build_amd_iommu() as
+> an example how to build binary tables using it and how to use comments
+> to document fields.
+> Basic idea is that api makes function building a table match table's
+> description in spec (each call represents a row in spec) and comment
+> belonging to a row should contain verbatim field name as used by spec
+> so reader could copy/past and grep it easily.
 
-Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- hw/i386/vmport.c         | 17 +++++++++++++++++
- include/hw/i386/vmport.h |  1 +
- 2 files changed, 18 insertions(+)
 
-diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-index c5b659c59343..7e57eda4b526 100644
---- a/hw/i386/vmport.c
-+++ b/hw/i386/vmport.c
-@@ -183,6 +183,22 @@ static uint32_t vmport_cmd_time(void *opaque, uint32_t addr)
-     return (uint32_t)tv.tv_sec;
- }
- 
-+static uint32_t vmport_cmd_time_full(void *opaque, uint32_t addr)
-+{
-+    X86CPU *cpu = X86_CPU(current_cpu);
-+    qemu_timeval tv;
-+
-+    if (qemu_gettimeofday(&tv) < 0) {
-+        return UINT32_MAX;
-+    }
-+
-+    cpu->env.regs[R_ESI] = (uint32_t)((uint64_t)tv.tv_sec >> 32);
-+    cpu->env.regs[R_EDX] = (uint32_t)tv.tv_sec;
-+    cpu->env.regs[R_EBX] = (uint32_t)tv.tv_usec;
-+    cpu->env.regs[R_ECX] = port_state->max_time_lag_us;
-+    return VMPORT_MAGIC;
-+}
-+
- /* vmmouse helpers */
- void vmmouse_get_data(uint32_t *data)
- {
-@@ -230,6 +246,7 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
-     if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
-         vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid, NULL);
-         vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
-+        vmport_register(VMPORT_CMD_GETTIMEFULL, vmport_cmd_time_full, NULL);
-     }
- }
- 
-diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
-index 50416c8c8f3e..5d19963ed417 100644
---- a/include/hw/i386/vmport.h
-+++ b/include/hw/i386/vmport.h
-@@ -12,6 +12,7 @@ typedef enum {
-     VMPORT_CMD_VMMOUSE_DATA     = 39,
-     VMPORT_CMD_VMMOUSE_STATUS   = 40,
-     VMPORT_CMD_VMMOUSE_COMMAND  = 41,
-+    VMPORT_CMD_GETTIMEFULL      = 46,
-     VMPORT_ENTRIES
- } VMPortCommand;
- 
--- 
-2.20.1
+BTW how about a better name for this function?
+
+>=20
+>=20
+>=20
+> > +
+> > +    build_header(linker, table_data,
+> > +                 (void *)waet, "WAET", sizeof(*waet), 1, NULL, NULL);
+> > +}
+> > +
+> >  /*
+> >   *   IVRS table as specified in AMD IOMMU Specification v2.62, Section=
+ 5.2
+> >   *   accessible here http://support.amd.com/TechDocs/48882_IOMMU.pdf
+> > @@ -2859,6 +2872,11 @@ void acpi_build(AcpiBuildTables *tables, Machine=
+State *machine)
+> >                            machine->nvdimms_state, machine->ram_slots);
+> >      }
+> > =20
+> > +    if (!pcmc->do_not_add_waet_acpi) {
+> > +        acpi_add_table(table_offsets, tables_blob);
+> > +        build_waet(tables_blob, tables->linker);
+> > +    }
+>=20
+> we typically do not version ACPI table changes (there might be exceptions
+> but it should be a justified one).
+> ACPI tables are considered to be a part of firmware (even though they are
+> generated by QEMU) so on QEMU upgrade user gets a new firmware along with
+> new ACPI tables.
+>=20
+> > +
+> >      /* Add tables supplied by user (if any) */
+> >      for (u =3D acpi_table_first(); u; u =3D acpi_table_next(u)) {
+> >          unsigned len =3D acpi_table_len(u);
+> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> > index 9088db8fb601..2d11a8b50a9c 100644
+> > --- a/hw/i386/pc_piix.c
+> > +++ b/hw/i386/pc_piix.c
+> > @@ -432,9 +432,11 @@ DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
+> > =20
+> >  static void pc_i440fx_4_2_machine_options(MachineClass *m)
+> >  {
+> > +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> >      pc_i440fx_5_0_machine_options(m);
+> >      m->alias =3D NULL;
+> >      m->is_default =3D false;
+> > +    pcmc->do_not_add_waet_acpi =3D true;
+> >      compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len=
+);
+> >      compat_props_add(m->compat_props, pc_compat_4_2, pc_compat_4_2_len=
+);
+> >  }
+> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> > index 84cf925cf43a..1e0a726b27a7 100644
+> > --- a/hw/i386/pc_q35.c
+> > +++ b/hw/i386/pc_q35.c
+> > @@ -361,8 +361,10 @@ DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+> > =20
+> >  static void pc_q35_4_2_machine_options(MachineClass *m)
+> >  {
+> > +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> >      pc_q35_5_0_machine_options(m);
+> >      m->alias =3D NULL;
+> > +    pcmc->do_not_add_waet_acpi =3D true;
+> >      compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len=
+);
+> >      compat_props_add(m->compat_props, pc_compat_4_2, pc_compat_4_2_len=
+);
+> >  }
+> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > index 57a3f58b0c9a..803c904471d5 100644
+> > --- a/include/hw/acpi/acpi-defs.h
+> > +++ b/include/hw/acpi/acpi-defs.h
+> > @@ -634,4 +634,29 @@ struct AcpiIortRC {
+> >  } QEMU_PACKED;
+> >  typedef struct AcpiIortRC AcpiIortRC;
+> > =20
+> > +/*
+> > + * Windows ACPI Emulated Devices Table.
+> > + * Specification:
+> > + * http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470B-A97=
+E-CE7CE0D98DC2/WAET.docx
+> > + */
+> > +
+> > +/*
+> > + * Indicates whether the RTC has been enhanced not to require acknowle=
+dgment
+> > + * after it asserts an interrupt. With this bit set, an interrupt hand=
+ler can
+> > + * bypass reading the RTC register C to unlatch the pending interrupt.
+> > + */
+> > +#define ACPI_WAET_RTC_GOOD      (1 << 0)
+> > +/*
+> > + * Indicates whether the ACPI PM timer has been enhanced not to requir=
+e
+> > + * multiple reads. With this bit set, only one read of the ACPI PM tim=
+er is
+> > + * necessary to obtain a reliable value.
+> > + */
+> > +#define ACPI_WAET_PM_TIMER_GOOD (1 << 1)
+> > +
+> > +struct AcpiTableWaet {
+> > +    ACPI_TABLE_HEADER_DEF
+> > +    uint32_t emulated_device_flags;
+> > +} QEMU_PACKED;
+> > +typedef struct AcpiTableWaet AcpiTableWaet;
+> > +
+> >  #endif
+> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> > index 60c988c4a5aa..f1f64e8f45c8 100644
+> > --- a/include/hw/i386/pc.h
+> > +++ b/include/hw/i386/pc.h
+> > @@ -100,6 +100,7 @@ typedef struct PCMachineClass {
+> >      int legacy_acpi_table_size;
+> >      unsigned acpi_data_size;
+> >      bool do_not_add_smb_acpi;
+> > +    bool do_not_add_waet_acpi;
+> > =20
+> >      /* SMBIOS compat: */
+> >      bool smbios_defaults;
 
 
