@@ -2,87 +2,86 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DC2C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67710C1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D318E206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 335FB206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:48:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wTUQYuIs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D318E206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fsXSJ/vt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 335FB206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR0Q-0005dc-V3
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:48:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35593)
+	id 1jCR0X-0005xw-9O
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:48:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxL-0008D8-Un
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:14 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxR-0008LW-8l
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxK-00051L-Fu
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:11 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:37614)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxQ-00057c-0H
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:17 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34880)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxK-000514-9E
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:10 -0400
-Received: by mail-wr1-x431.google.com with SMTP id 6so8367864wre.4
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:10 -0700 (PDT)
+ id 1jCQxP-000572-P7
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:15 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d5so8026708wrc.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=/PWbtf8pRZrw4wwB/2VhUgWYgstVtgiipMKB/g1At8o=;
- b=wTUQYuIsqAntuMi3uFoT0i1uV16vdE67N+C7rFUP0l5Inb/a7EEdVX/uLQp3YOZU9M
- 2BlDpMIR6Y+jW27o0bOzeXL9N2vMzHIA/L3iyKEJDtl6ywKsFXKEIaoOlKxnkSY6QENi
- K57dCfYxP4Exbz6Ize/BZhKVa8D6OodJ0VDExq0D30ehooxIvA6afBx7ffq/zVNpvsBt
- e9WBkiUi72ECFYXZDyragU1ObPMVGpgvohLnHUNFGxW4w8v0Jg+a4UMk1b8gqLoGFnU4
- hZYx/CecBnFFDX4QM6tcndCAnHb+jreBUaAMUkVdCAlJhea88RxgNfdMoKszkDSd5K/G
- PGjg==
+ bh=Ubre2v1uHL3eoMEypp4g/yeKbGebypuneeqbWFZfkPA=;
+ b=fsXSJ/vtvTK6AA6hJsCSFGo9dRmDrLSwm2qQeXKggynijD99UcyRZwg7WmT4p89N3D
+ hlBlZQ7P910gY6+gmqp5eWzSydQnx7Af3lbnP6Q4MOfNkktGivRcIQSaK9ToWWnxA60a
+ TxU5eAd9hqOQi1adY/MyUUHYWobwDz9RTK9OphLFo6cTN7HqmbM62fT9MSBNeu1fwGEp
+ Qje1tbIfndADn9mPJ8ZHogppXGpWyiVaT2TeWWsEP2w0CigFlrSYikxGyR+6HyVtGoxJ
+ JkOej5Nq5cVfIeZrC3VIKfNKgX0N80QXMLpFIDazMeDE+nhcxSJZrQhf6y/Foq3DYUDU
+ CV4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/PWbtf8pRZrw4wwB/2VhUgWYgstVtgiipMKB/g1At8o=;
- b=JNmasdyKK/xuZ/CjlIWUdmX0qKVx7HapUmNVUAw/c2wvDDMF5SFu4KHtdrJ43tnu2s
- 2ZmAGFgPcTI7D6c06sQnzGCUgqdkDZdHPHpCfSdqjaJCk2dU0K+AAlMJSpFVDizn4/jw
- lJB+GhN5hnVdEW/BgHGbKpg2oOL3V966AjfGnLZQe9uSK0rNw4faCdKn9UsiZti1g7Oh
- +kMH2Elc80SRK3ziDDEr3pYN2foRM2lx5NaarHCIBz6gX3LLM3X8eBcgKIJj2dhNIpU0
- pddxwxFw7w0W4+++upEoRqnLyLH1RIRzXc7m17rToFW/Xwyu9911EiLzhBEar3dhRvSo
- fBIg==
-X-Gm-Message-State: ANhLgQ3uZ4uw/f0YOhZI1mlCWVhaNylmoAcceimnRXl8gmQdQVoMIkn0
- eWWqUc0xMqrJVA2JOVV/XT1624Hh4g0f7g==
-X-Google-Smtp-Source: ADFU+vtiCaUOGSg9m15kyJ+XTSoCxa5v8TsSGZTe7ivRcoGHE9U+DnjPSp2fRMj7cH5gNQf4vtvwfg==
-X-Received: by 2002:adf:b19d:: with SMTP id q29mr11745218wra.211.1584031508962; 
- Thu, 12 Mar 2020 09:45:08 -0700 (PDT)
+ bh=Ubre2v1uHL3eoMEypp4g/yeKbGebypuneeqbWFZfkPA=;
+ b=fb9xnBCEimrhiDN3RqzmkpvsPKvrd71L2y3kwY1WETiuOgmDmUesT3+vbVYSddrmK9
+ Lpm+rcTPHsWxaTn6PNBMKUiOlA/qdVKymI6OqfkCQwlDYGAWeL9RercVCjU9gH3AydEH
+ ArbzT8M6DWcBzbnW9GRU9qeUxSTsnSyGkr6ysO0fVUj6LvqhPCYNNA8VZAiv3QGPXMrW
+ bxEMqd26YQpKZ5ulYF5+TwtC/Yzig96HM+fkVZodH/xdbiaTKjJMwN+71+cBEze6Bk0S
+ IvzTXk8rzpp9VjTuZZ8qbymSNnUgGHMGw52EBu3fQ7kAY0Mi2yOzPD9ep0YCzOlHTzL6
+ Hf8A==
+X-Gm-Message-State: ANhLgQ3mOFfSJTPmbt024LC6x+s6dyt5aOcvATASaUDBwi27FFnL/nYf
+ DzF8tSrInUDiAu6Rp8arQPAJYk10bF+17A==
+X-Google-Smtp-Source: ADFU+vvW1JtIPMVO3cZqLBhulLpT5u5eaprS/e33cv5CBubkEpI2uOhvChkiYnK/ocYTGiOTeUh6YA==
+X-Received: by 2002:adf:f94f:: with SMTP id q15mr11743394wrr.65.1584031514350; 
+ Thu, 12 Mar 2020 09:45:14 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.07
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.13
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:08 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:13 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/36] aspeed/smc: Fix User mode select/unselect scheme
-Date: Thu, 12 Mar 2020 16:44:29 +0000
-Message-Id: <20200312164459.25924-7-peter.maydell@linaro.org>
+Subject: [PULL 11/36] hw/arm/fsl-imx25: Wire up USB controllers
+Date: Thu, 12 Mar 2020 16:44:34 +0000
+Message-Id: <20200312164459.25924-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,118 +97,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Guenter Roeck <linux@roeck-us.net>
 
-The Aspeed SMC Controller can operate in different modes : Read, Fast
-Read, Write and User modes. When the User mode is configured, it
-selects automatically the SPI slave device until the CE_STOP_ACTIVE
-bit is set to 1. When any other modes are configured the device is
-unselected. The HW logic handles the chip select automatically when
-the flash is accessed through its AHB window.
+i.MX25 supports two USB controllers. Let's wire them up.
 
-When configuring the CEx Control Register, the User mode logic to
-select and unselect the slave is incorrect and data corruption can be
-seen on machines using two chips, witherspoon and romulus.
+With this patch, imx25-pdk can boot from both USB ports.
 
-Rework the handler setting the CEx Control Register to fix this issue.
-
-Fixes: 7c1c69bca43c ("ast2400: add SMC controllers (FMC and SPI)")
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-Message-id: 20200206112645.21275-3-clg@kaod.org
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200310215146.19688-3-linux@roeck-us.net
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/aspeed_smc.c | 39 +++++++++++++++++++++++----------------
- hw/ssi/trace-events |  1 +
- 2 files changed, 24 insertions(+), 16 deletions(-)
+ include/hw/arm/fsl-imx25.h |  9 +++++++++
+ hw/arm/fsl-imx25.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index e5621bf728c..32be2a02b0e 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -639,27 +639,23 @@ static inline int aspeed_smc_flash_is_4byte(const AspeedSMCFlash *fl)
+diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
+index 4e2d4868cda..5e196bbf059 100644
+--- a/include/hw/arm/fsl-imx25.h
++++ b/include/hw/arm/fsl-imx25.h
+@@ -28,6 +28,7 @@
+ #include "hw/i2c/imx_i2c.h"
+ #include "hw/gpio/imx_gpio.h"
+ #include "hw/sd/sdhci.h"
++#include "hw/usb/chipidea.h"
+ #include "exec/memory.h"
+ #include "target/arm/cpu.h"
+ 
+@@ -40,6 +41,7 @@
+ #define FSL_IMX25_NUM_I2CS 3
+ #define FSL_IMX25_NUM_GPIOS 4
+ #define FSL_IMX25_NUM_ESDHCS 2
++#define FSL_IMX25_NUM_USBS 2
+ 
+ typedef struct FslIMX25State {
+     /*< private >*/
+@@ -57,6 +59,7 @@ typedef struct FslIMX25State {
+     IMXI2CState    i2c[FSL_IMX25_NUM_I2CS];
+     IMXGPIOState   gpio[FSL_IMX25_NUM_GPIOS];
+     SDHCIState     esdhc[FSL_IMX25_NUM_ESDHCS];
++    ChipideaState  usb[FSL_IMX25_NUM_USBS];
+     MemoryRegion   rom[2];
+     MemoryRegion   iram;
+     MemoryRegion   iram_alias;
+@@ -226,6 +229,10 @@ typedef struct FslIMX25State {
+ #define FSL_IMX25_GPIO1_SIZE    0x4000
+ #define FSL_IMX25_GPIO2_ADDR    0x53FD0000
+ #define FSL_IMX25_GPIO2_SIZE    0x4000
++#define FSL_IMX25_USB1_ADDR     0x53FF4000
++#define FSL_IMX25_USB1_SIZE     0x0200
++#define FSL_IMX25_USB2_ADDR     0x53FF4400
++#define FSL_IMX25_USB2_SIZE     0x0200
+ #define FSL_IMX25_AVIC_ADDR     0x68000000
+ #define FSL_IMX25_AVIC_SIZE     0x4000
+ #define FSL_IMX25_IRAM_ADDR     0x78000000
+@@ -259,5 +266,7 @@ typedef struct FslIMX25State {
+ #define FSL_IMX25_GPIO4_IRQ     23
+ #define FSL_IMX25_ESDHC1_IRQ    9
+ #define FSL_IMX25_ESDHC2_IRQ    8
++#define FSL_IMX25_USB1_IRQ      37
++#define FSL_IMX25_USB2_IRQ      35
+ 
+ #endif /* FSL_IMX25_H */
+diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
+index f977c42426b..a3f829f4366 100644
+--- a/hw/arm/fsl-imx25.c
++++ b/hw/arm/fsl-imx25.c
+@@ -81,6 +81,12 @@ static void fsl_imx25_init(Object *obj)
+         sysbus_init_child_obj(obj, "sdhc[*]", &s->esdhc[i], sizeof(s->esdhc[i]),
+                               TYPE_IMX_USDHC);
      }
- }
- 
--static inline bool aspeed_smc_is_ce_stop_active(const AspeedSMCFlash *fl)
-+static void aspeed_smc_flash_do_select(AspeedSMCFlash *fl, bool unselect)
- {
--    const AspeedSMCState *s = fl->controller;
-+    AspeedSMCState *s = fl->controller;
- 
--    return s->regs[s->r_ctrl0 + fl->id] & CTRL_CE_STOP_ACTIVE;
-+    trace_aspeed_smc_flash_select(fl->id, unselect ? "un" : "");
 +
-+    qemu_set_irq(s->cs_lines[fl->id], unselect);
- }
- 
- static void aspeed_smc_flash_select(AspeedSMCFlash *fl)
- {
--    AspeedSMCState *s = fl->controller;
--
--    s->regs[s->r_ctrl0 + fl->id] &= ~CTRL_CE_STOP_ACTIVE;
--    qemu_set_irq(s->cs_lines[fl->id], aspeed_smc_is_ce_stop_active(fl));
-+    aspeed_smc_flash_do_select(fl, false);
- }
- 
- static void aspeed_smc_flash_unselect(AspeedSMCFlash *fl)
- {
--    AspeedSMCState *s = fl->controller;
--
--    s->regs[s->r_ctrl0 + fl->id] |= CTRL_CE_STOP_ACTIVE;
--    qemu_set_irq(s->cs_lines[fl->id], aspeed_smc_is_ce_stop_active(fl));
-+    aspeed_smc_flash_do_select(fl, true);
- }
- 
- static uint32_t aspeed_smc_check_segment_addr(const AspeedSMCFlash *fl,
-@@ -911,13 +907,25 @@ static const MemoryRegionOps aspeed_smc_flash_ops = {
-     },
- };
- 
--static void aspeed_smc_flash_update_cs(AspeedSMCFlash *fl)
-+static void aspeed_smc_flash_update_ctrl(AspeedSMCFlash *fl, uint32_t value)
- {
-     AspeedSMCState *s = fl->controller;
-+    bool unselect;
- 
--    s->snoop_index = aspeed_smc_is_ce_stop_active(fl) ? SNOOP_OFF : SNOOP_START;
-+    /* User mode selects the CS, other modes unselect */
-+    unselect = (value & CTRL_CMD_MODE_MASK) != CTRL_USERMODE;
- 
--    qemu_set_irq(s->cs_lines[fl->id], aspeed_smc_is_ce_stop_active(fl));
-+    /* A change of CTRL_CE_STOP_ACTIVE from 0 to 1, unselects the CS */
-+    if (!(s->regs[s->r_ctrl0 + fl->id] & CTRL_CE_STOP_ACTIVE) &&
-+        value & CTRL_CE_STOP_ACTIVE) {
-+        unselect = true;
++    for (i = 0; i < FSL_IMX25_NUM_USBS; i++) {
++        sysbus_init_child_obj(obj, "usb[*]", &s->usb[i], sizeof(s->usb[i]),
++                              TYPE_CHIPIDEA);
 +    }
 +
-+    s->regs[s->r_ctrl0 + fl->id] = value;
-+
-+    s->snoop_index = unselect ? SNOOP_OFF : SNOOP_START;
-+
-+    aspeed_smc_flash_do_select(fl, unselect);
  }
  
- static void aspeed_smc_reset(DeviceState *d)
-@@ -1249,8 +1257,7 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
-         s->regs[addr] = value;
-     } else if (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->num_cs) {
-         int cs = addr - s->r_ctrl0;
--        s->regs[addr] = value;
--        aspeed_smc_flash_update_cs(&s->flashes[cs]);
-+        aspeed_smc_flash_update_ctrl(&s->flashes[cs], value);
-     } else if (addr >= R_SEG_ADDR0 &&
-                addr < R_SEG_ADDR0 + s->ctrl->max_slaves) {
-         int cs = addr - R_SEG_ADDR0;
-diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
-index ffe531a500a..0a70629801a 100644
---- a/hw/ssi/trace-events
-+++ b/hw/ssi/trace-events
-@@ -7,3 +7,4 @@ aspeed_smc_flash_write(int cs, uint64_t addr,  uint32_t size, uint64_t data, int
- aspeed_smc_read(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
- aspeed_smc_dma_checksum(uint32_t addr, uint32_t data) "0x%08x: 0x%08x"
- aspeed_smc_write(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRIx64 " size %u: 0x%" PRIx64
-+aspeed_smc_flash_select(int cs, const char *prefix) "CS%d %sselect"
+ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+@@ -278,6 +284,24 @@ static void fsl_imx25_realize(DeviceState *dev, Error **errp)
+                                             esdhc_table[i].irq));
+     }
+ 
++    /* USB */
++    for (i = 0; i < FSL_IMX25_NUM_USBS; i++) {
++        static const struct {
++            hwaddr addr;
++            unsigned int irq;
++        } usb_table[FSL_IMX25_NUM_USBS] = {
++            { FSL_IMX25_USB1_ADDR, FSL_IMX25_USB1_IRQ },
++            { FSL_IMX25_USB2_ADDR, FSL_IMX25_USB2_IRQ },
++        };
++
++        object_property_set_bool(OBJECT(&s->usb[i]), true, "realized",
++                                 &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usb[i]), 0, usb_table[i].addr);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->usb[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->avic),
++                                            usb_table[i].irq));
++    }
++
+     /* initialize 2 x 16 KB ROM */
+     memory_region_init_rom(&s->rom[0], NULL,
+                            "imx25.rom0", FSL_IMX25_ROM0_SIZE, &err);
 -- 
 2.20.1
 
