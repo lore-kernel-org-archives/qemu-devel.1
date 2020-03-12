@@ -2,86 +2,58 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F78C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F209C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:20:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 012562067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:20:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n2GlV9qa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012562067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5C38B2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:20:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C38B2067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRVR-00012m-61
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37686)
+	id 1jCRVa-0001F1-DB
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:20:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37847)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jCR8o-0005L4-OZ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:57:03 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRA3-0008If-Qr
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:58:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jCR8n-0004WM-OW
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:57:02 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34039)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jCR8l-0004Rg-CY; Thu, 12 Mar 2020 12:56:59 -0400
-Received: by mail-pg1-x541.google.com with SMTP id t3so3358207pgn.1;
- Thu, 12 Mar 2020 09:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=R1Klp5VmAGtpJcR4uZfnLflfD0zf1gm8bN8uDrXOuqw=;
- b=n2GlV9qaxcgxAWMqLiIAArXZ7T8pEEua/Q1vbXXt3GGW03JhWe2miqdzBtUKzZ0IvT
- e9Ca2xCAuq+Zclf2zA5gaFjm4Sq3Tun54zSVGei94jDUPoULUCW3JLyOhCi67Pjr+JTz
- VPY8C8G03QyboWBtG7fkmolFmycRTbXKQowD8WtzWrkmuaUZFnottGfo2HVqiidygAJh
- fNN0cyWUaHDbQHzlnOppNy4elBEdH1t4dnH9EvCLDkBfAKR3IjVi9glZe+J5feZRh130
- sZ6DFRLLE2+NiCGVAt9DZFZQo/5x793638F/vBQ4AoiYoC6BhvjufSxhaKzdwOBl5ktx
- zSjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=R1Klp5VmAGtpJcR4uZfnLflfD0zf1gm8bN8uDrXOuqw=;
- b=kh+eaIdMRL3xw9AgEQKqiO+YQ8VePlw+37UJDDqQr+vYZnS8zxd6B6McRND3pKOt6H
- K1c82dEFVP5U+KS6rG73vDODbA5hIhat9OpOvmPXri/ivxZL7lal5E0o9W5t/OlXih8i
- YUwSSitgHKlondwSw2OOBv0nIXvBUSnZ1ALLU1GteOJ7DdGjg486YjtvxkEBbkUxCgEO
- 80BxVDX2lm03udC9uTjTgX8mXxsI9xCQ/fHInTPM1NVRQrfEzADyfMNfq0CLK8WXK74a
- pQ5OzS8mtvL3LkbCeYMi8twGc/LaW8g1xRNsmbm+s2d2nm7VJBFA4Rk0EQC0SuDENYyC
- S+TQ==
-X-Gm-Message-State: ANhLgQ11s+F5gH3hzalsoR6MuqEfKOdzMPGSrDPmzZyxMYaDgedsBDwZ
- ytfSpAAVcrSan8U9vqLx6cHVN6OC
-X-Google-Smtp-Source: ADFU+vv02tgl7/1sLd3pv5R9SrZixC4bN6WNWciNKx+a90kIKIManiEmnIE9lUJDC4cQ3WUmsIbrOg==
-X-Received: by 2002:a63:e00c:: with SMTP id e12mr8766856pgh.354.1584032217640; 
- Thu, 12 Mar 2020 09:56:57 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id h132sm51332238pfe.118.2020.03.12.09.56.56
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 12 Mar 2020 09:56:57 -0700 (PDT)
-Date: Thu, 12 Mar 2020 09:56:56 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 3/3] hw/arm/fsl-imx6: Wire up USB controllers
-Message-ID: <20200312165656.GB16719@roeck-us.net>
-References: <20200310210434.31544-1-linux@roeck-us.net>
- <20200310210434.31544-4-linux@roeck-us.net>
- <CAFEAcA9itKNV6c07wm_4dJiGtHMLXCFt+A-W5xC5DX1Wxfu30w@mail.gmail.com>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRA1-0005k3-Hx
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:58:19 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43270)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCRA1-0005h2-2Q; Thu, 12 Mar 2020 12:58:17 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07819935|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.264572-6.6529e-05-0.735362;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-QLEgr_1584032291; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-QLEgr_1584032291)
+ by smtp.aliyun-inc.com(10.147.44.129);
+ Fri, 13 Mar 2020 00:58:12 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 59/60] target/riscv: vector compress instruction
+Date: Thu, 12 Mar 2020 22:58:59 +0800
+Message-Id: <20200312145900.2054-60-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9itKNV6c07wm_4dJiGtHMLXCFt+A-W5xC5DX1Wxfu30w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,45 +65,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 01:29:34PM +0000, Peter Maydell wrote:
-> On Tue, 10 Mar 2020 at 21:04, Guenter Roeck <linux@roeck-us.net> wrote:
-> >
-> > With this patch, the USB controllers on 'sabrelite' are detected
-> > and can be used to boot the system.
-> >
-> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> 
-> > +    for (i = 0; i < FSL_IMX6_NUM_USBS; i++) {
-> > +        static const int FSL_IMX6_USBn_IRQ[] = {
-> > +            FSL_IMX6_USB_OTG_IRQ,
-> > +            FSL_IMX6_USB_HOST1_IRQ,
-> > +            FSL_IMX6_USB_HOST2_IRQ,
-> > +            FSL_IMX6_USB_HOST3_IRQ,
-> > +        };
-> > +
-> > +        object_property_set_bool(OBJECT(&s->usbphy[i]), true, "realized",
-> > +                                 &error_abort);
-> > +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->usbphy[i]), 0,
-> > +                        FSL_IMX6_USBPHY1_ADDR + i * 0x1000);
-> 
-> Are you sure these addresses are right? Four of these starting
-> at USBPHY1_ADDR means the last one clashes with what we define
-> as "FSL_IMX6_SNVSHP_ADDR 0x020CC000".
-> 
-> I only have the i.MX 6Dual/6Quad reference manual to hand,
-> so maybe this imx6 variant is different, but that document
-> says there are 4 USB controllers but only 2 PHY blocks.
-> 
-Oops, I think you are correct. Good catch. I'll re-check the datsheet
-and send an updated patch.
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   |  5 +++++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 28 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 28 +++++++++++++++++++++++++
+ 4 files changed, 62 insertions(+)
 
-Thanks,
-Guenter
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index b9ec0a4efc..3e223ed7d7 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1146,3 +1146,8 @@ DEF_HELPER_6(vrgather_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vrgather_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vcompress_vm_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vcompress_vm_d, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index d92861a334..8eab175a74 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -569,6 +569,7 @@ vslide1down_vx  001111 . ..... ..... 110 ..... 1010111 @r_vm
+ vrgather_vv     001100 . ..... ..... 000 ..... 1010111 @r_vm
+ vrgather_vx     001100 . ..... ..... 100 ..... 1010111 @r_vm
+ vrgather_vi     001100 . ..... ..... 011 ..... 1010111 @r_vm
++vcompress_vm    010111 - ..... ..... 010 ..... 1010111 @r
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index f3b08919b9..b7959ad417 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2356,3 +2356,31 @@ static bool vrgather_vx_check(DisasContext *s, arg_rmrr *a)
+ }
+ GEN_OPIVX_TRANS(vrgather_vx, vrgather_vx_check)
+ GEN_OPIVI_TRANS(vrgather_vi, 1, vrgather_vx, vrgather_vx_check)
++
++/* Vector Compress Instruction */
++static bool vcompress_vm_check(DisasContext *s, arg_r *a)
++{
++    return (vext_check_isa_ill(s, RVV) &&
++            vext_check_reg(s, a->rd, false) &&
++            vext_check_reg(s, a->rs2, false) &&
++            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs1, 1) &&
++            (a->rd != a->rs2));
++}
++
++static bool trans_vcompress_vm(DisasContext *s, arg_r *a)
++{
++    if (vcompress_vm_check(s, a)) {
++        uint32_t data = 0;
++        static gen_helper_gvec_4_ptr * const fns[4] = {
++            gen_helper_vcompress_vm_b, gen_helper_vcompress_vm_h,
++            gen_helper_vcompress_vm_w, gen_helper_vcompress_vm_d,
++        };
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
++            vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),
++            cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 5788e46dcf..8ab68bcdd1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4715,3 +4715,31 @@ GEN_VEXT_VRGATHER_VX(vrgather_vx_b, uint8_t, H1, clearb)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_h, uint16_t, H2, clearh)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_w, uint32_t, H4, clearl)
+ GEN_VEXT_VRGATHER_VX(vrgather_vx_d, uint64_t, H8, clearq)
++
++/* Vector Compress Instruction */
++#define GEN_VEXT_VCOMPRESS_VM(NAME, ETYPE, H, CLEAR_FN)                   \
++void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
++        CPURISCVState *env, uint32_t desc)                                \
++{                                                                         \
++    uint32_t mlen = vext_mlen(desc);                                      \
++    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
++    uint32_t vl = env->vl;                                                \
++    uint32_t num = 0, i;                                                  \
++                                                                          \
++    for (i = 0; i < vl; i++) {                                            \
++        if (!vext_elem_mask(vs1, mlen, i)) {                              \
++            continue;                                                     \
++        }                                                                 \
++        *((ETYPE *)vd + H(num)) = *((ETYPE *)vs2 + H(i));                 \
++        num++;                                                            \
++    }                                                                     \
++    if (i == 0) {                                                         \
++        return;                                                           \
++    }                                                                     \
++    CLEAR_FN(vd, num, num * sizeof(ETYPE), vlmax * sizeof(ETYPE));        \
++}
++/* Compress into vd elements of vs2 where vs1 is enabled */
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_b, uint8_t, H1, clearb)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_h, uint16_t, H2, clearh)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_w, uint32_t, H4, clearl)
++GEN_VEXT_VCOMPRESS_VM(vcompress_vm_d, uint64_t, H8, clearq)
+-- 
+2.23.0
+
 
