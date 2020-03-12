@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0C9C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA369C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:45:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B9CE20637
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:45:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A958B20637
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:45:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ViHYVa2I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9CE20637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZjnJenYd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A958B20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTm4-0005Rs-7d
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:45:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45366)
+	id 1jCTm5-0005Vb-Q4
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:45:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTj8-0005Lh-4T
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTiw-0004oc-My
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTj6-0001zS-Vj
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:42 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54809)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTiv-0001kM-8i
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:30 -0400
+Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:36111)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTj6-0001xu-Pm
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:40 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id np16so2964216pjb.4
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:40 -0700 (PDT)
+ id 1jCTiv-0001jo-2h
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:29 -0400
+Received: by mail-pl1-x631.google.com with SMTP id g2so569031plo.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wN0TfHqfZivaapeBhs6fRX0f635NiC55vaX3XaH653M=;
- b=ViHYVa2IeF2adL4f3D4ETRqrlHVsziMQ7lV68vafRzNA2+lyX+m/bhOYsTKGAeVAHA
- bsxm7M/poAJu1lqEqXuChqSrsqeLqpX7PMcgcMNjg0RdiK9uJIqWT7ZyE13bb2B900v6
- TAurQKqQicROPyOkVxxQAn9wP6mnR1qV8zXhwhWBti1kdDfBLb3r3rRJj7xZLcVXHfed
- 9KLyAWFXcbwMsOKYXWMPfh8XdbK9t+WOFZwcIK8mkBsEydJoXn3eQHg9uHVbwzxAkelr
- a+DeCQF4BDR4G0SgFjTfW19BdUeNJwzdlM80R2JDmaIfK1UbETWpuaNVcjJEtv2RdGYa
- i04w==
+ bh=/pGqR0ZT/lu7yV5pm4MglVp61s4Mp3dEdpOqchZImpI=;
+ b=ZjnJenYdXVG6ygE/hvwGUgJolEbNN7rTg4fkKZlbbgupjYkXXQpCk5HCZaC/BRndAg
+ Sb2EC7oePEBHntT7+/ntA22H6yJ8EdKr79Qw4nUcT/O1YaVEE4UTIBRFNbekNmnDYJKl
+ W2Yltewzxm04aQie/Qs+zlIZodGj85e5JlaZlt6qonWkzt9cu+TKUVljnHDMW1vBiu8t
+ xdqNi6kOadEmGDExWf0aLVYMo8cfT3S4NPA7NDnv/ueaG4b91LRLZVDPNYEyzT/kUfAD
+ v0OUYnYjwPzcSTQIIRFwZssBgvDk+8Xa63ur6oT4fDF4MySzIHQ1IqS9W0qh9LZM9c8h
+ WSBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wN0TfHqfZivaapeBhs6fRX0f635NiC55vaX3XaH653M=;
- b=IYIs9Ytrq8cJMIxVFGsgnqaMJG9XifsosIFDYNXxkRvfsJqhTAAw3Q4n1VGmeSWoYB
- p/ZVgS5du+dnnwWhZdb7ysxRCStBL9QA9yPWU0iTvRG97XpRmxibiOnoIZOCXc1JDBnD
- MD2IcMs0CPgpgr/iJ5Bq5BVv03sTA0jNKQnc4y4F7lGarBh385W3shAfX2ZQ0cYNJlVM
- OmN6J5eWhzKPK8JcUmp29/Dvvcqhi0GSTd5EeLB6nXWiuYGtmeTAnJMNGZtgKfR0e/VF
- n+U+AjjCiD3gA7npkollk1gFheSjnoopcZ9GZOKsHXQnElF57rjec9WuqUoN7j4dq1rK
- VKZA==
-X-Gm-Message-State: ANhLgQ3vSsHuDz3LNLg33xkjglKyH+153sv3ikQQ8kXgw5jPoq3vGVLJ
- bufZCaLKaQdJdpBcvkyHcFzynKErTXU=
-X-Google-Smtp-Source: ADFU+vvBl8xXhve2nk+KtSWPbdc4kzq+cZcbkDzr/ZJudrGaWu/pRVyl7s3X1RskCe7fJ2xQHu+xXw==
-X-Received: by 2002:a17:90a:9306:: with SMTP id p6mr5806526pjo.0.1584042159488; 
- Thu, 12 Mar 2020 12:42:39 -0700 (PDT)
+ bh=/pGqR0ZT/lu7yV5pm4MglVp61s4Mp3dEdpOqchZImpI=;
+ b=AQ3KhLVpXRER8KQLutMohjabm8sItCp7LtNQw3JSlMgV1/OwpXw7BCHcnY8rvE3/AK
+ oylMCgZrZ4HGjox8N+Jf73in82GNdCvGLY2m4GOK58vEPdSgo8kLz3Plwfm7Uu/FMQ41
+ g75ZCT4HGrAZYoAKMgAkTDAWYAiBFzB6Lkpz3ZHxjnZIdTGt1YSJWYjs3I9UCzrOiuk9
+ wAjPxRiPEJWJZ12xrvl12CzA9baOvslc4IvmpnqPE0zQojisPsSa3n/XO7gHczvr/VYp
+ fPMdyoZNILAI/k1fXMIGhHw/aOvlLYGcikqMdG+/bfrZIF+GU1RatFIkeOrPiQOVxqqU
+ 4adw==
+X-Gm-Message-State: ANhLgQ3qyuz+Hh9dI05h4hrVF9X3qV338FoFG62KeZ3ox6Upp04lxvnk
+ lOX3VUgD5O/zVskCm/oaOT0HbDVR7Zs=
+X-Google-Smtp-Source: ADFU+vs5jLyNuoDQREiDOpSSrTfH2SYhM8rP0b36Jhg4f7MZ9bdvTvUYbVaU5wxZLfquXJb/q36xjg==
+X-Received: by 2002:a17:90a:aa83:: with SMTP id l3mr5721193pjq.5.1584042147577; 
+ Thu, 12 Mar 2020 12:42:27 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.38
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:42:38 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:26 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 14/42] target/arm: Add helper_probe_access
-Date: Thu, 12 Mar 2020 12:41:51 -0700
-Message-Id: <20200312194219.24406-15-richard.henderson@linaro.org>
+Subject: [PATCH v6 05/42] target/arm: Rename DISAS_UPDATE to DISAS_UPDATE_EXIT
+Date: Thu, 12 Mar 2020 12:41:42 -0700
+Message-Id: <20200312194219.24406-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-Received-From: 2607:f8b0:4864:20::631
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,76 +98,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Raise an exception if the given virtual memory is not accessible.
+Emphasize that the is_jmp option exits to the main loop.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        |  2 ++
- target/arm/op_helper.c     | 16 ++++++++++++++++
- target/arm/translate-a64.c | 13 +++++++++++++
- 3 files changed, 31 insertions(+)
+ target/arm/translate.h         | 14 ++++++++------
+ target/arm/translate-a64.c     |  8 ++++----
+ target/arm/translate-vfp.inc.c |  2 +-
+ target/arm/translate.c         | 12 ++++++------
+ 4 files changed, 19 insertions(+), 17 deletions(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 72eb9e6a1a..8a616ed6d8 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -95,6 +95,8 @@ DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
- DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index d9ea0c99cc..41d6cc8db5 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -148,7 +148,8 @@ static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
  
-+DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, tl, i32, i32, i32)
-+
- DEF_HELPER_1(vfp_get_fpscr, i32, env)
- DEF_HELPER_2(vfp_set_fpscr, void, env, i32)
+ /* is_jmp field values */
+ #define DISAS_JUMP      DISAS_TARGET_0 /* only pc was modified dynamically */
+-#define DISAS_UPDATE    DISAS_TARGET_1 /* cpu state was modified dynamically */
++/* CPU state was modified dynamically; exit to main loop for interrupts. */
++#define DISAS_UPDATE_EXIT  DISAS_TARGET_1
+ /* These instructions trap after executing, so the A32/T32 decoder must
+  * defer them until after the conditional execution state has been updated.
+  * WFI also needs special handling when single-stepping.
+@@ -164,11 +165,12 @@ static inline void disas_set_insn_syndrome(DisasContext *s, uint32_t syn)
+  * custom end-of-TB code)
+  */
+ #define DISAS_BX_EXCRET DISAS_TARGET_8
+-/* For instructions which want an immediate exit to the main loop,
+- * as opposed to attempting to use lookup_and_goto_ptr. Unlike
+- * DISAS_UPDATE this doesn't write the PC on exiting the translation
+- * loop so you need to ensure something (gen_a64_set_pc_im or runtime
+- * helper) has done so before we reach return from cpu_tb_exec.
++/*
++ * For instructions which want an immediate exit to the main loop, as opposed
++ * to attempting to use lookup_and_goto_ptr.  Unlike DISAS_UPDATE_EXIT, this
++ * doesn't write the PC on exiting the translation loop so you need to ensure
++ * something (gen_a64_set_pc_im or runtime helper) has done so before we reach
++ * return from cpu_tb_exec.
+  */
+ #define DISAS_EXIT      DISAS_TARGET_9
  
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index eb0de080f1..b1065216b2 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -935,3 +935,19 @@ uint32_t HELPER(ror_cc)(CPUARMState *env, uint32_t x, uint32_t i)
-         return ((uint32_t)x >> shift) | (x << (32 - shift));
-     }
- }
-+
-+void HELPER(probe_access)(CPUARMState *env, target_ulong ptr,
-+                          uint32_t access_type, uint32_t mmu_idx,
-+                          uint32_t size)
-+{
-+    uint32_t in_page = -((uint32_t)ptr | TARGET_PAGE_SIZE);
-+    uintptr_t ra = GETPC();
-+
-+    if (likely(size <= in_page)) {
-+        probe_access(env, ptr, size, access_type, mmu_idx, ra);
-+    } else {
-+        probe_access(env, ptr, in_page, access_type, mmu_idx, ra);
-+        probe_access(env, ptr + in_page, size - in_page,
-+                     access_type, mmu_idx, ra);
-+    }
-+}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 49c94bc565..45a95d8ea0 100644
+index 8fffb52203..a793ec9ee1 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -249,6 +249,19 @@ static void gen_address_with_allocation_tag0(TCGv_i64 dst, TCGv_i64 src)
-     tcg_gen_andi_i64(dst, src, ~MAKE_64BIT_MASK(56, 4));
+@@ -1661,7 +1661,7 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+         gen_helper_msr_i_daifclear(cpu_env, t1);
+         tcg_temp_free_i32(t1);
+         /* For DAIFClear, exit the cpu loop to re-evaluate pending IRQs.  */
+-        s->base.is_jmp = DISAS_UPDATE;
++        s->base.is_jmp = DISAS_UPDATE_EXIT;
+         break;
+ 
+     default:
+@@ -1840,7 +1840,7 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+ 
+     if ((tb_cflags(s->base.tb) & CF_USE_ICOUNT) && (ri->type & ARM_CP_IO)) {
+         /* I/O operations must end the TB here (whether read or write) */
+-        s->base.is_jmp = DISAS_UPDATE;
++        s->base.is_jmp = DISAS_UPDATE_EXIT;
+     }
+     if (!isread && !(ri->type & ARM_CP_SUPPRESS_TB_END)) {
+         /*
+@@ -1855,7 +1855,7 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+          * but allow this to be suppressed by the register definition
+          * (usually only necessary to work around guest bugs).
+          */
+-        s->base.is_jmp = DISAS_UPDATE;
++        s->base.is_jmp = DISAS_UPDATE_EXIT;
+     }
  }
  
-+static void gen_probe_access(DisasContext *s, TCGv_i64 ptr,
-+                             MMUAccessType acc, int log2_size)
-+{
-+    TCGv_i32 t_acc = tcg_const_i32(acc);
-+    TCGv_i32 t_idx = tcg_const_i32(get_mem_index(s));
-+    TCGv_i32 t_size = tcg_const_i32(1 << log2_size);
-+
-+    gen_helper_probe_access(cpu_env, ptr, t_acc, t_idx, t_size);
-+    tcg_temp_free_i32(t_acc);
-+    tcg_temp_free_i32(t_idx);
-+    tcg_temp_free_i32(t_size);
-+}
-+
- typedef struct DisasCompare64 {
-     TCGCond cond;
-     TCGv_i64 value;
+@@ -14456,7 +14456,7 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+             gen_goto_tb(dc, 1, dc->base.pc_next);
+             break;
+         default:
+-        case DISAS_UPDATE:
++        case DISAS_UPDATE_EXIT:
+             gen_a64_set_pc_im(dc->base.pc_next);
+             /* fall through */
+         case DISAS_EXIT:
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index b087bbd812..454bff6d01 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -2867,6 +2867,6 @@ static bool trans_VLLDM_VLSTM(DisasContext *s, arg_VLLDM_VLSTM *a)
+     tcg_temp_free_i32(fptr);
+ 
+     /* End the TB, because we have updated FP control bits */
+-    s->base.is_jmp = DISAS_UPDATE;
++    s->base.is_jmp = DISAS_UPDATE_EXIT;
+     return true;
+ }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 6259064ea7..5a21766cce 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -2935,7 +2935,7 @@ static void gen_msr_banked(DisasContext *s, int r, int sysm, int rn)
+     tcg_temp_free_i32(tcg_tgtmode);
+     tcg_temp_free_i32(tcg_regno);
+     tcg_temp_free_i32(tcg_reg);
+-    s->base.is_jmp = DISAS_UPDATE;
++    s->base.is_jmp = DISAS_UPDATE_EXIT;
+ }
+ 
+ static void gen_mrs_banked(DisasContext *s, int r, int sysm, int rn)
+@@ -2957,7 +2957,7 @@ static void gen_mrs_banked(DisasContext *s, int r, int sysm, int rn)
+     tcg_temp_free_i32(tcg_tgtmode);
+     tcg_temp_free_i32(tcg_regno);
+     store_reg(s, rn, tcg_reg);
+-    s->base.is_jmp = DISAS_UPDATE;
++    s->base.is_jmp = DISAS_UPDATE_EXIT;
+ }
+ 
+ /* Store value to PC as for an exception return (ie don't
+@@ -7635,7 +7635,7 @@ static void gen_srs(DisasContext *s,
+         tcg_temp_free_i32(tmp);
+     }
+     tcg_temp_free_i32(addr);
+-    s->base.is_jmp = DISAS_UPDATE;
++    s->base.is_jmp = DISAS_UPDATE_EXIT;
+ }
+ 
+ /* Generate a label used for skipping this instruction */
+@@ -10682,7 +10682,7 @@ static bool trans_SETEND(DisasContext *s, arg_SETEND *a)
+     }
+     if (a->E != (s->be_data == MO_BE)) {
+         gen_helper_setend(cpu_env);
+-        s->base.is_jmp = DISAS_UPDATE;
++        s->base.is_jmp = DISAS_UPDATE_EXIT;
+     }
+     return true;
+ }
+@@ -11419,7 +11419,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+             break;
+         case DISAS_NEXT:
+         case DISAS_TOO_MANY:
+-        case DISAS_UPDATE:
++        case DISAS_UPDATE_EXIT:
+             gen_set_pc_im(dc, dc->base.pc_next);
+             /* fall through */
+         default:
+@@ -11446,7 +11446,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_JUMP:
+             gen_goto_ptr();
+             break;
+-        case DISAS_UPDATE:
++        case DISAS_UPDATE_EXIT:
+             gen_set_pc_im(dc, dc->base.pc_next);
+             /* fall through */
+         default:
 -- 
 2.20.1
 
