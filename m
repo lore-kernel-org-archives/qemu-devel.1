@@ -2,82 +2,74 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075AFC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DFF3C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCE7020716
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:08:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C9D72072F
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZbODNO/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCE7020716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ZMZU4fuE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9D72072F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCSGJ-0003zD-Qv
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 14:08:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53499)
+	id 1jCSZ5-0005rc-6R
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 14:28:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jCSFO-0002Xm-Ju
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:07:56 -0400
+ (envelope-from <kwankhede@nvidia.com>) id 1jCSXx-0004wY-DK
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jCSFM-0003MY-F2
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:07:54 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57173
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwankhede@nvidia.com>) id 1jCSXu-0007l6-Vn
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:27:04 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:14478)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCSFM-0003FQ-51
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:07:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584036470;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rjjk5DZbniRzVmALfrMcx+UXIqvi6YT8DrtlqaEc59A=;
- b=JZbODNO/aOtKRe+OIb9GcQ4jj9xCtqp5BscHdOrNU/cxZeJ59RNMz6Twl4mFm/3dzk918k
- lSdm2zO4XkaSu9lvZ5MJHBhbtti9kp0Jf/H/b6lOH68r1XwQhzGcAMaBGOfim1s91GIbK2
- vQYg6kcE/Ix8RpkYid0lq4eQ5ez+vPo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-j95Z4wAPNO2naHAGD_usQQ-1; Thu, 12 Mar 2020 14:07:47 -0400
-X-MC-Unique: j95Z4wAPNO2naHAGD_usQQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B1B11034B3A;
- Thu, 12 Mar 2020 18:07:46 +0000 (UTC)
-Received: from work-vm (ovpn-116-106.ams2.redhat.com [10.36.116.106])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B2F4060FCC;
- Thu, 12 Mar 2020 18:07:38 +0000 (UTC)
-Date: Thu, 12 Mar 2020 18:07:35 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH] migration/throttle: Add throttle-trig-thres migration
- parameter
-Message-ID: <20200312180735.GL3211@work-vm>
-References: <20200224023142.39360-1-zhukeqian1@huawei.com>
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1jCSXu-0007jk-Cf
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:27:02 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e6a7e970000>; Thu, 12 Mar 2020 11:25:27 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 12 Mar 2020 11:26:59 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 12 Mar 2020 11:26:59 -0700
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 12 Mar
+ 2020 18:26:59 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 12 Mar 2020 18:26:52 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v13 Kernel 0/7] KABIs to support migration for VFIO devices
+Date: Thu, 12 Mar 2020 23:23:20 +0530
+Message-ID: <1584035607-23166-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-In-Reply-To: <20200224023142.39360-1-zhukeqian1@huawei.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1584037527; bh=zwIve2BRvRqssYiqW3459nW7Na/hrNhBHhsKIWuKtxE=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ X-NVConfidentiality:MIME-Version:Content-Type;
+ b=ZMZU4fuEW9/a6efsdpr7IT0ZvxWrYb4nuiQvF0vMEax/AjDjRPMDqxjsS9evKQN4M
+ F60pAy95JEykjVa63jgrLVUYuszbAQLwW1fsZCZRdVa1Np/0G1zfOA4YxZWeMFDb+g
+ Fe6yGtZSEwH4+sVtMyJnYUxSDDDCIpDk+j0WSVFKuyittih606/GiOnNsr+m1lBqAi
+ +TlJaFUf3cM3raw6Z7OcBUwwKKxEv/MoVSBjWaoF4F9W2mAnSzFR60eNkxd5KDgFgM
+ +UfSHHXsR6CrcFiidSjBn74Zpq8XE1cKLD7MO31XtJ3B0g2Mq+8urHk6af7TJi2577
+ rjz3yubhan99A==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,351 +81,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org,
- wanghaibin.wang@huawei.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Keqian Zhu (zhukeqian1@huawei.com) wrote:
-> Currently, if the bytes_dirty_period is more than the 50% of
-> bytes_xfer_period, we start or increase throttling.
->=20
-> If we make this percentage higher, then we can tolerate higher
-> dirty rate during migration, which means less impact on guest.
-> The side effect of higher percentage is longer migration time.
-> We can make this parameter configurable to switch between mig-
-> ration time first or guest performance first.
->=20
-> The default value is 50 and valid range is 1 to 100.
->=20
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Hi,
 
-Apologies for the delay.
-This looks fine now; so
+This patch set adds:
+* New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
-and I'll queue it.
-I think we could do with a better description than the current one if we
-can find it:
+* Patch 7 is proposed change to detect if IOMMU capable device driver is
+  smart to report pages to be marked dirty by pinning pages using
+  vfio_pin_pages() API.
 
- The ratio of bytes_dirty_period and bytes_xfer_period
- to trigger throttling. It is expressed as percentage.
 
-assumes people understand what those bytes*period mean.
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
 
-Still, until we do:
+Adding revision history from previous QEMU patch set to understand KABI
+changes done till now
 
-Queued for migration
+v12 -> v13
+- Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
+- Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
+- Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
+  field.
 
-> ---
-> Changelog:
->=20
-> v1->v2
->  -Use full name for parameter. Suggested by Eric Blake.
->  -Change the upper bound of threshold to 100.
->  -Extract the throttle strategy as function.
->=20
-> ---
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
->=20
-> ---
->  migration/migration.c | 24 ++++++++++++++++++++
->  migration/ram.c       | 52 +++++++++++++++++++++++++------------------
->  monitor/hmp-cmds.c    |  7 ++++++
->  qapi/migration.json   | 16 ++++++++++++-
->  4 files changed, 76 insertions(+), 23 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 8fb68795dc..42d2d556e3 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -78,6 +78,7 @@
->  /*0: means nocompress, 1: best speed, ... 9: best compress ratio */
->  #define DEFAULT_MIGRATE_COMPRESS_LEVEL 1
->  /* Define default autoconverge cpu throttle migration parameters */
-> +#define DEFAULT_MIGRATE_THROTTLE_TRIGGER_THRESHOLD 50
->  #define DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL 20
->  #define DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT 10
->  #define DEFAULT_MIGRATE_MAX_CPU_THROTTLE 99
-> @@ -778,6 +779,8 @@ MigrationParameters *qmp_query_migrate_parameters(Err=
-or **errp)
->      params->compress_wait_thread =3D s->parameters.compress_wait_thread;
->      params->has_decompress_threads =3D true;
->      params->decompress_threads =3D s->parameters.decompress_threads;
-> +    params->has_throttle_trigger_threshold =3D true;
-> +    params->throttle_trigger_threshold =3D s->parameters.throttle_trigge=
-r_threshold;
->      params->has_cpu_throttle_initial =3D true;
->      params->cpu_throttle_initial =3D s->parameters.cpu_throttle_initial;
->      params->has_cpu_throttle_increment =3D true;
-> @@ -1164,6 +1167,15 @@ static bool migrate_params_check(MigrationParamete=
-rs *params, Error **errp)
->          return false;
->      }
-> =20
-> +    if (params->has_throttle_trigger_threshold &&
-> +        (params->throttle_trigger_threshold < 1 ||
-> +         params->throttle_trigger_threshold > 100)) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-> +                   "throttle_trigger_threshold",
-> +                   "an integer in the range of 1 to 100");
-> +        return false;
-> +    }
-> +
->      if (params->has_cpu_throttle_initial &&
->          (params->cpu_throttle_initial < 1 ||
->           params->cpu_throttle_initial > 99)) {
-> @@ -1279,6 +1291,10 @@ static void migrate_params_test_apply(MigrateSetPa=
-rameters *params,
->          dest->decompress_threads =3D params->decompress_threads;
->      }
-> =20
-> +    if (params->has_throttle_trigger_threshold) {
-> +        dest->throttle_trigger_threshold =3D params->throttle_trigger_th=
-reshold;
-> +    }
-> +
->      if (params->has_cpu_throttle_initial) {
->          dest->cpu_throttle_initial =3D params->cpu_throttle_initial;
->      }
-> @@ -1360,6 +1376,10 @@ static void migrate_params_apply(MigrateSetParamet=
-ers *params, Error **errp)
->          s->parameters.decompress_threads =3D params->decompress_threads;
->      }
-> =20
-> +    if (params->has_throttle_trigger_threshold) {
-> +        s->parameters.throttle_trigger_threshold =3D params->throttle_tr=
-igger_threshold;
-> +    }
-> +
->      if (params->has_cpu_throttle_initial) {
->          s->parameters.cpu_throttle_initial =3D params->cpu_throttle_init=
-ial;
->      }
-> @@ -3506,6 +3526,9 @@ static Property migration_properties[] =3D {
->      DEFINE_PROP_UINT8("x-decompress-threads", MigrationState,
->                        parameters.decompress_threads,
->                        DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
-> +    DEFINE_PROP_UINT8("x-throttle-trigger-threshold", MigrationState,
-> +                      parameters.throttle_trigger_threshold,
-> +                      DEFAULT_MIGRATE_THROTTLE_TRIGGER_THRESHOLD),
->      DEFINE_PROP_UINT8("x-cpu-throttle-initial", MigrationState,
->                        parameters.cpu_throttle_initial,
->                        DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL),
-> @@ -3606,6 +3629,7 @@ static void migration_instance_init(Object *obj)
->      params->has_compress_level =3D true;
->      params->has_compress_threads =3D true;
->      params->has_decompress_threads =3D true;
-> +    params->has_throttle_trigger_threshold =3D true;
->      params->has_cpu_throttle_initial =3D true;
->      params->has_cpu_throttle_increment =3D true;
->      params->has_max_bandwidth =3D true;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ed23ed1c7c..3a38253903 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -896,11 +896,38 @@ static void migration_update_rates(RAMState *rs, in=
-t64_t end_time)
->      }
->  }
-> =20
-> +static void migration_trigger_throttle(RAMState *rs)
-> +{
-> +    MigrationState *s =3D migrate_get_current();
-> +    uint64_t threshold =3D s->parameters.throttle_trigger_threshold;
-> +
-> +    uint64_t bytes_xfer_period =3D ram_counters.transferred - rs->bytes_=
-xfer_prev;
-> +    uint64_t bytes_dirty_period =3D rs->num_dirty_pages_period * TARGET_=
-PAGE_SIZE;
-> +    uint64_t bytes_dirty_threshold =3D bytes_xfer_period * threshold / 1=
-00;
-> +
-> +    /* During block migration the auto-converge logic incorrectly detect=
-s
-> +     * that ram migration makes no progress. Avoid this by disabling the
-> +     * throttling logic during the bulk phase of block migration. */
-> +    if (migrate_auto_converge() && !blk_mig_bulk_active()) {
-> +        /* The following detection logic can be refined later. For now:
-> +           Check to see if the ratio between dirtied bytes and the appro=
-x.
-> +           amount of bytes that just got transferred since the last time
-> +           we were in this routine reaches the threshold. If that happen=
-s
-> +           twice, start or increase throttling. */
-> +
-> +        if ((bytes_dirty_period > bytes_dirty_threshold) &&
-> +            (++rs->dirty_rate_high_cnt >=3D 2)) {
-> +            trace_migration_throttle();
-> +            rs->dirty_rate_high_cnt =3D 0;
-> +            mig_throttle_guest_down();
-> +        }
-> +    }
-> +}
-> +
->  static void migration_bitmap_sync(RAMState *rs)
->  {
->      RAMBlock *block;
->      int64_t end_time;
-> -    uint64_t bytes_xfer_now;
-> =20
->      ram_counters.dirty_sync_count++;
-> =20
-> @@ -927,26 +954,7 @@ static void migration_bitmap_sync(RAMState *rs)
-> =20
->      /* more than 1 second =3D 1000 millisecons */
->      if (end_time > rs->time_last_bitmap_sync + 1000) {
-> -        bytes_xfer_now =3D ram_counters.transferred;
-> -
-> -        /* During block migration the auto-converge logic incorrectly de=
-tects
-> -         * that ram migration makes no progress. Avoid this by disabling=
- the
-> -         * throttling logic during the bulk phase of block migration. */
-> -        if (migrate_auto_converge() && !blk_mig_bulk_active()) {
-> -            /* The following detection logic can be refined later. For n=
-ow:
-> -               Check to see if the dirtied bytes is 50% more than the ap=
-prox.
-> -               amount of bytes that just got transferred since the last =
-time we
-> -               were in this routine. If that happens twice, start or inc=
-rease
-> -               throttling */
-> -
-> -            if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
-> -                   (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
-> -                (++rs->dirty_rate_high_cnt >=3D 2)) {
-> -                    trace_migration_throttle();
-> -                    rs->dirty_rate_high_cnt =3D 0;
-> -                    mig_throttle_guest_down();
-> -            }
-> -        }
-> +        migration_trigger_throttle(rs);
-> =20
->          migration_update_rates(rs, end_time);
-> =20
-> @@ -955,7 +963,7 @@ static void migration_bitmap_sync(RAMState *rs)
->          /* reset period counters */
->          rs->time_last_bitmap_sync =3D end_time;
->          rs->num_dirty_pages_period =3D 0;
-> -        rs->bytes_xfer_prev =3D bytes_xfer_now;
-> +        rs->bytes_xfer_prev =3D ram_counters.transferred;
->      }
->      if (migrate_use_events()) {
->          qapi_event_send_migration_pass(ram_counters.dirty_sync_count);
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 53bc3f76c4..de67d0bd53 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -409,6 +409,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const=
- QDict *qdict)
->          monitor_printf(mon, "%s: %u\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREAD=
-S),
->              params->decompress_threads);
-> +        assert(params->has_throttle_trigger_threshold);
-> +        monitor_printf(mon, "%s: %u\n",
-> +            MigrationParameter_str(MIGRATION_PARAMETER_THROTTLE_TRIGGER_=
-THRESHOLD),
-> +            params->throttle_trigger_threshold);
->          assert(params->has_cpu_throttle_initial);
->          monitor_printf(mon, "%s: %u\n",
->              MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INIT=
-IAL),
-> @@ -1764,6 +1768,9 @@ void hmp_migrate_set_parameter(Monitor *mon, const =
-QDict *qdict)
->          p->has_decompress_threads =3D true;
->          visit_type_int(v, param, &p->decompress_threads, &err);
->          break;
-> +    case MIGRATION_PARAMETER_THROTTLE_TRIGGER_THRESHOLD:
-> +        p->has_throttle_trigger_threshold =3D true;
-> +        visit_type_int(v, param, &p->throttle_trigger_threshold, &err);
->      case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
->          p->has_cpu_throttle_initial =3D true;
->          visit_type_int(v, param, &p->cpu_throttle_initial, &err);
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 52f3429969..0e7ac64c98 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -524,6 +524,10 @@
->  #                      compression, so set the decompress-threads to the=
- number about 1/4
->  #                      of compress-threads is adequate.
->  #
-> +# @throttle-trigger-threshold: The ratio of bytes_dirty_period and bytes=
-_xfer_period
-> +#                              to trigger throttling. It is expressed as=
- percentage.
-> +#                              The default value is 50. (Since 5.0)
-> +#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are throt=
-tled
->  #                        when migration auto-converge is activated. The
->  #                        default value is 20. (Since 2.7)
-> @@ -592,7 +596,7 @@
->    'data': ['announce-initial', 'announce-max',
->             'announce-rounds', 'announce-step',
->             'compress-level', 'compress-threads', 'decompress-threads',
-> -           'compress-wait-thread',
-> +           'compress-wait-thread', 'throttle-trigger-threshold',
->             'cpu-throttle-initial', 'cpu-throttle-increment',
->             'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
->             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-> @@ -626,6 +630,10 @@
->  #
->  # @decompress-threads: decompression thread count
->  #
-> +# @throttle-trigger-threshold: The ratio of bytes_dirty_period and bytes=
-_xfer_period
-> +#                              to trigger throttling. It is expressed as=
- percentage.
-> +#                              The default value is 50. (Since 5.0)
-> +#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are
->  #                        throttled when migration auto-converge is activ=
-ated.
->  #                        The default value is 20. (Since 2.7)
-> @@ -701,6 +709,7 @@
->              '*compress-threads': 'int',
->              '*compress-wait-thread': 'bool',
->              '*decompress-threads': 'int',
-> +            '*throttle-trigger-threshold': 'int',
->              '*cpu-throttle-initial': 'int',
->              '*cpu-throttle-increment': 'int',
->              '*tls-creds': 'StrOrNull',
-> @@ -759,6 +768,10 @@
->  #
->  # @decompress-threads: decompression thread count
->  #
-> +# @throttle-trigger-threshold: The ratio of bytes_dirty_period and bytes=
-_xfer_period
-> +#                              to trigger throttling. It is expressed as=
- percentage.
-> +#                              The default value is 50. (Since 5.0)
-> +#
->  # @cpu-throttle-initial: Initial percentage of time guest cpus are
->  #                        throttled when migration auto-converge is activ=
-ated.
->  #                        (Since 2.7)
-> @@ -834,6 +847,7 @@
->              '*compress-threads': 'uint8',
->              '*compress-wait-thread': 'bool',
->              '*decompress-threads': 'uint8',
-> +            '*throttle-trigger-threshold': 'uint8',
->              '*cpu-throttle-initial': 'uint8',
->              '*cpu-throttle-increment': 'uint8',
->              '*tls-creds': 'str',
-> --=20
-> 2.19.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
+
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
+
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
+
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
+
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
+
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+
+Kirti Wankhede (7):
+  vfio: KABI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Add ioctl definition for dirty pages tracking.
+  vfio iommu: Implementation of ioctl to for dirty pages tracking.
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Adds flag to indicate dirty pages tracking capability
+    support
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |   9 +-
+ drivers/vfio/vfio_iommu_type1.c | 386 ++++++++++++++++++++++++++++++++++++++--
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 295 +++++++++++++++++++++++++++++-
+ 4 files changed, 673 insertions(+), 21 deletions(-)
+
+-- 
+2.7.0
 
 
