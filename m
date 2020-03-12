@@ -2,88 +2,79 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0A7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33218C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:20:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99B1C20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F371C20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:20:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F38wJAdU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99B1C20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R7nFNDqv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F371C20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCNie-0006WV-QD
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:17:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51054)
+	id 1jCNlU-0000Vw-27
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:20:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jCNhi-0004mP-6d
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCNki-0008Li-Cy
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jCNhd-0003Zi-1a
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38068
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCNhc-0003We-TD
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584019003;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CF6Pu+8Rvbo00lwLLN/U2Sg3wr6R9K7gulVnFZMuX+8=;
- b=F38wJAdUXFQ0L0vlTvaKE3l8cfjcCTN4SoBXwTPbvMBQChAaPlhj9xABB8Nvp8D/UwauJg
- cfj79OKrZn810QsSEGFAFOhAwOZ2HzNoVqfMeEXy5G6lK37foj3rNwz/ux9XVUWML+xmnk
- PubZ39dUYKH3hQrsKLlEZhaJyL0IOxo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-FIfQNOpXP82xIqmOqJzJyw-1; Thu, 12 Mar 2020 09:16:37 -0400
-X-MC-Unique: FIfQNOpXP82xIqmOqJzJyw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32332DB60;
- Thu, 12 Mar 2020 13:16:36 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
- [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F38129CA3;
- Thu, 12 Mar 2020 13:16:35 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8311211386A6; Thu, 12 Mar 2020 14:16:34 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 31/33] docs: Stop building qemu-doc
-References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-32-peter.maydell@linaro.org>
- <87blp3x7rr.fsf@dusky.pond.sub.org>
- <CAFEAcA9EEuAeKm8kXtSJUtm6F3=VfyMxOkESvrZzoVt87HwKpw@mail.gmail.com>
- <87sgiertt8.fsf@dusky.pond.sub.org>
- <CAFEAcA9PrO+=pVyh1DR2Xh=apkZAXw0_aF=RxUmG=kR5VOdeDQ@mail.gmail.com>
-Date: Thu, 12 Mar 2020 14:16:34 +0100
-In-Reply-To: <CAFEAcA9PrO+=pVyh1DR2Xh=apkZAXw0_aF=RxUmG=kR5VOdeDQ@mail.gmail.com>
- (Peter Maydell's message of "Thu, 12 Mar 2020 10:11:34 +0000")
-Message-ID: <8736adr9vx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCNkh-0007A0-C5
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:19:56 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45012)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCNkh-00078h-5q
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:19:55 -0400
+Received: by mail-ot1-x344.google.com with SMTP id a49so3372673otc.11
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 06:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/cNo1o70PZrIiyrIkcN27XUdEr6GJ9T+R0TNlmRIjyY=;
+ b=R7nFNDqvsIJkVAvdwd3B7KLt3rsQNN9iioCIfDokZHPoNYbE3nLOZpZwi/0m5BZiC+
+ 7Vdm/o164PkWl0k0NzBsd/p5nfGo837fSZH65QCYryddtP3PpKd7864vyldgLYXT394C
+ XvgeheVZxLPcwpVyY8h+K5bLC8CbZrrDaU4M45WdzhybeUZ8HlLb6VSoFyOvojIFuelI
+ FaiM3mlLpivXusTuqsTkbVc9eYiqz7O3XZJTSK3bQAGIzmikm1tos2jtt6Pmy41s4AFY
+ fj3kljpVRo8Oy+HWWH2UCj65/HEYcWugrsn7TEv2wYF2QXx46vZLhfd6QervqezVWTQM
+ FCAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/cNo1o70PZrIiyrIkcN27XUdEr6GJ9T+R0TNlmRIjyY=;
+ b=cRvWop+dZO+agtf8SF9NJBcurWBJaoKnhS9LSeEEj5QIEH/LsUrpfvRwUESMpNwoAm
+ F1OFNFTI2p6YJPSrYDVxyXwv7hf8XBOHxMgtzm1YxsIHCj8Q3VH+bjrl+HXTH38brAxQ
+ S8WsA3eoIW4SoiQeSAk0k16d6pbQ/fbTYz/V4IJw5OL/s69vwFDfj2nyijKfLN0OX559
+ AQKxl178SHC/O3D2BMXyC3tT05I0aRK7B/s6qyOEal4JPizyMwiFBTUXE9UTf17RFNXZ
+ D6n3Nz9F58xvXPyltVBJogI7MHwLjZAjIaawPdYqw3wR4SOZFhx9Ux4rUeTLzgCMZYsx
+ 8u4A==
+X-Gm-Message-State: ANhLgQ3TS3lX8ro4gW813yGhdlBUjZBio6P/KUii37f8KDDaUAOtJjOB
+ dvOCeyIw7azGb6zWNJQEizIJgInke0q4OQsbUem9NWWM+YPc9A==
+X-Google-Smtp-Source: ADFU+vs0Zhruc1yZKWGzBzCvd+2BrnKFCJGbPH8W2AC2YCupAoDD4B0ewjxanAGYxUvbR2uEiOwIWRFKzkTejTXNaPQ=
+X-Received: by 2002:a9d:76c9:: with SMTP id p9mr6335114otl.135.1584019193088; 
+ Thu, 12 Mar 2020 06:19:53 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200310210434.31544-1-linux@roeck-us.net>
+ <20200310210434.31544-3-linux@roeck-us.net>
+In-Reply-To: <20200310210434.31544-3-linux@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Mar 2020 13:19:41 +0000
+Message-ID: <CAFEAcA811Zo6JjCait2G467oQo-nL0RTYVdqE-ofmDSxWPcuCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] hw/arm/fsl-imx6ul: Wire up USB controllers
+To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,40 +86,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Tue, 10 Mar 2020 at 21:04, Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> IMX6UL USB controllers are quite similar to IMX7 USB controllers.
+> Wire them up the same way.
+>
+> The only real difference is that wiring up phy devices is necessary
+> to avoid phy reset timeouts in the Linux kernel.
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+> v2: Use USB PHY emulation
+>
+>  hw/arm/fsl-imx6ul.c         | 33 +++++++++++++++++++++++++++++++++
+>  include/hw/arm/fsl-imx6ul.h |  9 +++++++++
+>  2 files changed, 42 insertions(+)
+>
+> diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
+> @@ -456,6 +467,28 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
+>                                              FSL_IMX6UL_ENETn_TIMER_IRQ[i]));
+>      }
+>
+> +    /* USB */
+> +    for (i = 0; i < FSL_IMX6UL_NUM_USBS; i++) {
+> +        static const int FSL_IMX6UL_USBn_IRQ[] = {
+> +            FSL_IMX6UL_USB2_IRQ,
+> +            FSL_IMX6UL_USB1_IRQ,
+> +        };
 
-> On Thu, 12 Mar 2020 at 06:06, Markus Armbruster <armbru@redhat.com> wrote=
-:
->> Would it be possible to additionally render a complete manual as one
->> humongous .html?  Without an index, there's only search, and the
->> ergonomics of searching within a single page are so much better.
->
-> There is a "build one big fat HTML page" Sphinx builder,
-> I think. But again, I'm dubious about increasing the number
-> of supported output formats -- it's all extra makefile complexity
-> and more things to get right in 'make install' and so on.
->
-> PS: assuming you have js enabled, each HTML manual has a js
-> search engine built in, eg the 'quick search' box at the bottom
-> of the LHS navigation bar on
-> https://www.qemu.org/docs/master/system/index.html
->
->> I'm tempted to write a trivial QAPI doc comment backend to spit out
->> minimally processed doc comments as one plain text file just for that.
->
-> What would be the difference there compared to just looking
-> at the manpage? The manpages don't have the full content
-> of all the HTML manuals, but the QAPI reference manpages
-> will have all the QAPI content.
+Do we really want to wire up USB1 to USB2_IRQ and USB2 to USB1_IRQ ?
+If so, a comment explaining that it is deliberate would be useful.
 
-I forgot qemu-qmp-ref.7 exists, and missed Paolo's hint earlier in this
-thread.  Thanks!
+Side note: not used here, but in the header file we define:
+    FSL_IMX6UL_USB1_IRQ     = 42,
+    FSL_IMX6UL_USB2_IRQ     = 43,
+    FSL_IMX6UL_USB_PHY1_IRQ = 44,
+    FSL_IMX6UL_USB_PHY2_IRQ = 44,
 
+Is that last one correct, or a cut-n-paste error that should be "45" ?
+
+thanks
+-- PMM
 
