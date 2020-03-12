@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F3DC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE71C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:12:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA40220737
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:11:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA40220737
+	by mail.kernel.org (Postfix) with ESMTPS id D186F20739
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:12:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D186F20739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCG7u-0003iy-1B
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 01:11:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43714)
+	id 1jCG8o-0004ZS-Tl
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 01:12:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jCG7K-0003Hv-VF
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:10:47 -0400
+ (envelope-from <bounces@canonical.com>) id 1jCG7L-0003IH-0i
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jCG7J-0001Ls-Kp
+ (envelope-from <bounces@canonical.com>) id 1jCG7J-0001Lx-Kw
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:10:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53066)
+Received: from indium.canonical.com ([91.189.90.7]:53058)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jCG7J-0001Jl-Ek
+ id 1jCG7J-0001Ig-FH
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:10:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jCG7I-0000Ah-G3
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:10:44 +0000
+ id 1jCG7H-0000Ag-VD
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:10:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6D8B62E80C3
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:10:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8F3B82E80C9
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:10:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Mar 2020 05:03:06 -0000
+Date: Thu, 12 Mar 2020 04:59:20 -0000
 From: Richard Henderson <rth@twiddle.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: pcc-goog rth
 X-Launchpad-Bug-Reporter: Peter Collingbourne (pcc-goog)
 X-Launchpad-Bug-Modifier: Richard Henderson (rth)
 References: <158397461074.11691.9165479040998830806.malonedeb@soybean.canonical.com>
-Message-Id: <158398938649.26276.11267664102647690834.malone@gac.canonical.com>
+Message-Id: <158398916050.26762.10177995120826343544.malone@gac.canonical.com>
 Subject: [Bug 1867072] Re: ARM: tag bits cleared in FAR_EL1
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e0878392dc799b267dea80578fa65500a5d74155";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6cb1fca332a8d49448727986bf0b77ff4b58e7cf
+X-Launchpad-Hash: ec17e29be210e3d0234b9feda3b0b2f03aca0d7b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,10 +82,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Actually, I take that back: Peter has merged my TBI patch set,
-and is included in 6e8a73e911f066.
+As it happens, I posted some cleanups for this last week:
+https://patchew.org/QEMU/20200302175829.2183-1-richard.henderson@linaro.org/
 
-Do you have a test case?
+Some of them have been queued to Peter's target-arm.next branch,
+but that hasn't made it to master yet.
+
+** Changed in: qemu
+       Status: New =3D> In Progress
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Richard Henderson (rth)
 
 -- =
 
