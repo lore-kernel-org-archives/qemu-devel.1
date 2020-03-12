@@ -2,82 +2,107 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C29C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587D2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AA9120663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 294F620663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 18:50:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIaTJuKz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA9120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="yMXfhI5G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 294F620663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCSqG-0006MX-75
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 14:46:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33189)
+	id 1jCSuA-0003rH-AA
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 14:50:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jCSp6-00027b-Sa
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:44:50 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jCStC-00011y-Rl
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jCSp5-00076Y-1h
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:44:48 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39031
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCSp4-00075r-Tc
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:44:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584038686;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cXWX0siXr/EdrkvohaFdzwwOwZ4xJur6Mvj7FNGOvGg=;
- b=GIaTJuKzwdj9H178DWDepwkthT3S70bN43dIMxxg4WiI328kU84LQO66TehycEZdZdh82U
- XLuLMkGODyGTSgkkI9jzWtG3SE9Q+gYx9+cfo17bbVDMy9ImkV3TT7S26WasLku3ummovL
- aBpg8gmACQKgL95hXpT2pN+B5uqNAEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-UdrqxJ3kPlKw9885FVY0FQ-1; Thu, 12 Mar 2020 14:44:42 -0400
-X-MC-Unique: UdrqxJ3kPlKw9885FVY0FQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 147DD107ACC7;
- Thu, 12 Mar 2020 18:44:41 +0000 (UTC)
-Received: from work-vm (ovpn-116-106.ams2.redhat.com [10.36.116.106])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C429B93500;
- Thu, 12 Mar 2020 18:44:39 +0000 (UTC)
-Date: Thu, 12 Mar 2020 18:44:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Subject: Re: [PATCH V2 4/8] COLO: Optimize memory back-up process
-Message-ID: <20200312184437.GM3211@work-vm>
-References: <20200224065414.36524-1-zhang.zhanghailiang@huawei.com>
- <20200224065414.36524-5-zhang.zhanghailiang@huawei.com>
+ (envelope-from <liran.alon@oracle.com>) id 1jCStB-00025F-Bw
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:49:02 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52632)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jCStB-00023v-1i
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 14:49:01 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CIdRsl007431;
+ Thu, 12 Mar 2020 18:48:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=1pZKESU6clCTdDAUXIg++LDttMxk9AzmoIA9iqpwR0o=;
+ b=yMXfhI5GZG6sUXH/kYmPYaJS0ct7iFFIjyEinZgcXJcCOvaLYOHECbfXVUTVs7zZuOS0
+ aAUu+ZHaBgfNyjB+fDEPhM7JvKuqEDSM7biOezEtxwehMXYTcY9qBixtCk57DuBac2iU
+ BledkgnkaZciSx3e/ZYnRf72TjfipoxPBrWR69Q3yPvq2MQuBwrJpPzl0/nNO9/l0Ne6
+ CA/IGrE91Vg8qLuFG/D8LPZp9dLqHRjJMPyvRsn+3XIRS0rd+9xVhCXU1Itwvft0vHJx
+ wjnDzt07m2jZdiVequUisBAwVvxj3Vfgsq7LyPGf+BvDQGCy1ZlU3PUFeEJfzK2eJKBP Hg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2yqtavg4d7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Mar 2020 18:48:58 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CIhExw069070;
+ Thu, 12 Mar 2020 18:48:57 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2yqtata53f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Mar 2020 18:48:57 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02CImu1t022049;
+ Thu, 12 Mar 2020 18:48:56 GMT
+Received: from Lirans-MacBook-Pro.local (/10.74.126.186)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 12 Mar 2020 11:48:56 -0700
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200311162509-mutt-send-email-mst@kernel.org>
+ <92564357-25c1-0a0f-537b-6902f45a88d0@oracle.com>
+ <20200312012859-mutt-send-email-mst@kernel.org>
+ <8cab6eba-22bc-a62e-d4a8-e2138b815a01@oracle.com>
+ <20200312080602-mutt-send-email-mst@kernel.org>
+ <adbb172c-a6b2-f2a5-3f35-dbc353e4f716@oracle.com>
+ <20200312173527.3a218dc0@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <1cd97deb-be90-5698-a99a-14bd4918a82d@oracle.com>
+Date: Thu, 12 Mar 2020 20:48:48 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200224065414.36524-5-zhang.zhanghailiang@huawei.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200312173527.3a218dc0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ bulkscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003120094
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ suspectscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 adultscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003120093
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,235 +114,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielcho@qnap.com, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* zhanghailiang (zhang.zhanghailiang@huawei.com) wrote:
-> This patch will reduce the downtime of VM for the initial process,
-> Privously, we copied all these memory in preparing stage of COLO
-> while we need to stop VM, which is a time-consuming process.
-> Here we optimize it by a trick, back-up every page while in migration
-> process while COLO is enabled, though it affects the speed of the
-> migration, but it obviously reduce the downtime of back-up all SVM'S
-> memory in COLO preparing stage.
->=20
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 12/03/2020 18:35, Igor Mammedov wrote:
+> On Thu, 12 Mar 2020 14:55:50 +0200
+> Liran Alon <liran.alon@oracle.com> wrote:
+>
+>> On 12/03/2020 14:19, Michael S. Tsirkin wrote:
+>>> On Thu, Mar 12, 2020 at 01:30:01PM +0200, Liran Alon wrote:
+>>>> On 12/03/2020 8:12, Michael S. Tsirkin wrote:
+>>>>> On Thu, Mar 12, 2020 at 01:20:02AM +0200, Liran Alon wrote:
+>>>>>> But this is just a good practice in general and in the past it was said by
+>>>>>> maintainers that this is one of the main reasons that ACPI and SMBIOS
+>>>>>> generation have moved from SeaBIOS to QEMU.
+>>>>> I think a flag to disable this might make sense though. For example,
+>>>>> some guests might behave differently and get broken.
+>>>> Right. That's why I think it's a good practice to have this flag and tie it
+>>>> to machine-type.
+>>> Tying things to the machine type is not what I had in mind.
+>>> A separate flag would also be helpful so users can tweak this
+>>> for new machine types, too.
+>> I think it's unnecessary, given how common WAET ACPI table is exposed by
+>> default by other hypervisors.
+>>
+>> But if you insist, I can add such flag on a separate commit in v2...
+>> Where do you want to have such flag? It cannot be a property of some
+>> qdev object.
+>> So you want to add a new QEMU_OPTION_no_weat in vl.c?
+> If it doesn't break any windows guests we probably don't need an option.
+> Can you test if old guests are booting fine with new table, to confirm
+> that it's fine? (starting with XPsp3)
 
-I'll queue this as well; I'm going to clean up some minor things:
+Old guests boot fine with the new WAET table.
+We are running with this table in production for many years with many 
+Windows XP guests (and much more esoteric guests)
 
-> ---
->  migration/colo.c |  3 +++
->  migration/ram.c  | 68 +++++++++++++++++++++++++++++++++++-------------
->  migration/ram.h  |  1 +
->  3 files changed, 54 insertions(+), 18 deletions(-)
->=20
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 93c5a452fb..44942c4e23 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -26,6 +26,7 @@
->  #include "qemu/main-loop.h"
->  #include "qemu/rcu.h"
->  #include "migration/failover.h"
-> +#include "migration/ram.h"
->  #ifdef CONFIG_REPLICATION
->  #include "replication.h"
->  #endif
-> @@ -845,6 +846,8 @@ void *colo_process_incoming_thread(void *opaque)
->       */
->      qemu_file_set_blocking(mis->from_src_file, true);
-> =20
-> +    colo_incoming_start_dirty_log();
-> +
->      bioc =3D qio_channel_buffer_new(COLO_BUFFER_BASE_SIZE);
->      fb =3D qemu_fopen_channel_input(QIO_CHANNEL(bioc));
->      object_unref(OBJECT(bioc));
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ed23ed1c7c..ebf9e6ba51 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2277,6 +2277,7 @@ static void ram_list_init_bitmaps(void)
->               * dirty_memory[DIRTY_MEMORY_MIGRATION] don't include the wh=
-ole
->               * guest memory.
->               */
-> +
+Just to verify, I've just now run it with a WinXP SP3 VM and it works 
+just fine.
+So should I remove the flag completely or remain with the current 
+functionality I have that makes sure WAET is only exposed on new 
+machine-types?
 
-That change is nice, but shouldn't really be here.
+-Liran
 
->              block->bmap =3D bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
->              block->clear_bmap_shift =3D shift;
-> @@ -2986,7 +2987,6 @@ int colo_init_ram_cache(void)
->                  }
->                  return -errno;
->              }
-> -            memcpy(block->colo_cache, block->host, block->used_length);
->          }
->      }
-> =20
-> @@ -3000,19 +3000,36 @@ int colo_init_ram_cache(void)
-> =20
->          RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->              unsigned long pages =3D block->max_length >> TARGET_PAGE_BIT=
-S;
-> -
->              block->bmap =3D bitmap_new(pages);
-> -            bitmap_set(block->bmap, 0, pages);
->          }
->      }
-> -    ram_state =3D g_new0(RAMState, 1);
-> -    ram_state->migration_dirty_pages =3D 0;
-> -    qemu_mutex_init(&ram_state->bitmap_mutex);
-> -    memory_global_dirty_log_start();
-> =20
-> +    ram_state_init(&ram_state);
->      return 0;
->  }
-> =20
-> +/* TODO: duplicated with ram_init_bitmaps */
-> +void colo_incoming_start_dirty_log(void)
-> +{
-> +    RAMBlock *block =3D NULL;
-> +    /* For memory_global_dirty_log_start below. */
-> +    qemu_mutex_lock_iothread();
-> +    qemu_mutex_lock_ramlist();
-> +
-> +    memory_global_dirty_log_sync();
-> +    WITH_RCU_READ_LOCK_GUARD() {
-> +        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> +            ramblock_sync_dirty_bitmap(ram_state, block);
-> +            /* Discard this dirty bitmap record */
-> +            bitmap_zero(block->bmap, block->max_length >> TARGET_PAGE_BI=
-TS);
-> +        }
-> +        memory_global_dirty_log_start();
-> +    }
-> +    ram_state->migration_dirty_pages =3D 0;
-> +    qemu_mutex_unlock_ramlist();
-> +    qemu_mutex_unlock_iothread();
-> +}
-> +
->  /* It is need to hold the global lock to call this helper */
->  void colo_release_ram_cache(void)
->  {
-> @@ -3032,9 +3049,7 @@ void colo_release_ram_cache(void)
->              }
->          }
->      }
-> -    qemu_mutex_destroy(&ram_state->bitmap_mutex);
-> -    g_free(ram_state);
-> -    ram_state =3D NULL;
-> +    ram_state_cleanup(&ram_state);
->  }
-> =20
->  /**
-> @@ -3302,7 +3317,6 @@ static void colo_flush_ram_cache(void)
->              ramblock_sync_dirty_bitmap(ram_state, block);
->          }
->      }
-> -
-
-I'll remove that
-
->      trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
->      WITH_RCU_READ_LOCK_GUARD() {
->          block =3D QLIST_FIRST_RCU(&ram_list.blocks);
-> @@ -3348,7 +3362,7 @@ static int ram_load_precopy(QEMUFile *f)
-> =20
->      while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
->          ram_addr_t addr, total_ram_bytes;
-> -        void *host =3D NULL;
-> +        void *host =3D NULL, *host_bak =3D NULL;
->          uint8_t ch;
-> =20
->          /*
-> @@ -3379,20 +3393,35 @@ static int ram_load_precopy(QEMUFile *f)
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)=
-) {
->              RAMBlock *block =3D ram_block_from_stream(f, flags);
-> =20
-> +            host =3D host_from_ram_block_offset(block, addr);
->              /*
-> -             * After going into COLO, we should load the Page into colo_=
-cache.
-> +             * After going into COLO stage, we should not load the page
-> +             * into SVM's memory diretly, we put them into colo_cache fi=
-rstly.
-                                        ^ typo - c
-> +             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
-> +             * Privously, we copied all these memory in preparing stage =
-of COLO
-                    ^ typo - e
-
-> +             * while we need to stop VM, which is a time-consuming proce=
-ss.
-> +             * Here we optimize it by a trick, back-up every page while =
-in
-> +             * migration process while COLO is enabled, though it affect=
-s the
-> +             * speed of the migration, but it obviously reduce the downt=
-ime of
-> +             * back-up all SVM'S memory in COLO preparing stage.
->               */
-> -            if (migration_incoming_in_colo_state()) {
-> -                host =3D colo_cache_from_block_offset(block, addr);
-> -            } else {
-> -                host =3D host_from_ram_block_offset(block, addr);
-> +            if (migration_incoming_colo_enabled()) {
-> +                if (migration_incoming_in_colo_state()) {
-> +                    /* In COLO stage, put all pages into cache temporari=
-ly */
-> +                    host =3D colo_cache_from_block_offset(block, addr);
-> +                } else {
-> +                   /*
-> +                    * In migration stage but before COLO stage,
-> +                    * Put all pages into both cache and SVM's memory.
-> +                    */
-> +                    host_bak =3D colo_cache_from_block_offset(block, add=
-r);
-> +                }
->              }
->              if (!host) {
->                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
->                  ret =3D -EINVAL;
->                  break;
->              }
-> -
->              if (!migration_incoming_in_colo_state()) {
->                  ramblock_recv_bitmap_set(block, host);
->              }
-> @@ -3506,6 +3535,9 @@ static int ram_load_precopy(QEMUFile *f)
->          if (!ret) {
->              ret =3D qemu_file_get_error(f);
->          }
-> +        if (!ret && host_bak) {
-> +            memcpy(host_bak, host, TARGET_PAGE_SIZE);
-> +        }
->      }
-> =20
->      ret |=3D wait_for_decompress_done();
-> diff --git a/migration/ram.h b/migration/ram.h
-> index a553d40751..5ceaff7cb4 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -66,5 +66,6 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock=
- *rb);
->  /* ram cache */
->  int colo_init_ram_cache(void);
->  void colo_release_ram_cache(void);
-> +void colo_incoming_start_dirty_log(void);
-> =20
->  #endif
-> --=20
-> 2.21.0
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>> Guest-visible changes shouldn't be exposed to old machine-types.
+>>> Well almost any change in qemu is guest visible to some level.
+>>> Even optimizations are guest visible.
+>>> We made changes in ACPI without versioning in the past but I'm not
+>>> opposed to versioning here. However in that case pls do add a bit
+>>> of documentation about why this is done here.
+>> I remember that maintainers have explicitly specified that ACPI/SMBIOS
+>> should not be changed between machine-types.
+>> This have been one of the reasons to move ACPI/SMBIOS generation from
+>> SeaBIOS to QEMU control.
+>>
+>> What can of documentation you want me to add and where?
+>> The only thing I can say is that I tie it to machine-type because I do
+>> not think a given machine-type should suddenly change BIOS exposed info
+>> to guest.
+>> But that's kinda generic. I haven't found similar documentation in other
+>> ACPI-disable flags to copy from (E.g. do_not_add_smb_acpi).
+>>
+>>> What I am asking about is whether we need a flag to disable
+>>> this as part of the stable interface.
+>> I personally think not. But if you think otherwise, can you provide
+>> guidance of where you suggest to add this flag?
+>> As the only place I see fit is adding a new QEMU_OPTION_no_weat.
 
 
