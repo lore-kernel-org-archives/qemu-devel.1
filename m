@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A8EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0170BC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F23F8206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5E36206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KqsNWxv5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23F8206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w8bN2ukf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E36206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR43-0008S8-3U
+	id 1jCR43-0008VD-Ss
 	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35763)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35603)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxe-0000PE-M3
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxN-0008FI-P2
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxd-0005CU-6s
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:30 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51765)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxL-00053r-KG
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:13 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41246)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxc-0005CE-W2
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:29 -0400
-Received: by mail-wm1-x342.google.com with SMTP id a132so6861587wme.1
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:28 -0700 (PDT)
+ id 1jCQxL-00051z-DW
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:11 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s14so8371939wrt.8
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=0qXFteYUhNwOiO+xUdaCVR+e7Yo1U4U6SKAxr37djug=;
- b=KqsNWxv5hrq/aA1luH26jK2qDx1nb3JKayAZizqmBS84P5Ys/SYM+4AX6UaEIdRXGF
- ccQNKEmzEBCkLzOQPDc3e1WWZaYD/sQHAddqctaSepUzE1Rdg+WQikae330eRHBEB2Dk
- 4th3qxH0+XAa/GbkMYKywyIto/Ia2AVTkueVnGRU/EJsAT09DbZY75Rdo5NhMNRysGVb
- 2hFYrmEMuyxOteDc7pa3R8lo00v+4cMfDf8JF57c7jmnIjP+g/pqsHJ2ehPUfVfVAqqG
- LnmtrosJ7wmZQ0dt73vr7zmL+wN2U6YRy97AUr0tgUCqWA+/xtpGWwAECBYN2Lc1B2zG
- peLw==
+ bh=2a4oBo+1GmPL1/JooGpcol4Cf4xTWSFHxDnNoSO8Mq8=;
+ b=w8bN2ukfZgL9OkxxFvPedxq0nhCZeuZ15NwgN8r4iVNaDPVO5E3zE+BYX7fFuOhtWA
+ Q+5YKKCFQ49b6BjYuuSsfqG0W7r6hJiFIyN+BLF7BrQD2SS4B/7ShP4GgqnAOftCm6NT
+ FvJzLtN0JRLQYBssQn7O2TX0mae4rwQL/v5LTAUTHzLcpI4zEEdyOIsjCKGLfO2H4khD
+ 15zYKM1LmX8q4SQqg1YYqFHqYYJJgxqLCsufME+DkyJodDMXOnYWUtJlJf+DcjlJjzGI
+ LHmRNBDl7kOi4JBIUrnfh4e8/VoH/X0A1rkM0kFShXTgNtPbaKk/lODx07ZCuxnoR364
+ KmqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0qXFteYUhNwOiO+xUdaCVR+e7Yo1U4U6SKAxr37djug=;
- b=puOhjy4OMkintb81QgQNmzsAjHyrGHT721Q7ub3LpkTEudZRiBXJKkTR1Ll8LOn+dR
- ycw2MnNfVyPEUSEvcH38ubud4skKhiQAuc4mZCoyvgHNg5BHRZ65wv99okgC63DCofNb
- rYWkUh37Ah+nfXEPejVC4GiOaSokVDhOrVTz+NYhuiFvb9OlghrVgvDTC6lGHd2htTWV
- CTot6aWssZaAm3DVMl0w3Jgg5JPGeWhoR7rfxZLkBHekFnhBlAOnUwqraVuOFLBdEGJp
- k4nwOlGXe7yt7vKcIh4PYI9ZsZxT1jfk0QcYN6trMgLzTEY6YQXdwGB+EeStQbBQlF1e
- zsow==
-X-Gm-Message-State: ANhLgQ3yL1cDnpShcdSCaEkawVRFvPvhL+jIKz7K4gzRrqo7qTSrqpU+
- 4m2SEiBJkS5X2CrCiuwVSAQAk4p3XRw9BA==
-X-Google-Smtp-Source: ADFU+vtUMn9BojiBw/+1pxvDHxTLDp2SOS3E7epy2NuDsoDGY+99eTbY26XQ0VwNSGJpMcva7eQiIg==
-X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr5809499wmt.137.1584031527451; 
- Thu, 12 Mar 2020 09:45:27 -0700 (PDT)
+ bh=2a4oBo+1GmPL1/JooGpcol4Cf4xTWSFHxDnNoSO8Mq8=;
+ b=PoJDpPSj9lbQh5Qew1JI9DIFX6kS8FpW491PM/GX/dcmr9AVYZVJ330zj5ufm+8bZT
+ 4sofm29brGunpV1L/hfgBXQYrGfr++hRGGtLUHTxN2lJpJ9Hffw2L/fV5Cn7g+BeavBs
+ TkptmXWj6/S6e5kVuz4aj/IHDT3zYrnD8a/AZDmh/B3oDT0GmFuuhYt2iBiRyFBNWyk4
+ RP1CYR3DZNfHB+FHeexlHEFr93pJwHRQJ7Kqt+wgptbhF1WLpWk2hC6Y9aB3wQbx1NBO
+ 2MCHKHA2/VqMguXVVndL4NOnPdDHzcyzeRXAcDx0+UX9CXTH9M63TkaQeodnZ946JKVd
+ IBKg==
+X-Gm-Message-State: ANhLgQ0qV5qbpqhyF0t0E7kLrWgTx9f5TcQpNg61gvSYfMMQKhhsdn8I
+ Yb28SYufjay3uvay07ZQt0tcliBLuaFrMQ==
+X-Google-Smtp-Source: ADFU+vuOlM3/MzJWPxjUFts6QnBDhG2odQjQ+ZGETnBmPe2Pj8MbMfAT6d23rTk03u5h1XEZCTQ51w==
+X-Received: by 2002:a5d:4683:: with SMTP id u3mr12492793wrq.251.1584031510211; 
+ Thu, 12 Mar 2020 09:45:10 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.26
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.09
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:26 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:09 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/36] hw/arm/allwinner-h3: add Boot ROM support
-Date: Thu, 12 Mar 2020 16:44:44 +0000
-Message-Id: <20200312164459.25924-22-peter.maydell@linaro.org>
+Subject: [PULL 07/36] target/arm: Check addresses for disabled regimes
+Date: Thu, 12 Mar 2020 16:44:30 +0000
+Message-Id: <20200312164459.25924-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,121 +97,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-A real Allwinner H3 SoC contains a Boot ROM which is the
-first code that runs right after the SoC is powered on.
-The Boot ROM is responsible for loading user code (e.g. a bootloader)
-from any of the supported external devices and writing the downloaded
-code to internal SRAM. After loading the SoC begins executing the code
-written to SRAM.
+We fail to validate the upper bits of a virtual address on a
+translation disabled regime, as per AArch64.TranslateAddressS1Off.
 
-This commits adds emulation of the Boot ROM firmware setup functionality
-by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
-64KiB, we limit the size to 32KiB because the real H3 Boot ROM also rejects
-sizes larger than 32KiB. For reference, this behaviour is documented
-by the Linux Sunxi project wiki at:
-
-  https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
-
-Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20200311221854.30370-11-nieklinnenbank@gmail.com
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200308012946.16303-2-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/allwinner-h3.h | 21 +++++++++++++++++++++
- hw/arm/allwinner-h3.c         | 17 +++++++++++++++++
- hw/arm/orangepi.c             |  5 +++++
- 3 files changed, 43 insertions(+)
+ target/arm/helper.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index f9b9a023734..d338003724e 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -46,6 +46,7 @@
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/net/allwinner-sun8i-emac.h"
- #include "target/arm/cpu.h"
-+#include "sysemu/block-backend.h"
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index fc1192d1204..b61ee73d18a 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11780,7 +11780,40 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+     /* Definitely a real MMU, not an MPU */
  
- /**
-  * Allwinner H3 device list
-@@ -129,4 +130,24 @@ typedef struct AwH3State {
-     MemoryRegion sram_c;
- } AwH3State;
- 
-+/**
-+ * Emulate Boot ROM firmware setup functionality.
-+ *
-+ * A real Allwinner H3 SoC contains a Boot ROM
-+ * which is the first code that runs right after
-+ * the SoC is powered on. The Boot ROM is responsible
-+ * for loading user code (e.g. a bootloader) from any
-+ * of the supported external devices and writing the
-+ * downloaded code to internal SRAM. After loading the SoC
-+ * begins executing the code written to SRAM.
-+ *
-+ * This function emulates the Boot ROM by copying 32 KiB
-+ * of data from the given block device and writes it to
-+ * the start of the first internal SRAM memory.
-+ *
-+ * @s: Allwinner H3 state object pointer
-+ * @blk: Block backend device object pointer
-+ */
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk);
+     if (regime_translation_disabled(env, mmu_idx)) {
+-        /* MMU disabled. */
++        /*
++         * MMU disabled.  S1 addresses within aa64 translation regimes are
++         * still checked for bounds -- see AArch64.TranslateAddressS1Off.
++         */
++        if (mmu_idx != ARMMMUIdx_Stage2) {
++            int r_el = regime_el(env, mmu_idx);
++            if (arm_el_is_aa64(env, r_el)) {
++                int pamax = arm_pamax(env_archcpu(env));
++                uint64_t tcr = env->cp15.tcr_el[r_el].raw_tcr;
++                int addrtop, tbi;
 +
- #endif /* HW_ARM_ALLWINNER_H3_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index d1245d2b016..a9767c70c08 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -29,6 +29,7 @@
- #include "hw/char/serial.h"
- #include "hw/misc/unimp.h"
- #include "hw/usb/hcd-ehci.h"
-+#include "hw/loader.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/allwinner-h3.h"
- 
-@@ -170,6 +171,22 @@ enum {
-     AW_H3_GIC_NUM_SPI       = 128
- };
- 
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk)
-+{
-+    const int64_t rom_size = 32 * KiB;
-+    g_autofree uint8_t *buffer = g_new0(uint8_t, rom_size);
++                tbi = aa64_va_parameter_tbi(tcr, mmu_idx);
++                if (access_type == MMU_INST_FETCH) {
++                    tbi &= ~aa64_va_parameter_tbid(tcr, mmu_idx);
++                }
++                tbi = (tbi >> extract64(address, 55, 1)) & 1;
++                addrtop = (tbi ? 55 : 63);
 +
-+    if (blk_pread(blk, 8 * KiB, buffer, rom_size) < 0) {
-+        error_setg(&error_fatal, "%s: failed to read BlockBackend data",
-+                   __func__);
-+        return;
-+    }
++                if (extract64(address, pamax, addrtop - pamax + 1) != 0) {
++                    fi->type = ARMFault_AddressSize;
++                    fi->level = 0;
++                    fi->stage2 = false;
++                    return 1;
++                }
 +
-+    rom_add_blob("allwinner-h3.bootrom", buffer, rom_size,
-+                  rom_size, s->memmap[AW_H3_SRAM_A1],
-+                  NULL, NULL, NULL, NULL, false);
-+}
-+
- static void allwinner_h3_init(Object *obj)
- {
-     AwH3State *s = AW_H3(obj);
-diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-index d65bbf8a2fe..b8ebcb08b76 100644
---- a/hw/arm/orangepi.c
-+++ b/hw/arm/orangepi.c
-@@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)
-     memory_region_add_subregion(get_system_memory(), h3->memmap[AW_H3_SDRAM],
-                                 machine->ram);
- 
-+    /* Load target kernel or start using BootROM */
-+    if (!machine->kernel_filename && blk_is_available(blk)) {
-+        /* Use Boot ROM to copy data from SD card to SRAM */
-+        allwinner_h3_bootrom_setup(h3, blk);
-+    }
-     orangepi_binfo.loader_start = h3->memmap[AW_H3_SDRAM];
-     orangepi_binfo.ram_size = machine->ram_size;
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
++                /*
++                 * When TBI is disabled, we've just validated that all of the
++                 * bits above PAMax are zero, so logically we only need to
++                 * clear the top byte for TBI.  But it's clearer to follow
++                 * the pseudocode set of addrdesc.paddress.
++                 */
++                address = extract64(address, 0, 52);
++            }
++        }
+         *phys_ptr = address;
+         *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+         *page_size = TARGET_PAGE_SIZE;
 -- 
 2.20.1
 
