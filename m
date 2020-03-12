@@ -2,118 +2,100 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E00C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED10C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:22:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1999F206B1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:09:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1999F206B1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
+	by mail.kernel.org (Postfix) with ESMTPS id 01FAA206F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:22:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eISS4NUr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01FAA206F7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCHxr-00043e-4Y
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 03:09:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35558)
+	id 1jCIB8-00087a-44
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 03:22:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37141)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <max@m00nbsd.net>) id 1jCHx4-00038K-Mw
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:08:19 -0400
+ (envelope-from <mst@redhat.com>) id 1jCIAK-0007EH-1X
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:22:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <max@m00nbsd.net>) id 1jCHx3-0007Zb-AE
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:08:18 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:48917)
+ (envelope-from <mst@redhat.com>) id 1jCIAI-0005GF-4T
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:21:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40054
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1jCHx3-0007PH-3S
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:08:17 -0400
-Received: from mxplan6.mail.ovh.net (unknown [10.108.16.194])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BCA202650A3E;
- Thu, 12 Mar 2020 08:08:14 +0100 (CET)
-Received: from m00nbsd.net (37.59.142.99) by DAG3EX2.mxp6.local (172.16.2.22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Thu, 12 Mar
- 2020 08:08:14 +0100
-From: Maxime Villard <max@m00nbsd.net>
-Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20200206115731.13552-1-n54@gmx.com>
- <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
- <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
- <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
- <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
- <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
- <24fe7b93-8a34-e5d7-18b5-0f7607221ad3@redhat.com>
- <85e4202d-91dd-0d31-373a-febe566353ab@m00nbsd.net>
- <93e2e198-26ed-c8c7-b47e-977915156a17@redhat.com>
- <f48f9c36-5104-1346-cb91-d52c2887097b@m00nbsd.net>
- <050cacce-41fc-db89-ded9-5cdf6c20a2de@redhat.com>
- <cad16d05-13db-cb80-a049-84bb048def23@m00nbsd.net>
- <933ede25-3ccf-3937-3649-3c7caea83f86@redhat.com>
-Autocrypt: addr=max@m00nbsd.net; keydata=
- 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
-Message-ID: <be4b7957-1b02-fba1-5a60-0acf89c25d1f@m00nbsd.net>
-Date: Thu, 12 Mar 2020 08:08:08 +0100
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCIAI-0005Fx-0k
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:21:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583997717;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7Wl7RPZSZWCMfFeE2+akTWk3PjIGDcNNkNd9oQ5tAgc=;
+ b=eISS4NUrZ9ZkB5iELGa7WelbArb9qkeF7SO3P5KTBgaH6k/mMiz0TO+Yd/CneL7/R9kqZ9
+ nDF+13lp/94RfvG371he2/OPErGD7uaEhyxgbF+vb/dh9N8i8vGOFK42WCFFXUuD4imXGF
+ OiccuNr9IuOMVcgmnA1texYJqIpBL3s=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-fjVLkX72Mke_5BaAVYJYEQ-1; Thu, 12 Mar 2020 03:21:55 -0400
+X-MC-Unique: fjVLkX72Mke_5BaAVYJYEQ-1
+Received: by mail-qk1-f198.google.com with SMTP id j10so3242886qkm.12
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 00:21:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=bHP9MbRUEpuMxNhY1+MEEUd5AEeKIia3Fb4M9Cs0bpY=;
+ b=uEUE9x0G+pLHLjhD4RnQXVPdo4D5YNg8V7I2n7hN8UQ344yFZMbps0t79+t1bqJkF9
+ 2GHgDhJ0AZoiqEDn1p5Ly2XQxyMTjg4B50+zgijNGEQKJQNSfVPljAqZSDAAz/tp2owB
+ AWmR0CEimsVP/yIezI3kVGAcKXcD0bsY9ChAgniNdm9atcsYdRF5YQ5sBgTpwn3Q75u0
+ JkO1lYKNa2e7ylPVsaVOoRMmhPI/aOjjoMntHTubhp2mTg1vuYqmOOXx3qLOzo4H2HXC
+ Vpoq2WTdwMvY0aY9FAvaeg4pOYI7r9XYCJMppebUldP0x4R3WMG4Y17ifyKcurMKviaU
+ jAfA==
+X-Gm-Message-State: ANhLgQ3cD8P22huqHJc6ui+8EqLB6jsOrxx6jWQoM2KaJzUMGlmAcQMg
+ d0/9VtPkgoN9skef0FGc9YMQGS++jm4wPPQSDYt0/7/VybU49rDdHR8UZHabJW0XpGiG+MwDphH
+ ZON5Uczjd6IpfNoE=
+X-Received: by 2002:a37:67c2:: with SMTP id b185mr6226932qkc.292.1583997715095; 
+ Thu, 12 Mar 2020 00:21:55 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs/b/ga2tlZ+QhgbUN+6/jei1n7LjaOIXlvIsehQeP5bUiMvZrrxOMq7MEpIsioG+vxdwLyRA==
+X-Received: by 2002:a37:67c2:: with SMTP id b185mr6226913qkc.292.1583997714802; 
+ Thu, 12 Mar 2020 00:21:54 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id p73sm8022500qka.14.2020.03.12.00.21.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 00:21:53 -0700 (PDT)
+Date: Thu, 12 Mar 2020 03:21:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH v3 1/6] virtio-net: introduce RSS and hash report features
+Message-ID: <20200312031427-mutt-send-email-mst@kernel.org>
+References: <20200311123518.4025-1-yuri.benditovich@daynix.com>
+ <20200311123518.4025-2-yuri.benditovich@daynix.com>
+ <20200311094553-mutt-send-email-mst@kernel.org>
+ <CAOEp5OdgDB5u-SeZO3y4iCTjFy6hpNfPA-ADaBbnvx=MHD_dTw@mail.gmail.com>
+ <20200311161819-mutt-send-email-mst@kernel.org>
+ <CAOEp5OcrWewBYNT8TT6r1oFc=diq-HoGfe-zXwXPNSP0RguFkQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <933ede25-3ccf-3937-3649-3c7caea83f86@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-X-Originating-IP: [37.59.142.99]
-X-ClientProxiedBy: DAG3EX1.mxp6.local (172.16.2.21) To DAG3EX2.mxp6.local
- (172.16.2.22)
-X-Ovh-Tracer-GUID: f30035cd-3bd7-4d15-a286-49995666f22f
-X-Ovh-Tracer-Id: 16131330917497638703
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvgedgudduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhuffvfhfkffggjggtgfhisehtkeertddttdejnecuhfhrohhmpeforgigihhmvgcugghilhhlrghrugcuoehmrgigsehmtddtnhgsshgurdhnvghtqeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghniedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrgigsehmtddtnhgsshgurdhnvghtpdhrtghpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtghomh
+In-Reply-To: <CAOEp5OcrWewBYNT8TT6r1oFc=diq-HoGfe-zXwXPNSP0RguFkQ@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.125.2
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,57 +107,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, jmcneill@invisible.ca, Kamil Rytarowski <n54@gmx.com>,
- philmd@redhat.com, rth <rth@twiddle.net>
+Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/03/2020 =C3=A0 22:44, Paolo Bonzini a =C3=A9crit=C2=A0:
-> On 11/03/20 22:21, Maxime Villard wrote:
->>> Yes, you don't know how long that run would take.  I don't know about
->>> NVMM but for KVM it may even never leave if the guest is in HLT state=
-.
->> Ok, I see, thanks.
->>
->> In NVMM the runs are short
+On Thu, Mar 12, 2020 at 09:02:38AM +0200, Yuri Benditovich wrote:
+>     >=A0 =A0 =A0> +#define virtio_net_config virtio_net_config_with_rss
+>     >
+>     >=A0 =A0 =A0Do we have to? Let's just tweak code to do the right thin=
+g...
+>     >
+>     >
+>     > Are we going to update the virtio_net some time?
+>     > If yes, IMO makes sense to do less tweaking in the middle of the co=
+de.
+>     > Then, upon update of virtio_net.h - easily remove all these defines=
+ that
+>     were
+>     > added in virtio-net.c=A0
 >=20
-> How do you ensure that a guest with interrupts off exits promptly?
-
-In NVMM there are several conditions unrelated to the guest state which
-cause returns to userland. These are reschedulings, signals and softints.
-They happen "regularly". As the man page states: "this gives a chance
-for emulator software to halt the VM in its tracks".
-
-There was a specific reason this design was chosen, but it's true that a
-nvmm_vcpu_kick() is more precise and warranted here.
-
->> , the syscalls are fast, and pending signals
->> cause returns to userland. Therefore, in practice, it's not a big prob=
-lem,
->> because (1) the window is small and (2) if we have a miss it's not goi=
-ng
->> to take long to come back to Qemu.
->>
->> I see a quick kernel change I can make to reduce 95% of the window
->> already in the current state. The remaining 5% will need a new
->> nvmm_vcpu_kick() function.
+>     We'll update it in a month or two. But I'd be reluctant to merge hack=
+s
+>     since people tend to copy-paste code ...
 >=20
-> You can also do what KVM did until a few years ago: swap the signal mas=
-k
-> atomically when you enter the hypervisor (e.g. unmasking SIGUSR1---this
-> has to be done in the kernel) and when you leave it.  Then in QEMU you
-> keep SIGUSR1 masked and "eat" it with sigwaitinfo.
 >=20
->> For now this issue is unimportant and no Qemu change is required.
->=20
-> If you say so.
+> I agree that merging hacks is very bad practice.
+> Which change is more looks like a hack: redefine the struct to its _real_
+> layout or change the type of the struct in 5 places?
 
-At first I thought the race was an actual locking problem. In fact it's
-just a delay which on NVMM happens to be small, so yeah, not a very
-important issue, it will be addressed in a future patch set soon.
+Anything that would be unacceptable as a permanent solution is a hack.
+In this case how about
+=09virtio_net_config_rss {
+=09=09struct virtio_net_config config;
+=09=09/* RSS things */
+=09}
 
-Thanks,
-Maxime
+
+--=20
+MST
+
 
