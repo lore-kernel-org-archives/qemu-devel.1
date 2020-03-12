@@ -2,58 +2,88 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22284C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C133C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA35F206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:58:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA35F206F1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0592D206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:58:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jdoM0IYa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0592D206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45849 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR9o-0007Eg-14
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:58:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36056)
+	id 1jCRAc-0008Q6-7U
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQyP-00023w-9Q
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:46:18 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxn-0000cQ-2P
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQyO-0005Sg-3P
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:46:17 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:58180)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCQyN-0005QC-Jy; Thu, 12 Mar 2020 12:46:16 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07674538|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.673856-0.000228795-0.325915;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-QJ9Bb_1584031566; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-QJ9Bb_1584031566)
- by smtp.aliyun-inc.com(10.147.41.138);
- Fri, 13 Mar 2020 00:46:06 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 53/60] target/riscv: vector element index instruction
-Date: Thu, 12 Mar 2020 22:58:53 +0800
-Message-Id: <20200312145900.2054-54-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxk-0005H2-QL
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:38 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38398)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCQxk-0005GA-JD
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:36 -0400
+Received: by mail-wr1-x431.google.com with SMTP id x11so3602597wrv.5
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=YSG3HtCrNVfcOl0dKH+LvpqkhidIbVYkjI8m3z3mpH0=;
+ b=jdoM0IYamBrADL7yk6pYcacN9od4zlXUl3kBNlgK0njm6G4hm6bmFk9te9y1hfMH32
+ j2EltBO1HYtGuGe0jT44Seq6spRKLmXo76FcfTbbxIR8ly7xPSBe+9A/FkgYF7IOQJoV
+ 3HEjZ0Kkp/FbYzWePglMSgE+nGmUxkEqm1punErdl+gutRWWYc+bwPvM2ypbIgUn0tzc
+ qOME4jILPYyM+mzgWJ9r5AT6Xgvxy5uZ3/IbgK+h7khOd144W44bBZpJXQ4ZC437TmNc
+ hpTM1HtDanXrNJooAlWWNJegrGsVk1KmH8A5/suVC/IjyYzhKZzemrr6gUUVzwl0YE1+
+ suoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=YSG3HtCrNVfcOl0dKH+LvpqkhidIbVYkjI8m3z3mpH0=;
+ b=h9fTYltCNHOajTIuork0V899pDHcy8xPSuhIOPgDWt7FoJDlbKnygpSVpjOu982YnC
+ GfaQ4ElUEVV0j9w8PcenHpnENtTxoWp3f1hTU8ZAkWfB5tJZ/cN/BSv5WDyX9Z3Xem8o
+ ZhwwdnOnechuICrT2DzNN8fQ1/+U5AXsnMkfiUpKZDBKIGBnq5RXyYy16qDELECHaatd
+ BlFjE615yKlzCz9rShQnvcAA+2CfB4hLFRpoqrVrDl1en/t9cKj7KPf/ckcAIfbwErT/
+ 5jVjiHJY7UrTEiu7lMMQMQlpAZfHwVgs7rUP6hTD9x7zUm4iZE1TlqQLqFrdL7pIXnWm
+ eH5w==
+X-Gm-Message-State: ANhLgQ1sjN6KXcwIBIWKEttQFSetqJy6AkLD8HIAHpmebpz+gjMyu23T
+ ucwMRljszcx8yh1bnNc0e7vbyRT/nT/qSw==
+X-Google-Smtp-Source: ADFU+vttiI6jvPs3/ChFhgZnb9xijqnmANaDKwoQgYHU1bItWGyw5WAwczLzP+FyFI21f9rQthtmWw==
+X-Received: by 2002:adf:ff83:: with SMTP id j3mr3344116wrr.131.1584031535129; 
+ Thu, 12 Mar 2020 09:45:35 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.33
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 09:45:34 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 27/36] tests/boot_linux_console: Add a SLOW test booting Ubuntu
+ on OrangePi PC
+Date: Thu, 12 Mar 2020 16:44:50 +0000
+Message-Id: <20200312164459.25924-28-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
+References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,118 +95,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  5 +++++
- target/riscv/insn32.decode              |  2 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 21 ++++++++++++++++++++
- target/riscv/vector_helper.c            | 26 +++++++++++++++++++++++++
- 4 files changed, 54 insertions(+)
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 1a7653a431..e3f2970221 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1096,3 +1096,8 @@ DEF_HELPER_5(viota_m_b, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(viota_m_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(viota_m_w, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(viota_m_d, void, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_4(vid_v_b, void, ptr, ptr, env, i32)
-+DEF_HELPER_4(vid_v_h, void, ptr, ptr, env, i32)
-+DEF_HELPER_4(vid_v_w, void, ptr, ptr, env, i32)
-+DEF_HELPER_4(vid_v_d, void, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 00b8d2df9d..1504059415 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -70,6 +70,7 @@
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
- @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
- @r2_vm   ...... vm:1 ..... ..... ... ..... ....... &rmr %rs2 %rd
-+@r1_vm   ...... vm:1 ..... ..... ... ..... ....... %rd
- @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
- @r_vm    ...... vm:1 ..... ..... ... ..... ....... &rmrr %rs2 %rs1 %rd
- @r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
-@@ -553,6 +554,7 @@ vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
-+vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+This test boots Ubuntu Bionic on a OrangePi PC board.
+
+As it requires 1GB of storage, and is slow, this test is disabled
+on automatic CI testing.
+
+It is useful for workstation testing. Currently Avocado timeouts too
+quickly, so we can't run userland commands.
+
+The kernel image and DeviceTree blob are built by the Armbian
+project (based on Debian):
+https://www.armbian.com/orange-pi-pc/
+
+The Ubuntu image is downloaded from:
+https://dl.armbian.com/orangepipc/Bionic_current
+
+This test can be run using:
+
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
+  console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
+  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi PC
+  console: DRAM:  1 GiB
+  console: MMC:   mmc@1c0f000: 0
+  [...]
+  console: Uncompressing Linux... done, booting the kernel.
+  console: Booting Linux on physical CPU 0x0
+  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
+  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
+  console: CPU: div instructions available: patching division code
+  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+  console: OF: fdt: Machine model: Xunlong Orange Pi PC
+  [...]
+  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+  console: done.
+  console: Begin: Running /scripts/local-bottom ... done.
+  console: Begin: Running /scripts/init-bottom ... done.
+  console: systemd[1]: systemd 237 running in system mode. (...)
+  console: systemd[1]: Detected architecture arm.
+  console: Welcome to Ubuntu 18.04.3 LTS!
+  console: systemd[1]: Set hostname to <orangepipc>.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20200311221854.30370-17-nieklinnenbank@gmail.com
+[NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
+[NL: changed test to boot from SD card via BootROM, added check for 7z]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
+
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 0762dbe83a5..e035c88b078 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -19,7 +19,13 @@ from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
++from avocado.utils.path import find_command, CmdNotFoundError
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index c7be689553..1ff72a6406 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2189,3 +2189,24 @@ static bool trans_viota_m(DisasContext *s, arg_viota_m *a)
-     }
-     return false;
- }
++P7ZIP_AVAILABLE = True
++try:
++    find_command('7z')
++except CmdNotFoundError:
++    P7ZIP_AVAILABLE = False
+ 
+ class BootLinuxConsole(Test):
+     """
+@@ -619,6 +625,48 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
+ 
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
++    def test_arm_orangepi_bionic(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:orangepi-pc
++        """
 +
-+/* Vector Element Index Instruction */
-+static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
-+{
-+    if (vext_check_isa_ill(s, RVV) &&
-+        vext_check_reg(s, a->rd, false) &&
-+        vext_check_overlap_mask(s, a->rd, a->vm, false)) {
-+        uint32_t data = 0;
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-+        static gen_helper_gvec_2_ptr * const fns[4] = {
-+            gen_helper_vid_v_b, gen_helper_vid_v_h,
-+            gen_helper_vid_v_w, gen_helper_vid_v_d,
-+        };
-+        tcg_gen_gvec_2_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),
-+            cpu_env, 0, s->vlen / 8, data, fns[s->sew]);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 6089be92fa..ff3b60e9c8 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4414,3 +4414,29 @@ GEN_VEXT_VIOTA_M(viota_m_b, uint8_t, H1, clearb)
- GEN_VEXT_VIOTA_M(viota_m_h, uint16_t, H2, clearh)
- GEN_VEXT_VIOTA_M(viota_m_w, uint32_t, H4, clearl)
- GEN_VEXT_VIOTA_M(viota_m_d, uint64_t, H8, clearq)
++        # This test download a 196MB compressed image and expand it to 932MB...
++        image_url = ('https://dl.armbian.com/orangepipc/archive/'
++                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
++        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
++        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
++        image_path = os.path.join(self.workdir, image_name)
++        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
 +
-+/* Vector Element Index Instruction */
-+#define GEN_VEXT_VID_V(NAME, ETYPE, H, CLEAR_FN)                          \
-+void HELPER(NAME)(void *vd, void *v0, CPURISCVState *env, uint32_t desc)  \
-+{                                                                         \
-+    uint32_t mlen = vext_mlen(desc);                                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-+    uint32_t vm = vext_vm(desc);                                          \
-+    uint32_t vl = env->vl;                                                \
-+    int i;                                                                \
-+                                                                          \
-+    for (i = 0; i < vl; i++) {                                            \
-+        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
-+            continue;                                                     \
-+        }                                                                 \
-+        *((ETYPE *)vd + H(i)) = i;                                        \
-+    }                                                                     \
-+    if (i == 0) {                                                         \
-+        return;                                                           \
-+    }                                                                     \
-+    CLEAR_FN(vd, vl, vl * sizeof(ETYPE), vlmax * sizeof(ETYPE));          \
-+}
-+GEN_VEXT_VID_V(vid_v_b, uint8_t, H1, clearb)
-+GEN_VEXT_VID_V(vid_v_h, uint16_t, H2, clearh)
-+GEN_VEXT_VID_V(vid_v_w, uint32_t, H4, clearl)
-+GEN_VEXT_VID_V(vid_v_d, uint64_t, H8, clearq)
++        self.vm.set_console()
++        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
++                         '-nic', 'user',
++                         '-no-reboot')
++        self.vm.launch()
++
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'loglevel=7 '
++                               'nosmp '
++                               'systemd.default_timeout_start_sec=9000 '
++                               'systemd.mask=armbian-zram-config.service '
++                               'systemd.mask=armbian-ramlog.service')
++
++        self.wait_for_console_pattern('U-Boot SPL')
++        self.wait_for_console_pattern('Autoboot in ')
++        exec_command_and_wait_for_pattern(self, ' ', '=>')
++        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
++                                                kernel_command_line + "'", '=>')
++        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++
++        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
++                                      'to <orangepipc>')
++        self.wait_for_console_pattern('Starting Load Kernel Modules...')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
-2.23.0
+2.20.1
 
 
