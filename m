@@ -2,139 +2,123 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE857C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8803C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:07:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A808206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:06:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A808206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 79038206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:07:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IWSy95oo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79038206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCJnq-0003jk-Qj
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52157)
+	id 1jCJo9-0004Bg-JO
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:07:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCJjo-0003zp-QA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:02:46 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jCJnL-0003F3-5m
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCJjn-0006rI-CP
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:02:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2598)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jCJnK-0000fD-2V
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:06:23 -0400
+Received: from mail-db8eur05on2125.outbound.protection.outlook.com
+ ([40.107.20.125]:18176 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jCJjn-0006qu-7e
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:02:43 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02C90bgL055539
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:02:42 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yqe67nyqm-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:02:42 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Thu, 12 Mar 2020 08:50:38 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 08:50:35 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02C8nYKe48431414
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 08:49:34 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4EF9852054;
- Thu, 12 Mar 2020 08:50:34 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.141])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1F7CD5204F;
- Thu, 12 Mar 2020 08:50:34 +0000 (GMT)
-Subject: Re: [PATCH v9 06/15] s390x: Add SIDA memory ops
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-7-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Thu, 12 Mar 2020 09:50:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200311132151.172389-7-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jCJnJ-0000e2-Gk; Thu, 12 Mar 2020 05:06:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ti0stRQtXRSQdsh/0V9m45HbXyKv/FCUbwb/R4PMDTooxLFPDNrkHLBXuzHJDYC9l+Mj/GFNZX1xjKiDjoxs0VerQVwfdc5gaSlgZntA+c2FmqcuUAHUq1Iz4K7sx1X1rX8blE568/dOd8bcVnKtYJkzdlxY/5V7ihw0VnwRQ8Rrm3yoARqggfMzhkGhZh7aIr/JbOuGFyZZXT6vjjMU4XXxsM/ZN/paTUl6Ky5BB5K1qIcDZopNOve3Pr6IcjLPw2pcVp4JtkK8U0W5Mhu/NEUMRDRxHzYuoaKf2yY8PKGSDCZbqpea0D5jhQ9g6eVbElholR/jlf1zknRU6PJThw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=asDK+YUYCocOb13cTaashHlqEH6pB0bbyEZ45GloY2M=;
+ b=nmnCtnJGQAUjqkJZKBA8T2wBrYR5lP/+d0gPZakgkJeTn55P2XExNezQbp41siPLJkkHlRociZceWHJeQTtVHl7IQfgMI6Png0QsG4xLA8CPYZFSVqpGkj0UTwr4KnFeXgDUSpxLvp1Jqy3V5AbpGzktA8frGUKGM+WotiTl4It19dQTNttIT3X2umJ84OhwKtLyBnX3kV/p+0xueurUcOgFQeUJam18fVCnJHtYoHS5EWwkUinLWBuBypFhkIcLU2yhmJVEz/W98aSQk2ubirbpOV9OznmNvbGqcbhIJ9n7e5qQoJVKHRgjN9qVkXuWmuRh7wnhgf/exu//b6a1nA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=asDK+YUYCocOb13cTaashHlqEH6pB0bbyEZ45GloY2M=;
+ b=IWSy95oo2Wn9JSzCVL68qzwXzDAuHBogQZLbd46ukPkqVx9ssdfYXoVwEqqloj0l1JVdReQpl2eGi2h63c7D2BLuOIRn0EflWBPvqBKJFtSNMJ5DvLEO7lT/4KQWrQxJD+fucxPPG1AwXCG6QqRt9O9IfoRr+wXvyMC7wkGI6J8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4360.eurprd08.prod.outlook.com (20.179.4.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.13; Thu, 12 Mar 2020 09:06:18 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2814.007; Thu, 12 Mar 2020
+ 09:06:18 +0000
+Subject: Re: [PATCH 3/3] block: fail on open when file size is unaligned to
+ request_alignment
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-block@nongnu.org
+References: <20200130152218.7600-1-vsementsov@virtuozzo.com>
+ <20200130152218.7600-4-vsementsov@virtuozzo.com>
+ <4fb7d692-4009-c6a7-c765-292ac8073ae3@redhat.com>
+ <186c8080-a45b-0756-fa4d-c38af02f3a8b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200312120616021
+Message-ID: <c30d19ae-52c0-455e-8ff1-0af7a853ef0f@virtuozzo.com>
+Date: Thu, 12 Mar 2020 12:06:16 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <186c8080-a45b-0756-fa4d-c38af02f3a8b@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031208-0008-0000-0000-0000035BFB55
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031208-0009-0000-0000-00004A7D4448
-Message-Id: <83a4e6f4-c3ab-5ca6-68ce-b9daefd74598@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-12_01:2020-03-11,
- 2020-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 impostorscore=0
- suspectscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003120048
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1PR0301CA0011.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::21) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0301CA0011.eurprd03.prod.outlook.com (2603:10a6:3:76::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2793.20 via Frontend Transport; Thu, 12 Mar 2020 09:06:17 +0000
+X-Tagtoolbar-Keys: D20200312120616021
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 03a7cd6d-46bb-4b44-bc3d-08d7c664a006
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4360:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB43601E9CB0B668F6D5731D41C1FD0@AM6PR08MB4360.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-Forefront-PRVS: 0340850FCD
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(346002)(396003)(376002)(366004)(136003)(199004)(2906002)(81166006)(316002)(31686004)(956004)(110136005)(52116002)(6486002)(4326008)(81156014)(26005)(36756003)(5660300002)(8936002)(8676002)(2616005)(31696002)(478600001)(16576012)(86362001)(53546011)(66556008)(16526019)(186003)(66946007)(66476007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4360;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gg1X8sjgl1XdLgD64hS38dCXtr29cMMj9cFyn/lxnwKd340zaWuORAhmOd+w1TtkFjMxUuKpC51ffUabpX1fv0L8d908BUVuohxBqysKJwotkfq/gxtQO1CfSBBJ0nf8dCfKebnj2SHZFgRdPxUq1538Wp/aExHwmQY0QwdaUGVplvBdXlTYNcpRGKIXgBoIE/RBBN/Yr8zzDLOHM6eNdUzxwjZU73yWke+WFuc/nul1Jd/LKPZT4snMrMZ/p+ycAZ3fkpnlU2aBk6uxWFy8oRCYLGUD7sONhNid0YSxLxaszi4Vd3ZbzJJmyb8BN9owbeXQEw9H+g5oks0cLbjvOiTHged0wiHQja4QDflgfB/01WmN3mZ0FeqYDZuqjh338RAPG7co9mgWX5TJhOTbaPBX3pB55ULwjbNUccUt9cOOJbfjktARYIMsFpkyaJV4
+X-MS-Exchange-AntiSpam-MessageData: Ea402QC6zdCRPf52FGTUXXAGQok+2KhQHSoHCqj7cb04JI8NwTM2OOJo7rKBLkZ9fXPE5/uMjwD7Y+24ahGh2pYP6SgZCOYF44wlTSQpK9vgBBCExkz1wD2YJpo2twGJ5z0VqS/3nYSE1XdQ2Cb99A==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03a7cd6d-46bb-4b44-bc3d-08d7c664a006
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2020 09:06:18.1818 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TXHzEoNQ3zZ/7yvCNZxiAAylK4NBB4gpI+t7GY3omPGdfJh1RAVkNJWf1jOvcwrnQr9r9HvnYLPN9MnSRpjS2+/0LapDvsfD20DSQ3pjblE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4360
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.20.125
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,138 +130,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11.03.20 14:21, Janosch Frank wrote:
-> Protected guests save the instruction control blocks in the SIDA
-> instead of QEMU/KVM directly accessing the guest's memory.
-> 
-> Let's introduce new functions to access the SIDA.
-> 
-> Also the new memops are available with KVM_CAP_S390_PROTECTED, so
-> let's check for that.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+11.03.2020 15:29, Eric Blake wrote:
+> On 3/11/20 6:06 AM, Max Reitz wrote:
+>> On 30.01.20 16:22, Vladimir Sementsov-Ogievskiy wrote:
+>>> Prior to the commit the following command lead to crash:
+>>>
+>>> =A0=A0 ./qemu-io --image-opts -c 'write 0 512' \
+>>> =A0=A0 driver=3Dblkdebug,align=3D4096,image.driver=3Dnull-co,image.size=
+=3D512
+>>>
+>>> It failes on assertion in bdrv_aligned_pwritev:
+>>> =A0=A0 "end_sector <=3D bs->total_sectors || child->perm & BLK_PERM_RES=
+IZE"
+>>>
+>>> The problem is obvious: 512 is aligned to 4096 and becomes larger than
+>>> file size. And the core bad thing is that file size is unaligned to
+>>> request_alignment.
+>>>
+>>> Let's catch such case on bdrv_open_driver and fail.
+>>
+>> I think we had a discussion on this before, but I can=92t find it right
+>> now.=A0 (Although I think that had more to do with something in the
+>> file-posix driver, because it wasn=92t limited to alignments above 512.)
+>>
+>> In any case, the file itself is totally valid.=A0 Most importantly, qcow=
+2
+>> will regularly create files with unaligned file lengths.
+>>
+>> So let me create a qcow2 image on a 4k-aligned device:
+>>
+>> $ truncate 512M fs.img
+>> $ sudo losetup -f --show -b 4096 fs.img
+>> /dev/loop0
+>> $ sudo mkfs.ext4 /dev/loop0
+>> [...]
+>> $ sudo mount /dev/loop0 /mnt/tmp
+>>
+>> $ sudo ./qemu-img create -f qcow2 /mnt/tmp/foo.qcow2 64M
+>> Formatting '/mnt/tmp/foo.qcow2', fmt=3Dqcow2 size=3D67108864
+>> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+>> $ sudo ./qemu-io -t none -c quit /mnt/tmp/foo.qcow2
+>> qemu-io: can't open device /mnt/tmp/foo.qcow2: File size is unaligned to
+>> request alignment
+>>
+>> Which is too bad.
+>>
+>> So the real solution would probably...=A0 Be to align the file size up t=
+o
+>> the alignment?
+>=20
+> Or to bite the bullet and finally implement byte-accurate size everywhere=
+ (instead of our current insistence on rounding size up to 512-byte multipl=
+es).=A0 If we have to deal with unaligned tails anyways, it's better to mak=
+e the code universally applicable whether that unaligned tail is to 512 or =
+to 4k, than to have it work for 512 but to fail for 4k.
+>=20
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+But how it helps with the problem of files unaligned to request_alignment d=
+efined by driver?
 
-> ---
->  target/s390x/cpu.h        |  7 ++++++-
->  target/s390x/kvm.c        | 25 +++++++++++++++++++++++++
->  target/s390x/kvm_s390x.h  |  2 ++
->  target/s390x/mmu_helper.c | 14 ++++++++++++++
->  4 files changed, 47 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 1d17709d6e10b5e0..035427521cec2528 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -823,7 +823,12 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
->  #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
->          s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
->  void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uintptr_t ra);
-> -
-> +int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset, void *hostbuf,
-> +                       int len, bool is_write);
-> +#define s390_cpu_pv_mem_read(cpu, offset, dest, len)    \
-> +        s390_cpu_pv_mem_rw(cpu, offset, dest, len, false)
-> +#define s390_cpu_pv_mem_write(cpu, offset, dest, len)       \
-> +        s390_cpu_pv_mem_rw(cpu, offset, dest, len, true)
->  
->  /* sigp.c */
->  int s390_cpu_restart(S390CPU *cpu);
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index eec0b92479465b9c..cdcd538b4f7fb318 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -154,6 +154,7 @@ static int cap_ri;
->  static int cap_gs;
->  static int cap_hpage_1m;
->  static int cap_vcpu_resets;
-> +static int cap_protected;
->  
->  static int active_cmma;
->  
-> @@ -346,6 +347,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_mem_op = kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
->      cap_s390_irq = kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
->      cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
-> +    cap_protected = kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
->  
->      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
->          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
-> @@ -846,6 +848,29 @@ int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
->      return ret;
->  }
->  
-> +int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
-> +                       int len, bool is_write)
-> +{
-> +    struct kvm_s390_mem_op mem_op = {
-> +        .sida_offset = offset,
-> +        .size = len,
-> +        .op = is_write ? KVM_S390_MEMOP_SIDA_WRITE
-> +                       : KVM_S390_MEMOP_SIDA_READ,
-> +        .buf = (uint64_t)hostbuf,
-> +    };
-> +    int ret;
-> +
-> +    if (!cap_mem_op || !cap_protected) {
-> +        return -ENOSYS;
-> +    }
-> +
-> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_S390_MEM_OP, &mem_op);
-> +    if (ret < 0) {
-> +        error_report("KVM_S390_MEM_OP failed: %s", strerror(-ret));
-> +    }
-> +    return ret;
-> +}
-> +
->  /*
->   * Legacy layout for s390:
->   * Older S390 KVM requires the topmost vma of the RAM to be
-> diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
-> index 0b21789796d7c462..9c38f6ccce83e39e 100644
-> --- a/target/s390x/kvm_s390x.h
-> +++ b/target/s390x/kvm_s390x.h
-> @@ -19,6 +19,8 @@ void kvm_s390_vcpu_interrupt(S390CPU *cpu, struct kvm_s390_irq *irq);
->  void kvm_s390_access_exception(S390CPU *cpu, uint16_t code, uint64_t te_code);
->  int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
->                      int len, bool is_write);
-> +int kvm_s390_mem_op_pv(S390CPU *cpu, vaddr addr, void *hostbuf, int len,
-> +                       bool is_write);
->  void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code);
->  int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
->  void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 0be2f300bbe4ac8b..7d9f3059cd502c49 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -474,6 +474,20 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
->      return 0;
->  }
->  
-> +int s390_cpu_pv_mem_rw(S390CPU *cpu, unsigned int offset, void *hostbuf,
-> +                       int len, bool is_write)
-> +{
-> +    int ret;
-> +
-> +    if (kvm_enabled()) {
-> +        ret = kvm_s390_mem_op_pv(cpu, offset, hostbuf, len, is_write);
-> +    } else {
-> +        /* Protected Virtualization is a KVM/Hardware only feature */
-> +        g_assert_not_reached();
-> +    }
-> +    return ret;
-> +}
-> +
->  /**
->   * s390_cpu_virt_mem_rw:
->   * @laddr:     the logical start address
-> 
-
+--=20
+Best regards,
+Vladimir
 
