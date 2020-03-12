@@ -2,55 +2,144 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F70C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D89BC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:05:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0AD5206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:05:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0AD5206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F1F6206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:05:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F1F6206F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCJm1-00081q-Sy
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51631)
+	id 1jCJmC-0008Lu-EK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:05:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCJhI-00074U-5a
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:14 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jCJiN-0001QK-4g
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCJhB-0004sD-R0
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48462)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jCJhB-0004qg-GO
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:01 -0400
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1jCJgt-0004Ve-Hl; Thu, 12 Mar 2020 11:59:43 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9 02/10] scripts: Coccinelle script to use
- ERRP_AUTO_PROPAGATE()
-Date: Thu, 12 Mar 2020 11:59:28 +0300
-Message-Id: <20200312085936.9552-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200312085936.9552-1-vsementsov@virtuozzo.com>
-References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1jCJiL-0005vo-Qa
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:01:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32310
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1jCJiL-0005sx-Kc
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:01:13 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02C8vixi029352
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:01:12 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yqh99hy20-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:00:55 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 12 Mar 2020 08:54:31 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 12 Mar 2020 08:54:28 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02C8sS6Z61407478
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Mar 2020 08:54:28 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 030634C044;
+ Thu, 12 Mar 2020 08:54:28 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C87C14C04A;
+ Thu, 12 Mar 2020 08:54:27 +0000 (GMT)
+Received: from dyn-9-152-224-122.boeblingen.de.ibm.com (unknown
+ [9.152.224.122])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 12 Mar 2020 08:54:27 +0000 (GMT)
+Subject: Re: [PATCH v9 02/15] s390x: protvirt: Support unpack facility
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20200311132151.172389-1-frankja@linux.ibm.com>
+ <20200311132151.172389-3-frankja@linux.ibm.com>
+ <a0edb6d5-284f-5f10-02e5-d2f252043d71@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 12 Mar 2020 09:54:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <a0edb6d5-284f-5f10-02e5-d2f252043d71@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Gsn8wURgqIIp1Ybjr4EAOE0AIkSY4W14q"
+X-TM-AS-GCONF: 00
+x-cbid: 20031208-0012-0000-0000-0000038FD1CC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031208-0013-0000-0000-000021CCA2F1
+Message-Id: <f7f2c1ca-5547-d793-5508-5d6d64319ae0@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-12_01:2020-03-11,
+ 2020-03-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 mlxlogscore=999
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1015
+ phishscore=0 suspectscore=3 adultscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003120048
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,417 +151,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
-does corresponding changes in code (look for details in
-include/qapi/error.h)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Gsn8wURgqIIp1Ybjr4EAOE0AIkSY4W14q
+Content-Type: multipart/mixed; boundary="KoNdwDOuqePZPnRT3JgAjOZlJVdOzehc8"
 
-Usage example:
-spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
- --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
- --max-width 80 FILES...
+--KoNdwDOuqePZPnRT3JgAjOZlJVdOzehc8
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+On 3/11/20 5:07 PM, David Hildenbrand wrote:
+>=20
+>> +++ b/include/hw/s390x/pv.h
+>> @@ -0,0 +1,57 @@
+>> +/*
+>> + * Protected Virtualization header
+>> + *
+>> + * Copyright IBM Corp. 2020
+>> + * Author(s):
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ (at
+>> + * your option) any later version. See the COPYING file in the top-le=
+vel
+>> + * directory.
+>> + */
+>> +#ifndef HW_S390_PV_H
+>> +#define HW_S390_PV_H
+>> +
+>> +#ifdef CONFIG_KVM
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>> +
+>> +static inline bool s390_is_pv(void)
+>> +{
+>> +    static S390CcwMachineState *ccw;
+>> +    Object *obj;
+>> +
+>> +    if (ccw) {
+>> +        return ccw->pv;
+>> +    }
+>> +
+>> +    /* we have to bail out for the "none" machine */
+>> +    obj =3D object_dynamic_cast(qdev_get_machine(),
+>> +                              TYPE_S390_CCW_MACHINE);
+>> +    if (!obj) {
+>> +        return false;
+>> +    }
+>> +    ccw =3D S390_CCW_MACHINE(obj);
+>> +    return ccw->pv;
+>> +}
+>> +
+>> +int s390_pv_vm_enable(void);
+>> +void s390_pv_vm_disable(void);
+>> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
+>> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
+>> +void s390_pv_perf_clear_reset(void);
+>> +int s390_pv_verify(void);
+>> +void s390_pv_unshare(void);
+>> +#else
+>> +static inline bool s390_is_pv(void) { return false; }
+>> +static inline int s390_pv_vm_enable(void) { return 0; }
+>> +static inline void s390_pv_vm_disable(void) {}
+>> +static inline int s390_pv_set_sec_parms(uint64_t origin, uint64_t len=
+gth) { return 0; }
+>> +static inline int s390_pv_unpack(uint64_t addr, uint64_t size, uint64=
+_t tweak) { return 0; }
+>> +static inline void s390_pv_perf_clear_reset(void) {}
+>> +static inline int s390_pv_verify(void) { return 0; }
+>> +static inline void s390_pv_unshare(void) {}
+>> +#endif
+>=20
+> Maybe /* CONFIG_KVM */ for the else and endif. Whatever you prefer.
 
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Berger <stefanb@linux.ibm.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Cc: xen-devel@lists.xenproject.org
+Ack
 
- scripts/coccinelle/auto-propagated-errp.cocci | 327 ++++++++++++++++++
- include/qapi/error.h                          |   3 +
- MAINTAINERS                                   |   1 +
- 3 files changed, 331 insertions(+)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+>=20
+>> +
+>> +
+>> +
+>=20
+> Nit: too many newlines.
 
-diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coccinelle/auto-propagated-errp.cocci
-new file mode 100644
-index 0000000000..7dac2dcfa4
---- /dev/null
-+++ b/scripts/coccinelle/auto-propagated-errp.cocci
-@@ -0,0 +1,327 @@
-+// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
-+//
-+// Copyright (c) 2020 Virtuozzo International GmbH.
-+//
-+// This program is free software; you can redistribute it and/or
-+// modify it under the terms of the GNU General Public License as
-+// published by the Free Software Foundation; either version 2 of the
-+// License, or (at your option) any later version.
-+//
-+// This program is distributed in the hope that it will be useful,
-+// but WITHOUT ANY WARRANTY; without even the implied warranty of
-+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+// GNU General Public License for more details.
-+//
-+// You should have received a copy of the GNU General Public License
-+// along with this program.  If not, see
-+// <http://www.gnu.org/licenses/>.
-+//
-+// Usage example:
-+// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-+//  --macro-file scripts/cocci-macro-file.h --in-place \
-+//  --no-show-diff --max-width 80 FILES...
-+//
-+// Note: --max-width 80 is needed because coccinelle default is less
-+// than 80, and without this parameter coccinelle may reindent some
-+// lines which fit into 80 characters but not to coccinelle default,
-+// which in turn produces extra patch hunks for no reason.
-+
-+// Switch unusual Error ** parameter names to errp
-+// (this is necessary to use ERRP_AUTO_PROPAGATE).
-+//
-+// Disable optional_qualifier to skip functions with
-+// "Error *const *errp" parameter.
-+//
-+// Skip functions with "assert(_errp && *_errp)" statement, because
-+// that signals unusual semantics, and the parameter name may well
-+// serve a purpose. (like nbd_iter_channel_error()).
-+//
-+// Skip util/error.c to not touch, for example, error_propagate() and
-+// error_propagate_prepend().
-+@ depends on !(file in "util/error.c") disable optional_qualifier@
-+identifier fn;
-+identifier _errp != errp;
-+@@
-+
-+ fn(...,
-+-   Error **_errp
-++   Error **errp
-+    ,...)
-+ {
-+(
-+     ... when != assert(_errp && *_errp)
-+&
-+     <...
-+-    _errp
-++    errp
-+     ...>
-+)
-+ }
-+
-+// Add invocation of ERRP_AUTO_PROPAGATE to errp-functions where
-+// necessary
-+//
-+// Note, that without "when any" the final "..." does not mach
-+// something matched by previous pattern, i.e. the rule will not match
-+// double error_prepend in control flow like in
-+// vfio_set_irq_signaling().
-+//
-+// Note, "exists" says that we want apply rule even if it matches not
-+// on all possible control flows (otherwise, it will not match
-+// standard pattern when error_propagate() call is in if branch).
-+@ disable optional_qualifier exists@
-+identifier fn, local_err;
-+symbol errp;
-+@@
-+
-+ fn(..., Error **errp, ...)
-+ {
-++   ERRP_AUTO_PROPAGATE();
-+    ...  when != ERRP_AUTO_PROPAGATE();
-+(
-+(
-+    error_append_hint(errp, ...);
-+|
-+    error_prepend(errp, ...);
-+|
-+    error_vprepend(errp, ...);
-+)
-+    ... when any
-+|
-+    Error *local_err = NULL;
-+    ...
-+(
-+    error_propagate_prepend(errp, local_err, ...);
-+|
-+    error_propagate(errp, local_err);
-+)
-+    ...
-+)
-+ }
-+
-+
-+// Match functions with propagation of local error to errp.
-+// We want to refer these functions in several following rules, but I
-+// don't know a proper way to inherit a function, not just its name
-+// (to not match another functions with same name in following rules).
-+// Not-proper way is as follows: rename errp parameter in functions
-+// header and match it in following rules. Rename it back after all
-+// transformations.
-+//
-+// The simplest case of propagation scheme is single definition of
-+// local_err with at most one error_propagate_prepend or
-+// error_propagate on each control-flow. Still, we want to match more
-+// complex schemes too. We'll warn them with help of further rules.
-+@rule1 disable optional_qualifier exists@
-+identifier fn, local_err;
-+symbol errp;
-+@@
-+
-+ fn(..., Error **
-+-    errp
-++    ____
-+    , ...)
-+ {
-+     ...
-+     Error *local_err = NULL;
-+     ...
-+(
-+     error_propagate_prepend(errp, local_err, ...);
-+|
-+     error_propagate(errp, local_err);
-+)
-+     ...
-+ }
-+
-+
-+// Warn several Error * definitions.
-+@check1 disable optional_qualifier exists@
-+identifier fn = rule1.fn, local_err, local_err2;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     ...
-+     Error *local_err = NULL;
-+     ... when any
-+     Error *local_err2 = NULL;
-+     ... when any
-+ }
-+
-+@ script:python @
-+fn << check1.fn;
-+@@
-+
-+print('Warning: function {} has several definitions of '
-+      'Error * local variable'.format(fn))
-+
-+// Warn several propagations in control flow.
-+@check2 disable optional_qualifier exists@
-+identifier fn = rule1.fn;
-+symbol errp;
-+position p1, p2;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     ...
-+(
-+     error_propagate_prepend(errp, ...);@p1
-+|
-+     error_propagate(errp, ...);@p1
-+)
-+     ...
-+(
-+     error_propagate_prepend(errp, ...);@p2
-+|
-+     error_propagate(errp, ...);@p2
-+)
-+     ... when any
-+ }
-+
-+@ script:python @
-+fn << check2.fn;
-+p1 << check2.p1;
-+p2 << check2.p2;
-+@@
-+
-+print('Warning: function {} propagates to errp several times in '
-+      'one control flow: at {}:{} and then at {}:{}'.format(
-+          fn, p1[0].file, p1[0].line, p2[0].file, p2[0].line))
-+
-+// Convert special case with goto separately.
-+// I tried merging this into the following rule the obvious way, but
-+// it made Coccinelle hang on block.c
-+//
-+// Note interesting thing: if we don't do it here, and try to fixup
-+// "out: }" things later after all transformations (the rule will be
-+// the same, just without error_propagate() call), coccinelle fails to
-+// match this "out: }".
-+@ disable optional_qualifier@
-+identifier rule1.fn, rule1.local_err, out;
-+symbol errp;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     <...
-+-    goto out;
-++    return;
-+     ...>
-+- out:
-+-    error_propagate(errp, local_err);
-+ }
-+
-+// Convert most of local_err related stuff.
-+//
-+// Note, that we update everything related to matched by rule1
-+// function name and local_err name. We may match something not
-+// related to the pattern matched by rule1. For example, local_err may
-+// be defined with the same name in different blocks inside one
-+// function, and in one block follow the propagation pattern and in
-+// other block doesn't. Or we may have several functions with the same
-+// name (for different configurations).
-+//
-+// Note also that errp-cleaning functions
-+//   error_free_errp
-+//   error_report_errp
-+//   error_reportf_errp
-+//   warn_report_errp
-+//   warn_reportf_errp
-+// are not yet implemented. They must call corresponding Error* -
-+// freeing function and then set *errp to NULL, to avoid further
-+// propagation to original errp (consider ERRP_AUTO_PROPAGATE in use).
-+// For example, error_free_errp may look like this:
-+//
-+//    void error_free_errp(Error **errp)
-+//    {
-+//        error_free(*errp);
-+//        *errp = NULL;
-+//    }
-+@ disable optional_qualifier exists@
-+identifier rule1.fn, rule1.local_err;
-+expression list args;
-+symbol errp;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     <...
-+(
-+-    Error *local_err = NULL;
-+|
-+
-+// Convert error clearing functions
-+(
-+-    error_free(local_err);
-++    error_free_errp(errp);
-+|
-+-    error_report_err(local_err);
-++    error_report_errp(errp);
-+|
-+-    error_reportf_err(local_err, args);
-++    error_reportf_errp(errp, args);
-+|
-+-    warn_report_err(local_err);
-++    warn_report_errp(errp);
-+|
-+-    warn_reportf_err(local_err, args);
-++    warn_reportf_errp(errp, args);
-+)
-+?-    local_err = NULL;
-+
-+|
-+-    error_propagate_prepend(errp, local_err, args);
-++    error_prepend(errp, args);
-+|
-+-    error_propagate(errp, local_err);
-+|
-+-    &local_err
-++    errp
-+)
-+     ...>
-+ }
-+
-+// Convert remaining local_err usage. For example, different kinds of
-+// error checking in if conditionals. We can't merge this into
-+// previous hunk, as this conflicts with other substitutions in it (at
-+// least with "- local_err = NULL").
-+@ disable optional_qualifier@
-+identifier rule1.fn, rule1.local_err;
-+symbol errp;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     <...
-+-    local_err
-++    *errp
-+     ...>
-+ }
-+
-+// Always use the same pattern for checking error
-+@ disable optional_qualifier@
-+identifier rule1.fn;
-+symbol errp;
-+@@
-+
-+ fn(..., Error ** ____, ...)
-+ {
-+     <...
-+-    *errp != NULL
-++    *errp
-+     ...>
-+ }
-+
-+// Revert temporary ___ identifier.
-+@ disable optional_qualifier@
-+identifier rule1.fn;
-+@@
-+
-+ fn(..., Error **
-+-   ____
-++   errp
-+    , ...)
-+ {
-+     ...
-+ }
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index 30140d9bfe..56c133520d 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -214,6 +214,9 @@
-  *         }
-  *         ...
-  *     }
-+ *
-+ * For mass-conversion use script
-+ *   scripts/coccinelle/auto-propagated-errp.cocci
-  */
- 
- #ifndef ERROR_H
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 857f969aa1..047f1b9714 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1998,6 +1998,7 @@ F: include/qemu/error-report.h
- F: qapi/error.json
- F: util/error.c
- F: util/qemu-error.c
-+F: scripts/coccinelle/*err*.cocci
- 
- GDB stub
- M: Alex Bennée <alex.bennee@linaro.org>
--- 
-2.21.0
+Ack
+
+>=20
+>> +#endif /* HW_S390_PV_H */
+>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s39=
+0-virtio-ccw.h
+>> index 8aa27199c9123bab..cd1dccc6e3ba8645 100644
+>=20
+>=20
+> Nothing jumped at me :)
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+
+Thanks
+
+>=20
+
+
+
+--KoNdwDOuqePZPnRT3JgAjOZlJVdOzehc8--
+
+--Gsn8wURgqIIp1Ybjr4EAOE0AIkSY4W14q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5p+MMACgkQ41TmuOI4
+ufiQdQ//Z3g8EB26f52NXpFz2FspM/DlzupZYW01LbJKuK3YS+7aLqgAL10Puhf9
+UpR0ls2CRwEG8dl1GAy9ewefQWyGLhm05ImGoXEODdX0Mc5WhYgjKyVJtSyAz2Qw
+JHrSErkCzF+bfuQLOE6KIiZk2OejSqTdFm70S6yFKU81JWI8XUBbgv0aPdg51qMD
+t2gykHU0kRpcFDgqpLh/cYLndju9TaTi/qs+8OkuL4T/eAFDH0uLuuGXErm6lADI
+K7/pF2d3zFLQrCDoUvrhyUUUTB6qz3e9lBne5xML6PhKpCJmzCchvNUHSKPKSo87
+MSh2W1W+jJ0vnWOIcQsMq/vpPFUfUDXYhZP4BNJA2RChBQZVx2I0Zof/N/Ftv7iV
+UoHozZmHTODOBem0DRwj4WoU9dn7ZcL+bIcmpERxmeTpCu16KZUJRNNsPwp1m/Ms
+foTRQJPxB4fDIMbpm5l3L8x+feNn2691iBPirEzwluVoFoGMBCa/FzqO3B6K9qnv
+bCHa6IzxnJP2Zb1a42hdF/LZ781bBX+4m2kteeAEpxTuK8jfCrtEIPATwOZz6iyT
+frFzZzM4lg/+wndbK4srmAp0u6B7WWPy8itoUPNIi9Kd9aXU2FiWvcsTwYK+apbD
+xhkP+NpFS9ANaZGYSOTVYHC+f4JXrAiOvL9BwjlSyyPyhbbm3hU=
+=NEBi
+-----END PGP SIGNATURE-----
+
+--Gsn8wURgqIIp1Ybjr4EAOE0AIkSY4W14q--
 
 
