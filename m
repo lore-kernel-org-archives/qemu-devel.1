@@ -2,88 +2,103 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995B0C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC60C1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:34:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 646492067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A40F82067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:34:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djGOUB47"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 646492067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XWIUyM7O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40F82067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRZI-0007mq-KR
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:24:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42199)
+	id 1jCRiq-0005WK-UZ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:34:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jCRVn-0002JW-VQ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:20:49 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jCRiC-00056t-2J
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jCRVm-0005wj-Ri
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:20:47 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33090)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jCRVk-0005vY-6c; Thu, 12 Mar 2020 13:20:44 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m5so3397075pgg.0;
- Thu, 12 Mar 2020 10:20:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=yThmBkuW2LdehValOsK92YJ4z7LhKs38L7+Dci/UMV8=;
- b=djGOUB475YL4CZMFaIOy3V9zmrXfRPXnevAeJafk00xB94yJoh5aBVVNkGZrzQVZez
- gx2LFv2WP1HuVkdxTGdCl7WoU2MlbRE6Ukj38aAqJE1xYqUPxpWIjGk+HAWtiEo2ncuw
- E+d5Nk8gSO3BFTyFTfJbMRTVqhcLr+OyR7wb4Xd8BAgmJ99EFQxUYp6tVTwQ31WsUQGY
- QXO5h36UMxX4ZzUekD9WtUS9/qAtBj/vafycjnqrzcdO6xYLYOMLXkf4L3y8MIwQSQN5
- rF3avUpeCLNONX7r4gFu04pMxPkP40z1cUFz+BL+0Eb32qbvwAFp+d5cKxeIwuYxmBoE
- WWpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=yThmBkuW2LdehValOsK92YJ4z7LhKs38L7+Dci/UMV8=;
- b=A4QuwkvbOXWvYQedEEuDKyZ2hi8rEdWyHhrIBqDTF0+120v5oOYe1XCJqLHDW4dTxB
- UyN15R8ZtpTyeZhQWC6e7xSF52FldWSYjB+Sjzjt3GjbuMf93mi2QohlLpHhREF4Og9B
- y5dRu4jrNZlsnSPKAjX1IfVo+jB8hLspJmKgd8xbtML4EyKVQGAomXnFRLfDqrnKTOg0
- woXZaW4O9zPX5g91ELple8k/M1j3ECyDokwmMC45xd1kljS2zqByUFytpwv4GHgpXpgn
- tV+d6FZxxGqCz+sLHcDCexlyf8XF43H4UoSsgeIH5MZb1ETtaXVEUz3FYmP1zkzp6LCm
- UieQ==
-X-Gm-Message-State: ANhLgQ09qEcK3gl0Xz/Qi9hVTB4Ck8rvDC1SlW47FXcNEjlX1aItWMf8
- s8OYLug9wNO4IHq8tX+cY8w=
-X-Google-Smtp-Source: ADFU+vu74nXVbFAp1c0ChlaT+cdCPJu6FMIXB1JHDLF4T3zEwbsEaImSJ2yIonGXXOArhhV60cVhNQ==
-X-Received: by 2002:a63:9d0c:: with SMTP id i12mr8688044pgd.378.1584033642964; 
- Thu, 12 Mar 2020 10:20:42 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id e187sm3149706pfe.50.2020.03.12.10.20.41
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 12 Mar 2020 10:20:42 -0700 (PDT)
-Date: Thu, 12 Mar 2020 10:20:40 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 2/3] hw/arm/fsl-imx6ul: Wire up USB controllers
-Message-ID: <20200312172040.GA18358@roeck-us.net>
-References: <20200310210434.31544-1-linux@roeck-us.net>
- <20200310210434.31544-3-linux@roeck-us.net>
- <CAFEAcA811Zo6JjCait2G467oQo-nL0RTYVdqE-ofmDSxWPcuCQ@mail.gmail.com>
- <20200312165511.GA16719@roeck-us.net>
- <CAFEAcA8QKwrVyBz-iGe0+1Kr7efJZC7nwwrTTV0FSUnmcEW=xA@mail.gmail.com>
+ (envelope-from <liran.alon@oracle.com>) id 1jCRi9-00055h-7I
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:33:34 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:50482)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jCRi8-00054X-U4
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:33:33 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CHU5MH184621;
+ Thu, 12 Mar 2020 17:33:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=1k5neVzAI2t8O/+MOXu8yGGxm13ucX5gYysItt7VSOE=;
+ b=XWIUyM7OGV5VFe1dTKx65KHGFNXmDos/Xkw9LN/SOFLbzpy3njjCeJLXGlbIkCZonb+c
+ jE7W5EzoLZ2Jp4C2BjQElF9Ri32wX6lVx0sX5tcXbYtf9rMBJfmCmjXXdGEHoUp0rN09
+ oi7lQMTVXzxIIp4fH3jEKk+Izw5dqPnspdGE/BsGMDDJn8Xyxbn5On6jd7ZOUPhGy7xu
+ UXaV1UYjG3NDUQZmpnLtFcqQi/QVpOpy89tNEIugPNKlwFjWLLQUDHDjSIaz7WTm++bo
+ Im9jB95MZ88riLuM8SbjYtzWmWD+nX+zG1KGjPHLMLBW7Hu4NY+dM//r//KK0Hil5ITM WQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 2yp9v6e3qt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Mar 2020 17:33:29 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CHX5YI157645;
+ Thu, 12 Mar 2020 17:33:28 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2yp8r0vdp9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Mar 2020 17:33:10 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02CHSa2v021888;
+ Thu, 12 Mar 2020 17:28:36 GMT
+Received: from Lirans-MacBook-Pro.local (/10.74.126.134)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 12 Mar 2020 10:28:35 -0700
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200312172745.1b7b2222@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
+Date: Thu, 12 Mar 2020 19:28:31 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8QKwrVyBz-iGe0+1Kr7efJZC7nwwrTTV0FSUnmcEW=xA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+In-Reply-To: <20200312172745.1b7b2222@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ malwarescore=0 mlxscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003120089
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ spamscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003120089
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 02CHU5MH184621
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,83 +110,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 05:05:25PM +0000, Peter Maydell wrote:
-> On Thu, 12 Mar 2020 at 16:55, Guenter Roeck <linux@roeck-us.net> wrote:
-> >
-> > On Thu, Mar 12, 2020 at 01:19:41PM +0000, Peter Maydell wrote:
-> > > On Tue, 10 Mar 2020 at 21:04, Guenter Roeck <linux@roeck-us.net> wrote:
-> > > > diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
-> > > > @@ -456,6 +467,28 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
-> > > >                                              FSL_IMX6UL_ENETn_TIMER_IRQ[i]));
-> > > >      }
-> > > >
-> > > > +    /* USB */
-> > > > +    for (i = 0; i < FSL_IMX6UL_NUM_USBS; i++) {
-> > > > +        static const int FSL_IMX6UL_USBn_IRQ[] = {
-> > > > +            FSL_IMX6UL_USB2_IRQ,
-> > > > +            FSL_IMX6UL_USB1_IRQ,
-> > > > +        };
-> > >
-> > > Do we really want to wire up USB1 to USB2_IRQ and USB2 to USB1_IRQ ?
-> > > If so, a comment explaining that it is deliberate would be useful.
-> > >
-> > Yes. I think the definitions may be incorrect (or the Linux dts files are
-> > incorrect, but that seems unlikely). I tried the other way but then I get
-> > unhandled interrupt errors when trying to access a USB flash drive.
-> 
-> I guess we should check the datasheet and see if we just
-> have our #define names the wrong way around...
-> 
 
-From "i.MX 6UltraLite Applications Processor Reference Manual":
+On 12/03/2020 18:27, Igor Mammedov wrote:
+> On Wed, 11 Mar 2020 19:08:26 +0200
+> Liran Alon <liran.alon@oracle.com> wrote:
+>> +
+>> +static void
+>> +build_waet(GArray *table_data, BIOSLinker *linker)
+> see build_hmat_lb() for example how to doc comment for such function
+> should look like. Use earliest spec version where table was introduced.
 
-74 USB USBO2 USB OTG2
-75 USB USBO2 USB OTG1
-76 USB_PHY UTMI0 interrupt request
-77 USB_PHY UTMI1 interrupt request
+Note that WAET is a table that is not part of ACPI spec officially.
+It's specified on it's own document, there is only a single version, and=20
+there is only a single table in that document describing that table=20
+structure.
 
-So it looks like the dts files in the Linux kernel are correct.
+Therefore, I cannot write a comment such as build_hmat_lb() have:
+/*
+ =C2=A0* ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Informa=
+tion
+ =C2=A0* Structure: Table 5-146
+*/
 
-> > > Side note: not used here, but in the header file we define:
-> > >     FSL_IMX6UL_USB1_IRQ     = 42,
-> > >     FSL_IMX6UL_USB2_IRQ     = 43,
-> > >     FSL_IMX6UL_USB_PHY1_IRQ = 44,
-> > >     FSL_IMX6UL_USB_PHY2_IRQ = 44,
-> > >
-> > > Is that last one correct, or a cut-n-paste error that should be "45" ?
-> > >
-> > From Linux devicetree files:
-> >
-> >         usbphy1: usbphy@20c9000 {
-> >                 compatible = "fsl,imx6ul-usbphy", "fsl,imx23-usbphy";
-> >                 reg = <0x020c9000 0x1000>;
-> >                 interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
-> >         usbphy2: usbphy@20ca000 {
-> >                 compatible = "fsl,imx6ul-usbphy", "fsl,imx23-usbphy";
-> >                 reg = <0x020ca000 0x1000>;
-> >                 interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
-> >         usbotg1: usb@2184000 {
-> >                 compatible = "fsl,imx6ul-usb", "fsl,imx27-usb";
-> >                 reg = <0x02184000 0x200>;
-> >                 interrupts = <GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>;
-> >         usbotg2: usb@2184200 {
-> >                 compatible = "fsl,imx6ul-usb", "fsl,imx27-usb";
-> >                 reg = <0x02184200 0x200>;
-> >                 interrupts = <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>;
-> >
-> > Should I maybe fix the definitions in a separate patch ?
-> 
-> Yes please.
-> 
-Ok, will do. And, sorry, I should have done that in the first place.
+My best attempt to do something similar in v2 is:
+/*
+ =C2=A0* Windows ACPI Emulated Devices Table
+ =C2=A0* (Version 1.0 - April 6, 2009)
+ =C2=A0* Spec:=20
+http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470B-A97E-CE7C=
+E0D98DC2/WAET.docx
+ =C2=A0*
+ =C2=A0* Helpful to speedup Windows guests and ignored by others.
+ =C2=A0*/
 
-Thanks,
-Guenter
+If it's not sufficient. Please suggest alternative phrasing which I=20
+would use in v2.
+
+>
+>> +{
+>> +    AcpiTableWaet *waet;
+>> +
+>> +    waet =3D acpi_data_push(table_data, sizeof(*waet));
+>> +    waet->emulated_device_flags =3D cpu_to_le32(ACPI_WAET_PM_TIMER_GO=
+OD);
+> we don't use packed structures for building ACPI tables anymore (there =
+is
+> old code that still does but that's being converted when we touch it)
+>
+> pls use build_append_int_noprefix() api instead, see build_amd_iommu() =
+as
+> an example how to build binary tables using it and how to use comments
+> to document fields.
+> Basic idea is that api makes function building a table match table's
+> description in spec (each call represents a row in spec) and comment
+> belonging to a row should contain verbatim field name as used by spec
+> so reader could copy/past and grep it easily.
+Thanks for pointing this out.
+I will make sure to update my code accordingly in v2.
+>
+>
+>
+>
+>> +
+>> +    build_header(linker, table_data,
+>> +                 (void *)waet, "WAET", sizeof(*waet), 1, NULL, NULL);
+>> +}
+>> +
+>>   /*
+>>    *   IVRS table as specified in AMD IOMMU Specification v2.62, Secti=
+on 5.2
+>>    *   accessible here https://urldefense.com/v3/__http://support.amd.=
+com/TechDocs/48882_IOMMU.pdf__;!!GqivPVa7Brio!On_WsDCS8ysOeUG17h1l3dTpWEm=
+79AHwMHLbbUgsvagBSpgZAk5U1cXddn6ZNOU$
+>> @@ -2859,6 +2872,11 @@ void acpi_build(AcpiBuildTables *tables, Machin=
+eState *machine)
+>>                             machine->nvdimms_state, machine->ram_slots=
+);
+>>       }
+>>  =20
+>> +    if (!pcmc->do_not_add_waet_acpi) {
+>> +        acpi_add_table(table_offsets, tables_blob);
+>> +        build_waet(tables_blob, tables->linker);
+>> +    }
+> we typically do not version ACPI table changes (there might be exceptio=
+ns
+> but it should be a justified one).
+> ACPI tables are considered to be a part of firmware (even though they a=
+re
+> generated by QEMU) so on QEMU upgrade user gets a new firmware along wi=
+th
+> new ACPI tables.
+
+Hmm... I would have expected as a QEMU user that upgrading QEMU may=20
+update my firmware exposed table (Such as ACPI),
+but only if I don't specify I wish to run on a specific machine-type. In=20
+that case, I would've expect to be exposed with exact same firmware=20
+information.
+I understood that this was one of the main reasons why ACPI/SMBIOS=20
+generation was moved from SeaBIOS to QEMU.
+
+If you think this isn't the case, I can just remove this flag (Makes=20
+code simpler). What do you prefer?
+
+Thanks for the review,
+-Liran
+
+
 
