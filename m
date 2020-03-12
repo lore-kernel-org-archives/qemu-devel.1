@@ -2,96 +2,95 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1721C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A188FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C109E20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8028A20575
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 06:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UIAqUMME"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C109E20650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QoHsud+t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8028A20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCHKH-0002V7-Ri
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 02:28:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57213)
+	id 1jCHLv-0003yg-Ls
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 02:29:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jCHJk-00026I-PC
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:27:41 -0400
+ (envelope-from <mst@redhat.com>) id 1jCHLL-0003Z1-Mr
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:29:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jCHJj-0001gd-Ia
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:27:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43338
+ (envelope-from <mst@redhat.com>) id 1jCHLK-0002ri-L9
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:29:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36643
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCHJj-0001gZ-Ez
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:27:39 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCHLK-0002qq-HR
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 02:29:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583994458;
+ s=mimecast20190719; t=1583994558;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vW79lUS0h1V7Eyblq4bb+3SFkOltmth3ON+GRbz419c=;
- b=UIAqUMMEy+EyrRoo3RSbHTWt8ItzoD6AmMSGDNkkkpt69364btE89fYQ/U6p+r+dOhVWps
- E5UJIECOJw1ESflkIxtxY3EiT5UNlJhlIIOPrRnGVBrFlSONPcae39PPRZFQe9FEXvK5Q7
- oMGWbsR0DpKVHXGC2KkrOAQ/6XK8bNQ=
+ bh=i9n5NubjGxEKOWHwsxFCKXhSSqLMBgC3mhH3M43NoPU=;
+ b=QoHsud+tK30dN0calaIJIId+JFV87QmbR9eiZnEMMOP3yRqoKi/2nZb6Y7VrL16CCnbDiQ
+ 26L9bOe0HADa7tohPdqNE1ujRVsFUeezWqT1DjntAMSvH0VAFL5GjK3nTYkiwx43BHddvi
+ CzLYvfLbgFBX82Jkbhzjwcfcz70P2jM=
 Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
  [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-04u9vXEMMuOL3f9TgoybDA-1; Thu, 12 Mar 2020 02:27:37 -0400
-X-MC-Unique: 04u9vXEMMuOL3f9TgoybDA-1
-Received: by mail-qk1-f198.google.com with SMTP id k194so3174268qke.10
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 23:27:37 -0700 (PDT)
+ us-mta-163-7dgvDAB-O2qUD3G01nbC4w-1; Thu, 12 Mar 2020 02:29:14 -0400
+X-MC-Unique: 7dgvDAB-O2qUD3G01nbC4w-1
+Received: by mail-qk1-f198.google.com with SMTP id 22so3193886qkc.7
+ for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 23:29:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=yf15mK3j0ve3Ws3qlHwRST8JSAglK1FKhDOoy3AIEA8=;
- b=NdzHUmxr9YsiZpc9oAfWtLQuic04sgtQY5D/SEylL8GojaW8vc4+wF12xjMUvzKMWr
- qc3DcBmSubvhMcPbDMAZ6OdWae2F0cjnz45hI7yS6dVYPsJ2kmzqVe22sYHtQ2spsPRQ
- 8Ph0pR4OnnH4InKPbv/mPLVH+DNJVHBTZja5uUMI0CxCOHBOvpHlhuzliJ7ZWusx46Ct
- 95ZZUhaza72PHvcU6bRLqZkvp4Z+cTl3mEui9W5pSP2XGplxqZ54wlUW2ItamXEMKB4Z
- j7/syjJRxH/ARqzy7edt+TpMty71vaC/9k6k8IU4xa40zwjLp63/6qkF8fC0/jf17lcD
- fZPA==
-X-Gm-Message-State: ANhLgQ365s9Bj/n+Vbdql+wC+ciMuTxf//3Peohdw7MZy6oKRb5eXaq+
- /8hA4f+WIyNCujd3rMlHXE0KCghM6TMjC8yO2mDhYYTwVS4+6Gylxa1Lwwz9W/h/TmQ0eXrkT58
- hBHwAwggsgSYdEbY=
-X-Received: by 2002:a0c:ecc3:: with SMTP id o3mr6139510qvq.163.1583994456496; 
- Wed, 11 Mar 2020 23:27:36 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvNTpkCjt4y/GnMaV2A4H5jlVn1SnHz0XFSH1tgWwUKhyaMurNM3ONJxrLkNWeCP5PVmXIOQg==
-X-Received: by 2002:a0c:ecc3:: with SMTP id o3mr6139497qvq.163.1583994456263; 
- Wed, 11 Mar 2020 23:27:36 -0700 (PDT)
+ bh=UFFyDSR7FtJiuuT7AcaoJ7MGpczFKXVyCkW+ZyfiMNY=;
+ b=MzKVP/UoOAC5/k32yggSkSM+lwibHP/gFtsrjN4QQiXj3Lg5oXGLOJ1JpEnv21hki9
+ syiweyfz+X8ZXUw8zquOdybqbNywRgChxcnscI2anbJnhVG0SJ+1iH8u896OVonZwuw6
+ HsMjZXG3AKjjBgrBHBHthHvGQirf6kjdMt2p1T1W10brlq7twT9SAVZgZAxIElIzrjUt
+ SSzP2DFhzkCzSnx9aDJqoOs8LHtTKjA5ElC8WjDw93TTiWNEP9qyZjSylpRu+Qc3/QXG
+ zcW+MGVMp3eJBVSqOa1Ks1MJQ0UafW1919Oy800sb2KGHrt7JTjS+PZsbC9b2k5zTENu
+ /z1A==
+X-Gm-Message-State: ANhLgQ0aGWCrQIVP8XNs7KuBpNb1LU6Jh9JNOOswnvy9VKW+xXb27Q1T
+ YNnRaiAUlVi9AyZb0YN6VDncRyoS7S9czLoMbyc/phlTwatbYygXkYY4Q6yACJCBy6w8zy93s87
+ Os7kX04IMSRFdJOw=
+X-Received: by 2002:ae9:f503:: with SMTP id o3mr6000867qkg.402.1583994553444; 
+ Wed, 11 Mar 2020 23:29:13 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs2KekrrGgmJaowfg2mibtUVpqct5x3l8jwfaW/iS3mCcEoRWeLeTmuithr1zPJVf+eyRPlKw==
+X-Received: by 2002:ae9:f503:: with SMTP id o3mr6000855qkg.402.1583994553214; 
+ Wed, 11 Mar 2020 23:29:13 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id a141sm27093323qkb.50.2020.03.11.23.27.32
+ by smtp.gmail.com with ESMTPSA id o16sm26896975qke.35.2020.03.11.23.29.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Mar 2020 23:27:35 -0700 (PDT)
-Date: Thu, 12 Mar 2020 02:27:30 -0400
+ Wed, 11 Mar 2020 23:29:12 -0700 (PDT)
+Date: Thu, 12 Mar 2020 02:29:07 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
-Message-ID: <20200312021332-mutt-send-email-mst@kernel.org>
-References: <158395315920.8804.12475968769225149761@39012742ff91>
- <ebb59967-ebd3-374a-a2a6-1f374e4768ad@oracle.com>
- <20200311162321-mutt-send-email-mst@kernel.org>
- <f746828c-0a15-2613-a6bf-300750be1be5@oracle.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 1/2] Use -isystem for linux-headers dir
+Message-ID: <20200312022902-mutt-send-email-mst@kernel.org>
+References: <20200311232342.1614944-1-ehabkost@redhat.com>
+ <20200311232342.1614944-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f746828c-0a15-2613-a6bf-300750be1be5@oracle.com>
+In-Reply-To: <20200311232342.1614944-2-ehabkost@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,58 +102,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
- elad.gabay@oracle.com, imammedo@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, jingqi.liu@intel.com, jtomko@redhat.com,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 03:31:49AM +0200, Liran Alon wrote:
+On Wed, Mar 11, 2020 at 07:23:41PM -0400, Eduardo Habkost wrote:
+> glibc and Linux-provided headers are known to generate macro
+> redefinition warnings when used together.  For example:
+> <linux/mman.h> and <sys/mman.h> duplicate some macro definitions.
 >=20
-> On 11/03/2020 22:24, Michael S. Tsirkin wrote:
-> > Notice the process as documented in ./tests/qtest/bios-tables-test.c
-> >=20
-> Thanks for explicitly pointing me to that process.
+> We normally never see those warnings because GCC suppresses
+> warnings generated by system headers.  We carry our own copy of
+> Linux header files, though, and this makes those warnings not be
+> suppressed when glibc headers are included before Linux headers
+> (e.g. if <sys/mman.h> is included before <linux/mman.h>).
 >=20
-> I have followed the process described there (Both steps 1-3 and steps 4-7=
-).
-> On step (6), I have noted that many existing ACPI tables don't have expec=
-ted
-> binaries for all the execution-matrix.
-> E.g. tests/data/acpi/pc/APIC.{bridge, ipmikcs, memhp, numamem} are all
-> missing.
-> Similar missing files exists for FACP, FACS, HPET and MCFG.
+> Use -isystem instead of -I for linux-headers.  This makes the
+> compiler treat our linux-headers directory the same way it treats
+> system-provided Linux headers, and suppress warnings generated by
+> them.
 >=20
-> I should add for WAET the expected binaries for all the execution-matrix
-> right?
-> Is it just an existing issue that for the existing tables some of the
-> expected binaries are missing? But the tests seems to pass.
-> Can you clarify this for me?
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+> Changes v1 -> v2:
+> * Use -isystem for $PWD/linux-headers too
+>   Reported-by: "Michael S. Tsirkin" <mst@redhat.com>
+> ---
+>  Makefile.target | 2 +-
+>  configure       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >=20
-> Thanks,
-> -Liran
-
-It's because of this (which we should probably rewrite as a loop):
-
-try_again:
-        aml_file =3D g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machin=
-e,
-                                   sdt->aml, ext);
-        if (getenv("V")) {
-            fprintf(stderr, "Looking for expected file '%s'\n", aml_file);
-        }
-        if (g_file_test(aml_file, G_FILE_TEST_EXISTS)) {
-            exp_sdt.aml_file =3D aml_file;
-        } else if (*ext !=3D '\0') {
-            /* try fallback to generic (extension less) expected file */
-            ext =3D "";
-            g_free(aml_file);
-            goto try_again;
-        }
-
-if WAET is always added, then a single WAET will be enough for you.
-
---=20
-MST
+> diff --git a/Makefile.target b/Makefile.target
+> index 2d43dc586a..934a9f7431 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -12,7 +12,7 @@ endif
+> =20
+>  $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
+>  ifdef CONFIG_LINUX
+> -QEMU_CFLAGS +=3D -I../linux-headers
+> +QEMU_CFLAGS +=3D -isystem ../linux-headers
+>  endif
+>  QEMU_CFLAGS +=3D -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BASE_ARC=
+H) -DNEED_CPU_H
+> =20
+> diff --git a/configure b/configure
+> index cbf864bff1..bf5bf70600 100755
+> --- a/configure
+> +++ b/configure
+> @@ -899,7 +899,7 @@ Linux)
+>    linux=3D"yes"
+>    linux_user=3D"yes"
+>    kvm=3D"yes"
+> -  QEMU_INCLUDES=3D"-I\$(SRC_PATH)/linux-headers -I$PWD/linux-headers $QE=
+MU_INCLUDES"
+> +  QEMU_INCLUDES=3D"-isystem \$(SRC_PATH)/linux-headers -isystem $PWD/lin=
+ux-headers $QEMU_INCLUDES"
+>    supported_os=3D"yes"
+>    libudev=3D"yes"
+>  ;;
+> --=20
+> 2.24.1
 
 
