@@ -2,47 +2,49 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A72C4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA4C0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:03:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 768CC20716
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:03:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768CC20716
+	by mail.kernel.org (Postfix) with ESMTPS id C3AB920716
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 09:03:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AB920716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCJkC-0004Es-EV
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:03:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51624)
+	id 1jCJkF-0004N4-Lk
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 05:03:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCJhH-00073z-Rj
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:09 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jCJhA-0006rp-KY
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCJhB-0004s0-PO
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:07 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48458)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1jCJh9-0004pm-Cu
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:00 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48430)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jCJhB-0004qf-EM
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 05:00:01 -0400
+ id 1jCJh9-0004ox-5D
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:59:59 -0400
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1jCJgp-0004Ve-Pn; Thu, 12 Mar 2020 11:59:40 +0300
+ id 1jCJgv-0004Ve-2Y; Thu, 12 Mar 2020 11:59:45 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 00/10] error: auto propagated local_err part I
-Date: Thu, 12 Mar 2020 11:59:26 +0300
-Message-Id: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v9 05/10] pflash: introduce ERRP_AUTO_PROPAGATE
+Date: Thu, 12 Mar 2020 11:59:31 +0300
+Message-Id: <20200312085936.9552-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -60,130 +62,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
- armbru@redhat.com, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v9
-01: A lot of rewordings [thanks to Eric]
-    Still, keep all r-b marks, assuming that they are mostly about macro definition
-02: significant changes are:
-    1. Do not match double propagation pattern in ERRP_AUTO_PROPAGATE-adding rule
-    2. Introduce errp->____->errp scheme to match only functions matched by rule1
-       in rules inherited from rule1
-    3. Add rules to warn about unusual patterns
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &error_fatal
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-    Also, add line to MAINTAINERS to keep error related coccinelle scripts under
-    Error section.
-07: add Christian's r-b
-09: add Eric's r-b
-10: a bit of context in xen_block_iothread_create  and qmp_object_add()
-    signature are changed. Patch change is obvious, so I keep Paul's r-b
+If we want to check error after errp-function call, we need to
+introduce local_err and then propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatal, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
-v9 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v9
-v8 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v8
+This commit is generated by command
 
-In these series, there is no commit-per-subsystem script, each generated
-commit is generated in separate.
-
-Still, generating commands are very similar, and looks like
-
-    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
+    sed -n '/^Parallel NOR Flash devices$/,/^$/{s/^F: //p}' \
+        MAINTAINERS | \
     xargs git ls-files | grep '\.[hc]$' | \
     xargs spatch \
         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
         --macro-file scripts/cocci-macro-file.h \
         --in-place --no-show-diff --max-width 80
 
-Note, that in each generated commit, generation command is the only
-text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-commits (for example, after rebase, or change in coccinelle script), you
-may use the following command:
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 7 +++----
+ hw/block/pflash_cfi02.c | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-git rebase -x "sh -c \"git show --pretty= --name-only | xargs git checkout HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~7
-
-Which will start automated interactive rebase for generated patches,
-which will stop if generated patch changed
-(you may do git commit --amend to apply updated generated changes).
-
-Note:
-  git show --pretty= --name-only   - lists files, changed in HEAD
-  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
-
-
-Check for compilation of changed .c files
-git rebase -x "sh -c \"git show --pretty= --name-only | sed -n 's/\.c$/.o/p' | xargs make -j9\"" HEAD~7
-
-Vladimir Sementsov-Ogievskiy (10):
-  error: auto propagated local_err
-  scripts: Coccinelle script to use ERRP_AUTO_PROPAGATE()
-  hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-  SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
-  pflash: introduce ERRP_AUTO_PROPAGATE
-  fw_cfg: introduce ERRP_AUTO_PROPAGATE
-  virtio-9p: introduce ERRP_AUTO_PROPAGATE
-  TPM: introduce ERRP_AUTO_PROPAGATE
-  nbd: introduce ERRP_AUTO_PROPAGATE
-  xen: introduce ERRP_AUTO_PROPAGATE
-
- scripts/coccinelle/auto-propagated-errp.cocci | 327 ++++++++++++++++++
- include/block/nbd.h                           |   1 +
- include/qapi/error.h                          | 208 +++++++++--
- block/nbd.c                                   |  21 +-
- hw/9pfs/9p-local.c                            |  12 +-
- hw/9pfs/9p.c                                  |   1 +
- hw/block/dataplane/xen-block.c                |  17 +-
- hw/block/pflash_cfi01.c                       |   7 +-
- hw/block/pflash_cfi02.c                       |   7 +-
- hw/block/xen-block.c                          | 125 +++----
- hw/nvram/fw_cfg.c                             |  14 +-
- hw/pci-host/xen_igd_pt.c                      |   7 +-
- hw/sd/sdhci-pci.c                             |   7 +-
- hw/sd/sdhci.c                                 |  21 +-
- hw/sd/ssi-sd.c                                |  26 +-
- hw/tpm/tpm_util.c                             |   7 +-
- hw/xen/xen-backend.c                          |   7 +-
- hw/xen/xen-bus.c                              |  92 +++--
- hw/xen/xen-host-pci-device.c                  |  27 +-
- hw/xen/xen_pt.c                               |  25 +-
- hw/xen/xen_pt_config_init.c                   |  20 +-
- nbd/client.c                                  |   5 +
- nbd/server.c                                  |   5 +
- tpm.c                                         |   7 +-
- MAINTAINERS                                   |   1 +
- 25 files changed, 717 insertions(+), 280 deletions(-)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Berger <stefanb@linux.ibm.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Cc: xen-devel@lists.xenproject.org
-
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 24f3bce7ef..a5755e6119 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -700,12 +700,12 @@ static const MemoryRegionOps pflash_cfi01_ops = {
+ 
+ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PFlashCFI01 *pfl = PFLASH_CFI01(dev);
+     uint64_t total_len;
+     int ret;
+     uint64_t blocks_per_device, sector_len_per_device, device_len;
+     int num_devices;
+-    Error *local_err = NULL;
+ 
+     if (pfl->sector_len == 0) {
+         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
+@@ -739,9 +739,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+         &pfl->mem, OBJECT(dev),
+         &pflash_cfi01_ops,
+         pfl,
+-        pfl->name, total_len, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++        pfl->name, total_len, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 12f18d401a..3da9f56391 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -718,9 +718,9 @@ static const MemoryRegionOps pflash_cfi02_ops = {
+ 
+ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PFlashCFI02 *pfl = PFLASH_CFI02(dev);
+     int ret;
+-    Error *local_err = NULL;
+ 
+     if (pfl->uniform_sector_len == 0 && pfl->sector_len[0] == 0) {
+         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
+@@ -786,9 +786,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+ 
+     memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
+                                   &pflash_cfi02_ops, pfl, pfl->name,
+-                                  pfl->chip_len, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                  pfl->chip_len, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
