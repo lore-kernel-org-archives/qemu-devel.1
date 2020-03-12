@@ -2,38 +2,39 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B7EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37052C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:39:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF59E206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:38:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D38DC206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:39:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5RQ/S2y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF59E206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWZunL/m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38DC206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTfV-0004Lh-VV
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:38:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44212)
+	id 1jCTfr-0004yh-2p
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:39:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jCTdc-0006zo-My
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:37:01 -0400
+ (envelope-from <crosa@redhat.com>) id 1jCTdd-00074e-HK
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jCTdb-0007s1-I3
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:37:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57254
+ (envelope-from <crosa@redhat.com>) id 1jCTdc-0007sH-0k
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:37:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29622
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jCTdb-0007ro-EN
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jCTdb-0007s9-TE
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:36:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1584041819;
@@ -41,30 +42,30 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FVtqhaDz31hPkY62S3ERAd5gLcsSXZwSZmNt1nLa3ww=;
- b=Z5RQ/S2ydCwA9JaaZhKayx0hhIxRuSIGtpEQncLVIW/ZpuRvrNxAHqXQkQWxjIK/o5nzI5
- TgAZDo91FnCMjN3oYviVbc8TMZjK2vJcQLeLr/qL//aWjFB4cZ5a6Awswy3CPhVWN5QaGv
- yBFHIEkOXtfW0I/xCgmB41SzH1bO+OA=
+ bh=ZPizTgORafpKHefddcD0j2V6GIQK6ROg5iFW9mvYRmY=;
+ b=KWZunL/mgmAdT4QLGEYaSq91VGy1VIGKhlh1k0WhuN35EGfWVL9RNo5xocRyQ2c8PGnsnM
+ HhZHPPvZgZpYTHTI1EMALTUNmExOTVhyesjlfWbYVi4C+A7PVWjc8RWYpHhsQiS3f8sK46
+ Rwc9R5NhTHuyvz7H492HQgjBY8XpbdQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-pFxr24iPMYCpeOHrYcnXPw-1; Thu, 12 Mar 2020 15:36:55 -0400
-X-MC-Unique: pFxr24iPMYCpeOHrYcnXPw-1
+ us-mta-198-mwYTm12SOric2lx0YNd8zA-1; Thu, 12 Mar 2020 15:36:56 -0400
+X-MC-Unique: mwYTm12SOric2lx0YNd8zA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA943801F88;
- Thu, 12 Mar 2020 19:36:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C31E19251A9;
+ Thu, 12 Mar 2020 19:36:55 +0000 (UTC)
 Received: from dhcp-17-173.bos.redhat.com (dhcp-17-173.bos.redhat.com
  [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F34065C1B5;
- Thu, 12 Mar 2020 19:36:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5D075C1B5;
+ Thu, 12 Mar 2020 19:36:53 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Subject: [PATCH 3/5] GitLab CI: avoid calling before_scripts on unintended jobs
-Date: Thu, 12 Mar 2020 15:36:14 -0400
-Message-Id: <20200312193616.438922-4-crosa@redhat.com>
+Subject: [PATCH 4/5] GitLab Gating CI: introduce pipeline-status contrib script
+Date: Thu, 12 Mar 2020 15:36:15 -0400
+Message-Id: <20200312193616.438922-5-crosa@redhat.com>
 In-Reply-To: <20200312193616.438922-1-crosa@redhat.com>
 References: <20200312193616.438922-1-crosa@redhat.com>
 MIME-Version: 1.0
@@ -97,97 +98,190 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At this point it seems that all jobs depend on those steps, with
-maybe the EDK2 jobs as exceptions.
+This script is intended to be used right after a push to a branch.
 
-The jobs that will be added will not want those scripts to be
-run, so let's move these steps to the appropriate jobs, while
-still trying to avoid repetition.
+By default, it will look for the pipeline associated with the commit
+that is the HEAD of the *local* staging branch.  It can be used as a
+one time check, or with the `--wait` option to wait until the pipeline
+completes.
+
+If the pipeline is successful, then a merge of the staging branch into
+the master branch should be the next step.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.yml | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ contrib/ci/scripts/gitlab-pipeline-status | 148 ++++++++++++++++++++++
+ 1 file changed, 148 insertions(+)
+ create mode 100755 contrib/ci/scripts/gitlab-pipeline-status
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 72f8b8aa51..3ef1551273 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -1,11 +1,10 @@
- include:
-   - local: '/.gitlab-ci-edk2.yml'
-=20
--before_script:
-+build-system1:
-+ before_script: &before_scr_apt
-  - apt-get update -qq
-  - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev geniso=
-image
--
--build-system1:
-  script:
-  - apt-get install -y -qq libgtk-3-dev libvte-dev nettle-dev libcacard-dev
-       libusb-dev libvde-dev libspice-protocol-dev libgl1-mesa-dev libvdepl=
-ug-dev
-@@ -18,6 +17,8 @@ build-system1:
-  - make -j2 check
-=20
- build-system2:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio-d=
-ev
-       libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
-@@ -31,6 +32,8 @@ build-system2:
-  - make -j2 check
-=20
- build-disabled:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - mkdir build
-  - cd build
-@@ -45,6 +48,8 @@ build-disabled:
-  - make -j2 check-qtest SPEED=3Dslow
-=20
- build-tcg-disabled:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - apt-get install -y -qq clang libgtk-3-dev libusb-dev
-  - mkdir build
-@@ -63,6 +68,8 @@ build-tcg-disabled:
-             260 261 262 263 264 270 272 273 277 279
-=20
- build-user:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - mkdir build
-  - cd build
-@@ -72,6 +79,8 @@ build-user:
-  - make run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
-=20
- build-clang:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - apt-get install -y -qq clang libsdl2-dev libattr1-dev libcap-ng-dev
-       xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev librbd=
--dev
-@@ -84,6 +93,8 @@ build-clang:
-  - make -j2 check
-=20
- build-tci:
-+ before_script:
-+  *before_scr_apt
-  script:
-  - TARGETS=3D"aarch64 alpha arm hppa m68k microblaze moxie ppc64 s390x x86=
-_64"
-  - mkdir build
+diff --git a/contrib/ci/scripts/gitlab-pipeline-status b/contrib/ci/scripts=
+/gitlab-pipeline-status
+new file mode 100755
+index 0000000000..83d412daec
+--- /dev/null
++++ b/contrib/ci/scripts/gitlab-pipeline-status
+@@ -0,0 +1,148 @@
++#!/usr/bin/env python3
++
++"""
++Checks the GitLab pipeline status for a given commit commit
++"""
++
++# pylint: disable=3DC0103
++
++import argparse
++import http.client
++import json
++import os
++import subprocess
++import time
++import sys
++
++
++def get_local_staging_branch_commit():
++    """
++    Returns the commit sha1 for the *local* branch named "staging"
++    """
++    result =3D subprocess.run(['git', 'rev-parse', 'staging'],
++                            stdin=3Dsubprocess.DEVNULL,
++                            stdout=3Dsubprocess.PIPE,
++                            stderr=3Dsubprocess.DEVNULL,
++                            cwd=3Dos.path.dirname(__file__),
++                            universal_newlines=3DTrue).stdout.strip()
++    if result =3D=3D 'staging':
++        raise ValueError("There's no local staging branch")
++    if len(result) !=3D 40:
++        raise ValueError("Branch staging HEAD doesn't look like a sha1")
++    return result
++
++
++def get_pipeline_status(project_id, commit_sha1):
++    """
++    Returns the JSON content of the pipeline status API response
++    """
++    url =3D '/api/v4/projects/{}/pipelines?sha=3D{}'.format(project_id,
++                                                        commit_sha1)
++    connection =3D http.client.HTTPSConnection('gitlab.com')
++    connection.request('GET', url=3Durl)
++    response =3D connection.getresponse()
++    if response.code !=3D http.HTTPStatus.OK:
++        raise ValueError("Failed to receive a successful response")
++    json_response =3D json.loads(response.read())
++    # afaict, there should one one pipeline for the same project + commit
++    # if this assumption is false, we can add further filters to the
++    # url, such as username, and order_by.
++    if not json_response:
++        raise ValueError("No pipeline found")
++    return json_response[0]
++
++
++def wait_on_pipeline_success(timeout, interval,
++                             project_id, commit_sha):
++    """
++    Waits for the pipeline to end up to the timeout given
++    """
++    start =3D time.time()
++    while True:
++        if time.time() >=3D (start + timeout):
++            print("Waiting on the pipeline success timed out")
++            return False
++
++        status =3D get_pipeline_status(project_id, commit_sha)
++        if status['status'] =3D=3D 'running':
++            time.sleep(interval)
++            print('running...')
++            continue
++
++        if status['status'] =3D=3D 'success':
++            return True
++
++        msg =3D "Pipeline ended unsuccessfully, check: %s" % status['web_u=
+rl']
++        print(msg)
++        return False
++
++
++def main():
++    """
++    Script entry point
++    """
++    parser =3D argparse.ArgumentParser(
++        prog=3D'pipeline-status',
++        description=3D'check or wait on a pipeline status')
++
++    parser.add_argument('-t', '--timeout', type=3Dint, default=3D7200,
++                        help=3D('Amount of time (in seconds) to wait for t=
+he '
++                              'pipeline to complete.  Defaults to '
++                              '%(default)s'))
++    parser.add_argument('-i', '--interval', type=3Dint, default=3D60,
++                        help=3D('Amount of time (in seconds) to wait betwe=
+en '
++                              'checks of the pipeline status.  Defaults '
++                              'to %(default)s'))
++    parser.add_argument('-w', '--wait', action=3D'store_true', default=3DF=
+alse,
++                        help=3D('Wether to wait, instead of checking only =
+once '
++                              'the status of a pipeline'))
++    parser.add_argument('-p', '--project-id', type=3Dint, default=3D111676=
+99,
++                        help=3D('The GitLab project ID. Defaults to the pr=
+oject '
++                              'for https://gitlab.com/qemu-project/qemu, t=
+hat '
++                              'is, "%(default)s"'))
++    try:
++        default_commit =3D get_local_staging_branch_commit()
++        commit_required =3D False
++    except ValueError:
++        default_commit =3D ''
++        commit_required =3D True
++    parser.add_argument('-c', '--commit', required=3Dcommit_required,
++                        default=3Ddefault_commit,
++                        help=3D('Look for a pipeline associated with the g=
+iven '
++                              'commit.  If one is not explicitly given, th=
+e '
++                              'commit associated with the local branch nam=
+ed '
++                              '"staging" is used.  Default: %(default)s'))
++    parser.add_argument('--verbose', action=3D'store_true', default=3DFals=
+e,
++                        help=3D('A minimal verbosity level that prints the=
+ '
++                              'overall result of the check/wait'))
++
++    args =3D parser.parse_args()
++
++    try:
++        if args.wait:
++            success =3D wait_on_pipeline_success(
++                args.timeout,
++                args.interval,
++                args.project_id,
++                args.commit)
++        else:
++            status =3D get_pipeline_status(args.project_id,
++                                         args.commit)
++            success =3D status['status'] =3D=3D 'success'
++    except Exception as error:      # pylint: disable=3DW0703
++        success =3D False
++        if args.verbose:
++            print("ERROR: %s" % error.args[0])
++
++    if success:
++        if args.verbose:
++            print('success')
++        sys.exit(0)
++    else:
++        if args.verbose:
++            print('failure')
++        sys.exit(1)
++
++
++if __name__ =3D=3D '__main__':
++    main()
 --=20
 2.24.1
 
