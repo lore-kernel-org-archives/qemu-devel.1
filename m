@@ -2,91 +2,86 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D43C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 04:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD67C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E00B20739
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 04:39:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAABD20739
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 05:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iJXlrRjV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E00B20739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=tencent.com header.i=@tencent.com header.b="mxRFgsCW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAABD20739
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tencent.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCFd1-00028W-8Z
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 00:39:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38258)
+	id 1jCG2v-0001fg-Of
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 01:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCFcH-0001dO-Ut
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 00:38:42 -0400
+ (envelope-from <bauerchen@tencent.com>) id 1jCG2C-0000RB-FF
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCFcG-0000Nj-VZ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 00:38:41 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38090)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCFcG-0000Mv-OY
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 00:38:40 -0400
-Received: by mail-pl1-x642.google.com with SMTP id w3so2135819plz.5
- for <qemu-devel@nongnu.org>; Wed, 11 Mar 2020 21:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=BPruapG5gkRbwPfWuXzqL/1TOcvgyX/vSJbSLtZKK5w=;
- b=iJXlrRjVQE2EKiA2R9VAb9bUhs8PkPkF7Pup4DzVvkXWkTMTVeqZvt5+6W8rOcbLNb
- /eXcYdzwVFnVT/4YEUC8q2zHAKslbDp1Rh2+iwmlpeW68uxjRD0+yMQAFsG5LiPjNI+M
- 6WNSYposoa+CHbvyta58HskcPVwAJljQ209/AKCYc7M+jMgnJLXsw92+T1E+Qd9Wh9g7
- 5LHag7dDVbK3BS7L4xFIBsHbYwyrd78G+EiZTRgCYtgLfYFETKEpRg1MnC2O7CkaaAs8
- ykMHOWLIds8OsXm77+JUIi0FQlBsaomwZtxzNUoy696Dz8kAIxiNTtQ405DlD3r1tQi7
- qyGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BPruapG5gkRbwPfWuXzqL/1TOcvgyX/vSJbSLtZKK5w=;
- b=sk8jcXQ7Kj+HIKqKk3mRGItxbCkSbdbT3DDQwnKRFRwy6irlYrA2mTbKBTON3Td8DG
- km4K879Y0gQR6DKn4WIUHqVmeMLwrvr4Hc8NYhEaGXOCrYeMiYEwBIUWOjz7wDkdpUbv
- DZqqy2xJT3bDLoXFNnUpln9gTHENvMJJEmRV/oQtpouz7x7GnGjV9ErsfQyomMqlYA5c
- MRUD+6+EsjFVYqib5xdaqALqGL2JDP0JOEBlMR6sq2nemKlgf0yfOUL7owAHoNukq8Mn
- PHdpauD/bYwHkUIxx1hPBOBehLdxQXZDNaFKi6bM5lIMt0dUSnPs+h7QpyR14kPMJqi3
- JbHg==
-X-Gm-Message-State: ANhLgQ2F2KuKSCOGghxYPmS5HlAPsuu89ihOVrhru3o4sN5VqIYuvwq9
- 24HT8MWB7JcVx++rq43f5Lsgug==
-X-Google-Smtp-Source: ADFU+vs/XghBeZg1QDfhxCmcWrB5DWYm8uO2l26iWep1oqiRTW3QBbWX3nUm2bTt4XMbk0zOc6oR/A==
-X-Received: by 2002:a17:902:9890:: with SMTP id
- s16mr6007662plp.71.1583987919419; 
- Wed, 11 Mar 2020 21:38:39 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- y125sm2205770pfy.195.2020.03.11.21.38.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Mar 2020 21:38:38 -0700 (PDT)
-Subject: Re: [PATCH 02/16] accel/tcg: Add probe_access_flags
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20200311064420.30606-1-richard.henderson@linaro.org>
- <20200311064420.30606-3-richard.henderson@linaro.org>
-Message-ID: <9d7cd2d0-298b-74a1-94e7-cd6889627c6e@linaro.org>
-Date: Wed, 11 Mar 2020 21:38:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bauerchen@tencent.com>) id 1jCG28-0005CH-7Q
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 01:05:25 -0400
+Received: from mail4.tencent.com ([183.57.53.109]:39273)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bauerchen@tencent.com>)
+ id 1jCG21-0004qu-Am; Thu, 12 Mar 2020 01:05:20 -0400
+Received: from EX-SZ019.tencent.com (unknown [10.28.6.74])
+ by mail4.tencent.com (Postfix) with ESMTP id 274E872602;
+ Thu, 12 Mar 2020 13:05:04 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tencent.com;
+ s=s202002; t=1583989504;
+ bh=uhzdmdvKT8dKVTv96B3/EZ+4HseNLifcAYKWkg+YkrA=;
+ h=From:To:CC:Subject:Date:References;
+ b=mxRFgsCW0z4ii38/Am+y5wAahAfe0j1Cz+QBKY5zPclOj0UFEtVFOSJLi3bwjXhZG
+ vVeNKceqWHuC+ZVk4KEeW1pGUm+q/6HDO3VDwRuzJoGSGZAEdyecubCmL93QBdhqVU
+ Kf6yl4NuHC2LNfv+5JP+NjOtjIS4JPzmr22pghFM=
+Received: from EX-SZ008.tencent.com (10.28.6.32) by EX-SZ019.tencent.com
+ (10.28.6.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Thu, 12 Mar
+ 2020 13:05:04 +0800
+Received: from EX-SZ005.tencent.com (10.28.6.29) by EX-SZ008.tencent.com
+ (10.28.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1847.3; Thu, 12 Mar
+ 2020 13:05:03 +0800
+Received: from EX-SZ005.tencent.com ([fe80::a42c:28db:54ef:6adf]) by
+ EX-SZ005.tencent.com ([fe80::a42c:28db:54ef:6adf%4]) with mapi id
+ 15.01.1847.007; Thu, 12 Mar 2020 13:05:03 +0800
+From: =?utf-8?B?YmF1ZXJjaGVuKOmZiOiSmeiSmSk=?= <bauerchen@tencent.com>
+To: pbonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Subject: Re: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet mail)
+Thread-Topic: Re: [PATCH] mem-prealloc: initialize cond and mutex(Internet
+ mail)
+Thread-Index: AQHV99O0uevKFo4oKEOufcaFp2Pr5A==
+Date: Thu, 12 Mar 2020 05:05:03 +0000
+Message-ID: <b25c127443a8448eb453cd439fd3821e@tencent.com>
+References: <20200306085014.120669-1-borntraeger@de.ibm.com>,
+ <20200309110331.3ef650a9@redhat.com>,
+ <13a05c3e-e374-8411-952d-05f4312ad6c0@redhat.com>,
+ <d37b122a-1980-32f3-6c06-89e5ef2a4807@de.ibm.com>,
+ <4976eaee60934e458e105bebe20d4d18@tencent.com>,
+ <20200309141914.0b9ad42f@Igors-MacBook-Pro>,
+ <d656861cb19e4f468da5fe2db80e060e@tencent.com>,
+ <a60b2bf8-5016-f0cc-217a-d9d0296e711b@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [10.28.2.14]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20200311064420.30606-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 183.57.53.109
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,28 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: borntraeger <borntraeger@de.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ mhartmay <mhartmay@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/10/20 11:44 PM, Richard Henderson wrote:
-> +int probe_access_flags(CPUArchState *env, target_ulong addr,
-> +                       MMUAccessType access_type, int mmu_idx,
-> +                       bool nonfault, void **phost, uintptr_t retaddr)
-> +{
-> +    void *host;
-> +    int flags;
-> +
-> +    flags = probe_access_internal(env, addr, 0, access_type, mmu_idx,
-> +                                  nonfault, &host, retaddr);
-
-Bug here.  Should have passed along phost to probe_access_internal instead of a
-new local host variable.
-
-I've sent a v2 for this patch, in-reply-to.  I'll not repost the whole patch
-set until I've also addressed any review.
-
-
-r~
+b2sgLHRoYW5rcyBQYW9sbwoKYmF1ZXIKwqAKRnJvbTrCoFBhb2xvIEJvbnppbmkKRGF0ZTrCoDIw
+MjAtMDMtMTLCoDAyOjM0ClRvOsKgYmF1ZXJjaGVuKOmZiOiSmeiSmSk7IElnb3IgTWFtbWVkb3YK
+Q0M6wqBib3JudHJhZWdlcjsgcWVtdS1kZXZlbDsgcWVtdS1zMzkweDsgbWhhcnRtYXkKU3ViamVj
+dDrCoFJlOiBbUEFUQ0hdIG1lbS1wcmVhbGxvYzogaW5pdGlhbGl6ZSBjb25kIGFuZCBtdXRleChJ
+bnRlcm5ldCBtYWlsKQpPbiAxMC8wMy8yMCAwODowNiwgYmF1ZXJjaGVuKOmZiOiSmeiSmSkgd3Jv
+dGU6Cj4gb2ggLHllcy5UaGFua3MKPiBJIHdhbnQgdG8ga25vdyBpZiBJIHN1Ym1pdCBhIG5ldyBm
+aXhlZCBwYXRjaCBvciBqdXN0IGEgcGF0Y2ggZml4ZWQKPiBjdXJyZW50IHByb2JsZW0/P8KgCj4g
+aWYgYSBuZXcgZml4ZWQgcGF0Y2gsIG1heWJlIG5lZWQgYSByZXZlcnQgPwrCoApTb3JyeSBJIG1p
+c3NlZCB0aGlzIG1lc3NhZ2UuwqAgSSBoYXZlIGFscmVhZHkgc2VudCBhIGZpeGVkIHBhdGNoLCB0
+aGFua3MhCsKgClBhb2xvCsKgCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gYmF1ZXJjaGVuKOmZiOiSmeiS
+mSkKPgo+wqDCoMKgwqAgwqAKPsKgwqDCoMKgICpGcm9tOirCoElnb3IgTWFtbWVkb3YgPG1haWx0
+bzppbWFtbWVkb0ByZWRoYXQuY29tPgo+wqDCoMKgwqAgKkRhdGU6KsKgMjAyMC0wMy0wOcKgMjE6
+MTkKPsKgwqDCoMKgICpUbzoqwqBiYXVlcmNoZW4o6ZmI6JKZ6JKZKSA8bWFpbHRvOmJhdWVyY2hl
+bkB0ZW5jZW50LmNvbT4KPsKgwqDCoMKgICpDQzoqwqBib3JudHJhZWdlciA8bWFpbHRvOmJvcm50
+cmFlZ2VyQGRlLmlibS5jb20+OyBwYm9uemluaQo+wqDCoMKgwqAgPG1haWx0bzpwYm9uemluaUBy
+ZWRoYXQuY29tPjsgcWVtdS1kZXZlbAo+wqDCoMKgwqAgPG1haWx0bzpxZW11LWRldmVsQG5vbmdu
+dS5vcmc+OyBxZW11LXMzOTB4Cj7CoMKgwqDCoCA8bWFpbHRvOnFlbXUtczM5MHhAbm9uZ251Lm9y
+Zz47IG1oYXJ0bWF5IDxtYWlsdG86bWhhcnRtYXlAbGludXguaWJtLmNvbT4KPsKgwqDCoMKgICpT
+dWJqZWN0OirCoFJlOiBbUEFUQ0hdIG1lbS1wcmVhbGxvYzogaW5pdGlhbGl6ZSBjb25kIGFuZAo+
+wqDCoMKgwqAgbXV0ZXgoSW50ZXJuZXQgbWFpbCkKPsKgwqDCoMKgIE9uIE1vbiwgOSBNYXIgMjAy
+MCAxMToxNjoxMCArMDAwMAo+wqDCoMKgwqAgYmF1ZXJjaGVuKOmZiOiSmeiSmSkgPGJhdWVyY2hl
+bkB0ZW5jZW50LmNvbT4gd3JvdGU6Cj7CoMKgwqDCoCDCoAo+wqDCoMKgwqAgPiBUaGFua3MsIMKg
+aW4gZmFjdCxkb190b3VjaF9wYWdlcyBpcyBjYWxsZWQganVzdCB3aGVuIHZtIHN0YXJ0cyB1cCwK
+PsKgwqDCoMKgIGJ1dCB1c2luZyBpbml0IGZsYWcgYW5kIEdvbmNlIG1heWJlIG1vcmUgZWxlZ2Fu
+dCAhCj7CoMKgwqDCoCA+IGlmIG5lZWRlZCxJIGNhbiBzdWJtaXQgYSBuZXcgcGF0Y2ggIQo+wqDC
+oMKgwqAgPiB0aGFua3MgdmVyeSBtdWNoIQo+wqDCoMKgwqAgwqAKPsKgwqDCoMKgIGl0J3MgY2Fs
+bGVkIGZyb20gb3NfbWVtX3ByZWFsbG9jKCkgLT4gdG91Y2hfYWxsX3BhZ2VzKCkgd2hpY2ggaXMg
+Y2FsbGVkCj7CoMKgwqDCoCBhdCBsZWFzdCBvbmNlIHBlciBhbiBpbnN0YW5jZSBvZiBob3RzbWVt
+IGJhY2tlbmQuIFNvIGlmIHNldmVyYWwgYmFja2VuZHMKPsKgwqDCoMKgIGFyZSB1c2VkIHRoZW4g
+aXQgc2hvdWxkIGJlIGNhbGxlZCBzZXZlcmFsIHRpbWVzLgo+wqDCoMKgwqAgVGhlIHNhbWUgYXBw
+bGllcyB3aGVuIGEgaG9zdG1lbSBiYWNrZW5kIGlzIGFkZGVkIGR1cmluZyBydW50aW1lCj7CoMKg
+wqDCoCAoaG90cGx1ZykKPsKgwqDCoMKgIMKgCj7CoMKgwqDCoCDCoAo+CsKgCsKg
 
