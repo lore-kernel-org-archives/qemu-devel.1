@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFF8C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02072C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05EB22067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C10BE20650
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hlXc9bv7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05EB22067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kPO+ikxE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C10BE20650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCOjg-0005lN-5x
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 10:22:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34379)
+	id 1jCOl2-0006eB-T1
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 10:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <linus.walleij@linaro.org>) id 1jCOii-0005Kk-Hz
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:22:05 -0400
+ (envelope-from <linus.walleij@linaro.org>) id 1jCOk5-0006B5-VX
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:23:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <linus.walleij@linaro.org>) id 1jCOiZ-0000gA-TA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:21:56 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38258)
+ (envelope-from <linus.walleij@linaro.org>) id 1jCOk5-00044z-0g
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:23:21 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:36030)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
- id 1jCOiZ-0000d3-KD
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:21:47 -0400
-Received: by mail-lj1-x243.google.com with SMTP id w1so6661602ljh.5
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 07:21:47 -0700 (PDT)
+ id 1jCOk4-00043W-PX
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:23:20 -0400
+Received: by mail-lj1-x244.google.com with SMTP id g12so6666671ljj.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 07:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=79OHKgNVg5IiTjP/EryhR/on7yjmd+OeOqFhBOB19Rg=;
- b=hlXc9bv7wKtJYos/CvmIf1aWytTx7tjjvZA7MyZXi7udPi5CdammboSrae1hgCitp/
- MSpq1qvYRN9mFEXkFN/xNTTmmao3V3GjlW0KxdQXRUqYqGp5IwObLZ7yB+renP8z+pfN
- tTWRkIMDIS1GZe95+PfMemVe3rr1Kwnkd636g3iGRWP+yiHdYGH7FrFNCkkgIeRsEdxg
- L1z1MSWPXkvi5ST+LYKisjEtlJI83foQzqkY8AUQk+nrdOaavjVDuTxl3sWpnDBKyxpA
- I+Y+/KkkggsGEGEO3b8x79C2+nvBFhV0SVSG0v4dMd8b9iZmSihZqNyIYhxl61ZhaL+L
- SMHA==
+ :cc; bh=5Dt+A0XYoM4z0Muyh4Z1oK3OQIHOd+TenS7WS4Spt8M=;
+ b=kPO+ikxEgegYspLtVJSTdDZGCrznn2iZHcCDSpipCfIKchWvbMXImnOGvH1GmkJfoD
+ KcE6fvz9RgDqdCcl4OhN7O0CjnJ+M6liGFX7kS02szV8Mo1+CU8jkrhYkKZ+cX6rh0Qw
+ H/nnJeTMB5ClokfZT4zcoYejI5wYd4XBiBYB1T5WDgosR4K8w/H85ETqh8BS+y3N6LvM
+ 5Y95Pb1xYZfEjIrgLVRhecU/tTp74SEk3Ps55TNUzCeR9gXSB6amj6Kc+BpjDlZq6zaG
+ WIiIfQNErmoQIOMBgKTJD8wyx6zy8TH+bDi310hmLvyph1kUIo4otwnn+KNf7P9k3532
+ g2vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=79OHKgNVg5IiTjP/EryhR/on7yjmd+OeOqFhBOB19Rg=;
- b=Up5E6TWpHMXJcSVtgbYhMQIVOH+uPmP/neNRtEDy8cfDmJR7Vu3+fN2xCTdR53mfup
- I2+PozE8l3kbDAz4S0GkasuGLUdHxmrDOkxCH1fvGTXLNxZgolgNbuKY1+B+w7RZBZt0
- 3mFFyrsWx3/papZmOBBB1XRUoLloJ5QpxdTFFDGHfR5oS4wmKHcJiFhOkt1htNZo/kc1
- qcTougY2wER3Vf8Ybm+hKO8BrqWV8omzUwDgJQLIu+4zGEi8fg+6WjeNHRMv9X7I/kVn
- URr2knNAZrAglXuO+ht1YVBvnKJzQR24/AjR4K+PVnTgsI7K9x9hHAiqXvyPKQMdcMko
- RO4w==
-X-Gm-Message-State: ANhLgQ14I03y4kgUpSBiszU6ucGEzE+MvEiSU28DIJuQmiq2bN6AJMSH
- 3d6pmVjmQ7XZsOSl/5ruWbDpLMMg36gWb611u1jZPQ==
-X-Google-Smtp-Source: ADFU+vtcIZFKaUxv+zzMf8n7cOQduYtCadrIv8wfIOW4HDImubBu1ngGLVdiQB+7d6huEorOiDcjWc0JqvkBbK9RrNg=
-X-Received: by 2002:a05:651c:2c1:: with SMTP id
- f1mr5239338ljo.125.1584022905409; 
- Thu, 12 Mar 2020 07:21:45 -0700 (PDT)
+ bh=5Dt+A0XYoM4z0Muyh4Z1oK3OQIHOd+TenS7WS4Spt8M=;
+ b=bdwZdqYD13fpg5YnpRmps25EMWPHB+VzSPeXktiXCaPW3lSUbk2um8aul4OBDPOE0t
+ 5LBB7gW0F5QMmVEyLoPARJRZAjIVjOIvP/8Nc9PaODeNNJYBqjHuc04RNJd8ju1ZlMbJ
+ M6KuKL5QpqMm//rwt3V6zYJIpOV35MB6gbdmoRT8Ei5vgAy7lr/Pd5rjqGuvBU3G915X
+ 4tS1pf5u2RmCgUkUU8dC3obWINxuqDhMcQ2H1NqqegOTDhMoySLq5gVQ4fyxb38A9WdR
+ O7mQGtKcgKTxBln/nDfb8vs+Yq+g6e7U6sTVAQqI28UfMjAkqgt/vPtlC/TIOhFG3f61
+ 7UtQ==
+X-Gm-Message-State: ANhLgQ0JwaXSjwVUrs7HmDuqFWdo0N/giwtIkkVXYa0gnAYA2Oelipkw
+ /ysiRc+biRdKWhRPpg19IYxToxQAqmsfHoUMZO/eCg==
+X-Google-Smtp-Source: ADFU+vv7LNhuqWt6huv0FXgE1q4FBl/D6hN2gAx1rsopSHV4jlVMS8grUwQme6vafr3oWKM7JsBOgEJp0guAr/W7u10=
+X-Received: by 2002:a05:651c:2049:: with SMTP id
+ t9mr5600275ljo.39.1584022999468; 
+ Thu, 12 Mar 2020 07:23:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200218151812.7816-1-geert+renesas@glider.be>
- <20200218151812.7816-3-geert+renesas@glider.be>
-In-Reply-To: <20200218151812.7816-3-geert+renesas@glider.be>
+ <20200218151812.7816-2-geert+renesas@glider.be>
+In-Reply-To: <20200218151812.7816-2-geert+renesas@glider.be>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 12 Mar 2020 15:21:34 +0100
-Message-ID: <CACRpkda1JAnC=Feb39GeKEEP6q8Qwpsth6J+4OKj6A8S3YAUyQ@mail.gmail.com>
-Subject: Re: [PATCH v5 2/5] gpiolib: Add support for GPIO line table lookup
+Date: Thu, 12 Mar 2020 15:23:08 +0100
+Message-ID: <CACRpkdZGKB9opaOFT8Yz-tfE9vcCVeF9EvvBi7jWWuAAh3C_FA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] gpiolib: Add support for gpiochipN-based table
+ lookup
 To: Geert Uytterhoeven <geert+renesas@glider.be>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,35 +106,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Geert,
-
-I'm sorry for the slow review, it's a large patch set and
-takes some time to sit down and review, and see whether my
-earlier comments have been addressed.
-
 On Tue, Feb 18, 2020 at 4:18 PM Geert Uytterhoeven
 <geert+renesas@glider.be> wrote:
 
-> Currently GPIOs can only be referred to by GPIO controller and offset in
-> GPIO lookup tables.
+> Currently GPIO controllers can only be referred to by label in GPIO
+> lookup tables.
 >
-> Add support for looking them up by line name.
-> Rename gpiod_lookup.chip_label to gpiod_lookup.key, to make it clear
-> that this field can have two meanings, and update the kerneldoc and
-> GPIO_LOOKUP*() macros.
+> Add support for looking them up by "gpiochipN" name, with "N" the
+> corresponding GPIO device's ID number.
 >
 > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > Reviewed-by: Ulrich Hecht <uli+renesas@fpond.eu>
 > Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 > Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 
-I will try to understand why this change is necessary to implement
-the gpio aggregator (probablt I will comment that on the other
-patches like "aha now I see it" or so, but it would help a lot if the
-commit message
-would state the technical reason to why we need to do this change,
-like what it is that you want to do and why you cannot do it without
-this change.
+Just like with patch 2/5 I have the same problem here that
+the commit message doesn't state the technical reason why
+we need to change this and support the device name in these
+tables and not just labels.
+
+(Possibly again I will realize it...)
 
 Yours,
 Linus Walleij
