@@ -2,85 +2,87 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD39FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91477C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7855C20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F6642071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Koxv45o3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7855C20674
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXl9ZO2/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6642071C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCMHA-00055d-KZ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:45:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58029)
+	id 1jCMHF-0005EG-Gw
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:45:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMG6-0003RJ-Ra
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMGA-0003Wh-UW
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMG5-0001zD-5X
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:14 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:44547)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMG9-00023F-TM
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:18 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:52755)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCMG4-0001y9-UJ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:13 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id l18so6980991wru.11
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:12 -0700 (PDT)
+ id 1jCMG9-00022u-NW
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:17 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id 11so5737592wmo.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ktwBlGPnJjETlEEbOT+skykkPPBSlbE51IVXCS/jbrw=;
- b=Koxv45o3VmRxkxi4aHsc/d12o0BjiuCjIHQOT88cGFJ8GMkFlrl2WTSpPcGdTBDbhE
- ydqcaLT7WhjYD6HIqERgzbI0Al9c47yjHD4snUfVcI6xTmYq3OLl+uU51JeDR6kkgJ4W
- pfpzBclSHZz/XvF8hDRjXUxms+yz7DVKubwjPXY5NjwxyLFtUAPV6nKuhZmxZWDSfsqE
- AkU3/bH+T7xK5F6pcpio5WlWNgBsSieEC6g93EId6Lvw8fawMKJJzoboWW7mwWemnPuC
- lyXbzuEztIhWMjCTMlpkaLhg8FxD/+wu7vPk8RXd7z0SztgimDxe7crnAX4WL08Ea+mQ
- qLLw==
+ bh=ltLfBMZsG49hGD8i/lFgQSG60+4ZbaBAO10u35X5v7U=;
+ b=nXl9ZO2/NU9Ipw5vX47dYtVkxvhwp3GGVJDfeykzaYQs6fpusUq+/A9bCBWSo5ip+W
+ lNK9myjarjl1xhI4tx/SEFj7szMOqO1azuJsTs/VCNNSbketTQFxgfCCbeNW2mkG3O89
+ hFzju4Y0BLKjmAf3246Fqcub/pHKZXWmqA8/5/gpqVmstVO1pMKS3drwES5tqgJxzZb5
+ MjSknq5W05YWY8gMDLTUN4uOEQdGNMBwntEO214CcCu1PRFqzv/DM14U9BdOyxXL91JB
+ RP88B4/4CwYM7kIXsILLnDooK24mmzrtSthPc1CSYxI4LYgr6GGmDHiUUelMk3r79I5Q
+ SNSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ktwBlGPnJjETlEEbOT+skykkPPBSlbE51IVXCS/jbrw=;
- b=SjEtAuGeQKpBzuylJU5j9Hjml/sOZC0ZWZoC6okX4CYfcLaIjd3ceDOcPu14oOuDYN
- Dg7hoDkO72vwS+cRtuXZbEFzGF0i9Fgag5DdIp4cNEmstAUpuBYGLcXb2MV003Y+n7JS
- NRyhC9hC7NBo1Ecx5afYG9LT7Eb4k+s4e1qAJovHnpWyRS5PAbIiWeDzIeHNIV6fgfgv
- VgCCgiZPqSYA4+epxoSKJYhtiOdABWXgXHZZVrVIl0qo7/oWPYVCLrbbvzjX8s1rHKg4
- I5OjTDTBziwhNuzUwm8Fomf36fAGcW5zieKUfNYIWs4nYBMMluXuLPezL0wCEdHPz0QX
- u2JQ==
-X-Gm-Message-State: ANhLgQ1NL2IX2pldAOS+DJDEmqN3KNyy3IPuxItgapDCnHrGLfUXUxe9
- xAhntsGqCwJj4s/HWm7T4zCnEREGBohgBA==
-X-Google-Smtp-Source: ADFU+vvIZCsIJ6VvuKKX4/3PdoG4dLQ3AkQ0Y41hXs7nTjJhu8pGbQPNaZrCu4z60Be1oMXEC3Vd3w==
-X-Received: by 2002:a5d:61c9:: with SMTP id q9mr11080625wrv.164.1584013451359; 
- Thu, 12 Mar 2020 04:44:11 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ltLfBMZsG49hGD8i/lFgQSG60+4ZbaBAO10u35X5v7U=;
+ b=WogOw3ZmcAIRTFrb8kY5wxilf+jsQA+eG9T75ztwEueje0R7rR5E8vzOiXKHILUe9G
+ zs8QRprDScun1dxxNg0Dh3Yl8LdPuVw1ewUGLIWEQSNOfNApGE8P7JRQ6jFkXY85Sz/S
+ rFH6Q8BjFQQfvA+RejohNkB08CPIPIxbQQ7LP5hGcxu8ftBaN6jwXFC+Pl1Hv1satA9r
+ I2NE/SUwHMq09OPIuClX6KHAavyZZiD7bdrypjta//CdPZ1AOMDh1ktZQSSVIoP2DTk1
+ WHo4t7iCojcu6jUZDQxhig0KY8At/G3xo1etgAwQGMSUdcDJNleEamvbFdj7VWH7hrVY
+ TMEw==
+X-Gm-Message-State: ANhLgQ1Jp91XVdMDSQ4mpHNrOzZkVwXrCQAwItJyCKk37J5imF/O0KgH
+ 0SK4+XwZeUNMBNMoBxg+0HR+4ykVMEQz6A==
+X-Google-Smtp-Source: ADFU+vvnaQlAIUHzpX1LvLmxKHZhKjDiA1Dkl3mNJj3t2RLLDlLsNcRYpqik1qZWoqgxNhHKXx1MDg==
+X-Received: by 2002:a7b:c8d5:: with SMTP id f21mr4478630wml.60.1584013456452; 
+ Thu, 12 Mar 2020 04:44:16 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.10
+ by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.15
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 04:44:10 -0700 (PDT)
+ Thu, 12 Mar 2020 04:44:15 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/12] docs queue
-Date: Thu, 12 Mar 2020 11:43:56 +0000
-Message-Id: <20200312114408.16891-1-peter.maydell@linaro.org>
+Subject: [PULL 05/12] Makefile: Make all Sphinx documentation depend on the
+ extensions
+Date: Thu, 12 Mar 2020 11:44:01 +0000
+Message-Id: <20200312114408.16891-6-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312114408.16891-1-peter.maydell@linaro.org>
+References: <20200312114408.16891-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,88 +98,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some documentation-related updates now that the main
-qemu-doc conversion is in master. Includes the splitting
-out of arm-specific info into subpages.
+Add the Python source files of our Sphinx extensions to the
+dependencies of the Sphinx manuals, so that if we edit the
+extension source code the manuals get rebuilt.
 
-thanks
--- PMM
+Adding this dependency unconditionally means that we'll rebuild
+a manual even if it happens to not use the extension whose
+source file was changed, but this is simpler and less error
+prone, and it's unlikely that we'll be making frequent changes
+to the extensions.
 
-The following changes since commit 5931ed5641ca6c4a237e82e4e5d2a08639865ce7:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200306171749.10756-6-peter.maydell@linaro.org
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-03-11' into staging (2020-03-11 17:06:40 +0000)
+diff --git a/Makefile b/Makefile
+index fae4ce181ea..65e89b5095a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1080,7 +1080,8 @@ build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(
+ # We assume all RST files in the manual's directory are used in it
+ manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
+               $(SRC_PATH)/docs/defs.rst.inc \
+-              $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
++              $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py \
++              $(SRC_PATH)/docs/sphinx/*.py
+ # Macro to write out the rule and dependencies for building manpages
+ # Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,extradeps])
+ # 'extradeps' is optional, and specifies extra files (eg .hx files) that
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-docs-20200312
-
-for you to fetch changes up to 6fe6d6c9a953901251e1a85088f0a61ff5caf648:
-
-  docs: Be consistent about capitalization of 'Arm' (2020-03-12 11:20:20 +0000)
-
-----------------------------------------------------------------
-docs queue:
- * Remove some no longer needed texinfo infrastructure
- * Reorder the top level index docs to put most useful manuals first
- * Split the Arm target-specific info into sub-pages
- * Improve the Arm documentation a bit with info previously
-   only on the wiki page
-
-----------------------------------------------------------------
-Peter Maydell (12):
-      Makefile: Remove redundant Texinfo related code
-      Update comments in .hx files that mention Texinfo
-      hxtool: Remove Texinfo generation support
-      docs/sphinx/hxtool.py: Remove STEXI/ETEXI support
-      Makefile: Make all Sphinx documentation depend on the extensions
-      docs/index.rst, docs/index.html.in: Reorder manuals
-      docs/qemu-option-trace.rst.inc: Remove redundant comment
-      Makefile: Allow for subdirectories in Sphinx manual dependencies
-      docs/system: Split target-arm.rst into sub-documents
-      docs/system/target-arm.rst: Add some introductory text
-      docs: Move arm-cpu-features.rst into the system manual
-      docs: Be consistent about capitalization of 'Arm'
-
- docs/can.txt                                       |   2 +-
- docs/devel/atomics.txt                             |   2 +-
- docs/devel/multi-thread-tcg.txt                    |   8 +-
- docs/replay.txt                                    |   2 +-
- docs/specs/fw_cfg.txt                              |   2 +-
- Makefile                                           |  16 +-
- MAINTAINERS                                        |   9 +
- docs/devel/kconfig.rst                             |   2 +-
- docs/devel/loads-stores.rst                        |   2 +-
- docs/devel/tcg.rst                                 |   2 +-
- docs/index.html.in                                 |  10 +-
- docs/index.rst                                     |   8 +-
- docs/qemu-option-trace.rst.inc                     |   4 -
- docs/specs/tpm.rst                                 |   6 +-
- docs/sphinx/hxtool.py                              |  28 +-
- .../arm/cpu-features.rst}                          |  12 +-
- docs/system/arm/integratorcp.rst                   |  16 ++
- docs/system/arm/musicpal.rst                       |  19 ++
- docs/system/arm/nseries.rst                        |  33 +++
- docs/system/arm/palm.rst                           |  23 ++
- docs/system/arm/realview.rst                       |  34 +++
- docs/system/arm/stellaris.rst                      |  26 ++
- docs/system/arm/sx1.rst                            |  18 ++
- docs/system/arm/versatile.rst                      |  29 ++
- docs/system/arm/xscale.rst                         |  29 ++
- docs/system/target-arm.rst                         | 295 ++++++---------------
- docs/user/main.rst                                 |   8 +-
- hmp-commands-info.hx                               |   8 +-
- hmp-commands.hx                                    |   8 +-
- qemu-options.hx                                    |   8 +-
- scripts/hxtool                                     |  78 +-----
- 31 files changed, 369 insertions(+), 378 deletions(-)
- rename docs/{arm-cpu-features.rst => system/arm/cpu-features.rst} (98%)
- create mode 100644 docs/system/arm/integratorcp.rst
- create mode 100644 docs/system/arm/musicpal.rst
- create mode 100644 docs/system/arm/nseries.rst
- create mode 100644 docs/system/arm/palm.rst
- create mode 100644 docs/system/arm/realview.rst
- create mode 100644 docs/system/arm/stellaris.rst
- create mode 100644 docs/system/arm/sx1.rst
- create mode 100644 docs/system/arm/versatile.rst
- create mode 100644 docs/system/arm/xscale.rst
 
