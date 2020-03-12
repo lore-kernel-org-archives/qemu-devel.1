@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1551DC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A8EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7A9E206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:51:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F23F8206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:52:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VL9pFigF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A9E206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KqsNWxv5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23F8206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCR3M-00066Q-Ra
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:51:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35718)
+	id 1jCR43-0008S8-3U
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:52:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxY-00009Z-7x
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxe-0000PE-M3
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxW-0005A1-1d
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:24 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:35241)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxd-0005CU-6s
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51765)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxV-00059m-Py
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:21 -0400
-Received: by mail-wm1-x336.google.com with SMTP id m3so7126356wmi.0
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:21 -0700 (PDT)
+ id 1jCQxc-0005CE-W2
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:29 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a132so6861587wme.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=78jazQtF+RQHW96LIyEOH/mPjBtNV9tWgWuJ9A/+O8o=;
- b=VL9pFigFD1Wg7GVHt6PNQA4S4jaxUQhyN76sKuOfSCtAOOY7plFmVUmeinnlviFNq5
- EnpV7w95KPKAcNiQC8VJS7lxL8E4HyTc8n6XUuunp59d+kFCgf1kEx2/DSKQbGvg8VAA
- YKx8DF4ErylOAFO4yeDJVD82amLBhvD4t0wM10LS9Mhc+JveSV8FhuqBdYm/+HmFsx+W
- sEpIUX6vSIIrWvqLSvoacPR8WxCpCYC14RhaH+C2C/MNWVq+umjsxSXBwHhhNABAWe7I
- WckIrMcUSK6gsv88yvGKhU/wrv/xEmWgz/7SS0CPQRKNkf72ThycPSyEEKjRucUhsGx4
- iH9g==
+ bh=0qXFteYUhNwOiO+xUdaCVR+e7Yo1U4U6SKAxr37djug=;
+ b=KqsNWxv5hrq/aA1luH26jK2qDx1nb3JKayAZizqmBS84P5Ys/SYM+4AX6UaEIdRXGF
+ ccQNKEmzEBCkLzOQPDc3e1WWZaYD/sQHAddqctaSepUzE1Rdg+WQikae330eRHBEB2Dk
+ 4th3qxH0+XAa/GbkMYKywyIto/Ia2AVTkueVnGRU/EJsAT09DbZY75Rdo5NhMNRysGVb
+ 2hFYrmEMuyxOteDc7pa3R8lo00v+4cMfDf8JF57c7jmnIjP+g/pqsHJ2ehPUfVfVAqqG
+ LnmtrosJ7wmZQ0dt73vr7zmL+wN2U6YRy97AUr0tgUCqWA+/xtpGWwAECBYN2Lc1B2zG
+ peLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=78jazQtF+RQHW96LIyEOH/mPjBtNV9tWgWuJ9A/+O8o=;
- b=O9ikx9xDjck/kWnTgQ49KEah1cjScSH58AakaZzr3uyEUS9EvxdZyTsxgvgFFVblpV
- 6diA5K7fDbz+QMZEyPef0D9pPS33E5RMDFUEvqqK5U15/h+HnPw234gINpP217B3qrjL
- O6gl5RKL2EE4mE97+kbV5leK+yGxKujeFMolM9FNO29b1R7ztv5g/K0gMyTzWUV+Zs/x
- vsKwie5rtMz6umRplzecNO5DGrXXxriIuVJUeu08R1lZsPbucaJ69hGsil8zT559racs
- RQRxJdggYDmA0otuAT2tlKiL1pPM63MRSjBrN0aB4Z1QcVY7wVy6wyFfMkXSTd0nneu5
- +6HQ==
-X-Gm-Message-State: ANhLgQ3G4S9on014lw6YykCTdXqlngO7s4wkUop5TzCAHRSiX7VDsKY9
- WvB1m45K8M3iVDqUN0Z/HJVOUoxy3HV1Ew==
-X-Google-Smtp-Source: ADFU+vsP103tZ6OyLNNr/Ii98cblgy1bzVINWUY+GG3lv8kE6/sH1jDcaaZhuaauONXqgSnqpEgO+A==
-X-Received: by 2002:a1c:a5c2:: with SMTP id o185mr5487869wme.173.1584031520264; 
- Thu, 12 Mar 2020 09:45:20 -0700 (PDT)
+ bh=0qXFteYUhNwOiO+xUdaCVR+e7Yo1U4U6SKAxr37djug=;
+ b=puOhjy4OMkintb81QgQNmzsAjHyrGHT721Q7ub3LpkTEudZRiBXJKkTR1Ll8LOn+dR
+ ycw2MnNfVyPEUSEvcH38ubud4skKhiQAuc4mZCoyvgHNg5BHRZ65wv99okgC63DCofNb
+ rYWkUh37Ah+nfXEPejVC4GiOaSokVDhOrVTz+NYhuiFvb9OlghrVgvDTC6lGHd2htTWV
+ CTot6aWssZaAm3DVMl0w3Jgg5JPGeWhoR7rfxZLkBHekFnhBlAOnUwqraVuOFLBdEGJp
+ k4nwOlGXe7yt7vKcIh4PYI9ZsZxT1jfk0QcYN6trMgLzTEY6YQXdwGB+EeStQbBQlF1e
+ zsow==
+X-Gm-Message-State: ANhLgQ3yL1cDnpShcdSCaEkawVRFvPvhL+jIKz7K4gzRrqo7qTSrqpU+
+ 4m2SEiBJkS5X2CrCiuwVSAQAk4p3XRw9BA==
+X-Google-Smtp-Source: ADFU+vtUMn9BojiBw/+1pxvDHxTLDp2SOS3E7epy2NuDsoDGY+99eTbY26XQ0VwNSGJpMcva7eQiIg==
+X-Received: by 2002:a1c:2dc7:: with SMTP id t190mr5809499wmt.137.1584031527451; 
+ Thu, 12 Mar 2020 09:45:27 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.19
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.26
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:19 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:26 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/36] hw/arm/allwinner-h3: add System Control module
-Date: Thu, 12 Mar 2020 16:44:39 +0000
-Message-Id: <20200312164459.25924-17-peter.maydell@linaro.org>
+Subject: [PULL 21/36] hw/arm/allwinner-h3: add Boot ROM support
+Date: Thu, 12 Mar 2020 16:44:44 +0000
+Message-Id: <20200312164459.25924-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,327 +100,119 @@ Sender: "Qemu-devel"
 
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 
-The Allwinner H3 System on Chip has an System Control
-module that provides system wide generic controls and
-device information. This commit adds support for the
-Allwinner H3 System Control module.
+A real Allwinner H3 SoC contains a Boot ROM which is the
+first code that runs right after the SoC is powered on.
+The Boot ROM is responsible for loading user code (e.g. a bootloader)
+from any of the supported external devices and writing the downloaded
+code to internal SRAM. After loading the SoC begins executing the code
+written to SRAM.
+
+This commits adds emulation of the Boot ROM firmware setup functionality
+by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
+64KiB, we limit the size to 32KiB because the real H3 Boot ROM also rejects
+sizes larger than 32KiB. For reference, this behaviour is documented
+by the Linux Sunxi project wiki at:
+
+  https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200311221854.30370-6-nieklinnenbank@gmail.com
+Message-id: 20200311221854.30370-11-nieklinnenbank@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/Makefile.objs                  |   1 +
- include/hw/arm/allwinner-h3.h          |   3 +
- include/hw/misc/allwinner-h3-sysctrl.h |  67 ++++++++++++
- hw/arm/allwinner-h3.c                  |   9 +-
- hw/misc/allwinner-h3-sysctrl.c         | 140 +++++++++++++++++++++++++
- 5 files changed, 219 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
- create mode 100644 hw/misc/allwinner-h3-sysctrl.c
+ include/hw/arm/allwinner-h3.h | 21 +++++++++++++++++++++
+ hw/arm/allwinner-h3.c         | 17 +++++++++++++++++
+ hw/arm/orangepi.c             |  5 +++++
+ 3 files changed, 43 insertions(+)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 5e635b74d5a..63b2e528f98 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) += macio/
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
- 
- common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
- common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
 diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index 4f4dcbcd177..43500c42621 100644
+index f9b9a023734..d338003724e 100644
 --- a/include/hw/arm/allwinner-h3.h
 +++ b/include/hw/arm/allwinner-h3.h
-@@ -40,6 +40,7 @@
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/arm_gic.h"
- #include "hw/misc/allwinner-h3-ccu.h"
-+#include "hw/misc/allwinner-h3-sysctrl.h"
+@@ -46,6 +46,7 @@
+ #include "hw/sd/allwinner-sdhost.h"
+ #include "hw/net/allwinner-sun8i-emac.h"
  #include "target/arm/cpu.h"
++#include "sysemu/block-backend.h"
  
  /**
-@@ -56,6 +57,7 @@ enum {
-     AW_H3_SRAM_A1,
-     AW_H3_SRAM_A2,
-     AW_H3_SRAM_C,
-+    AW_H3_SYSCTRL,
-     AW_H3_EHCI0,
-     AW_H3_OHCI0,
-     AW_H3_EHCI1,
-@@ -108,6 +110,7 @@ typedef struct AwH3State {
-     const hwaddr *memmap;
-     AwA10PITState timer;
-     AwH3ClockCtlState ccu;
-+    AwH3SysCtrlState sysctrl;
-     GICState gic;
-     MemoryRegion sram_a1;
-     MemoryRegion sram_a2;
-diff --git a/include/hw/misc/allwinner-h3-sysctrl.h b/include/hw/misc/allwinner-h3-sysctrl.h
-new file mode 100644
-index 00000000000..af4119e0269
---- /dev/null
-+++ b/include/hw/misc/allwinner-h3-sysctrl.h
-@@ -0,0 +1,67 @@
-+/*
-+ * Allwinner H3 System Control emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_MISC_ALLWINNER_H3_SYSCTRL_H
-+#define HW_MISC_ALLWINNER_H3_SYSCTRL_H
-+
-+#include "qom/object.h"
-+#include "hw/sysbus.h"
-+
+  * Allwinner H3 device list
+@@ -129,4 +130,24 @@ typedef struct AwH3State {
+     MemoryRegion sram_c;
+ } AwH3State;
+ 
 +/**
-+ * @name Constants
-+ * @{
++ * Emulate Boot ROM firmware setup functionality.
++ *
++ * A real Allwinner H3 SoC contains a Boot ROM
++ * which is the first code that runs right after
++ * the SoC is powered on. The Boot ROM is responsible
++ * for loading user code (e.g. a bootloader) from any
++ * of the supported external devices and writing the
++ * downloaded code to internal SRAM. After loading the SoC
++ * begins executing the code written to SRAM.
++ *
++ * This function emulates the Boot ROM by copying 32 KiB
++ * of data from the given block device and writes it to
++ * the start of the first internal SRAM memory.
++ *
++ * @s: Allwinner H3 state object pointer
++ * @blk: Block backend device object pointer
 + */
++void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk);
 +
-+/** Highest register address used by System Control device */
-+#define AW_H3_SYSCTRL_REGS_MAXADDR   (0x30)
-+
-+/** Total number of known registers */
-+#define AW_H3_SYSCTRL_REGS_NUM       ((AW_H3_SYSCTRL_REGS_MAXADDR / \
-+                                      sizeof(uint32_t)) + 1)
-+
-+/** @} */
-+
-+/**
-+ * @name Object model
-+ * @{
-+ */
-+
-+#define TYPE_AW_H3_SYSCTRL    "allwinner-h3-sysctrl"
-+#define AW_H3_SYSCTRL(obj) \
-+    OBJECT_CHECK(AwH3SysCtrlState, (obj), TYPE_AW_H3_SYSCTRL)
-+
-+/** @} */
-+
-+/**
-+ * Allwinner H3 System Control object instance state
-+ */
-+typedef struct AwH3SysCtrlState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    /** Maps I/O registers in physical memory */
-+    MemoryRegion iomem;
-+
-+    /** Array of hardware registers */
-+    uint32_t regs[AW_H3_SYSCTRL_REGS_NUM];
-+
-+} AwH3SysCtrlState;
-+
-+#endif /* HW_MISC_ALLWINNER_H3_SYSCTRL_H */
+ #endif /* HW_ARM_ALLWINNER_H3_H */
 diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index c205f06738a..0aa46712db7 100644
+index d1245d2b016..a9767c70c08 100644
 --- a/hw/arm/allwinner-h3.c
 +++ b/hw/arm/allwinner-h3.c
-@@ -37,6 +37,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_SRAM_A1]    = 0x00000000,
-     [AW_H3_SRAM_A2]    = 0x00044000,
-     [AW_H3_SRAM_C]     = 0x00010000,
-+    [AW_H3_SYSCTRL]    = 0x01c00000,
-     [AW_H3_EHCI0]      = 0x01c1a000,
-     [AW_H3_OHCI0]      = 0x01c1a400,
-     [AW_H3_EHCI1]      = 0x01c1b000,
-@@ -66,7 +67,6 @@ struct AwH3Unimplemented {
- } unimplemented[] = {
-     { "d-engine",  0x01000000, 4 * MiB },
-     { "d-inter",   0x01400000, 128 * KiB },
--    { "syscon",    0x01c00000, 4 * KiB },
-     { "dma",       0x01c02000, 4 * KiB },
-     { "nfdc",      0x01c03000, 4 * KiB },
-     { "ts",        0x01c06000, 4 * KiB },
-@@ -192,6 +192,9 @@ static void allwinner_h3_init(Object *obj)
+@@ -29,6 +29,7 @@
+ #include "hw/char/serial.h"
+ #include "hw/misc/unimp.h"
+ #include "hw/usb/hcd-ehci.h"
++#include "hw/loader.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/arm/allwinner-h3.h"
  
-     sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
-                           TYPE_AW_H3_CCU);
-+
-+    sysbus_init_child_obj(obj, "sysctrl", &s->sysctrl, sizeof(s->sysctrl),
-+                          TYPE_AW_H3_SYSCTRL);
- }
+@@ -170,6 +171,22 @@ enum {
+     AW_H3_GIC_NUM_SPI       = 128
+ };
  
- static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -301,6 +304,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     qdev_init_nofail(DEVICE(&s->ccu));
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
- 
-+    /* System Control */
-+    qdev_init_nofail(DEVICE(&s->sysctrl));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctrl), 0, s->memmap[AW_H3_SYSCTRL]);
-+
-     /* Universal Serial Bus */
-     sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
-                          qdev_get_gpio_in(DEVICE(&s->gic),
-diff --git a/hw/misc/allwinner-h3-sysctrl.c b/hw/misc/allwinner-h3-sysctrl.c
-new file mode 100644
-index 00000000000..1d07efa880d
---- /dev/null
-+++ b/hw/misc/allwinner-h3-sysctrl.c
-@@ -0,0 +1,140 @@
-+/*
-+ * Allwinner H3 System Control emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "hw/misc/allwinner-h3-sysctrl.h"
-+
-+/* System Control register offsets */
-+enum {
-+    REG_VER               = 0x24,  /* Version */
-+    REG_EMAC_PHY_CLK      = 0x30,  /* EMAC PHY Clock */
-+};
-+
-+#define REG_INDEX(offset)   (offset / sizeof(uint32_t))
-+
-+/* System Control register reset values */
-+enum {
-+    REG_VER_RST           = 0x0,
-+    REG_EMAC_PHY_CLK_RST  = 0x58000,
-+};
-+
-+static uint64_t allwinner_h3_sysctrl_read(void *opaque, hwaddr offset,
-+                                          unsigned size)
++void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk)
 +{
-+    const AwH3SysCtrlState *s = AW_H3_SYSCTRL(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
++    const int64_t rom_size = 32 * KiB;
++    g_autofree uint8_t *buffer = g_new0(uint8_t, rom_size);
 +
-+    if (idx >= AW_H3_SYSCTRL_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    return s->regs[idx];
-+}
-+
-+static void allwinner_h3_sysctrl_write(void *opaque, hwaddr offset,
-+                                       uint64_t val, unsigned size)
-+{
-+    AwH3SysCtrlState *s = AW_H3_SYSCTRL(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    if (idx >= AW_H3_SYSCTRL_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
++    if (blk_pread(blk, 8 * KiB, buffer, rom_size) < 0) {
++        error_setg(&error_fatal, "%s: failed to read BlockBackend data",
++                   __func__);
 +        return;
 +    }
 +
-+    switch (offset) {
-+    case REG_VER:       /* Version */
-+        break;
-+    default:
-+        s->regs[idx] = (uint32_t) val;
-+        break;
++    rom_add_blob("allwinner-h3.bootrom", buffer, rom_size,
++                  rom_size, s->memmap[AW_H3_SRAM_A1],
++                  NULL, NULL, NULL, NULL, false);
++}
++
+ static void allwinner_h3_init(Object *obj)
+ {
+     AwH3State *s = AW_H3(obj);
+diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+index d65bbf8a2fe..b8ebcb08b76 100644
+--- a/hw/arm/orangepi.c
++++ b/hw/arm/orangepi.c
+@@ -97,6 +97,11 @@ static void orangepi_init(MachineState *machine)
+     memory_region_add_subregion(get_system_memory(), h3->memmap[AW_H3_SDRAM],
+                                 machine->ram);
+ 
++    /* Load target kernel or start using BootROM */
++    if (!machine->kernel_filename && blk_is_available(blk)) {
++        /* Use Boot ROM to copy data from SD card to SRAM */
++        allwinner_h3_bootrom_setup(h3, blk);
 +    }
-+}
-+
-+static const MemoryRegionOps allwinner_h3_sysctrl_ops = {
-+    .read = allwinner_h3_sysctrl_read,
-+    .write = allwinner_h3_sysctrl_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static void allwinner_h3_sysctrl_reset(DeviceState *dev)
-+{
-+    AwH3SysCtrlState *s = AW_H3_SYSCTRL(dev);
-+
-+    /* Set default values for registers */
-+    s->regs[REG_INDEX(REG_VER)] = REG_VER_RST;
-+    s->regs[REG_INDEX(REG_EMAC_PHY_CLK)] = REG_EMAC_PHY_CLK_RST;
-+}
-+
-+static void allwinner_h3_sysctrl_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwH3SysCtrlState *s = AW_H3_SYSCTRL(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_sysctrl_ops, s,
-+                           TYPE_AW_H3_SYSCTRL, 4 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_h3_sysctrl_vmstate = {
-+    .name = "allwinner-h3-sysctrl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AwH3SysCtrlState, AW_H3_SYSCTRL_REGS_NUM),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void allwinner_h3_sysctrl_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = allwinner_h3_sysctrl_reset;
-+    dc->vmsd = &allwinner_h3_sysctrl_vmstate;
-+}
-+
-+static const TypeInfo allwinner_h3_sysctrl_info = {
-+    .name          = TYPE_AW_H3_SYSCTRL,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_h3_sysctrl_init,
-+    .instance_size = sizeof(AwH3SysCtrlState),
-+    .class_init    = allwinner_h3_sysctrl_class_init,
-+};
-+
-+static void allwinner_h3_sysctrl_register(void)
-+{
-+    type_register_static(&allwinner_h3_sysctrl_info);
-+}
-+
-+type_init(allwinner_h3_sysctrl_register)
+     orangepi_binfo.loader_start = h3->memmap[AW_H3_SDRAM];
+     orangepi_binfo.ram_size = machine->ram_size;
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
 -- 
 2.20.1
 
