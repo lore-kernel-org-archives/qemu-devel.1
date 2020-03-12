@@ -2,89 +2,58 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C98C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191F5C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0825E2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:40:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFOgDPnO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0825E2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DADC42067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:41:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADC42067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQt2-0004lQ-7L
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:40:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34594)
+	id 1jCQtf-0000Fu-3H
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:41:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jCQro-0007FF-3d
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:39:29 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQsf-00047I-AJ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:40:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jCQrm-0005r9-Vl
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:39:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38496
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQsc-0006oc-7T
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:40:20 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40490)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCQrm-0005r2-SA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:39:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584031166;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k/yD8fal8CCL/bE6LGP4x8ytyK0/Cd7U2jJO5ljBrUI=;
- b=CFOgDPnOGIdOfNSO6AQv7cpmurSlaLlhiiM0GdrT3l1QXShO1bFW8ZYAlz2Ejz6meJHkMW
- 4irLU+jRKVxAnVXSXenO56mFkKMdewgCwByuO2Cljf8AZnckJglOVyj8GnhA8SHa99fpH+
- 9Nm6BHZa1XZynpmyTNn94VA32bNhb+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-AvVZl5O6O9WRz5t4IgEX5w-1; Thu, 12 Mar 2020 12:39:24 -0400
-X-MC-Unique: AvVZl5O6O9WRz5t4IgEX5w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 658FC800EBC;
- Thu, 12 Mar 2020 16:39:23 +0000 (UTC)
-Received: from work-vm (ovpn-116-106.ams2.redhat.com [10.36.116.106])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E1BF48F37D;
- Thu, 12 Mar 2020 16:39:21 +0000 (UTC)
-Date: Thu, 12 Mar 2020 16:39:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: The issues about architecture of the COLO checkpoint
-Message-ID: <20200312163919.GJ3211@work-vm>
-References: <20200213103752.GE2960@work-vm>
- <CA+XQNE7i15fTmwN6UL_fNi1e2sEb5v6+T05FaYdy0nS-DFC9HA@mail.gmail.com>
- <e820e35d-5b8a-18c8-736b-6c38cff9798e@intel.com>
- <CA+XQNE49wq2nRKJ0CA4uHDZ4OUEbFGPKBfAWB4+UwPYgiZkrCw@mail.gmail.com>
- <5d030380-76d6-67c6-39a1-82c197e320b4@intel.com>
- <CA+XQNE6riKARXtP9oZaQjK9Gqgfh-+Ae8qX+WsWhGfMB0hf8tg@mail.gmail.com>
- <0c69b913bf1047c4b7d5edac50f3988b@intel.com>
- <CA+XQNE6tZv0uhGoqqnS2ki=ZjP_YFaE53ZZntKPAbCxGnO1V8A@mail.gmail.com>
- <343daa37127e424c94fa0a3edde30f0c@intel.com>
- <20200306162201.3a1cd3ae@luklap>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCQsb-0006eY-QU; Thu, 12 Mar 2020 12:40:18 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08619472|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.00248817-8.17171e-05-0.99743;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-QBWTX_1584031203; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-QBWTX_1584031203)
+ by smtp.aliyun-inc.com(10.147.41.199);
+ Fri, 13 Mar 2020 00:40:04 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 50/60] target/riscv: vmfirst find-first-set mask bit
+Date: Thu, 12 Mar 2020 22:58:50 +0800
+Message-Id: <20200312145900.2054-51-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <20200306162201.3a1cd3ae@luklap>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,62 +65,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Cho <danielcho@qnap.com>, "Zhang, Chen" <chen.zhang@intel.com>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> On Wed, 4 Mar 2020 07:44:11 +0000
-> "Zhang, Chen" <chen.zhang@intel.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Daniel Cho <danielcho@qnap.com>
-> > > Sent: Monday, February 24, 2020 3:15 PM
-> > > To: Zhang, Chen <chen.zhang@intel.com>
-> > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>; Zhanghailiang
-> > > <zhang.zhanghailiang@huawei.com>; qemu-devel@nongnu.org; Jason
-> > > Wang <jasowang@redhat.com>
-> > > Subject: Re: The issues about architecture of the COLO checkpoint
-> > >
-> > > Hi Zhang,
-> > >
-> > > Thanks for your help.
-> > > However, did you occur the error which the function qemu_hexdump in
-> > > colo-compare.c will crash the qemu process while doing operation with
-> > > network?
-> > >
-> >
-> > No, qemu_hexdump looks no relationship with network...
-> > Do you means it will crashed in qemu_hexdump sometimes?
->=20
-> Jeah, I hit that bug too, but it was fixed with
-> 1e907a32b77e5d418538453df5945242e43224fa "COLO-compare: Fix incorrect `if=
-` logic"
-> in qemu 4.2.
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   |  2 ++
+ target/riscv/insn32.decode              |  1 +
+ target/riscv/insn_trans/trans_rvv.inc.c | 32 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 19 +++++++++++++++
+ 4 files changed, 54 insertions(+)
 
-Is anyone running any CI stuff for COLO?  I'm not, but bugs like that
-make it clear we probably should be;  it's not trivial to setup, but it
-should be doable in a nest setup these days.
-
-Dave
-
-> Regards,
-> Lukas Straub
->=20
-> > > We are working on VM fault tolerance study and COLO function evalutat=
-ion
-> > > first. Currently we did not have a confirmed plan on it.
-> >
-> > OK, keep connection.
-> >
-> > Thanks
-> > Zhang Chen
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 3f6b8ab451..363bc52dc4 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1085,3 +1085,5 @@ DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_4(vmpopc_m, tl, ptr, ptr, env, i32)
++
++DEF_HELPER_4(vmfirst_m, tl, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index eac767ad82..328a6c75bb 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -548,6 +548,7 @@ vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
+ vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
+ vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
+ vmpopc_m        010100 . ..... ----- 010 ..... 1010111 @r2_vm
++vmfirst_m       010101 . ..... ----- 010 ..... 1010111 @r2_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index c56f30a257..265d94245f 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2112,3 +2112,35 @@ static bool trans_vmpopc_m(DisasContext *s, arg_rmr *a)
+     }
+     return false;
+ }
++
++/* vmfirst find-first-set mask bit */
++static bool trans_vmfirst_m(DisasContext *s, arg_rmr *a)
++{
++    if (vext_check_isa_ill(s, RVV)) {
++        TCGv_ptr src2, mask;
++        TCGv dst;
++        TCGv_i32 desc;
++        uint32_t data = 0;
++        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
++        data = FIELD_DP32(data, VDATA, VM, a->vm);
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
++
++        mask = tcg_temp_new_ptr();
++        src2 = tcg_temp_new_ptr();
++        dst = tcg_temp_new();
++        desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++
++        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
++        tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
++
++        gen_helper_vmfirst_m(dst, mask, src2, cpu_env, desc);
++        gen_set_gpr(a->rd, dst);
++
++        tcg_temp_free_ptr(mask);
++        tcg_temp_free_ptr(src2);
++        tcg_temp_free(dst);
++        tcg_temp_free_i32(desc);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 4bd901e826..8a3f8ccdec 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4298,3 +4298,22 @@ target_ulong HELPER(vmpopc_m)(void *v0, void *vs2, CPURISCVState *env,
+     }
+     return cnt;
+ }
++
++/* vmfirst find-first-set mask bit*/
++target_ulong HELPER(vmfirst_m)(void *v0, void *vs2, CPURISCVState *env,
++        uint32_t desc)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    int i;
++
++    for (i = 0; i < vl; i++) {
++        if (vm || vext_elem_mask(v0, mlen, i)) {
++            if (vext_elem_mask(vs2, mlen, i)) {
++               return i;
++            }
++        }
++    }
++    return -1LL;
++}
+-- 
+2.23.0
 
 
