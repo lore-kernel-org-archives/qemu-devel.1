@@ -2,79 +2,94 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 006E5C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E191FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:36:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DD83205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C15F205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 21:36:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vT68LnEG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DD83205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vv7r8OJX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C15F205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCVRf-0006VS-7o
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 17:32:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54815)
+	id 1jCVUt-0000hN-PU
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 17:36:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jCVQJ-0004Ps-En
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:31:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCVU1-0008Lv-BI
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jCVQH-0001Z7-82
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:31:23 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:38587)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jCVQH-0001Yb-1x; Thu, 12 Mar 2020 17:31:21 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id k26so4754410vso.5;
- Thu, 12 Mar 2020 14:31:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GjyiUQj+NC9VJYpr/6jESMXRolQIM10W8pNegLphvdo=;
- b=vT68LnEGIj9Y9+3avLsCO1KVEO233yoq2hFZP8CTzo3a4i2Gj2rBHHK1py7Bj+3oEc
- u3CpOCUnkc1AQlAU7wEp7i6Uh7f5B4CZtqk4DPhT/3SIEkq6JWSOkVQ1gwRw8xvd9L2w
- nm2TA9TXdfGvVJJSQk0/EPt1aLCcZ9i9La1b9f1hVjQFM2iBp93woQR7t6wDMSaE6FWQ
- +Tdp9/bVdrsInOQ5Qp2BRSC+DtRQlyCWk8jXVcnXs4lqitWXhDIXc45V/1Uja/qxYK//
- fX5gvaiKlr8Ol3dol+1vYOszEPc8pkWbHUBna71Z77r6iAkdWBbQ0bkrw4/vokfrt1xn
- yAfA==
+ (envelope-from <philmd@redhat.com>) id 1jCVTy-0005FH-MA
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:35:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50532
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCVTy-0005Dw-Gt
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 17:35:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584048909;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=mFXbCCigBc0ZW7QUeDzPsEBC/Vs0XXPpm3bcXDVS2qo=;
+ b=Vv7r8OJXQXEy7zVe7Tx/Ws+9mLZBHLjKXYSk0ON8NipM8YFf+L4PQ5wRonXqfWKbrc9bVl
+ tXiZIuIQi6PJHkvGCLIWz4gI9VZY77amiu5BOBUKbRgbVoE1LprMT2gQkMXcbFubCibJwy
+ ukMbqZ6TuEWr7len1zT60zMKxEQC8Mo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-H_zKZ35vOMmIWRJP9VH-NA-1; Thu, 12 Mar 2020 17:35:06 -0400
+X-MC-Unique: H_zKZ35vOMmIWRJP9VH-NA-1
+Received: by mail-wr1-f71.google.com with SMTP id x14so3201300wrv.23
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 14:35:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GjyiUQj+NC9VJYpr/6jESMXRolQIM10W8pNegLphvdo=;
- b=TvUKLWEPruTHqlSpV0EEmH1xY9lfLIkXJgPOixFUrbDkQ7N2/bCmVzeGBzdutWNeIu
- QU9XFjTlcDUrnVnUnoTkDuF+rPr1WnfAbFieGtKVSS0C8IJV19wKtSpjZtrLDq0XslYV
- aEE3HXnJfMjMxbM/UYO/pC+knTK7Ffnize+yPBKY7DLiNcBoDiez8S+2FvnS/iQf/ASR
- 7X4uDYpof70r5oSvqV/2aV6/H3yaknEaGlMpc3/gYHqBO8FuMEgsOVTJGg8pLR4IVxKU
- IWL4KiCd7QI8eFG9hcal5c5q+/PqJcNVkOWoE3IlBguqn0Fp7P6WgFBN3L+sJNtZjBU5
- Ojyw==
-X-Gm-Message-State: ANhLgQ2eiY9IumcuLo2dYUmjiqcDi+nTdBnfX3IrsgVUVAxO8OdxFQD3
- I0VnuaK7Vguv57EgHiswWrQThTEX4uXpI2Hc0SU=
-X-Google-Smtp-Source: ADFU+vtLAbQlmXHRMRKe+4Yq8COAsPmS0G7j10MVVupVn2qKluCq1muaIM0jNULKCBm5/oiShHyG38XuD6lDu+1EYFg=
-X-Received: by 2002:a67:643:: with SMTP id 64mr7223137vsg.180.1584048680094;
- Thu, 12 Mar 2020 14:31:20 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uTi8YTd4XLR6S3OLKdtMkCx2y1clO9+fdoByjKp8tgw=;
+ b=rmeK+ZhI3K1B4+Kl/thPxXiPCseUyi7EOyztnoLOc6VdCPcOM7sIgsri0L8eagUq8U
+ rTFJY5LX16iUL6TsJm7+B3IdktdK3WIgd0X2GVq3TzqGhVmYQnHD80wMvHg0+LzrVegu
+ hspGAs2ezK1cedR3wMHg4a6soF+Fc+q4n+Njv4c+T7W6sTKNlVqy9JU6uW7eDCAlO6hk
+ FIBbSmh7R9kztdRR20E/9g2eqoZB+c8Kv6bMZ89+S58FzWxVaUwUAQlOOx6LY5mvRtec
+ neNUU2gZBFyUMF27Z+CZj3ASsrjUowMl+SuhA5KMsyp6EppL+1Q2GOlSldLAhEvWr+eo
+ 8ceA==
+X-Gm-Message-State: ANhLgQ2+M0wj6XekCyaJK3uh0rlu8XWx6H94Qm7gS2lKdQKaK9yytVay
+ ebhEM/YEkk+KOMub1EixfF/EU4KuuSE23JM1ZpbTbfx36DZOakfm4BAyd6u3ZQdqzLzK4vSV/u7
+ XfHCdyCe/bCWd1c4=
+X-Received: by 2002:adf:f0c6:: with SMTP id x6mr12710936wro.273.1584048904595; 
+ Thu, 12 Mar 2020 14:35:04 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt8fZoMUyuCmbotEsYLt0U6/nNuLbwTihVrSMt+qJbD5nUadL3LPbMfD7mricK2RHLrOcWHZw==
+X-Received: by 2002:adf:f0c6:: with SMTP id x6mr12710886wro.273.1584048903943; 
+ Thu, 12 Mar 2020 14:35:03 -0700 (PDT)
+Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id i9sm14457664wmd.37.2020.03.12.14.35.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 14:35:03 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/arm/bcm283x: Correct the license text
+Date: Thu, 12 Mar 2020 22:34:55 +0100
+Message-Id: <20200312213455.15854-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-5-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200312145900.2054-5-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 12 Mar 2020 14:23:29 -0700
-Message-ID: <CAKmqyKOA2xH+wCZ2L1TGDoL+3kfdEVGFKcqARua_e7GdN_iTuQ@mail.gmail.com>
-Subject: Re: [PATCH v5 04/60] target/riscv: add vector configure instruction
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,373 +101,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-trivial@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 8:07 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> vsetvl and vsetvli are two configure instructions for vl, vtype. TB flags
-> should update after configure instructions. The (ill, lmul, sew ) of vtype
-> and the bit of (VSTART == 0 && VL == VLMAX) will be placed within tb_flags.
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  target/riscv/Makefile.objs              |  2 +-
->  target/riscv/cpu.h                      | 63 ++++++++++++++++++----
->  target/riscv/helper.h                   |  2 +
->  target/riscv/insn32.decode              |  5 ++
->  target/riscv/insn_trans/trans_rvv.inc.c | 69 +++++++++++++++++++++++++
->  target/riscv/translate.c                | 17 +++++-
->  target/riscv/vector_helper.c            | 53 +++++++++++++++++++
->  7 files changed, 199 insertions(+), 12 deletions(-)
->  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
->  create mode 100644 target/riscv/vector_helper.c
->
-> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-> index ff651f69f6..ff38df6219 100644
-> --- a/target/riscv/Makefile.objs
-> +++ b/target/riscv/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
-> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o vector_helper.o gdbstub.o
->  obj-$(CONFIG_SOFTMMU) += pmp.o
->
->  ifeq ($(CONFIG_SOFTMMU),y)
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 603715f849..505d1a8515 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -21,6 +21,7 @@
->  #define RISCV_CPU_H
->
->  #include "hw/core/cpu.h"
-> +#include "hw/registerfields.h"
->  #include "exec/cpu-defs.h"
->  #include "fpu/softfloat-types.h"
->
-> @@ -99,6 +100,12 @@ typedef struct CPURISCVState CPURISCVState;
->
->  #define RV_VLEN_MAX 512
->
-> +FIELD(VTYPE, VLMUL, 0, 2)
-> +FIELD(VTYPE, VSEW, 2, 3)
-> +FIELD(VTYPE, VEDIV, 5, 2)
-> +FIELD(VTYPE, RESERVED, 7, sizeof(target_ulong) * 8 - 9)
-> +FIELD(VTYPE, VILL, sizeof(target_ulong) * 8 - 2, 1)
-> +
->  struct CPURISCVState {
->      target_ulong gpr[32];
->      uint64_t fpr[32]; /* assume both F and D extensions */
-> @@ -358,19 +365,62 @@ void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
->  #define TB_FLAGS_MMU_MASK   3
->  #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
->
-> +typedef CPURISCVState CPUArchState;
-> +typedef RISCVCPU ArchCPU;
-> +#include "exec/cpu-all.h"
-> +
-> +FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
-> +FIELD(TB_FLAGS, LMUL, 3, 2)
-> +FIELD(TB_FLAGS, SEW, 5, 3)
-> +FIELD(TB_FLAGS, VILL, 8, 1)
-> +
-> +/*
-> + * A simplification for VLMAX
-> + * = (1 << LMUL) * VLEN / (8 * (1 << SEW))
-> + * = (VLEN << LMUL) / (8 << SEW)
-> + * = (VLEN << LMUL) >> (SEW + 3)
-> + * = VLEN >> (SEW + 3 - LMUL)
-> + */
-> +static inline uint32_t vext_get_vlmax(RISCVCPU *cpu, target_ulong vtype)
-> +{
-> +    uint8_t sew, lmul;
-> +
-> +    sew = FIELD_EX64(vtype, VTYPE, VSEW);
-> +    lmul = FIELD_EX64(vtype, VTYPE, VLMUL);
-> +    return cpu->cfg.vlen >> (sew + 3 - lmul);
-> +}
-> +
->  static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
-> -                                        target_ulong *cs_base, uint32_t *flags)
-> +                                        target_ulong *cs_base, uint32_t *pflags)
->  {
-> +    uint32_t flags = 0;
-> +
->      *pc = env->pc;
->      *cs_base = 0;
-> +
-> +    if (env->misa & RVV) {
+The license is the 'GNU General Public License v2.0 or later',
+not 'and':
 
-Can you use: riscv_has_ext(env, RVV) instead?
+  This program is free software; you can redistribute it and/ori
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation; either version 2 of
+  the License, or (at your option) any later version.
 
-> +        uint32_t vlmax = vext_get_vlmax(env_archcpu(env), env->vtype);
-> +        bool vl_eq_vlmax = (env->vstart == 0) && (vlmax == env->vl);
-> +        flags = FIELD_DP32(flags, TB_FLAGS, VILL,
-> +                    FIELD_EX64(env->vtype, VTYPE, VILL));
-> +        flags = FIELD_DP32(flags, TB_FLAGS, SEW,
-> +                    FIELD_EX64(env->vtype, VTYPE, VSEW));
-> +        flags = FIELD_DP32(flags, TB_FLAGS, LMUL,
-> +                    FIELD_EX64(env->vtype, VTYPE, VLMUL));
-> +        flags = FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
-> +    } else {
-> +        flags = FIELD_DP32(flags, TB_FLAGS, VILL, 1);
-> +    }
-> +
->  #ifdef CONFIG_USER_ONLY
-> -    *flags = TB_FLAGS_MSTATUS_FS;
-> +    flags |= TB_FLAGS_MSTATUS_FS;
->  #else
-> -    *flags = cpu_mmu_index(env, 0);
-> +    flags |= cpu_mmu_index(env, 0);
->      if (riscv_cpu_fp_enabled(env)) {
-> -        *flags |= env->mstatus & MSTATUS_FS;
-> +        flags |= env->mstatus & MSTATUS_FS;
->      }
->  #endif
-> +    *pflags = flags;
->  }
->
->  int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
-> @@ -411,9 +461,4 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
->
->  void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
->
-> -typedef CPURISCVState CPUArchState;
-> -typedef RISCVCPU ArchCPU;
-> -
-> -#include "exec/cpu-all.h"
-> -
->  #endif /* RISCV_CPU_H */
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index debb22a480..3c28c7e407 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -76,3 +76,5 @@ DEF_HELPER_2(mret, tl, env, tl)
->  DEF_HELPER_1(wfi, void, env)
->  DEF_HELPER_1(tlb_flush, void, env)
->  #endif
-> +/* Vector functions */
-> +DEF_HELPER_3(vsetvl, tl, env, tl, tl)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index b883672e63..53340bdbc4 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -62,6 +62,7 @@
->  @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
->  @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
->  @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-> +@r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
->
->  @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
->  @hfence_bvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-> @@ -207,3 +208,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011 @r2_rm
->  fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
->  fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
->  fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
-> +
-> +# *** RV32V Extension ***
-> +vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
-> +vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> new file mode 100644
-> index 0000000000..da82c72bbf
-> --- /dev/null
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -0,0 +1,69 @@
-> +/*
-> + * RISC-V translation routines for the RVV Standard Extension.
-> + *
-> + * Copyright (c) 2020 C-SKY Limited. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
-> +{
-> +    TCGv s1, s2, dst;
-> +    s2 = tcg_temp_new();
-> +    dst = tcg_temp_new();
-> +
-> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-> +    if (a->rs1 == 0) {
-> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-> +        s1 = tcg_const_tl(RV_VLEN_MAX);
-> +    } else {
-> +        s1 = tcg_temp_new();
-> +        gen_get_gpr(s1, a->rs1);
-> +    }
-> +    gen_get_gpr(s2, a->rs2);
-> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
-> +    gen_set_gpr(a->rd, dst);
-> +    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-> +    exit_tb(ctx);
+Fix the license comment.
 
-Why does this
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ include/hw/arm/bcm2835_peripherals.h | 3 ++-
+ include/hw/arm/bcm2836.h             | 3 ++-
+ include/hw/char/bcm2835_aux.h        | 3 ++-
+ include/hw/display/bcm2835_fb.h      | 3 ++-
+ include/hw/dma/bcm2835_dma.h         | 4 +++-
+ include/hw/intc/bcm2835_ic.h         | 4 +++-
+ include/hw/intc/bcm2836_control.h    | 3 ++-
+ include/hw/misc/bcm2835_mbox.h       | 4 +++-
+ include/hw/misc/bcm2835_mbox_defs.h  | 4 +++-
+ include/hw/misc/bcm2835_property.h   | 4 +++-
+ hw/arm/bcm2835_peripherals.c         | 3 ++-
+ hw/arm/bcm2836.c                     | 3 ++-
+ hw/arm/raspi.c                       | 3 ++-
+ hw/display/bcm2835_fb.c              | 1 -
+ hw/dma/bcm2835_dma.c                 | 4 +++-
+ hw/intc/bcm2835_ic.c                 | 4 ++--
+ hw/intc/bcm2836_control.c            | 4 +++-
+ hw/misc/bcm2835_mbox.c               | 4 +++-
+ hw/misc/bcm2835_property.c           | 4 +++-
+ 19 files changed, 45 insertions(+), 20 deletions(-)
 
-> +    ctx->base.is_jmp = DISAS_NORETURN;
-> +
-> +    tcg_temp_free(s1);
-> +    tcg_temp_free(s2);
-> +    tcg_temp_free(dst);
-> +    return true;
-> +}
-> +
-> +static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
-> +{
-> +    TCGv s1, s2, dst;
-> +    s2 = tcg_const_tl(a->zimm);
-> +    dst = tcg_temp_new();
-> +
-> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-> +    if (a->rs1 == 0) {
-> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-> +        s1 = tcg_const_tl(RV_VLEN_MAX);
-> +    } else {
-> +        s1 = tcg_temp_new();
-> +        gen_get_gpr(s1, a->rs1);
-> +    }
-> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
-> +    gen_set_gpr(a->rd, dst);
-> +    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_=
+peripherals.h
+index 7859281e11..2e8655a7c2 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_PERIPHERALS_H
+diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+index 92a6544816..024af8aae4 100644
+--- a/include/hw/arm/bcm2836.h
++++ b/include/hw/arm/bcm2836.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2836_H
+diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/char/bcm2835_aux.h
+index cdbf7e3e37..934acf9c81 100644
+--- a/include/hw/char/bcm2835_aux.h
++++ b/include/hw/char/bcm2835_aux.h
+@@ -2,7 +2,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_AUX_H
+diff --git a/include/hw/display/bcm2835_fb.h b/include/hw/display/bcm2835_f=
+b.h
+index 228988ba05..2246be74d8 100644
+--- a/include/hw/display/bcm2835_fb.h
++++ b/include/hw/display/bcm2835_fb.h
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_FB_H
+diff --git a/include/hw/dma/bcm2835_dma.h b/include/hw/dma/bcm2835_dma.h
+index 91ed8d05d1..a6747842b7 100644
+--- a/include/hw/dma/bcm2835_dma.h
++++ b/include/hw/dma/bcm2835_dma.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_DMA_H
+diff --git a/include/hw/intc/bcm2835_ic.h b/include/hw/intc/bcm2835_ic.h
+index fb75fa0064..392ded1cb3 100644
+--- a/include/hw/intc/bcm2835_ic.h
++++ b/include/hw/intc/bcm2835_ic.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_IC_H
+diff --git a/include/hw/intc/bcm2836_control.h b/include/hw/intc/bcm2836_co=
+ntrol.h
+index de061b8929..2c22405686 100644
+--- a/include/hw/intc/bcm2836_control.h
++++ b/include/hw/intc/bcm2836_control.h
+@@ -8,7 +8,8 @@
+  * ARM Local Timer IRQ Copyright (c) 2019. Zolt=C3=A1n Baldaszti
+  * Added basic IRQ_TIMER interrupt support
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2836_CONTROL_H
+diff --git a/include/hw/misc/bcm2835_mbox.h b/include/hw/misc/bcm2835_mbox.=
+h
+index 7e8f3ce86d..57f95cc35e 100644
+--- a/include/hw/misc/bcm2835_mbox.h
++++ b/include/hw/misc/bcm2835_mbox.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_MBOX_H
+diff --git a/include/hw/misc/bcm2835_mbox_defs.h b/include/hw/misc/bcm2835_=
+mbox_defs.h
+index a18e520b22..9670bf33a0 100644
+--- a/include/hw/misc/bcm2835_mbox_defs.h
++++ b/include/hw/misc/bcm2835_mbox_defs.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_MBOX_DEFS_H
+diff --git a/include/hw/misc/bcm2835_property.h b/include/hw/misc/bcm2835_p=
+roperty.h
+index 11be0dbeac..b321f22499 100644
+--- a/include/hw/misc/bcm2835_property.h
++++ b/include/hw/misc/bcm2835_property.h
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #ifndef BCM2835_PROPERTY_H
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 17207ae07e..edcaa4916d 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index 38e2941bab..43022b83f5 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -5,7 +5,8 @@
+  * Rasperry Pi 2 emulation and refactoring Copyright (c) 2015, Microsoft
+  * Written by Andrew Baumann
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index acd2bb794d..fe3b9bc78b 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -8,7 +8,8 @@
+  * Raspberry Pi 3 emulation Copyright (c) 2018 Zolt=C3=A1n Baldaszti
+  * Upstream code cleanup (c) 2018 Pekka Enberg
+  *
+- * This code is licensed under the GNU GPLv2 and later.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
+index d6bf3374a6..c6263808a2 100644
+--- a/hw/display/bcm2835_fb.c
++++ b/hw/display/bcm2835_fb.c
+@@ -1,7 +1,6 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+  * Refactoring for Pi2 Copyright (c) 2015, Microsoft. Written by Andrew Ba=
+umann.
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * Heavily based on milkymist-vgafb.c, copyright terms below:
+  *  QEMU model of the Milkymist VGA framebuffer.
+diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
+index ccff5ed55b..4cd9dab745 100644
+--- a/hw/dma/bcm2835_dma.c
++++ b/hw/dma/bcm2835_dma.c
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/intc/bcm2835_ic.c b/hw/intc/bcm2835_ic.c
+index 05bd28e4f9..53ab8f5881 100644
+--- a/hw/intc/bcm2835_ic.c
++++ b/hw/intc/bcm2835_ic.c
+@@ -1,7 +1,6 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+  * Refactoring for Pi2 Copyright (c) 2015, Microsoft. Written by Andrew Ba=
+umann.
+- * This code is licensed under the GNU GPLv2 and later.
+  * Heavily based on pl190.c, copyright terms below:
+  *
+  * Arm PrimeCell PL190 Vector Interrupt Controller
+@@ -9,7 +8,8 @@
+  * Copyright (c) 2006 CodeSourcery.
+  * Written by Paul Brook
+  *
+- * This code is licensed under the GPL.
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
+index 61f884ff9e..53dba0080c 100644
+--- a/hw/intc/bcm2836_control.c
++++ b/hw/intc/bcm2836_control.c
+@@ -4,7 +4,6 @@
+  * Written by Andrew Baumann
+  *
+  * Based on bcm2835_ic.c (Raspberry Pi emulation) (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * At present, only implements interrupt routing, and mailboxes (i.e.,
+  * not PMU interrupt, or AXI counters).
+@@ -13,6 +12,9 @@
+  *
+  * Ref:
+  * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/=
+QA7_rev3.4.pdf
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
+index 77d2d80706..2afa06a746 100644
+--- a/hw/misc/bcm2835_mbox.c
++++ b/hw/misc/bcm2835_mbox.c
+@@ -1,11 +1,13 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
+  *
+  * This file models the system mailboxes, which are used for
+  * communication with low-bandwidth GPU peripherals. Refs:
+  *   https://github.com/raspberrypi/firmware/wiki/Mailboxes
+  *   https://github.com/raspberrypi/firmware/wiki/Accessing-mailboxes
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+index df91280dfc..3e228ca0ae 100644
+--- a/hw/misc/bcm2835_property.c
++++ b/hw/misc/bcm2835_property.c
+@@ -1,6 +1,8 @@
+ /*
+  * Raspberry Pi emulation (c) 2012 Gregory Estrade
+- * This code is licensed under the GNU GPLv2 and later.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
+--=20
+2.21.1
 
-Need to be different to this?
-
-Alistair
-
-> +    ctx->base.is_jmp = DISAS_NORETURN;
-> +
-> +    tcg_temp_free(s1);
-> +    tcg_temp_free(s2);
-> +    tcg_temp_free(dst);
-> +    return true;
-> +}
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 43bf7e39a6..af07ac4160 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -56,6 +56,12 @@ typedef struct DisasContext {
->         to reset this known value.  */
->      int frm;
->      bool ext_ifencei;
-> +    /* vector extension */
-> +    bool vill;
-> +    uint8_t lmul;
-> +    uint8_t sew;
-> +    uint16_t vlen;
-> +    bool vl_eq_vlmax;
->  } DisasContext;
->
->  #ifdef TARGET_RISCV64
-> @@ -711,6 +717,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->  #include "insn_trans/trans_rva.inc.c"
->  #include "insn_trans/trans_rvf.inc.c"
->  #include "insn_trans/trans_rvd.inc.c"
-> +#include "insn_trans/trans_rvv.inc.c"
->  #include "insn_trans/trans_privileged.inc.c"
->
->  /* Include the auto-generated decoder for 16 bit insn */
-> @@ -745,10 +752,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      DisasContext *ctx = container_of(dcbase, DisasContext, base);
->      CPURISCVState *env = cs->env_ptr;
->      RISCVCPU *cpu = RISCV_CPU(cs);
-> +    uint32_t tb_flags = ctx->base.tb->flags;
->
->      ctx->pc_succ_insn = ctx->base.pc_first;
-> -    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
-> -    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
-> +    ctx->mem_idx = tb_flags & TB_FLAGS_MMU_MASK;
-> +    ctx->mstatus_fs = tb_flags & TB_FLAGS_MSTATUS_FS;
->      ctx->priv_ver = env->priv_ver;
->  #if !defined(CONFIG_USER_ONLY)
->      if (riscv_has_ext(env, RVH)) {
-> @@ -772,6 +780,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      ctx->misa = env->misa;
->      ctx->frm = -1;  /* unknown rounding mode */
->      ctx->ext_ifencei = cpu->cfg.ext_ifencei;
-> +    ctx->vlen = cpu->cfg.vlen;
-> +    ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
-> +    ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
-> +    ctx->lmul = FIELD_EX32(tb_flags, TB_FLAGS, LMUL);
-> +    ctx->vl_eq_vlmax = FIELD_EX32(tb_flags, TB_FLAGS, VL_EQ_VLMAX);
->  }
->
->  static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> new file mode 100644
-> index 0000000000..2afe716f2a
-> --- /dev/null
-> +++ b/target/riscv/vector_helper.c
-> @@ -0,0 +1,53 @@
-> +/*
-> + * RISC-V Vector Extension Helpers for QEMU.
-> + *
-> + * Copyright (c) 2020 C-SKY Limited. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#include "exec/exec-all.h"
-> +#include "exec/helper-proto.h"
-> +#include <math.h>
-> +
-> +target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
-> +    target_ulong s2)
-> +{
-> +    int vlmax, vl;
-> +    RISCVCPU *cpu = env_archcpu(env);
-> +    uint16_t sew = 8 << FIELD_EX64(s2, VTYPE, VSEW);
-> +    uint8_t ediv = FIELD_EX64(s2, VTYPE, VEDIV);
-> +    bool vill = FIELD_EX64(s2, VTYPE, VILL);
-> +    target_ulong reserved = FIELD_EX64(s2, VTYPE, RESERVED);
-> +
-> +    if ((sew > cpu->cfg.elen) || vill || (ediv != 0) || (reserved != 0)) {
-> +        /* only set vill bit. */
-> +        env->vtype = FIELD_DP64(0, VTYPE, VILL, 1);
-> +        env->vl = 0;
-> +        env->vstart = 0;
-> +        return 0;
-> +    }
-> +
-> +    vlmax = vext_get_vlmax(cpu, s2);
-> +    if (s1 <= vlmax) {
-> +        vl = s1;
-> +    } else {
-> +        vl = vlmax;
-> +    }
-> +    env->vl = vl;
-> +    env->vtype = s2;
-> +    env->vstart = 0;
-> +    return vl;
-> +}
-> --
-> 2.23.0
->
 
