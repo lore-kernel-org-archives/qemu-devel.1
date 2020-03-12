@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B83E5C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22801C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83111206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6B22206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CF7jfNpf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83111206F1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kRnC/RMU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6B22206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQyO-0001UK-Iy
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:46:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35523)
+	id 1jCQyR-0001Zn-2u
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:46:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxG-00084T-Fh
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxH-00085R-4H
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxF-0004zL-75
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:06 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43747)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxG-0004ze-3g
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:07 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34586)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxF-0004z1-1D
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:05 -0400
-Received: by mail-wr1-x434.google.com with SMTP id b2so2137427wrj.10
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:04 -0700 (PDT)
+ id 1jCQxF-0004zP-Ta
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:06 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z15so8380523wrl.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=2ZMyDKOs221YK54nfIMgl82UUxNxqh4DM/94KMAkg9o=;
- b=CF7jfNpfOU7qbI7yJqZ6pdFAAm+rFsSqSdPNkF3DTNia1p16dJHn/WBbAOImg2ixBU
- It2AO0ge5mhcburjxY+id3rTKUEfPtyaxt/ky0VW6HmPkHJ/239e73XzVhUMT7z0wOaW
- le9fTX4UIF8A+Ufmfu8SVPPUNAOmn+Gb7c2PrsS6pexsBgvgqcPT9OZzFc1U+MCV08Yk
- IrUBGJZsL5mYH8dxNBdHYT8i2jsEiLQ+Frt+JixjDbJeW4YPwcUOA5qCv8s7BKOYYBE0
- fXKHQJy7/O6G3V3XnskTrwwBnVpuhvxW81tmFAnuawezigR4fM7WPlpH7oJr52jZCp5o
- QG4A==
+ bh=8CaBKL2SveIQE6UGOFKfKIzbSJiAUmm7injqvPnlpXo=;
+ b=kRnC/RMUgwnUH53EFwwYPeDQL8qOVlrvnFoITNWd3NGaRzMxDKn0+v5Qx/hiMi3NnZ
+ m4hdffK6Bq+HJhcCho8EdC2uXvK2DN4mmBIivJpKVOWllSHv/Xs0vnpz5XlzZ+qZk9BO
+ Y6BJ/jSeDHmHZzghp/oQCgNzt1T97mTt4ivzfqWD4UoEhmb/J4g564xKL/ISOkTlF+5M
+ ViWllKYcDrpJ3WUoBYYwpTnfqeuNE/4qTjAe4FcTcCQtxc2YxmRQLMUFy24LK8zmQ4Te
+ Rd57HYawIlqTiYNvQ9I2uAXyzzSGuNPP3uXBmEM9mUW5JIO/36+tY7FtpIengdVCAF6E
+ LoQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2ZMyDKOs221YK54nfIMgl82UUxNxqh4DM/94KMAkg9o=;
- b=Q30KZL8azOLj2wAVhm/lpMXXJIN87+h0qh+T4VMQ0sLIzLiMj/07980fbBzPZEh0iU
- aLFpUOQKVxbU+Z5meFVD2x17E+Z41UzQHkxKc5E5iY2bNoVLa7lSLg6wE2cWm4ZhRzwH
- 7Tm5Sh3ffZblTHVOgPI2eGFlndKjrgnr2kbJgZnLpLzzg8VatVEMYoFu7e1w+d9hZTGY
- Ncs1zyCEFWMUv8MOSf1zoBr5rvB8Xjs/ZxgX+qbadXUdZYe5qBM/4jHWA/S/1T008z/s
- DkbXkio8Gc2/Xwwc0dm0W/PEn8eZf3l5Q3zEI/ZrihSgIUToK5WrQ6HzG68mQHzRJHYI
- oHgQ==
-X-Gm-Message-State: ANhLgQ21cCnkpd8C0D148DktgAsjLwgHC56x/bsz0nJWoy4I7nm5c8Ug
- oW1REmSs4Muu9Wbnc8VBuFfdIAZBQTTMrQ==
-X-Google-Smtp-Source: ADFU+vsMWJp5DePOdrLm6pWoaOoew70K1yBtbWQ/WoWvCD0Dip914jyCHePwUtRMuaeDBTHF2CQWSA==
-X-Received: by 2002:a05:6000:120e:: with SMTP id
- e14mr12236218wrx.182.1584031503777; 
- Thu, 12 Mar 2020 09:45:03 -0700 (PDT)
+ bh=8CaBKL2SveIQE6UGOFKfKIzbSJiAUmm7injqvPnlpXo=;
+ b=ukfBvZR6cWxMFMUct0vSPy0JRP1GuuVeSBE9LA1nlqCMZZUiVtFvAdIOmb4J+r4tpP
+ JCVzCRAZztKquKVHlyR1rKaRwN0fL2gD8C+ZhJ6OB7VBHBAAAjqg67DPVVQIO7F+EjtB
+ e1wHEhRjWsYJocgf4SI9QrufrL+BjKh2GsYwfYV6Ls9XZbp/ao1g4PCTh3gGTec7J1m2
+ B5ZZH8T55KGztbG7ZkVIbNl5hqz/KMxmROiv8L3QZ39g2SjoBnGHG4XWXo7mURCtY5iK
+ kHcWTewKMf23fKpv1QzYLtJO8Ser/6V84558FuXZVnQi5p7N+27srArMV7fD13G3yEnL
+ kElA==
+X-Gm-Message-State: ANhLgQ25SDc0PHkS3Nz1hqk9bsPkZPBEZLm+Ri2duDl5LMCBnE07Zbnb
+ Xc5X42GjIlQN0P4hB7Wf253Jts1bu0cqsg==
+X-Google-Smtp-Source: ADFU+vtG7P1G8yl+RWCZXzrqdqklPzFhfrWkJ1F20lai1sUlUXvvH1sE4Xwio/rHEhp2C18RLUBPAg==
+X-Received: by 2002:adf:de84:: with SMTP id w4mr12124411wrl.350.1584031504632; 
+ Thu, 12 Mar 2020 09:45:04 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
  by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:03 -0700 (PDT)
+ Thu, 12 Mar 2020 09:45:04 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/36] hw/intc/armv7m_nvic: Rebuild hflags on reset
-Date: Thu, 12 Mar 2020 16:44:24 +0000
-Message-Id: <20200312164459.25924-2-peter.maydell@linaro.org>
+Subject: [PULL 02/36] target/arm: Update hflags in trans_CPS_v7m()
+Date: Thu, 12 Mar 2020 16:44:25 +0000
+Message-Id: <20200312164459.25924-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
 References: <20200312164459.25924-1-peter.maydell@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,39 +97,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of an M-profile CPU's cached hflags state depends on state that's
-in our NVIC object. We already do an hflags rebuild when the NVIC
-registers are written, but we also need to do this on NVIC reset,
-because there's no guarantee that this will happen before the
-CPU reset.
-
-This fixes an assertion due to mismatched hflags which happens if
-the CPU is reset from inside a HardFault handler.
+For M-profile CPUs, the FAULTMASK value affects the CPU's MMU index
+(it changes the NegPri bit). We update the hflags after calls
+to the v7m_msr helper in trans_MSR_v7m() but forgot to do so
+in trans_CPS_v7m().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200303174950.3298-2-peter.maydell@linaro.org
+Message-id: 20200303174950.3298-3-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/arm/translate.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index a62587eb3f0..1ad35e55292 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -2593,6 +2593,12 @@ static void armv7m_nvic_reset(DeviceState *dev)
-             s->itns[i] = true;
-         }
-     }
-+
-+    /*
-+     * We updated state that affects the CPU's MMUidx and thus its hflags;
-+     * and we can't guarantee that we run before the CPU reset function.
-+     */
-+    arm_rebuild_hflags(&s->cpu->env);
- }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 6259064ea7c..7f0154194cf 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10590,7 +10590,7 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
  
- static void nvic_systick_trigger(void *opaque, int n, int level)
+ static bool trans_CPS_v7m(DisasContext *s, arg_CPS_v7m *a)
+ {
+-    TCGv_i32 tmp, addr;
++    TCGv_i32 tmp, addr, el;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_M)) {
+         return false;
+@@ -10613,6 +10613,9 @@ static bool trans_CPS_v7m(DisasContext *s, arg_CPS_v7m *a)
+         gen_helper_v7m_msr(cpu_env, addr, tmp);
+         tcg_temp_free_i32(addr);
+     }
++    el = tcg_const_i32(s->current_el);
++    gen_helper_rebuild_hflags_m32(cpu_env, el);
++    tcg_temp_free_i32(el);
+     tcg_temp_free_i32(tmp);
+     gen_lookup_tb(s);
+     return true;
 -- 
 2.20.1
 
