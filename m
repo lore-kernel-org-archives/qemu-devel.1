@@ -2,84 +2,80 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02000C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5434AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF21220663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EDAC20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 14:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J06cYGm3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF21220663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZEh7AU0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EDAC20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCOuh-0004um-TZ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 10:34:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35697)
+	id 1jCOvH-000695-7k
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 10:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1jCOrJ-0007Ig-Qb
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:30:54 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1jCOtk-00031I-8s
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:33:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1jCOrE-0006X7-Vp
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:30:49 -0400
-Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:44035)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1jCOrE-0006Wb-QC
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:30:44 -0400
-Received: by mail-pl1-x633.google.com with SMTP id d9so2723175plo.11
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 07:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=8MBax5bvqnGFn59+X+0C/P+ZVgi3X2sGtV0kV14mTCU=;
- b=J06cYGm3233jvXeQUOsSAkPSWCP9g6/W9r8rJPtGKgW8HSC0UJJ69/ezmPCpWb1mCW
- lj6cJgOU+ZTpt0xylcPUQw7BtvuOgRuGCNCrUvmYpU/1LkLPsQ4PplbfYwhs2npYtVpB
- tfU1poP61yi6Ik7alJQmCgH6ImjUBaHzkaekDUQHYovNScNs4lm9PK5gGF5rlB5AWG+e
- lvD/yJyz4YW5Xc+K9874vRsg2Vl61yrF4CjLegqNDZHreY60OkEGXsCEQ7RIqtQb/2vS
- STNGO7oMCHyrQ4/8sApQ5Lqyi7+eRw1sIxb+u9x7LykLWXRDUOJlxNthXf+B5IY2liNv
- JYKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=8MBax5bvqnGFn59+X+0C/P+ZVgi3X2sGtV0kV14mTCU=;
- b=dakFVDTHvFmEbIIzgeudmtch17GclsmJ1MHloah6+pxd2V8l62bvWt3DAmUKDwcC8L
- GcX0jNBV6+PHAZaJYjZHYDEqOw+5i3JstPfq2iKwc+hdV7GasmxWO2KUtvkEGZhH4Mn9
- ItU8jWHeNC7fZQGvTX2chGhK5PuqLtGPpzwzVKTnp3+3OuMe9dWqpe7+RaY+4x4/NUgE
- Uj10Jgux/5R8Lv7rZzMwsvOLotTCOksRb3ieFeVAY73YHBuPRfZQrXCvmzzyBswqqKde
- Dece0sZYV4YDihlAfapnCRQGU+RMRZXYxLN8BqLsWLGnFUBe3yIIQ+1nQ+Q9To7FSSTP
- Qcig==
-X-Gm-Message-State: ANhLgQ0tWD13r50yC/FY8QENDDpUFfwUQ/LIWC9rvJL252uxLv5J/FC0
- EWUGO59nKjO0Gdz8NF+ZX4LHKhZC1H0=
-X-Google-Smtp-Source: ADFU+vu2iqanlfiAPx1vh89F01EoaI3xidL4bcWHHnAGk/uQfPJdXpBueHeY6RcabMll8QPhrVKt1w==
-X-Received: by 2002:a17:902:9b8a:: with SMTP id
- y10mr7923687plp.114.1584023443479; 
- Thu, 12 Mar 2020 07:30:43 -0700 (PDT)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:845e:b9f6:81a6:8f5e])
- by smtp.gmail.com with ESMTPSA id 63sm14832651pfx.132.2020.03.12.07.30.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 07:30:42 -0700 (PDT)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 06/10] tests/vm: allow wait_ssh() to specify command
-Date: Thu, 12 Mar 2020 10:27:24 -0400
-Message-Id: <20200312142728.12285-7-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200312142728.12285-1-robert.foley@linaro.org>
-References: <20200312142728.12285-1-robert.foley@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::633
+ (envelope-from <mlevitsk@redhat.com>) id 1jCOth-0007oI-UL
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:33:19 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41861
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1jCOth-0007nu-ON
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 10:33:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584023596;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cfb7TTuVc9Nbz1RrInVDWas33/OQXlomUl20knSLEww=;
+ b=dZEh7AU0zLD3phnGJ/eGG3rppiG5Bw1JA2J3Lt/uLbS7KNfEBjXcrVGKNCL9BBzUhzZiXi
+ LCYT/pplZHCC9/hIEYFIlTe18GenZJuf2ltDWJo2PsURCDH4juTfxrJbW39S+NOOk99Xc8
+ yFCiMSriHibAYLVxy1xGPSS7SMLRb+Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-eSKJgQzdNRaWEqVD3ggCLA-1; Thu, 12 Mar 2020 10:33:15 -0400
+X-MC-Unique: eSKJgQzdNRaWEqVD3ggCLA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 420FB189F762;
+ Thu, 12 Mar 2020 14:33:14 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C17319C6A;
+ Thu, 12 Mar 2020 14:33:08 +0000 (UTC)
+Message-ID: <c2d1cbfdf24c0673d257329393b065635bb6f8f4.camel@redhat.com>
+Subject: Re: [PATCH v2 00/14] LUKS: encryption slot management using amend
+ interface
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Date: Thu, 12 Mar 2020 16:33:07 +0200
+In-Reply-To: <bd526fff-5719-c056-e1cc-722c4e49c82b@redhat.com>
+References: <20200308151903.25941-1-mlevitsk@redhat.com>
+ <bd526fff-5719-c056-e1cc-722c4e49c82b@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,56 +87,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
- peter.puhov@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows for waiting for completion of arbitrary commands.
+On Thu, 2020-03-12 at 06:56 -0500, Eric Blake wrote:
+> On 3/8/20 10:18 AM, Maxim Levitsky wrote:
+> > Hi!
+> > Here is the updated series of my patches, incorporating all the feedback I received.
+> > 
+> > Patches are strictly divided by topic to 3 groups, and each group depends on former groups.
+> > 
+> > * Patches 1,2 implement qcrypto generic amend interface, including definition
+> >    of structs used in crypto.json and implement this in luks crypto driver
+> >    Nothing is exposed to the user at this stage
+> > 
+> > * Patches 3-9 use the code from patches 1,2 to implement qemu-img amend based encryption slot management
+> >    for luks and for qcow2, and add a bunch of iotests to cover that.
+> > 
+> > * Patches 10-13 add x-blockdev-amend (I'll drop the -x prefix if you like), and wire it
+> >    to luks and qcow2 driver to implement qmp based encryption slot management also using
+> >    the code from patches 1,2, and also add a bunch of iotests to cover this.
+> >   tests/qemu-iotests/284.out       |   6 +-
+> >   tests/qemu-iotests/300           | 207 ++++++++++++++++
+> 
+> Any reason why you skipped straight to test 300, rather than using an 
+> available slot like 290?  (Admittedly, our process for reserving slots 
+> is not very high-tech: manually scan the list for what other patches out 
+> there have claimed a slot, and be prepared to renumber when rebasing)
+The only reason I used these slots is that I know sadly that I'll have to resend and
+rebase this patchset for a while, and every time a test with the number I use is added,
+this causes relatively hard to fix conflict (or at least I don't know how to fix these conflicts effectively)
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- tests/vm/basevm.py | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Thus I used safe numbers, but at the rate this task progresses I won't be surprised that when this is merged,
+these will be test numbers to use...
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 3562a33ffa..305b839000 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -394,24 +394,24 @@ class BaseVM(object):
-     def print_step(self, text):
-         sys.stderr.write("### %s ...\n" % text)
- 
--    def wait_ssh(self, wait_root=False, seconds=300):
-+    def wait_ssh(self, wait_root=False, seconds=300, cmd="exit 0"):
-         # Allow more time for VM to boot under TCG.
-         if not kvm_available(self.arch):
-             seconds *= self.tcg_ssh_timeout_multiplier
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
--        guest_up = False
-+        cmd_success = False
-         while datetime.datetime.now() < endtime:
--            if wait_root and self.ssh_root("exit 0") == 0:
--                guest_up = True
-+            if wait_root and self.ssh_root(cmd) == 0:
-+                cmd_success = True
-                 break
--            elif self.ssh("exit 0") == 0:
--                guest_up = True
-+            elif self.ssh(cmd) == 0:
-+                cmd_success = True
-                 break
-             seconds = (endtime - datetime.datetime.now()).total_seconds()
-             logging.debug("%ds before timeout", seconds)
-             time.sleep(1)
--        if not guest_up:
-+        if not cmd_success:
-             raise Exception("Timeout while waiting for guest ssh")
- 
-     def shutdown(self):
--- 
-2.17.1
+TL;DR - these are placeholders, and once the patch set is blesssed for merging upstream I'll update this next
+available numbers.
+
+Best regards,
+	Maxim Levitsky
 
 
