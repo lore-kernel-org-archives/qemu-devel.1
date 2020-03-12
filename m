@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE332C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD89BC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC0CC206EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F1C920637
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:54:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zvsz+a5+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC0CC206EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bQB23GnC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F1C920637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTtu-0006AB-VJ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:53:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45699)
+	id 1jCTup-0008Kt-Mi
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjO-000604-U1
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:00 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjM-0005r6-9k
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjN-0002FF-FZ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:58 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37868)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjK-0002DL-S6
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:56 -0400
+Received: from mail-pl1-x633.google.com ([2607:f8b0:4864:20::633]:34149)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTjN-0002El-9i
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:57 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id ca13so3080435pjb.2
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:57 -0700 (PDT)
+ id 1jCTjK-0002D1-MI
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:54 -0400
+Received: by mail-pl1-x633.google.com with SMTP id a23so3080320plm.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mxH1z7hu6JWyA2yDv2VBwZVGJWKtIh1G7GDAiImS5lg=;
- b=Zvsz+a5+BrOwCde1qmvRbrjxWo/P4LV4e8xWh5Y68M7xSG4QN0XSKO5FxPj/dhIzr2
- poXLWwfehj6gJl8TuTfIAt4oZSbHDf4cROm2X8Pfk1iq9s6AER771ob2R4wsWb4lfPCk
- 6Ym7xRbAGyxRro0qZEEQdOsZDoT1nHDjVgm/OngpzE+/TCnFbt4yAYCXPgeI2EWHoddp
- gtBOPs6kiFmcBvY/RRdA4FMvklE7Ie/VFNZxWWs0zeynNbFAs25JwvUaswV8K6p9XS1c
- YJ2ES/fyoC3KZfVbnynHmXxmhT8y1AFQQM/9GMKZ84WVgbYHeFgAVqsPT7zgjYekOaUl
- apnw==
+ bh=VrNJWtbNYR04xVfCscKaMniKIGIvli/mwQv8Bqsi+6U=;
+ b=bQB23GnC8RsFCyIQf8D57QMT8ZGW5WIeRbZz1WdFXBfsYgtLiGNPN2VqPukJzI9SQU
+ LCYDOWbuQzfE3IKueuw97P1PeMPkrMk04ZwTKMEuBYgooazXPWVGwSY2jnTjTZWoReMO
+ oJU+XVyXjf4Dz7XuKcbu7OKu9rub4j4YU3p+nWbENgxH0AQLKVCgmdXD1PhlFPHq1bzQ
+ QhMk7m1I1ditlErnEHvRv0TdsJjIdcita1Ql07SYcOmWu2WXUAFxdPUzXCDxXjgJArk0
+ c23vLb5KIDazAaR+jISPRn/iAzNmIZfJk/BLiXiEsxv/lbSU5KzM4/H1gYAIP5AatAOW
+ o5Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=mxH1z7hu6JWyA2yDv2VBwZVGJWKtIh1G7GDAiImS5lg=;
- b=k5qy0DcaSVg6wL3CUGXwIqbPH9OQkkSZ57UN1w2ohTWPES7IZvaT489OT3cHzm+feh
- QyX6MwOwxsfVO7cVyTAmrypOgz3GFkiHL9C1DIGQDWfY8ybUR6jqFNVHXK/qXDcxvt5q
- 2SW6UIg/irYTmBsrL7WTEVpd+sfCsnF6akmfdEuAbUMux6NS/QNeO+8gq1BsIez66d1V
- yv2zzYNHzGF9p+HBwblgrlDPrcppZPJ8qr/hGYc9LpHp1NsdJH6Qxyq59gob4Byfczwh
- 9LcNx1caJSWGmQfY/RO/kLmyawntTQP6RkgAt+PaWp516kjgAYaYBldmBRXvMWy04ntq
- VnCw==
-X-Gm-Message-State: ANhLgQ0Otgenv2k7HmJHKbxQx5Ur57NYYfp8BKZdUklZEoFPMIel18+W
- jP9jOXS31sEPbx4iAERpw4/W2RDlYzs=
-X-Google-Smtp-Source: ADFU+vtiuzqDLWcjp34ykO0VnMAaoR+cJwdzI5bjV6mHKDKtw8+DgXt7HPwWzobZ9oOYlScMV6TjLQ==
-X-Received: by 2002:a17:902:343:: with SMTP id
- 61mr9680731pld.332.1584042175877; 
- Thu, 12 Mar 2020 12:42:55 -0700 (PDT)
+ bh=VrNJWtbNYR04xVfCscKaMniKIGIvli/mwQv8Bqsi+6U=;
+ b=UPZYd+DZpGP7/7cNgkuprT+BbnK1v27L6xVw0yhZdl/G+eG04OHjQZ19BHQ2AKub9r
+ KLaXS/oeKIRdqj1IZjURHnolb1yL0XptmNNI/G2kmVEQp8+XaE9VYseYSz9pVJRd6KEp
+ FPN1Dx1FUdrMDaiCcnDX6EMaPWBpsKzsEn/ZhjLfdXfuMAQxmEzHKCuyWnSwAYK6prEx
+ RUgF7lIuXDf+XNTYjOuPCO8VFNnLLUKWAr1IBVaBTiUfEqpYoCedt1RwFhpMfU6nXkYu
+ PtoLGG0VLDciSnxggUBn12EJE1YZMGJGqBfaGN1q/zoB7Gm3nLyjjj76TjP+Sf8UAQ9E
+ aoXA==
+X-Gm-Message-State: ANhLgQ3ChzwskhDZ+CINcgM0m3tCNWKafVXaQVWK9+u92Na1kr8Z81AN
+ UOQUBVk85BhoC4f4alW50W8QmUBSAcU=
+X-Google-Smtp-Source: ADFU+vv/OEzPKfch7WsF2Rfjks3h2xOV/IB0ak/uuAgL6uoyL7zSQJm3CrHnh2dVO0I3pxGdyhRvNQ==
+X-Received: by 2002:a17:902:778c:: with SMTP id
+ o12mr9786734pll.324.1584042173317; 
+ Thu, 12 Mar 2020 12:42:53 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.54
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:42:55 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 26/42] target/arm: Implement helper_mte_checkN
-Date: Thu, 12 Mar 2020 12:42:03 -0700
-Message-Id: <20200312194219.24406-27-richard.henderson@linaro.org>
+Subject: [PATCH v6 24/42] target/arm: Add gen_mte_checkN
+Date: Thu, 12 Mar 2020 12:42:01 -0700
+Message-Id: <20200312194219.24406-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+X-Received-From: 2607:f8b0:4864:20::633
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,199 +99,202 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fill out the stub that was added earlier.
+Replace existing uses of check_data_tbi in translate-a64.c that
+perform multiple logical memory access.  Leave the helper blank
+for now to reduce the patch size.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h  |   1 +
- target/arm/mte_helper.c | 162 +++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 162 insertions(+), 1 deletion(-)
+ target/arm/helper-a64.h    |  1 +
+ target/arm/translate-a64.h |  2 ++
+ target/arm/mte_helper.c    |  8 +++++
+ target/arm/translate-a64.c | 71 +++++++++++++++++++++++++++++---------
+ 4 files changed, 66 insertions(+), 16 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 8bbaf9b453..04f0b619b7 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1316,6 +1316,7 @@ FIELD(MTEDESC, TSIZE, 14, 10)  /* mte_checkN only */
+diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+index 2faa49d0a3..005af678c7 100644
+--- a/target/arm/helper-a64.h
++++ b/target/arm/helper-a64.h
+@@ -105,6 +105,7 @@ DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
  
- bool mte_probe1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
- uint64_t mte_check1(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra);
+ DEF_HELPER_FLAGS_3(mte_check1, TCG_CALL_NO_WG, i64, env, i32, i64)
++DEF_HELPER_FLAGS_3(mte_checkN, TCG_CALL_NO_WG, i64, env, i32, i64)
+ DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
+ DEF_HELPER_FLAGS_4(addsubg, TCG_CALL_NO_RWG_SE, i64, env, i64, s32, i32)
+ DEF_HELPER_FLAGS_3(ldg, TCG_CALL_NO_WG, i64, env, i64, i64)
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+index cc77e6ce8b..452b4764d0 100644
+--- a/target/arm/translate-a64.h
++++ b/target/arm/translate-a64.h
+@@ -42,6 +42,8 @@ bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+ bool sve_access_check(DisasContext *s);
+ TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
+                         bool tag_checked, int log2_size);
++TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
++                        bool tag_checked, int count, int log2_esize);
  
- static inline int allocation_tag_from_addr(uint64_t ptr)
- {
+ /* We should have at some point before trying to access an FP register
+  * done the necessary access check, so assert that
 diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 7a87574b35..94f67b33d1 100644
+index ec12768dfc..907a12b366 100644
 --- a/target/arm/mte_helper.c
 +++ b/target/arm/mte_helper.c
-@@ -494,7 +494,167 @@ uint64_t HELPER(mte_check1)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- /*
-  * Perform an MTE checked access for multiple logical accesses.
-  */
+@@ -366,3 +366,11 @@ uint64_t HELPER(mte_check1)(CPUARMState *env, uint32_t desc, uint64_t ptr)
+ {
+     return ptr;
+ }
 +
-+/**
-+ * checkN:
-+ * @tag: tag memory to test
-+ * @odd: true to begin testing at tags at odd nibble
-+ * @cmp: the tag to compare against
-+ * @count: number of tags to test
-+ *
-+ * Return the number of successful tests.
-+ * Thus a return value < @count indicates a failure.
-+ *
-+ * A note about sizes: count is expected to be small.
-+ *
-+ * The most common use will be LDP/STP of two integer registers,
-+ * which means 16 bytes of memory touching at most 2 tags, but
-+ * often the access is aligned and thus just 1 tag.
-+ *
-+ * Using AdvSIMD LD/ST (multiple), one can access 64 bytes of memory,
-+ * touching at most 5 tags.  SVE LDR/STR (vector) with the default
-+ * vector length is also 64 bytes; the maximum architectural length
-+ * is 256 bytes touching at most 9 tags.
-+ *
-+ * The loop below uses 7 logical operations and 1 memory operation
-+ * per tag pair.  An implementation that loads an aligned word and
-+ * uses masking to ignore adjacent tags requires 18 logical operations
-+ * and thus does not begin to pay off until 6 tags.
-+ * Which, according to the survey above, is unlikely to be common.
++/*
++ * Perform an MTE checked access for multiple logical accesses.
 + */
-+
-+static int checkN(uint8_t *mem, int odd, int cmp, int count)
++uint64_t HELPER(mte_checkN)(CPUARMState *env, uint32_t desc, uint64_t ptr)
 +{
-+    int n = 0, diff;
++    return ptr;
++}
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 683a8a3dba..c6187ccd60 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -301,6 +301,34 @@ TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
+                                  false, get_mem_index(s));
+ }
+ 
++/*
++ * For MTE, check multiple logical sequential accesses.  
++ */
++TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
++                        bool tag_checked, int log2_esize, int total_size)
++{
++    if (tag_checked && s->mte_active[0] && total_size != (1 << log2_esize)) {
++        TCGv_i32 tcg_desc;
++        TCGv_i64 ret;
++        int desc = 0;
 +
-+    /* Replicate the test tag and compare.  */
-+    cmp *= 0x11;
-+    diff = *mem++ ^ cmp;
++        desc = FIELD_DP32(desc, MTEDESC, MIDX, get_mem_index(s));
++        desc = FIELD_DP32(desc, MTEDESC, TBI, s->tbid);
++        desc = FIELD_DP32(desc, MTEDESC, TCMA, s->tcma);
++        desc = FIELD_DP32(desc, MTEDESC, WRITE, is_write);
++        desc = FIELD_DP32(desc, MTEDESC, ESIZE, 1 << log2_esize);
++        desc = FIELD_DP32(desc, MTEDESC, TSIZE, total_size);
++        tcg_desc = tcg_const_i32(desc);
 +
-+    if (odd) {
-+        goto start_odd;
++        ret = new_tmp_a64(s);
++        gen_helper_mte_checkN(ret, cpu_env, tcg_desc, addr);
++        tcg_temp_free_i32(tcg_desc);
++
++        return ret;
 +    }
-+
-+    while (1) {
-+        /* Test even tag. */
-+        if (unlikely((diff) & 0x0f)) {
-+            break;
-+        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+    start_odd:
-+        /* Test odd tag. */
-+        if (unlikely((diff) & 0xf0)) {
-+            break;
-+        }
-+        if (++n == count) {
-+            break;
-+        }
-+
-+        diff = *mem++ ^ cmp;
-+    }
-+    return n;
++    return gen_mte_check1(s, addr, is_write, tag_checked, log2_esize);
 +}
 +
-+uint64_t mte_checkN(CPUARMState *env, uint32_t desc, uint64_t ptr, uintptr_t ra)
-+{
-+    int mmu_idx, ptr_tag, bit55;
-+    uint64_t ptr_last, ptr_end, next_page;
-+    uint64_t tag_first, tag_end;
-+    uint64_t tag_byte_first, tag_byte_end;
-+    uint32_t esize, total, tag_count, tag_size, n, c;
-+    uint8_t *mem1, *mem2;
-+    MMUAccessType type;
+ typedef struct DisasCompare64 {
+     TCGCond cond;
+     TCGv_i64 value;
+@@ -2889,7 +2917,10 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+         }
+     }
+ 
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = gen_mte_checkN(s, dirty_addr, !is_load,
++                                (wback || rn != 31) && !set_tag,
++                                size, 2 << size);
 +
-+    bit55 = extract64(ptr, 55, 1);
-+
-+    /* If TBI is disabled, the access is unchecked, and ptr is not dirty. */
-+    if (unlikely(!tbi_check(desc, bit55))) {
-+        return ptr;
-+    }
-+
-+    ptr_tag = allocation_tag_from_addr(ptr);
-+
-+    if (tcma_check(desc, bit55, ptr_tag)) {
-+        goto done;
-+    }
-+
-+    mmu_idx = FIELD_EX32(desc, MTEDESC, MIDX);
-+    type = FIELD_EX32(desc, MTEDESC, WRITE) ? MMU_DATA_STORE : MMU_DATA_LOAD;
-+    esize = FIELD_EX32(desc, MTEDESC, ESIZE);
-+    total = FIELD_EX32(desc, MTEDESC, TSIZE);
-+
-+    /* Find the addr of the end of the access, and of the last element. */
-+    ptr_end = ptr + total;
-+    ptr_last = ptr_end - esize;
-+
-+    /* Round the bounds to the tag granule, and compute the number of tags. */
-+    tag_first = QEMU_ALIGN_DOWN(ptr, TAG_GRANULE);
-+    tag_end = QEMU_ALIGN_UP(ptr_last, TAG_GRANULE);
-+    tag_count = (tag_end - tag_first) / TAG_GRANULE;
-+
-+    /* Round the bounds to twice the tag granule, and compute the bytes. */
-+    tag_byte_first = QEMU_ALIGN_DOWN(ptr, 2 * TAG_GRANULE);
-+    tag_byte_end = QEMU_ALIGN_UP(ptr_last, 2 * TAG_GRANULE);
-+
-+    next_page = TARGET_PAGE_ALIGN(ptr);
-+    if (likely(tag_end <= next_page)) {
-+        /* Memory access stays on one page. */
-+        tag_size = (tag_byte_end - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, total,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+        if (!mem1) {
-+            goto done;
-+        }
-+        /* Perform all of the comparisons. */
-+        n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, tag_count);
-+    } else {
-+        /* Memory access crosses to next page. */
-+        tag_size = (next_page - tag_byte_first) / (2 * TAG_GRANULE);
-+        mem1 = allocation_tag_mem(env, mmu_idx, ptr, type, next_page - ptr,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        tag_size = (tag_byte_end - next_page) / (2 * TAG_GRANULE);
-+        mem2 = allocation_tag_mem(env, mmu_idx, next_page, type,
-+                                  ptr_end - next_page,
-+                                  MMU_DATA_LOAD, tag_size, ra);
-+
-+        /*
-+         * Perform all of the comparisons.
-+         * Note the possible but unlikely case of the operation spanning
-+         * two pages that do not both have tagging enabled.
-+         */
-+        n = c = (next_page - tag_first) / TAG_GRANULE;
-+        if (mem1) {
-+            n = checkN(mem1, ptr & TAG_GRANULE, ptr_tag, c);
-+        }
-+        if (n == c) {
-+            if (!mem2) {
-+                goto done;
-+            }
-+            n += checkN(mem2, 0, ptr_tag, tag_count - c);
-+        }
-+    }
+     if (is_vector) {
+         if (is_load) {
+             do_fp_ld(s, rt, clean_addr, size);
+@@ -3555,7 +3586,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     TCGv_i64 clean_addr, tcg_rn, tcg_ebytes;
+     MemOp endian = s->be_data;
+ 
+-    int ebytes;   /* bytes per element */
++    int total;    /* total bytes */
+     int elements; /* elements per vector */
+     int rpt;    /* num iterations */
+     int selem;  /* structure elements */
+@@ -3625,19 +3656,26 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+         endian = MO_LE;
+     }
+ 
+-    /* Consecutive little-endian elements from a single register
++    total = rpt * selem * (is_q ? 16 : 8);
++    tcg_rn = cpu_reg_sp(s, rn);
 +
 +    /*
-+     * If we failed, we know which granule.  Compute the element that
-+     * is first in that granule, and signal failure on that element.
++     * Issue the MTE check vs the logical repeat count, before we
++     * promote consecutive little-endian elements below.
 +     */
-+    if (unlikely(n < tag_count)) {
-+        uint64_t fail_ofs;
++    clean_addr = gen_mte_checkN(s, tcg_rn, is_store, is_postidx || rn != 31,
++                                size, total);
 +
-+        fail_ofs = tag_first + n * TAG_GRANULE - ptr;
-+        fail_ofs = ROUND_UP(fail_ofs, esize);
-+        mte_check_fail(env, mmu_idx, ptr + fail_ofs, ra);
-+    }
++    /*
++     * Consecutive little-endian elements from a single register
+      * can be promoted to a larger little-endian operation.
+      */
+     if (selem == 1 && endian == MO_LE) {
+         size = 3;
+     }
+-    ebytes = 1 << size;
+-    elements = (is_q ? 16 : 8) / ebytes;
+-
+-    tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
+-    tcg_ebytes = tcg_const_i64(ebytes);
++    elements = (is_q ? 16 : 8) >> size;
+ 
++    tcg_ebytes = tcg_const_i64(1 << size);
+     for (r = 0; r < rpt; r++) {
+         int e;
+         for (e = 0; e < elements; e++) {
+@@ -3671,7 +3709,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+ 
+     if (is_postidx) {
+         if (rm == 31) {
+-            tcg_gen_addi_i64(tcg_rn, tcg_rn, rpt * elements * selem * ebytes);
++            tcg_gen_addi_i64(tcg_rn, tcg_rn, total);
+         } else {
+             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
+         }
+@@ -3717,7 +3755,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     int selem = (extract32(opc, 0, 1) << 1 | R) + 1;
+     bool replicate = false;
+     int index = is_q << 3 | S << 2 | size;
+-    int ebytes, xs;
++    int xs, total;
+     TCGv_i64 clean_addr, tcg_rn, tcg_ebytes;
+ 
+     if (extract32(insn, 31, 1)) {
+@@ -3771,16 +3809,17 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+         return;
+     }
+ 
+-    ebytes = 1 << scale;
+-
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+ 
++    total = selem << scale;
+     tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
+-    tcg_ebytes = tcg_const_i64(ebytes);
+ 
++    clean_addr = gen_mte_checkN(s, tcg_rn, !is_load, is_postidx || rn != 31,
++                                scale, total);
 +
-+ done:
-+    return useronly_clean_ptr(ptr);
-+}
-+
- uint64_t HELPER(mte_checkN)(CPUARMState *env, uint32_t desc, uint64_t ptr)
- {
--    return ptr;
-+    return mte_checkN(env, desc, ptr, GETPC());
- }
++    tcg_ebytes = tcg_const_i64(1 << scale);
+     for (xs = 0; xs < selem; xs++) {
+         if (replicate) {
+             /* Load and replicate to all elements */
+@@ -3807,7 +3846,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+ 
+     if (is_postidx) {
+         if (rm == 31) {
+-            tcg_gen_addi_i64(tcg_rn, tcg_rn, selem * ebytes);
++            tcg_gen_addi_i64(tcg_rn, tcg_rn, total);
+         } else {
+             tcg_gen_add_i64(tcg_rn, tcg_rn, cpu_reg(s, rm));
+         }
 -- 
 2.20.1
 
