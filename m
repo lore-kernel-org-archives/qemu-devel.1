@@ -2,98 +2,87 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA17C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 298F8C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98D1D205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:05:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAC67205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRa8bRqW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98D1D205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Htm7rd1q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC67205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCU4i-0005Bv-Mt
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:05:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46833)
+	id 1jCU65-0003Py-4y
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:06:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45779)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jCTo1-0003kn-Uk
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:47:47 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjT-0006C9-1E
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jCTo0-0004o5-Dr
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:47:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47672
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCTo0-0004np-9E
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:47:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584042463;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WeGGn3tuYcsSwexU50DeBDd23ygmx98fJfdSJk4l0HA=;
- b=hRa8bRqWfRtLNu+yVs3N3Ssh3zkINz4f2W9+r1R/AYreYCZP2J1DFKmg0DhLKMs+yAEgSe
- 4qTXu2NsU06zeZdEIEX7NOlhJjKk/MGylBfAoyNJ5Itz1/QlVUdQ4GfAzlFvvMMuhfbY62
- 7F8U3JaO7C0MUXT1FEUiRZjOeDnD6tM=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-9Dl0c4YdMVGEeSkenVzonw-1; Thu, 12 Mar 2020 15:47:25 -0400
-X-MC-Unique: 9Dl0c4YdMVGEeSkenVzonw-1
-Received: by mail-qt1-f197.google.com with SMTP id l21so4903345qtq.1
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:47:25 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjR-0002Ht-JK
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:02 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44657)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jCTjR-0002Ha-Do
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:01 -0400
+Received: by mail-pg1-x543.google.com with SMTP id 37so3558674pgm.11
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=QJvhSRp707cxdamQl0vVDLxpjNb38jwO6L+jNT02qis=;
+ b=Htm7rd1qhbD8wYpn5xGztYpEq7moH6Jqt1IzRBbiBRgtuNx6WRyILUK157ppeHE11z
+ Ntq3SN/Mx+rNPDIH7aP7HoowgFWkZvaidtuf7SAyJ7gd7Duns+0n9KNCTJAwiAtMlmdT
+ P2AuJ8hxcGowmVL0H+ZMvv5REOrgO5E+0vSgMKVTQ5R5LOalwjkw9MYBegqfUdGbvCIx
+ n4BUVwtAnUMqp4gwyrr1xJwpWBc3ETjt0+MoXvkZgU41btzfrAD7tH93PxZGikxW/lxJ
+ 6ViOLGedLDXtWkYtdHM9TsDZHJFfBTarLgN8ssPXDz8enlXnG/uZk1qR8WBYv1Pj98Zi
+ Pekg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=SkcYgLGpr3Lsb1aJDuXv9LdnBxIKt6Gcb3cWx5ncf00=;
- b=mOz8LumASUhWGE+tysrZfrsY1ETntF2Bc8xhqDDyCxzeBiCV2DgiOgVPXkn5gMLHkz
- aycIFHEIY3Pjd6uTV6MoXxstM3+so/HJhZOkWm4AC+q4HsZvzBOXUOv8WzNDhj4OPuZE
- tfXmGViBNg9xQlXlQAEeMB5qwYB5K0pheO1iFbZbVvGxv46sLLTsuzv3SFlyn2mIk8iC
- wcZcPGuigRx2pk5/FCVjUhvSmDKpS8Fd8QzidTv840oQCfIuqz5+gGLcWmQHtesvy6hm
- 2n0pBk7RrODyU4ikhShGPIAat0JqdJ+RFQruwKlLrQgngLLRWNBniYFpM904nHAHNbGr
- jv8w==
-X-Gm-Message-State: ANhLgQ3MkWe+AVCG1GEdR/4SnYlWIqo1WfAJCyvxaDmhDobAPWDoDGp6
- Zb/Oc9IyhR4+8JXdjWPW9lfzV5gcY4B8pjf85YigoaVPM/r7QybM36VJXlAPqoSR3HRYWT9BJh3
- K3OfFmCh03ZzyNh8=
-X-Received: by 2002:a05:620a:12d5:: with SMTP id
- e21mr9360747qkl.226.1584042444958; 
- Thu, 12 Mar 2020 12:47:24 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vubRMoG4fHZDvDStmZHVaxeN8T4Zjz6M0iMdsbm9um9qmBHc8uaSsgsgMcmngHIGe/JKU0Tbw==
-X-Received: by 2002:a05:620a:12d5:: with SMTP id
- e21mr9360724qkl.226.1584042444685; 
- Thu, 12 Mar 2020 12:47:24 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id x188sm18853664qka.53.2020.03.12.12.47.21
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=QJvhSRp707cxdamQl0vVDLxpjNb38jwO6L+jNT02qis=;
+ b=PB5xaJfuXBZy9zy+gCkhhL5TMgH+Tmjy01k3bTwOaYgVJad7xo1wpe1MpP1WMCBJYH
+ KMluabD3g6n9gZTXonn7U9bBoEd6VtKrNVJWdXigYu5bAXlMen82lMwYDV+H7CjMrUDF
+ V3vq/VB2Wzz5mYr9JSC5nrOQy0+XLzQIM7tsMnUTxGC3rdJTZRRlqjsYTUKjc0lzGfIc
+ +TL/7WTkYdOKqlzPh5vgxqg+h7m1DoDhnpLAfQk2AorHFTkznc5q8eor6Sf3fXutZY9p
+ dFjYxr4scgK74xHT+zNF4z1+vSB0XVBBL/bey93TywAen0qXmnuMdDeJrIDYCnRf56Bh
+ 54uA==
+X-Gm-Message-State: ANhLgQ2BOxEVuTXqzhH5LWl/Z3j3C+jadvst4Aj/KwdL1du9G5W2CQRg
+ GYPo4K0VgfyCRUhVfRfrVDu0XUYPH1U=
+X-Google-Smtp-Source: ADFU+vuTJzcTioii6xrC8Sx0g8tv+L/giG2Iml54SBRGew7tYRXGyHeSXVM1pQghu8G39Rarzzs3VQ==
+X-Received: by 2002:a62:16d2:: with SMTP id 201mr7235600pfw.295.1584042180076; 
+ Thu, 12 Mar 2020 12:43:00 -0700 (PDT)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:47:23 -0700 (PDT)
-Date: Thu, 12 Mar 2020 15:47:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
-Message-ID: <20200312154646-mutt-send-email-mst@kernel.org>
-References: <20200311170826.79419-1-liran.alon@oracle.com>
- <20200312172745.1b7b2222@redhat.com>
- <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
+ Thu, 12 Mar 2020 12:42:59 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 29/42] target/arm: Use mte_checkN for sve unpredicated
+ stores
+Date: Thu, 12 Mar 2020 12:42:06 -0700
+Message-Id: <20200312194219.24406-30-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
+References: <20200312194219.24406-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,123 +94,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
- Elad Gabay <elad.gabay@oracle.com>, Igor Mammedov <imammedo@redhat.com>,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 07:28:31PM +0200, Liran Alon wrote:
->=20
-> On 12/03/2020 18:27, Igor Mammedov wrote:
-> > On Wed, 11 Mar 2020 19:08:26 +0200
-> > Liran Alon <liran.alon@oracle.com> wrote:
-> > > +
-> > > +static void
-> > > +build_waet(GArray *table_data, BIOSLinker *linker)
-> > see build_hmat_lb() for example how to doc comment for such function
-> > should look like. Use earliest spec version where table was introduced.
->=20
-> Note that WAET is a table that is not part of ACPI spec officially.
-> It's specified on it's own document, there is only a single version, and
-> there is only a single table in that document describing that table
-> structure.
->=20
-> Therefore, I cannot write a comment such as build_hmat_lb() have:
-> /*
-> =A0* ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-> =A0* Structure: Table 5-146
-> */
->=20
-> My best attempt to do something similar in v2 is:
-> /*
-> =A0* Windows ACPI Emulated Devices Table
-> =A0* (Version 1.0 - April 6, 2009)
-> =A0* Spec: http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470=
-B-A97E-CE7CE0D98DC2/WAET.docx
-> =A0*
-> =A0* Helpful to speedup Windows guests and ignored by others.
-> =A0*/
->=20
-> If it's not sufficient. Please suggest alternative phrasing which I would
-> use in v2.
->=20
-> >=20
-> > > +{
-> > > +    AcpiTableWaet *waet;
-> > > +
-> > > +    waet =3D acpi_data_push(table_data, sizeof(*waet));
-> > > +    waet->emulated_device_flags =3D cpu_to_le32(ACPI_WAET_PM_TIMER_G=
-OOD);
-> > we don't use packed structures for building ACPI tables anymore (there =
-is
-> > old code that still does but that's being converted when we touch it)
-> >=20
-> > pls use build_append_int_noprefix() api instead, see build_amd_iommu() =
-as
-> > an example how to build binary tables using it and how to use comments
-> > to document fields.
-> > Basic idea is that api makes function building a table match table's
-> > description in spec (each call represents a row in spec) and comment
-> > belonging to a row should contain verbatim field name as used by spec
-> > so reader could copy/past and grep it easily.
-> Thanks for pointing this out.
-> I will make sure to update my code accordingly in v2.
-> >=20
-> >=20
-> >=20
-> >=20
-> > > +
-> > > +    build_header(linker, table_data,
-> > > +                 (void *)waet, "WAET", sizeof(*waet), 1, NULL, NULL)=
-;
-> > > +}
-> > > +
-> > >   /*
-> > >    *   IVRS table as specified in AMD IOMMU Specification v2.62, Sect=
-ion 5.2
-> > >    *   accessible here https://urldefense.com/v3/__http://support.amd=
-.com/TechDocs/48882_IOMMU.pdf__;!!GqivPVa7Brio!On_WsDCS8ysOeUG17h1l3dTpWEm7=
-9AHwMHLbbUgsvagBSpgZAk5U1cXddn6ZNOU$
-> > > @@ -2859,6 +2872,11 @@ void acpi_build(AcpiBuildTables *tables, Machi=
-neState *machine)
-> > >                             machine->nvdimms_state, machine->ram_slot=
-s);
-> > >       }
-> > > +    if (!pcmc->do_not_add_waet_acpi) {
-> > > +        acpi_add_table(table_offsets, tables_blob);
-> > > +        build_waet(tables_blob, tables->linker);
-> > > +    }
-> > we typically do not version ACPI table changes (there might be exceptio=
-ns
-> > but it should be a justified one).
-> > ACPI tables are considered to be a part of firmware (even though they a=
-re
-> > generated by QEMU) so on QEMU upgrade user gets a new firmware along wi=
-th
-> > new ACPI tables.
->=20
-> Hmm... I would have expected as a QEMU user that upgrading QEMU may updat=
-e
-> my firmware exposed table (Such as ACPI),
-> but only if I don't specify I wish to run on a specific machine-type. In
-> that case, I would've expect to be exposed with exact same firmware
-> information.
-> I understood that this was one of the main reasons why ACPI/SMBIOS
-> generation was moved from SeaBIOS to QEMU.
->=20
-> If you think this isn't the case, I can just remove this flag (Makes code
-> simpler). What do you prefer?
->=20
-> Thanks for the review,
-> -Liran
->=20
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper-sve.h    |  1 +
+ target/arm/sve_helper.c    | 63 ++++++++++++++++++++++++++-
+ target/arm/translate-sve.c | 88 ++++++++++++++------------------------
+ 3 files changed, 94 insertions(+), 58 deletions(-)
 
-I'm inclined to agree, but no biggie if Igor disagrees let's go along
-with his opinion.
-
---=20
-MST
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index 82ea70cf63..4e71501838 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -1124,6 +1124,7 @@ DEF_HELPER_FLAGS_5(sve_ftmad_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_ftmad_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ 
+ DEF_HELPER_FLAGS_4(sve_ldr, TCG_CALL_NO_WG, void, env, ptr, tl, int)
++DEF_HELPER_FLAGS_4(sve_str, TCG_CALL_NO_WG, void, env, ptr, tl, int)
+ 
+ DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+ DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index ede72a2989..2396737420 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -4191,7 +4191,7 @@ static bool sve_probe_page(SVEHostPage *info, bool nofault,
+ }
+ 
+ /*
+- * Load contiguous data, unpredicated.
++ * Load/store contiguous data, unpredicated.
+  *
+  * Note that unpredicated load/store of vector/predicate registers
+  * are defined as a stream of bytes, which equates to little-endian
+@@ -4261,6 +4261,67 @@ void HELPER(sve_ldr)(CPUARMState *env, void *vd, target_ulong addr, int size)
+     }
+ }
+ 
++void HELPER(sve_str)(CPUARMState *env, void *vd, target_ulong addr, int size)
++{
++    int mem_idx = cpu_mmu_index(env, false);
++    int in_page = -((int)addr | TARGET_PAGE_MASK);
++    uintptr_t ra = GETPC();
++    uint64_t val;
++    void *host;
++    int i;
++
++    /* Small stores are expanded inline. */
++    tcg_debug_assert(size > 2 * 8);
++
++    if (likely(size <= in_page)) {
++        host = probe_write(env, addr, size, mem_idx, ra);
++        if (likely(host != NULL)) {
++            for (i = 0; i + 8 <= size; i += 8) {
++                stq_le_p(host + i, *(uint64_t *)(vd + i));
++            }
++
++            /* Predicate load length may be any multiple of 2. */
++            if (unlikely(i != size)) {
++                val = *(uint64_t *)(vd + i);
++                if (size & 4) {
++                    stl_le_p(host + i, val);
++                    i += 4;
++                    val >>= 32;
++                }
++                if (size & 2) {
++                    stw_le_p(host + i, val);
++                }
++            }
++            return;
++        }
++    } else {
++        (void)probe_write(env, addr, in_page, mem_idx, ra);
++        (void)probe_write(env, addr + in_page, size - in_page, mem_idx, ra);
++    }
++
++    /*
++     * Note there is no endian-specific target store function, so to handle
++     * aarch64_be-linux-user we need to bswap the big-endian store.
++     */
++    for (i = 0; i + 8 <= size; i += 8) {
++        val = *(uint64_t *)(vd + i);
++        cpu_stq_data_ra(env, addr + i, le_bswap64(val), ra);
++    }
++
++    /* Predicate load length may be any multiple of 2. */
++    if (unlikely(i != size)) {
++        val = *(uint64_t *)(vd + i);
++        if (size & 4) {
++            cpu_stl_data_ra(env, addr + i, le_bswap32(val), ra);
++            i += 4;
++            val >>= 32;
++        }
++        if (size & 2) {
++            cpu_stw_data_ra(env, addr + i, le_bswap16(val), ra);
++        }
++    }
++}
++
+ /*
+  * Analyse contiguous data, protected by a governing predicate.
+  */
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index e55f8835bb..49d2e68564 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -4430,78 +4430,52 @@ static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int imm)
+     int len_remain = len % 8;
+     int nparts = len / 8 + ctpop8(len_remain);
+     int midx = get_mem_index(s);
+-    TCGv_i64 addr, t0;
++    TCGv_i64 dirty_addr, clean_addr, t0;
++    int i;
++
++    dirty_addr = read_cpu_reg_sp(s, rn, true);
++    tcg_gen_addi_i64(dirty_addr, dirty_addr, imm);
++
++    clean_addr = gen_mte_checkN(s, dirty_addr, true, rn != 31, len, MO_8);
++
++    /* Limit tcg code expansion by doing large loads out of line. */
++    if (nparts > 4) {
++        TCGv_ptr t_rd = tcg_temp_new_ptr();
++        TCGv_i32 t_len = tcg_const_i32(len);
++
++        tcg_gen_addi_ptr(t_rd, cpu_env, vofs);
++        gen_helper_sve_str(cpu_env, t_rd, clean_addr, t_len);
++        tcg_temp_free_ptr(t_rd);
++        tcg_temp_free_i32(t_len);
++        return;
++    }
+ 
+-    addr = tcg_temp_new_i64();
+     t0 = tcg_temp_new_i64();
+-
+-    /* Note that unpredicated load/store of vector/predicate registers
+-     * are defined as a stream of bytes, which equates to little-endian
+-     * operations on larger quantities.  There is no nice way to force
+-     * a little-endian store for aarch64_be-linux-user out of line.
+-     *
+-     * Attempt to keep code expansion to a minimum by limiting the
+-     * amount of unrolling done.
+-     */
+-    if (nparts <= 4) {
+-        int i;
+-
+-        for (i = 0; i < len_align; i += 8) {
+-            tcg_gen_ld_i64(t0, cpu_env, vofs + i);
+-            tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + i);
+-            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
+-        }
+-    } else {
+-        TCGLabel *loop = gen_new_label();
+-        TCGv_ptr t2, i = tcg_const_local_ptr(0);
+-
+-        gen_set_label(loop);
+-
+-        t2 = tcg_temp_new_ptr();
+-        tcg_gen_add_ptr(t2, cpu_env, i);
+-        tcg_gen_ld_i64(t0, t2, vofs);
+-
+-        /* Minimize the number of local temps that must be re-read from
+-         * the stack each iteration.  Instead, re-compute values other
+-         * than the loop counter.
+-         */
+-        tcg_gen_addi_ptr(t2, i, imm);
+-        tcg_gen_extu_ptr_i64(addr, t2);
+-        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, rn));
+-        tcg_temp_free_ptr(t2);
+-
+-        tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
+-
+-        tcg_gen_addi_ptr(i, i, 8);
+-
+-        tcg_gen_brcondi_ptr(TCG_COND_LTU, i, len_align, loop);
+-        tcg_temp_free_ptr(i);
++    for (i = 0; i < len_align; i += 8) {
++        tcg_gen_ld_i64(t0, cpu_env, vofs + i);
++        tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEQ);
++        tcg_gen_addi_i64(clean_addr, clean_addr, 8);
+     }
+ 
+     /* Predicate register stores can be any multiple of 2.  */
+     if (len_remain) {
+         tcg_gen_ld_i64(t0, cpu_env, vofs + len_align);
+-        tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + len_align);
+-
+         switch (len_remain) {
+-        case 2:
+-        case 4:
+-        case 8:
+-            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LE | ctz32(len_remain));
+-            break;
+-
+         case 6:
+-            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUL);
+-            tcg_gen_addi_i64(addr, addr, 4);
++            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUL);
++            tcg_gen_addi_i64(clean_addr, clean_addr, 4);
+             tcg_gen_shri_i64(t0, t0, 32);
+-            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUW);
++            /* fall through */
++        case 2:
++            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUW);
++            break;
++        case 4:
++            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUL);
+             break;
+-
+         default:
+             g_assert_not_reached();
+         }
+     }
+-    tcg_temp_free_i64(addr);
+     tcg_temp_free_i64(t0);
+ }
+ 
+-- 
+2.20.1
 
 
