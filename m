@@ -2,58 +2,87 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2A0C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D753FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41573206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:02:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41573206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 91867206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:03:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="euoNpR0z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91867206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCREO-0002Gp-Ba
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:02:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36596)
+	id 1jCREp-0003wx-NB
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:03:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR2K-0003e1-O9
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:50:23 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxq-0000lz-DD
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR2I-0006tK-UH
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:50:20 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42604)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCR2I-0006qH-3g; Thu, 12 Mar 2020 12:50:18 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07881809|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_alarm|0.638062-0.000405901-0.361533; FP=0|0|0|0|0|-1|-1|-1;
- HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=10; RT=10; SR=0;
- TI=SMTPD_---.H-QQmfe_1584031807; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-QQmfe_1584031807)
- by smtp.aliyun-inc.com(10.147.41.158);
- Fri, 13 Mar 2020 00:50:08 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 55/60] target/riscv: integer scalar move instruction
-Date: Thu, 12 Mar 2020 22:58:55 +0800
-Message-Id: <20200312145900.2054-56-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQxo-0005Ie-Rs
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:42 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:35242)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCQxo-0005IR-K8
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:40 -0400
+Received: by mail-wm1-x333.google.com with SMTP id m3so7127477wmi.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=LW+uhVLtDVUYFrSt24tGGyA8LHnhD06A1jm/O2Dydpk=;
+ b=euoNpR0zJ0xaOGfQPCASYBml2PVfr0s3neeidYkZzOs9iQycoiqyi9JxKT+QIEjds/
+ ENPGz2w18J0t0/VcDvUD2/WgVcuyOmFXjvLAWw9YXDRYJHg3AmgLKc8EUQb5z0obBdpA
+ XoEvC8YhU9ymOkgRcVSvMGBQeKiau7A70E9L0vXzmb3Y9NUALr+movcDgKCDEsaTsbHV
+ 8+YoJy2QwoVHWS0bc/ytahcQi8k41xUzZ/rmg3OlXERcguFE0Lz9a/lstjVjRyf1RLP5
+ qoMnMLVhxjejPWr0/xGtZzEtAZxuW67Q9Pxwoh7omXa8+s8QomH6L1WyC7zfZU89NsLf
+ ngzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=LW+uhVLtDVUYFrSt24tGGyA8LHnhD06A1jm/O2Dydpk=;
+ b=KXnzPE+fQXNSpTjVcaAkXwCcead187WAYNAu0aq/yD8IuvLfE99dc/gct+CtZk3gOS
+ xc4dR19G/0MHoNiC6JjuCFN6utIee8dQR79WMf0lGJeKECrWR8KwjQDfy8zspVsQHqb3
+ KjPdMi4cyeWg4K4cQKaUlz9NpOSEXSNmB13kXqTqZfqQdPKrTRQRSOFtMnKP75eT887g
+ 4wO2oviyv6qh/HMqE/Wb6WrEgctqP1H6Wi5dFi/ge4Ypl2gCzji2X3SJx89Ad5eySwn8
+ WxOCw/r+h23YEFHTQhuqjEDPBcAt6CF7HDRW04alAZvA38UeiG5NQ8K+Or9KxgfOqECv
+ OqzA==
+X-Gm-Message-State: ANhLgQ0ouO0vjuOHJcjeKzvqJ27MlGeDtxQr3Ev7OU4gGhPhyKyEn2/d
+ 2rs7LewWvAzDh7CfhSXYJhZ4uROd0+vz7Q==
+X-Google-Smtp-Source: ADFU+vvik/FlM3IXtJ9k3iyLgKslKazyKDJDOtUq4OGNS1saa/KpDx9nX+yvnQpagX7K0wTqvQcRpg==
+X-Received: by 2002:a7b:c7cd:: with SMTP id z13mr5401096wmk.97.1584031539304; 
+ Thu, 12 Mar 2020 09:45:39 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.38
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 09:45:38 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 31/36] hw/arm/virt: Introduce VirtGICType enum type
+Date: Thu, 12 Mar 2020 16:44:54 +0000
+Message-Id: <20200312164459.25924-32-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
+References: <20200312164459.25924-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,104 +94,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  5 +++++
- target/riscv/insn32.decode              |  1 +
- target/riscv/insn_trans/trans_rvv.inc.c | 26 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 15 ++++++++++++++
- 4 files changed, 47 insertions(+)
+From: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index d94347a9a5..41cecd266c 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1106,3 +1106,8 @@ DEF_HELPER_3(vext_x_v_b, tl, ptr, tl, env)
- DEF_HELPER_3(vext_x_v_h, tl, ptr, tl, env)
- DEF_HELPER_3(vext_x_v_w, tl, ptr, tl, env)
- DEF_HELPER_3(vext_x_v_d, tl, ptr, tl, env)
-+
-+DEF_HELPER_3(vmv_s_x_b, void, ptr, tl, env)
-+DEF_HELPER_3(vmv_s_x_h, void, ptr, tl, env)
-+DEF_HELPER_3(vmv_s_x_w, void, ptr, tl, env)
-+DEF_HELPER_3(vmv_s_x_d, void, ptr, tl, env)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c26a186d6a..7e1efeec05 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -556,6 +556,7 @@ vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
-+vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+We plan to introduce yet another value for the gic version (nosel).
+As we already use exotic values such as 0 and -1, let's introduce
+a dedicated enum type and let vms->gic_version take this
+type.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Message-id: 20200311131618.7187-3-eric.auger@redhat.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/arm/virt.h | 11 +++++++++--
+ hw/arm/virt.c         | 30 +++++++++++++++---------------
+ 2 files changed, 24 insertions(+), 17 deletions(-)
+
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 02f500cb8e2..c0827cacdf3 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -95,6 +95,13 @@ typedef enum VirtIOMMUType {
+     VIRT_IOMMU_VIRTIO,
+ } VirtIOMMUType;
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 46651dfb10..7720ffecde 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2243,3 +2243,29 @@ static bool trans_vext_x_v(DisasContext *s, arg_r *a)
-     }
-     return false;
++typedef enum VirtGICType {
++    VIRT_GIC_VERSION_MAX,
++    VIRT_GIC_VERSION_HOST,
++    VIRT_GIC_VERSION_2,
++    VIRT_GIC_VERSION_3,
++} VirtGICType;
++
+ typedef struct MemMapEntry {
+     hwaddr base;
+     hwaddr size;
+@@ -123,7 +130,7 @@ typedef struct {
+     bool highmem_ecam;
+     bool its;
+     bool virt;
+-    int32_t gic_version;
++    VirtGICType gic_version;
+     VirtIOMMUType iommu;
+     uint16_t virtio_iommu_bdf;
+     struct arm_boot_info bootinfo;
+@@ -162,7 +169,7 @@ static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+     uint32_t redist0_capacity =
+                 vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+ 
+-    assert(vms->gic_version == 3);
++    assert(vms->gic_version == VIRT_GIC_VERSION_3);
+ 
+     return vms->smp_cpus > redist0_capacity ? 2 : 1;
  }
-+
-+/* Integer Scalar Move Instruction */
-+typedef void (* gen_helper_vmv_s_x)(TCGv_ptr, TCGv, TCGv_env);
-+static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
-+{
-+    if (vext_check_isa_ill(s, RVV)) {
-+        TCGv_ptr dest;
-+        TCGv src1;
-+        gen_helper_vmv_s_x fns[4] = {
-+            gen_helper_vmv_s_x_b, gen_helper_vmv_s_x_h,
-+            gen_helper_vmv_s_x_w, gen_helper_vmv_s_x_d
-+        };
-+
-+        src1 = tcg_temp_new();
-+        dest = tcg_temp_new_ptr();
-+        gen_get_gpr(src1, a->rs1);
-+        tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
-+
-+        fns[s->sew](dest, src1, cpu_env);
-+
-+        tcg_temp_free(src1);
-+        tcg_temp_free_ptr(dest);
-+        return true;
-+    }
-+    return false;
-+}
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 8704ee120f..66ee69da99 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4460,3 +4460,18 @@ GEN_VEXT_X_V(vext_x_v_b, uint8_t, H1)
- GEN_VEXT_X_V(vext_x_v_h, uint16_t, H2)
- GEN_VEXT_X_V(vext_x_v_w, uint32_t, H4)
- GEN_VEXT_X_V(vext_x_v_d, uint64_t, H8)
-+
-+/* Integer Scalar Move Instruction */
-+#define GEN_VEXT_VMV_S_X(NAME, ETYPE, H, CLEAR_FN)                       \
-+void HELPER(NAME)(void *vd, target_ulong s1, CPURISCVState *env)         \
-+{                                                                        \
-+    if (env->vl == 0) {                                                  \
-+        return;                                                          \
-+    }                                                                    \
-+    *((ETYPE *)vd + H(0)) = s1;                                          \
-+    CLEAR_FN(vd, 1, sizeof(ETYPE), env_archcpu(env)->cfg.vlen / 8);      \
-+}
-+GEN_VEXT_VMV_S_X(vmv_s_x_b, uint8_t, H1, clearb)
-+GEN_VEXT_VMV_S_X(vmv_s_x_h, uint16_t, H2, clearh)
-+GEN_VEXT_VMV_S_X(vmv_s_x_w, uint32_t, H4, clearl)
-+GEN_VEXT_VMV_S_X(vmv_s_x_d, uint64_t, H8, clearq)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 7c38c6c7f91..4ed1f0cb2e5 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -299,7 +299,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
+         irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+     }
+ 
+-    if (vms->gic_version == 2) {
++    if (vms->gic_version == VIRT_GIC_VERSION_2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+                              (1 << vms->smp_cpus) - 1);
+@@ -440,7 +440,7 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 0x2);
+     qemu_fdt_setprop(vms->fdt, nodename, "ranges", NULL, 0);
+-    if (vms->gic_version == 3) {
++    if (vms->gic_version == VIRT_GIC_VERSION_3) {
+         int nb_redist_regions = virt_gicv3_redist_region_count(vms);
+ 
+         qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
+@@ -519,7 +519,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+         }
+     }
+ 
+-    if (vms->gic_version == 2) {
++    if (vms->gic_version == VIRT_GIC_VERSION_2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+                              (1 << vms->smp_cpus) - 1);
+@@ -1470,7 +1470,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+          * purposes are to make TCG consistent (with 64-bit KVM hosts)
+          * and to improve SGI efficiency.
+          */
+-        if (vms->gic_version == 3) {
++        if (vms->gic_version == VIRT_GIC_VERSION_3) {
+             clustersz = GICV3_TARGETLIST_BITS;
+         } else {
+             clustersz = GIC_TARGETLIST_BITS;
+@@ -1561,15 +1561,15 @@ static void machvirt_init(MachineState *machine)
+     /* We can probe only here because during property set
+      * KVM is not available yet
+      */
+-    if (vms->gic_version <= 0) {
+-        /* "host" or "max" */
++    if (vms->gic_version == VIRT_GIC_VERSION_HOST ||
++        vms->gic_version == VIRT_GIC_VERSION_MAX) {
+         if (!kvm_enabled()) {
+-            if (vms->gic_version == 0) {
++            if (vms->gic_version == VIRT_GIC_VERSION_HOST) {
+                 error_report("gic-version=host requires KVM");
+                 exit(1);
+             } else {
+                 /* "max": currently means 3 for TCG */
+-                vms->gic_version = 3;
++                vms->gic_version = VIRT_GIC_VERSION_3;
+             }
+         } else {
+             vms->gic_version = kvm_arm_vgic_probe();
+@@ -1628,7 +1628,7 @@ static void machvirt_init(MachineState *machine)
+     /* The maximum number of CPUs depends on the GIC version, or on how
+      * many redistributors we can fit into the memory map.
+      */
+-    if (vms->gic_version == 3) {
++    if (vms->gic_version == VIRT_GIC_VERSION_3) {
+         virt_max_cpus =
+             vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         virt_max_cpus +=
+@@ -1856,7 +1856,7 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+ static char *virt_get_gic_version(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+-    const char *val = vms->gic_version == 3 ? "3" : "2";
++    const char *val = vms->gic_version == VIRT_GIC_VERSION_3 ? "3" : "2";
+ 
+     return g_strdup(val);
+ }
+@@ -1866,13 +1866,13 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+ 
+     if (!strcmp(value, "3")) {
+-        vms->gic_version = 3;
++        vms->gic_version = VIRT_GIC_VERSION_3;
+     } else if (!strcmp(value, "2")) {
+-        vms->gic_version = 2;
++        vms->gic_version = VIRT_GIC_VERSION_2;
+     } else if (!strcmp(value, "host")) {
+-        vms->gic_version = 0; /* Will probe later */
++        vms->gic_version = VIRT_GIC_VERSION_HOST; /* Will probe later */
+     } else if (!strcmp(value, "max")) {
+-        vms->gic_version = -1; /* Will probe later */
++        vms->gic_version = VIRT_GIC_VERSION_MAX; /* Will probe later */
+     } else {
+         error_setg(errp, "Invalid gic-version value");
+         error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
+@@ -2141,7 +2141,7 @@ static void virt_instance_init(Object *obj)
+                                     "physical address space above 32 bits",
+                                     NULL);
+     /* Default GIC type is v2 */
+-    vms->gic_version = 2;
++    vms->gic_version = VIRT_GIC_VERSION_2;
+     object_property_add_str(obj, "gic-version", virt_get_gic_version,
+                         virt_set_gic_version, NULL);
+     object_property_set_description(obj, "gic-version",
 -- 
-2.23.0
+2.20.1
 
 
