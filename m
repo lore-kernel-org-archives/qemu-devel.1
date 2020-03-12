@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D357C4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1632FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FC3E2073E
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBB9D2071B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:49:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vTmwaRAi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC3E2073E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h1F+dI61"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB9D2071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCMIt-0000QF-Gm
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:47:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58084)
+	id 1jCMKj-0004JM-UH
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:49:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMGA-0003Um-7d
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMGI-0003l4-Oa
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMG9-00022i-0I
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:18 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:35935)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMGH-000285-NA
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:26 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38141)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCMG8-00021q-QG
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:16 -0400
-Received: by mail-wm1-x332.google.com with SMTP id g62so5922283wme.1
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:16 -0700 (PDT)
+ id 1jCMGH-00027B-Gn
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:25 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id h83so2363576wmf.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=8Ns4C0QWDYdgHc/0sLmGsAuNfWOgxN1irF3iygAMeMI=;
- b=vTmwaRAizjlAyPZa7dZRNHLHmiZsjReJpVJIRFds1SzfNHaT+S6khBsci5GqZKGJlM
- l3xrDMEDpkv3eNo3pYh7IbxDh10MoLNKrEDyRmtze9NIY+FQuw1FdV7qATCCn/NfKCep
- QcdC/ijeZI0VaSx+Fpk9W8XAXhm1eKqXiQxuLrLTz/vfeueIYjfHnQRS5TtEZKcaBkU4
- J4zCzP5uQRJ0dylsfANex2CMIoFlZI4qOBnRkfwQTpjfu+gkXt5f5cwp6y9sN6l1j8M9
- f2AaProS8mEOkMSd3YAT2HGH7vFiQr4CjruwzAUgwrnRgAwG9b/C9fd+lGgSZYH3iHZ0
- 7eiw==
+ bh=x0nPLg6o5kFBPoh4kuF9kT3BgcDTmNXl/C7a8wQonTY=;
+ b=h1F+dI61BkunoCYlaUv+sSw5WPXaFkuyUbaDtdg2hc3mJDYBxwo4arMlGYm4Ov920R
+ 6pTIS/LHOs6pQq6GtjKJm458uZ4WzAIgGWQPKyCMQjlb0oSHfi6kHlK47XNvRdc+CrZ3
+ WFM/bsPFk6l4SW5wZYIcci1r/mNupEYsCIy8l30aV7vOZQ3qWx7zZQP9b6Nb1NQ2eYc7
+ SfLejFuwrt3oU3ckkD/BmFL9s0iFtASc9LxBO5Aqhs5U/JEl6gMtGL3IyX/9gumRGVFL
+ hfiHrcpyg4gu+lcLvzpjinleh+o22gF5swiwXWtG9fFLvvkqkK5uqu4GeJ+QDB0CL9+5
+ 2GNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8Ns4C0QWDYdgHc/0sLmGsAuNfWOgxN1irF3iygAMeMI=;
- b=bjmyUV1b8tR9RmjAGbeV+/Zud0C1692RVGw05g7/RxiDz6oVjBcuE78H/bT1jAelVJ
- C3xEfbyqP+AI1w05SAwK8bJabeLlMhVyWYPaC2/9RW/GRsk7+S+BzytiUGqIbJW1xibq
- Y3Jgyy7y4MRfv+fTnDUQ3iHWEdBvv3WUBk3wwsJgOU+tiWXQMhtYftFirWKqZY+faxQG
- D25NFgRPpPa7dwbDvdKSW4Nli2EPx+1j+pxfQS47v+/GvWGriCLPWwCtT1SnJ27JF9to
- kp7k4iTYBs0hl8yZ+0yyS8ye2NhkJ+uoEapF9WNx8tjUwgmFSR0nhNNz/3b0hGk5uL36
- 2zuA==
-X-Gm-Message-State: ANhLgQ1NqEfWx+dgP1qqA6zrEX7KSaQX5Q47+Uj0nAy6JdCQ/JAPmVpL
- gDuc2XOFqathXnbIbdUntK8dfcpUqvryJw==
-X-Google-Smtp-Source: ADFU+vtXdZKJwBQAbo685mkkT9Jfau7WPZugN4FA4ahIx9Ure4UQvbYHuNUuQrli1y0gQnMeySxjnQ==
-X-Received: by 2002:a1c:63c4:: with SMTP id x187mr4478014wmb.124.1584013455582; 
- Thu, 12 Mar 2020 04:44:15 -0700 (PDT)
+ bh=x0nPLg6o5kFBPoh4kuF9kT3BgcDTmNXl/C7a8wQonTY=;
+ b=JYhK4bj/jUPJnlJNbF6ArXL/0NauMcvrAvfJ6U5uRVuMedhcQcymhJn8fA5gvP8ajH
+ t69u52BH0RSS7vYzNolajYgG80cFt5s2RO5pHvZZmTPEwEMrAsWbO/Ig62ikAYReAgyv
+ oxyKMcG5+Yv3HM/1NyFEmS2wrTZFOWa92GQuu1gACwbcNGoNcXyYr0A93EvzJrkjLMpG
+ w7sbhENpWuzzQ4fiAMB82CISAzi7R0/+Qq9z/4Nxg4L696rqCKt30pbBtH34yBbyK+8s
+ yooRhpp/OLh5x/KCv7b8BfB/CBHNQt4OuRonPt3ooNR2FKUUjXRMWe2XiGolydVEJI5f
+ wAFw==
+X-Gm-Message-State: ANhLgQ0aGvtxZisrFhLJ3tqQadXevLjtbv7fHR2YuKJ9Fzi94SiRqXCs
+ c+0nZyXNpXn0861K53eijjINcNozfOYCqA==
+X-Google-Smtp-Source: ADFU+vuyyYFLUnwXULLu2HeiW/NUa2Pb9ACZzt21cV4ssL9ALOUBpKL2mmj435jSlt2F6GkU62wj2Q==
+X-Received: by 2002:a1c:a78a:: with SMTP id q132mr4517597wme.107.1584013462468; 
+ Thu, 12 Mar 2020 04:44:22 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.14
+ by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.21
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 04:44:15 -0700 (PDT)
+ Thu, 12 Mar 2020 04:44:21 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/12] docs/sphinx/hxtool.py: Remove STEXI/ETEXI support
-Date: Thu, 12 Mar 2020 11:44:00 +0000
-Message-Id: <20200312114408.16891-5-peter.maydell@linaro.org>
+Subject: [PULL 11/12] docs: Move arm-cpu-features.rst into the system manual
+Date: Thu, 12 Mar 2020 11:44:07 +0000
+Message-Id: <20200312114408.16891-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312114408.16891-1-peter.maydell@linaro.org>
 References: <20200312114408.16891-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,71 +98,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that none of our input .hx files have STEXI/ETEXI blocks,
-we can remove the code in the Sphinx hxtool extension that
-supported parsing them.
+Now we have somewhere to put arm-specific rst documentation,
+we can move arm-cpu-features.rst from the docs/ top level
+directory into docs/system/arm/.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200306171749.10756-5-peter.maydell@linaro.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Message-id: 20200309215818.2021-5-peter.maydell@linaro.org
 ---
- docs/sphinx/hxtool.py | 28 ++++------------------------
- 1 file changed, 4 insertions(+), 24 deletions(-)
+ .../{arm-cpu-features.rst => system/arm/cpu-features.rst} | 8 +-------
+ docs/system/target-arm.rst                                | 6 ++++++
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+ rename docs/{arm-cpu-features.rst => system/arm/cpu-features.rst} (99%)
 
-diff --git a/docs/sphinx/hxtool.py b/docs/sphinx/hxtool.py
-index 7dd223fe362..fb0649a3d5b 100644
---- a/docs/sphinx/hxtool.py
-+++ b/docs/sphinx/hxtool.py
-@@ -37,13 +37,11 @@ else:
+diff --git a/docs/arm-cpu-features.rst b/docs/system/arm/cpu-features.rst
+similarity index 99%
+rename from docs/arm-cpu-features.rst
+rename to docs/system/arm/cpu-features.rst
+index fc1623aeca5..7495b7b672b 100644
+--- a/docs/arm-cpu-features.rst
++++ b/docs/system/arm/cpu-features.rst
+@@ -1,11 +1,5 @@
++Arm CPU Features
+ ================
+-ARM CPU Features
+-================
+-
+-Examples of probing and using ARM CPU features
+-
+-Introduction
+-============
  
- __version__ = '1.0'
- 
--# We parse hx files with a state machine which may be in one of three
--# states: reading the C code fragment, inside a texi fragment,
--# or inside a rST fragment.
-+# We parse hx files with a state machine which may be in one of two
-+# states: reading the C code fragment, or inside a rST fragment.
- class HxState(Enum):
-     CTEXT = 1
--    TEXI = 2
--    RST = 3
-+    RST = 2
- 
- def serror(file, lnum, errtext):
-     """Raise an exception giving a user-friendly syntax error message"""
-@@ -110,31 +108,13 @@ class HxtoolDocDirective(Directive):
- 
-                 if directive == 'HXCOMM':
-                     pass
--                elif directive == 'STEXI':
--                    if state == HxState.RST:
--                        serror(hxfile, lnum, 'expected ERST, found STEXI')
--                    elif state == HxState.TEXI:
--                        serror(hxfile, lnum, 'expected ETEXI, found STEXI')
--                    else:
--                        state = HxState.TEXI
--                elif directive == 'ETEXI':
--                    if state == HxState.RST:
--                        serror(hxfile, lnum, 'expected ERST, found ETEXI')
--                    elif state == HxState.CTEXT:
--                        serror(hxfile, lnum, 'expected STEXI, found ETEXI')
--                    else:
--                        state = HxState.CTEXT
-                 elif directive == 'SRST':
-                     if state == HxState.RST:
-                         serror(hxfile, lnum, 'expected ERST, found SRST')
--                    elif state == HxState.TEXI:
--                        serror(hxfile, lnum, 'expected ETEXI, found SRST')
-                     else:
-                         state = HxState.RST
-                 elif directive == 'ERST':
--                    if state == HxState.TEXI:
--                        serror(hxfile, lnum, 'expected ETEXI, found ERST')
--                    elif state == HxState.CTEXT:
-+                    if state == HxState.CTEXT:
-                         serror(hxfile, lnum, 'expected SRST, found ERST')
-                     else:
-                         state = HxState.CTEXT
+ CPU features are optional features that a CPU of supporting type may
+ choose to implement or not.  In QEMU, optional CPU features have
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index 86ea6f2f568..1425bd5303a 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -78,3 +78,9 @@ undocumented; you can get a complete list by running
+    arm/stellaris
+    arm/musicpal
+    arm/sx1
++
++Arm CPU features
++================
++
++.. toctree::
++   arm/cpu-features
 -- 
 2.20.1
 
