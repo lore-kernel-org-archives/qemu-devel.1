@@ -2,59 +2,96 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB4BC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0C3C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:29:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6108E20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6108E20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4829320663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 15:29:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwbYg91p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4829320663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCPkz-0001yp-KK
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46581)
+	id 1jCPmK-000650-GK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 11:29:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCPkI-0008Uo-9h
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:27:39 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jCPlf-0004cP-ML
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:29:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCPkG-00036N-4B
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:27:38 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43530)
+ (envelope-from <pbonzini@redhat.com>) id 1jCPle-0004UM-17
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:29:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45792
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCPkE-00032i-7Y; Thu, 12 Mar 2020 11:27:35 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07608486|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.723719-8.98328e-05-0.276192;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-OYe0y_1584026845; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-OYe0y_1584026845)
- by smtp.aliyun-inc.com(10.147.42.135);
- Thu, 12 Mar 2020 23:27:26 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 14/60] target/riscv: vector narrowing integer right shift
- instructions
-Date: Thu, 12 Mar 2020 22:58:14 +0800
-Message-Id: <20200312145900.2054-15-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jCPld-0004U1-NJ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 11:29:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584026940;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FpoM4a0s4GbmSqM3DdAEXmQOUs6euMRHeyQKl+IkM7w=;
+ b=dwbYg91pVNhNem5R/JjhbfNGQilRtZ2VUMtmMOrj798uJjYwkme89zUHEkoX9jbSjAt5ef
+ RIinRSvyXooU8OO8e3mXxNqeLb7j7DfDMz7BCNUOjSlO09dbtJW6SGrwG2nd+Si4s9+XzG
+ 2CnTOHVdrCaZo56cx1c0oSbKRiFJt5o=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-470-92UrJ-jdMEWPl_WoQNcZ0Q-1; Thu, 12 Mar 2020 11:28:58 -0400
+X-MC-Unique: 92UrJ-jdMEWPl_WoQNcZ0Q-1
+Received: by mail-wm1-f72.google.com with SMTP id a13so2321503wme.7
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 08:28:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FpoM4a0s4GbmSqM3DdAEXmQOUs6euMRHeyQKl+IkM7w=;
+ b=Vn3bzH/8BFNpVAziKAJaecsxsrY34q3IIlwBGnvasZsySjOyfPDG6gCG10n8mogtpT
+ AaE/yJiAv8+BH3hVMcnb+YYnrDleYoErApT/91MlC76d62cjDj/Gk8HFVztRuCbPIXXl
+ kWbzTHpNKhqfvhL54C2aVnbcFDBgdfU83LHMDB7mD0rsikWOow8gvaK6FhPFeERdKBRM
+ 4s5Cq1jPtjQ7NneXM+aJiI1i8jQW5MR+MVe/nrXdP4N6D3Pt5/yFGwQvM22IDZ8+PHfU
+ MRR84NEDNoLcoYp6sJMCAul+RfOsjaTbqQRNo93xeqhqgmKF8BZ6Aq7rdQUtbFMd6cCq
+ nJXQ==
+X-Gm-Message-State: ANhLgQ0F+o6SKmoTvMFPblNzspjp72/Kt2B2n77aw7PLNzoC2GK+g5qj
+ l0Q5v+XQF57HdDdT9fqnCn3JjOWp0ndOafjheTAW75WaMBOxRYxE1F5eii3o0C814DjxqhaWPno
+ Z5X5tJoAVmGnYHnw=
+X-Received: by 2002:a5d:474d:: with SMTP id o13mr11376284wrs.162.1584026936659; 
+ Thu, 12 Mar 2020 08:28:56 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtleXzM45HsnuAxSJkrDSJBZ5mnmrF0Svcoj2oFSa6cY7K/FbjtIVdKGIBtSVJYuu3t7rjlHQ==
+X-Received: by 2002:a5d:474d:: with SMTP id o13mr11376263wrs.162.1584026936464; 
+ Thu, 12 Mar 2020 08:28:56 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.173.186])
+ by smtp.gmail.com with ESMTPSA id e26sm11211273wmk.9.2020.03.12.08.28.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 12 Mar 2020 08:28:55 -0700 (PDT)
+Subject: Re: [RFC] cpus: avoid get stuck in pause_all_vcpus
+To: "Longpeng(Mike)" <longpeng2@huawei.com>, rth@twiddle.net
+References: <20200310091443.1326-1-longpeng2@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8ed76f64-1a24-a278-51f3-19515e65ff39@redhat.com>
+Date: Thu, 12 Mar 2020 16:28:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <20200310091443.1326-1-longpeng2@huawei.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,181 +103,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ "qemu-devel @ nongnu . org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   | 13 ++++
- target/riscv/insn32.decode              |  6 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 91 +++++++++++++++++++++++++
- target/riscv/vector_helper.c            | 14 ++++
- 4 files changed, 124 insertions(+)
+On 10/03/20 10:14, Longpeng(Mike) wrote:
+> From: Longpeng <longpeng2@huawei.com>
+> 
+> We find an issue when repeat reboot in guest during migration, it cause the
+> migration thread never be waken up again.
+> 
+> <main loop>                        |<migration_thread>
+>                                    |
+> LOCK BQL                           |
+> ...                                |
+> main_loop_should_exit              |
+>  pause_all_vcpus                   |
+>   1. set all cpus ->stop=true      |
+>      and then kick                 |
+>   2. return if all cpus is paused  |
+>      (by '->stopped == true'), else|
+>   3. qemu_cond_wait [BQL UNLOCK]   |
+>                                    |LOCK BQL
+>                                    |...
+>                                    |do_vm_stop
+>                                    | pause_all_vcpus
+>                                    |  (A)set all cpus ->stop=true
+>                                    |     and then kick
+>                                    |  (B)return if all cpus is paused
+>                                    |     (by '->stopped == true'), else
+>                                    |  (C)qemu_cond_wait [BQL UNLOCK]
+>   4. be waken up and LOCK BQL      |  (D)be waken up BUT wait for  BQL
+>   5. goto 2.                       |
+>  (BQL is still LOCKed)             |
+>  resume_all_vcpus                  |
+>   1. set all cpus ->stop=false     |
+>      and ->stopped=false           |
+> ...                                |
+> BQL UNLOCK                         |  (E)LOCK BQL
+>                                    |  (F)goto B. [but stopped is false now!]
+>                                    |Finally, sleep at step 3 forever.
+> 
+> 
+> Note: This patch is just for discuss this issue, I'm looking forward to
+>       your suggestions, thanks!
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 47284c7476..0f36a8ce43 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -422,3 +422,16 @@ DEF_HELPER_6(vsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+Thanks Mike,
+
+the above sketch is really helpful.
+
+I think the problem is not that pause_all_vcpus() is not pausing hard
+enough; the problem is rather than resume_all_vcpus(), when used outside
+vm_start(), should know about the race and do nothing if it happens.
+
+Fortunately resume_all_vcpus does not release the BQL so it should be
+enough to test once; translated to code, this would be the patch to fix it:
+
+diff --git a/cpus.c b/cpus.c
+index b4f8b84b61..1eb7533a91 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1899,6 +1899,10 @@ void resume_all_vcpus(void)
+ {
+     CPUState *cpu;
+
++    if (!runstate_is_running()) {
++        return;
++    }
 +
-+DEF_HELPER_6(vnsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index dbbfa34b97..e21b3d6b5e 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -328,6 +328,12 @@ vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
- vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
- vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
- vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsrl_vv        101100 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsrl_vx        101100 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsrl_vi        101100 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsra_vv        101101 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsra_vx        101101 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsra_vi        101101 . ..... ..... 011 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index a60518e1df..7033eeaa4d 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1267,3 +1267,94 @@ GEN_OPIVX_GVEC_SHIFT_TRANS(vsra_vx,  sars)
- GEN_OPIVI_GVEC_TRANS(vsll_vi, 1, vsll_vx,  shli)
- GEN_OPIVI_GVEC_TRANS(vsrl_vi, 1, vsrl_vx,  shri)
- GEN_OPIVI_GVEC_TRANS(vsra_vi, 1, vsra_vx,  sari)
-+
-+/* Vector Narrowing Integer Right Shift Instructions */
-+static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s, RVV) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_reg(s, a->rs1, false) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
-+                2 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+/* OPIVV with NARROW */
-+#define GEN_OPIVV_NARROW_TRANS(NAME)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-+{                                                                  \
-+    if (opivv_narrow_check(s, a)) {                                \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_4_ptr * const fns[3] = {            \
-+            gen_helper_##NAME##_b,                                 \
-+            gen_helper_##NAME##_h,                                 \
-+            gen_helper_##NAME##_w,                                 \
-+        };                                                         \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+            vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),              \
-+            cpu_env, 0, s->vlen / 8, data, fns[s->sew]);           \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+GEN_OPIVV_NARROW_TRANS(vnsra_vv)
-+GEN_OPIVV_NARROW_TRANS(vnsrl_vv)
-+
-+static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return (vext_check_isa_ill(s, RVV) &&
-+            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-+            vext_check_reg(s, a->rd, false) &&
-+            vext_check_reg(s, a->rs2, true) &&
-+            vext_check_overlap_group(a->rd, 1 << s->lmul, a->rs2,
-+                2 << s->lmul) &&
-+            (s->lmul < 0x3) && (s->sew < 0x3));
-+}
-+
-+/* OPIVX with NARROW */
-+#define GEN_OPIVX_NARROW_TRANS(NAME)                                     \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (opivx_narrow_check(s, a)) {                                      \
-+        uint32_t data = 0;                                               \
-+        static gen_helper_opivx const fns[3] = {                         \
-+            gen_helper_##NAME##_b,                                       \
-+            gen_helper_##NAME##_h,                                       \
-+            gen_helper_##NAME##_w,                                       \
-+        };                                                               \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);                   \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                       \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                   \
-+        return opivx_trans(a->rd, a->rs1, a->rs2, data, fns[s->sew], s); \
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+GEN_OPIVX_NARROW_TRANS(vnsra_vx)
-+GEN_OPIVX_NARROW_TRANS(vnsrl_vx)
-+
-+/* OPIVI with NARROW */
-+#define GEN_OPIVI_NARROW_TRANS(NAME, ZX, OPIVX)                          \
-+static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-+{                                                                        \
-+    if (opivx_narrow_check(s, a)) {                                      \
-+        uint32_t data = 0;                                               \
-+        static gen_helper_opivx const fns[3] = {                         \
-+            gen_helper_##OPIVX##_b,                                      \
-+            gen_helper_##OPIVX##_h,                                      \
-+            gen_helper_##OPIVX##_w,                                      \
-+        };                                                               \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);                   \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                       \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                   \
-+        return opivi_trans(a->rd, a->rs1, a->rs2, data,                  \
-+                fns[s->sew], s, ZX);                                     \
-+    }                                                                    \
-+    return false;                                                        \
-+}
-+GEN_OPIVI_NARROW_TRANS(vnsra_vi, 1, vnsra_vx)
-+GEN_OPIVI_NARROW_TRANS(vnsrl_vi, 1, vnsrl_vx)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 3772b059b1..895155576c 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1335,3 +1335,17 @@ GEN_VEXT_SHIFT_VX(vsra_vx_b, int8_t, int8_t, H1, H1, DO_SRL, 0x7, clearb)
- GEN_VEXT_SHIFT_VX(vsra_vx_h, int16_t, int16_t, H2, H2, DO_SRL, 0xf, clearh)
- GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
- GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
-+
-+/* Vector Narrowing Integer Right Shift Instructions */
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VV(vnsrl_vv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VV(vnsra_vv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VX(vnsrl_vx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf, clearb)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
-+GEN_VEXT_SHIFT_VX(vnsra_vx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
--- 
-2.23.0
+     qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+     CPU_FOREACH(cpu) {
+         cpu_resume(cpu);
+
+
+Thanks,
+
+Paolo
 
 
