@@ -2,164 +2,59 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 781E7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91BBDC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:35:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 448D72067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:35:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6Wo9bug"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448D72067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 639BF2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:35:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 639BF2067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQnU-0002TV-Ge
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:35:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33079)
+	id 1jCQoP-0003bs-I8
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jCQmW-0000z5-4C
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:34:01 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQmj-0001QI-IO
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jCQmT-00013g-Hu
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:33:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40998
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQmi-0001U0-6j
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:34:13 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57740)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jCQmT-00013M-A6
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:33:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584030836;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BOjtgBHokfBbkSh2M/w4thneUdFvPi/Y7j91TgSWiv0=;
- b=A6Wo9buguE3E27V/YFldOmEovOJWWD28gMKUN7tmsuG38ToNk0XpXKWJjcj57vbn5GQEQT
- 2MA5ZA3WdVyGOtm1r8FLc3D9UF0ZNpXcbyxhPN+fXgN2pPHDplA7ZBYIA8x6JSPALRqT68
- xMD9lZi9YU6Z6gwhTT8mjR2S6QcDyXo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-OGDMHdADPDmodU7kvJeLhQ-1; Thu, 12 Mar 2020 12:33:55 -0400
-X-MC-Unique: OGDMHdADPDmodU7kvJeLhQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB23F800D54;
- Thu, 12 Mar 2020 16:33:53 +0000 (UTC)
-Received: from [10.10.125.118] (ovpn-125-118.rdu2.redhat.com [10.10.125.118])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A2D6C9298D;
- Thu, 12 Mar 2020 16:33:52 +0000 (UTC)
-Subject: Re: [PATCH v4 00/10] Further bitmaps improvements
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200205112041.6003-1-vsementsov@virtuozzo.com>
- <4cf33f31-cdbb-cee4-a1b4-4053c88a002e@redhat.com>
- <6b570584-100b-248f-5412-98a5d91f62f5@virtuozzo.com>
- <ca6f95ef-d51f-130a-8ad1-4eba5e0a3528@redhat.com>
- <7b655cdf-8c54-b10a-4140-2ad083dec75a@virtuozzo.com>
- <153ff5cc-a929-1aa9-c405-846739b13570@redhat.com>
- <f3068c48-4c59-3328-5190-9e47a792ab57@virtuozzo.com>
- <f8adc071-4226-aa51-5598-abc86af04608@redhat.com>
- <ad32a4c0-976d-0f8c-18a0-17de9fc615f8@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e993dbbe-f08f-f0b2-5b46-be244931ee0d@redhat.com>
-Date: Thu, 12 Mar 2020 12:33:46 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCQmh-0001GW-LS; Thu, 12 Mar 2020 12:34:12 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07462233|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.00179811-4.04403e-05-0.998161;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03302; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-Q5Mm4_1584030840; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-Q5Mm4_1584030840)
+ by smtp.aliyun-inc.com(10.147.42.253);
+ Fri, 13 Mar 2020 00:34:01 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 47/60] target/riscv: vector widening floating-point
+ reduction instructions
+Date: Thu, 12 Mar 2020 22:58:47 +0800
+Message-Id: <20200312145900.2054-48-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-In-Reply-To: <ad32a4c0-976d-0f8c-18a0-17de9fc615f8@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -171,21 +66,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+---
+ target/riscv/helper.h                   |  3 ++
+ target/riscv/insn32.decode              |  2 +
+ target/riscv/insn_trans/trans_rvv.inc.c |  3 ++
+ target/riscv/vector_helper.c            | 50 +++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
 
-
-On 3/12/20 1:59 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> It would be great, if it is convenient for you. Thanks!
-> All patches are reviewed now by Max or Eric, so, I'd be very glad if
-> this get in 5.0.
-
-Testing and staging right now.
-
---js
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 0a1aa30514..b0bb617b42 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1071,3 +1071,6 @@ DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++
++DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 294e55b7ae..f1efc8886d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -537,6 +537,8 @@ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+ vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
++# Vector widening ordered and unordered float reduction sum
++vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
+ 
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index d66ec4a1e4..ad864c9742 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2049,3 +2049,6 @@ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
++
++/* Vector Widening Floating-Point Reduction Instructions */
++GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 948135f60b..d325fe5e2e 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4188,3 +4188,53 @@ GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
+ GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
+ GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
+ GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
++
++/* Vector Widening Floating-Point Reduction Instructions */
++/* Unordered reduce 2*SEW = 2*SEW + sum(promote(SEW)) */
++void HELPER(vfwredsum_vs_h)(void *vd, void *v0, void *vs1,
++        void *vs2, CPURISCVState *env, uint32_t desc)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    uint32_t i;
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;
++
++    uint32_t s1 =  *((uint32_t *)vs1 + H4(0));
++    for (i = 0; i < vl; i++) {
++        uint16_t s2 = *((uint16_t *)vs2 + H2(i));
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        s1 = float32_add(s1, float16_to_float32(s2, true, &env->fp_status),
++                &env->fp_status);
++    }
++    if (i != 0) {
++        *((uint32_t *)vd + H4(0)) = s1;
++        clearl(vd, 1, sizeof(uint32_t), tot);
++    }
++}
++
++void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
++        void *vs2, CPURISCVState *env, uint32_t desc)
++{
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vm = vext_vm(desc);
++    uint32_t vl = env->vl;
++    uint32_t i;
++    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;
++
++    uint64_t s1 =  *((uint64_t *)vs1);
++    for (i = 0; i < vl; i++) {
++        uint32_t s2 = *((uint32_t *)vs2 + H4(i));
++        if (!vm && !vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        s1 = float64_add(s1, float32_to_float64(s2, &env->fp_status),
++                &env->fp_status);
++    }
++    if (i != 0) {
++        *((uint64_t *)vd) = s1;
++        clearq(vd, 1, sizeof(uint64_t), tot);
++    }
++}
+-- 
+2.23.0
 
 
