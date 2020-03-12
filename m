@@ -2,59 +2,64 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLACK,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FF8C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E767C5ACD7
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E5C4206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 07:51:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E5C4206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04AD920650
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 08:03:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04AD920650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCId8-0003mF-Qt
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 03:51:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40433)
+	id 1jCIoH-0000dc-3c
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 04:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jCIcE-0002VI-Qd
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:50:52 -0400
+ (envelope-from <groug@kaod.org>) id 1jCInh-00006x-0E
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:02:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <teawaterz@linux.alibaba.com>) id 1jCIcD-0003jf-Dp
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:50:50 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:58871)
+ (envelope-from <groug@kaod.org>) id 1jCInf-000374-9L
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:02:40 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:45145)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <teawaterz@linux.alibaba.com>)
- id 1jCIcD-0003iq-1u
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 03:50:49 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R141e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04396; MF=teawaterz@linux.alibaba.com;
- NM=1; PH=DS; RN=12; SR=0; TI=SMTPD_---0TsNBE7I_1583999424; 
-Received: from localhost(mailfrom:teawaterz@linux.alibaba.com
- fp:SMTPD_---0TsNBE7I_1583999424) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 12 Mar 2020 15:50:28 +0800
-From: Hui Zhu <teawater@gmail.com>
-To: mst@redhat.com, jasowang@redhat.com, akpm@linux-foundation.org,
- pagupta@redhat.com, mojha@codeaurora.org, david@redhat.com,
- namit@vmware.com, virtualization@lists.linux-foundation.org,
- linux-kernel@vger.kernel.org, qemu-devel@nongnu.org
-Subject: [RFC for QEMU] virtio-balloon: Add option thp-order to set
- VIRTIO_BALLOON_F_THP_ORDER
-Date: Thu, 12 Mar 2020 15:49:55 +0800
-Message-Id: <1583999395-9131-2-git-send-email-teawater@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1583999395-9131-1-git-send-email-teawater@gmail.com>
-References: <1583999395-9131-1-git-send-email-teawater@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jCIne-00030e-Oq
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 04:02:38 -0400
+Received: from player779.ha.ovh.net (unknown [10.108.42.119])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 9EB1B87C10
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:02:29 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id F026B104D8A35;
+ Thu, 12 Mar 2020 08:02:16 +0000 (UTC)
+Date: Thu, 12 Mar 2020 09:02:13 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH v3 2/2] spapr: Enable virtio iommu_platform=on by default
+Message-ID: <20200312090213.7866de16@bahia.home>
+In-Reply-To: <e9a2de91-7737-f793-b445-4846a1126daf@ozlabs.ru>
+References: <20200305043009.611636-1-david@gibson.dropbear.id.au>
+ <20200305043009.611636-3-david@gibson.dropbear.id.au>
+ <20200305125903.096c3897@bahia.home>
+ <20200310114351.5381504e@bahia.home>
+ <e9a2de91-7737-f793-b445-4846a1126daf@ozlabs.ru>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 17047531968660085237
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvgedguddvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepohiilhgrsghsrdhorhhgpdhkvghrnhgvlhdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.50.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,149 +71,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hui Zhu <teawaterz@linux.alibaba.com>, Hui Zhu <teawater@gmail.com>
+Cc: pair@us.ibm.com, mst@redhat.com, qemu-devel@nongnu.org, paulus@samba.org,
+ clg@kaod.org, mdroth@us.ibm.com, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the guest kernel has many fragmentation pages, use virtio_balloon
-will split THP of QEMU when it calls MADV_DONTNEED madvise to release
-the balloon pages.
-Set option thp-order to on will open flags VIRTIO_BALLOON_F_THP_ORDER.
-It will set balloon size to THP size to handle the THP split issue.
+On Thu, 12 Mar 2020 15:14:06 +1100
+Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 
-Signed-off-by: Hui Zhu <teawaterz@linux.alibaba.com>
----
- hw/virtio/virtio-balloon.c                      | 67 ++++++++++++++++---------
- include/standard-headers/linux/virtio_balloon.h |  4 ++
- 2 files changed, 47 insertions(+), 24 deletions(-)
+> 
+> 
+> On 10/03/2020 21:43, Greg Kurz wrote:
+> > On Thu, 5 Mar 2020 12:59:03 +0100
+> > Greg Kurz <groug@kaod.org> wrote:
+> > 
+> >> On Thu,  5 Mar 2020 15:30:09 +1100
+> >> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>
+> >>> Traditionally, virtio devices don't do DMA by the usual path on the
+> >>> guest platform.  In particular they usually bypass any virtual IOMMU
+> >>> the guest has, using hypervisor magic to access untranslated guest
+> >>> physical addresses.
+> >>>
+> >>> There's now the optional iommu_platform flag which can tell virtio
+> >>> devices to use the platform's normal DMA path, including any IOMMUs.
+> >>> That flag was motiviated for the case of hardware virtio
+> >>> implementations, but there are other reasons to want it.
+> >>>
+> >>> Specifically, the fact that the virtio device doesn't use vIOMMU
+> >>> translation means that virtio devices are unsafe to pass to nested
+> >>> guests, or to use with VFIO userspace drivers inside the guest.  This
+> >>> is particularly noticeable on the pseries platform which *always* has
+> >>> a guest-visible vIOMMU.
+> >>>
+> >>> Not using the normal DMA path also causes difficulties for the guest
+> >>> side driver when using the upcoming POWER Secure VMs (a.k.a. PEF).
+> >>> While it's theoretically possible to handle this on the guest side,
+> >>> it's really fiddly.  Given the other problems with the non-translated
+> >>> virtio device, let's just enable vIOMMU translation for virtio devices
+> >>> by default in the pseries-5.0 (and later) machine types.
+> >>>
+> >>> This does mean the new machine type will no longer support guest
+> >>> kernels older than 4.8, unless they have support for the virtio
+> >>> IOMMU_PLATFORM flag backported (which some distro kernels like RHEL7
+> >>> do).
+> >>>
+> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>> ---
+> >>
+> >> The patch looks good but I'm not sure if we're quite ready to merge
+> >> it yet. With this applied, I get zero output on a virtio-serial based
+> >> console:
+> >>
+> >> ie.
+> >>   -chardev stdio,id=con0 -device virtio-serial -device virtconsole,chardev=con0 
+> >>
+> >> FYI, virtio-serial is a bit broken for spapr with iommu_platform=off already:
+> >>
+> >> (1) pressing a key in the console during SLOF or grub has no effect
+> >>
+> >> (2) the guest kernel boot stays stuck around quiesce
+> >>
+> >> These are regressions introduced by this SLOF update:
+> >>
+> >> a363e9ed8731f45674260932a340a0d81c4b0a6f is the first bad commit
+> >> commit a363e9ed8731f45674260932a340a0d81c4b0a6f
+> >> Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >> Date:   Tue Dec 17 11:31:54 2019 +1100
+> >>     pseries: Update SLOF firmware image
+> >>
+> >> A trivial fix was already posted on the SLOF list for (1) :
+> >>
+> >> https://patchwork.ozlabs.org/patch/1249338/
+> >>
+> >> (2) is still under investigation but the console is _at least_
+> >> functional until the guest OS takes control. This is no longer
+> >> the case with this patch.
+> >>
+> > 
+> > Some progress was made on the SLOF front:
+> > 
+> > https://patchwork.ozlabs.org/project/slof/list/?series=163314
+> > 
+> > With these series applied to SLOF, I can now boot a fedora31 guest
+> > with a virtio-serial console and iommu_platform=on... but now
+> > I'm trying out other virtio devices supported by SLOF and I'm
+> > running into issues around virtio-pci.disable-legacy as mentioned
+> > in some other mail...
+> > 
+> > It seems we may not be ready to merge this series yet.
+> 
+> 
+> fwiw I sent a pull request:
+> 
+> https://lore.kernel.org/qemu-devel/20200312041010.16229-1-aik@ozlabs.ru/T/#u
+> 
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a4729f7..cfe86b0 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -340,37 +340,49 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-         while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) == 4) {
-             unsigned int p = virtio_ldl_p(vdev, &pfn);
-             hwaddr pa;
-+            size_t handle_size = BALLOON_PAGE_SIZE;
- 
-             pa = (hwaddr) p << VIRTIO_BALLOON_PFN_SHIFT;
-             offset += 4;
- 
--            section = memory_region_find(get_system_memory(), pa,
--                                         BALLOON_PAGE_SIZE);
--            if (!section.mr) {
--                trace_virtio_balloon_bad_addr(pa);
--                continue;
--            }
--            if (!memory_region_is_ram(section.mr) ||
--                memory_region_is_rom(section.mr) ||
--                memory_region_is_romd(section.mr)) {
--                trace_virtio_balloon_bad_addr(pa);
--                memory_region_unref(section.mr);
--                continue;
--            }
-+            if (virtio_has_feature(s->host_features,
-+                                   VIRTIO_BALLOON_F_THP_ORDER))
-+                handle_size = BALLOON_PAGE_SIZE << VIRTIO_BALLOON_THP_ORDER;
-+
-+            while (handle_size > 0) {
-+                section = memory_region_find(get_system_memory(), pa,
-+                                             BALLOON_PAGE_SIZE);
-+                if (!section.mr) {
-+                    trace_virtio_balloon_bad_addr(pa);
-+                    continue;
-+                }
-+                if (!memory_region_is_ram(section.mr) ||
-+                    memory_region_is_rom(section.mr) ||
-+                    memory_region_is_romd(section.mr)) {
-+                    trace_virtio_balloon_bad_addr(pa);
-+                    memory_region_unref(section.mr);
-+                    continue;
-+                }
- 
--            trace_virtio_balloon_handle_output(memory_region_name(section.mr),
--                                               pa);
--            if (!qemu_balloon_is_inhibited()) {
--                if (vq == s->ivq) {
--                    balloon_inflate_page(s, section.mr,
--                                         section.offset_within_region, &pbp);
--                } else if (vq == s->dvq) {
--                    balloon_deflate_page(s, section.mr, section.offset_within_region);
--                } else {
--                    g_assert_not_reached();
-+                trace_virtio_balloon_handle_output(memory_region_name(section.mr),
-+                                                   pa);
-+                if (!qemu_balloon_is_inhibited()) {
-+                    if (vq == s->ivq) {
-+                        balloon_inflate_page(s, section.mr,
-+                                             section.offset_within_region,
-+                                             &pbp);
-+                    } else if (vq == s->dvq) {
-+                        balloon_deflate_page(s, section.mr,
-+                                             section.offset_within_region);
-+                    } else {
-+                        g_assert_not_reached();
-+                    }
-                 }
-+                memory_region_unref(section.mr);
-+
-+                pa += BALLOON_PAGE_SIZE;
-+                handle_size -= BALLOON_PAGE_SIZE;
-             }
--            memory_region_unref(section.mr);
-         }
- 
-         virtqueue_push(vq, elem, offset);
-@@ -693,6 +705,8 @@ static void virtio_balloon_set_config(VirtIODevice *vdev,
- 
-     memcpy(&config, config_data, virtio_balloon_config_size(dev));
-     dev->actual = le32_to_cpu(config.actual);
-+    if (virtio_has_feature(vdev->host_features, VIRTIO_BALLOON_F_THP_ORDER))
-+        dev->actual <<= VIRTIO_BALLOON_THP_ORDER;
-     if (dev->actual != oldactual) {
-         qapi_event_send_balloon_change(vm_ram_size -
-                         ((ram_addr_t) dev->actual << VIRTIO_BALLOON_PFN_SHIFT));
-@@ -728,6 +742,9 @@ static void virtio_balloon_to_target(void *opaque, ram_addr_t target)
-     }
-     if (target) {
-         dev->num_pages = (vm_ram_size - target) >> VIRTIO_BALLOON_PFN_SHIFT;
-+        if (virtio_has_feature(dev->host_features,
-+                               VIRTIO_BALLOON_F_THP_ORDER))
-+            dev->num_pages >>= VIRTIO_BALLOON_THP_ORDER;
-         virtio_notify_config(vdev);
-     }
-     trace_virtio_balloon_to_target(target, dev->num_pages);
-@@ -916,6 +933,8 @@ static Property virtio_balloon_properties[] = {
-                     VIRTIO_BALLOON_F_DEFLATE_ON_OOM, false),
-     DEFINE_PROP_BIT("free-page-hint", VirtIOBalloon, host_features,
-                     VIRTIO_BALLOON_F_FREE_PAGE_HINT, false),
-+    DEFINE_PROP_BIT("thp-order", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_THP_ORDER, false),
-     /* QEMU 4.0 accidentally changed the config size even when free-page-hint
-      * is disabled, resulting in QEMU 3.1 migration incompatibility.  This
-      * property retains this quirk for QEMU 4.1 machine types.
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 9375ca2..f54d613 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -36,10 +36,14 @@
- #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
- #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
- #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
-+#define VIRTIO_BALLOON_F_THP_ORDER	5 /* Set balloon page order to thp order */
- 
- /* Size of a PFN in the balloon interface. */
- #define VIRTIO_BALLOON_PFN_SHIFT 12
- 
-+/* The order of the balloon page */
-+#define VIRTIO_BALLOON_THP_ORDER 9
-+
- #define VIRTIO_BALLOON_CMD_ID_STOP	0
- #define VIRTIO_BALLOON_CMD_ID_DONE	1
- struct virtio_balloon_config {
--- 
-2.7.4
+Great ! Thanks mate ! :)
+
+> 
+> 
+> > 
+> >>>  hw/ppc/spapr.c | 2 ++
+> >>>  1 file changed, 2 insertions(+)
+> >>>
+> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>> index 3cfc98ac61..5ef099536e 100644
+> >>> --- a/hw/ppc/spapr.c
+> >>> +++ b/hw/ppc/spapr.c
+> >>> @@ -4575,6 +4575,7 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
+> >>>       */
+> >>>      static GlobalProperty compat[] = {
+> >>>          { TYPE_VIRTIO_PCI, "disable-legacy", "on", },
+> >>> +        { TYPE_VIRTIO_DEVICE, "iommu_platform", "on", },
+> >>>      };
+> >>>  
+> >>>      mc->alias = "pseries";
+> >>> @@ -4622,6 +4623,7 @@ static void spapr_machine_4_2_class_options(MachineClass *mc)
+> >>>      SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+> >>>      static GlobalProperty compat[] = {
+> >>>          { TYPE_VIRTIO_PCI, "disable-legacy", "auto" },
+> >>> +        { TYPE_VIRTIO_DEVICE, "iommu_platform", "off", },
+> >>>      };
+> >>>  
+> >>>      spapr_machine_5_0_class_options(mc);
+> >>
+> > 
+> 
 
 
