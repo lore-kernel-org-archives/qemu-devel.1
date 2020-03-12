@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD017C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C527AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:20:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F412206BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8145C206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:20:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MpyPdlUl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F412206BE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YCArF8VH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8145C206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCLr6-0005HG-Kc
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:18:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50904)
+	id 1jCLt8-0007XT-Ik
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:20:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jCLpz-0004iA-WA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:17:18 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jCLsC-0006TD-Py
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jCLpx-0001sH-Ss
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:17:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34089
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jCLsA-0003mK-G7
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:19:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37513
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jCLpx-0001rS-No
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:17:13 -0400
+ id 1jCLsA-0003lf-AV
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:19:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584011833;
+ s=mimecast20190719; t=1584011969;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zCjz3Bgm0/Ul3j+NgrdxbQve6e+WlQQ1jJUuqiID9l4=;
- b=MpyPdlUlzWDXkFU7Dfo85bjGBPAdyUy6LqAgYhnm3tcHXupmAn5KgD6/gzko10vd1e3srX
- nq7q3dQArhoKMZzjDeCau8YPWZqUrd9A7xwEFCBZ7J42R/ZhCX6avFl3+Izu85XGiyZXUy
- utjJA1gC1+0C/5Cc0aArULWUtI7fELE=
+ bh=QFoEmrGBNcTv0DkM3wQ8/I8+nHOb44y6HtJi42cCJD0=;
+ b=YCArF8VHII1YdXdZmREHMFr7eJCJsrPYvheQ76nOfVMDhCykoHVCXpSiKW/xWs78PFVwN8
+ sgWSdtks5cgvr2h0l9yooMpRZdGReCBYgoF56/+04EvDRaaxx8RJbHLRlmifhEdo6qfsdu
+ Si9VTEhcFYn9fG3PlztHJ5pp0np0Wl4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-fkev6FX8PRq-uvXGN0-Msw-1; Thu, 12 Mar 2020 07:16:59 -0400
-X-MC-Unique: fkev6FX8PRq-uvXGN0-Msw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-445-AHdALYxEMk-yP3olkGud2Q-1; Thu, 12 Mar 2020 07:19:28 -0400
+X-MC-Unique: AHdALYxEMk-yP3olkGud2Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89E95100550E;
- Thu, 12 Mar 2020 11:16:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BE54801E66;
+ Thu, 12 Mar 2020 11:19:26 +0000 (UTC)
 Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA0151001902;
- Thu, 12 Mar 2020 11:16:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 27F9F8D56C;
+ Thu, 12 Mar 2020 11:19:20 +0000 (UTC)
 Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
 To: Andrew Jones <drjones@redhat.com>
 References: <20200130112510.15154-1-eric.auger@redhat.com>
  <20200130112510.15154-6-eric.auger@redhat.com>
- <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+ <20200305093339.wavpi6xmqv5aedwx@kamzik.brq.redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <7d774de0-fb95-5b66-1eca-2c3839706372@redhat.com>
-Date: Thu, 12 Mar 2020 12:16:50 +0100
+Message-ID: <949eb139-6562-cd61-d57c-337ae6d6590c@redhat.com>
+Date: Thu, 12 Mar 2020 12:19:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200305094217.6drwprfz6jnyzbdx@kamzik.brq.redhat.com>
+In-Reply-To: <20200305093339.wavpi6xmqv5aedwx@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,7 +100,7 @@ Sender: "Qemu-devel"
 
 Hi Drew,
 
-On 3/5/20 10:42 AM, Andrew Jones wrote:
+On 3/5/20 10:33 AM, Andrew Jones wrote:
 > On Thu, Jan 30, 2020 at 12:25:06PM +0100, Eric Auger wrote:
 >> Adds the following tests:
 >> - event-counter-config: test event counter configuration
@@ -172,6 +173,16 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +
 >> +#define read_regn(__reg, __n) \
 >> +	read_sysreg(__reg ## __n ## _el0)
+> 
+> You can delete regn_el0() since you don't use it anyway.
+> 
+> The el0 should probably be in the macro names,
+> 
+> write_regn_el0()
+> read_regn_el0()
+> 
+> Also they could go in lib/arm64/asm/sysreg.h
+> 
 >> +
 >> +#define print_pmevtyper(__s, __n) do { \
 >> +	uint32_t val; \
@@ -209,6 +220,9 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +	"       mov     x10, %[loop]\n"
 >> +	"1:     sub     x10, x10, #1\n"
 >> +	"       ldr x9, [%[addr]]\n"
+> 
+> indent is wrong for line above
+> 
 >> +	"       cmp     x10, #0x0\n"
 >> +	"       b.gt    1b\n"
 >> +	"       msr     pmcr_el0, xzr\n"
@@ -229,17 +243,6 @@ On 3/5/20 10:42 AM, Andrew Jones wrote:
 >> +	/* disable overflow interrupts on all counters */
 >> +	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
 >> +	isb();
-> 
-> Is there a test we can do here to ensure the PMU was succesfully reset and
-> assert if not? Reset is a critical part of each test prep, so we should be
-> sure it has been done.
-we can read the regs we have just written (?). In case the reset were to
-fail, the subsequent test would fail anyway.
-
-Thanks
-
-Eric
-> 
 >> +}
 >> +
 >> +static void test_event_counter_config(void)
@@ -315,6 +318,12 @@ Eric
 >> +		0x11,	/* CPU_CYCLES */
 >> +		0x8,	/* INST_RETIRED */
 >> +	};
+> 
+> #define CPU_CYCLES 0x11
+> #define INST_RETIRED 0x8
+> 
+> then no need for the comments and ...
+> 
 >> +
 >> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
 >> +		return;
@@ -325,6 +334,10 @@ Eric
 >> +
 >> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
 >> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> 
+> ... here we can see what we're doing more clearing using the defines
+> instead of array members.
+> 
 >> +
 >> +	/* disable all counters */
 >> +	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
@@ -358,6 +371,10 @@ Eric
 >> +
 >> +	/* Disable all counters but counters #0 and #1 */
 >> +	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
+> 
+> First time you've used ~ to define a mask. I prefer this to all the
+> 0xFFF..'s, but I prefer consistency and defines even more.
+> 
 >> +	report((read_sysreg_s(PMCNTENSET_EL0) == read_sysreg_s(PMCNTENCLR_EL0)) &&
 >> +		(read_sysreg_s(PMCNTENSET_EL0) == 0x3),
 >> +		"pmcntenset: just enabled #0 and #1");
@@ -397,14 +414,33 @@ Eric
 >> +		0x13,   /* MEM_ACCESS */
 >> +		0x13,   /* MEM_ACCESS */
 >> +	};
+> 
+> #define MEM_ACCESS 0x13
+> 
 >> +
 >> +	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> 
+> No need to check the same event twice. Just call satisfy_prerequisites
+> with ((uint32_t []){ MEM_ACCESS }, 1)
+satisfy_prerequisites also test the number of implemented counters match
+the ARRAY_SIZE.
+
+In Practice most of my tests use 2 counters. I could skip the tests if
+we don't have 2 counters.
+
+But well ...
+
+Eric
+> 
 >> +		return;
 >> +
 >> +	pmu_reset();
 >> +
 >> +	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
 >> +	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> 
+> Same comment on using defines rather than array members.
+> 
 >> +	write_sysreg_s(0x3, PMCNTENSET_EL0);
 >> +	isb();
 >> +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
@@ -445,6 +481,11 @@ Eric
 >> +	} else if (strcmp(argv[1], "mem-access") == 0) {
 >> +		report_prefix_push(argv[1]);
 >> +		test_mem_access();
+> 
+> missing the pops. I know they're not necessary since we finish the tests
+> afterwards, but the universe must stay balanced. Where there's a yin, we
+> should put a yang.
+> 
 >>  	} else {
 >>  		report_abort("Unknown sub-test '%s'", argv[1]);
 >>  	}
@@ -481,5 +522,12 @@ Eric
 >> 2.20.1
 >>
 >>
+> 
+> I only skimmed this looking for style/framework issues. I'd prefer more
+> defines in general to all the hex, but I won't insist on that.
+> 
+> Thanks,
+> drew
+> 
 
 
