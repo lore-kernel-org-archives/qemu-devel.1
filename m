@@ -2,58 +2,78 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4EDC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0194FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:23:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4181E20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:23:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4181E20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id C141020663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:23:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gaHs3QU9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C141020663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQbt-0000bq-GA
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:23:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59056)
+	id 1jCQcR-00018g-VT
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:23:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQb9-0008JY-Fm
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:22:16 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQbR-00009S-6J
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCQb8-0005dc-47
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:22:15 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39234)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCQb7-0005Rm-JV; Thu, 12 Mar 2020 12:22:14 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1875849|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_regular_dialog|0.208831-0.00023773-0.790931;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H-Peteu_1584030114; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H-Peteu_1584030114) by smtp.aliyun-inc.com(10.147.40.2);
- Fri, 13 Mar 2020 00:21:55 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v5 41/60] target/riscv: vector floating-point/integer
- type-convert instructions
-Date: Thu, 12 Mar 2020 22:58:41 +0800
-Message-Id: <20200312145900.2054-42-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQbQ-00062I-3q
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:22:32 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:44848)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCQbP-00061J-UI
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:22:32 -0400
+Received: by mail-oi1-x229.google.com with SMTP id d62so6024468oia.11
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=n8mouH4+5KXIU8ayOQ93LGAgkFs47pe1sEFjRgLZ1/U=;
+ b=gaHs3QU9bPUoSE/1Ij8i64wwJXEznu8EGTgNACwRwFbeiUhWE0Ejw7gWVY1n5PTcU+
+ qGhRyTQMYv1RaVu5psGuJAldAe9g3QhQUoPOy3m1G3UBlUjPXj+TrMIdkS54bUIpDCIJ
+ ZoMruusZcBMBK+Z6IoSMXs+L2eBD6TM51xV6GY8+hSKuJ5VFDBZwegwq8ryithmW5lBm
+ /WOqKlQzAGiOLcBhiGGU+Fgik3I8nQS24ccxBBzTEaXOudAwyYWN3y3FAG8ngVeOv2Pa
+ tcwXYb6AOeCvTRiRbDrsMW+P/bJYHZIuegUhNBeppYlkK+4vwO362alL0MaYqB9fe1pl
+ d3QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=n8mouH4+5KXIU8ayOQ93LGAgkFs47pe1sEFjRgLZ1/U=;
+ b=kIO8c4cF4RL9qlN69/2ULpOZ89NJCdROtHRJkThIHM8CiEPDuyv8Q7lHVPjYv4DRwk
+ 2DYAtKqdBltnSYbspXbx/i0FgQJGxyu1CRySA8bXM7XFqTKIZgI/qsbptizVc9D5eync
+ aWTKgds/h+wyye2lhjd7qWf27uO0kRB9OYwNaLLCly8FjTatB1jrbqNCD3egfP5iARhF
+ LsWSaxpXYpFcjVSsGDenE+ljFw0+s1k428tTn8dDRIua7Deth4bVTXcb+zBi1KgiIRpI
+ ateV2503uMC1E+zau2pe8n67oer4FOkNI26d99ZMYtoDbDQeDIDvoQUEZ0P6u5+Y6DvU
+ 1MyQ==
+X-Gm-Message-State: ANhLgQ3r0U/jkuaNGvSR6jJ/7ssoiyBxh7u/99TLkSTDrtMhwc/eqZLB
+ I5Uvt2Y56gMCkYggl0eeZB88BiG4VpQYDIlH6Sa1wA==
+X-Google-Smtp-Source: ADFU+vvm44QeZu5ArgZHy6JC9416PD5p7ISXpNWGeiJLcDgIKjF8BqpmiDXrjBzfiR6rVei4BxgtyIasTqglgktXers=
+X-Received: by 2002:aca:47c8:: with SMTP id u191mr3355461oia.170.1584030150729; 
+ Thu, 12 Mar 2020 09:22:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+References: <20200311221854.30370-1-nieklinnenbank@gmail.com>
+In-Reply-To: <20200311221854.30370-1-nieklinnenbank@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Mar 2020 16:22:19 +0000
+Message-ID: <CAFEAcA9UqDRT-32Qnap8n3uYh8hyK_89KhsTwceHDRiTzihyJg@mail.gmail.com>
+Subject: Re: [PATCH v8 00/18] Add Allwinner H3 SoC and Orange Pi PC Machine
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,113 +85,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   | 13 ++++++++++
- target/riscv/insn32.decode              |  4 +++
- target/riscv/insn_trans/trans_rvv.inc.c |  6 +++++
- target/riscv/vector_helper.c            | 33 +++++++++++++++++++++++++
- 4 files changed, 56 insertions(+)
+On Wed, 11 Mar 2020 at 22:19, Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
+>
+> Dear QEMU developers,
+>
+> Hereby I would like to contribute the following set of patches to QEMU
+> which add support for the Allwinner H3 System on Chip and the
+> Orange Pi PC machine. The following features and devices are supported:
+>
+>  * SMP (Quad Core Cortex A7)
+>  * Generic Interrupt Controller configuration
+>  * SRAM mappings
+>  * SDRAM controller
+>  * Real Time Clock
+>  * Timer device (re-used from Allwinner A10)
+>  * UART
+>  * SD/MMC storage controller
+>  * EMAC ethernet
+>  * USB 2.0 interfaces
+>  * Clock Control Unit
+>  * System Control module
+>  * Security Identifier device
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c02b207b44..a34157e277 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -986,3 +986,16 @@ DEF_HELPER_5(vfclass_v_d, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_h, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_w, void, ptr, ptr, i64, ptr, env, i32)
- DEF_HELPER_6(vfmerge_vfm_d, void, ptr, ptr, i64, ptr, env, i32)
-+
-+DEF_HELPER_5(vfcvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_xu_f_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_x_f_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_xu_v_d, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfcvt_f_x_v_d, void, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 41074f314a..6ca6f97323 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -509,6 +509,10 @@ vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
- vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
- vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
- vfmerge_vfm     010111 . ..... ..... 101 ..... 1010111 @r_vm
-+vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
-+vfcvt_x_f_v     100010 . ..... 00001 001 ..... 1010111 @r2_vm
-+vfcvt_f_xu_v    100010 . ..... 00010 001 ..... 1010111 @r2_vm
-+vfcvt_f_x_v     100010 . ..... 00011 001 ..... 1010111 @r2_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 1ddaee6dab..a61c7fdf32 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1933,3 +1933,9 @@ static bool opfvf_vfmerge_check(DisasContext *s, arg_rmrr *a)
-             (s->sew != 0));
- }
- GEN_OPFVF_TRANS(vfmerge_vfm, opfvf_vfmerge_check)
-+
-+/* Single-Width Floating-Point/Integer Type-Convert Instructions */
-+GEN_OPFV_TRANS(vfcvt_xu_f_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_x_f_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_f_xu_v, opfv_check)
-+GEN_OPFV_TRANS(vfcvt_f_x_v, opfv_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 00f8d9344f..d032745e94 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -3942,3 +3942,36 @@ void HELPER(NAME)(void *vd, void *v0, uint64_t s1,        \
- GEN_VFMERGE_VF(vfmerge_vfm_h, int16_t, H2, clearh)
- GEN_VFMERGE_VF(vfmerge_vfm_w, int32_t, H4, clearl)
- GEN_VFMERGE_VF(vfmerge_vfm_d, int64_t, H8, clearq)
-+
-+/* Single-Width Floating-Point/Integer Type-Convert Instructions */
-+/* vfcvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_h, OP_UU_H, H2, H2, float16_to_uint16)
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_w, OP_UU_W, H4, H4, float32_to_uint32)
-+RVVCALL(OPFVV1, vfcvt_xu_f_v_d, OP_UU_D, H8, H8, float64_to_uint64)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_xu_f_v_d, 8, 8, clearq)
-+
-+/* vfcvt.x.f.v vd, vs2, vm # Convert float to signed integer. */
-+RVVCALL(OPFVV1, vfcvt_x_f_v_h, OP_UU_H, H2, H2, float16_to_int16)
-+RVVCALL(OPFVV1, vfcvt_x_f_v_w, OP_UU_W, H4, H4, float32_to_int32)
-+RVVCALL(OPFVV1, vfcvt_x_f_v_d, OP_UU_D, H8, H8, float64_to_int64)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_x_f_v_d, 8, 8, clearq)
-+
-+/* vfcvt.f.xu.v vd, vs2, vm # Convert unsigned integer to float. */
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_h, OP_UU_H, H2, H2, uint16_to_float16)
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_w, OP_UU_W, H4, H4, uint32_to_float32)
-+RVVCALL(OPFVV1, vfcvt_f_xu_v_d, OP_UU_D, H8, H8, uint64_to_float64)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_f_xu_v_d, 8, 8, clearq)
-+
-+/* vfcvt.f.x.v vd, vs2, vm # Convert integer to float. */
-+RVVCALL(OPFVV1, vfcvt_f_x_v_h, OP_UU_H, H2, H2, int16_to_float16)
-+RVVCALL(OPFVV1, vfcvt_f_x_v_w, OP_UU_W, H4, H4, int32_to_float32)
-+RVVCALL(OPFVV1, vfcvt_f_x_v_d, OP_UU_D, H8, H8, int64_to_float64)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_w, 4, 4, clearl)
-+GEN_VEXT_V_ENV(vfcvt_f_x_v_d, 8, 8, clearq)
--- 
-2.23.0
 
+
+Applied to target-arm.next, thanks. (I moved
+the doc into the its new location now that the split-out
+of the arm board docs into separate files has landed.)
+
+-- PMM
 
