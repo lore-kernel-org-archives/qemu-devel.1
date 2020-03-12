@@ -2,79 +2,88 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 911F4C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0A7C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EF0A20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99B1C20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rSNWDg+G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF0A20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F38wJAdU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99B1C20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCNi5-0005CY-Fd
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:17:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50859)
+	id 1jCNie-0006WV-QD
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCNh9-0004Df-Bi
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:16 -0400
+ (envelope-from <armbru@redhat.com>) id 1jCNhi-0004mP-6d
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCNh8-0001mG-5z
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:15 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44592)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCNh7-0001ji-Uq
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:14 -0400
-Received: by mail-oi1-x242.google.com with SMTP id d62so5371538oia.11
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 06:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0dnyT0V5hNHVjGHyHBwPkekbDHXrX1zyrjIt9zRZphk=;
- b=rSNWDg+G7SdGpW6ZqxT1YM45aQ3PDQWCdjgNr8IaweyMfeebuL80CHwJrSa+0oeraE
- lksIUgw81oTMbMduPAvYW1DStpO1/YHsiE0+2MbfoFI1Y+QxzPi+yYrUgqKHRGOzOLba
- GmZYK48553W+Vz5iz9AYwfuJCKQOkj5+beg8DdRG76VQ2R6FGsEWqZHj6f7LeTJeXbKS
- AxGBmKpxY7rufSCH9Y2kgnMjaFR2smIi0H8b4z9jO3w+jyCLUfGKVae8k8S+tjfygQwp
- fF0HXWM0DC+z7GXUwfdCowfwypdbQEY3RHg6lOFZWvBeoaIjOU2sXWwO4H+if0rmQ2R+
- 5wXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0dnyT0V5hNHVjGHyHBwPkekbDHXrX1zyrjIt9zRZphk=;
- b=fGGmiyZu06rHa6WNopNAdWUk+fexnAQUpCkyt9JwC0qonIySznUyFtcFDa2k4JmTtw
- LEFOls1fTVlIhkVF0rWJZVzN/e8d1of8B3IennGX1vozlCRFoO4wfEJWppgRRfzz2c2P
- AXoBYoRYJ6NM3mGbtlFoBrbyjYRuKwbdb4Y1f5/yfmYZnXRTEpNvA41Ntsqo9iUSH1yT
- oiSmA+isbnRQGwVGUnvzHI8J9xbeZMdlufH0lMHqGGsFkDKrRfeIs2aPIAb623I8Lpwh
- Qo9OgRCC7BlWJLF7ffo9n5GC7r54I3uIs+zmLW70AiPKuzM/JuKQ+2O+ov90bBM95oo6
- l5gg==
-X-Gm-Message-State: ANhLgQ0N7xmFssRyMbSvDZKVdKl3Hfl0p9J53V56zjNdLdHiB0jE5US4
- VGHZGr6nqikWNB7lB26ir1z1T2wkecpwwbyGovqOiw==
-X-Google-Smtp-Source: ADFU+vtbQ/EjBVAKohabCdL6NRPN6gqkAFR14axUaFremYk0wugSg3uNJLWQItRj21t8eyXPYVfTZ3/E1PoJLbjTbro=
-X-Received: by 2002:aca:5b07:: with SMTP id p7mr2447363oib.146.1584018972888; 
- Thu, 12 Mar 2020 06:16:12 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jCNhd-0003Zi-1a
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38068
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCNhc-0003We-TD
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:16:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584019003;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CF6Pu+8Rvbo00lwLLN/U2Sg3wr6R9K7gulVnFZMuX+8=;
+ b=F38wJAdUXFQ0L0vlTvaKE3l8cfjcCTN4SoBXwTPbvMBQChAaPlhj9xABB8Nvp8D/UwauJg
+ cfj79OKrZn810QsSEGFAFOhAwOZ2HzNoVqfMeEXy5G6lK37foj3rNwz/ux9XVUWML+xmnk
+ PubZ39dUYKH3hQrsKLlEZhaJyL0IOxo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-FIfQNOpXP82xIqmOqJzJyw-1; Thu, 12 Mar 2020 09:16:37 -0400
+X-MC-Unique: FIfQNOpXP82xIqmOqJzJyw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32332DB60;
+ Thu, 12 Mar 2020 13:16:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F38129CA3;
+ Thu, 12 Mar 2020 13:16:35 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8311211386A6; Thu, 12 Mar 2020 14:16:34 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 31/33] docs: Stop building qemu-doc
+References: <20200228153619.9906-1-peter.maydell@linaro.org>
+ <20200228153619.9906-32-peter.maydell@linaro.org>
+ <87blp3x7rr.fsf@dusky.pond.sub.org>
+ <CAFEAcA9EEuAeKm8kXtSJUtm6F3=VfyMxOkESvrZzoVt87HwKpw@mail.gmail.com>
+ <87sgiertt8.fsf@dusky.pond.sub.org>
+ <CAFEAcA9PrO+=pVyh1DR2Xh=apkZAXw0_aF=RxUmG=kR5VOdeDQ@mail.gmail.com>
+Date: Thu, 12 Mar 2020 14:16:34 +0100
+In-Reply-To: <CAFEAcA9PrO+=pVyh1DR2Xh=apkZAXw0_aF=RxUmG=kR5VOdeDQ@mail.gmail.com>
+ (Peter Maydell's message of "Thu, 12 Mar 2020 10:11:34 +0000")
+Message-ID: <8736adr9vx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200310210434.31544-1-linux@roeck-us.net>
- <20200310210434.31544-2-linux@roeck-us.net>
-In-Reply-To: <20200310210434.31544-2-linux@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Mar 2020 13:16:01 +0000
-Message-ID: <CAFEAcA_B5zjyV0xknaffcGbqELjTUUDEg7OG_wh+21r-Ya29Lg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] hw/usb: Add basic i.MX USB Phy support
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,63 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Mar 2020 at 21:04, Guenter Roeck <linux@roeck-us.net> wrote:
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Thu, 12 Mar 2020 at 06:06, Markus Armbruster <armbru@redhat.com> wrote=
+:
+>> Would it be possible to additionally render a complete manual as one
+>> humongous .html?  Without an index, there's only search, and the
+>> ergonomics of searching within a single page are so much better.
 >
-> Add basic USB PHY support as implemented in i.MX23, i.MX28, i.MX6,
-> and i.MX7 SoCs.
+> There is a "build one big fat HTML page" Sphinx builder,
+> I think. But again, I'm dubious about increasing the number
+> of supported output formats -- it's all extra makefile complexity
+> and more things to get right in 'make install' and so on.
 >
-> The only support really needed - at least to boot Linux - is support
-> for soft reset, which needs to reset various registers to their initial
-> value. Otherwise, just record register values.
+> PS: assuming you have js enabled, each HTML manual has a js
+> search engine built in, eg the 'quick search' box at the bottom
+> of the LHS navigation bar on
+> https://www.qemu.org/docs/master/system/index.html
 >
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
-> v2: New patch, replacing dummy STMP register support with basic USB PHY
->     emulation.
+>> I'm tempted to write a trivial QAPI doc comment backend to spit out
+>> minimally processed doc comments as one plain text file just for that.
 >
->  hw/arm/Kconfig               |   1 +
->  hw/usb/Kconfig               |   5 +
->  hw/usb/Makefile.objs         |   2 +
->  hw/usb/imx-usb-phy.c         | 225 +++++++++++++++++++++++++++++++++++
->  include/hw/usb/imx-usb-phy.h |  53 +++++++++
->  5 files changed, 286 insertions(+)
->  create mode 100644 hw/usb/imx-usb-phy.c
->  create mode 100644 include/hw/usb/imx-usb-phy.h
+> What would be the difference there compared to just looking
+> at the manpage? The manpages don't have the full content
+> of all the HTML manuals, but the QAPI reference manpages
+> will have all the QAPI content.
 
+I forgot qemu-qmp-ref.7 exists, and missed Paolo's hint earlier in this
+thread.  Thanks!
 
-> +        /*
-> +         * All REG_NAME_SET register access are in fact targeting the
-> +         * the REG_NAME register.
-> +         */
-
-All these comments have a duplicate word: "the the".
-
-You should add the new files to MAINTAINERS:
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 857f969aa1f..4e42187aafb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -748,6 +748,8 @@ F: hw/arm/sabrelite.c
- F: hw/arm/fsl-imx6.c
- F: hw/misc/imx6_*.c
- F: hw/ssi/imx_spi.c
-+F: hw/usb/imx-usb-phy.c
-+F: include/hw/usb/imx-usb-phy.h
- F: include/hw/arm/fsl-imx6.h
- F: include/hw/misc/imx6_*.h
- F: include/hw/ssi/imx_spi.h
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
 
