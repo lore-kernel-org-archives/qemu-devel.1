@@ -1,88 +1,80 @@
 Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 298F8C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF71AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAC67205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78644205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 20:06:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Htm7rd1q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC67205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kAcqgkax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78644205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCU65-0003Py-4y
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:06:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45779)
+	id 1jCU6b-0005Qh-LL
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 16:06:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50686)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjT-0006C9-1E
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:04 -0400
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jCU2C-0005B0-CT
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjR-0002Ht-JK
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:02 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44657)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1jCU2B-0005Mg-7W
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 16:02:24 -0400
+Received: from mail-io1-xd2a.google.com ([2607:f8b0:4864:20::d2a]:36764)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTjR-0002Ha-Do
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:01 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 37so3558674pgm.11
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:43:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=QJvhSRp707cxdamQl0vVDLxpjNb38jwO6L+jNT02qis=;
- b=Htm7rd1qhbD8wYpn5xGztYpEq7moH6Jqt1IzRBbiBRgtuNx6WRyILUK157ppeHE11z
- Ntq3SN/Mx+rNPDIH7aP7HoowgFWkZvaidtuf7SAyJ7gd7Duns+0n9KNCTJAwiAtMlmdT
- P2AuJ8hxcGowmVL0H+ZMvv5REOrgO5E+0vSgMKVTQ5R5LOalwjkw9MYBegqfUdGbvCIx
- n4BUVwtAnUMqp4gwyrr1xJwpWBc3ETjt0+MoXvkZgU41btzfrAD7tH93PxZGikxW/lxJ
- 6ViOLGedLDXtWkYtdHM9TsDZHJFfBTarLgN8ssPXDz8enlXnG/uZk1qR8WBYv1Pj98Zi
- Pekg==
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1jCU2B-0005IF-1q; Thu, 12 Mar 2020 16:02:23 -0400
+Received: by mail-io1-xd2a.google.com with SMTP id d15so7014787iog.3;
+ Thu, 12 Mar 2020 13:02:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iEExUs14yIhTspSpMTZEiP0XS6fhKXstB4RbOjXMcI8=;
+ b=kAcqgkax3VsBgHjQ/4y69SlZ1Wq95HihuANakTA4nSOEPI0bYWsiqAt4LxCmyxjsok
+ Osuj8BudukDevJ+O6y+7UKdDtkZYAgvXr51xFNISG5vHVfimofOJQbWi6b0zJN2eidpg
+ 6ytMLZVqz2xLmPC3afvyDObHxvua1NQdcPX20gdrfk0z2XunefVaTavFj/lxLTJnF8Uk
+ 676JqleQ0ICjAAQ9Wo/kBPd+DSOi6+QYYpra9iXi6bl4ltursirehS39kJacP/Pw3OEF
+ IFC15iyk/ZzRfd1DOA3/hGEbfyv8H9OWOztk6zDehCFDWWYm6rDtkA8S7S7zrVGtHRao
+ XYig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=QJvhSRp707cxdamQl0vVDLxpjNb38jwO6L+jNT02qis=;
- b=PB5xaJfuXBZy9zy+gCkhhL5TMgH+Tmjy01k3bTwOaYgVJad7xo1wpe1MpP1WMCBJYH
- KMluabD3g6n9gZTXonn7U9bBoEd6VtKrNVJWdXigYu5bAXlMen82lMwYDV+H7CjMrUDF
- V3vq/VB2Wzz5mYr9JSC5nrOQy0+XLzQIM7tsMnUTxGC3rdJTZRRlqjsYTUKjc0lzGfIc
- +TL/7WTkYdOKqlzPh5vgxqg+h7m1DoDhnpLAfQk2AorHFTkznc5q8eor6Sf3fXutZY9p
- dFjYxr4scgK74xHT+zNF4z1+vSB0XVBBL/bey93TywAen0qXmnuMdDeJrIDYCnRf56Bh
- 54uA==
-X-Gm-Message-State: ANhLgQ2BOxEVuTXqzhH5LWl/Z3j3C+jadvst4Aj/KwdL1du9G5W2CQRg
- GYPo4K0VgfyCRUhVfRfrVDu0XUYPH1U=
-X-Google-Smtp-Source: ADFU+vuTJzcTioii6xrC8Sx0g8tv+L/giG2Iml54SBRGew7tYRXGyHeSXVM1pQghu8G39Rarzzs3VQ==
-X-Received: by 2002:a62:16d2:: with SMTP id 201mr7235600pfw.295.1584042180076; 
- Thu, 12 Mar 2020 12:43:00 -0700 (PDT)
-Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
- [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:42:59 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 29/42] target/arm: Use mte_checkN for sve unpredicated
- stores
-Date: Thu, 12 Mar 2020 12:42:06 -0700
-Message-Id: <20200312194219.24406-30-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
-References: <20200312194219.24406-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iEExUs14yIhTspSpMTZEiP0XS6fhKXstB4RbOjXMcI8=;
+ b=C9J2CnDbXJxujt9omtjT+UrH8t1hkHD9QHSvO723VISgpjVCYRPaS6+FywRvcRbxuC
+ A3G/JuFZum6Ln1DI1o8bIOxtH5KtOGiL9sFv1vqte4Htg9//go0unMm+e9CtU7wEPZXU
+ gq6OmrAFsodKGQaHKY3NtjFJg4YOGOgenstf2kTl/mXRh0uL/zllbl15lrP/jMWCgdGy
+ 1qSJvcmnrVqGYc7rBaz+4wdqOaj2WRkiVWIfE+ldsIrQadwB7EOyvMF8B/Sk+rQ2nu9t
+ hnW3l1bG0aNIAxNrz1r3JP+Yneu4z8JIrA3uBS2qsoTaDa4PPdI7wM/UdU+uYRL88v/s
+ pPfw==
+X-Gm-Message-State: ANhLgQ0RZeKVu3+0sx4sRMpN1IJ+LEJ47ZFvfJWkRMNL3a26waMfNYu5
+ FY03r//oIfCl25pi4H0Gj3GuDzcAYN/8MH2FAeU=
+X-Google-Smtp-Source: ADFU+vsZ+8dqR3Tlma42xnqtUmTMantE6dZEz8LVB+6IIJEMvyVz4NMKgWny3j4gp5QLi3vWQkZ/UbUPmyA636srTN0=
+X-Received: by 2002:a6b:5406:: with SMTP id i6mr9248179iob.188.1584043339648; 
+ Thu, 12 Mar 2020 13:02:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200311221854.30370-1-nieklinnenbank@gmail.com>
+ <CAFEAcA9UqDRT-32Qnap8n3uYh8hyK_89KhsTwceHDRiTzihyJg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9UqDRT-32Qnap8n3uYh8hyK_89KhsTwceHDRiTzihyJg@mail.gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Thu, 12 Mar 2020 21:02:08 +0100
+Message-ID: <CAPan3WpgoCnnQCqxeYC3vPJ692TxFkLxs3dnD1xv9HfCukr7NA@mail.gmail.com>
+Subject: Re: [PATCH v8 00/18] Add Allwinner H3 SoC and Orange Pi PC Machine
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000009195a605a0add438"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::d2a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,226 +86,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper-sve.h    |  1 +
- target/arm/sve_helper.c    | 63 ++++++++++++++++++++++++++-
- target/arm/translate-sve.c | 88 ++++++++++++++------------------------
- 3 files changed, 94 insertions(+), 58 deletions(-)
+--0000000000009195a605a0add438
+Content-Type: text/plain; charset="UTF-8"
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 82ea70cf63..4e71501838 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -1124,6 +1124,7 @@ DEF_HELPER_FLAGS_5(sve_ftmad_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_ftmad_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- 
- DEF_HELPER_FLAGS_4(sve_ldr, TCG_CALL_NO_WG, void, env, ptr, tl, int)
-+DEF_HELPER_FLAGS_4(sve_str, TCG_CALL_NO_WG, void, env, ptr, tl, int)
- 
- DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index ede72a2989..2396737420 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -4191,7 +4191,7 @@ static bool sve_probe_page(SVEHostPage *info, bool nofault,
- }
- 
- /*
-- * Load contiguous data, unpredicated.
-+ * Load/store contiguous data, unpredicated.
-  *
-  * Note that unpredicated load/store of vector/predicate registers
-  * are defined as a stream of bytes, which equates to little-endian
-@@ -4261,6 +4261,67 @@ void HELPER(sve_ldr)(CPUARMState *env, void *vd, target_ulong addr, int size)
-     }
- }
- 
-+void HELPER(sve_str)(CPUARMState *env, void *vd, target_ulong addr, int size)
-+{
-+    int mem_idx = cpu_mmu_index(env, false);
-+    int in_page = -((int)addr | TARGET_PAGE_MASK);
-+    uintptr_t ra = GETPC();
-+    uint64_t val;
-+    void *host;
-+    int i;
-+
-+    /* Small stores are expanded inline. */
-+    tcg_debug_assert(size > 2 * 8);
-+
-+    if (likely(size <= in_page)) {
-+        host = probe_write(env, addr, size, mem_idx, ra);
-+        if (likely(host != NULL)) {
-+            for (i = 0; i + 8 <= size; i += 8) {
-+                stq_le_p(host + i, *(uint64_t *)(vd + i));
-+            }
-+
-+            /* Predicate load length may be any multiple of 2. */
-+            if (unlikely(i != size)) {
-+                val = *(uint64_t *)(vd + i);
-+                if (size & 4) {
-+                    stl_le_p(host + i, val);
-+                    i += 4;
-+                    val >>= 32;
-+                }
-+                if (size & 2) {
-+                    stw_le_p(host + i, val);
-+                }
-+            }
-+            return;
-+        }
-+    } else {
-+        (void)probe_write(env, addr, in_page, mem_idx, ra);
-+        (void)probe_write(env, addr + in_page, size - in_page, mem_idx, ra);
-+    }
-+
-+    /*
-+     * Note there is no endian-specific target store function, so to handle
-+     * aarch64_be-linux-user we need to bswap the big-endian store.
-+     */
-+    for (i = 0; i + 8 <= size; i += 8) {
-+        val = *(uint64_t *)(vd + i);
-+        cpu_stq_data_ra(env, addr + i, le_bswap64(val), ra);
-+    }
-+
-+    /* Predicate load length may be any multiple of 2. */
-+    if (unlikely(i != size)) {
-+        val = *(uint64_t *)(vd + i);
-+        if (size & 4) {
-+            cpu_stl_data_ra(env, addr + i, le_bswap32(val), ra);
-+            i += 4;
-+            val >>= 32;
-+        }
-+        if (size & 2) {
-+            cpu_stw_data_ra(env, addr + i, le_bswap16(val), ra);
-+        }
-+    }
-+}
-+
- /*
-  * Analyse contiguous data, protected by a governing predicate.
-  */
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index e55f8835bb..49d2e68564 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4430,78 +4430,52 @@ static void do_str(DisasContext *s, uint32_t vofs, int len, int rn, int imm)
-     int len_remain = len % 8;
-     int nparts = len / 8 + ctpop8(len_remain);
-     int midx = get_mem_index(s);
--    TCGv_i64 addr, t0;
-+    TCGv_i64 dirty_addr, clean_addr, t0;
-+    int i;
-+
-+    dirty_addr = read_cpu_reg_sp(s, rn, true);
-+    tcg_gen_addi_i64(dirty_addr, dirty_addr, imm);
-+
-+    clean_addr = gen_mte_checkN(s, dirty_addr, true, rn != 31, len, MO_8);
-+
-+    /* Limit tcg code expansion by doing large loads out of line. */
-+    if (nparts > 4) {
-+        TCGv_ptr t_rd = tcg_temp_new_ptr();
-+        TCGv_i32 t_len = tcg_const_i32(len);
-+
-+        tcg_gen_addi_ptr(t_rd, cpu_env, vofs);
-+        gen_helper_sve_str(cpu_env, t_rd, clean_addr, t_len);
-+        tcg_temp_free_ptr(t_rd);
-+        tcg_temp_free_i32(t_len);
-+        return;
-+    }
- 
--    addr = tcg_temp_new_i64();
-     t0 = tcg_temp_new_i64();
--
--    /* Note that unpredicated load/store of vector/predicate registers
--     * are defined as a stream of bytes, which equates to little-endian
--     * operations on larger quantities.  There is no nice way to force
--     * a little-endian store for aarch64_be-linux-user out of line.
--     *
--     * Attempt to keep code expansion to a minimum by limiting the
--     * amount of unrolling done.
--     */
--    if (nparts <= 4) {
--        int i;
--
--        for (i = 0; i < len_align; i += 8) {
--            tcg_gen_ld_i64(t0, cpu_env, vofs + i);
--            tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + i);
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
--        }
--    } else {
--        TCGLabel *loop = gen_new_label();
--        TCGv_ptr t2, i = tcg_const_local_ptr(0);
--
--        gen_set_label(loop);
--
--        t2 = tcg_temp_new_ptr();
--        tcg_gen_add_ptr(t2, cpu_env, i);
--        tcg_gen_ld_i64(t0, t2, vofs);
--
--        /* Minimize the number of local temps that must be re-read from
--         * the stack each iteration.  Instead, re-compute values other
--         * than the loop counter.
--         */
--        tcg_gen_addi_ptr(t2, i, imm);
--        tcg_gen_extu_ptr_i64(addr, t2);
--        tcg_gen_add_i64(addr, addr, cpu_reg_sp(s, rn));
--        tcg_temp_free_ptr(t2);
--
--        tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEQ);
--
--        tcg_gen_addi_ptr(i, i, 8);
--
--        tcg_gen_brcondi_ptr(TCG_COND_LTU, i, len_align, loop);
--        tcg_temp_free_ptr(i);
-+    for (i = 0; i < len_align; i += 8) {
-+        tcg_gen_ld_i64(t0, cpu_env, vofs + i);
-+        tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEQ);
-+        tcg_gen_addi_i64(clean_addr, clean_addr, 8);
-     }
- 
-     /* Predicate register stores can be any multiple of 2.  */
-     if (len_remain) {
-         tcg_gen_ld_i64(t0, cpu_env, vofs + len_align);
--        tcg_gen_addi_i64(addr, cpu_reg_sp(s, rn), imm + len_align);
--
-         switch (len_remain) {
--        case 2:
--        case 4:
--        case 8:
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LE | ctz32(len_remain));
--            break;
--
-         case 6:
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUL);
--            tcg_gen_addi_i64(addr, addr, 4);
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUL);
-+            tcg_gen_addi_i64(clean_addr, clean_addr, 4);
-             tcg_gen_shri_i64(t0, t0, 32);
--            tcg_gen_qemu_st_i64(t0, addr, midx, MO_LEUW);
-+            /* fall through */
-+        case 2:
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUW);
-+            break;
-+        case 4:
-+            tcg_gen_qemu_st_i64(t0, clean_addr, midx, MO_LEUL);
-             break;
--
-         default:
-             g_assert_not_reached();
-         }
-     }
--    tcg_temp_free_i64(addr);
-     tcg_temp_free_i64(t0);
- }
- 
+On Thu, Mar 12, 2020 at 5:22 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+> On Wed, 11 Mar 2020 at 22:19, Niek Linnenbank <nieklinnenbank@gmail.com>
+> wrote:
+> >
+> > Dear QEMU developers,
+> >
+> > Hereby I would like to contribute the following set of patches to QEMU
+> > which add support for the Allwinner H3 System on Chip and the
+> > Orange Pi PC machine. The following features and devices are supported:
+> >
+> >  * SMP (Quad Core Cortex A7)
+> >  * Generic Interrupt Controller configuration
+> >  * SRAM mappings
+> >  * SDRAM controller
+> >  * Real Time Clock
+> >  * Timer device (re-used from Allwinner A10)
+> >  * UART
+> >  * SD/MMC storage controller
+> >  * EMAC ethernet
+> >  * USB 2.0 interfaces
+> >  * Clock Control Unit
+> >  * System Control module
+> >  * Security Identifier device
+>
+>
+>
+> Applied to target-arm.next, thanks.
+
+
+Great news! And thanks for your support as well Peter!
+
+
+> (I moved
+> the doc into the its new location now that the split-out
+> of the arm board docs into separate files has landed.)
+>
+> Yeah sure, indeed, that makes sense.
+
+Regards,
+Niek
+
+
+> -- PMM
+>
+
+
 -- 
-2.20.1
+Niek Linnenbank
 
+--0000000000009195a605a0add438
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Mar 12, 2020 at 5:22 PM Peter=
+ Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lina=
+ro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On Wed, 11 Mar 2020 at 22:19, Niek Linnenbank &lt;<a href=3D"mailto:n=
+ieklinnenbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;=
+ wrote:<br>
+&gt;<br>
+&gt; Dear QEMU developers,<br>
+&gt;<br>
+&gt; Hereby I would like to contribute the following set of patches to QEMU=
+<br>
+&gt; which add support for the Allwinner H3 System on Chip and the<br>
+&gt; Orange Pi PC machine. The following features and devices are supported=
+:<br>
+&gt;<br>
+&gt;=C2=A0 * SMP (Quad Core Cortex A7)<br>
+&gt;=C2=A0 * Generic Interrupt Controller configuration<br>
+&gt;=C2=A0 * SRAM mappings<br>
+&gt;=C2=A0 * SDRAM controller<br>
+&gt;=C2=A0 * Real Time Clock<br>
+&gt;=C2=A0 * Timer device (re-used from Allwinner A10)<br>
+&gt;=C2=A0 * UART<br>
+&gt;=C2=A0 * SD/MMC storage controller<br>
+&gt;=C2=A0 * EMAC ethernet<br>
+&gt;=C2=A0 * USB 2.0 interfaces<br>
+&gt;=C2=A0 * Clock Control Unit<br>
+&gt;=C2=A0 * System Control module<br>
+&gt;=C2=A0 * Security Identifier device<br>
+<br>
+<br>
+<br>
+Applied to target-arm.next, thanks. </blockquote><div><br></div><div>Great =
+news! And thanks for your support as well Peter!<br></div><div>=C2=A0</div>=
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">(I moved<br>
+the doc into the its new location now that the split-out<br>
+of the arm board docs into separate files has landed.)<br>
+<br></blockquote><div>Yeah sure, indeed, that makes sense.</div><div><br></=
+div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
+gb(204,204,204);padding-left:1ex">
+-- PMM<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--0000000000009195a605a0add438--
 
