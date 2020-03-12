@@ -6,69 +6,67 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7289C4CECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C364C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA82A206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A172206B1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:32:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JouNphuT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA82A206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bpQe1Pzn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A172206B1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCMvp-0006Qi-Vl
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 08:27:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39958)
+	id 1jCN0n-0003vz-7q
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 08:32:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jCMv8-0005Yu-3A
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:26:39 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jCMzi-0003VD-T0
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jCMv6-0006p4-PJ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:26:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30598
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1jCMzh-0001PW-HT
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:31:22 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44219)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jCMv6-0006o3-LB
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:26:36 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jCMzf-0001Og-SD
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:31:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584015995;
+ s=mimecast20190719; t=1584016279;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H+qmfhij1SG96WLJXFWjwbc/ncPahO1Bzpx8zf1zDbc=;
- b=JouNphuTkOivQqb/3UWClsq9AgIZ6D/VGjaEDtnDVSxhjRKk2meyhkuYIB5Eg1UqY22jTY
- 8vHddGFtdzTEjBRrXgGm65hvu+9W0cxJaPxaLZuNxcac9+OTOoJRt/5TwwYYCx/iZGiIqA
- 1sPHOjvl2hzIA/nwhd6ND8xt2X8V8VA=
+ bh=+dg9rMbiI9zfHIRDNy2o7XogkMlo6CVtc9p4Ofkg1Kg=;
+ b=bpQe1Pznb+qmg1Ek5X+Kn1iKHReASAen3JyEHCsSk3D5guplElGZ6bB3YAszKegoJopW/M
+ 5eIxv6SuiIAxAUDYbo6ddLtMUw2O9RAV5Z2Bqv85sjWBwK9bGk6TACMUPzJIavkxV7HDyr
+ 1JkLb36zEWBkMB17j2O72l+KhyWKWlo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-mLg8E2_kOoS-6DFgydrfQw-1; Thu, 12 Mar 2020 08:26:33 -0400
-X-MC-Unique: mLg8E2_kOoS-6DFgydrfQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-2-SaeBANIHOhaCUhI7oWxbPA-1; Thu, 12 Mar 2020 08:31:13 -0400
+X-MC-Unique: SaeBANIHOhaCUhI7oWxbPA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90E5FDB24;
- Thu, 12 Mar 2020 12:26:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9153C100550D;
+ Thu, 12 Mar 2020 12:31:12 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8BDEF92D2D;
- Thu, 12 Mar 2020 12:26:28 +0000 (UTC)
-Date: Thu, 12 Mar 2020 13:26:26 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C30719C6A;
+ Thu, 12 Mar 2020 12:31:08 +0000 (UTC)
+Date: Thu, 12 Mar 2020 13:31:07 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v7 10/13] i386: Introduce use_epyc_apic_id_encoding in
- X86CPUDefinition
-Message-ID: <20200312132626.3e20f530@redhat.com>
-In-Reply-To: <158396723514.58170.14825482171652019765.stgit@naples-babu.amd.com>
+Subject: Re: [PATCH v7 11/13] hw/i386: Move arch_id decode inside x86_cpus_init
+Message-ID: <20200312133107.2048675d@redhat.com>
+In-Reply-To: <158396724217.58170.12256158354204870716.stgit@naples-babu.amd.com>
 References: <158396702138.58170.7920458595372792959.stgit@naples-babu.amd.com>
- <158396723514.58170.14825482171652019765.stgit@naples-babu.amd.com>
+ <158396724217.58170.12256158354204870716.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -92,72 +90,145 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Mar 2020 17:53:55 -0500
+On Wed, 11 Mar 2020 17:54:02 -0500
 Babu Moger <babu.moger@amd.com> wrote:
 
-> Add a boolean variable use_epyc_apic_id_encoding in X86CPUDefinition.
-> This will be set if this cpu model needs to use new EPYC based
-> apic id encoding.
+> Apicid calculation depends on knowing the total number of numa nodes
+> for EPYC cpu models. Right now, we are calculating the arch_id while
+> parsing the numa(parse_numa). At this time, it is not known how many
+> total numa nodes are configured in the system.
 > 
-> Override the handlers with EPYC based handlers if use_epyc_apic_id_encoding
-> is set. This will be done in x86_cpus_init.
+> Move the arch_id calculation inside x86_cpus_init. At this time, smp
+> parse is already completed and numa node information is available.
+> 
+> Override the handlers if use_epyc_apic_id_encoding is enabled in
+> cpu model definition.
+> 
+> Also replace the calling convention to use handlers from
+> X86MachineState.
 > 
 > Signed-off-by: Babu Moger <babu.moger@amd.com>
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 > ---
->  target/i386/cpu.c |   16 ++++++++++++++++
->  target/i386/cpu.h |    1 +
->  2 files changed, 17 insertions(+)
+>  hw/i386/pc.c  |    6 +++---
+>  hw/i386/x86.c |   37 ++++++++++++++++++++++++++++++-------
+>  2 files changed, 33 insertions(+), 10 deletions(-)
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 7361a53166..1e4400df7a 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1614,6 +1614,10 @@ typedef struct X86CPUDefinition {
->      FeatureWordArray features;
->      const char *model_id;
->      CPUCaches *cache_info;
-> +
-> +    /* Use AMD EPYC encoding for apic id */
-> +    bool use_epyc_apic_id_encoding;
-> +
->      /*
->       * Definitions for alternative versions of CPU model.
->       * List is terminated by item with version == 0.
-> @@ -1655,6 +1659,18 @@ static const X86CPUVersionDefinition *x86_cpu_def_get_versions(X86CPUDefinition
->      return def->versions ?: default_version_list;
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 98ee763f68..2d7d611184 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1580,14 +1580,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> -        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
+> +        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
+>  
+>      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+>      if (!cpu_slot) {
+>          MachineState *ms = MACHINE(pcms);
+>  
+> -        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>          error_setg(errp,
+>              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+>              " APIC ID %" PRIu32 ", valid index range 0:%d",
+> @@ -1608,7 +1608,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
+>       * once -smp refactoring is complete and there will be CPU private
+>       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
+> -    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+>          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+>              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 0a81ab5151..023dce1dbd 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -68,6 +68,22 @@ inline void init_topo_info(X86CPUTopoInfo *topo_info,
+>      topo_info->threads_per_core = ms->smp.threads;
 >  }
 >  
-> +bool cpu_x86_use_epyc_apic_id_encoding(const char *cpu_type)
+> +/*
+> + * Set up with the new EPYC topology handlers
+> + *
+> + * AMD uses different apic id encoding for EPYC based cpus. Override
+> + * the default topo handlers with EPYC encoding handlers.
+> + */
+> +static void x86_set_epyc_topo_handlers(MachineState *machine)
 > +{
-> +    X86CPUClass *xcc = X86_CPU_CLASS(object_class_by_name(cpu_type));
+> +    X86MachineState *x86ms = X86_MACHINE(machine);
 > +
-> +    assert(xcc);
-> +    if (xcc->model && xcc->model->cpudef) {
-> +        return xcc->model->cpudef->use_epyc_apic_id_encoding;
-> +    } else {
-> +        return false;
-> +    }
+> +    x86ms->apicid_from_cpu_idx = x86_apicid_from_cpu_idx_epyc;
+> +    x86ms->topo_ids_from_apicid = x86_topo_ids_from_apicid_epyc;
+> +    x86ms->apicid_from_topo_ids = x86_apicid_from_topo_ids_epyc;
+> +    x86ms->apicid_pkg_offset = apicid_pkg_offset_epyc;
 > +}
 > +
->  static CPUCaches epyc_cache_info = {
->      .l1d_cache = &(CPUCacheInfo) {
->          .type = DATA_CACHE,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 7e9e963d78..6e522fcd34 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1897,6 +1897,7 @@ void cpu_clear_apic_feature(CPUX86State *env);
->  void host_cpuid(uint32_t function, uint32_t count,
->                  uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
->  void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
-> +bool cpu_x86_use_epyc_apic_id_encoding(const char *cpu_type);
+>  /*
+>   * Calculates initial APIC ID for a specific CPU index
+>   *
+> @@ -86,7 +102,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
 >  
->  /* helper.c */
->  bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> 
+>      init_topo_info(&topo_info, x86ms);
+>  
+> -    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
+> +    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
+>      if (x86mc->compat_apic_id_mode) {
+>          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+>              error_report("APIC IDs set in compatibility mode, "
+> @@ -121,6 +137,11 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+>      MachineState *ms = MACHINE(x86ms);
+>      MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+>  
+> +    /* Check for apicid encoding */
+> +    if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
+> +        x86_set_epyc_topo_handlers(ms);
+> +    }
+> +
+>      x86_cpu_set_default_version(default_cpu_version);
+>  
+>      /*
+> @@ -134,6 +155,12 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+>      x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+>                                                        ms->smp.max_cpus - 1) + 1;
+>      possible_cpus = mc->possible_cpu_arch_ids(ms);
+> +
+> +    for (i = 0; i < ms->smp.cpus; i++) {
+> +        ms->possible_cpus->cpus[i].arch_id =
+> +            x86_cpu_apic_id_from_index(x86ms, i);
+> +    }
+> +
+>      for (i = 0; i < ms->smp.cpus; i++) {
+>          x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+>      }
+> @@ -158,8 +185,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>     init_topo_info(&topo_info, x86ms);
+>  
+>     assert(idx < ms->possible_cpus->len);
+> -   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> -                            &topo_info, &topo_ids);
+> +   x86_topo_ids_from_idx(&topo_info, idx, &topo_ids);
+>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
+>  }
+>  
+> @@ -190,10 +216,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>  
+>          ms->possible_cpus->cpus[i].type = ms->cpu_type;
+>          ms->possible_cpus->cpus[i].vcpus_count = 1;
+> -        ms->possible_cpus->cpus[i].arch_id =
+> -            x86_cpu_apic_id_from_index(x86ms, i);
+> -        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> -                                 &topo_info, &topo_ids);
+> +        x86_topo_ids_from_idx(&topo_info, i, &topo_ids);
+>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+>          if (x86ms->smp_dies > 1) {
 > 
 
 
