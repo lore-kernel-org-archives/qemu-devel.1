@@ -4,64 +4,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D540C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B1EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E27D2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E27D2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 37F8A2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:18:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F8A2067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRTI-000569-ID
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37485)
+	id 1jCRTV-0005pD-Fe
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:18:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jCR7T-0002DA-N4
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:55:40 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRC8-0004JI-3K
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jCR7S-0003SS-Km
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:55:39 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:47953)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jCR7S-0003R9-C0
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:55:38 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mgvev-1jpMF9276T-00hLz3; Thu, 12 Mar 2020 17:55:34 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] linux-user: fix socket() strace
-Date: Thu, 12 Mar 2020 17:55:30 +0100
-Message-Id: <20200312165530.53450-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCRC5-0007dB-59
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 13:00:26 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60490)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCRC3-0007Yi-0d; Thu, 12 Mar 2020 13:00:23 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0743909|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.0358285-0.000344232-0.963827;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-QJ.qU_1584032412; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-QJ.qU_1584032412)
+ by smtp.aliyun-inc.com(10.147.40.233);
+ Fri, 13 Mar 2020 01:00:13 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 60/60] target/riscv: configure and turn on vector extension
+ from command line
+Date: Thu, 12 Mar 2020 22:59:00 +0800
+Message-Id: <20200312145900.2054-61-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:S8VBigd0/pfnZuC1hFc18/4bvMs6PXJ6lf+oPtaFy8YD2L1eQYO
- AYE68kjRW64/v/CInWp87+LDb84B5FFQQe2cz9ZOUjRKglTSJsoceJ/YvNeRhaXeusrRqDx
- k8eO5DJD8TYiFFhE7V0D2ZF9aILPZ0sTkrnhRPBclQ+9ctUBxw66aWHIkoRFzC1V0gefhvh
- Szp9eV37s7DlkqUcvVNug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:U70d+VLByeA=:Z+B5d7u5C+bHRc2P4xcqh8
- tb2ovQnjd7PwU07wtvY7e9I/Akbyx4htJKp4aWDhOTA5HveY0ko4DTpkjGj2Iw8M5a34bO2wH
- Q02CsilPn/qqv/uemeV1S3BiYWckEC375ZbxmYgVYoMFgmh6xOWiCmYN9RcNJO/YuHlG7pDvn
- NZC2NPpKKr2hKRG/iMUrAE7ZcLDRkQj7/S6+QYtpjoiZ2NxC/+4WgHoBH8n7t5KaN/FV58raz
- ZUhy91afj8/Vdxj89Y1KmfaOu4U0fIdrHcVo1wOqgX2Rj/5cdFta5IFhqZ0o8NwWNeCDUJvM8
- EvvFi9QCSE44R3AByjKkRxM5VWS9djaClMF8GmeVT05EdrOB6iG6gxioVbIyVPWXc2ahv8Yt0
- AxeuH1WHnGiZK8wzCWnu6bKpjcruY47R2t4j/HpKrSkis5YGSySjgWRAGVZ0ZHKgKZh8ppt2n
- YRviOP1ZfFyHNpudJDxX8zk4WuMpbNn18U+ObN+bieD+XNnC5nWU99Sry/Goed6dyinT50p7S
- vyn2SLe8DkpjbHxeESHTTkmashBADSSi1LUhSLGSQzhXg9S8/JfRrRTLzfoYvwS6U0klUz/3M
- UD8xCvkDsHw6wN4NQM90HcgJmEkYn/fUumYOZApxF/dvuZgoHW3bpfdjGKq8ixLMAHPuOJ7Ie
- /7MydGqGKA5v/ui9zCnDjMjJE6dlQGZ7YtvnYJxURqCBR1Esl3uaRllUUQVKmjPl9OZZvUW/F
- tHDmoq4nP9nupf5a4vJfxR85J2FR9gI7+FIaR8WoLZYdfdpzdjcd4PuoYm1Cqe1fzXh8znY/5
- fOk9tSTeT/tpn4n3hDHqb8Wg5V/DLoQsbCkPOhQnNsZFQSRc8yi4tFUhSptP2fel7p9U4c1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,50 +66,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-print_socket_type() doesn't manage flags and the correct type cannot
-be displayed
+Vector extension is default off. The only way to use vector extension is
+1. use cpu rv32 or rv64
+2. turn on it by command line
+"-cpu rv64,v=true,vlen=128,elen=64,vext_spec=v0.7.1".
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+vlen is the vector register length, default value is 128 bit.
+elen is the max operator size in bits, default value is 64 bit.
+vext_spec is the vector specification version, default value is v0.7.1.
+These properties can be specified with other values.
+
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
+ target/riscv/cpu.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+ target/riscv/cpu.h |  2 ++
+ 2 files changed, 45 insertions(+), 1 deletion(-)
 
-Notes:
-    v2: replace gemu_log() by qemu_log() as it has been removed from qemu
-
- linux-user/strace.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 4f7130b2ff63..69232f7e27b8 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -444,7 +444,7 @@ print_socket_domain(int domain)
- static void
- print_socket_type(int type)
- {
--    switch (type) {
-+    switch (type & TARGET_SOCK_TYPE_MASK) {
-     case TARGET_SOCK_DGRAM:
-         qemu_log("SOCK_DGRAM");
-         break;
-@@ -464,6 +464,12 @@ print_socket_type(int type)
-         qemu_log("SOCK_PACKET");
-         break;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 6e4135583d..5f1cdd4f2b 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -395,7 +395,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
      }
-+    if (type & TARGET_SOCK_CLOEXEC) {
-+        qemu_log("|SOCK_CLOEXEC");
-+    }
-+    if (type & TARGET_SOCK_NONBLOCK) {
-+        qemu_log("|SOCK_NONBLOCK");
-+    }
- }
  
- static void
+     set_priv_version(env, priv_version);
+-    set_vext_version(env, vext_version);
+     set_resetvec(env, DEFAULT_RSTVEC);
+ 
+     if (cpu->cfg.mmu) {
+@@ -463,6 +462,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         if (cpu->cfg.ext_h) {
+             target_misa |= RVH;
+         }
++        if (cpu->cfg.ext_v) {
++            target_misa |= RVV;
++            if (!is_power_of_2(cpu->cfg.vlen)) {
++                error_setg(errp,
++                        "Vector extension VLEN must be power of 2");
++                return;
++            }
++            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
++                error_setg(errp,
++                        "Vector extension implementation only supports VLEN "
++                        "in the range [128, %d]", RV_VLEN_MAX);
++                return;
++            }
++            if (!is_power_of_2(cpu->cfg.elen)) {
++                error_setg(errp,
++                        "Vector extension ELEN must be power of 2");
++                return;
++            }
++            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
++                error_setg(errp,
++                        "Vector extension implementation only supports ELEN "
++                        "in the range [8, 64]");
++                return;
++            }
++            if (cpu->cfg.vext_spec) {
++                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
++                    vext_version = VEXT_VERSION_0_07_1;
++                } else {
++                    error_setg(errp,
++                           "Unsupported vector spec version '%s'",
++                           cpu->cfg.vext_spec);
++                    return;
++                }
++            } else {
++                qemu_log("vector verison is not specified, "
++                        "use the default value v0.7.1\n");
++            }
++            set_vext_version(env, vext_version);
++        }
+ 
+         set_misa(env, RVXLEN | target_misa);
+     }
+@@ -500,10 +538,14 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+     /* This is experimental so mark with 'x-' */
+     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
++    DEFINE_PROP_BOOL("v", RISCVCPU, cfg.ext_v, false),
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
++    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
++    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
++    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index e069e55e81..36ead8d6d5 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -285,12 +285,14 @@ typedef struct RISCVCPU {
+         bool ext_s;
+         bool ext_u;
+         bool ext_h;
++        bool ext_v;
+         bool ext_counters;
+         bool ext_ifencei;
+         bool ext_icsr;
+ 
+         char *priv_spec;
+         char *user_spec;
++        char *vext_spec;
+         uint16_t vlen;
+         uint16_t elen;
+         bool mmu;
 -- 
-2.24.1
+2.23.0
 
 
