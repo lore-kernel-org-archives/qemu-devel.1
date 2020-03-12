@@ -2,141 +2,76 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5628C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4DAC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB27420663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB27420663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF71A20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:16:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LIPsZ84j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF71A20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQVC-00005Q-Rx
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:16:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57173)
+	id 1jCQVa-0001nO-4y
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:16:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jCQSa-0002Ku-An
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:13:26 -0400
+ (envelope-from <david@redhat.com>) id 1jCQTF-0003fD-N2
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jCQSY-0007xw-M4
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:13:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60524)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jCQSY-0007xL-CS
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:13:22 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02CG7FDs069756
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:13:21 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yqpe7es4a-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:13:19 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 12 Mar 2020 16:13:15 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 16:13:12 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02CGDBIC42664418
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:13:11 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0D2CC52050;
- Thu, 12 Mar 2020 16:13:11 +0000 (GMT)
-Received: from dyn-9-152-224-122.boeblingen.de.ibm.com (unknown
- [9.152.224.122])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D128F52052;
- Thu, 12 Mar 2020 16:13:10 +0000 (GMT)
-Subject: Re: [PATCH v9 13/15] s390x: protvirt: Handle SIGP store status
- correctly
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-14-frankja@linux.ibm.com>
- <b89dafb1-d931-906a-671d-caf71d795873@de.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 12 Mar 2020 17:13:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <david@redhat.com>) id 1jCQTC-0008VK-Nv
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41933
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1jCQTC-0008Uj-Je
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:14:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584029642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aUmlo8MrH4gk71Z4QNFrQL6GEhldMh1YHNoBnWn6ApQ=;
+ b=LIPsZ84jMGJXs8m5JNvnN8x056rUiTf4pymEBnN5CvQq0A6c4Zem58Avli8P3TI29S8lCi
+ rruqMH6vsOrgsr0Apk7aq9IJ3ulTuUP8Dg8kwy2S5Oq7koYuN4+ViSahY4BOL17P0Mcv2C
+ rNoY3tt+xNzeYOK5Ye5K3iPwgCEncUk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-dmC-x3q7M-Wm-r0xaaxhTA-1; Thu, 12 Mar 2020 12:14:00 -0400
+X-MC-Unique: dmC-x3q7M-Wm-r0xaaxhTA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 322E68017CC;
+ Thu, 12 Mar 2020 16:13:59 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-117-131.ams2.redhat.com [10.36.117.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B507A5C1B5;
+ Thu, 12 Mar 2020 16:13:54 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH RFCv2 4/4] kvm: Implement atomic memory region resizes via
+ region_resize()
+Date: Thu, 12 Mar 2020 17:12:17 +0100
+Message-Id: <20200312161217.3590-5-david@redhat.com>
+In-Reply-To: <20200312161217.3590-1-david@redhat.com>
+References: <20200312161217.3590-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b89dafb1-d931-906a-671d-caf71d795873@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nnsXzrbVIwIBgrtXcrAKj3bWUTOqJ7fOp"
-X-TM-AS-GCONF: 00
-x-cbid: 20031216-0028-0000-0000-000003E3B9A3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031216-0029-0000-0000-000024A901C6
-Message-Id: <d40bc40f-c217-f464-9f65-ea8899bbb899@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-12_09:2020-03-11,
- 2020-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 malwarescore=0
- priorityscore=1501 spamscore=0 adultscore=0 bulkscore=0 mlxscore=0
- suspectscore=3 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003120083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,98 +83,367 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ qemu-s390x@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nnsXzrbVIwIBgrtXcrAKj3bWUTOqJ7fOp
-Content-Type: multipart/mixed; boundary="M80R2NwX2ONg1WaguFo8Fn8row1kozeT3"
+virtio-mem wants to resize (esp. grow) ram memory regions while the guest
+is already aware of them and makes use of them. Resizing a KVM slot can
+only currently be done by removing it and re-adding it. While the kvm slo=
+t
+is temporarily removed, VCPUs that try to access memory on these slots (v=
+ia
+KVM_RUN) will fault. But also, other ioctls might depend on all slots bei=
+ng
+in place.
 
---M80R2NwX2ONg1WaguFo8Fn8row1kozeT3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Let's inhibit most KVM ioctls while performing the resize. Once we have a=
+n
+ioctl that can perform atomic resizes (e.g., KVM_SET_USER_MEMORY_REGION
+extensions), we can make inhibiting optional at runtime.
 
-On 3/12/20 4:51 PM, Christian Borntraeger wrote:
-> On 11.03.20 14:21, Janosch Frank wrote:
->> For protected VMs status storing is not done by QEMU anymore.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->=20
->=20
->> ---
->>  target/s390x/helper.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
->> index ed726849114f2f35..5022df8812d406c9 100644
->> --- a/target/s390x/helper.c
->> +++ b/target/s390x/helper.c
->> @@ -25,6 +25,7 @@
->>  #include "qemu/timer.h"
->>  #include "qemu/qemu-print.h"
->>  #include "hw/s390x/ioinst.h"
->> +#include "hw/s390x/pv.h"
->>  #include "sysemu/hw_accel.h"
->>  #include "sysemu/runstate.h"
->>  #ifndef CONFIG_USER_ONLY
->> @@ -246,6 +247,11 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, =
-bool store_arch)
->>      hwaddr len =3D sizeof(*sa);
->>      int i;
->> =20
->> +    /* Storing will occur on next SIE entry for protected VMs */
->=20
-> Maybe ... next SIE entry of the sending CPU ....=20
-> ?
+To minimize cache-line bouncing, use separate indicators (in_ioctl) and
+locks (ioctl_mutex) per CPU.  Also, make sure to hold the kvm_slots_lock
+while performing both actions (removing+re-adding).
 
-Well that would be the current cpu, right?
-So:
-/* For PVMs storing will occur when this cpu enters SIE again */
+We have to wait until all IOCTLs were exited and block new ones from
+getting executed. Kick all CPUs, so they will exit the KVM_RUN ioctl.
 
->=20
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
->=20
->=20
->> +    if (s390_is_pv()) {
->> +        return 0;
->> +    }
->> +
->>      sa =3D cpu_physical_memory_map(addr, &len, true);
->>      if (!sa) {
->>          return -EFAULT;
->>
+This approach cannot result in a deadlock as long as the inhibitor does
+not hold any locks that might hinder an IOCTL from getting finished and
+exited - something fairly unusual. The inhibitor will always hold the BQL=
+.
 
+AFAIKs, one possible candidate would be userfaultfd. If a page cannot be
+placed (e.g., during postcopy), because we're waiting for a lock, or if t=
+he
+userfaultfd thread cannot process a fault, because it is waiting for a
+lock, there could be a deadlock. However, the BQL is not applicable here,
+because any other guest memory access while holding the BQL would already
+result in a deadlock.
 
+Nothing else in the kernel should block forever and wait for userspace
+intervention.
 
---M80R2NwX2ONg1WaguFo8Fn8row1kozeT3--
+Note1: Resizes of memory regions currently seems to happen during bootup
+only, so I don't think any existing RT users should be affected.
 
---nnsXzrbVIwIBgrtXcrAKj3bWUTOqJ7fOp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Note2: pause_all_vcpus()/resume_all_vcpus() or
+start_exclusive()/end_exclusive() cannot be used, as they either drop
+the BQL or require to be called without the BQL - something inhibitors
+cannot handle. We need a low-level locking mechanism that is
+deadlock-free even when not releasing the BQL.
 
------BEGIN PGP SIGNATURE-----
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ accel/kvm/kvm-all.c   | 129 +++++++++++++++++++++++++++++++++++++++---
+ hw/core/cpu.c         |   2 +
+ include/hw/core/cpu.h |   4 ++
+ 3 files changed, 128 insertions(+), 7 deletions(-)
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5qX5YACgkQ41TmuOI4
-ufhGLA//QXKteD6Ev/Js8odlpE1Hv+GJK1l86WTVriccXzM/7/SuxbPwEUEsEtKL
-OKQpzjtc87fhCdmo7nzNGUrWyh4JQCc3XkqN3r+GW74dX40+5I0Ks+Jx5BzZa93i
-pEksQCUCI0slHB4xw8ejn6u4LN9JUNQwORx9GB7vigaOus9Qxt6c0d8cNvNYsnFS
-D67O8GU+gsASM8nSYjTAKD8jvV05f/g/yGOnj1G8jyTSCLmysU/fzMsMXJe8cV8u
-CE6Ch92vGO48+0V2kwOhVHz6q+YtvZDB61db02XGg8Cd+8tkAaYaMEs3NngfYqnx
-Jp9APxVB7C1+SkhVpO+uDSIqZhZokzcbOTafuEbnLjG0zrJePtafVfKIy2mDtMSO
-Io8ONPQ/zld9tXCpFTx5ks2L+tl0Ccf1OelsWqqP6c6g6zabjdyCma3fuvDMZvRT
-Sg+a9HtDHt4YkCMzEhoFe6b+qpJ2VId2ow1FK0Eq5rrjHkozA7ItqqGxOPXuQhE/
-QJcibyAAtioXte+UPzYLMEfNW5VwrYz9oBmgBEpY+nd2LvuIh/b1zB/d7/tgS4sc
-WjSAUalFPATJ2oOya+bzPG0RbyH2vAvHykrsUUoK1oRlbHnq+1TOZQoE2YNj/wke
-FXhQCcg0wQq0PJrhmzUpRh8jezs5SMQHRWXYxKN7VGCNqDFYsQs=
-=+7fN
------END PGP SIGNATURE-----
-
---nnsXzrbVIwIBgrtXcrAKj3bWUTOqJ7fOp--
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 439a4efe52..be159a2f78 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -149,6 +149,21 @@ bool kvm_msi_use_devid;
+ static bool kvm_immediate_exit;
+ static hwaddr kvm_max_slot_size =3D ~0;
+=20
++/*
++ * While holding kvm_ioctl_mutex and all cpu->ioctl_mutex, no new KVM io=
+ctls
++ * can be started, but kvm ioctl inhibitors will have to wait for existi=
+ng ones
++ * to finish (indicated by cpu->in_ioctl and kvm_in_ioctl, both updated =
+with
++ * kvm_ioctl_mutex or under the cpu->ioctl_mutex when entering the ioctl=
+).
++ */
++QemuMutex kvm_ioctl_mutex;
++/*
++ * Atomic counter of active KVM ioctls except
++ * - The KVM ioctl inhibitor is doing an ioctl
++ * - kvm_ioctl(): Harmless and not interesting for inhibitors.
++ * - kvm_vcpu_ioctl(): Tracked via cpu->in_ioctl.
++ */
++static int kvm_in_ioctl;
++
+ static const KVMCapabilityInfo kvm_required_capabilites[] =3D {
+     KVM_CAP_INFO(USER_MEMORY),
+     KVM_CAP_INFO(DESTROY_MEMORY_REGION_WORKS),
+@@ -1023,6 +1038,7 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
+     kvm_max_slot_size =3D max_slot_size;
+ }
+=20
++/* Called with KVMMemoryListener.slots_lock held */
+ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                              MemoryRegionSection *section, bool add)
+ {
+@@ -1052,14 +1068,12 @@ static void kvm_set_phys_mem(KVMMemoryListener *k=
+ml,
+     ram =3D memory_region_get_ram_ptr(mr) + section->offset_within_regio=
+n +
+           (start_addr - section->offset_within_address_space);
+=20
+-    kvm_slots_lock(kml);
+-
+     if (!add) {
+         do {
+             slot_size =3D MIN(kvm_max_slot_size, size);
+             mem =3D kvm_lookup_matching_slot(kml, start_addr, slot_size)=
+;
+             if (!mem) {
+-                goto out;
++                return;
+             }
+             if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+                 kvm_physical_sync_dirty_bitmap(kml, section);
+@@ -1079,7 +1093,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
+,
+             start_addr +=3D slot_size;
+             size -=3D slot_size;
+         } while (size);
+-        goto out;
++        return;
+     }
+=20
+     /* register the new slot */
+@@ -1108,9 +1122,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml=
+,
+         ram +=3D slot_size;
+         size -=3D slot_size;
+     } while (size);
+-
+-out:
+-    kvm_slots_unlock(kml);
+ }
+=20
+ static void kvm_region_add(MemoryListener *listener,
+@@ -1119,7 +1130,9 @@ static void kvm_region_add(MemoryListener *listener=
+,
+     KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
+ listener);
+=20
+     memory_region_ref(section->mr);
++    kvm_slots_lock(kml);
+     kvm_set_phys_mem(kml, section, true);
++    kvm_slots_unlock(kml);
+ }
+=20
+ static void kvm_region_del(MemoryListener *listener,
+@@ -1127,10 +1140,76 @@ static void kvm_region_del(MemoryListener *listen=
+er,
+ {
+     KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,=
+ listener);
+=20
++    kvm_slots_lock(kml);
+     kvm_set_phys_mem(kml, section, false);
++    kvm_slots_unlock(kml);
+     memory_region_unref(section->mr);
+ }
+=20
++/*
++ * Certain updates (e.g., resizing memory regions) require temporarily r=
+emoving
++ * kvm memory slots. Make sure any ioctl sees a consistent memory slot s=
+tate.
++ */
++static void kvm_ioctl_inhibit_begin(void)
++{
++    CPUState *cpu;
++
++    /*
++     * We allow to inhibit only when holding the BQL, so we can identify
++     * when an inhibitor wants to issue an ioctl easily.
++     */
++    g_assert(qemu_mutex_iothread_locked());
++
++    CPU_FOREACH(cpu) {
++        qemu_mutex_lock(&cpu->ioctl_mutex);
++    }
++    qemu_mutex_lock(&kvm_ioctl_mutex);
++
++    /* Inhibiting happens rarely, we can keep things simple and spin her=
+e. */
++    while (true) {
++        bool any_cpu_in_ioctl =3D false;
++
++        CPU_FOREACH(cpu) {
++            if (atomic_read(&cpu->in_ioctl)) {
++                any_cpu_in_ioctl =3D true;
++                qemu_cpu_kick(cpu);
++            }
++        }
++        if (!any_cpu_in_ioctl && !atomic_read(&kvm_in_ioctl)) {
++            break;
++        }
++        g_usleep(100);
++    }
++}
++
++static void kvm_ioctl_inhibit_end(void)
++{
++    CPUState *cpu;
++
++    qemu_mutex_unlock(&kvm_ioctl_mutex);
++    CPU_FOREACH(cpu) {
++        qemu_mutex_unlock(&cpu->ioctl_mutex);
++    }
++}
++
++static void kvm_region_resize(MemoryListener *listener,
++                              MemoryRegionSection *section, Int128 new)
++{
++    KVMMemoryListener *kml =3D container_of(listener, KVMMemoryListener,
++                                          listener);
++    MemoryRegionSection new_section =3D *section;
++
++    new_section.size =3D new;
++
++    kvm_slots_lock(kml);
++    /* Inhibit KVM ioctls while temporarily removing slots. */
++    kvm_ioctl_inhibit_begin();
++    kvm_set_phys_mem(kml, section, false);
++    kvm_set_phys_mem(kml, &new_section, true);
++    kvm_ioctl_inhibit_end();
++    kvm_slots_unlock(kml);
++}
++
+ static void kvm_log_sync(MemoryListener *listener,
+                          MemoryRegionSection *section)
+ {
+@@ -1249,6 +1328,7 @@ void kvm_memory_listener_register(KVMState *s, KVMM=
+emoryListener *kml,
+=20
+     kml->listener.region_add =3D kvm_region_add;
+     kml->listener.region_del =3D kvm_region_del;
++    kml->listener.region_resize =3D kvm_region_resize;
+     kml->listener.log_start =3D kvm_log_start;
+     kml->listener.log_stop =3D kvm_log_stop;
+     kml->listener.log_sync =3D kvm_log_sync;
+@@ -1894,6 +1974,7 @@ static int kvm_init(MachineState *ms)
+     assert(TARGET_PAGE_SIZE <=3D qemu_real_host_page_size);
+=20
+     s->sigmask_len =3D 8;
++    qemu_mutex_init(&kvm_ioctl_mutex);
+=20
+ #ifdef KVM_CAP_SET_GUEST_DEBUG
+     QTAILQ_INIT(&s->kvm_sw_breakpoints);
+@@ -2304,6 +2385,34 @@ static void kvm_eat_signals(CPUState *cpu)
+     } while (sigismember(&chkset, SIG_IPI));
+ }
+=20
++static void kvm_cpu_set_in_ioctl(CPUState *cpu, bool in_ioctl)
++{
++    if (unlikely(qemu_mutex_iothread_locked())) {
++        return;
++    }
++    if (in_ioctl) {
++        qemu_mutex_lock(&cpu->ioctl_mutex);
++        cpu->in_ioctl =3D true;
++        qemu_mutex_unlock(&cpu->ioctl_mutex);
++    } else {
++        atomic_set(&cpu->in_ioctl, false);
++    }
++}
++
++static void kvm_set_in_ioctl(bool in_ioctl)
++{
++    if (likely(qemu_mutex_iothread_locked())) {
++        return;
++    }
++    if (in_ioctl) {
++        qemu_mutex_lock(&kvm_ioctl_mutex);
++        kvm_in_ioctl++;
++        qemu_mutex_unlock(&kvm_ioctl_mutex);
++    } else {
++        atomic_dec(&kvm_in_ioctl);
++    }
++}
++
+ int kvm_cpu_exec(CPUState *cpu)
+ {
+     struct kvm_run *run =3D cpu->kvm_run;
+@@ -2488,7 +2597,9 @@ int kvm_vm_ioctl(KVMState *s, int type, ...)
+     va_end(ap);
+=20
+     trace_kvm_vm_ioctl(type, arg);
++    kvm_set_in_ioctl(true);
+     ret =3D ioctl(s->vmfd, type, arg);
++    kvm_set_in_ioctl(false);
+     if (ret =3D=3D -1) {
+         ret =3D -errno;
+     }
+@@ -2506,7 +2617,9 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...)
+     va_end(ap);
+=20
+     trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
++    kvm_cpu_set_in_ioctl(cpu, true);
+     ret =3D ioctl(cpu->kvm_fd, type, arg);
++    kvm_cpu_set_in_ioctl(cpu, false);
+     if (ret =3D=3D -1) {
+         ret =3D -errno;
+     }
+@@ -2524,7 +2637,9 @@ int kvm_device_ioctl(int fd, int type, ...)
+     va_end(ap);
+=20
+     trace_kvm_device_ioctl(fd, type, arg);
++    kvm_set_in_ioctl(true);
+     ret =3D ioctl(fd, type, arg);
++    kvm_set_in_ioctl(false);
+     if (ret =3D=3D -1) {
+         ret =3D -errno;
+     }
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index fe65ca62ac..3591dc3874 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -379,6 +379,7 @@ static void cpu_common_initfn(Object *obj)
+     cpu->nr_threads =3D 1;
+=20
+     qemu_mutex_init(&cpu->work_mutex);
++    qemu_mutex_init(&cpu->ioctl_mutex);
+     QTAILQ_INIT(&cpu->breakpoints);
+     QTAILQ_INIT(&cpu->watchpoints);
+=20
+@@ -389,6 +390,7 @@ static void cpu_common_finalize(Object *obj)
+ {
+     CPUState *cpu =3D CPU(obj);
+=20
++    qemu_mutex_destroy(&cpu->ioctl_mutex);
+     qemu_mutex_destroy(&cpu->work_mutex);
+ }
+=20
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 73e9a869a4..3abf251037 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -431,6 +431,10 @@ struct CPUState {
+     /* shared by kvm, hax and hvf */
+     bool vcpu_dirty;
+=20
++    /* kvm only for now: CPU is in kvm_vcpu_ioctl() (esp. KVM_RUN) */
++    bool in_ioctl;
++    QemuMutex ioctl_mutex;
++
+     /* Used to keep track of an outstanding cpu throttle thread for migr=
+ation
+      * autoconverge
+      */
+--=20
+2.24.1
 
 
