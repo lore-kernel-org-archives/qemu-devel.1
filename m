@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E0AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BD2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:51:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 209A620637
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:51:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB1FD20637
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:51:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iz9sohRf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 209A620637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Abh9nIy3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB1FD20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTrE-0004Db-6t
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:51:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45258)
+	id 1jCTrZ-0005YK-51
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:51:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTj4-00059i-BA
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:39 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjI-0005bn-2w
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTj3-0001sH-7L
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:38 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35992)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjF-000299-RR
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:51 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:37866)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTj3-0001rX-0E
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:37 -0400
-Received: by mail-pl1-x643.google.com with SMTP id g2so569180plo.3
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:36 -0700 (PDT)
+ id 1jCTjF-00027R-LA
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:49 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id ca13so3080240pjb.2
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vuXdTs06kem+zl5v2k/H9+yey7HUM714c+09ME0Bjkg=;
- b=iz9sohRft4D9uRi34zYLnkcdeuYuaRlbH5kQo7eRR1/e7VPH4K4Tjc4NMe9l38s4fU
- LKU8fAYriEpgtYMww3XYpdo1P/nU8TZcCNienZSyx1UcLgNB5uV/3iKzAWvoE90xTBje
- 1xm5O2JWrJuODowJIlGj8IlWMIo7mLelZe/LaARcxNRnT/hvWHYH1Pc+pqdIwtAqxRAy
- 2N0XzpmdHo2zrr87q7rUR0TaaOWOwDAJ3joD7NkkFWwtgKJJzrDQtoJqa/jIYUcggRPP
- QVkvaxwtGKROVTsG2gPJ06vndlWwiTP9ABVW7LB/CF29Is/w8kVe5w6cOoJehDaw9Lo+
- 3aew==
+ bh=JBLvmRkIs5r/ZixfpsDU17HkY1c+JR6WvLvqW6Jbx1o=;
+ b=Abh9nIy34f4vrATLK4BTPz6BBAZvbS71pZ5ZszSqUMR27+Qc+okyzXmeb35xH02mDm
+ isUnSqL+4kG17rO50PX5Z2GXhA2X4OOz004+7zZqQfqKHOFlpfwN+5toDXg49+ywI9Lt
+ 2Lf65hgUU0z2akxJqgWWoEDPy6Ld9/SjjJsBnLonFDs0DWsIf3uNAq0goz1rv8ZNBgg+
+ /c3VEgp1rl2vpNggfl5y7shTAidH+T/9Ef/bz8X7vF4nn2m/rH8jfHtyG8fPjDXa/np0
+ BqKBS40NlrQL1NM+TTo6nyfXhPUbk0owGVveadB+iBxqXi0WnwTsp9x/VAOb3EKsaaaR
+ whRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vuXdTs06kem+zl5v2k/H9+yey7HUM714c+09ME0Bjkg=;
- b=POtF/v2w4BOOSc9avWKsMUmKC2OlHCdEOSRWyLuEMuivSNqlkqr1PaJCeWChgborxR
- 13hb0WnexZrw7aR9GKbPLPRfGO+wx/L00s5ry5Ol6Mjnh9TGFytqaIzgTg4aUYPw05HH
- d96vSLWatgYw/5A3zL02CNysf0Fn5WquCRPL0PS1jlmHDpqwGiaYB0y+zyyPQzf6Zi9E
- jdWERCZ0QvNdAUIDiBz5uEZWUo6g1jsfXrI7BMXaGORsZ/c3qyB81O6x5TZNxEdnqR/r
- Jf85o7l5VpGfxY2nWBasu7C2F2R/eBJcY2vWm36waCelYNN/Tcz6Fr7qlbCzlXaA3+w9
- zlXA==
-X-Gm-Message-State: ANhLgQ15ozoGe6b+dJoqch2mUwO2yoWjQgMkex5GletrFGm2KdGBG/KC
- PKk06nw+G7UjFo/MDXRcllOhSh+IHR8=
-X-Google-Smtp-Source: ADFU+vsKEQLUZZnJN6ZTtI9bx9IQVtIb8yCOdGzzJtAe2wF6GoQ+7kdu+n68zRj4ngsm8qqJtRA6ug==
-X-Received: by 2002:a17:90a:e658:: with SMTP id
- ep24mr5584622pjb.70.1584042155798; 
- Thu, 12 Mar 2020 12:42:35 -0700 (PDT)
+ bh=JBLvmRkIs5r/ZixfpsDU17HkY1c+JR6WvLvqW6Jbx1o=;
+ b=pyWeyMcnCtyOswB0IsUF6PGy1qrd5O7/IXqtRub8fWk7vAZW2L/C262CIXylRT65L8
+ ZTCxUGthegXMC5jq284MIqvgxRbWLOskPgKmjWRfTraujUhUgLv/HfobnLqMQjGeb93G
+ K0mbHVkfbN0lHMcs2oFQi6qfc0RMlIIRiXvLgai/b7N45sWJjcc3Z3pM6kKKhxwiH5za
+ 2h0WthoLBz0DycI9ylzIGJLjjPervLyKFWyUuLGiwM6l687W6HEN2URUsc3hanwKE0se
+ f4Q4qPrSN68L1B1oMj+B2iNNxK/H/D/iyx0cc/Fym750HIHz6QeNbSrAoZghAPVECvo5
+ j8dw==
+X-Gm-Message-State: ANhLgQ1zMyKVZGSXnT4f1lq1X49PIxcPj2e+IXH6v6xmx3Um7/HcJJxy
+ CjARi38MDQy6XTOaEB+xyeN1i864tPE=
+X-Google-Smtp-Source: ADFU+vuwmAcOJBVmF2P+40EMXgJNif9lwvugy9SmbpXCqxsh2KUTrwL1NMf3Eq1W0poT/qunLc7F+g==
+X-Received: by 2002:a17:902:7d94:: with SMTP id
+ a20mr9927958plm.307.1584042163358; 
+ Thu, 12 Mar 2020 12:42:43 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.34
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:42:35 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:42 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 11/42] target/arm: Implement the GMI instruction
-Date: Thu, 12 Mar 2020 12:41:48 -0700
-Message-Id: <20200312194219.24406-12-richard.henderson@linaro.org>
+Subject: [PATCH v6 17/42] target/arm: Restrict the values of DCZID.BS under TCG
+Date: Thu, 12 Mar 2020 12:41:54 -0700
+Message-Id: <20200312194219.24406-18-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,39 +99,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We can simplify our DC_ZVA if we recognize that the largest BS
+that we actually use in system mode is 64.  Let us just assert
+that it fits within TARGET_PAGE_SIZE.
+
+For DC_GVA and STZGM, we want to be able to write whole bytes
+of tag memory, so assert that BS is >= 2 * TAG_GRANULE, or 32.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v6: Inline the operation.
----
- target/arm/translate-a64.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/arm/cpu.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 02f31d5948..9adc259186 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5379,6 +5379,21 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
-                                              cpu_reg_sp(s, rn));
-         }
-         break;
-+    case 5: /* GMI */
-+        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
-+            goto do_unallocated;
-+        } else {
-+            TCGv_i64 t1 = tcg_const_i64(1);
-+            TCGv_i64 t2 = tcg_temp_new_i64();
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index cb3c3fe8c2..96c20317ad 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1807,6 +1807,30 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+ #endif
+ 
++    if (tcg_enabled()) {
++        int dcz_blocklen = 4 << cpu->dcz_blocksize;
 +
-+            tcg_gen_extract_i64(t2, cpu_reg_sp(s, rn), 56, 4);
-+            tcg_gen_shl_i64(t1, t1, t2);
-+            tcg_gen_or_i64(cpu_reg(s, rd), cpu_reg(s, rm), t1);
++        /*
++         * We only support DCZ blocklen that fits on one page.
++         *
++         * Architectually this is always true.  However TARGET_PAGE_SIZE
++         * is variable and, for compatibility with -machine virt-2.7,
++         * is only 1KiB, as an artifact of legacy ARMv5 subpage support.
++         * But even then, while the largest architectural DCZ blocklen
++         * is 2KiB, no cpu actually uses such a large blocklen.
++         */
++        assert(dcz_blocklen <= TARGET_PAGE_SIZE);
 +
-+            tcg_temp_free_i64(t1);
-+            tcg_temp_free_i64(t2);
++        /*
++         * We only support DCZ blocksize >= 2*TAG_GRANULE, which is to say
++         * both nibbles of each byte storing tag data may be written at once.
++         * Since TAG_GRANULE is 16, this means that blocklen must be >= 32.
++         */
++        if (cpu_isar_feature(aa64_mte, cpu)) {
++            assert(dcz_blocklen >= 2 * TAG_GRANULE);
 +        }
-+        break;
-     case 8: /* LSLV */
-         handle_shift_reg(s, A64_SHIFT_TYPE_LSL, sf, rm, rn, rd);
-         break;
++    }
++
+     qemu_init_vcpu(cs);
+     cpu_reset(cs);
+ 
 -- 
 2.20.1
 
