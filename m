@@ -2,79 +2,80 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050A5C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447EBC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C64B82067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:34:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1496A2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:34:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EK5VSVXN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C64B82067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHzgIens"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1496A2067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQmk-0000w7-Uh
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60535)
+	id 1jCQmp-00015c-6a
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:34:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQiF-0000qX-NQ
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:29:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQli-0007wL-OZ
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQiE-0005Z1-BL
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:29:35 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43018)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCQle-0000IB-WD
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:33:09 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34067)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQiE-0005YW-4V
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:29:34 -0400
-Received: by mail-oi1-x244.google.com with SMTP id p125so6064228oif.10
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:29:33 -0700 (PDT)
+ id 1jCQld-0000G2-3I
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:33:06 -0400
+Received: by mail-ot1-x341.google.com with SMTP id j16so6927575otl.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:33:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Yci7ESIggvSpzMh2gFyRoUQKy4ZjZUSxsTCXLIHhUcQ=;
- b=EK5VSVXNwl2Bc3ITaplbci5hZ4KA+Ek+z1AlWunzCqXT5Zm6ZPX4QtiT24kOCow6SQ
- qbr5CI33GcjlGFBDT4zubFRS8jd8kj5ys0RB1bjpD9z7T9froMevhN4n0HReJQFMI1RH
- srZSYE9WE3vyRNROwWn/XkVztgKPgBD7DVzaHx/xFMtbGEsCzaUJrK1sU5AEpAliJf7S
- dnlw8B/Wh4n5oLj2lGDW9fboIgGT9zrOuP5E1/Yz/C1n6t8At9HsoM/0CrSbO0zHsb4Z
- k3VdX21R/3aaB6XCuYiQ53ECD+Tb7FmHT6lNN7pu1O0wQU/Fm1Ki/DSoqPxGDh7tb/M2
- GcRw==
+ :cc; bh=0VRQIv4qXD7Q5fEXczD6vOATnHwuTS2cyDP1QenEnps=;
+ b=MHzgIensqHxS/3cxZERb3e3XdvDQgU1GjlryxvGwB1bgIgw+JbE+enfvDyonB3f8gM
+ JnpcV1DAUyKyX/ipEBnESgQBXOyxs84B6XQxy+w0hpy5q1f1lZskT8gMhWafZvCjU8vu
+ pfaICmM0xEccLFKpQA3tllm635JBBL4l1XiERi+YDqAA2nRE+uDOKOYw3BhigSmmecMW
+ yYEK73tlWmhBkpy6JwrrrtlzJ9P5ca8iy3GnFCEHPh6InXhLe/93sysmRKRGxtAeulvr
+ FRD50l9e9HlVFC+QSVcP5AWWDo0O0huF8PLvuiBMGcu7+5ghCc1TOR+howe0OaLTKGnH
+ DqRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Yci7ESIggvSpzMh2gFyRoUQKy4ZjZUSxsTCXLIHhUcQ=;
- b=Lt0wvsGKBwv6potVC/8hyUSYfL9jFbFlcDeYMPTCORFeuoM4GzGJJ5jxI00QzUIrTK
- eWX9PJueymVT+5osyJeLouZ7cgBsVZ2Yz3/1W5XP5g31aRfZGM0KUskdi4RR/WzXGFAn
- XZRi/jCPYgfQwLg+NYWlV0laCZGLIHhZz6lJ+NXvHJk9bw0L5U9HmoFDQmweLItzTSxD
- 1AFoTvqvL5dHa+Qj5sJJ3EjrmTGOoib6/mI0PMNI5TunknVqrM5mCTkI84Lhm6bHkwP2
- kL53NvpasPQOe1kaJMz+Q8DPyN8QJDOdNQUy2YsHV/29s/Zi8ZG//gTWgr+24qsvTe5W
- 3jsQ==
-X-Gm-Message-State: ANhLgQ17mCPk9Bm6qm4aT0RmJB3vNHI8hTbP9FQ+h10GOu6herlCicMW
- udCDpHvVWidN825jKiyTwooXSjPCH7OFjwka1DbM+w==
-X-Google-Smtp-Source: ADFU+vuLPZPxZRPCoygUcMneA6C5bxsczWazXaRgS8QGjHRC4X3dd1dihNaq2nUxCI4tS91fQTh6AXLDoLK2nOwFj+8=
-X-Received: by 2002:aca:5b07:: with SMTP id p7mr3135099oib.146.1584030573082; 
- Thu, 12 Mar 2020 09:29:33 -0700 (PDT)
+ bh=0VRQIv4qXD7Q5fEXczD6vOATnHwuTS2cyDP1QenEnps=;
+ b=LpVLu4SBBcA/7Gr4g8tsoomIy451CIauFVJWaY0gUCMtbQrLZcbmvsAfTGHzsXlBEb
+ KhCXWstnj7kfWfTPqbckIaCf1V0aFXXnvSwpMdgo5chT7vEH9CpGK/0y69Fc3PzoQk8A
+ 3eZ3V68+ip+O9LhlZVg0CqK3zchDPf1pOuhb1LgHS6BvBptk8cppV15d2A8H4R1UzKhe
+ icmvXDbXhKCdYZrBs0M+zG25Dia2NpLLjPpV+MGoTt27tRp3L6rkNtXQcx35gAE8hDqd
+ KFusJ9mMsjIN7s5aZN0WMpkaJNcxP7jnNBU9Ei/hWvjQUG5eUbm0vp5FlQ4bwpDqquCN
+ MM2Q==
+X-Gm-Message-State: ANhLgQ0vyM3Lwozob4iETY7oTxVFTH2+HKzLrJimh49Qf/+3W33SwanG
+ lX13ihXzXSRoZ3KRGxnVlTTMp+Qz2YU1rUQD9giltQ==
+X-Google-Smtp-Source: ADFU+vsQTL+6pcesecAzObSP/AMwX5+2/sIepkjwZse514F/Bluy0l5CbOVfSwNDL3YK6i4MXxcyW+23beeY+Qb7fMs=
+X-Received: by 2002:a9d:6f88:: with SMTP id h8mr7105904otq.91.1584030782701;
+ Thu, 12 Mar 2020 09:33:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200311131618.7187-1-eric.auger@redhat.com>
-In-Reply-To: <20200311131618.7187-1-eric.auger@redhat.com>
+References: <20200312003401.29017-1-beata.michalska@linaro.org>
+ <20200312003401.29017-2-beata.michalska@linaro.org>
+In-Reply-To: <20200312003401.29017-2-beata.michalska@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Mar 2020 16:29:21 +0000
-Message-ID: <CAFEAcA9ZuxSAZ+K1MS6R8U1-ouU3qh=J72tyeNrRA4-k=AkKuQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] hw/arm/virt: kvm: allow gicv3 by default if v2
- cannot work
-To: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 12 Mar 2020 16:32:51 +0000
+Message-ID: <CAFEAcA_5avBsNJUDh6o8vGfm4DGcFA-iT-UNG5h8M+hPDOif9g@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] target/arm: kvm: Inject events at the last stage
+ of sync
+To: Beata Michalska <beata.michalska@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +87,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: Andrew Jones <drjones@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Christoffer Dall <Christoffer.Dall@arm.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Mar 2020 at 13:16, Eric Auger <eric.auger@redhat.com> wrote:
+On Thu, 12 Mar 2020 at 00:34, Beata Michalska
+<beata.michalska@linaro.org> wrote:
 >
-> At the moment if the end-user does not specify the gic-version along
-> with KVM acceleration, v2 is set by default. However most of the
-> systems now have GICv3 and sometimes they do not support GICv2
-> compatibility. In that case we now end up with the following error:
+> KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
+> As such this should be the last step of sync to avoid potential overwriting
+> of whatever changes KVM might have done.
 >
-> "qemu-system-aarch64: Initialization of device kvm-arm-gic failed:
-> error creating in-kernel VGIC: No such device
-> Perhaps the host CPU does not support GICv2?"
->
-> since "1904f9b5f1  hw/intc/arm_gic_kvm: Don't assume kernel can
-> provide a GICv2" which already allowed to output an explicit error
-> message.
->
-> This patch keeps the default v2 selection in all cases except
-> in the KVM accelerated mode when v2 cannot work:
-> - either because the host does not support v2 in-kernel emulation or
-> - because more than 8 vcpus were requested.
->
-> Those cases did not work anyway so we do not break any compatibility.
-> Now we get v3 selected in such a case.
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
 
-Applied to target-arm.next, thanks.
+Hi; I'm going to take patch 1 into target-arm.next since it
+seems worth having on its own and I'm doing a pullreq today
+anyway. Andrew's given you feedback on patch 2.
 
+thanks
 -- PMM
 
