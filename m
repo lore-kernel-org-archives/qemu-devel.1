@@ -2,87 +2,68 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 683D1C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2055EC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:15:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3473B2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:00:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWHFoL+V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3473B2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAD8220663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 13:15:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD8220663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCNRr-0005KG-AJ
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:00:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46459)
+	id 1jCNgY-0003lL-2q
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 09:15:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jandryuk@gmail.com>) id 1jCNO4-0000YJ-8p
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:56:34 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jCNfv-0003H8-4b
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jandryuk@gmail.com>) id 1jCNO3-00074w-Az
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:56:32 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36914)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1jCNO3-00074g-7J
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:56:31 -0400
-Received: by mail-qk1-x742.google.com with SMTP id z25so1021249qkj.4
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=1VSF7YAtLh+8LFVIeTwCMtUaSmVrA9/zD3UEqGOwfDU=;
- b=nWHFoL+VTAwwfalpjOc31nwWzR4h++PjFNO2zoscIhQ+SooUhd3IeUiwdBZzvJ5ktX
- ewhlwk4BSr6Nl44hvabDFqlfk2V40OozBCsJ6087uwkIAxB/nNpvNnaVWhuqW03cYGm3
- suij1NKFigGeEAsBPXtEXygNCwJYRUOnIIKryRJSWuQFZ4mOrOwwRlI+ADT6EQqD4VND
- jQBE9c7MpoY30ZtdIRSmh7t2j95hq+9ropSOqyHZdXbl9/SeSkdN5+X8FHJhxtVQjdYc
- blCfN20vZz7luRFsLAzmt3TycofSazVyfxYHiCh9aOTDz9qPF/lZ27bTdFgeog7ARTF0
- MAAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1VSF7YAtLh+8LFVIeTwCMtUaSmVrA9/zD3UEqGOwfDU=;
- b=iIWhPbSChxccS6Urh3RlmCt1dEeCPWbhzNz6ay5ze8V3F65gDf3Kj5GYVg27PZB/02
- /UWu7ax9Tfud3L2xFRr3faS8HsxMPehEGHo48ZYEsTm36ivOdXv0UXqtgvZ1uboIu6YX
- lHhF+Zr5C38wwteDxurNDRwWa07z87ECwBTiINkQhzJ/jurwGLQh0of1d3ba4DD63kn5
- LTc+TAu8ywQ6i88z8ZSNRsqVLMv7odlVNtyiMOgLRuuATsaB1gp1kVP4HjJtFlDSqLJV
- B5/CIRlkk+y2kZ1sggUuszQcVJdTkKBlEjVNo1umEo+xN1IMI91tOhWG7ud9VHzkNWxG
- la2w==
-X-Gm-Message-State: ANhLgQ0Cz1rJVstfEejqeNod7Qld0nEy9/JeqqIgIh6ALSxWV0Vj7JNN
- quYwFnJ0d9c+n8TCQNXRl1Y=
-X-Google-Smtp-Source: ADFU+vvFXLrl/y9HypBnN3hxEjBTPTibISr/pCh+D4pmLsT8nul7nxM4m/9rRhk1wGNfUwpqq9+mHA==
-X-Received: by 2002:a37:992:: with SMTP id 140mr7719156qkj.36.1584017790665;
- Thu, 12 Mar 2020 05:56:30 -0700 (PDT)
-Received: from pm2-ws13.praxislan02.com ([2001:470:8:67e:ba27:ebff:fee8:ce27])
- by smtp.gmail.com with ESMTPSA id
- u3sm8001236qkc.4.2020.03.12.05.56.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 05:56:30 -0700 (PDT)
-From: Jason Andryuk <jandryuk@gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
-Subject: [PATCH 4/4] usb-serial: Fix timeout closing the device
-Date: Thu, 12 Mar 2020 08:55:23 -0400
-Message-Id: <20200312125524.7812-5-jandryuk@gmail.com>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <no-reply@patchew.org>) id 1jCNft-00067T-3h
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:14:58 -0400
+Resent-Date: Thu, 12 Mar 2020 09:14:58 -0400
+Resent-Message-Id: <E1jCNft-00067T-3h@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21199)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jCNfs-0005ws-QH
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 09:14:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584018874; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=HfbO/aiLprqPoDN70rvVWpHQzjAw51pJV5AhWa78qjP1+aAErzMfGNflE8rVP+kn57q5r8m5QooXVdrpsX0/RYix3O/MaZOu7bqvWtqcvRkzxriXtm8udndcB1i5yM/p3fdMalDytvrkMF8C12dIy5ZlbuvBqQIyRh0PNdQEcCk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584018874;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=uLmiIbbMvMMPhQfXpRvc9YIt6Fbew15z5+W3uQq3gnw=; 
+ b=C+hR92av7ssqaPKhSPSkhsYqVRh/Ky9RSpqs5TaAUMBQieTRgJcwVq2UMo80riDI4EAgviKwIzZwx0tcQyzshPhJprOFG3861Lay2IDLfNJD3Dyl1/JqNFxC1YCYbMs4Q7OJQvNVB0xyQXmlLGmAk1fQ/YxXhmK6FokFdjRQL+w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584018872527310.454762274769;
+ Thu, 12 Mar 2020 06:14:32 -0700 (PDT)
 In-Reply-To: <20200312125524.7812-1-jandryuk@gmail.com>
-References: <20200312125524.7812-1-jandryuk@gmail.com>
+Subject: Re: [PATCH 0/4] usb-serial: xHCI and timeout fixes
+Message-ID: <158401887145.15607.4367755462902255111@39012742ff91>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jandryuk@gmail.com
+Date: Thu, 12 Mar 2020 06:14:32 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,44 +75,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Jason Andryuk <jandryuk@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: samuel.thibault@ens-lyon.org, jandryuk@gmail.com, kraxel@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Linux guests wait ~30 seconds when closing the emulated /dev/ttyUSB0.
-During that time, the kernel driver is sending many control URBs
-requesting GetModemStat (5).  Real hardware returns a status with
-FTDI_THRE (Transmitter Holding Register) and FTDI_TEMT (Transmitter
-Empty) set.  QEMU leaves them clear, and it seems Linux is waiting for
-FTDI_TEMT to be set to indicate the tx queue is empty before closing.
-
-Set the bits when responding to a GetModemStat query and avoid the
-shutdown delay.
-
-Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
-
----
-Looking at a USB dump for a real FTDI USB adapter, I see these bits set
-in all the bulk URBs where QEMU currently has them clear.
----
- hw/usb/dev-serial.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index ef33bcd127..5389235f17 100644
---- a/hw/usb/dev-serial.c
-+++ b/hw/usb/dev-serial.c
-@@ -332,7 +332,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
-         break;
-     case DeviceInVendor | FTDI_GET_MDM_ST:
-         data[0] = usb_get_modem_lines(s) | 1;
--        data[1] = 0;
-+        data[1] = FTDI_THRE | FTDI_TEMT;
-         p->actual_length = 2;
-         break;
-     case DeviceOutVendor | FTDI_SET_EVENT_CHR:
--- 
-2.24.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMjEyNTUyNC43ODEy
+LTEtamFuZHJ5dWtAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggMC80XSB1c2Itc2VyaWFsOiB4SENJIGFuZCB0aW1l
+b3V0IGZpeGVzCk1lc3NhZ2UtaWQ6IDIwMjAwMzEyMTI1NTI0Ljc4MTItMS1qYW5kcnl1a0BnbWFp
+bC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY1N2VlZTMgdXNiLXNlcmlhbDogRml4IHRpbWVvdXQg
+Y2xvc2luZyB0aGUgZGV2aWNlCjI5OWNlMzcgdXNiLXNlcmlhbDogSW5jcmVhc2UgcmVjZWl2ZSBi
+dWZmZXIgdG8gNDk2CjgwNDExZTMgdXNiLXNlcmlhbDogY2h1bmsgZGF0YSB0byB3TWF4UGFja2V0
+U2l6ZQoxZDkzMzI2IHVzYi1zZXJpYWw6IE1vdmUgVVNCX1RPS0VOX0lOIGludG8gYSBoZWxwZXIg
+ZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNCBDaGVja2luZyBjb21taXQgMWQ5MzMy
+NjcxYTBkICh1c2Itc2VyaWFsOiBNb3ZlIFVTQl9UT0tFTl9JTiBpbnRvIGEgaGVscGVyIGZ1bmN0
+aW9uKQpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiM0NDogRklMRTogaHcvdXNiL2Rldi1zZXJpYWwuYzozODQ6CisgICAgaWYgKGxl
+biA+IHMtPnJlY3ZfdXNlZCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBm
+b3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzUwOiBGSUxFOiBody91c2IvZGV2LXNlcmlh
+bC5jOjM5MDoKKyAgICBpZiAoZmlyc3RfbGVuID4gbGVuKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTQ6IEZJTEU6
+IGh3L3VzYi9kZXYtc2VyaWFsLmM6Mzk0OgorICAgIGlmIChsZW4gPiBmaXJzdF9sZW4pClsuLi5d
+Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDk0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEv
+NCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi80IENoZWNraW5nIGNvbW1pdCA4MDQxMWUz
+YzdlODUgKHVzYi1zZXJpYWw6IGNodW5rIGRhdGEgdG8gd01heFBhY2tldFNpemUpCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzgw
+OiBGSUxFOiBody91c2IvZGV2LXNlcmlhbC5jOjM5NToKKyAgICAgICAgaWYgKGxlbiA+IHMtPnJl
+Y3ZfdXNlZCkKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFy
+bXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzg0OiBGSUxFOiBody91c2IvZGV2LXNlcmlhbC5jOjM5OToK
+KyAgICAgICAgaWYgKGZpcnN0X2xlbiA+IGxlbikKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJl
+IG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzg4OiBGSUxFOiBody91
+c2IvZGV2LXNlcmlhbC5jOjQwMzoKKyAgICAgICAgaWYgKGxlbiA+IGZpcnN0X2xlbikKWy4uLl0K
+CnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgNjMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi80
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzQgQ2hlY2tpbmcgY29tbWl0IDI5OWNlMzdh
+MWY2MyAodXNiLXNlcmlhbDogSW5jcmVhc2UgcmVjZWl2ZSBidWZmZXIgdG8gNDk2KQo0LzQgQ2hl
+Y2tpbmcgY29tbWl0IDY1N2VlZTNjZTgzZiAodXNiLXNlcmlhbDogRml4IHRpbWVvdXQgY2xvc2lu
+ZyB0aGUgZGV2aWNlKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5v
+cmcvbG9ncy8yMDIwMDMxMjEyNTUyNC43ODEyLTEtamFuZHJ5dWtAZ21haWwuY29tL3Rlc3Rpbmcu
+Y2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
