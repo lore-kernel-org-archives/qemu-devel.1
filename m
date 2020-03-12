@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA796C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD44BC1975A
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8054D206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:09:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8054D206F1
+	by mail.kernel.org (Postfix) with ESMTPS id 82A82206FA
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 16:10:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A82206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCQOc-0000fk-Ok
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:09:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54924)
+	id 1jCQPV-000599-NH
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 12:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54876)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jCQNg-0005Bq-W3
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:22 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1jCQNN-0003oz-Kk
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jCQNf-0004Dl-Nn
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30754
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1jCQNM-00041h-5M
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11288)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jCQNf-0004DM-Iz
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:19 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02CG60RJ009466
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:08:19 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yqr9u050a-1
+ id 1jCQNL-000411-Pp
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:08:00 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02CG7Gcc069808
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:07:58 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yqpe7ec54-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:06:52 -0400
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:07:56 -0400
 Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 12 Mar 2020 16:05:48 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Thu, 12 Mar 2020 16:07:50 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 16:05:45 -0000
+ Thu, 12 Mar 2020 16:07:46 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
  [9.149.105.232])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02CG4jkR34406682
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02CG7jcW51249194
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 16:04:45 GMT
+ Thu, 12 Mar 2020 16:07:45 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBF2452050;
- Thu, 12 Mar 2020 16:05:44 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id C3A5352054;
+ Thu, 12 Mar 2020 16:07:45 +0000 (GMT)
 Received: from dyn-9-152-224-122.boeblingen.de.ibm.com (unknown
  [9.152.224.122])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 958835204E;
- Thu, 12 Mar 2020 16:05:44 +0000 (GMT)
-Subject: Re: [PATCH v9 10/15] s390x: protvirt: Move diag 308 data over SIDA
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 882225204F;
+ Thu, 12 Mar 2020 16:07:45 +0000 (GMT)
+Subject: Re: [PATCH v9 11/15] s390x: protvirt: Disable address checks for PV
+ guest IO emulation
 To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
 References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-11-frankja@linux.ibm.com>
- <8231b188-50ca-e8e8-5e5d-fc07e0dfd20d@de.ibm.com>
+ <20200311132151.172389-12-frankja@linux.ibm.com>
+ <e17fae02-5195-b4ed-9aca-63b8fb2b8a60@de.ibm.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -113,30 +113,30 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 12 Mar 2020 17:05:44 +0100
+Date: Thu, 12 Mar 2020 17:07:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <8231b188-50ca-e8e8-5e5d-fc07e0dfd20d@de.ibm.com>
+In-Reply-To: <e17fae02-5195-b4ed-9aca-63b8fb2b8a60@de.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="6bAU38SGVhtALf8t3Tc3s1W3pTOhWUsri"
+ boundary="9lC64ycr25CScjA7CPwqwXH7IItqfoA6Y"
 X-TM-AS-GCONF: 00
-x-cbid: 20031216-0028-0000-0000-000003E3B8B4
+x-cbid: 20031216-0020-0000-0000-000003B3542F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031216-0029-0000-0000-000024A900D4
-Message-Id: <0c8657b3-8f97-624b-1268-3cd0dbb1d36e@linux.ibm.com>
+x-cbparentid: 20031216-0021-0000-0000-0000220BA8F3
+Message-Id: <46eb4e3f-6dac-c26c-d757-90696c0b095c@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-12_09:2020-03-11,
  2020-03-12 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1015
- malwarescore=0 suspectscore=3 lowpriorityscore=0 impostorscore=0
- phishscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ phishscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 adultscore=0 bulkscore=0 mlxscore=0
+ suspectscore=3 mlxlogscore=999 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003120083
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,133 +154,170 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6bAU38SGVhtALf8t3Tc3s1W3pTOhWUsri
-Content-Type: multipart/mixed; boundary="YtgqXKKsJlhnI1ZprZvqltQ2WJqsLY3JH"
+--9lC64ycr25CScjA7CPwqwXH7IItqfoA6Y
+Content-Type: multipart/mixed; boundary="sTnHJ2a8EYZX1l8zEnwWjtlyjBUgD56i8"
 
---YtgqXKKsJlhnI1ZprZvqltQ2WJqsLY3JH
+--sTnHJ2a8EYZX1l8zEnwWjtlyjBUgD56i8
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 3/12/20 4:17 PM, Christian Borntraeger wrote:
->=20
->=20
+On 3/12/20 4:41 PM, Christian Borntraeger wrote:
 > On 11.03.20 14:21, Janosch Frank wrote:
->> For protected guests the IPIB is written/read to/from the SIDA, so we
+>> IO instruction data is routed through SIDAD for protected guests, so
+>> adresses do not need to be checked, as this is kernel memory.
 >=20
-> I think we need to make up our mind regarding IPLB vs. IPIB....
->=20
-> Otherwise
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Maybe also mention that the data structures for  the I/O instrutions
+> start at offset 0 of the SIDA?
 
-Shall I put that onto the list of things I need to fix in my cleanup seri=
-es?
+You mean in the comment for get_address_from_regs() or in the commit
+message? It would certainly make sense for get_address_from_regs().
 
-> 			=09
->> need those accesses to go through s390_cpu_pv_mem_read/write().
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
 >> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
+>=20
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>=20
+>=20
+>=20
 >> ---
->>  target/s390x/diag.c | 27 +++++++++++++++++++++------
->>  1 file changed, 21 insertions(+), 6 deletions(-)
+>>  target/s390x/ioinst.c | 33 ++++++++++++++++++++++++++-------
+>>  1 file changed, 26 insertions(+), 7 deletions(-)
 >>
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index b245e557037ded06..a733485caf162111 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -88,6 +88,7 @@ static int diag308_parm_check(CPUS390XState *env, ui=
-nt64_t r1, uint64_t addr,
->>  void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, ui=
-ntptr_t ra)
->>  {
->>      CPUState *cs =3D env_cpu(env);
->> +    S390CPU *cpu =3D S390_CPU(cs);
->>      uint64_t addr =3D  env->regs[r1];
->>      uint64_t subcode =3D env->regs[r3];
->>      IplParameterBlock *iplb;
->> @@ -124,13 +125,22 @@ void handle_diag_308(CPUS390XState *env, uint64_=
-t r1, uint64_t r3, uintptr_t ra)
->>              return;
->>          }
->>          iplb =3D g_new0(IplParameterBlock, 1);
->> -        cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
->> +        if (!s390_is_pv()) {
->> +            cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
->> +        } else {
->> +            s390_cpu_pv_mem_read(cpu, 0, iplb, sizeof(iplb->len));
->> +        }
+>> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+>> index c437a1d8c6afed80..481d789de9e09a04 100644
+>> --- a/target/s390x/ioinst.c
+>> +++ b/target/s390x/ioinst.c
+>> @@ -16,6 +16,23 @@
+>>  #include "hw/s390x/ioinst.h"
+>>  #include "trace.h"
+>>  #include "hw/s390x/s390-pci-bus.h"
+>> +#include "hw/s390x/pv.h"
 >> +
->>          if (!iplb_valid_len(iplb)) {
->>              env->regs[r1 + 1] =3D DIAG_308_RC_INVALID;
->>              goto out;
->>          }
+>> +static uint64_t get_address_from_regs(CPUS390XState *env, uint32_t ip=
+b,
+>> +                                      uint8_t *ar)
+>> +{
+>> +    /*
+>> +     * Addresses for protected guests are all offsets into the
+>> +     * satellite block which holds the IO control structures. Those
+>> +     * control structures are always aligned and accessible, so we ca=
+n
+>> +     * return 0 here which will pass the following address checks.
+>> +     */
+>> +    if (s390_is_pv()) {
+>> +        *ar =3D 0;
+>> +        return 0;
+>> +    }
+>> +    return decode_basedisp_s(env, ipb, ar);
+>> +}
 >> =20
->> -        cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));=
-
->> +        if (!s390_is_pv()) {
->> +            cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->le=
-n));
->> +        } else {
->> +            s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len)=
-);
->> +        }
+>>  int ioinst_disassemble_sch_ident(uint32_t value, int *m, int *cssid, =
+int *ssid,
+>>                                   int *schid)
+>> @@ -114,7 +131,7 @@ void ioinst_handle_msch(S390CPU *cpu, uint64_t reg=
+1, uint32_t ipb, uintptr_t ra)
+>>      CPUS390XState *env =3D &cpu->env;
+>>      uint8_t ar;
 >> =20
->>          if (!iplb_valid(iplb)) {
->>              env->regs[r1 + 1] =3D DIAG_308_RC_INVALID;
->> @@ -152,12 +162,17 @@ out:
->>          } else {
->>              iplb =3D s390_ipl_get_iplb();
->>          }
->> -        if (iplb) {
->> -            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->l=
-en));
->> -            env->regs[r1 + 1] =3D DIAG_308_RC_OK;
->> -        } else {
->> +        if (!iplb) {
->>              env->regs[r1 + 1] =3D DIAG_308_RC_NO_CONF;
->> +            return;
->>          }
->> +
->> +        if (!s390_is_pv()) {
->> +            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->l=
-en));
->> +        } else {
->> +            s390_cpu_pv_mem_write(cpu, 0, iplb, be32_to_cpu(iplb->len=
-));
->> +        }
->> +        env->regs[r1 + 1] =3D DIAG_308_RC_OK;
+>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>> +    addr =3D get_address_from_regs(env, ipb, &ar);
+>>      if (addr & 3) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
 >>          return;
->>      case DIAG308_PV_START:
->>          iplb =3D s390_ipl_get_iplb_pv();
+>> @@ -171,7 +188,7 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t reg=
+1, uint32_t ipb, uintptr_t ra)
+>>      CPUS390XState *env =3D &cpu->env;
+>>      uint8_t ar;
+>> =20
+>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>> +    addr =3D get_address_from_regs(env, ipb, &ar);
+>>      if (addr & 3) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>          return;
+>> @@ -203,7 +220,7 @@ void ioinst_handle_stcrw(S390CPU *cpu, uint32_t ip=
+b, uintptr_t ra)
+>>      CPUS390XState *env =3D &cpu->env;
+>>      uint8_t ar;
+>> =20
+>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>> +    addr =3D get_address_from_regs(env, ipb, &ar);
+>>      if (addr & 3) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>          return;
+>> @@ -234,7 +251,7 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t re=
+g1, uint32_t ipb,
+>>      CPUS390XState *env =3D &cpu->env;
+>>      uint8_t ar;
+>> =20
+>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>> +    addr =3D get_address_from_regs(env, ipb, &ar);
+>>      if (addr & 3) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>          return;
+>> @@ -303,7 +320,7 @@ int ioinst_handle_tsch(S390CPU *cpu, uint64_t reg1=
+, uint32_t ipb, uintptr_t ra)
+>>          return -EIO;
+>>      }
+>>      trace_ioinst_sch_id("tsch", cssid, ssid, schid);
+>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>> +    addr =3D get_address_from_regs(env, ipb, &ar);
+>>      if (addr & 3) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>          return -EIO;
+>> @@ -601,7 +618,7 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb=
+, uintptr_t ra)
+>>  {
+>>      ChscReq *req;
+>>      ChscResp *res;
+>> -    uint64_t addr;
+>> +    uint64_t addr =3D 0;
+>>      int reg;
+>>      uint16_t len;
+>>      uint16_t command;
+>> @@ -610,7 +627,9 @@ void ioinst_handle_chsc(S390CPU *cpu, uint32_t ipb=
+, uintptr_t ra)
+>> =20
+>>      trace_ioinst("chsc");
+>>      reg =3D (ipb >> 20) & 0x00f;
+>> -    addr =3D env->regs[reg];
+>> +    if (!s390_is_pv()) {
+>> +        addr =3D env->regs[reg];
+>> +    }
+>>      /* Page boundary? */
+>>      if (addr & 0xfff) {
+>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
 >>
 
 
 
---YtgqXKKsJlhnI1ZprZvqltQ2WJqsLY3JH--
+--sTnHJ2a8EYZX1l8zEnwWjtlyjBUgD56i8--
 
---6bAU38SGVhtALf8t3Tc3s1W3pTOhWUsri
+--9lC64ycr25CScjA7CPwqwXH7IItqfoA6Y
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5qXdgACgkQ41TmuOI4
-ufjSwBAAgyqw5CYuM/xFahknb8hjKNYjLmDj+aZ0pIvIWh+gZLMYD3qxqAMG5Z5g
-aICInykGnxOEk4xC7l37xtvU8X2XiF/1AwegZzfzCMUa8tVH8Ose6kQjQ3bVlRS1
-8qL+Qzayk9UWxGe2O/RGoKhz16iVBbbiz1H3QbzpwKu7taCpRPaX5N3ZcPlRoSbI
-UD3o3bOUKfO1/DUFvqllAJCLvaB5mwu/UMW0hk9UB9nOtVBNbVoTgxCJ6pmpFFIv
-m9qpowNMS77DQtZdC+7d7nWPS6ou3WJHPjAdEBbss1MGgibkZgj9Wb+yaHl7zj/E
-s2uTXQFtM5aWmxaZnEazfobcP8fZhoOl37iypoDDLKo87XImkdJBfR3Oa56p4HS+
-X72aksTdnNMRBBozYOJLlbAERHN4MaNv5GlQDPVcRaUX8e7xe28MRV4R6Ehvov9M
-1ByInyoSTg5tmGkkzSkBPub5TMka89GZ4JKtVAze7chjvEiedRRIVU6I9WQxGzOB
-FIseLyCEVVtWzoc0AvQK6+Aanxj/nybRRof/wyY9Dx79u9tPYuWbcNZ+5gR3I9i+
-kpbOtKJwiSFeF6qh0EVsmuAyTM1/FtGwyA10QeEUXHgV8VZkI+6hpH8JYsisSHEN
-GoLBFIp98mFmQHPIzGzImDanEa5X4+RmznABsWiHu/FVDashJZ0=
-=V/dc
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5qXlEACgkQ41TmuOI4
+ufitAg/+K7/+Hxnrt851S5zPS8cy2MYKUZLT9nzQYro7tKJkfQinzph8Ponk/mwJ
+NEwRxhFm0r3JMt6r4z357cn5RuQbPKmKd0gDweWMuFD+0bFetIJ0fU+7lErO0E3V
+fqZlS+dw2H4ojuT2Y8YQzB3ws7BJkVnpSN6XjwreuXJEItRkf12KTOnp2Q/h0MEb
+hbTfGjWEnn5N3OxWeHOwwqvKDYMLNUIKCtS7dGQVYFL1suZ3XXMEe2o9+GhqGg1I
+o2u174GP3JlENrvuJOuijw0K2vYlTUP9jqIpiKYGEra9IHLbH6mw687ACH/gDcb1
+6VMP69ecC8f+/Y8fiWXt3PWirCAKvc8tB5jbf5b2Z1SgcpxkuEO/TQluTr0X1Mez
+1KXByr5qWywtuQJRD3wkq5ADBB3SNkHq1AO22tjfDW3bAO465WET3W0otv6gbax2
+UN8Y6ge5jba7JjK+F/7ElxvvvloK0zUcZyWryJkCuSvF6VVJGCKIYTPwmn42Pc24
+5F4WFupuTxfCOuwTKXdzypazoUsbYxtEgAgvLvsBzUGoWzo4B3VxXK7FJ/FcQQJ1
+rpswye6dSKf4AdkGYzAD8Jx8UFO9uAl7a8alZPoesHXzv/6Hzhry1Z4rTjMht8GU
+r+0/t+L6BJeVzNm+LXERjnEd8v3Lmp0SP9VFWuXP5J1pDUbglkU=
+=N+KN
 -----END PGP SIGNATURE-----
 
---6bAU38SGVhtALf8t3Tc3s1W3pTOhWUsri--
+--9lC64ycr25CScjA7CPwqwXH7IItqfoA6Y--
 
 
