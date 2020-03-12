@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E0BC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF92CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:56:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8998020637
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82CC32071B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:56:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w7WAjdqm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8998020637
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NQm0MU3c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CC32071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTvj-000208-Mt
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:55:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45874)
+	id 1jCTwV-0003iW-NW
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:56:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjZ-0006VR-Dn
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:10 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjH-0005bD-Uj
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCTjY-0002Lb-7g
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:09 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45930)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCTjG-00029m-E0
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:51 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55665)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCTjY-0002L1-1e
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:43:08 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m15so3556049pgv.12
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:43:07 -0700 (PDT)
+ id 1jCTjG-00027e-7a
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:42:50 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id mj6so2824831pjb.5
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 12:42:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6fjfG7LN06yH+pNuquMUhvUVJ8pyrVs4uGZznYaGBxE=;
- b=w7WAjdqm2IUPa54aUDMzrWvOUWnadKKNZ8zE/Wu55e9dow8az+53kEZml1xoogi3aK
- wdIA9mkwxqtHeN891u8Ilqqk2zevxXmKyXYLCTS3jfbPuR73/qcs4D8umBD7IR3jF47t
- tvIoKNiXsK7SWqpAS7RStxJLcYJD8gzCzPZJTd/Mjct9Nchz3FPtjzpquOzwqUNCGnrG
- MHjNE52OjeBKr8LVG3O+VapEURoY99G3PeKTsRtii1qDtEuBrmTJq3UAE9//7HNXNxv9
- PG87InYvMWZreqbISqdex9pTokXRnorqDcbP7UEzukpsgQhX558jUb4C8pmWVMpdFlqj
- 1i+Q==
+ bh=OdUOrVG4+6fOcBEkk2TzuAIf4lO1j/SFFZ3HajmExks=;
+ b=NQm0MU3cApmQWVJ1p95QWuiOx5XAxifQxmDkUuQZ8Gw4Th1elugQeFMOt9PvfpGsiC
+ U83e/TEiJcIYtY2ZLmPh8eZ3f/xH5sLnEeokLkaacqXXtPPFnxa4vgtrVrpGkXkN3cOG
+ YNljKf6M2dl4yZ9DxitGrlR6B0PuRcCDclQLoWjbLpHUlnCjQPZ1PztoO2RGE1c8EZSU
+ ehB/bFm3ExrQ+ayB4Z5ZRhjqU6HFqffb/q6z9eEA2afsbR2iwhkIZQMKARxmuDNbdS9O
+ e34n7aYYRn3ArD2lad7SuhqeOBgtUbbxV5WT2GWWdA9TQoa/F8XTC4bWARhKHzIc7x/0
+ +ARg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=6fjfG7LN06yH+pNuquMUhvUVJ8pyrVs4uGZznYaGBxE=;
- b=GEQnCN+2QNjT7CWbcaSaOLInvAVBgIvE01CjWN0d4SEoiIxfEPEzbA7y+AkUv4zE9j
- f/e2KbqDSoc2addNigKe3v50YldpehZNBoqtCQUNRpWQYnGVX1wOn/Jh3GLtpmilwQ7N
- pw/lk02EvMha2CEtzKlK/C3IWdNkJbCOSOOyWmscshtKJM7N9XTrErKb5wCdWrEP7yKP
- lmr81J66VGoqMtd/z2mBXVBKMdDH3iDyHv1GJQIbtcopJ1iM+ZPy5kQGLMBcrK5FCewi
- MA2HQ9k+CQa94NoNaH42MTbzp6S2c+xz5K4VTsR65QrjolU2rAMXPgBoqq1TwwotO5K7
- KUsA==
-X-Gm-Message-State: ANhLgQ0R5ArrPl8Vt8nnKSUDDSAydz+7+eQhEIY/Y7ES6q8IXfyAi0/a
- b1srW4OFIRsvUJXciiPtYA4gEKLJeOk=
-X-Google-Smtp-Source: ADFU+vsDnHH/9gAegEsN1OI3RsAD0l6lzGLQ8QeM6tbZzGYOllgrqNiUEbLh2NmDXNFE2nRAA/+Fqg==
-X-Received: by 2002:a62:7c82:: with SMTP id x124mr1497509pfc.280.1584042186745; 
- Thu, 12 Mar 2020 12:43:06 -0700 (PDT)
+ bh=OdUOrVG4+6fOcBEkk2TzuAIf4lO1j/SFFZ3HajmExks=;
+ b=h93fLn5IkxCAeFhxEHET5Er9nCROC06VZBaoGzkGPmpFM3kQQDv+uCZsQHwqr0UH6v
+ BftfvBljdBP30WUzeHk1D+zmeZ1iE32VgWt3kNj38GHELGALRiFeU6CL5Hp7NWxfVawB
+ +8GXZ1361th796gNw+UDHNaVEw39Dldm//wtG3+vKAEov/ujW6OBeoonlHtdw29jJVK9
+ 6ged4TudDxT78R98GLWn5gSuBhumBDkbzISL6NrR+6ltPGtv11rvPKzz49oIwXkcCaf2
+ TZCy9VRlO4F97BxMOXzbf7ZBSwgF6AejbdQxROvAqECQ38Q6GNvAicCHOTmPfbxqn3Dy
+ PXfA==
+X-Gm-Message-State: ANhLgQ2KxTsdaM40/SefuS9N5Zgnux7bNpUuqP4oFkPXku97WdILVS+b
+ /YEF1V6JkLQJHI7gttXfb6QSs03Fzps=
+X-Google-Smtp-Source: ADFU+vu0oH21qXkYGhSbyxVN3lhjP0De7OnHEpOmfTReU/VfNdXwsSJEX5BYO735f5eY6gzE9Zl2/g==
+X-Received: by 2002:a17:90b:94a:: with SMTP id
+ dw10mr5787263pjb.89.1584042165705; 
+ Thu, 12 Mar 2020 12:42:45 -0700 (PDT)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.43.05
+ by smtp.gmail.com with ESMTPSA id g69sm6824842pje.34.2020.03.12.12.42.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 12:43:06 -0700 (PDT)
+ Thu, 12 Mar 2020 12:42:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 34/42] target/arm: Handle TBI for sve scalar + int memory
- ops
-Date: Thu, 12 Mar 2020 12:42:11 -0700
-Message-Id: <20200312194219.24406-35-richard.henderson@linaro.org>
+Subject: [PATCH v6 18/42] target/arm: Simplify DC_ZVA
+Date: Thu, 12 Mar 2020 12:41:55 -0700
+Message-Id: <20200312194219.24406-19-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312194219.24406-1-richard.henderson@linaro.org>
 References: <20200312194219.24406-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,66 +99,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We still need to handle tbi for user-only when mte is inactive.
+Now that we know that the operation is on a single page,
+we need not loop over pages while probing.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.h | 1 +
- target/arm/translate-a64.c | 2 +-
- target/arm/translate-sve.c | 6 ++++--
- 3 files changed, 6 insertions(+), 3 deletions(-)
+ target/arm/helper-a64.c | 94 +++++++++++------------------------------
+ 1 file changed, 25 insertions(+), 69 deletions(-)
 
-diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
-index 452b4764d0..65c0280498 100644
---- a/target/arm/translate-a64.h
-+++ b/target/arm/translate-a64.h
-@@ -40,6 +40,7 @@ TCGv_ptr get_fpstatus_ptr(bool);
- bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
-                             unsigned int imms, unsigned int immr);
- bool sve_access_check(DisasContext *s);
-+TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr);
- TCGv_i64 gen_mte_check1(DisasContext *s, TCGv_i64 addr, bool is_write,
-                         bool tag_checked, int log2_size);
- TCGv_i64 gen_mte_checkN(DisasContext *s, TCGv_i64 addr, bool is_write,
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index d86c13a32d..1314b200e0 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -232,7 +232,7 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
-  * of the write-back address.
-  */
- 
--static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
-+TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
- {
-     TCGv_i64 clean = new_tmp_a64(s);
- #ifdef CONFIG_USER_ONLY
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 5b399bb005..ce67b79b02 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4554,9 +4554,8 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
-      * For e.g. LD4, there are not enough arguments to pass all 4
-      * registers as pointers, so encode the regno into the data field.
-      * For consistency, do this even for LD1.
--     * TODO: mte_n check here while callers are updated.
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index bc0649a44a..60a04dc880 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -1119,85 +1119,41 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
+      * (which matches the usual QEMU behaviour of not implementing either
+      * alignment faults or any memory attribute handling).
       */
--    if (mte_n && s->mte_active[0]) {
-+    if (s->mte_active[0]) {
-         int msz = dtype_msz(dtype);
++    int blocklen = 4 << env_archcpu(env)->dcz_blocksize;
++    uint64_t vaddr = vaddr_in & -blocklen;
++    int mmu_idx = cpu_mmu_index(env, false);
++    void *mem;
  
-         desc = FIELD_DP32(desc, MTEDESC, MIDX, get_mem_index(s));
-@@ -4566,7 +4565,10 @@ static void do_mem_zpa(DisasContext *s, int zt, int pg, TCGv_i64 addr,
-         desc = FIELD_DP32(desc, MTEDESC, ESIZE, 1 << msz);
-         desc = FIELD_DP32(desc, MTEDESC, TSIZE, mte_n << msz);
-         desc <<= SVE_MTEDESC_SHIFT;
-+    } else {
-+        addr = clean_data_tbi(s, addr);
-     }
+-    ARMCPU *cpu = env_archcpu(env);
+-    uint64_t blocklen = 4 << cpu->dcz_blocksize;
+-    uint64_t vaddr = vaddr_in & ~(blocklen - 1);
++    /*
++     * Trapless lookup.  In addition to actual invalid page, may
++     * return NULL for I/O, watchpoints, clean pages, etc.
++     */
++    mem = tlb_vaddr_to_host(env, vaddr, MMU_DATA_STORE, mmu_idx);
+ 
+ #ifndef CONFIG_USER_ONLY
+-    {
++    if (unlikely(!mem)) {
++        uintptr_t ra = GETPC();
 +
-     desc = simd_desc(vsz, vsz, zt | desc);
-     t_desc = tcg_const_i32(desc);
-     t_pg = tcg_temp_new_ptr();
+         /*
+-         * Slightly awkwardly, QEMU's TARGET_PAGE_SIZE may be less than
+-         * the block size so we might have to do more than one TLB lookup.
+-         * We know that in fact for any v8 CPU the page size is at least 4K
+-         * and the block size must be 2K or less, but TARGET_PAGE_SIZE is only
+-         * 1K as an artefact of legacy v5 subpage support being present in the
+-         * same QEMU executable. So in practice the hostaddr[] array has
+-         * two entries, given the current setting of TARGET_PAGE_BITS_MIN.
++         * Trap if accessing an invalid page.  DC_ZVA requires that we supply
++         * the original pointer for an invalid page.  But watchpoints require
++         * that we probe the actual space.  So do both.
+          */
+-        int maxidx = DIV_ROUND_UP(blocklen, TARGET_PAGE_SIZE);
+-        void *hostaddr[DIV_ROUND_UP(2 * KiB, 1 << TARGET_PAGE_BITS_MIN)];
+-        int try, i;
+-        unsigned mmu_idx = cpu_mmu_index(env, false);
+-        TCGMemOpIdx oi = make_memop_idx(MO_UB, mmu_idx);
++        (void) probe_write(env, vaddr_in, 1, mmu_idx, ra);
++        mem = probe_write(env, vaddr, blocklen, mmu_idx, ra);
+ 
+-        assert(maxidx <= ARRAY_SIZE(hostaddr));
+-
+-        for (try = 0; try < 2; try++) {
+-
+-            for (i = 0; i < maxidx; i++) {
+-                hostaddr[i] = tlb_vaddr_to_host(env,
+-                                                vaddr + TARGET_PAGE_SIZE * i,
+-                                                1, mmu_idx);
+-                if (!hostaddr[i]) {
+-                    break;
+-                }
+-            }
+-            if (i == maxidx) {
+-                /*
+-                 * If it's all in the TLB it's fair game for just writing to;
+-                 * we know we don't need to update dirty status, etc.
+-                 */
+-                for (i = 0; i < maxidx - 1; i++) {
+-                    memset(hostaddr[i], 0, TARGET_PAGE_SIZE);
+-                }
+-                memset(hostaddr[i], 0, blocklen - (i * TARGET_PAGE_SIZE));
+-                return;
+-            }
++        if (unlikely(!mem)) {
+             /*
+-             * OK, try a store and see if we can populate the tlb. This
+-             * might cause an exception if the memory isn't writable,
+-             * in which case we will longjmp out of here. We must for
+-             * this purpose use the actual register value passed to us
+-             * so that we get the fault address right.
++             * The only remaining reason for mem == NULL is I/O.
++             * Just do a series of byte writes as the architecture demands.
+              */
+-            helper_ret_stb_mmu(env, vaddr_in, 0, oi, GETPC());
+-            /* Now we can populate the other TLB entries, if any */
+-            for (i = 0; i < maxidx; i++) {
+-                uint64_t va = vaddr + TARGET_PAGE_SIZE * i;
+-                if (va != (vaddr_in & TARGET_PAGE_MASK)) {
+-                    helper_ret_stb_mmu(env, va, 0, oi, GETPC());
+-                }
++            for (int i = 0; i < blocklen; i++) {
++                cpu_stb_mmuidx_ra(env, vaddr + i, 0, mmu_idx, ra);
+             }
+-        }
+-
+-        /*
+-         * Slow path (probably attempt to do this to an I/O device or
+-         * similar, or clearing of a block of code we have translations
+-         * cached for). Just do a series of byte writes as the architecture
+-         * demands. It's not worth trying to use a cpu_physical_memory_map(),
+-         * memset(), unmap() sequence here because:
+-         *  + we'd need to account for the blocksize being larger than a page
+-         *  + the direct-RAM access case is almost always going to be dealt
+-         *    with in the fastpath code above, so there's no speed benefit
+-         *  + we would have to deal with the map returning NULL because the
+-         *    bounce buffer was in use
+-         */
+-        for (i = 0; i < blocklen; i++) {
+-            helper_ret_stb_mmu(env, vaddr + i, 0, oi, GETPC());
++            return;
+         }
+     }
+-#else
+-    memset(g2h(vaddr), 0, blocklen);
+ #endif
++
++    memset(mem, 0, blocklen);
+ }
 -- 
 2.20.1
 
