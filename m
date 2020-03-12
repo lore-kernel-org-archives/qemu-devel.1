@@ -2,85 +2,74 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88272C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 10:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1854EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 10:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59E84206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 10:12:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9tkdPB3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E84206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EAA6F20674
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 10:16:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAA6F20674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCKpB-0005Az-Gp
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 06:12:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35579)
+	id 1jCKtX-0006nN-3d
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 06:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCKod-0004lB-Jq
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:11:48 -0400
+ (envelope-from <bounces@canonical.com>) id 1jCKsi-0005zJ-SH
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCKoc-0003pb-9i
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:11:47 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38665)
+ (envelope-from <bounces@canonical.com>) id 1jCKsh-0006r9-Od
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:16:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41498)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCKoc-0003pR-3l
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:11:46 -0400
-Received: by mail-ot1-x343.google.com with SMTP id t28so2896561ott.5
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 03:11:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gYuC/43+aqzczPwvXcevGnLj4Oj3/YRC9kospWvX1+w=;
- b=Z9tkdPB33pytrv+6s/rnlxWeIC46CscIRVgQbET4lETsNjbrobgfkQWPfFiF7P5K9K
- 5trtKShxn7Th2RCuIMtzlRrvlK2YtBwZ1WtCsD/2si1+RStLnIrRwo3hXMPX9bS4aA0U
- M2YdzJaQp6q9oV4puJxc6O/Kzjpdchc6y6Smzz69fqxS1AVwpKoDld0DgI61t0/Bs/gl
- OLXL+8i3tuZp56ctiZ33+fQ3EXazvDZmYLg8VaiTnh+MXCCqqO3UPcmJWzrAGP+/r1DC
- PYfmLCbtjcqucER+vrOjxBwK5N8zNuL39cR3vByiI794S7McyVTCkNi8XSgrTjwg0gdC
- E+Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gYuC/43+aqzczPwvXcevGnLj4Oj3/YRC9kospWvX1+w=;
- b=Y94MIKqP4kMz0g6e066b5dqfH/FSvVvDNtenDLTrS5unxqsZumViq3/E3J+dXxdG11
- Ujrboa4ud+KgykvizxNrtm45OVo8W9kQmDs+9FYZwYNwAe46NyJQE8qcA28pN/Pf+dzf
- YXRCuGpjkUfX30hxIXVT0uwDg70TQJr7x51P7dAfXKwEbtU7NQHRk6oG2tztgODjXOBK
- OrlxcjHX+lhp7L9ed8bY3eequDJ6mdPcLaV+YjcI9OTcrvaqZzfMRJafeA/04VE9u5cM
- /BbB35KmPRnUD+oFUAK06PkeAuZb6CFzrPu/R5tRTCK9phY+Cg+L4HLlAjN2wHKFPwau
- vMMg==
-X-Gm-Message-State: ANhLgQ3YeXfFAwA1q3f+yqGrG0pYFFtj3BfyzhXcNwTVYWMaJGahTT9e
- LSILLys0kRwr29fpWyjTgiZNBM9VoSOY1F/7JklL5A==
-X-Google-Smtp-Source: ADFU+vupV6/PzE2jYKxiB5K51dc3YU2ImiskaIxiUCxCxMZoXbGM9NJEDCLXrk9/BbaO49/zRfoObfZs12qGVJ3fwG4=
-X-Received: by 2002:a9d:76c9:: with SMTP id p9mr5720783otl.135.1584007905058; 
- Thu, 12 Mar 2020 03:11:45 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jCKsh-0006qb-JN
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 06:15:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jCKsd-0000sh-RI
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 10:15:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5D7FB2E80EC
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 10:15:54 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-32-peter.maydell@linaro.org>
- <87blp3x7rr.fsf@dusky.pond.sub.org>
- <CAFEAcA9EEuAeKm8kXtSJUtm6F3=VfyMxOkESvrZzoVt87HwKpw@mail.gmail.com>
- <87sgiertt8.fsf@dusky.pond.sub.org>
-In-Reply-To: <87sgiertt8.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Mar 2020 10:11:34 +0000
-Message-ID: <CAFEAcA9PrO+=pVyh1DR2Xh=apkZAXw0_aF=RxUmG=kR5VOdeDQ@mail.gmail.com>
-Subject: Re: [PATCH v3 31/33] docs: Stop building qemu-doc
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Mar 2020 10:07:28 -0000
+From: Boris  Derzhavets <1866870@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dbaxps0220 paelzer tstrike34
+X-Launchpad-Bug-Reporter: tstrike (tstrike34)
+X-Launchpad-Bug-Modifier: Boris  Derzhavets (dbaxps0220)
+References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
+Message-Id: <158400764852.7008.8849923366089207361.malone@chaenomeles.canonical.com>
+Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 23c3dc21b036e9019cfe84e80286eb34a2c90d41
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,36 +78,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Kashyap Chamarthy <kchamart@redhat.com>
+Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 12 Mar 2020 at 06:06, Markus Armbruster <armbru@redhat.com> wrote:
-> Would it be possible to additionally render a complete manual as one
-> humongous .html?  Without an index, there's only search, and the
-> ergonomics of searching within a single page are so much better.
+I've got the same issue starting guest via virt-install even with serial
+console.
 
-There is a "build one big fat HTML page" Sphinx builder,
-I think. But again, I'm dubious about increasing the number
-of supported output formats -- it's all extra makefile complexity
-and more things to get right in 'make install' and so on.
+-- =
 
-PS: assuming you have js enabled, each HTML manual has a js
-search engine built in, eg the 'quick search' box at the bottom
-of the LHS navigation bar on
-https://www.qemu.org/docs/master/system/index.html
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866870
 
-> I'm tempted to write a trivial QAPI doc comment backend to spit out
-> minimally processed doc comments as one plain text file just for that.
+Title:
+  KVM Guest pauses after upgrade to Ubuntu 20.04
 
-What would be the difference there compared to just looking
-at the manpage? The manpages don't have the full content
-of all the HTML manuals, but the QAPI reference manpages
-will have all the QAPI content.
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
 
-thanks
--- PMM
+Bug description:
+  Symptom:
+  Error unpausing domain: internal error: unable to execute QEMU command 'c=
+ont': Resetting the Virtual Machine is required
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
+ in resume
+      self._backend.resume()
+    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
+      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
+t': Resetting the Virtual Machine is required
+
+  =
+
+  ---
+
+  As outlined here:
+  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
+
+  After upgrade, all KVM guests are in a default pause state. Even after
+  forcing them off via virsh, and restarting them the guests are paused.
+
+  These Guests are not nested.
+
+  A lot of diganostic information are outlined in the previous bug
+  report link provided. The solution mentioned in previous report had
+  been allegedly integrated into the downstream updates.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
