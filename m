@@ -2,87 +2,58 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,WEIRD_QUOTING
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8ABC10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7D7C10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:05:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E4E206F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:05:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f95598/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E4E206F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id F376D206F1
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 17:05:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F376D206F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCRGZ-0001jJ-E0
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35897)
+	id 1jCRHC-000460-VD
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 13:05:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxp-0000kN-Sx
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:44 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR4D-0001Nc-Aw
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCQxn-0005I8-CC
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:41 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:35538)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCQxn-0005Hf-3V
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:45:39 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id d5so8028503wrc.2
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 09:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Ted6m1WkJFc8UqGJYYtw+Q7z+HdH6t/vQqJNiDoDyls=;
- b=f95598/euXoQLAlYf/HZ0Ck/tK04Wpv1Y+8f2I0lFrmnoZK3dxWZtuLVc50ZMuQd5r
- 5JsN2pG3WyjYu4M7BVT9Ozun4NQ0T1mpPc4A3q7iLm/YnFQSDlQW8yts2oohi+Tkl1Zc
- arrrF6v9eFx57TndKdTPYB88TJMb38FwDZV7f/I2fPVWZuSlYSwYYqzOFCK9ym13uLIg
- T2hv79kPCR6z1Xc9SLas21pVncs6FlQ5T4Jhwwkx9FY5L2IQeujJm8VfWyGw5DBiLREr
- 939P2rtFM0KPOAxlG/NY671BNpFr7iuhbYIWrkiPOLAK08jtfAa7uXyunPtOVpu/aZ2h
- 2ojQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ted6m1WkJFc8UqGJYYtw+Q7z+HdH6t/vQqJNiDoDyls=;
- b=DD2jAGeRBBMBr/nyc+Q4LfyrFWU4sbc6+jd0lNOl9jPBUBAR/QHemTLUcih1QYZou3
- BvlGv1BOL45kU3hg8lDwYgoajfjwu171DAeRhu5Q4N7CQ9fPegyqeXtryP/XBRqdBi1A
- TnxlX1zI4UZrlHVZK47KT8hFjVoO8K0RyHOeciW1Bt4wjFPXddQXH7z9z/vaK+e64zxc
- sTbi0ypK5X+D5wUuXwzZ10ML5C0auebbfPAn4raxsj5JYqaBp1XdeAMJ3TiuQ5UM2xqE
- CEUrQvTwrtLxEDv7Pu8k5TIB/v3U1BDUgTmKI0oghDn0YKjgMJcAmzOI3UNP3MDsRkte
- 2BjA==
-X-Gm-Message-State: ANhLgQ1OQyU5nm/Ktp010okVdCm5Y4w0nWmYZQCuUN4nfs7G8L6CgOcu
- ex6kd7bNQ0/7cc99GwkHcbWE7XThbStcBQ==
-X-Google-Smtp-Source: ADFU+vt+HlV92qqxeejuzGEvCgS+e90zjFnUZXOM89y7g6Y2lNEswf/xdeMu+vfrylgOD3bnaWyVBw==
-X-Received: by 2002:adf:de84:: with SMTP id w4mr12126551wrl.350.1584031537234; 
- Thu, 12 Mar 2020 09:45:37 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id j15sm36838640wrp.85.2020.03.12.09.45.36
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 09:45:36 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 29/36] docs: add Orange Pi PC document
-Date: Thu, 12 Mar 2020 16:44:52 +0000
-Message-Id: <20200312164459.25924-30-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200312164459.25924-1-peter.maydell@linaro.org>
-References: <20200312164459.25924-1-peter.maydell@linaro.org>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCR4C-0008Hu-2U
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 12:52:17 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43901)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCR4B-0008Dw-5C; Thu, 12 Mar 2020 12:52:16 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07476402|-1; CH=blue; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.411059-0.000646204-0.588295;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03293; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H-QPI7._1584031928; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H-QPI7._1584031928)
+ by smtp.aliyun-inc.com(10.147.41.231);
+ Fri, 13 Mar 2020 00:52:09 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v5 56/60] target/riscv: floating-point scalar move instructions
+Date: Thu, 12 Mar 2020 22:58:56 +0800
+Message-Id: <20200312145900.2054-57-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,325 +65,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-
-The Xunlong Orange Pi PC machine is a functional ARM machine
-based on the Allwinner H3 System-on-Chip. It supports mainline
-Linux, U-Boot, NetBSD and is covered by acceptance tests.
-
-This commit adds a documentation text file with a description
-of the machine and instructions for the user.
-
-Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20200311221854.30370-19-nieklinnenbank@gmail.com
-[PMM: moved file into docs/system/arm to match the reorg
-of the arm target part of the docs; tweaked heading to
-match other boards]
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 ---
- MAINTAINERS                  |   1 +
- docs/system/arm/orangepi.rst | 253 +++++++++++++++++++++++++++++++++++
- docs/system/target-arm.rst   |   2 +
- 3 files changed, 256 insertions(+)
- create mode 100644 docs/system/arm/orangepi.rst
+ target/riscv/helper.h                   |  9 +++++
+ target/riscv/insn32.decode              |  2 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 47 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 36 +++++++++++++++++++
+ 4 files changed, 94 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d7a26d7171e..32867bc6367 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -499,6 +499,7 @@ S: Maintained
- F: hw/*/allwinner-h3*
- F: include/hw/*/allwinner-h3*
- F: hw/arm/orangepi.c
-+F: docs/system/orangepi.rst
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 41cecd266c..7a689a5c07 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1111,3 +1111,12 @@ DEF_HELPER_3(vmv_s_x_b, void, ptr, tl, env)
+ DEF_HELPER_3(vmv_s_x_h, void, ptr, tl, env)
+ DEF_HELPER_3(vmv_s_x_w, void, ptr, tl, env)
+ DEF_HELPER_3(vmv_s_x_d, void, ptr, tl, env)
++
++DEF_HELPER_2(vfmv_f_s_b, i64, ptr, env)
++DEF_HELPER_2(vfmv_f_s_h, i64, ptr, env)
++DEF_HELPER_2(vfmv_f_s_w, i64, ptr, env)
++DEF_HELPER_2(vfmv_f_s_d, i64, ptr, env)
++DEF_HELPER_3(vfmv_s_f_b, void, ptr, i64, env)
++DEF_HELPER_3(vfmv_s_f_h, void, ptr, i64, env)
++DEF_HELPER_3(vfmv_s_f_w, void, ptr, i64, env)
++DEF_HELPER_3(vfmv_s_f_d, void, ptr, i64, env)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 7e1efeec05..bfdce0979c 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -557,6 +557,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+ vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+ vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
++vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
++vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
  
- ARM PrimeCell and CMSDK devices
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/docs/system/arm/orangepi.rst b/docs/system/arm/orangepi.rst
-new file mode 100644
-index 00000000000..c41adad4883
---- /dev/null
-+++ b/docs/system/arm/orangepi.rst
-@@ -0,0 +1,253 @@
-+Orange Pi PC (``orangepi-pc``)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
-+based embedded computer with mainline support in both U-Boot
-+and Linux. The board comes with a Quad Core Cortex-A7 @ 1.3GHz,
-+1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
-+various other I/O.
-+
-+Supported devices
-+"""""""""""""""""
-+
-+The Orange Pi PC machine supports the following devices:
-+
-+ * SMP (Quad Core Cortex-A7)
-+ * Generic Interrupt Controller configuration
-+ * SRAM mappings
-+ * SDRAM controller
-+ * Real Time Clock
-+ * Timer device (re-used from Allwinner A10)
-+ * UART
-+ * SD/MMC storage controller
-+ * EMAC ethernet
-+ * USB 2.0 interfaces
-+ * Clock Control Unit
-+ * System Control module
-+ * Security Identifier device
-+
-+Limitations
-+"""""""""""
-+
-+Currently, Orange Pi PC does *not* support the following features:
-+
-+- Graphical output via HDMI, GPU and/or the Display Engine
-+- Audio output
-+- Hardware Watchdog
-+
-+Also see the 'unimplemented' array in the Allwinner H3 SoC module
-+for a complete list of unimplemented I/O devices: ``./hw/arm/allwinner-h3.c``
-+
-+Boot options
-+""""""""""""
-+
-+The Orange Pi PC machine can start using the standard -kernel functionality
-+for loading a Linux kernel or ELF executable. Additionally, the Orange Pi PC
-+machine can also emulate the BootROM which is present on an actual Allwinner H3
-+based SoC, which loads the bootloader from a SD card, specified via the -sd argument
-+to qemu-system-arm.
-+
-+Machine-specific options
-+""""""""""""""""""""""""
-+
-+The following machine-specific options are supported:
-+
-+- allwinner-rtc.base-year=YYYY
-+
-+  The Allwinner RTC device is automatically created by the Orange Pi PC machine
-+  and uses a default base year value which can be overridden using the 'base-year' property.
-+  The base year is the actual represented year when the RTC year value is zero.
-+  This option can be used in case the target operating system driver uses a different
-+  base year value. The minimum value for the base year is 1900.
-+
-+- allwinner-sid.identifier=abcd1122-a000-b000-c000-12345678ffff
-+
-+  The Security Identifier value can be read by the guest.
-+  For example, U-Boot uses it to determine a unique MAC address.
-+
-+The above machine-specific options can be specified in qemu-system-arm
-+via the '-global' argument, for example:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -sd mycard.img \
-+       -global allwinner-rtc.base-year=2000
-+
-+Running mainline Linux
-+""""""""""""""""""""""
-+
-+Mainline Linux kernels from 4.19 up to latest master are known to work.
-+To build a Linux mainline kernel that can be booted by the Orange Pi PC machine,
-+simply configure the kernel using the sunxi_defconfig configuration:
-+
-+.. code-block:: bash
-+
-+  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make mrproper
-+  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make sunxi_defconfig
-+
-+To be able to use USB storage, you need to manually enable the corresponding
-+configuration item. Start the kconfig configuration tool:
-+
-+.. code-block:: bash
-+
-+  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make menuconfig
-+
-+Navigate to the following item, enable it and save your configuration:
-+
-+  Device Drivers > USB support > USB Mass Storage support
-+
-+Build the Linux kernel with:
-+
-+.. code-block:: bash
-+
-+  $ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make
-+
-+To boot the newly build linux kernel in QEMU with the Orange Pi PC machine, use:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
-+      -kernel /path/to/linux/arch/arm/boot/zImage \
-+      -append 'console=ttyS0,115200' \
-+      -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb
-+
-+Orange Pi PC images
-+"""""""""""""""""""
-+
-+Note that the mainline kernel does not have a root filesystem. You may provide it
-+with an official Orange Pi PC image from the official website:
-+
-+  http://www.orangepi.org/downloadresources/
-+
-+Another possibility is to run an Armbian image for Orange Pi PC which
-+can be downloaded from:
-+
-+   https://www.armbian.com/orange-pi-pc/
-+
-+Alternatively, you can also choose to build you own image with buildroot
-+using the orangepi_pc_defconfig. Also see https://buildroot.org for more information.
-+
-+You can choose to attach the selected image either as an SD card or as USB mass storage.
-+For example, to boot using the Orange Pi PC Debian image on SD card, simply add the -sd
-+argument and provide the proper root= kernel parameter:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
-+      -kernel /path/to/linux/arch/arm/boot/zImage \
-+      -append 'console=ttyS0,115200 root=/dev/mmcblk0p2' \
-+      -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb \
-+      -sd OrangePi_pc_debian_stretch_server_linux5.3.5_v1.0.img
-+
-+To attach the image as an USB mass storage device to the machine,
-+simply append to the command:
-+
-+.. code-block:: bash
-+
-+  -drive if=none,id=stick,file=myimage.img \
-+  -device usb-storage,bus=usb-bus.0,drive=stick
-+
-+Instead of providing a custom Linux kernel via the -kernel command you may also
-+choose to let the Orange Pi PC machine load the bootloader from SD card, just like
-+a real board would do using the BootROM. Simply pass the selected image via the -sd
-+argument and remove the -kernel, -append, -dbt and -initrd arguments:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
-+       -sd Armbian_19.11.3_Orangepipc_buster_current_5.3.9.img
-+
-+Note that both the official Orange Pi PC images and Armbian images start
-+a lot of userland programs via systemd. Depending on the host hardware and OS,
-+they may be slow to emulate, especially due to emulating the 4 cores.
-+To help reduce the performance slow down due to emulating the 4 cores, you can
-+give the following kernel parameters via U-Boot (or via -append):
-+
-+.. code-block:: bash
-+
-+  => setenv extraargs 'systemd.default_timeout_start_sec=9000 loglevel=7 nosmp console=ttyS0,115200'
-+
-+Running U-Boot
-+""""""""""""""
-+
-+U-Boot mainline can be build and configured using the orangepi_pc_defconfig
-+using similar commands as describe above for Linux. Note that it is recommended
-+for development/testing to select the following configuration setting in U-Boot:
-+
-+  Device Tree Control > Provider for DTB for DT Control > Embedded DTB
-+
-+To start U-Boot using the Orange Pi PC machine, provide the
-+u-boot binary to the -kernel argument:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
-+      -kernel /path/to/uboot/u-boot -sd disk.img
-+
-+Use the following U-boot commands to load and boot a Linux kernel from SD card:
-+
-+.. code-block:: bash
-+
-+  => setenv bootargs console=ttyS0,115200
-+  => ext2load mmc 0 0x42000000 zImage
-+  => ext2load mmc 0 0x43000000 sun8i-h3-orangepi-pc.dtb
-+  => bootz 0x42000000 - 0x43000000
-+
-+Running NetBSD
-+""""""""""""""
-+
-+The NetBSD operating system also includes support for Allwinner H3 based boards,
-+including the Orange Pi PC. NetBSD 9.0 is known to work best for the Orange Pi PC
-+board and provides a fully working system with serial console, networking and storage.
-+For the Orange Pi PC machine, get the 'evbarm-earmv7hf' based image from:
-+
-+  https://cdn.netbsd.org/pub/NetBSD/NetBSD-9.0/evbarm-earmv7hf/binary/gzimg/armv7.img.gz
-+
-+The image requires manually installing U-Boot in the image. Build U-Boot with
-+the orangepi_pc_defconfig configuration as described in the previous section.
-+Next, unzip the NetBSD image and write the U-Boot binary including SPL using:
-+
-+.. code-block:: bash
-+
-+  $ gunzip armv7.img.gz
-+  $ dd if=/path/to/u-boot-sunxi-with-spl.bin of=armv7.img bs=1024 seek=8 conv=notrunc
-+
-+Finally, before starting the machine the SD image must be extended such
-+that the NetBSD kernel will not conclude the NetBSD partition is larger than
-+the emulated SD card:
-+
-+.. code-block:: bash
-+
-+  $ dd if=/dev/zero bs=1M count=64 >> armv7.img
-+
-+Start the machine using the following command:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-arm -M orangepi-pc -nic user -nographic \
-+        -sd armv7.img -global allwinner-rtc.base-year=2000
-+
-+At the U-Boot stage, interrupt the automatic boot process by pressing a key
-+and set the following environment variables before booting:
-+
-+.. code-block:: bash
-+
-+  => setenv bootargs root=ld0a
-+  => setenv kernel netbsd-GENERIC.ub
-+  => setenv fdtfile dtb/sun8i-h3-orangepi-pc.dtb
-+  => setenv bootcmd 'fatload mmc 0:1 ${kernel_addr_r} ${kernel}; fatload mmc 0:1 ${fdt_addr_r} ${fdtfile}; fdt addr ${fdt_addr_r}; bootm ${kernel_addr_r} - ${fdt_addr_r}'
-+
-+Optionally you may save the environment variables to SD card with 'saveenv'.
-+To continue booting simply give the 'boot' command and NetBSD boots.
-+
-+Orange Pi PC acceptance tests
-+"""""""""""""""""""""""""""""
-+
-+The Orange Pi PC machine has several acceptance tests included.
-+To run the whole set of tests, build QEMU from source and simply
-+provide the following command:
-+
-+.. code-block:: bash
-+
-+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes avocado --show=app,console run \
-+     -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
-diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-index 1425bd5303a..324e2af1cbc 100644
---- a/docs/system/target-arm.rst
-+++ b/docs/system/target-arm.rst
-@@ -68,6 +68,7 @@ undocumented; you can get a complete list by running
- ``qemu-system-aarch64 --machine help``.
- 
- .. toctree::
-+   :maxdepth: 1
- 
-    arm/integratorcp
-    arm/versatile
-@@ -78,6 +79,7 @@ undocumented; you can get a complete list by running
-    arm/stellaris
-    arm/musicpal
-    arm/sx1
-+   arm/orangepi
- 
- Arm CPU features
- ================
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 7720ffecde..99cd45b0aa 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2269,3 +2269,50 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
+     }
+     return false;
+ }
++
++/* Floating-Point Scalar Move Instructions */
++typedef void (* gen_helper_vfmv_f_s)(TCGv_i64, TCGv_ptr, TCGv_env);
++static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
++{
++    if (vext_check_isa_ill(s, RVV)) {
++        TCGv_ptr src2;
++        gen_helper_vfmv_f_s fns[4] = {
++            gen_helper_vfmv_f_s_b, gen_helper_vfmv_f_s_h,
++            gen_helper_vfmv_f_s_w, gen_helper_vfmv_f_s_d
++        };
++
++        src2 = tcg_temp_new_ptr();
++        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
++
++        fns[s->sew](cpu_fpr[a->rd], src2, cpu_env);
++
++        tcg_temp_free_ptr(src2);
++        return true;
++    }
++    return false;
++}
++
++typedef void (* gen_helper_vfmv_s_f)(TCGv_ptr, TCGv_i64, TCGv_env);
++static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
++{
++    if (vext_check_isa_ill(s, RVV | RVF) ||
++        vext_check_isa_ill(s, RVV | RVD)) {
++        TCGv_ptr dest;
++        TCGv_i64 src1;
++        gen_helper_vfmv_s_f fns[4] = {
++            gen_helper_vfmv_s_f_b, gen_helper_vfmv_s_f_h,
++            gen_helper_vfmv_s_f_w, gen_helper_vfmv_s_f_d
++        };
++
++        src1 = tcg_temp_new_i64();
++        dest = tcg_temp_new_ptr();
++        tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
++
++        fns[s->sew](dest, src1, cpu_env);
++
++        tcg_temp_free_i64(src1);
++        tcg_temp_free_ptr(dest);
++        return true;
++    }
++    return false;
++}
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 66ee69da99..3235c3fbe1 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4475,3 +4475,39 @@ GEN_VEXT_VMV_S_X(vmv_s_x_b, uint8_t, H1, clearb)
+ GEN_VEXT_VMV_S_X(vmv_s_x_h, uint16_t, H2, clearh)
+ GEN_VEXT_VMV_S_X(vmv_s_x_w, uint32_t, H4, clearl)
+ GEN_VEXT_VMV_S_X(vmv_s_x_d, uint64_t, H8, clearq)
++
++/* Floating-Point Scalar Move Instructions */
++#define GEN_VEXT_VFMV_S_F(NAME, ETYPE, H, CLEAR_FN)                     \
++void HELPER(NAME)(void *vd, uint64_t s1, CPURISCVState *env)            \
++{                                                                       \
++    if (env->vl == 0) {                                                 \
++        return;                                                         \
++    }                                                                   \
++    *((ETYPE *)vd + H(0)) = s1;                                         \
++    CLEAR_FN(vd, 1, sizeof(ETYPE), env_archcpu(env)->cfg.vlen / 8);     \
++}
++GEN_VEXT_VFMV_S_F(vfmv_s_f_b, uint8_t, H1, clearb)
++GEN_VEXT_VFMV_S_F(vfmv_s_f_h, uint16_t, H2, clearh)
++GEN_VEXT_VFMV_S_F(vfmv_s_f_w, uint32_t, H4, clearl)
++GEN_VEXT_VFMV_S_F(vfmv_s_f_d, uint64_t, H8, clearq)
++
++uint64_t HELPER(vfmv_f_s_b)(void *vs2, CPURISCVState *env)
++{
++    return deposit64(-1ULL, 0, 8, *((uint8_t *)vs2 + H1(0)));
++}
++uint64_t HELPER(vfmv_f_s_h)(void *vs2, CPURISCVState *env)
++{
++    return deposit64(-1ULL, 0, 16, *((uint16_t *)vs2 + H2(0)));
++}
++uint64_t HELPER(vfmv_f_s_w)(void *vs2, CPURISCVState *env)
++{
++    return deposit64(-1ULL, 0, 32, *((uint32_t *)vs2 + H4(0)));
++}
++uint64_t HELPER(vfmv_f_s_d)(void *vs2, CPURISCVState *env)
++{
++    if (env->misa & RVD) {
++        return *((uint64_t *)vs2);
++    } else {
++        return deposit64(*((uint64_t *)vs2), 32, 32, 0xffffffff);
++    }
++}
 -- 
-2.20.1
+2.23.0
 
 
