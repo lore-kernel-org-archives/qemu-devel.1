@@ -2,141 +2,98 @@ Return-Path: <SRS0=x6Qc=45=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3D0C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A029AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2698206E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:17:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2698206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BB6E206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 12:20:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkBinH0K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB6E206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCMmX-0006zp-SS
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 08:17:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37638)
+	id 1jCMpZ-0002rx-Hx
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 08:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jCMlv-0006Ze-23
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:17:08 -0400
+ (envelope-from <mst@redhat.com>) id 1jCMov-0002FS-No
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jCMlt-0000He-RH
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:17:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36332
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jCMlt-0000HY-MP
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:17:05 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02CCFHVH107674
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 08:17:05 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yqksa2xvc-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 08:17:04 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 12 Mar 2020 12:10:39 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Mar 2020 12:10:37 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02CCAa9f54591550
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Mar 2020 12:10:36 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D1AD75204F;
- Thu, 12 Mar 2020 12:10:36 +0000 (GMT)
-Received: from dyn-9-152-224-122.boeblingen.de.ibm.com (unknown
- [9.152.224.122])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A20785204E;
- Thu, 12 Mar 2020 12:10:36 +0000 (GMT)
-Subject: Re: [PATCH v9 14/15] docs: Add protvirt docs
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-15-frankja@linux.ibm.com>
- <569575c9-5819-f890-e218-99f3a23bee99@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 12 Mar 2020 13:10:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <mst@redhat.com>) id 1jCMos-0001wK-It
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:20:12 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22550
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCMos-0001vZ-AF
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 08:20:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584015609;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=caf0aq/+3hCAGKB0Nbz2/tgYSSJUpCC+sMR1em4LqFw=;
+ b=CkBinH0K4U4gwMAQPmwJvDLHpr068BBKEAd4dyuguTAKTHSS+OkgZGSLfi1C4My3NM01qE
+ KLjYYQ9rwgF7GWSOWkLa9o8g/Wx3bxb95gaTpmWc+li4NTFpZGMOhPY8KFQbmcO0zKsurX
+ enk64kx89II59s+kdBsIa7JlHplMR4Y=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-gP0LGwtqNZ-MIs3g9JCs3A-1; Thu, 12 Mar 2020 08:19:42 -0400
+X-MC-Unique: gP0LGwtqNZ-MIs3g9JCs3A-1
+Received: by mail-qt1-f198.google.com with SMTP id a21so3492984qto.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 05:19:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=4TaOmtwGEIy4Jv/NCSeuPpMj6ecKWF6IZRyi7KYqHp8=;
+ b=Vac/mu2fqjCZd2tlADIIHvbqL2vtbIKL4J4+pEd0P39+ZgQvWIZyLT+KvUUoS+ZgGi
+ JGD7jIrLLgQNftKU+e7FaIYTKIs29HunwgAGCoZgagy63SgoQvR8exZ6VUPdVMOUvMCO
+ 556uk2NiuHpfvBqOZaTCLe/0TeQ6mzILFK6xHPacmwdPDyn1x8eakM9OIvEUKL7c5GHz
+ JRp+xQBZre9TWrsZNUOudEbI8AN6L8fxFJexXqmetacgqxyROo7ptFnBTLOcw+gSFp2J
+ Lkv5So06QbD1PoWCfmgOdjIgp2e4d/T6DSRR68/BT48+VHrHm3z88jNZgXTv+yQO51xB
+ Ydww==
+X-Gm-Message-State: ANhLgQ0bMlonlPASEQU0E8r7cHQscJ/7giGQSA+aTNalkz/hu91Aq6rq
+ K1kgnx3EjPbRQpVmVDFxpAuu/cMQ3qzeznXfh8ucEm8b6P87tmp6e9Ys+EX8xfCBO2XDOTsIWGj
+ nYemQRN4A0yn+d0Y=
+X-Received: by 2002:a37:b084:: with SMTP id z126mr7564275qke.497.1584015581828; 
+ Thu, 12 Mar 2020 05:19:41 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvmw+IJkWFhgvZbPnm0+DkTcoowq4jKA3SDtmQZb9rI0INY649WzhI4McHbLUvlLuKS0tpZiQ==
+X-Received: by 2002:a37:b084:: with SMTP id z126mr7564237qke.497.1584015581397; 
+ Thu, 12 Mar 2020 05:19:41 -0700 (PDT)
+Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
+ by smtp.gmail.com with ESMTPSA id j17sm27778194qth.27.2020.03.12.05.19.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 12 Mar 2020 05:19:40 -0700 (PDT)
+Date: Thu, 12 Mar 2020 08:19:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <20200312080602-mutt-send-email-mst@kernel.org>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200311162509-mutt-send-email-mst@kernel.org>
+ <92564357-25c1-0a0f-537b-6902f45a88d0@oracle.com>
+ <20200312012859-mutt-send-email-mst@kernel.org>
+ <8cab6eba-22bc-a62e-d4a8-e2138b815a01@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <569575c9-5819-f890-e218-99f3a23bee99@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WJeSFAj8zKvlqpRPsLVXVQUJ016gI75WN"
-X-TM-AS-GCONF: 00
-x-cbid: 20031212-0008-0000-0000-0000035C1109
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031212-0009-0000-0000-00004A7D5AA8
-Message-Id: <f3e18afe-9cb2-7bd4-38f9-e4d176d0cc3a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-12_03:2020-03-11,
- 2020-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- suspectscore=3 adultscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
- spamscore=0 phishscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003120067
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <8cab6eba-22bc-a62e-d4a8-e2138b815a01@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,151 +105,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
+ Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WJeSFAj8zKvlqpRPsLVXVQUJ016gI75WN
-Content-Type: multipart/mixed; boundary="fg5bB5KB6S80vBk2oQjKxUXC6Rgcnh2y7"
+On Thu, Mar 12, 2020 at 01:30:01PM +0200, Liran Alon wrote:
+>=20
+> On 12/03/2020 8:12, Michael S. Tsirkin wrote:
+> > On Thu, Mar 12, 2020 at 01:20:02AM +0200, Liran Alon wrote:
+> > > On 11/03/2020 22:36, Michael S. Tsirkin wrote:
+> > > > Thanks for the patch! Some questions/comments:
+> > > >=20
+> > > > On Wed, Mar 11, 2020 at 07:08:26PM +0200, Liran Alon wrote:
+> > > > > From: Elad Gabay <elad.gabay@oracle.com>
+> > > > >=20
+> > > > > Microsoft introduced this ACPI table to avoid Windows guests perf=
+orming
+> > > > > various workarounds for device erratas. As the virtual device emu=
+lated
+> > > > > by VMM may not have the errata.
+> > > > >=20
+> > > > > Currently, WAET allows hypervisor to inform guest about two
+> > > > > specific behaviors: One for RTC and the other for ACPI PM Timer.
+> > > > >=20
+> > > > > Support for WAET have been introduced since Windows Vista. This A=
+CPI
+> > > > > table is also exposed by other hypervisors, such as VMware, by de=
+fault.
+> > > > >=20
+> > > > > This patch adds WAET ACPI Table to QEMU.
+> > > > Could you add a bit more info? Why is this so useful we are adding =
+this
+> > > > by default? How does it change windows behaviour when present?
+> > > It changes behavior as documented in the WAET specification linked be=
+low
+> > > (and the comments above the flags definitions).
+> > > Specifically for ACPI_WAET_PM_TIMER_GOOD (Which is the only bit we se=
+t), the
+> > > guest performs only one read of ACPI PM Timer instead of multiple to =
+obtain
+> > > it's value.
+> > > Which improves performance as it removes unnecessary VMExits.
+> > Sounds excellent. Pls include this info in the commit log.
+> Ok. Will do in v2.
+> > As with any
+> > performance optimization, pls add a bit of info about how you tested
+> > and what kind of speedup was seen.
+> This is a quite an old patch of ours that I upstream now to contribute to
+> community.
+> I will need to re-setup such environment for gathering exact performance
+> numbers.
+>=20
+> Having said that, note that there isn't really a trade-off here between
+> better performance or something else.
 
---fg5bB5KB6S80vBk2oQjKxUXC6Rgcnh2y7
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Well some guests are known to make crazy assumptions. E.g. they would
+see this bit and say "oh so I know this hyperv" or something to
+that end.
 
-On 3/11/20 5:16 PM, David Hildenbrand wrote:
+> We just expose a bit to guest that says to it: "You don't need to do this
+> useless thing that cause unnecessary VMExits. You can just do this simple
+> operation which is always better because we support it".
+> Therefore, as long as other guests just ignore this ACPI table (Which the=
+y
+> do as far as I've seen from the vast variety of instances we have run on
+> production for over 5 years), exposing this just have positive effect.
 >=20
-> I don't have to warn you that I am not a native speaker ;)
->=20
->> +Prerequisites
->> +-------------
->> +
->> +To run PVMs a machine with the Protected Virtualization feature
->=20
-> PVMs, a
->=20
->> +which is indicated by the Ultravisor Call facility (stfle bit
->=20
-> , which ..., is required
->=20
->> +158) is required. The Ultravisor needs to be initialized at boot by
->> +setting `prot_virt=3D1` on the kernel command line.
->> +
->> +If those requirements are met, the capability `KVM_CAP_S390_PROTECTED=
-`
->> +will indicate that KVM can support PVMs on that LPAR.
->> +
->> +
->> +QEMU Settings
->> +-------------
->> +
->> +To indicate to the VM that it can transition into protected mode, the=
-
->> +`Unpack facility` (stfle bit 161 represented by the feature
->> +`S390_FEAT_UNPACK`) needs to be part of the cpu model of the VM.
->=20
-> maybe mention the feature name instead of S390_FEAT_UNPACK ? "unpack"
->=20
->> +
->> +All I/O devices need to use the IOMMU.
->=20
-> need to/have to ?
->=20
->> +Passthrough (vfio) devices are currently not supported.
->=20
-> Does that have to be fenced or will they simply not be detected/not wor=
-k?
-
-I guess they will lead to the VM being killed by the kernel, since it
-can't access protected memory. I need to check that with Halil to
-confirm though.
-
->=20
->> +
->> +Host huge page backings are not supported. However guests can use hug=
+> Also note that besides VMware which expose it by default, you can also se=
 e
->> +pages as indicated by its facilities.
+> this exposed by default by some cloud hypervisors, such as GCP:
+> [=A0=A0=A0 0.000000] ACPI: WAET 0x00000000BFFF5CE0 000028 (v01 Google GOO=
+GWAET
+> 00000001 GOOG 00000001)
 >=20
-> Maybe mention what will happen if huge pages are used.
-
-Currently we would fail the unpack process, which I dislike because it
-would only log a cryptic error code. I will have a look if I can instead
-print an error when the subcode 10 is issued and return an error.
-
-
+> > > > > It also makes sure to introduce
+> > > > > the new ACPI table only for new machine-types.
+> > > > OK and why is that?
+> > > As ACPI tables are guest-visible, we should make sure to not change i=
+t
+> > > between machine-types.
+> > > For example, a change in ACPI tables may invalidate a Windows guest l=
+icense
+> > > activation (As platform have changed).
+> > I don't think there's something like this taken into account, no.
+> Windows measures at boot-time if the hardware have "changed too much" sin=
+ce
+> activation.
+> The way it does so, is calculating a "weighted diff score" based on a num=
+ber
+> of hardware properties.
 >=20
->> +
->> +
->> +Boot Process
->> +------------
->> +
->> +A secure guest image can either be loaded from disk or supplied on th=
-e
->> +QEMU command line. Booting from disk is done by the unmodified
->> +s390-ccw BIOS. I.e., the bootmap is interpreted, multiple components
->> +are read into memory and control is transferred to one of the
->> +components (zipl stage3). Stag3 does some fixups and then transfers
->> +control to some program residing in guest memory, which is normally
->> +the OS kernel. The secure image has another component prepended
->> +(stage3a) that uses the new diag308 subcodes 8 and 10 to trigger the
->> +transition into secure mode.
->> +
->> +Booting from the image supplied via the QEMU command line requires
->=20
-> via/on as above?
+> It is at least documented internally in Ravello that some guests have bee=
+n
+> witnessed to broke their license activation because of ACPI/SMBIOS change=
+s.
 
-Sure
+Any data on which changes exactly?
+All I know about is this list, though it's pretty old.
+https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-x=
+p/bb457054(v=3Dtechnet.10)?redirectedfrom=3DMSDN
 
->=20
->> +that the file passed via -kernel has the same memory layout as would
->> +result from the disk boot. This memory layout includes the encrypted
->> +components (kernel, initrd, cmdline), the stage3a loader and
->> +metadata. In case this boot method is used, the command line
->> +options -initrd and -cmdline are ineffective. The preparation of a PV=
-M
->=20
-> Is there way we could warn if these would be set?
+Any chance it was actually to do with the EOM table that bypasses
+activation?
 
-I'll have a look, but I'm unsure where I'll need to hook into to make
-such a check and it the effort is worth it.
+> > > But this is just a good practice in general and in the past it was sa=
+id by
+> > > maintainers that this is one of the main reasons that ACPI and SMBIOS
+> > > generation have moved from SeaBIOS to QEMU.
+> > I think a flag to disable this might make sense though. For example,
+> > some guests might behave differently and get broken.
+> Right. That's why I think it's a good practice to have this flag and tie =
+it
+> to machine-type.
 
->=20
->> +image is done by genprotimg of the s390-tools package.
->>
->=20
->=20
-> Acked-by: David Hildenbrand <david@redhat.com>
->=20
+Tying things to the machine type is not what I had in mind.
+A separate flag would also be helpful so users can tweak this
+for new machine types, too.
 
-Thanks!
+> Guest-visible changes shouldn't be exposed to old machine-types.
 
+Well almost any change in qemu is guest visible to some level.
+Even optimizations are guest visible.
+We made changes in ACPI without versioning in the past but I'm not
+opposed to versioning here. However in that case pls do add a bit
+of documentation about why this is done here.
+What I am asking about is whether we need a flag to disable
+this as part of the stable interface.
 
---fg5bB5KB6S80vBk2oQjKxUXC6Rgcnh2y7--
+> >=20
+> >=20
+> > > > > Signed-off-by: Elad Gabay <elad.gabay@oracle.com>
+> > > > > Co-developed-by: Liran Alon <liran.alon@oracle.com>
+> > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > > > > ---
+> > > > >    hw/i386/acpi-build.c        | 18 ++++++++++++++++++
+> > > > >    hw/i386/pc_piix.c           |  2 ++
+> > > > >    hw/i386/pc_q35.c            |  2 ++
+> > > > >    include/hw/acpi/acpi-defs.h | 25 +++++++++++++++++++++++++
+> > > > >    include/hw/i386/pc.h        |  1 +
+> > > > >    5 files changed, 48 insertions(+)
+> > > > >=20
+> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > index 9c4e46fa7466..29f70741cd96 100644
+> > > > > --- a/hw/i386/acpi-build.c
+> > > > > +++ b/hw/i386/acpi-build.c
+> > > > > @@ -2512,6 +2512,19 @@ build_dmar_q35(GArray *table_data, BIOSLin=
+ker *linker)
+> > > > >        build_header(linker, table_data, (void *)(table_data->data=
+ + dmar_start),
+> > > > >                     "DMAR", table_data->len - dmar_start, 1, NULL=
+, NULL);
+> > > > >    }
+> > > > > +
+> > > > > +static void
+> > > > > +build_waet(GArray *table_data, BIOSLinker *linker)
+> > Add documentation that it's a Windows Emulated Device Flags table,
+> > helpful to speed up windows guests, and ignored by others.
+> Ok. Will do in v2.
+> >=20
+> > > > > +{
+> > > > > +    AcpiTableWaet *waet;
+> > > > > +
+> > > > > +    waet =3D acpi_data_push(table_data, sizeof(*waet));
+> > > > Can combine with the previous line.
+> > > Ok. Will do in v2.
+> > > > > +    waet->emulated_device_flags =3D cpu_to_le32(ACPI_WAET_PM_TIM=
+ER_GOOD);
+> > > > > +
+> > > > > +    build_header(linker, table_data,
+> > > > > +                 (void *)waet, "WAET", sizeof(*waet), 1, NULL, N=
+ULL);
+> > > > > +}
+> > > > > +
+> > > > >    /*
+> > > > >     *   IVRS table as specified in AMD IOMMU Specification v2.62,=
+ Section 5.2
+> > > > >     *   accessible here https://urldefense.com/v3/__http://suppor=
+t.amd.com/TechDocs/48882_IOMMU.pdf__;!!GqivPVa7Brio!OAQpLo9QhdHiNDa_aRLR_ma=
+1nWLZU1aQhDozYgUlrqBZiz1vKdZgg-lTDMIj_5g$
+> > > > > @@ -2859,6 +2872,11 @@ void acpi_build(AcpiBuildTables *tables, M=
+achineState *machine)
+> > > > >                              machine->nvdimms_state, machine->ram=
+_slots);
+> > > > >        }
+> > > > > +    if (!pcmc->do_not_add_waet_acpi) {
+> > > > > +        acpi_add_table(table_offsets, tables_blob);
+> > > > > +        build_waet(tables_blob, tables->linker);
+> > > > > +    }
+> > > > > +
+> > > > >        /* Add tables supplied by user (if any) */
+> > > > >        for (u =3D acpi_table_first(); u; u =3D acpi_table_next(u)=
+) {
+> > > > >            unsigned len =3D acpi_table_len(u);
+> > > > > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> > > > > index 9088db8fb601..2d11a8b50a9c 100644
+> > > > > --- a/hw/i386/pc_piix.c
+> > > > > +++ b/hw/i386/pc_piix.c
+> > > > > @@ -432,9 +432,11 @@ DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0",=
+ NULL,
+> > > > >    static void pc_i440fx_4_2_machine_options(MachineClass *m)
+> > > > >    {
+> > > > > +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> > > > >        pc_i440fx_5_0_machine_options(m);
+> > > > >        m->alias =3D NULL;
+> > > > >        m->is_default =3D false;
+> > > > > +    pcmc->do_not_add_waet_acpi =3D true;
+> > > > >        compat_props_add(m->compat_props, hw_compat_4_2, hw_compat=
+_4_2_len);
+> > > > >        compat_props_add(m->compat_props, pc_compat_4_2, pc_compat=
+_4_2_len);
+> > > > >    }
+> > > > > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> > > > > index 84cf925cf43a..1e0a726b27a7 100644
+> > > > > --- a/hw/i386/pc_q35.c
+> > > > > +++ b/hw/i386/pc_q35.c
+> > > > > @@ -361,8 +361,10 @@ DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+> > > > >    static void pc_q35_4_2_machine_options(MachineClass *m)
+> > > > >    {
+> > > > > +    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> > > > >        pc_q35_5_0_machine_options(m);
+> > > > >        m->alias =3D NULL;
+> > > > > +    pcmc->do_not_add_waet_acpi =3D true;
+> > > > >        compat_props_add(m->compat_props, hw_compat_4_2, hw_compat=
+_4_2_len);
+> > > > >        compat_props_add(m->compat_props, pc_compat_4_2, pc_compat=
+_4_2_len);
+> > > > >    }
+> > > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-d=
+efs.h
+> > > > > index 57a3f58b0c9a..803c904471d5 100644
+> > > > > --- a/include/hw/acpi/acpi-defs.h
+> > > > > +++ b/include/hw/acpi/acpi-defs.h
+> > > > > @@ -634,4 +634,29 @@ struct AcpiIortRC {
+> > > > >    } QEMU_PACKED;
+> > > > >    typedef struct AcpiIortRC AcpiIortRC;
+> > > > > +/*
+> > > > > + * Windows ACPI Emulated Devices Table.
+> > > > > + * Specification:
+> > > > > + * https://urldefense.com/v3/__http://download.microsoft.com/dow=
+nload/7/E/7/7E7662CF-CBEA-470B-A97E-CE7CE0D98DC2/WAET.docx____;!!GqivPVa7Br=
+io!MX1Hzr4X9NtS4pcT1Kb4VlDoV-pobn4n6YYQCkU3U-7imIaxXmu_ZsQzPB0e2Tc$
+> > Please include
+> > - name of the spec
+> The name of the spec is "Windows ACPI Emulated Devices Table".
+> You can see this by entering above link...
 
---WJeSFAj8zKvlqpRPsLVXVQUJ016gI75WN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Links go stale. Then someone will have to dig to find the new location.
+Name of the document will be helpful for that.
 
------BEGIN PGP SIGNATURE-----
+> > - earliest revision that includes the relevant bits
+> The above link is to version 1.0 of the document (Which as far as I know,=
+ is
+> the only version ever released).
+> So the bits exists in all revisions. Which documentation do you want me t=
+o
+> add then?
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5qJrwACgkQ41TmuOI4
-ufgrbA//caHBGWzeZNGJr3+VQxKrW3BYZUYpeIAXztU+ibJln4FpuX5QsqCT+dvA
-a3JA0JV5wNfUIkSxJ+VYUG7qOzEp8BfM/n/72E2kZ7zt7taBTDaqTecNuHwQ+TDz
-JHsRBmyduq/sHPvy5PnhdGzzJxvy+x//rxkiy++OD+gRssQBw+jXh5KyHpw1te42
-YCdS2z9M3+YtxN++RrakvUbzZJqwV2J0LOvVP4BGDmwcGKgz905OhqZi2BzWQlOa
-z5h/UlinuKQOd+S0vcagO1bnMp6MUr/qw25+Gj6GovX+ASgXCxUwc7zFYBG6m++c
-hPcGM0WJstPMCS3BqB2vmJcjsSAWQPTQBwygHZKy40UP0Ruqulw8t2B0GZLTOE3z
-jGvHNlTxZin5H6+D5h/8GDO12kJC8+SoWdF7LkhUR3/FUPxirefrBtkfo0w/OauU
-yQvCxk0oofIEeZxngqaXaK9D9P11TYoUKk3fnOc1Bc69O5osEC2vvcCRaTdra8UL
-YeRkj/uPmkVE5LAI9+YvC8H9GD6cNAX/qI765ibPPJcuOgTsoRYwSp0jqs0RQxOH
-EvEkfuNO5qhsB17pla7mwJopJwL08zIXoDUSP5wR+pPTmdW1+nKNxUmaRBSU1jLK
-d+5nyaPiiLBhqnAZkoY6tGQPV6r7wfLlD7CMtctNfCFtA+MU9dY=
-=OyOa
------END PGP SIGNATURE-----
+1. name of the document
+2. revision of the document that includes the bit (if multiple,
+include the earliest revision)
 
---WJeSFAj8zKvlqpRPsLVXVQUJ016gI75WN--
+--=20
+MST
 
 
