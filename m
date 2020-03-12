@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D89C10DCE
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0267EC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B76ED20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6E7E20674
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 11:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kTUiXXDZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76ED20674
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g2Qvk9Xj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6E7E20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCMH5-0004yX-RA
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:45:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58033)
+	id 1jCMHA-00056O-VN
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 07:45:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMG6-0003RK-Qx
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:15 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMG8-0003RQ-1S
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jCMG5-0001zh-RR
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:14 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44198)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCMG6-00020T-T9
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:15 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:45696)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jCMG5-0001z9-LY
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:13 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l18so6981063wru.11
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:13 -0700 (PDT)
+ id 1jCMG6-0001zv-NA
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 07:44:14 -0400
+Received: by mail-wr1-x434.google.com with SMTP id m9so6988913wro.12
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 04:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=UObsBGwVnKBodrfFF5Zg1LJ0/tMYPiJ56dulhQSD3Lg=;
- b=kTUiXXDZ9C3JA5EI6l72dJtvyZvaDtdxTssHCSl7LBD1CCYPZNwvmah5q2bdQkEQM3
- mfl1SNEUXWEwgAh9Wj7qiOKeRJCpV01FBKNsB2ZTckj9uIMOSlCuBm2niz4snbJjYand
- 23VeBP8+qUtFansEM23f/q4frPWHFUW+66k0PuIgm8MVIhmsyUQ7dA8cbdAd62gfg3Fd
- o7q+MHGqidP1HHznefdiFy+mUen4+LWPWS7VWrBqF4W0IQC55xRKgWQZynls2SexSECB
- r+31zACbkJvNx5VpQ9YrBNST7xDA1QdBf7gFQk4/aGfD616KBDVjZ5xb6rn0NAYu9IYE
- 5xTw==
+ bh=Wtsv78F6mJieh5xJc3TypPpJyRz/ixRbYU95r889w4Y=;
+ b=g2Qvk9XjcN9D9eamrJWm8nqNgyt7qRkO004yCndHWA2Tmb5s6gpBnw3ab1Up/+yt5J
+ zffp5WX8PTCaM3CXhFlvAxiQoMOrfT8LvV/bo2vAd7ntAJiDU5f8zAaP/BQnR1soF8dU
+ 8UIyYxVNMoFTvBgO9TccdMaow9owMuAgY8pfnnxWOMMswOKwXhlCe0JRGhAk0qisZ1+M
+ 4ZMAXwuDyQDyyPkMTGgOeJv4SKCOEfWf+Wp/Z4PFzwC6FfePaOkSwAmh+BUql0iN85DL
+ X+OAssAdR5NSJsgfNKdzIrEs3dZHkol7m3cT9h4AzogpDXSLyBEzF2Qps+phFOGuDG9V
+ bXZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UObsBGwVnKBodrfFF5Zg1LJ0/tMYPiJ56dulhQSD3Lg=;
- b=esT1YW+1Iaoy1MrhIdrOYJxJQC2QWimtkxjmHqeDvPv+dRkint4gjmPvkMcIoO6hdJ
- 5RvKAB4a9E4XhSgqB9c2wE6CIlM0ROAOvxP9kkAQqZ075bUd355/a75Bo1q5gXLZKpqz
- MEpj4aVo1p3ZDKIt7kIdFZ4t7nmHtuL4WQ2z//dMBojgnheSYFbpkm0DxAyPpt29iqn3
- c/YvBMA/rDbBxQh/KiZx1bjJiHYL08KFtiSH/yc+revvw61j6HDuyV91cIxcupTmKm9i
- 623mn38HAq1rFpHWBX/AAcj5jLc1tljqMhiwSRxqGvHxLZAdDEC5ihHv17dAGvU0/0uH
- Z7jQ==
-X-Gm-Message-State: ANhLgQ29uoSUU71ODC8S0336ix8jmm7a4g+zRuhWIvss0d8J8sxQgyu5
- fw1bgxr16FxObnuvxx8p6ZT/+bm4RvaYtw==
-X-Google-Smtp-Source: ADFU+vvdKNsSgTesq0bIPNGD3H0XybdrmR3IkLCnns+OaycSNxVLr5ZZOapKIItp+P/4F/7rIbwd2g==
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr10489333wrk.407.1584013452421; 
- Thu, 12 Mar 2020 04:44:12 -0700 (PDT)
+ bh=Wtsv78F6mJieh5xJc3TypPpJyRz/ixRbYU95r889w4Y=;
+ b=BZE56fD06kouuzXhWJiFVheClgJvCXmQ0+pWm9jdhVkKDZsO15AFQP+4IrbW247u+6
+ JtOig/dK6I+Kpaw3Ezid6gUn9MhUud4bUCdAaZO6N3Pp7CfKr+VwB0WiW4cvZB61d+Ga
+ RTnZGGjpGMLKHeDV8FoJtpfeODsUGzm4UaeLfUgBlslbMFrKLkUwUzZhGryFn4qZIgjj
+ 1CGpCMyCbdgWkR+PR4MEDYbtNwXV3n+beFKlDLXcV+QJCKfoPE/J0rxaJG+77hq7moPG
+ 69FAPlQV1yVcldBahPodmuSzVicPpd1HVHDfYgj7Ycf6SEIUvEiDfjS1Gx/U17GgoU0r
+ sSWA==
+X-Gm-Message-State: ANhLgQ3nS/FQ0m5Mmggre9pnnXlW3BejR+J1emjsQqUrs3Phxy0vMQoE
+ 5rssnyrCE3cub4tuqbzt2zLiURIG/5otxQ==
+X-Google-Smtp-Source: ADFU+vsHOULlPTrhQ4uXnyz49FYMK7afZcGMp+6FEWX/hIasJG6KhhtYMxDmooLAhCqFRe3y6fe1Ew==
+X-Received: by 2002:adf:f089:: with SMTP id n9mr10639715wro.395.1584013453402; 
+ Thu, 12 Mar 2020 04:44:13 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.11
+ by smtp.gmail.com with ESMTPSA id p16sm2688564wmg.22.2020.03.12.04.44.12
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 04:44:11 -0700 (PDT)
+ Thu, 12 Mar 2020 04:44:12 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/12] Makefile: Remove redundant Texinfo related code
-Date: Thu, 12 Mar 2020 11:43:57 +0000
-Message-Id: <20200312114408.16891-2-peter.maydell@linaro.org>
+Subject: [PULL 02/12] Update comments in .hx files that mention Texinfo
+Date: Thu, 12 Mar 2020 11:43:58 +0000
+Message-Id: <20200312114408.16891-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200312114408.16891-1-peter.maydell@linaro.org>
 References: <20200312114408.16891-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,44 +97,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recent conversion of qemu-doc.texi to rST forgot a few stray bits
-of makefile code that are now redundant. Remove them.
+Update the header comments in .hx files that mention STEXI/ETEXI
+markup; this is now SRST/ERST as all these files have been
+converted to rST.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200306171749.10756-2-peter.maydell@linaro.org
+Message-id: 20200306171749.10756-3-peter.maydell@linaro.org
 ---
- Makefile | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ hmp-commands-info.hx | 8 ++++----
+ hmp-commands.hx      | 8 ++++----
+ qemu-options.hx      | 8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 37aed4a2442..fae4ce181ea 100644
---- a/Makefile
-+++ b/Makefile
-@@ -795,7 +795,7 @@ rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(M
- endef
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 499d6d54b01..ca5198438de 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -1,9 +1,9 @@
+-HXCOMM Use DEFHEADING() to define headings in both help text and texi
+-HXCOMM Text between STEXI and ETEXI are copied to texi version and
+-HXCOMM discarded from C version
++HXCOMM Use DEFHEADING() to define headings in both help text and rST.
++HXCOMM Text between SRST and ERST is copied to the rST version and
++HXCOMM discarded from C version.
+ HXCOMM DEF(command, args, callback, arg_string, help) is used to construct
+ HXCOMM monitor info commands
+-HXCOMM HXCOMM can be used for comments, discarded from both texi and C
++HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
+ HXCOMM
+ HXCOMM In this file, generally SRST fragments should have two extra
+ HXCOMM spaces of indent, so that the documentation list item for "info foo"
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index f12263e071f..7f0f3974ad9 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1,9 +1,9 @@
+-HXCOMM Use DEFHEADING() to define headings in both help text and texi
+-HXCOMM Text between STEXI and ETEXI are copied to texi version and
+-HXCOMM discarded from C version
++HXCOMM Use DEFHEADING() to define headings in both help text and rST.
++HXCOMM Text between SRST and ERST is copied to the rST version and
++HXCOMM discarded from C version.
+ HXCOMM DEF(command, args, callback, arg_string, help) is used to construct
+ HXCOMM monitor commands
+-HXCOMM HXCOMM can be used for comments, discarded from both texi and C
++HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
  
- distclean: clean
--	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
-+	rm -f config-host.mak config-host.h* config-host.ld $(DOCS)
- 	rm -f tests/tcg/config-*.mak
- 	rm -f config-all-devices.mak config-all-disas.mak config.status
- 	rm -f $(SUBDIR_DEVICES_MAK)
-@@ -1122,15 +1122,6 @@ $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
- 	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
-              "GEN","$@")
  
--qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-monitor.texi: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
--qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
--	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
--
- docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
- 	@cp -p $< $@
+     {
+diff --git a/qemu-options.hx b/qemu-options.hx
+index f9fefd43be9..1d8f852d896 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1,10 +1,10 @@
+-HXCOMM Use DEFHEADING() to define headings in both help text and texi
+-HXCOMM Text between STEXI and ETEXI are copied to texi version and
+-HXCOMM discarded from C version
++HXCOMM Use DEFHEADING() to define headings in both help text and rST.
++HXCOMM Text between SRST and ERST is copied to the rST version and
++HXCOMM discarded from C version.
+ HXCOMM DEF(option, HAS_ARG/0, opt_enum, opt_help, arch_mask) is used to
+ HXCOMM construct option structures, enums and help message for specified
+ HXCOMM architectures.
+-HXCOMM HXCOMM can be used for comments, discarded from both texi and C
++HXCOMM HXCOMM can be used for comments, discarded from both rST and C.
+ 
+ DEFHEADING(Standard options:)
  
 -- 
 2.20.1
