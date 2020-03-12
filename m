@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E97C1975A
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEDBC10DCE
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:29:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C94EC206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:29:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC3EE206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Mar 2020 19:29:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOf7Fd2f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C94EC206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVVlBNIe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3EE206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCTWf-0005ou-RS
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42178)
+	id 1jCTWj-0005vA-0D
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 15:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCTVW-0004GF-IC
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:39 -0400
+ (envelope-from <eblake@redhat.com>) id 1jCTVa-0004Or-Oc
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCTVV-0006uC-I4
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22005
+ (envelope-from <eblake@redhat.com>) id 1jCTVZ-00072w-8z
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47553
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCTVV-0006sw-Ez
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:37 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCTVZ-00071G-4l
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 15:28:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584041317;
+ s=mimecast20190719; t=1584041320;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iuMYgC9w9ONLyxeRRLmmWK1FsLOHsfI+Gf/8rjpkgSs=;
- b=EOf7Fd2fwKuczSX0iz2neLpvMsk9i8dd/OsBCrjeZsVyyqUBzpYO2kTrHVjmMp/A0zTPH+
- A8XvKNcOyong7lSeLMztMmP0nOKv61lTcaruTD/JivwC8xQnPWg0wKeSPrvueHpHDSVJLL
- E7HV7gufvxoPkKZgg0x+NaY5kOJ3qgs=
+ bh=uLYZ0NYdK4KlsEb4Jhb+oZYrHEz1g67ux3Km4nveCu8=;
+ b=VVVlBNIeafLsJgYdbNNz6Tb5WzkCDKJxECGSpQX5nteU+oHJn1HGUju1a0YcANO4EvgSY0
+ HTdiKgdIhsi0ArhinpQUN7QGL+HkGjVehI4q/KuBefRkRqrW0DZDfOWHKWzFQVGWgXQS4n
+ N+BqQviimb10nINBUQfRtRGfF1+Vcvk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-zIX4nardOLeBD12wl20DFw-1; Thu, 12 Mar 2020 15:28:34 -0400
-X-MC-Unique: zIX4nardOLeBD12wl20DFw-1
+ us-mta-23-q3Ycqmd2Nja3ZyIlAfLWRA-1; Thu, 12 Mar 2020 15:28:38 -0400
+X-MC-Unique: q3Ycqmd2Nja3ZyIlAfLWRA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A5A6800D53;
- Thu, 12 Mar 2020 19:28:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C5B8107ACC7;
+ Thu, 12 Mar 2020 19:28:37 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-116-177.phx2.redhat.com [10.3.116.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B0985DA7B;
- Thu, 12 Mar 2020 19:28:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E60975DDA5;
+ Thu, 12 Mar 2020 19:28:36 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/7] vmdk: Add trivial backing_fmt support
-Date: Thu, 12 Mar 2020 14:28:17 -0500
-Message-Id: <20200312192822.3739399-3-eblake@redhat.com>
+Subject: [PATCH v4 4/7] qcow2: Deprecate use of qemu-img amend to change
+ backing file
+Date: Thu, 12 Mar 2020 14:28:19 -0500
+Message-Id: <20200312192822.3739399-5-eblake@redhat.com>
 In-Reply-To: <20200312192822.3739399-1-eblake@redhat.com>
 References: <20200312192822.3739399-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -72,7 +73,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,69 +86,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Fam Zheng <fam@euphon.net>, pkrempa@redhat.com,
- qemu-block@nongnu.org, kchamart@redhat.com, libvir-list@redhat.com,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- mreitz@redhat.com, "open list:Trivial patches" <qemu-trivial@nongnu.org>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
+ kchamart@redhat.com, libvir-list@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmdk already requires that if backing_file is present, that it be
-another vmdk image (see vmdk_co_do_create).  Meanwhile, we want to
-move towards always being explicit about the backing format for other
-drivers where it matters.  So for convenience, make qemu-img create -F
-vmdk work, while rejecting all other explicit formats (note that this
-is only for QemuOpts usage; there is no change to the QAPI to allow a
-format through -blockdev).
+The use of 'qemu-img amend' to change qcow2 backing files is not
+tested very well.  In particular, our implementation has a bug where
+if a new backing file is provided without a format, then the prior
+format is blindly reused, even if this results in data corruption, but
+this is not caught by iotests.
+
+There are also situations where amending other options needs access to
+the original backing file (for example, on a downgrade to a v2 image,
+knowing whether a v3 zero cluster must be allocated or may be left
+unallocated depends on knowing whether the backing file already reads
+as zero), but the command line does not have a nice way to tell us
+both the backing file to use for opening the image as well as the
+backing file to install after the operation is complete.
+
+Even if we do allow changing the backing file, it is redundant with
+the existing ability to change backing files via 'qemu-img rebase -u'.
+It is time to deprecate this support (leaving the existing behavior
+intact, even if it is buggy), and at a point in the future, require
+the use of only 'qemu-img rebase' for adjusting backing chain
+relations, saving 'qemu-img amend' for changes unrelated to the
+backing chain.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/vmdk.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ docs/system/deprecated.rst | 12 ++++++++++++
+ docs/tools/qemu-img.rst    |  4 ++++
+ block/qcow2.c              |  5 +++++
+ tests/qemu-iotests/061.out |  1 +
+ tests/qemu-iotests/082.out |  2 ++
+ 5 files changed, 24 insertions(+)
 
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 20e909d99794..3c7893817afe 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2611,6 +2611,14 @@ static int coroutine_fn vmdk_co_create_opts(const ch=
-ar *filename, QemuOpts *opts
-     bool zeroed_grain;
-     bool compat6;
-     VMDKCreateOptsData data;
-+    char *backing_fmt =3D NULL;
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 0838338d8fbe..4261d5589e6a 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -370,6 +370,18 @@ The above, converted to the current supported format::
+ Related binaries
+ ----------------
+
++qemu-img amend to adjust backing file (since 5.0.0)
++'''''''''''''''''''''''''''''''''''''''''''''''''''
 +
-+    backing_fmt =3D qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FMT);
-+    if (backing_fmt && strcmp(backing_fmt, "vmdk") !=3D 0) {
-+        error_setg(errp, "backing_file must be a vmdk image");
-+        ret =3D -EINVAL;
-+        goto exit;
-+    }
++The use of ``qemu-img amend`` to modify the name or format of a qcow2
++backing image is deprecated; this functionality was never fully
++documented or tested, and interferes with other amend operations that
++need access to the original backing image (such as deciding whether a
++v3 zero cluster may be left unallocated when converting to a v2
++image).  Rather, any changes to the backing chain should be performed
++with ``qemu-img rebase -u`` either before or after the remaining
++changes being performed by amend, as appropriate.
++
+ ``qemu-img convert -n -o`` (since 4.2.0)
+ ''''''''''''''''''''''''''''''''''''''''
 
-     if (filename_decompose(filename, path, prefix, postfix, PATH_MAX, errp=
-)) {
-         ret =3D -EINVAL;
-@@ -2669,6 +2677,7 @@ static int coroutine_fn vmdk_co_create_opts(const cha=
-r *filename, QemuOpts *opts
-                             vmdk_co_create_opts_cb, &data, errp);
+diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
+index 0080f83a76c9..83d57586be96 100644
+--- a/docs/tools/qemu-img.rst
++++ b/docs/tools/qemu-img.rst
+@@ -254,6 +254,10 @@ Command description:
+   Amends the image format specific *OPTIONS* for the image file
+   *FILENAME*. Not all file formats support this operation.
 
- exit:
-+    g_free(backing_fmt);
-     g_free(adapter_type);
-     g_free(backing_file);
-     g_free(hw_version);
-@@ -3005,6 +3014,11 @@ static QemuOptsList vmdk_create_opts =3D {
-             .type =3D QEMU_OPT_STRING,
-             .help =3D "File name of a base image"
-         },
-+        {
-+            .name =3D BLOCK_OPT_BACKING_FMT,
-+            .type =3D QEMU_OPT_STRING,
-+            .help =3D "Must be 'vmdk' if present",
-+        },
-         {
-             .name =3D BLOCK_OPT_COMPAT6,
-             .type =3D QEMU_OPT_BOOL,
++  The set of options that can be amended are dependent on the image
++  format, but note that amending the backing chain relationship should
++  instead be performed with ``qemu-img rebase``.
++
+ .. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
+] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+
+   Run a simple sequential I/O benchmark on the specified image. If ``-w`` =
+is
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d44b45633dbb..97a1757156bb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5281,6 +5281,11 @@ static int qcow2_amend_options(BlockDriverState *bs,=
+ QemuOpts *opts,
+     }
+
+     if (backing_file || backing_format) {
++        if (g_strcmp0(backing_file, s->image_backing_file) ||
++            g_strcmp0(backing_format, s->image_backing_format)) {
++            warn_report("Deprecated use of amend to alter the backing file=
+; "
++                        "use qemu-img rebase instead");
++        }
+         ret =3D qcow2_change_backing_file(bs,
+                     backing_file ?: s->image_backing_file,
+                     backing_format ?: s->image_backing_format);
+diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
+index 8b3091a412bc..3bf37b526f8b 100644
+--- a/tests/qemu-iotests/061.out
++++ b/tests/qemu-iotests/061.out
+@@ -342,6 +342,7 @@ wrote 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++qemu-img: warning: Deprecated use of amend to alter the backing file; use =
+qemu-img rebase instead
+ read 131072/131072 bytes at offset 0
+ 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
+diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
+index 9d4ed4dc9d61..94ea990a2754 100644
+--- a/tests/qemu-iotests/082.out
++++ b/tests/qemu-iotests/082.out
+@@ -806,10 +806,12 @@ Creation options for 'qcow2':
+ Note that not all of these options may be amendable.
+
+ Testing: amend -f qcow2 -o backing_file=3DTEST_DIR/t.qcow2,,help TEST_DIR/=
+t.qcow2
++qemu-img: warning: Deprecated use of amend to alter the backing file; use =
+qemu-img rebase instead
+
+ Testing: rebase -u -b  -f qcow2 TEST_DIR/t.qcow2
+
+ Testing: amend -f qcow2 -o backing_file=3DTEST_DIR/t.qcow2,,? TEST_DIR/t.q=
+cow2
++qemu-img: warning: Deprecated use of amend to alter the backing file; use =
+qemu-img rebase instead
+
+ Testing: rebase -u -b  -f qcow2 TEST_DIR/t.qcow2
+
 --=20
 2.25.1
 
