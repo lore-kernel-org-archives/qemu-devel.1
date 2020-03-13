@@ -2,86 +2,116 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D669CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF40C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F5182074E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:49:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nh4LkDLg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5182074E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 778AF2074C
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:49:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 778AF2074C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCsAx-0003Fy-ID
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:49:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46224)
+	id 1jCsBJ-0003kD-L8
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:49:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCsA7-00028v-DD
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:48:12 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jCsAS-0002nO-LO
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCsA6-0000pL-5a
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:48:11 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39121
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCsA6-0000hN-0q
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:48:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584136089;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lZ1ipuWhr00Q7fnHx89znDp6U66N5ws9/G+x5se4voo=;
- b=Nh4LkDLgX+NM9WJ6vTVQVN1kvb4EbG+LZcEnOcBrM4LVaEqBqBdO+/3pP30assxiMOsyYD
- heyYd/NRzTIsJPsOueuTlzrV5HBBnd3D0dZbHJRWN7FLCeReqIquQXmnqIy2qiZyRngFYm
- 3ESy7vatuR71mGaNrB5Lvdywx9Znz1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-yMa2RtZ8O4iWXrdax-v3Ug-1; Fri, 13 Mar 2020 17:48:06 -0400
-X-MC-Unique: yMa2RtZ8O4iWXrdax-v3Ug-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB685108838D;
- Fri, 13 Mar 2020 21:48:04 +0000 (UTC)
-Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 227CA96B60;
- Fri, 13 Mar 2020 21:47:59 +0000 (UTC)
-Subject: Re: [PATCH 4/5] block/io: fix bdrv_co_do_pwrite_zeroes head
- calculation
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200302100537.29058-1-vsementsov@virtuozzo.com>
- <20200302100537.29058-5-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <67a739c0-61c2-2134-50d5-559ed5f3a7e0@redhat.com>
-Date: Fri, 13 Mar 2020 16:47:58 -0500
+ (envelope-from <laurent@vivier.eu>) id 1jCsAR-0003IX-H4
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:48:32 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:49625)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jCsAO-0002wQ-Sl; Fri, 13 Mar 2020 17:48:29 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MlfCm-1jcXvp1iCI-00imBF; Fri, 13 Mar 2020 22:48:23 +0100
+Subject: Re: [PATCH v7 2/4] linux-user/syscall: Add support for
+ clock_gettime64/clock_settime64
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org, aleksandar.m.mail@gmail.com
+References: <cover.1584051142.git.alistair.francis@wdc.com>
+ <4a7fd05532400d10aa0f684c9043e2ac7b34d91c.1584051142.git.alistair.francis@wdc.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <2ff48a56-8230-493d-f014-e4e164404b04@vivier.eu>
+Date: Fri, 13 Mar 2020 22:48:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200302100537.29058-5-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4a7fd05532400d10aa0f684c9043e2ac7b34d91c.1584051142.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:ZPUddPnQtnLw4YQkkev0f9fD671oM5o5qk7t5ONx1PRUEAmCs5u
+ dIQrOndpQQ+JXUJr9NUtCuBHq/9KLA2CzEEGKTZXB+3bl0mvD7jjYdqMVran8jYQvp6VSwG
+ vOEEilUgKCy8RUDFXSNDI7aueGN+by1A3DE3VAgn9xpy0cUX7vjoW5Jq25QOLcT6moBm07K
+ W1WrdfwrHHZvLo6p0j7fg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1R1PaJTIh3Q=:OyHm0V0OQpOGVqpZNs/gve
+ xAInoq0o5apwusajlWFXxfAJnJFjTXYSSrxlk9RRZIrUEvsAaBjM4yE51pf/sbUg0rbZ5egS9
+ 5tX3CAjbm3Zwd59zHb7Nn0O9Ia4es6Vjfg+fr74ZC9EbkmCNALTy5+3rjXm3jg0b4bmHdBDQt
+ /fCaJVgp4AJN8mDdgPlV33HCf4UtVsVWGHnjDEnKSdEs+kfaNb6N45Sb9lN+89tc5Fo+RXSGl
+ XoPIovkeuitxxguJS9zNoJrU0FzmSiNKwJQbipwEcj9r39QtFhbLz5fhJRd6wqxgDREKhflsm
+ aaczWxO4QBioSd58OY/H6Vdq4T2W5oCPfh5J+hyxpzlHyvtGveX4buoLOCjOCU/KUqs5F6KDM
+ p04FeO1VadzglzLu5PtiypU1nVqEFX9Od/SWK1dBnhmSv9XtrPnOQ3Kvb/s28AddtiBDiETNk
+ OkNEnjynrQar8xx/qBAf7ZhlDKUz3Fbd6rG0pzc9yVxnctjX1duBTWrYpFnRezsqRKbN4rXFk
+ I8lUUDFuP5nYrGjuDis6HqIFuhQLSHOnqRXKE3hgCfMCP0/YWnQXIkGihYaTIQ9xNvPpfHtIi
+ 8OEkp7i58t+RxB8WMBNCCA60IdmFNuw2A9PK6wCUmFYHfnSjjjjngl7LcR1oTrb+Kk5dhQW3A
+ beHZTivQmmj5+6dVLT0pC0an5fheTZi3OC3WkagKnK+HUu3mNQuIsRR09lFb5kHK6x3zQWTtc
+ L4geSJYsRFh6gqnxgWjYmdeq9b71GTm/RmPyK9oxV+1d18hx7Y4W9SqOKAZPy8XvEfulVPQvn
+ 3nCdTPCevOWKaG+IkvJhwhXNphqrguAIN10D5P1etzBJQUEtURcScGf5LfgBjnd0o70r9ow
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,86 +123,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: alistair23@gmail.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 4:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It's wrong to update head using num in this place, as num may be
-> reduced during the iteration, and we'll have wrong head value on next
-> iteration.
+Le 12/03/2020 à 23:13, Alistair Francis a écrit :
+> Add support for the clock_gettime64/clock_settime64 syscalls.
 > 
-> Instead update head at iteration end.
+> If your host is 64-bit or is 32-bit with the *_time64 syscall then the
+> timespec will correctly be a 64-bit time_t. Otherwise the host will
+> return a 32-bit time_t which will be rounded to 64-bits. This will be
+> incorrect after y2038.
 > 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->   block/io.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-
-Offhand, I don't see how this fixes any bug....
-/me reads on
-
+>  linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
 > 
-> diff --git a/block/io.c b/block/io.c
-> index 75fd5600c2..c64566b4cf 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1785,7 +1785,6 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->                * convenience, limit this request to max_transfer even if
->                * we don't need to fall back to writes.  */
->               num = MIN(MIN(bytes, max_transfer), alignment - head);
-> -            head = (head + num) % alignment;
->               assert(num < max_write_zeroes);
-
-Here, we've asserted that if head was non-zero, num was already smaller 
-than max_write_zeroes.  The rest of the loop does indeed have code that 
-appears like it can reduce num, but that code is guarded:
-
-         /* limit request size */
-         if (num > max_write_zeroes) {
-             num = max_write_zeroes;
-         }
-...
-         if (ret == -ENOTSUP && !(flags & BDRV_REQ_NO_FALLBACK)) {
-             /* Fall back to bounce buffer if write zeroes is unsupported */
-             BdrvRequestFlags write_flags = flags & ~BDRV_REQ_ZERO_WRITE;
-
-             if ((flags & BDRV_REQ_FUA) &&
-                 !(bs->supported_write_flags & BDRV_REQ_FUA)) {
-                 /* No need for bdrv_driver_pwrite() to do a fallback
-                  * flush on each chunk; use just one at the end */
-                 write_flags &= ~BDRV_REQ_FUA;
-                 need_flush = true;
-             }
-             num = MIN(num, max_transfer);
-
-Oh. Now I see.  If max_write_zeroes is > max_transfer, but we fall back 
-to a bounce buffer, it is indeed possible that a misaligned request that 
-forces fallbacks to writes may indeed require more than one write to get 
-to the point where it is then using a buffer aligned to max_write_zeroes.
-
-Do we have an iotest provoking this, or is it theoretical?  With an 
-iotest, this one is material for 5.0 even if the rest of the series 
-misses soft freeze.
-
->           } else if (tail && num > alignment) {
->               /* Shorten the request to the last aligned sector.  */
-> @@ -1844,6 +1843,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->   
->           offset += num;
->           bytes -= num;
-> +        if (head) {
-> +            head = offset % alignment;
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 909bec94a5..60fd775d9c 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1229,6 +1229,22 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+>  }
+>  #endif
+>  
+> +#if defined(TARGET_NR_clock_settime64)
+> +static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
+> +                                                 abi_ulong target_addr)
+> +{
+> +    struct target__kernel_timespec *target_ts;
+> +
+> +    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
+> +    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
+> +    unlock_user_struct(target_ts, target_addr, 0);
+> +    return 0;
+> +}
+> +#endif
+> +
+>  static inline abi_long host_to_target_timespec(abi_ulong target_addr,
+>                                                 struct timespec *host_ts)
+>  {
+> @@ -11458,6 +11474,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          return ret;
+>      }
+>  #endif
+> +#ifdef TARGET_NR_clock_settime64
+> +    case TARGET_NR_clock_settime64:
+> +    {
+> +        struct timespec ts;
+> +
+> +        ret = target_to_host_timespec64(&ts, arg2);
+> +        if (!is_error(ret)) {
+> +            ret = get_errno(clock_settime(arg1, &ts));
 > +        }
+> +        return ret;
+> +    }
+> +#endif
+>  #ifdef TARGET_NR_clock_gettime
+>      case TARGET_NR_clock_gettime:
+>      {
+> @@ -11469,6 +11497,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          return ret;
+>      }
+>  #endif
+> +#ifdef TARGET_NR_clock_gettime64
+> +    case TARGET_NR_clock_gettime64:
+> +    {
+> +        struct timespec ts;
+> +        ret = get_errno(clock_gettime(arg1, &ts));
+> +        if (!is_error(ret)) {
+> +            ret = host_to_target_timespec64(arg2, &ts);
+> +        }
+> +        return ret;
+> +    }
+> +#endif
+>  #ifdef TARGET_NR_clock_getres
+>      case TARGET_NR_clock_getres:
+>      {
+> 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Applied to my linux-user branch.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Thanks,
+Laurent
 
