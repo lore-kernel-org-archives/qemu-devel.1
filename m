@@ -2,85 +2,67 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53140C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5026FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:16:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B4432074E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:07:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1DCJktR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B4432074E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25A4D2074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A4D2074A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCrXA-00017S-6T
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:07:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59921)
+	id 1jCrf0-0003eq-AW
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:16:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCrWZ-0000cg-PR
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:07:21 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jCreC-00039S-8P
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCrWX-00076c-Ol
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:07:19 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50275
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCrWX-00075a-IK
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:07:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584133636;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=obMUTDdvE19684E2P9L7tPR40QzciiuH+t6H9NT6rzg=;
- b=a1DCJktRa8vlPzCEYS5t8/779K6nGJWGPDNWCXklQmLa3V7QQqanGlD2GzVBJdcrVnr7Rz
- kRs9BQSejd4tQe/OvJuju0L/s7gEO5D2+mk1lSb0huezCTS6LflZYtR2fY7ZqU+miLj8Fh
- Ne013eIFLNkhAjLeDLlBdhfV+K2JK84=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-ef4qhN3pM4yHgkqjQjNK-Q-1; Fri, 13 Mar 2020 17:07:09 -0400
-X-MC-Unique: ef4qhN3pM4yHgkqjQjNK-Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E114F8017CC;
- Fri, 13 Mar 2020 21:07:07 +0000 (UTC)
-Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B5769051B;
- Fri, 13 Mar 2020 21:07:03 +0000 (UTC)
-Subject: Re: [PATCH 3/5] block: add max_pwrite_zeroes_no_fallback to
- BlockLimits
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200302100537.29058-1-vsementsov@virtuozzo.com>
- <20200302100537.29058-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <422e0c60-4423-b474-0836-3ea8997c90da@redhat.com>
-Date: Fri, 13 Mar 2020 16:07:03 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1jCreA-0007v6-P5
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:15:11 -0400
+Resent-Date: Fri, 13 Mar 2020 17:15:11 -0400
+Resent-Message-Id: <E1jCreA-0007v6-P5@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21124)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jCre6-0007tP-Ig; Fri, 13 Mar 2020 17:15:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584134071; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=jhm8CxGQIfWeGaq4opPE8BO7XIHO0+RECoX6OvEdEhwYnEQg1lqK4bzoxCSyY0u2CBtfjTLiE4AN92dhcIIHUUlScN7vryapnLvwJVJOVo+AS9OyOL2MmF3gWCOWuv8ZIsJQZC96QDrt9S5JOpTSCQxPPaHMDUWSs0HGIMJud8k=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584134071;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=SQOA3GBXTReDjTgyIVc6aBtFK/qu+i6gylwAuXLcz3Y=; 
+ b=bvInSAr3w8JjrqM77izpU+cqwqoiwIrhbZtcZVuDtJC/bMaDi88Mb3k8TXJFGQkiKSWteml9h0EXSvsFxHmXtWJjUNyABzFry4VmapthYWqYTo7wsrPCTT3LZ0y70RmIZYaeivEPqIcssF+D//GjSNZCI5cpvVoNyQy79yl6qkA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15841340696611003.6725708612325;
+ Fri, 13 Mar 2020 14:14:29 -0700 (PDT)
+In-Reply-To: <20200313184153.11275-1-philmd@redhat.com>
+Subject: Re: [PATCH 0/9] user-mode: Prune build dependencies (part 2)
+Message-ID: <158413406692.16773.10870771250680069237@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <20200302100537.29058-4-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Fri, 13 Mar 2020 14:14:29 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,145 +74,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, rth@twiddle.net, ben@skyportsystems.com,
+ pl@kamp.de, qemu-devel@nongnu.org, armbru@redhat.com, pbonzini@redhat.com,
+ ronniesahlberg@gmail.com, marcandre.lureau@redhat.com, imammedo@redhat.com,
+ mreitz@redhat.com, philmd@redhat.com, dgilbert@redhat.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 4:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> NBD spec is updated, so that max_block doesn't relate to
-
-Maybe: The NBD spec was recently updated to clarify that max_block...
-
-> NBD_CMD_WRITE_ZEROES with NBD_CMD_FLAG_FAST_ZERO (which mirrors Qemu
-> flag BDRV_REQ_NO_FALLBACK). To drop the restriction we need new
-> max_pwrite_zeroes_no_fallback.
-
-It feels odd to have two different pwrite_zeroes limits in the block 
-layer, but I can live with it if other block layer gurus are also okay 
-with it.
-
-> 
-> Default value of new max_pwrite_zeroes_no_fallback is zero and it means
-> no-restriction, so we are automatically done by this commit. Note that
-
-Why not have the default value be set to the existing value of the 
-normal pwrite_zeroes limit, rather than 0?
-
-> nbd and blkdebug are the only drivers which in the same time define
-> max_pwrite_zeroes limit and support BDRV_REQ_NO_FALLBACK, so we need to
-> update only blkdebug.
-
-Grammar:
-
-The default value for the new max_pwrite_zeroes_no_fallback is zero, 
-meaning no restriction, which covers all drivers not touched by this 
-commit.  Note that nbd and blkdebug are the only drivers which have a 
-max_pwrite_zeroes limit while supporting BDRV_REQ_NO_FALLBACK, so we 
-only need to update blkdebug.
-
-Except that I think there IS still a limit in current NBD: you can't 
-request anything larger than 32 bits (whereas some other drivers may 
-allow a full 63-bit request, as well as future NBD usage when we finally 
-add 64-bit extensions to the protocol).  So I think this patch is 
-incomplete; it should be updating the nbd code to set the proper limit.
-
-(I still need to post v2 of my patches for bdrv_co_make_zero support, 
-which is a case where knowing if there is a 32-bit limit when using 
-BDRV_REQ_NO_FALLBACK for fast zeroing is important).
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   include/block/block_int.h | 8 ++++++++
->   block/blkdebug.c          | 7 ++++++-
->   block/io.c                | 4 +++-
->   3 files changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 6f9fd5e20e..c167e887c6 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -618,6 +618,14 @@ typedef struct BlockLimits {
->        * pwrite_zeroes_alignment. May be 0 if no inherent 32-bit limit */
->       int32_t max_pwrite_zeroes;
->   
-> +    /*
-> +     * Maximum number of bytes that can zeroized at once if flag
-
-zeroed
-
-> +     * BDRV_REQ_NO_FALLBACK specified (since it is signed, it must be < 2G, if
-> +     * set).
-
-Why must it be a signed 32-bit number?  Why not let it be a 64-bit number?
-
-> Must be multiple of pwrite_zeroes_alignment. May be 0 if no
-> +     * inherent 32-bit limit.
-> +     */
-> +    int32_t max_pwrite_zeroes_no_fallback;
-> +
->       /* Optimal alignment for write zeroes requests in bytes. A power
->        * of 2 is best but not mandatory.  Must be a multiple of
->        * bl.request_alignment, and must be less than max_pwrite_zeroes
-> diff --git a/block/blkdebug.c b/block/blkdebug.c
-> index af44aa973f..7627fbcb3b 100644
-> --- a/block/blkdebug.c
-> +++ b/block/blkdebug.c
-> @@ -692,7 +692,11 @@ static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
->       }
->       assert(QEMU_IS_ALIGNED(offset, align));
->       assert(QEMU_IS_ALIGNED(bytes, align));
-> -    if (bs->bl.max_pwrite_zeroes) {
-> +    if ((flags & BDRV_REQ_NO_FALLBACK) &&
-> +        bs->bl.max_pwrite_zeroes_no_fallback)
-> +    {
-> +        assert(bytes <= bs->bl.max_pwrite_zeroes_no_fallback);
-> +    } else if (bs->bl.max_pwrite_zeroes) {
->           assert(bytes <= bs->bl.max_pwrite_zeroes);
->       }
->   
-> @@ -977,6 +981,7 @@ static void blkdebug_refresh_limits(BlockDriverState *bs, Error **errp)
->       }
->       if (s->max_write_zero) {
->           bs->bl.max_pwrite_zeroes = s->max_write_zero;
-> +        bs->bl.max_pwrite_zeroes_no_fallback = s->max_write_zero;
-
-Ah, so you DO default it to max_pwwrite_zeroes instead of to 0; the 
-commit message does not quite match the code.
-
->       }
->       if (s->opt_discard) {
->           bs->bl.pdiscard_alignment = s->opt_discard;
-> diff --git a/block/io.c b/block/io.c
-> index 7e4cb74cf4..75fd5600c2 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1752,7 +1752,9 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->       int head = 0;
->       int tail = 0;
->   
-> -    int max_write_zeroes = MIN_NON_ZERO(bs->bl.max_pwrite_zeroes, INT_MAX);
-> +    int max_write_zeroes = MIN_NON_ZERO((flags & BDRV_REQ_NO_FALLBACK) ?
-> +                                        bs->bl.max_pwrite_zeroes_no_fallback :
-> +                                        bs->bl.max_pwrite_zeroes, INT_MAX);
-
-I'd still like to get rid of this INT_MAX clamping.  If we can blank the 
-entire image in one call, even when it is larger than 4G, then it is 
-worth making that exposed to the user.  (Even in NBD, we might decide to 
-add an extension that allows NBD_CMD_WRITE_ZEROES with a new flag and 
-with offset/length == 0/0, as an official way to make the entire image 
-zero, whereas it is now currently unspecified to pass a length of 0).
-
->       int alignment = MAX(bs->bl.pwrite_zeroes_alignment,
->                           bs->bl.request_alignment);
->       int max_transfer = MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFFER);
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMzE4NDE1My4xMTI3
+NS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14
+ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBM
+SU5LICAgIHFlbXUtaW1nCi91c3IvYmluL2xkOiBxYXBpL3FhcGktY29tbWFuZHMtY2hhci5vOiBp
+biBmdW5jdGlvbiBgcW1wX21hcnNoYWxfYWRkX2NsaWVudCc6Ci90bXAvcWVtdS10ZXN0L2J1aWxk
+L3FhcGkvcWFwaS1jb21tYW5kcy1jaGFyLmM6NDA0OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBx
+bXBfYWRkX2NsaWVudCcKY2xhbmctODogZXJyb3I6IGxpbmtlciBjb21tYW5kIGZhaWxlZCB3aXRo
+IGV4aXQgY29kZSAxICh1c2UgLXYgdG8gc2VlIGludm9jYXRpb24pCm1ha2U6ICoqKiBbL3RtcC9x
+ZW11LXRlc3Qvc3JjL3J1bGVzLm1hazoxMjQ6IHFlbXUtc3RvcmFnZS1kYWVtb25dIEVycm9yIDEK
+bWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0
+IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
+bmUgNjY0LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRj
+b2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8n
+LCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1
+aWQ9NTFlMTQwODY1MzJjNDE5YjkzYmJjNzBhYWE2MDYyYTQnLCAnLXUnLCAnMTAwMScsICctLXNl
+Y3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRf
+TElTVD14ODZfNjQtc29mdG1tdScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9Jywg
+Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
+LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzRxcW96ZmQvc3JjL2RvY2tlci1zcmMuMjAyMC0wMy0x
+My0xNy4xMC4xMC44MDk4Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFy
+L3RtcC9xZW11L3J1bicsICd0ZXN0LWRlYnVnJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
+dHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTUxZTE0
+MDg2NTMyYzQxOWI5M2JiYzcwYWFhNjA2MmE0Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJy
+b3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLV80cXFvemZkL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtZGVidWdAZmVkb3Jh
+XSBFcnJvciAyCgpyZWFsICAgIDRtMTcuNjgycwp1c2VyICAgIDBtOC4xOTBzCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDMxMzE4NDE1
+My4xMTI3NS0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuYXNhbi8/dHlwZT1tZXNzYWdlLgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
 
