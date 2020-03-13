@@ -2,83 +2,105 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EB0C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1521C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:23:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFEE02074A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A6B1206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SYDQ6ZF7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFEE02074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqTxe265"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6B1206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCgOM-0002sM-3s
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42705)
+	id 1jCgXe-0002Yb-NF
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jCgNQ-00028x-GV
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:11 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jCgWv-00029o-JZ
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jCgNN-0002OE-K6
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29975
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1jCgWu-0006M6-K0
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47928
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCgNM-0002Le-LO
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:04 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jCgWu-0006KB-GY
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584090781;
+ s=mimecast20190719; t=1584091375;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aw/kWsXmVgVyyhr1DGtnI11sBPXCta5LSGeMZrDdnZk=;
- b=SYDQ6ZF7YNTxDkYfbM1LoVlyXrrK7eFPCNv/e/qFQVFu69o7k4FMWt8cGeGi8C5d4LQSem
- w1d/HyJQLW5oFP6x6sTxGoUDL9sw7y2qk1I4aXxxxA8RPICofJEse/OvSDKLXCLtMJ3ynw
- 8TnpS/6n1D5CqcI3U63hJFKAzDioZsg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-QR5FM8g8PceFQn6F5F2nMQ-1; Fri, 13 Mar 2020 05:12:56 -0400
-X-MC-Unique: QR5FM8g8PceFQn6F5F2nMQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8572800D50;
- Fri, 13 Mar 2020 09:12:54 +0000 (UTC)
-Received: from work-vm (ovpn-117-92.ams2.redhat.com [10.36.117.92])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 533B765F40;
- Fri, 13 Mar 2020 09:12:51 +0000 (UTC)
-Date: Fri, 13 Mar 2020 09:12:48 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Zhang, Chen" <chen.zhang@intel.com>
-Subject: Re: [PATCH] configure: Fix configure error.
-Message-ID: <20200313091248.GA3581@work-vm>
-References: <20200313065525.31722-1-chen.zhang@intel.com>
- <e240baab-18b8-94b9-7ed5-e7ec9daed489@vivier.eu>
- <3fdff67c4e4047859c0e8aa183bd53d9@intel.com>
+ bh=T8V3AWdy4+WE+ZqPdYu6cuPN0NWV4yxGlgYXsnIFD6s=;
+ b=OqTxe2651ETH6WR04bDW3plg3WZdoxV++fVWgGXuJ2qy5D3xXiiORU38UdRinGhifY2Ct+
+ dAlvNL5SnAlOk0KJEmV1J8XoRIgpkSqrpTx+ezwGnS1oXaI7UDvSRnIzSBrh2NE+D9A3m3
+ L8dWp4buFA4As6eWtCEVDATGRTQdUlM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-vCZAYp4zPmCn-VJDg7KRFg-1; Fri, 13 Mar 2020 05:22:54 -0400
+X-MC-Unique: vCZAYp4zPmCn-VJDg7KRFg-1
+Received: by mail-wm1-f72.google.com with SMTP id a23so3187956wmm.8
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 02:22:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=T8V3AWdy4+WE+ZqPdYu6cuPN0NWV4yxGlgYXsnIFD6s=;
+ b=bo7jioI+BoeQXRDdGL9eGxXIfUhuMvZ5343Kf+ShlJH3CZO5WSnLKjHSj3DhF68HG2
+ DZmVsc3Rc6reZAXNLRMRlJmPc8R9CQh42zPkVjxqG855N9Vls2xSIyqdRyz2h0H9EB50
+ qlbP4wXgHk1xGSeT3jcmuCr/f1fSEjgjJtgxD/QNGVyQRxkCG+doqEeIOwMM7p+RyOx8
+ 4KzZn1cIwsr/IaCFc4twDGI+SxPWMnTgRKD82IoD4zbOKv4IIxOFH0ctFMxopP+R5GME
+ OkSIzrNZ/GDzs/H0KHtxpYGyXcFL5UJg0STJH2Vho0TMTpqcHkfQyFbquZwxPJqODjLc
+ pIWA==
+X-Gm-Message-State: ANhLgQ1gV4Domu6lGHL0Pm/i/kEyRlkBEAFYWn6fRdKO0uVhm6dYurAK
+ npvCWPqfyE44Jb3OFFdZdBO5fCdCcexE4UQzlHQ128noXbh2NsG1zMvprNsaJc1F1Gilf7kjEfY
+ 8Gk9lbg2jBz96mHU=
+X-Received: by 2002:a05:600c:286:: with SMTP id
+ 6mr9847429wmk.101.1584091372862; 
+ Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsDU1/0D5s3SZeXTx3NzU2MhGnrbHWC5Yu1f5/X7Q+70cU5vXJpwo8Jop//gEuDU4CTg3nhIA==
+X-Received: by 2002:a05:600c:286:: with SMTP id
+ 6mr9847405wmk.101.1584091372669; 
+ Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7de8:5d90:2370:d1ac?
+ ([2001:b07:6468:f312:7de8:5d90:2370:d1ac])
+ by smtp.gmail.com with ESMTPSA id 61sm29764493wrd.58.2020.03.13.02.22.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
+Subject: Re: [RFC] cpus: avoid get stuck in pause_all_vcpus
+To: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
+ <longpeng2@huawei.com>
+References: <20200310091443.1326-1-longpeng2@huawei.com>
+ <8ed76f64-1a24-a278-51f3-19515e65ff39@redhat.com>
+ <a6c8eac3-a714-ff6f-2bd6-1fa1d1037a81@huawei.com>
+ <e4dc19fd-bee2-251f-1fef-b41cd6da6c23@redhat.com>
+ <e7a49ec8-6a71-78a9-05c6-f6967e1d55f2@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0b380490-dafc-39ef-1bf7-d3f4e54c14ad@redhat.com>
+Date: Fri, 13 Mar 2020 10:22:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <3fdff67c4e4047859c0e8aa183bd53d9@intel.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <e7a49ec8-6a71-78a9-05c6-f6967e1d55f2@huawei.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,78 +112,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Zhang Chen <zhangckid@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-dev <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel @ nongnu . org" <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Zhang, Chen (chen.zhang@intel.com) wrote:
->=20
->=20
-> > -----Original Message-----
-> > From: Laurent Vivier <laurent@vivier.eu>
-> > Sent: Friday, March 13, 2020 4:18 PM
-> > To: Zhang, Chen <chen.zhang@intel.com>; qemu-dev <qemu-
-> > devel@nongnu.org>
-> > Cc: Zhang Chen <zhangckid@gmail.com>; Dr . David Alan Gilbert
-> > <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>
-> > Subject: Re: [PATCH] configure: Fix configure error.
-> >=20
-> > Le 13/03/2020 =E0 07:55, Zhang Chen a =E9crit=A0:
-> > > From: Zhang Chen <chen.zhang@intel.com>
-> > >
-> > > When run the ./configure will always get this error:
-> > > Unknown option --exist
-> > >
-> > > It caused by this patch:
-> > > commit 3a67848134d0c07da49033f9ed08bf0ddeec0c6d
-> > > Author: Juan Quintela <quintela@redhat.com>
-> > > Date:   Tue Dec 17 21:15:24 2019 +0100
-> > >
-> > >     configure: Enable test and libs for zstd
-> > >
-> > >     Add it to several build systems to make testing good.
-> > >
-> > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> > > ---
-> > >  configure | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/configure b/configure
-> > > index 3c7470096f..305591f7e0 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -2475,7 +2475,7 @@ fi
-> > >  # zstd check
-> > >
-> > >  if test "$zstd" !=3D "no" ; then
-> > > -    if $pkg_config --exist libzstd ; then
-> > > +    if $pkg_config --exists libzstd ; then
-> > >          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
-> > >          zstd_libs=3D"$($pkg_config --libs libzstd)"
-> > >          LIBS=3D"$zstd_libs $LIBS"
-> > >
-> >=20
-> > Juan already sent a patch to fix that:
-> >=20
-> > [PATCH v2] configure: Improve zstd test
-> > https://patchew.org/QEMU/20200310111431.173151-1-
-> > quintela@redhat.com/
->=20
-> OK, Looks haven't merged to upstream.
+On 13/03/20 09:36, Longpeng (Mike, Cloud Infrastructure Service Product
+Dept.) wrote:
+>> You're right, do_vm_stop sets the runstate after pause_all_vcpus.  We
+>> can move that before and it should fix your case too.
+>>
+> Uh, it seems to work. So can I send a patch based on your suggestion ? Or feel
+> free to do if you want to fix it by yourself.
+> 
 
-I've built a pull with it in, testing it now.
+Yes, please.
 
-Dave
-
-> Thanks
-> Zhang Chen
->=20
-> >=20
-> > Thanks,
-> > Laurent
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
 
 
