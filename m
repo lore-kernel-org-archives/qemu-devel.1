@@ -2,98 +2,79 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288F7C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E0EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E653120409
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9EB7206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CXsHDqHY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E653120409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sRRQvXDw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9EB7206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCld5-0005ZS-3y
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42606)
+	id 1jCldd-0006gF-TC
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:50:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jClcG-0004EM-9K
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:48:49 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jClcS-0004h2-Sy
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:49:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jClcF-0005nL-5l
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:48:48 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37018)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jClcE-0005ka-Tt
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:48:47 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DEmbrB058091;
- Fri, 13 Mar 2020 14:48:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=ykRn0+RqCXA4m617GziSwqaMvQDkRJtuTYYXR559UBE=;
- b=CXsHDqHYIkpFndJmz9GfkbIinSZ3EGocQZNF2W+mbIc4BrAZjISGwven4jK3UiEtxU6i
- 2TtMyvsebF8ZCozAztRZqlZd2R7XeFJZUunyrGp/0GQ1YPx96/oeT+MIIc27Cu/cU5vM
- bhramu5eqyaFEW/nc3Mz/RZBiR7sPkVRyMiWNsPh43v1poCk3cDcPcpcCSMRvxAXZ0Qo
- LkY0w24fPRnMBBP3HSE9CL4J4EsudQgiFWtaSULs4mp4sexvCXuSfVf55QaPdNIt1J6Z
- 4Iufx/GjmbC+NuPV1BYDdr54ltOkcG0yLsZ97MvJmETSjzWdOyPcw0eM52oj4/K+/2fm Ow== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 2yqtagc900-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 14:48:45 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DEmKRc028746;
- Fri, 13 Mar 2020 14:48:44 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2yqtadaft7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 14:48:44 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02DEmgXh020222;
- Fri, 13 Mar 2020 14:48:43 GMT
-Received: from spark.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 13 Mar 2020 07:48:42 -0700
-From: Liran Alon <liran.alon@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/3] acpi: unit-test: Update WAET ACPI Table expected
- binaries
-Date: Fri, 13 Mar 2020 16:50:09 +0200
-Message-Id: <20200313145009.144820-4-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200313145009.144820-1-liran.alon@oracle.com>
-References: <20200313145009.144820-1-liran.alon@oracle.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jClcR-0006Gd-Ih
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:49:00 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:43298)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jClcR-0006F3-CO
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:48:59 -0400
+Received: by mail-oi1-x233.google.com with SMTP id p125so9595274oif.10
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 07:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GWljFi9fnqqkpaxlrWeRu49izTGa7gsrABdhz6/dr5U=;
+ b=sRRQvXDw75DYXrF+hNPO5Fw9/FzpwIHONkfejaxqV6Dr4+Jbh1+8FZ/qqKcwADOk1m
+ ZHSMdv3wceYVp7f8cXf4VeIlatnhc0S9le8R0ALaKM5bM9Kq9m6GWiLEVNHgEa+hOx+r
+ /T71rG9ySKH9EjTT3LYL43kBz557gIqgI2RtVOl3qVGJsijo94nANURFbuLQLjleuEmY
+ zzRvtbUNP0ezFKuBAaEnWZiUkFohyi9C0jJW+b+GpNrEqyuGOZDytao7xdpuFXljwEDl
+ f5Lp+4qPL16byK4T9HdgWEZtR4E65c6Aowb2+Yib1+Qifpgi0+it4u4zwCTyc4h4I0Fw
+ 9H1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GWljFi9fnqqkpaxlrWeRu49izTGa7gsrABdhz6/dr5U=;
+ b=e8ammH1pm5lijUc/5i8IccBD2+r7l0ijaGMVOA301/iJWvnNcIRmEmLjV0VPoP6XuL
+ wOCO4nMhQKpPD6PgYaUd/sI9Nxn6Q7Zf+fh3ghVNf8SAWIBSP7uoAQ+n9iiHnLHS7OhT
+ iVXFHfTnWDszHhXRkedjrGkC56pSHBq7O+jn4Jpa+kIG96yTplAjZVou4sghMaCN17kf
+ wI/z5ZYENV9+uNTlkxjk9cxFwiS8aqk9I77PhdgsdunmkDTD+xl51DzNcL0ByVOPExzA
+ W+81GTa0SymM+GId6pcIf86Jf7kEs8qteGFK9t4wGusGL3MspIXSbWHuBuF1CxkTWL5O
+ z5BA==
+X-Gm-Message-State: ANhLgQ17n07wfNYQzCPqfg52i5seWcCw4tNhYYVTUV5Y7tA1zkVR4fFl
+ 8XZXIDZHcBCqfQofxyoyqVujwZXyh5sJ5J4HdEw1wg==
+X-Google-Smtp-Source: ADFU+vv1dgMH+s/gxj5ZH1XLQ578Bub8QrpR+v2FcZg3hvPg9FnAeueRNrxsL8fX6TcZADGEaRojjBNxb/GguswKEeQ=
+X-Received: by 2002:aca:c695:: with SMTP id w143mr7381170oif.98.1584110938055; 
+ Fri, 13 Mar 2020 07:48:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 mlxlogscore=958 spamscore=0 suspectscore=1
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130078
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- suspectscore=1 bulkscore=0 impostorscore=0 spamscore=0 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130078
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+References: <20200313103039.150133-1-dgilbert@redhat.com>
+In-Reply-To: <20200313103039.150133-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 13 Mar 2020 14:48:46 +0000
+Message-ID: <CAFEAcA_smwdHY6rYR=hVOJ=6Jvyi0te9HmD6io_59D8sNOK-zg@mail.gmail.com>
+Subject: Re: [PULL 0/5] migration queue
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::233
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,71 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, Liran Alon <liran.alon@oracle.com>,
- pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
+Cc: Juan Quintela <quintela@redhat.com>, Keqian Zhu <zhukeqian1@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is done according to step (6) in the process described at
-tests/qtest/bios-tables-test.c.
+On Fri, 13 Mar 2020 at 10:32, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit d4f7d56759f7c75270c13d5f3f5f736a9558929c:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200312' into staging (2020-03-12 17:34:34 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20200313a
+>
+> for you to fetch changes up to 19dd408a479cae3027ae9ff9ef3f509ad3e681e5:
+>
+>   migration: recognize COLO as part of activating process (2020-03-13 09:36:30 +0000)
+>
+> ----------------------------------------------------------------
+> Migration pull 2020-03-13
+>
+> zstd build fix
+> A new auto-converge parameter
+> Some COLO improvements
 
-Expected WAET.dsl:
 
-[000h 0000   4]                    Signature : "WAET"    [Windows ACPI Emulated Devices Table]
-[004h 0004   4]                 Table Length : 00000028
-[008h 0008   1]                     Revision : 01
-[009h 0009   1]                     Checksum : 88
-[00Ah 0010   6]                       Oem ID : "BOCHS "
-[010h 0016   8]                 Oem Table ID : "BXPCWAET"
-[018h 0024   4]                 Oem Revision : 00000001
-[01Ch 0028   4]              Asl Compiler ID : "BXPC"
-[020h 0032   4]        Asl Compiler Revision : 00000001
+Applied, thanks.
 
-[024h 0036   4]        Flags (decoded below) : 00000002
-                        RTC needs no INT ack : 0
-                     PM timer, one read only : 1
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Raw Table Data: Length 40 (0x28)
-
-  0000: 57 41 45 54 28 00 00 00 01 88 42 4F 43 48 53 20  // WAET(.....BOCHS
-  0010: 42 58 50 43 57 41 45 54 01 00 00 00 42 58 50 43  // BXPCWAET....BXPC
-  0020: 01 00 00 00 02 00 00 00                          // ........
-
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- tests/data/acpi/pc/WAET                     | Bin 0 -> 40 bytes
- tests/data/acpi/q35/WAET                    | Bin 0 -> 40 bytes
- tests/qtest/bios-tables-test-allowed-diff.h |   2 --
- 3 files changed, 2 deletions(-)
-
-diff --git a/tests/data/acpi/pc/WAET b/tests/data/acpi/pc/WAET
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..c2240f58dff6b2f765386b5a2e506fda4800be3e 100644
-GIT binary patch
-literal 40
-mcmWG{bPds9U|?YEaPoKd2v%^42yhMuiZKGkKx`1r1jGQWX$JuS
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/q35/WAET b/tests/data/acpi/q35/WAET
-index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..c2240f58dff6b2f765386b5a2e506fda4800be3e 100644
-GIT binary patch
-literal 40
-mcmWG{bPds9U|?YEaPoKd2v%^42yhMuiZKGkKx`1r1jGQWX$JuS
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index b269a1e3e583..dfb8523c8bf4 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1,3 +1 @@
- /* List of comma-separated changed AML files to ignore */
--"tests/data/acpi/pc/WAET",
--"tests/data/acpi/q35/WAET",
--- 
-2.20.1
-
+-- PMM
 
