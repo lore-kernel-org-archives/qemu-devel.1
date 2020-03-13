@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4AB7C2BB1D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71A3C4CECE
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7130E206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 985F6206E2
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMyDN7n3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7130E206CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="durJYdeU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985F6206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCpGw-0002P3-Jd
+	id 1jCpGw-0002Qg-PX
 	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53660)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jCpBS-0008G3-3z
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:23 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCpBW-0008Qd-Jv
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jCpBQ-0002xo-Jr
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55936
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jCpBV-0003DR-BF
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32628
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpBQ-0002xC-G7
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:20 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpBV-0003C0-6P
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:37:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584124640;
+ s=mimecast20190719; t=1584124644;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8aoJLCXCrlxs+uxn6Eno2ayGO83+rkYY4ustjsPF1ac=;
- b=ZMyDN7n31T2NarG4yj86Dv7yd18T4TR/qmbPZ9BmPYPMK7PVKMD6cYU/+SqOpQvf7ysCfz
- z02EtGhbXtSxHBSQhqbjXFDbw0pg1sNlBKqQc4hR1hSycqsujx6e0dYM/SptjA/6zSY3YO
- M5IMwC+KwFfQ40OHFvplNwDgx91HZcw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-uaRWfU3NM8KwtL9Hq5BOpQ-1; Fri, 13 Mar 2020 14:37:18 -0400
-X-MC-Unique: uaRWfU3NM8KwtL9Hq5BOpQ-1
-Received: by mail-wr1-f70.google.com with SMTP id p2so2183142wrw.8
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:37:18 -0700 (PDT)
+ bh=RNscj4znfEFoxUyR2eitCsjwBW0o2g2YBibwWrrvxzw=;
+ b=durJYdeUM0TRBu/gX3dQnZSfpWgVA+KuxLKRqqPerXzuBOLEUxtuNfXI7+XyZTlqzTIwKD
+ Et6XJYdkmn/j6YqAigDT3MweTAl9SyC11/A/CUQcgU5QOA+prrPXKiR3KN1CdmkpbzE/pE
+ 4tLDuq6DiH6Vy2reIh7qsYa+1V1kL/Q=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-vw2RxISwP1yLFu33rPkvnw-1; Fri, 13 Mar 2020 14:37:23 -0400
+X-MC-Unique: vw2RxISwP1yLFu33rPkvnw-1
+Received: by mail-wr1-f71.google.com with SMTP id x14so4684216wrv.23
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:37:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=yX3/yxF6EHlmvUP2BbzjjZIQps3yYgRSbpFFIqc8F/E=;
- b=XEbuRm+OsaYMNWfLL1L1TuyBSquep4qI+VXc1DIV0LsQaOpxxp8jv5NoAUd1ul28Ku
- rllZtmWueDwlVhqC9Gb22h4Mpf/sma2qUkH6uzMPUaS5lRGCedTu5nP/xA0VlVeJiCCc
- G2mTbxhzjdoXGn9FW7WBWiEpK62cLXZaD8WpyrcXYJKGw1fGw26/LobiqlbKxSrQEGOD
- en1ZVz10TFDOeAAiKLPcJwxTfWBY2CURZthOhLAJvUfZLRCuvfVMeWEAqDcXXOurmObW
- UEl2lMl97uSAQueoC8SFyRHYu18ezbhpi2+Sn2Upr/P+GxhoGssotMEcnPr3O1ceQX1+
- 42Iw==
-X-Gm-Message-State: ANhLgQ0JqDpqTnPceoFDRwllyocf58NCchsEdo7sVczin5qgNhTFMzHZ
- VnEDZEosDV+WzSkUHwkkKyhjTEIwkFCSktKXL8O0iyZhaMSljnEkO9GtX0a03FLjaLYj+Q39kVO
- j/oQpqGqaB7THHtE=
-X-Received: by 2002:adf:f58f:: with SMTP id f15mr20039034wro.16.1584124636775; 
- Fri, 13 Mar 2020 11:37:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs+YASwG+nS4kzBdGtTjiJzofimMO54RlgalOMRsiMkPw/ith6XkJN27+mO5FmTGtPyElY/Jg==
-X-Received: by 2002:adf:f58f:: with SMTP id f15mr20038999wro.16.1584124636423; 
- Fri, 13 Mar 2020 11:37:16 -0700 (PDT)
+ bh=UFdvn7QNDrVxUqibYwnc6bH6F2vFCMCHuZOu+Zd/Cpc=;
+ b=RyPOiAlnsIMq2rFilZ1cL6TT3PFeCU2+9y/XHoenfP1d1PRV3rbsdrUOtab4rkxbuG
+ 0LgA6KzOA9H7FWAz7zgQ46wYdhYR1wOSmKIGJb4cEsvREvHp7YmubPYdu3eZ4JTV/e50
+ a3YhsB9wsC9CEMn3LRSN+T2fONzYl758I1m6sx5lVx1EDPfTT6yUSqludpWZTMfvA/A2
+ 4qW+6IbKCctqGRvqunqfMIZB0aBJVYGnlnY6nQVtufvo9OYqxrWZ2saIuDI769mhC+cL
+ O4qn5F+o+YAirx0O7IInT7H4R1ff/kwUN6p1IzggjU9okijhYzFSTheS0eSJ0e0GMDuy
+ hk5g==
+X-Gm-Message-State: ANhLgQ0Lte3xoUt4sIfxysUGYoq+393cU36xgLRLmzo7jsxiDcTewLeL
+ MZ3N8o40ejteslSmj0TadVPSkB8m2xCB7D17wZtE+/U02YxpIntNBBWBoZDE7XpTE2Ynw7Tqh3n
+ 8q6Q/wW+vrP5R/Ls=
+X-Received: by 2002:adf:ef92:: with SMTP id d18mr18557122wro.193.1584124641899; 
+ Fri, 13 Mar 2020 11:37:21 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtYmL5ub8rSmVi8dir3DAkQWGyPCni3RmNUQh9poMuQNlUlVUmlvaOCY/piDuFUDxUIHX22Mg==
+X-Received: by 2002:adf:ef92:: with SMTP id d18mr18557095wro.193.1584124641662; 
+ Fri, 13 Mar 2020 11:37:21 -0700 (PDT)
 Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id m11sm33980849wrn.92.2020.03.13.11.37.15
+ by smtp.gmail.com with ESMTPSA id n2sm12942644wrr.62.2020.03.13.11.37.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Mar 2020 11:37:15 -0700 (PDT)
+ Fri, 13 Mar 2020 11:37:21 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/14] tests/Makefile: Restrict some softmmu-only tests
-Date: Fri, 13 Mar 2020 19:36:42 +0100
-Message-Id: <20200313183652.10258-5-philmd@redhat.com>
+Subject: [PATCH 05/14] stubs/Makefile: Reduce the user-mode object list
+Date: Fri, 13 Mar 2020 19:36:43 +0100
+Message-Id: <20200313183652.10258-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200313183652.10258-1-philmd@redhat.com>
 References: <20200313183652.10258-1-philmd@redhat.com>
@@ -91,7 +91,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,82 +121,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These tests fails when configured with --disable-system.
+These stubs are not required when configured with --disable-system.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/Makefile.include | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ stubs/Makefile.objs | 52 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 22 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 99db5eb3e0..bf11f765c3 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -64,14 +64,14 @@ check-unit-y +=3D tests/check-qlit$(EXESUF)
- check-unit-y +=3D tests/test-qobject-output-visitor$(EXESUF)
- check-unit-y +=3D tests/test-clone-visitor$(EXESUF)
- check-unit-y +=3D tests/test-qobject-input-visitor$(EXESUF)
--check-unit-y +=3D tests/test-qmp-cmds$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-qmp-cmds$(EXESUF)
- check-unit-y +=3D tests/test-string-input-visitor$(EXESUF)
- check-unit-y +=3D tests/test-string-output-visitor$(EXESUF)
- check-unit-y +=3D tests/test-qmp-event$(EXESUF)
- check-unit-y +=3D tests/test-opts-visitor$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-coroutine$(EXESUF)
- check-unit-y +=3D tests/test-visitor-serialization$(EXESUF)
--check-unit-y +=3D tests/test-iov$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-iov$(EXESUF)
- check-unit-y +=3D tests/test-bitmap$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-aio$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-aio-multithread$(EXESUF)
-@@ -106,7 +106,7 @@ check-unit-y +=3D tests/test-qht$(EXESUF)
- check-unit-y +=3D tests/test-qht-par$(EXESUF)
- check-unit-y +=3D tests/test-bitops$(EXESUF)
- check-unit-y +=3D tests/test-bitcnt$(EXESUF)
--check-unit-y +=3D tests/test-qdev-global-props$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-qdev-global-props$(EXESUF)
- check-unit-y +=3D tests/check-qom-interface$(EXESUF)
- check-unit-y +=3D tests/check-qom-proplist$(EXESUF)
- check-unit-y +=3D tests/test-qemu-opts$(EXESUF)
-@@ -124,9 +124,9 @@ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)=
-) +=3D tests/test-crypto-tl
- ifneq (,$(findstring qemu-ga,$(TOOLS)))
- check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) +=3D tests=
-/test-qga$(EXESUF)
- endif
--check-unit-y +=3D tests/test-timed-average$(EXESUF)
--check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
--check-unit-y +=3D tests/test-util-sockets$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-timed-average$(EXESUF)
-+check-unit-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_INOTIFY1)) +=3D tests/te=
-st-util-filemonitor$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-util-sockets$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-authz-simple$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-authz-list$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-authz-listfile$(EXESUF)
-@@ -137,7 +137,7 @@ check-unit-$(CONFIG_BLOCK) +=3D tests/test-io-channel-f=
-ile$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) +=3D tests/test-i=
-o-channel-tls$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-io-channel-command$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-io-channel-buffer$(EXESUF)
--check-unit-y +=3D tests/test-base64$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-base64$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(if $(CONFIG_NETTLE),y,$(CONFIG_GC=
-RYPT))) +=3D tests/test-crypto-pbkdf$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-crypto-ivgen$(EXESUF)
- check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-afsplit$(EXESUF)
-@@ -145,7 +145,7 @@ check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_QEMU_PR=
-IVATE_XTS)) +=3D tests/test
- check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-block$(EXESUF)
- check-unit-y +=3D tests/test-logging$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_REPLICATION)) +=3D tests/t=
-est-replication$(EXESUF)
--check-unit-y +=3D tests/test-bufferiszero$(EXESUF)
-+check-unit-$(CONFIG_SOFTMMU) +=3D tests/test-bufferiszero$(EXESUF)
- check-unit-y +=3D tests/test-uuid$(EXESUF)
- check-unit-y +=3D tests/ptimer-test$(EXESUF)
- check-unit-y +=3D tests/test-qapi-util$(EXESUF)
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 45be5dc0ed..5ffa085c67 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,46 +1,54 @@
+-stub-obj-y +=3D arch_type.o
+-stub-obj-y +=3D bdrv-next-monitor-owned.o
+ stub-obj-y +=3D blk-commit-all.o
+-stub-obj-y +=3D blockdev-close-all-bdrv-states.o
+-stub-obj-y +=3D clock-warp.o
+ stub-obj-y +=3D cpu-get-clock.o
+ stub-obj-y +=3D cpu-get-icount.o
+ stub-obj-y +=3D dump.o
+ stub-obj-y +=3D error-printf.o
+ stub-obj-y +=3D fdset.o
+ stub-obj-y +=3D gdbstub.o
+-stub-obj-y +=3D get-vm-name.o
+-stub-obj-y +=3D iothread.o
+ stub-obj-y +=3D iothread-lock.o
+ stub-obj-y +=3D is-daemonized.o
+ stub-obj-$(CONFIG_LINUX_AIO) +=3D linux-aio.o
+ stub-obj-$(CONFIG_LINUX_IO_URING) +=3D io_uring.o
+-stub-obj-y +=3D machine-init-done.o
+-stub-obj-y +=3D migr-blocker.o
+-stub-obj-y +=3D change-state-handler.o
+-stub-obj-y +=3D monitor.o
+ stub-obj-y +=3D monitor-core.o
+ stub-obj-y +=3D notify-event.o
++stub-obj-y +=3D qmp_memory_device.o
+ stub-obj-y +=3D qtest.o
++stub-obj-y +=3D ramfb.o
+ stub-obj-y +=3D replay.o
+-stub-obj-y +=3D replay-user.o
+ stub-obj-y +=3D runstate-check.o
++stub-obj-$(CONFIG_SOFTMMU) +=3D semihost.o
+ stub-obj-y +=3D set-fd-handler.o
++stub-obj-y +=3D vmgenid.o
+ stub-obj-y +=3D sysbus.o
+ stub-obj-y +=3D tpm.o
+ stub-obj-y +=3D trace-control.o
+-stub-obj-y +=3D uuid.o
+-stub-obj-y +=3D vm-stop.o
+ stub-obj-y +=3D vmstate.o
++
++#######################################################################
++# code used by both qemu system emulation and qemu-img
++
++ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
++
++stub-obj-y +=3D arch_type.o
++stub-obj-y +=3D bdrv-next-monitor-owned.o
++stub-obj-y +=3D blockdev-close-all-bdrv-states.o
++stub-obj-y +=3D change-state-handler.o
++stub-obj-y +=3D clock-warp.o
+ stub-obj-y +=3D fd-register.o
+-stub-obj-y +=3D qmp_memory_device.o
+-stub-obj-y +=3D target-monitor-defs.o
+-stub-obj-y +=3D target-get-monitor-def.o
+-stub-obj-y +=3D vmgenid.o
+-stub-obj-y +=3D xen-common.o
+-stub-obj-y +=3D xen-hvm.o
++stub-obj-y +=3D fw_cfg.o
++stub-obj-y +=3D get-vm-name.o
++stub-obj-y +=3D iothread.o
++stub-obj-y +=3D machine-init-done.o
++stub-obj-y +=3D migr-blocker.o
++stub-obj-y +=3D monitor.o
+ stub-obj-y +=3D pci-host-piix.o
+ stub-obj-y +=3D ram-block.o
+-stub-obj-y +=3D ramfb.o
+-stub-obj-y +=3D fw_cfg.o
+-stub-obj-$(CONFIG_SOFTMMU) +=3D semihost.o
++stub-obj-y +=3D replay-user.o
++stub-obj-y +=3D target-get-monitor-def.o
++stub-obj-y +=3D target-monitor-defs.o
++stub-obj-y +=3D uuid.o
++stub-obj-y +=3D vm-stop.o
++stub-obj-y +=3D xen-common.o
++stub-obj-y +=3D xen-hvm.o
++
++endif # CONFIG_SOFTMMU || CONFIG_TOOLS
 --=20
 2.21.1
 
