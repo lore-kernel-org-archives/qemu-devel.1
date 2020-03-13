@@ -2,83 +2,80 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18EDCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A5EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:42:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D51BC20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:41:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B6E920663
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:42:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WaeE1CwJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51BC20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpaeK4Rx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6E920663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCs3K-0004pW-2T
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:41:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39243)
+	id 1jCs4y-0005wu-Gt
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:42:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCs2h-0004Bx-GF
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:40:32 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jCs4A-0005V6-TI
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCs2g-00063m-27
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:40:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57918
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCs2f-0005yw-UX
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:40:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584135628;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Q7KMye8407+Ra9yTJt/q0cP1UFOtuBrlF28m8VUyT2A=;
- b=WaeE1CwJDIRNXSMvqQzBmlOVEx7xhWZsLofaYWbbEcY+8svS5dcif5ZflBBWa6YdgLxnPd
- O/4YcXB68XXpt8KHbL16ZCTLtQyWuwWxk+4aB4/bytd83NmN5hOnADnVKGAlNEO7CJsJwB
- LH4z8oyVSki/l/CD4ulJFrK56Lr7xYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-Kb8H3kQ-MpegmX_f3HrqLA-1; Fri, 13 Mar 2020 17:40:11 -0400
-X-MC-Unique: Kb8H3kQ-MpegmX_f3HrqLA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7348518AB2C0;
- Fri, 13 Mar 2020 21:40:10 +0000 (UTC)
-Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 76EE95C1B0;
- Fri, 13 Mar 2020 21:40:09 +0000 (UTC)
-Subject: Re: [PATCH v6 1/4] qcow2: introduce compression type feature
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200312092242.5536-1-dplotnikov@virtuozzo.com>
- <20200312092242.5536-2-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <fb17996c-1c96-353d-a537-748bd05b94ff@redhat.com>
-Date: Fri, 13 Mar 2020 16:40:08 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <alistair23@gmail.com>) id 1jCs49-0007Pl-Im
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:42:02 -0400
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:35204)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jCs49-0007N6-Dz; Fri, 13 Mar 2020 17:42:01 -0400
+Received: by mail-qv1-xf41.google.com with SMTP id u10so5480245qvi.2;
+ Fri, 13 Mar 2020 14:42:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GY59U/7HQcWNi8/z2qIUgEQwnxnIagXUh1LLtb0qIXI=;
+ b=lpaeK4RxZOC7ZJzntJSRhHHfBSR0MfgBLhDK+Ruak0tpDeqCawLb7sGrj827IyXZtt
+ ls2HG/kk+mksSM6EeOlxcPDL3KSYR5s+/GzLdEk7ftdxOQZ1vLVRRWHiuSuRTI47skzU
+ IgaWE5C8iNawbu1z4b8PutrEalcy18PR6yhIyWU6YWMgt2UPjMUiYBHEjR4LKYxwj7dN
+ hco14xctKsmZFcBHrTXwrFuLItdHTnqmS7voC+geq2Ncc+01ByR/FJpJbZ33KNs0p6Kf
+ tU5AK+1p0EFfiaeeUl1WyXiO1AtmMBpd1SAmN0PrcYqUugjgZ50x9ajG1YBjTejB9IPB
+ tnkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GY59U/7HQcWNi8/z2qIUgEQwnxnIagXUh1LLtb0qIXI=;
+ b=s3+jBPmLs8hIEeQ01U2NyGTqWA/h+BJmpz7hieCd6Tzr27JqScgGKbg46PBmHT6UiJ
+ bXHpixrKXa9ykf1s6vrOAEsIk7zeRqYTZWFrevhlBsu1lgn8KOzAk7GnfeJQpvyzCnz2
+ WbmMUuqFCnHCSVanVkO6ZzXlrK7o3p584qOq49AFpHuYuLSieMm8fX9LuryA8Gx7XUSc
+ zkzcL3A3CN/PdB6XPlGzhFtxsFOxBL/NbtRTJm18TFhwS7n6eyiZeE15/lctswN+M8Ao
+ /XbUc65H5LSMZJnsxWLDZS/uY9Za3uJLZ9hFGK2SbRuOYQgVwmzjQWvEPmIyvKDmNGds
+ 1C8g==
+X-Gm-Message-State: ANhLgQ2D/kTXqdF35TLIk0oL5l7vThevPrfRY9J+cu1jHOyaRI05eVPe
+ AJNCGuh3/TY9xyietpmSESwmsXRwt6GB/6k9FQY=
+X-Google-Smtp-Source: ADFU+vsKmd67qq7jG5PL77Rh6RR+UK9MqvNyzkj7VutrgG/kCeOacCoQ6uco65Ewqmd1etcavQ6NQJP2cLwxpdZd5JU=
+X-Received: by 2002:ad4:436b:: with SMTP id u11mr13902281qvt.117.1584135720748; 
+ Fri, 13 Mar 2020 14:42:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200312092242.5536-2-dplotnikov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-61-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200312145900.2054-61-zhiwei_liu@c-sky.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 13 Mar 2020 14:41:34 -0700
+Message-ID: <CAKmqyKMJb=6GgtEToPvv+6AArmvmJ5PkjAdr_1j+evYurjf7MQ@mail.gmail.com>
+Subject: Re: [PATCH v5 60/60] target/riscv: configure and turn on vector
+ extension from command line
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,165 +87,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/12/20 4:22 AM, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type
-> feature to qcow2 allowing the use different compression methods for
-> image clusters (de)compressing.
-> 
-> It is implied that the compression type is set on the image creation and
-> can be changed only later by image conversion, thus compression type
-> defines the only compression algorithm used for the image, and thus,
-> for all image clusters.
-> 
-> The goal of the feature is to add support of other compression methods
-> to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
-> 
-> The default compression is ZLIB. Images created with ZLIB compression type
-> are backward compatible with older qemu versions.
-> 
-> Adding of the compression type breaks a number of tests because now the
-> compression type is reported on image creation and there are some changes
-> in the qcow2 header in size and offsets.
-> 
-> The tests are fixed in the following ways:
->      * filter out compression_type for all the tests
-
-Presumably this filter is optional, and we will not use it on the 
-specific new tests that prove zstd compression works - but that should 
-be later in the series, so for this patch it is okay.
-
->      * fix header size, feature table size and backing file offset
->        affected tests: 031, 036, 061, 080
->        header_size +=8: 1 byte compression type
->                         7 bytes padding
->        feature_table += 48: incompatible feture compression type
-
-feature
-
->        backing_file_offset += 56 (8 + 48 -> header_change + fature_table_change)
-
-feature
-
-(interesting that you have two different changed spellings ;)
-
->      * add "compression type" for test output matching when it isn't filtered
->        affected tests: 049, 060, 061, 065, 144, 182, 242, 255
-
-Or maybe the comment above should be changed to "many tests" rather than 
-"all the tests".
-
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Thu, Mar 12, 2020 at 10:00 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>
+> Vector extension is default off. The only way to use vector extension is
+> 1. use cpu rv32 or rv64
+> 2. turn on it by command line
+> "-cpu rv64,v=true,vlen=128,elen=64,vext_spec=v0.7.1".
+>
+> vlen is the vector register length, default value is 128 bit.
+> elen is the max operator size in bits, default value is 64 bit.
+> vext_spec is the vector specification version, default value is v0.7.1.
+> These properties can be specified with other values.
+>
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 > ---
->   qapi/block-core.json             |  22 +++++-
->   block/qcow2.h                    |  20 ++++-
->   include/block/block_int.h        |   1 +
->   block/qcow2.c                    | 121 +++++++++++++++++++++++++++++++
->   tests/qemu-iotests/031.out       |  14 ++--
->   tests/qemu-iotests/036.out       |   4 +-
->   tests/qemu-iotests/049.out       | 102 +++++++++++++-------------
->   tests/qemu-iotests/060.out       |   1 +
->   tests/qemu-iotests/061.out       |  34 +++++----
->   tests/qemu-iotests/065           |  28 ++++---
->   tests/qemu-iotests/080           |   2 +-
->   tests/qemu-iotests/144.out       |   4 +-
->   tests/qemu-iotests/182.out       |   2 +-
->   tests/qemu-iotests/242.out       |   5 ++
->   tests/qemu-iotests/255.out       |   8 +-
->   tests/qemu-iotests/common.filter |   3 +-
->   16 files changed, 275 insertions(+), 96 deletions(-)
-> 
+>  target/riscv/cpu.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+>  target/riscv/cpu.h |  2 ++
+>  2 files changed, 45 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 6e4135583d..5f1cdd4f2b 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -395,7 +395,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>      }
+>
+>      set_priv_version(env, priv_version);
+> -    set_vext_version(env, vext_version);
+>      set_resetvec(env, DEFAULT_RSTVEC);
+>
+>      if (cpu->cfg.mmu) {
+> @@ -463,6 +462,45 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>          if (cpu->cfg.ext_h) {
+>              target_misa |= RVH;
+>          }
+> +        if (cpu->cfg.ext_v) {
+> +            target_misa |= RVV;
+> +            if (!is_power_of_2(cpu->cfg.vlen)) {
+> +                error_setg(errp,
+> +                        "Vector extension VLEN must be power of 2");
+> +                return;
+> +            }
+> +            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
+> +                error_setg(errp,
+> +                        "Vector extension implementation only supports VLEN "
+> +                        "in the range [128, %d]", RV_VLEN_MAX);
+> +                return;
+> +            }
+> +            if (!is_power_of_2(cpu->cfg.elen)) {
+> +                error_setg(errp,
+> +                        "Vector extension ELEN must be power of 2");
+> +                return;
+> +            }
+> +            if (cpu->cfg.elen > 64 || cpu->cfg.vlen < 8) {
+> +                error_setg(errp,
+> +                        "Vector extension implementation only supports ELEN "
+> +                        "in the range [8, 64]");
+> +                return;
+> +            }
+> +            if (cpu->cfg.vext_spec) {
+> +                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
+> +                    vext_version = VEXT_VERSION_0_07_1;
+> +                } else {
+> +                    error_setg(errp,
+> +                           "Unsupported vector spec version '%s'",
+> +                           cpu->cfg.vext_spec);
+> +                    return;
+> +                }
+> +            } else {
+> +                qemu_log("vector verison is not specified, "
+> +                        "use the default value v0.7.1\n");
+> +            }
+> +            set_vext_version(env, vext_version);
+> +        }
+>
+>          set_misa(env, RVXLEN | target_misa);
+>      }
+> @@ -500,10 +538,14 @@ static Property riscv_cpu_properties[] = {
+>      DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>      /* This is experimental so mark with 'x-' */
+>      DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
+> +    DEFINE_PROP_BOOL("v", RISCVCPU, cfg.ext_v, false),
 
-> +++ b/block/qcow2.h
-> @@ -146,8 +146,16 @@ typedef struct QCowHeader {
->   
->       uint32_t refcount_order;
->       uint32_t header_length;
-> +
-> +    /* Additional fields */
-> +    uint8_t  compression_type;
-> +
-> +    /* header must be a multiple of 8 */
-> +    uint8_t  padding[7];
+This should be x-v as it's experimental.
 
-Why two spaces after uint8_t (twice)?
+Alistair
 
-
-> @@ -369,6 +380,13 @@ typedef struct BDRVQcow2State {
->   
->       bool metadata_preallocation_checked;
->       bool metadata_preallocation;
-> +    /*
-> +     * Compression type used for the image. Default: 0 - ZLIB
-> +     * The image compression type is set on image creation.
-> +     * The only way to change the compression type is to convert the image
-> +     * with the desired compression type set
-
-Missing trailing '.'.  Maybe someday we can get 'qemu-img amend' to also 
-adjust the compression type in-place; if that's something we think we 
-might do, then this could be better worded as "For now, the only way to 
-change...".
-
-> +++ b/block/qcow2.c
-> @@ -1242,6 +1242,48 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
->       return ret;
->   }
->   
-> +static int validate_compression_type(BDRVQcow2State *s, Error **errp)
-
-> +
-> +static int qcow2_compression_type_from_format(const char *ct)
-> +{
-> +    if (g_str_equal(ct, "zlib")) {
-> +        return QCOW2_COMPRESSION_TYPE_ZLIB;
-> +    } else {
-> +        return -EINVAL;
-> +    }
-
-Why are you open-coding this?
-
-qapi_enum_parse(&Qcow2CompressionType_lookup, ct, -1, errp)
-
-should do what you use this for, and automatically updates itself when 
-you add zstd to the qapi enum later.
-
-
-> @@ -3401,6 +3493,8 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
->           .refcount_table_offset      = cpu_to_be64(cluster_size),
->           .refcount_table_clusters    = cpu_to_be32(1),
->           .refcount_order             = cpu_to_be32(refcount_order),
-> +        /* don't deal with endians since compression_type is 1 byte long */
-
-endianness
-
-> +        .compression_type           = compression_type,
->           .header_length              = cpu_to_be32(sizeof(*header)),
->       };
->   
-> @@ -5516,6 +5631,12 @@ static QemuOptsList qcow2_create_opts = {
->               .help = "Width of a reference count entry in bits",
->               .def_value_str = "16"
->           },
-> +        {
-> +            .name = BLOCK_OPT_COMPRESSION_TYPE,
-> +            .type = QEMU_OPT_STRING,
-> +            .help = "Compression method used for image clusters compression",
-
-s/clusters/cluster/
-
-Overall, getting closer. I assume this would go through Max's tree, if 
-he has time to include it before soft freeze...
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>      DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+>      DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+>      DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+> +    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
+> +    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
+> +    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
+>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index e069e55e81..36ead8d6d5 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -285,12 +285,14 @@ typedef struct RISCVCPU {
+>          bool ext_s;
+>          bool ext_u;
+>          bool ext_h;
+> +        bool ext_v;
+>          bool ext_counters;
+>          bool ext_ifencei;
+>          bool ext_icsr;
+>
+>          char *priv_spec;
+>          char *user_spec;
+> +        char *vext_spec;
+>          uint16_t vlen;
+>          uint16_t elen;
+>          bool mmu;
+> --
+> 2.23.0
+>
 
