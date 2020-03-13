@@ -7,84 +7,86 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD03EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CEB0C4CECE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A34E20658
+	by mail.kernel.org (Postfix) with ESMTPS id D204720658
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:50:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YN7/Dl94"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A34E20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SpV1jA0t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D204720658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCpNo-0005nw-OR
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35247)
+	id 1jCpNp-0005pe-0T
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55254)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jCpKF-0000Zy-Bu
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:46:28 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCpCH-0001jl-B7
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jCpKE-0006Ao-9Z
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:46:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37470
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jCpCG-0005MO-7C
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59590
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpKE-00069v-5S
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:46:26 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpCG-0005Li-3s
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584125185;
+ s=mimecast20190719; t=1584124691;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4iGVZuF4Qb5AYL8uwIXnWmSt3UwwMw6MN0vCl+3WZX8=;
- b=YN7/Dl94Bv89OENtr0bmzNtDwmaZSy8ZzLPNb0vXE9LI8Uy8QoAwVUQe+7Gce2jP98z0E9
- td9CCC87+y/KokChPOXsgyskyRX7hJiWsZJAVON/jgnSQJBC7EmaexjFEGooTwtcEQXyyw
- t0TL/8T0JcGS5T85Jon3bIF7xs7kbSw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-5qsKRMjMOcaTrWIWRIT83Q-1; Fri, 13 Mar 2020 14:46:20 -0400
-X-MC-Unique: 5qsKRMjMOcaTrWIWRIT83Q-1
-Received: by mail-wr1-f70.google.com with SMTP id b11so4712311wru.21
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:46:19 -0700 (PDT)
+ bh=Jc8uJI+fsWVnbFhna2J0NMxSMRDSs2zyN/X211eVidg=;
+ b=SpV1jA0tXgvUa77PO6hYPhCjWVtlRLPl5Wm6Xs0ZaWl2JyJrpxioEPEXWg+wPXsKrzacv2
+ dUb7a0QvyR8Z5uJgCNMJ6bHpIJzzN8x/bFIOx8qMHHkDNad5wSvcLZSpZ/xJqM59LfAU0B
+ a/ITmn5CLHzJufI2yMNjs7a4hr42N8o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-mlC3S_BPOHuHagFc_wpHuA-1; Fri, 13 Mar 2020 14:38:08 -0400
+X-MC-Unique: mlC3S_BPOHuHagFc_wpHuA-1
+Received: by mail-wm1-f69.google.com with SMTP id a11so1368835wmm.9
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:38:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zCp7V6dmvI6Oe1etj78MAk0xW8iGI9/bbSjLeaMKlUw=;
- b=J4dndvc+9Cdg+uwchcgCkJ3e65Kb3EPGVxRvQH5DsiCvF2Z9kuU2sAc/lTzguVE2Ea
- m/aNgr6zcmiJeulTWcyY6IH/87ybwlnJuJDx/c9u2MArkeZmQL6QsfcVhHRHaLJZk5Fv
- h+BbkNWsx5/RhBE8tFSxxNZP0pBmJqRzWvY+Ubl2h8cmE5y9K48m+aANfS6kLzrJsDbZ
- y9apVXZdJnObv7qjkugvkR3PNGYy1qZIADzwr7LZK2wKOEzwRy8UHkQWijIZLgg4gQP7
- NtEWp1FkdL3Lduk94sk7D04L3Zom/d8dTmGUR909fzOr/lQrtaUMczucfpLPXQ4UqqWf
- gw2A==
-X-Gm-Message-State: ANhLgQ1g4XIDVYNgElz53xfwQfzpbKZqAMt/UOPQfKVqJPzb153x/kVH
- sz3APPxdgwjWBx/XkmHN+L2PnVli9VPAckrSU0u1bCI1l0QxPv8EaK7UbTobojeHqJYMvJskuVK
- njcP8HOSXwFXWASI=
-X-Received: by 2002:a1c:491:: with SMTP id 139mr4867677wme.21.1584125178774;
- Fri, 13 Mar 2020 11:46:18 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuaYIMh40A0NCuonushmZMvLIz51qi9sJGqlGelMgK3L3fXcRVsxiUGuEBrw15kAGNEnJPq4w==
-X-Received: by 2002:a1c:491:: with SMTP id 139mr4867658wme.21.1584125178571;
- Fri, 13 Mar 2020 11:46:18 -0700 (PDT)
+ bh=oL9lM1TjQ9zbVx8kM0/Y3ow0t+KGUtP0TdO5NgiCTHI=;
+ b=mrDSz/yyKJ+1g2wO+8s0H/K3mzjnsDVhLUimpM8xJS1L/cImJhlmqhpw8m6x3f97ix
+ fJfEh4f+eeMoSFi1WHfmP/qa1wEIAXWbI62sWolG1jfXYSkoSJ+gX5aU/UAxpkIxn4H7
+ ou0qNOkf8BhCVY3wX7qv/96LqsirC3RuY1IKkRdeh4v4hjdvqHTOVXGmVkt4GS7ITkLS
+ aNaki2W04Em4yZyjPCQmKtE6A7GB3IEGC/kcrQRf26gslrwhhSs7H7pP8rj3Gx3YiYCv
+ nKLd5fmO++Ak61lvN+5qges8UuKBavuxhgnMEG8nyjj9MSyLLyBg7fJrE67Sehz24abG
+ XhPw==
+X-Gm-Message-State: ANhLgQ3t9eUy/f9HmGjKQz01cNxKMkq5tS7q70XE7FiJzPsBc06HL4J4
+ 3blwk/E55atIoEMWQCO21n075GlM/mqu0s5+0PfeSxbvWpaNYqd3E8Nsr8o+fQ67SslQa8UFnkx
+ uI34lRhLEo2i8NQY=
+X-Received: by 2002:a05:600c:22d9:: with SMTP id
+ 25mr12481664wmg.41.1584124686791; 
+ Fri, 13 Mar 2020 11:38:06 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvkUiNDT12hS5ZR4JFRBhywm9lydrk/287pcgsHZIDKqKgIi1sD3FdgAsAeou1Hy1iXt4HYMQ==
+X-Received: by 2002:a05:600c:22d9:: with SMTP id
+ 25mr12481624wmg.41.1584124686545; 
+ Fri, 13 Mar 2020 11:38:06 -0700 (PDT)
 Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id i1sm63986354wrs.18.2020.03.13.11.46.17
+ by smtp.gmail.com with ESMTPSA id f17sm59325628wrm.3.2020.03.13.11.38.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Mar 2020 11:46:18 -0700 (PDT)
+ Fri, 13 Mar 2020 11:38:06 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/9] hw/core/qdev-properties: Use qemu_strtoul() in
- set_pci_host_devaddr()
-Date: Fri, 13 Mar 2020 19:46:00 +0100
-Message-Id: <20200313184607.11792-3-philmd@redhat.com>
+Subject: [PATCH 14/14] hw/core: Restrict CpuClass::get_crash_info() to
+ system-mode
+Date: Fri, 13 Mar 2020 19:36:52 +0100
+Message-Id: <20200313183652.10258-15-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200313184607.11792-1-philmd@redhat.com>
-References: <20200313184607.11792-1-philmd@redhat.com>
+In-Reply-To: <20200313183652.10258-1-philmd@redhat.com>
+References: <20200313183652.10258-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -93,7 +95,7 @@ Content-Type: text/plain; charset=UTF-8;
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,90 +107,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace strtoul() by qemu_strtoul() so checkpatch.pl won't complain
-if we move this code later.
-
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/core/qdev-properties.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ include/hw/core/cpu.h | 7 ++++++-
+ hw/core/cpu.c         | 2 ++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 48e4c98cf0..e1cefcaa61 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -820,7 +820,7 @@ static void set_pci_host_devaddr(Object *obj, Visitor *=
-v, const char *name,
-     PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
-     Error *local_err =3D NULL;
-     char *str, *p;
--    char *e;
-+    const char *e;
-     unsigned long val;
-     unsigned long dom =3D 0, bus =3D 0;
-     unsigned int slot =3D 0, func =3D 0;
-@@ -837,23 +837,23 @@ static void set_pci_host_devaddr(Object *obj, Visitor=
- *v, const char *name,
-     }
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 73e9a869a4..48ab5ec3ed 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -492,6 +492,8 @@ bool cpu_paging_enabled(const CPUState *cpu);
+ void cpu_get_memory_mapping(CPUState *cpu, MemoryMappingList *list,
+                             Error **errp);
 =20
-     p =3D str;
--    val =3D strtoul(p, &e, 16);
--    if (e =3D=3D p || *e !=3D ':') {
-+    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e =3D=3D p) {
-+        goto inval;
-+    }
-+    if (*e !=3D ':') {
-         goto inval;
-     }
-     bus =3D val;
++#if !defined(CONFIG_USER_ONLY)
++
+ /**
+  * cpu_write_elf64_note:
+  * @f: pointer to a function that writes memory to a file
+@@ -541,6 +543,8 @@ int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, C=
+PUState *cpu,
+  */
+ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu);
 =20
--    p =3D e + 1;
--    val =3D strtoul(p, &e, 16);
--    if (e =3D=3D p) {
-+    p =3D (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e =3D=3D p) {
-         goto inval;
++#endif /* !CONFIG_USER_ONLY */
++
+ /**
+  * CPUDumpFlags:
+  * @CPU_DUMP_CODE:
+@@ -634,7 +638,8 @@ static inline int cpu_asidx_from_attrs(CPUState *cpu, M=
+emTxAttrs attrs)
      }
-     if (*e =3D=3D ':') {
-         dom =3D bus;
-         bus =3D val;
--        p =3D e + 1;
--        val =3D strtoul(p, &e, 16);
--        if (e =3D=3D p) {
-+        p =3D (char *)e + 1;
-+        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e =3D=3D p)=
+     return ret;
+ }
+-#endif
++
++#endif /* CONFIG_USER_ONLY */
+=20
+ /**
+  * cpu_list_add:
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index fe65ca62ac..debdd7e670 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -209,6 +209,7 @@ static bool cpu_common_exec_interrupt(CPUState *cpu, in=
+t int_req)
+     return false;
+ }
+=20
++#if !defined(CONFIG_USER_ONLY)
+ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
  {
-             goto inval;
-         }
+     CPUClass *cc =3D CPU_GET_CLASS(cpu);
+@@ -219,6 +220,7 @@ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu=
+)
      }
-@@ -862,14 +862,13 @@ static void set_pci_host_devaddr(Object *obj, Visitor=
- *v, const char *name,
-     if (*e !=3D '.') {
-         goto inval;
-     }
--    p =3D e + 1;
--    val =3D strtoul(p, &e, 10);
--    if (e =3D=3D p) {
-+    p =3D (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e =3D=3D p) {
-         goto inval;
-     }
-     func =3D val;
+     return res;
+ }
++#endif
 =20
--    if (dom > 0xffff || bus > 0xff || slot > 0x1f || func > 7) {
-+    if (bus > 0xff) {
-         goto inval;
-     }
-=20
+ void cpu_dump_state(CPUState *cpu, FILE *f, int flags)
+ {
 --=20
 2.21.1
 
