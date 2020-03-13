@@ -2,64 +2,83 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB128C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EB0C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:14:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7260220746
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:11:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7260220746
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFEE02074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:14:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SYDQ6ZF7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFEE02074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCgMG-0001Nm-Lt
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:11:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39718)
+	id 1jCgOM-0002sM-3s
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:14:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jCgLS-0000gq-23
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:07 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jCgNQ-00028x-GV
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jCgLP-0006xf-7r
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:05 -0400
-Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:59165)
+ (envelope-from <dgilbert@redhat.com>) id 1jCgNN-0002OE-K6
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29975
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jCgLP-0006ez-1c
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:03 -0400
-Received: from player789.ha.ovh.net (unknown [10.108.35.74])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 350C42472C7
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 10:10:53 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player789.ha.ovh.net (Postfix) with ESMTPSA id BD2411069AFD4;
- Fri, 13 Mar 2020 09:10:43 +0000 (UTC)
-Subject: Re: [PATCH 3/4] spapr: Rename DT functions to newer naming convention
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org,
- philmd@redhat.com
-References: <20200313040539.819138-1-david@gibson.dropbear.id.au>
- <20200313040539.819138-4-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4a9cef8d-2a04-c5ff-8f3b-86c883a94362@kaod.org>
-Date: Fri, 13 Mar 2020 10:10:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCgNM-0002Le-LO
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:13:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584090781;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aw/kWsXmVgVyyhr1DGtnI11sBPXCta5LSGeMZrDdnZk=;
+ b=SYDQ6ZF7YNTxDkYfbM1LoVlyXrrK7eFPCNv/e/qFQVFu69o7k4FMWt8cGeGi8C5d4LQSem
+ w1d/HyJQLW5oFP6x6sTxGoUDL9sw7y2qk1I4aXxxxA8RPICofJEse/OvSDKLXCLtMJ3ynw
+ 8TnpS/6n1D5CqcI3U63hJFKAzDioZsg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-QR5FM8g8PceFQn6F5F2nMQ-1; Fri, 13 Mar 2020 05:12:56 -0400
+X-MC-Unique: QR5FM8g8PceFQn6F5F2nMQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8572800D50;
+ Fri, 13 Mar 2020 09:12:54 +0000 (UTC)
+Received: from work-vm (ovpn-117-92.ams2.redhat.com [10.36.117.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 533B765F40;
+ Fri, 13 Mar 2020 09:12:51 +0000 (UTC)
+Date: Fri, 13 Mar 2020 09:12:48 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Subject: Re: [PATCH] configure: Fix configure error.
+Message-ID: <20200313091248.GA3581@work-vm>
+References: <20200313065525.31722-1-chen.zhang@intel.com>
+ <e240baab-18b8-94b9-7ed5-e7ec9daed489@vivier.eu>
+ <3fdff67c4e4047859c0e8aa183bd53d9@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20200313040539.819138-4-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 5628655113576352576
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvjedgtdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <3fdff67c4e4047859c0e8aa183bd53d9@intel.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.46.10
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,316 +90,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, Zhang Chen <zhangckid@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-dev <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/13/20 5:05 AM, David Gibson wrote:
-> In the spapr code we've been gradually moving towards a convention that
-> functions which create pieces of the device tree are called spapr_dt_*(=
-).
-> This patch speeds that along by renaming most of the things that don't =
-yet
-> match that so that they do.
+* Zhang, Chen (chen.zhang@intel.com) wrote:
 >=20
-> For now we leave the *_dt_populate() functions which are actual methods
-> used in the DRCClass::dt_populate method.
 >=20
-> While we're there we remove a few comments that don't really say anythi=
-ng
-> useful.
+> > -----Original Message-----
+> > From: Laurent Vivier <laurent@vivier.eu>
+> > Sent: Friday, March 13, 2020 4:18 PM
+> > To: Zhang, Chen <chen.zhang@intel.com>; qemu-dev <qemu-
+> > devel@nongnu.org>
+> > Cc: Zhang Chen <zhangckid@gmail.com>; Dr . David Alan Gilbert
+> > <dgilbert@redhat.com>; Juan Quintela <quintela@redhat.com>
+> > Subject: Re: [PATCH] configure: Fix configure error.
+> >=20
+> > Le 13/03/2020 =E0 07:55, Zhang Chen a =E9crit=A0:
+> > > From: Zhang Chen <chen.zhang@intel.com>
+> > >
+> > > When run the ./configure will always get this error:
+> > > Unknown option --exist
+> > >
+> > > It caused by this patch:
+> > > commit 3a67848134d0c07da49033f9ed08bf0ddeec0c6d
+> > > Author: Juan Quintela <quintela@redhat.com>
+> > > Date:   Tue Dec 17 21:15:24 2019 +0100
+> > >
+> > >     configure: Enable test and libs for zstd
+> > >
+> > >     Add it to several build systems to make testing good.
+> > >
+> > > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> > > ---
+> > >  configure | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/configure b/configure
+> > > index 3c7470096f..305591f7e0 100755
+> > > --- a/configure
+> > > +++ b/configure
+> > > @@ -2475,7 +2475,7 @@ fi
+> > >  # zstd check
+> > >
+> > >  if test "$zstd" !=3D "no" ; then
+> > > -    if $pkg_config --exist libzstd ; then
+> > > +    if $pkg_config --exists libzstd ; then
+> > >          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
+> > >          zstd_libs=3D"$($pkg_config --libs libzstd)"
+> > >          LIBS=3D"$zstd_libs $LIBS"
+> > >
+> >=20
+> > Juan already sent a patch to fix that:
+> >=20
+> > [PATCH v2] configure: Improve zstd test
+> > https://patchew.org/QEMU/20200310111431.173151-1-
+> > quintela@redhat.com/
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> OK, Looks haven't merged to upstream.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+I've built a pull with it in, testing it now.
 
-> ---
->  hw/ppc/spapr.c              | 62 +++++++++++++++++--------------------
->  hw/ppc/spapr_ovec.c         |  4 +--
->  include/hw/ppc/spapr_ovec.h |  4 +--
->  3 files changed, 33 insertions(+), 37 deletions(-)
+Dave
+
+> Thanks
+> Zhang Chen
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index fc28d9df25..6c32ec3c0a 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -217,10 +217,9 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int =
-offset, PowerPCCPU *cpu)
->                            sizeof(associativity));
->  }
-> =20
-> -/* Populate the "ibm,pa-features" property */
-> -static void spapr_populate_pa_features(SpaprMachineState *spapr,
-> -                                       PowerPCCPU *cpu,
-> -                                       void *fdt, int offset)
-> +static void spapr_dt_pa_features(SpaprMachineState *spapr,
-> +                                 PowerPCCPU *cpu,
-> +                                 void *fdt, int offset)
->  {
->      uint8_t pa_features_206[] =3D { 6, 0,
->          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> @@ -315,8 +314,8 @@ static void add_str(GString *s, const gchar *s1)
->      g_string_append_len(s, s1, strlen(s1) + 1);
->  }
-> =20
-> -static int spapr_populate_memory_node(void *fdt, int nodeid, hwaddr st=
-art,
-> -                                       hwaddr size)
-> +static int spapr_dt_memory_node(void *fdt, int nodeid, hwaddr start,
-> +                                hwaddr size)
->  {
->      uint32_t associativity[] =3D {
->          cpu_to_be32(0x4), /* length */
-> @@ -391,9 +390,8 @@ spapr_get_drconf_cell(uint32_t seq_lmbs, uint64_t b=
-ase_addr,
->      return elem;
->  }
-> =20
-> -/* ibm,dynamic-memory-v2 */
-> -static int spapr_populate_drmem_v2(SpaprMachineState *spapr, void *fdt=
-,
-> -                                   int offset, MemoryDeviceInfoList *d=
-imms)
-> +static int spapr_dt_dynamic_memory_v2(SpaprMachineState *spapr, void *=
-fdt,
-> +                                      int offset, MemoryDeviceInfoList=
- *dimms)
->  {
->      MachineState *machine =3D MACHINE(spapr);
->      uint8_t *int_buf, *cur_index;
-> @@ -484,8 +482,7 @@ static int spapr_populate_drmem_v2(SpaprMachineStat=
-e *spapr, void *fdt,
->      return 0;
->  }
-> =20
-> -/* ibm,dynamic-memory */
-> -static int spapr_populate_drmem_v1(SpaprMachineState *spapr, void *fdt=
-,
-> +static int spapr_dt_dynamic_memory(SpaprMachineState *spapr, void *fdt=
-,
->                                     int offset, MemoryDeviceInfoList *d=
-imms)
->  {
->      MachineState *machine =3D MACHINE(spapr);
-> @@ -554,7 +551,8 @@ static int spapr_populate_drmem_v1(SpaprMachineStat=
-e *spapr, void *fdt,
->   * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
->   * of this device tree node.
->   */
-> -static int spapr_populate_drconf_memory(SpaprMachineState *spapr, void=
- *fdt)
-> +static int spapr_dt_dynamic_reconfiguration_memory(SpaprMachineState *=
-spapr,
-> +                                                   void *fdt)
->  {
->      MachineState *machine =3D MACHINE(spapr);
->      int nb_numa_nodes =3D machine->numa_state->num_nodes;
-> @@ -593,9 +591,9 @@ static int spapr_populate_drconf_memory(SpaprMachin=
-eState *spapr, void *fdt)
->      /* ibm,dynamic-memory or ibm,dynamic-memory-v2 */
->      dimms =3D qmp_memory_device_list();
->      if (spapr_ovec_test(spapr->ov5_cas, OV5_DRMEM_V2)) {
-> -        ret =3D spapr_populate_drmem_v2(spapr, fdt, offset, dimms);
-> +        ret =3D spapr_dt_dynamic_memory_v2(spapr, fdt, offset, dimms);
->      } else {
-> -        ret =3D spapr_populate_drmem_v1(spapr, fdt, offset, dimms);
-> +        ret =3D spapr_dt_dynamic_memory(spapr, fdt, offset, dimms);
->      }
->      qapi_free_MemoryDeviceInfoList(dimms);
-> =20
-> @@ -626,7 +624,7 @@ static int spapr_populate_drconf_memory(SpaprMachin=
-eState *spapr, void *fdt)
->      return ret;
->  }
-> =20
-> -static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
-> +static int spapr_dt_memory(SpaprMachineState *spapr, void *fdt)
->  {
->      MachineState *machine =3D MACHINE(spapr);
->      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> @@ -649,7 +647,7 @@ static int spapr_populate_memory(SpaprMachineState =
-*spapr, void *fdt)
->          if (!mem_start) {
->              /* spapr_machine_init() checks for rma_size <=3D node0_siz=
-e
->               * already */
-> -            spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
-> +            spapr_dt_memory_node(fdt, i, 0, spapr->rma_size);
->              mem_start +=3D spapr->rma_size;
->              node_size -=3D spapr->rma_size;
->          }
-> @@ -661,7 +659,7 @@ static int spapr_populate_memory(SpaprMachineState =
-*spapr, void *fdt)
->                  sizetmp =3D 1ULL << ctzl(mem_start);
->              }
-> =20
-> -            spapr_populate_memory_node(fdt, i, mem_start, sizetmp);
-> +            spapr_dt_memory_node(fdt, i, mem_start, sizetmp);
->              node_size -=3D sizetmp;
->              mem_start +=3D sizetmp;
->          }
-> @@ -672,7 +670,7 @@ static int spapr_populate_memory(SpaprMachineState =
-*spapr, void *fdt)
->          int ret;
-> =20
->          g_assert(smc->dr_lmb_enabled);
-> -        ret =3D spapr_populate_drconf_memory(spapr, fdt);
-> +        ret =3D spapr_dt_dynamic_reconfiguration_memory(spapr, fdt);
->          if (ret) {
->              return ret;
->          }
-> @@ -681,8 +679,8 @@ static int spapr_populate_memory(SpaprMachineState =
-*spapr, void *fdt)
->      return 0;
->  }
-> =20
-> -static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-> -                                  SpaprMachineState *spapr)
-> +static void spapr_dt_cpu(CPUState *cs, void *fdt, int offset,
-> +                         SpaprMachineState *spapr)
->  {
->      MachineState *ms =3D MACHINE(spapr);
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> @@ -782,7 +780,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
-d *fdt, int offset,
->                            page_sizes_prop, page_sizes_prop_size)));
->      }
-> =20
-> -    spapr_populate_pa_features(spapr, cpu, fdt, offset);
-> +    spapr_dt_pa_features(spapr, cpu, fdt, offset);
-> =20
->      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
->                             cs->cpu_index / vcpus_per_socket)));
-> @@ -816,7 +814,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
-d *fdt, int offset,
->                                pcc->lrg_decr_bits)));
->  }
-> =20
-> -static void spapr_populate_cpus_dt_node(void *fdt, SpaprMachineState *=
-spapr)
-> +static void spapr_dt_cpus(void *fdt, SpaprMachineState *spapr)
->  {
->      CPUState **rev;
->      CPUState *cs;
-> @@ -860,13 +858,13 @@ static void spapr_populate_cpus_dt_node(void *fdt=
-, SpaprMachineState *spapr)
->          offset =3D fdt_add_subnode(fdt, cpus_offset, nodename);
->          g_free(nodename);
->          _FDT(offset);
-> -        spapr_populate_cpu_dt(cs, fdt, offset, spapr);
-> +        spapr_dt_cpu(cs, fdt, offset, spapr);
->      }
-> =20
->      g_free(rev);
->  }
-> =20
-> -static int spapr_rng_populate_dt(void *fdt)
-> +static int spapr_dt_rng(void *fdt)
->  {
->      int node;
->      int ret;
-> @@ -1099,8 +1097,7 @@ static void spapr_dt_chosen(SpaprMachineState *sp=
-apr, void *fdt)
-> =20
->      spapr_dt_ov5_platform_support(spapr, fdt, chosen);
-> =20
-> -    _FDT(spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
-> -                                "ibm,architecture-vec-5"));
-> +    _FDT(spapr_dt_ovec(fdt, chosen, spapr->ov5_cas, "ibm,architecture-=
-vec-5"));
-> =20
->      g_free(stdout_path);
->      g_free(bootlist);
-> @@ -1181,7 +1178,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
-ool reset, size_t space)
->      /* /interrupt controller */
->      spapr_irq_dt(spapr, spapr_max_server_number(spapr), fdt, PHANDLE_I=
-NTC);
-> =20
-> -    ret =3D spapr_populate_memory(spapr, fdt);
-> +    ret =3D spapr_dt_memory(spapr, fdt);
->      if (ret < 0) {
->          error_report("couldn't setup memory nodes in fdt");
->          exit(1);
-> @@ -1191,7 +1188,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
-ool reset, size_t space)
->      spapr_dt_vdevice(spapr->vio_bus, fdt);
-> =20
->      if (object_resolve_path_type("", TYPE_SPAPR_RNG, NULL)) {
-> -        ret =3D spapr_rng_populate_dt(fdt);
-> +        ret =3D spapr_dt_rng(fdt);
->          if (ret < 0) {
->              error_report("could not set up rng device in the fdt");
->              exit(1);
-> @@ -1206,8 +1203,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
-ool reset, size_t space)
->          }
->      }
-> =20
-> -    /* cpus */
-> -    spapr_populate_cpus_dt_node(fdt, spapr);
-> +    spapr_dt_cpus(fdt, spapr);
-> =20
->      if (smc->dr_lmb_enabled) {
->          _FDT(spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
-> @@ -3400,8 +3396,8 @@ int spapr_lmb_dt_populate(SpaprDrc *drc, SpaprMac=
-hineState *spapr,
->      addr =3D spapr_drc_index(drc) * SPAPR_MEMORY_BLOCK_SIZE;
->      node =3D object_property_get_uint(OBJECT(drc->dev), PC_DIMM_NODE_P=
-ROP,
->                                      &error_abort);
-> -    *fdt_start_offset =3D spapr_populate_memory_node(fdt, node, addr,
-> -                                                   SPAPR_MEMORY_BLOCK_=
-SIZE);
-> +    *fdt_start_offset =3D spapr_dt_memory_node(fdt, node, addr,
-> +                                             SPAPR_MEMORY_BLOCK_SIZE);
->      return 0;
->  }
-> =20
-> @@ -3802,7 +3798,7 @@ int spapr_core_dt_populate(SpaprDrc *drc, SpaprMa=
-chineState *spapr,
->      offset =3D fdt_add_subnode(fdt, 0, nodename);
->      g_free(nodename);
-> =20
-> -    spapr_populate_cpu_dt(cs, fdt, offset, spapr);
-> +    spapr_dt_cpu(cs, fdt, offset, spapr);
-> =20
->      *fdt_start_offset =3D offset;
->      return 0;
-> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> index 0ff6d1aeae..dd003f1763 100644
-> --- a/hw/ppc/spapr_ovec.c
-> +++ b/hw/ppc/spapr_ovec.c
-> @@ -200,8 +200,8 @@ SpaprOptionVector *spapr_ovec_parse_vector(target_u=
-long table_addr, int vector)
->      return ov;
->  }
-> =20
-> -int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
-> -                           SpaprOptionVector *ov, const char *name)
-> +int spapr_dt_ovec(void *fdt, int fdt_offset,
-> +                  SpaprOptionVector *ov, const char *name)
->  {
->      uint8_t vec[OV_MAXBYTES + 1];
->      uint16_t vec_len;
-> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
-> index 2bed517a2b..d4dee9e06a 100644
-> --- a/include/hw/ppc/spapr_ovec.h
-> +++ b/include/hw/ppc/spapr_ovec.h
-> @@ -72,8 +72,8 @@ void spapr_ovec_set(SpaprOptionVector *ov, long bitnr=
-);
->  void spapr_ovec_clear(SpaprOptionVector *ov, long bitnr);
->  bool spapr_ovec_test(SpaprOptionVector *ov, long bitnr);
->  SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, in=
-t vector);
-> -int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
-> -                           SpaprOptionVector *ov, const char *name);
-> +int spapr_dt_ovec(void *fdt, int fdt_offset,
-> +                  SpaprOptionVector *ov, const char *name);
-> =20
->  /* migration */
->  extern const VMStateDescription vmstate_spapr_ovec;
->=20
+> >=20
+> > Thanks,
+> > Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
