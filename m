@@ -2,80 +2,64 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC55CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB128C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:11:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 819A9206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:52:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819A9206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7260220746
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:11:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7260220746
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCg3L-0003G5-OG
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 04:52:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40144)
+	id 1jCgMG-0001Nm-Lt
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1jCg2k-0002rY-5Y
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:51:48 -0400
+ (envelope-from <clg@kaod.org>) id 1jCgLS-0000gq-23
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1jCg2i-0006LI-6A
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:51:45 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56059)
+ (envelope-from <clg@kaod.org>) id 1jCgLP-0006xf-7r
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:05 -0400
+Received: from 4.mo3.mail-out.ovh.net ([178.33.46.10]:59165)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1jCg2h-00069z-UV
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:51:44 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 13 Mar 2020 01:51:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,548,1574150400"; d="scan'208";a="416234220"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
- by orsmga005.jf.intel.com with ESMTP; 13 Mar 2020 01:51:38 -0700
-Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 13 Mar 2020 01:51:24 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 13 Mar 2020 16:51:21 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Fri, 13 Mar 2020 16:51:21 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-dev <qemu-devel@nongnu.org>
-Subject: RE: [PATCH] configure: Fix configure error.
-Thread-Topic: [PATCH] configure: Fix configure error.
-Thread-Index: AQHV+QWoCV1IbU1BsEWn7GP9oLZwEKhFp6aAgACPL3A=
-Date: Fri, 13 Mar 2020 08:51:21 +0000
-Message-ID: <3fdff67c4e4047859c0e8aa183bd53d9@intel.com>
-References: <20200313065525.31722-1-chen.zhang@intel.com>
- <e240baab-18b8-94b9-7ed5-e7ec9daed489@vivier.eu>
-In-Reply-To: <e240baab-18b8-94b9-7ed5-e7ec9daed489@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jCgLP-0006ez-1c
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:11:03 -0400
+Received: from player789.ha.ovh.net (unknown [10.108.35.74])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 350C42472C7
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 10:10:53 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player789.ha.ovh.net (Postfix) with ESMTPSA id BD2411069AFD4;
+ Fri, 13 Mar 2020 09:10:43 +0000 (UTC)
+Subject: Re: [PATCH 3/4] spapr: Rename DT functions to newer naming convention
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org,
+ philmd@redhat.com
+References: <20200313040539.819138-1-david@gibson.dropbear.id.au>
+ <20200313040539.819138-4-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4a9cef8d-2a04-c5ff-8f3b-86c883a94362@kaod.org>
+Date: Fri, 13 Mar 2020 10:10:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
+In-Reply-To: <20200313040539.819138-4-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 5628655113576352576
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvjedgtdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.46.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,42 +71,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGF1cmVudCBWaXZpZXIg
-PGxhdXJlbnRAdml2aWVyLmV1Pg0KPiBTZW50OiBGcmlkYXksIE1hcmNoIDEzLCAyMDIwIDQ6MTgg
-UE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IHFlbXUtZGV2IDxx
-ZW11LQ0KPiBkZXZlbEBub25nbnUub3JnPg0KPiBDYzogWmhhbmcgQ2hlbiA8emhhbmdja2lkQGdt
-YWlsLmNvbT47IERyIC4gRGF2aWQgQWxhbiBHaWxiZXJ0DQo+IDxkZ2lsYmVydEByZWRoYXQuY29t
-PjsgSnVhbiBRdWludGVsYSA8cXVpbnRlbGFAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQ
-QVRDSF0gY29uZmlndXJlOiBGaXggY29uZmlndXJlIGVycm9yLg0KPiANCj4gTGUgMTMvMDMvMjAy
-MCDDoCAwNzo1NSwgWmhhbmcgQ2hlbiBhIMOpY3JpdMKgOg0KPiA+IEZyb206IFpoYW5nIENoZW4g
-PGNoZW4uemhhbmdAaW50ZWwuY29tPg0KPiA+DQo+ID4gV2hlbiBydW4gdGhlIC4vY29uZmlndXJl
-IHdpbGwgYWx3YXlzIGdldCB0aGlzIGVycm9yOg0KPiA+IFVua25vd24gb3B0aW9uIC0tZXhpc3QN
-Cj4gPg0KPiA+IEl0IGNhdXNlZCBieSB0aGlzIHBhdGNoOg0KPiA+IGNvbW1pdCAzYTY3ODQ4MTM0
-ZDBjMDdkYTQ5MDMzZjllZDA4YmYwZGRlZWMwYzZkDQo+ID4gQXV0aG9yOiBKdWFuIFF1aW50ZWxh
-IDxxdWludGVsYUByZWRoYXQuY29tPg0KPiA+IERhdGU6ICAgVHVlIERlYyAxNyAyMToxNToyNCAy
-MDE5ICswMTAwDQo+ID4NCj4gPiAgICAgY29uZmlndXJlOiBFbmFibGUgdGVzdCBhbmQgbGlicyBm
-b3IgenN0ZA0KPiA+DQo+ID4gICAgIEFkZCBpdCB0byBzZXZlcmFsIGJ1aWxkIHN5c3RlbXMgdG8g
-bWFrZSB0ZXN0aW5nIGdvb2QuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBaaGFuZyBDaGVuIDxj
-aGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgY29uZmlndXJlIHwgMiArLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gPg0KPiA+
-IGRpZmYgLS1naXQgYS9jb25maWd1cmUgYi9jb25maWd1cmUNCj4gPiBpbmRleCAzYzc0NzAwOTZm
-Li4zMDU1OTFmN2UwIDEwMDc1NQ0KPiA+IC0tLSBhL2NvbmZpZ3VyZQ0KPiA+ICsrKyBiL2NvbmZp
-Z3VyZQ0KPiA+IEBAIC0yNDc1LDcgKzI0NzUsNyBAQCBmaQ0KPiA+ICAjIHpzdGQgY2hlY2sNCj4g
-Pg0KPiA+ICBpZiB0ZXN0ICIkenN0ZCIgIT0gIm5vIiA7IHRoZW4NCj4gPiAtICAgIGlmICRwa2df
-Y29uZmlnIC0tZXhpc3QgbGlienN0ZCA7IHRoZW4NCj4gPiArICAgIGlmICRwa2dfY29uZmlnIC0t
-ZXhpc3RzIGxpYnpzdGQgOyB0aGVuDQo+ID4gICAgICAgICAgenN0ZF9jZmxhZ3M9IiQoJHBrZ19j
-b25maWcgLS1jZmxhZ3MgbGlienN0ZCkiDQo+ID4gICAgICAgICAgenN0ZF9saWJzPSIkKCRwa2df
-Y29uZmlnIC0tbGlicyBsaWJ6c3RkKSINCj4gPiAgICAgICAgICBMSUJTPSIkenN0ZF9saWJzICRM
-SUJTIg0KPiA+DQo+IA0KPiBKdWFuIGFscmVhZHkgc2VudCBhIHBhdGNoIHRvIGZpeCB0aGF0Og0K
-PiANCj4gW1BBVENIIHYyXSBjb25maWd1cmU6IEltcHJvdmUgenN0ZCB0ZXN0DQo+IGh0dHBzOi8v
-cGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxMDExMTQzMS4xNzMxNTEtMS0NCj4gcXVpbnRlbGFAcmVk
-aGF0LmNvbS8NCg0KT0ssIExvb2tzIGhhdmVuJ3QgbWVyZ2VkIHRvIHVwc3RyZWFtLg0KDQpUaGFu
-a3MNClpoYW5nIENoZW4NCg0KPiANCj4gVGhhbmtzLA0KPiBMYXVyZW50DQo=
+On 3/13/20 5:05 AM, David Gibson wrote:
+> In the spapr code we've been gradually moving towards a convention that
+> functions which create pieces of the device tree are called spapr_dt_*(=
+).
+> This patch speeds that along by renaming most of the things that don't =
+yet
+> match that so that they do.
+>=20
+> For now we leave the *_dt_populate() functions which are actual methods
+> used in the DRCClass::dt_populate method.
+>=20
+> While we're there we remove a few comments that don't really say anythi=
+ng
+> useful.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+> ---
+>  hw/ppc/spapr.c              | 62 +++++++++++++++++--------------------
+>  hw/ppc/spapr_ovec.c         |  4 +--
+>  include/hw/ppc/spapr_ovec.h |  4 +--
+>  3 files changed, 33 insertions(+), 37 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index fc28d9df25..6c32ec3c0a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -217,10 +217,9 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int =
+offset, PowerPCCPU *cpu)
+>                            sizeof(associativity));
+>  }
+> =20
+> -/* Populate the "ibm,pa-features" property */
+> -static void spapr_populate_pa_features(SpaprMachineState *spapr,
+> -                                       PowerPCCPU *cpu,
+> -                                       void *fdt, int offset)
+> +static void spapr_dt_pa_features(SpaprMachineState *spapr,
+> +                                 PowerPCCPU *cpu,
+> +                                 void *fdt, int offset)
+>  {
+>      uint8_t pa_features_206[] =3D { 6, 0,
+>          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+> @@ -315,8 +314,8 @@ static void add_str(GString *s, const gchar *s1)
+>      g_string_append_len(s, s1, strlen(s1) + 1);
+>  }
+> =20
+> -static int spapr_populate_memory_node(void *fdt, int nodeid, hwaddr st=
+art,
+> -                                       hwaddr size)
+> +static int spapr_dt_memory_node(void *fdt, int nodeid, hwaddr start,
+> +                                hwaddr size)
+>  {
+>      uint32_t associativity[] =3D {
+>          cpu_to_be32(0x4), /* length */
+> @@ -391,9 +390,8 @@ spapr_get_drconf_cell(uint32_t seq_lmbs, uint64_t b=
+ase_addr,
+>      return elem;
+>  }
+> =20
+> -/* ibm,dynamic-memory-v2 */
+> -static int spapr_populate_drmem_v2(SpaprMachineState *spapr, void *fdt=
+,
+> -                                   int offset, MemoryDeviceInfoList *d=
+imms)
+> +static int spapr_dt_dynamic_memory_v2(SpaprMachineState *spapr, void *=
+fdt,
+> +                                      int offset, MemoryDeviceInfoList=
+ *dimms)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+>      uint8_t *int_buf, *cur_index;
+> @@ -484,8 +482,7 @@ static int spapr_populate_drmem_v2(SpaprMachineStat=
+e *spapr, void *fdt,
+>      return 0;
+>  }
+> =20
+> -/* ibm,dynamic-memory */
+> -static int spapr_populate_drmem_v1(SpaprMachineState *spapr, void *fdt=
+,
+> +static int spapr_dt_dynamic_memory(SpaprMachineState *spapr, void *fdt=
+,
+>                                     int offset, MemoryDeviceInfoList *d=
+imms)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+> @@ -554,7 +551,8 @@ static int spapr_populate_drmem_v1(SpaprMachineStat=
+e *spapr, void *fdt,
+>   * Refer to docs/specs/ppc-spapr-hotplug.txt for the documentation
+>   * of this device tree node.
+>   */
+> -static int spapr_populate_drconf_memory(SpaprMachineState *spapr, void=
+ *fdt)
+> +static int spapr_dt_dynamic_reconfiguration_memory(SpaprMachineState *=
+spapr,
+> +                                                   void *fdt)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+>      int nb_numa_nodes =3D machine->numa_state->num_nodes;
+> @@ -593,9 +591,9 @@ static int spapr_populate_drconf_memory(SpaprMachin=
+eState *spapr, void *fdt)
+>      /* ibm,dynamic-memory or ibm,dynamic-memory-v2 */
+>      dimms =3D qmp_memory_device_list();
+>      if (spapr_ovec_test(spapr->ov5_cas, OV5_DRMEM_V2)) {
+> -        ret =3D spapr_populate_drmem_v2(spapr, fdt, offset, dimms);
+> +        ret =3D spapr_dt_dynamic_memory_v2(spapr, fdt, offset, dimms);
+>      } else {
+> -        ret =3D spapr_populate_drmem_v1(spapr, fdt, offset, dimms);
+> +        ret =3D spapr_dt_dynamic_memory(spapr, fdt, offset, dimms);
+>      }
+>      qapi_free_MemoryDeviceInfoList(dimms);
+> =20
+> @@ -626,7 +624,7 @@ static int spapr_populate_drconf_memory(SpaprMachin=
+eState *spapr, void *fdt)
+>      return ret;
+>  }
+> =20
+> -static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+> +static int spapr_dt_memory(SpaprMachineState *spapr, void *fdt)
+>  {
+>      MachineState *machine =3D MACHINE(spapr);
+>      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> @@ -649,7 +647,7 @@ static int spapr_populate_memory(SpaprMachineState =
+*spapr, void *fdt)
+>          if (!mem_start) {
+>              /* spapr_machine_init() checks for rma_size <=3D node0_siz=
+e
+>               * already */
+> -            spapr_populate_memory_node(fdt, i, 0, spapr->rma_size);
+> +            spapr_dt_memory_node(fdt, i, 0, spapr->rma_size);
+>              mem_start +=3D spapr->rma_size;
+>              node_size -=3D spapr->rma_size;
+>          }
+> @@ -661,7 +659,7 @@ static int spapr_populate_memory(SpaprMachineState =
+*spapr, void *fdt)
+>                  sizetmp =3D 1ULL << ctzl(mem_start);
+>              }
+> =20
+> -            spapr_populate_memory_node(fdt, i, mem_start, sizetmp);
+> +            spapr_dt_memory_node(fdt, i, mem_start, sizetmp);
+>              node_size -=3D sizetmp;
+>              mem_start +=3D sizetmp;
+>          }
+> @@ -672,7 +670,7 @@ static int spapr_populate_memory(SpaprMachineState =
+*spapr, void *fdt)
+>          int ret;
+> =20
+>          g_assert(smc->dr_lmb_enabled);
+> -        ret =3D spapr_populate_drconf_memory(spapr, fdt);
+> +        ret =3D spapr_dt_dynamic_reconfiguration_memory(spapr, fdt);
+>          if (ret) {
+>              return ret;
+>          }
+> @@ -681,8 +679,8 @@ static int spapr_populate_memory(SpaprMachineState =
+*spapr, void *fdt)
+>      return 0;
+>  }
+> =20
+> -static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+> -                                  SpaprMachineState *spapr)
+> +static void spapr_dt_cpu(CPUState *cs, void *fdt, int offset,
+> +                         SpaprMachineState *spapr)
+>  {
+>      MachineState *ms =3D MACHINE(spapr);
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> @@ -782,7 +780,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
+d *fdt, int offset,
+>                            page_sizes_prop, page_sizes_prop_size)));
+>      }
+> =20
+> -    spapr_populate_pa_features(spapr, cpu, fdt, offset);
+> +    spapr_dt_pa_features(spapr, cpu, fdt, offset);
+> =20
+>      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
+>                             cs->cpu_index / vcpus_per_socket)));
+> @@ -816,7 +814,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, voi=
+d *fdt, int offset,
+>                                pcc->lrg_decr_bits)));
+>  }
+> =20
+> -static void spapr_populate_cpus_dt_node(void *fdt, SpaprMachineState *=
+spapr)
+> +static void spapr_dt_cpus(void *fdt, SpaprMachineState *spapr)
+>  {
+>      CPUState **rev;
+>      CPUState *cs;
+> @@ -860,13 +858,13 @@ static void spapr_populate_cpus_dt_node(void *fdt=
+, SpaprMachineState *spapr)
+>          offset =3D fdt_add_subnode(fdt, cpus_offset, nodename);
+>          g_free(nodename);
+>          _FDT(offset);
+> -        spapr_populate_cpu_dt(cs, fdt, offset, spapr);
+> +        spapr_dt_cpu(cs, fdt, offset, spapr);
+>      }
+> =20
+>      g_free(rev);
+>  }
+> =20
+> -static int spapr_rng_populate_dt(void *fdt)
+> +static int spapr_dt_rng(void *fdt)
+>  {
+>      int node;
+>      int ret;
+> @@ -1099,8 +1097,7 @@ static void spapr_dt_chosen(SpaprMachineState *sp=
+apr, void *fdt)
+> =20
+>      spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+> =20
+> -    _FDT(spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
+> -                                "ibm,architecture-vec-5"));
+> +    _FDT(spapr_dt_ovec(fdt, chosen, spapr->ov5_cas, "ibm,architecture-=
+vec-5"));
+> =20
+>      g_free(stdout_path);
+>      g_free(bootlist);
+> @@ -1181,7 +1178,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
+ool reset, size_t space)
+>      /* /interrupt controller */
+>      spapr_irq_dt(spapr, spapr_max_server_number(spapr), fdt, PHANDLE_I=
+NTC);
+> =20
+> -    ret =3D spapr_populate_memory(spapr, fdt);
+> +    ret =3D spapr_dt_memory(spapr, fdt);
+>      if (ret < 0) {
+>          error_report("couldn't setup memory nodes in fdt");
+>          exit(1);
+> @@ -1191,7 +1188,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
+ool reset, size_t space)
+>      spapr_dt_vdevice(spapr->vio_bus, fdt);
+> =20
+>      if (object_resolve_path_type("", TYPE_SPAPR_RNG, NULL)) {
+> -        ret =3D spapr_rng_populate_dt(fdt);
+> +        ret =3D spapr_dt_rng(fdt);
+>          if (ret < 0) {
+>              error_report("could not set up rng device in the fdt");
+>              exit(1);
+> @@ -1206,8 +1203,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, b=
+ool reset, size_t space)
+>          }
+>      }
+> =20
+> -    /* cpus */
+> -    spapr_populate_cpus_dt_node(fdt, spapr);
+> +    spapr_dt_cpus(fdt, spapr);
+> =20
+>      if (smc->dr_lmb_enabled) {
+>          _FDT(spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
+> @@ -3400,8 +3396,8 @@ int spapr_lmb_dt_populate(SpaprDrc *drc, SpaprMac=
+hineState *spapr,
+>      addr =3D spapr_drc_index(drc) * SPAPR_MEMORY_BLOCK_SIZE;
+>      node =3D object_property_get_uint(OBJECT(drc->dev), PC_DIMM_NODE_P=
+ROP,
+>                                      &error_abort);
+> -    *fdt_start_offset =3D spapr_populate_memory_node(fdt, node, addr,
+> -                                                   SPAPR_MEMORY_BLOCK_=
+SIZE);
+> +    *fdt_start_offset =3D spapr_dt_memory_node(fdt, node, addr,
+> +                                             SPAPR_MEMORY_BLOCK_SIZE);
+>      return 0;
+>  }
+> =20
+> @@ -3802,7 +3798,7 @@ int spapr_core_dt_populate(SpaprDrc *drc, SpaprMa=
+chineState *spapr,
+>      offset =3D fdt_add_subnode(fdt, 0, nodename);
+>      g_free(nodename);
+> =20
+> -    spapr_populate_cpu_dt(cs, fdt, offset, spapr);
+> +    spapr_dt_cpu(cs, fdt, offset, spapr);
+> =20
+>      *fdt_start_offset =3D offset;
+>      return 0;
+> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> index 0ff6d1aeae..dd003f1763 100644
+> --- a/hw/ppc/spapr_ovec.c
+> +++ b/hw/ppc/spapr_ovec.c
+> @@ -200,8 +200,8 @@ SpaprOptionVector *spapr_ovec_parse_vector(target_u=
+long table_addr, int vector)
+>      return ov;
+>  }
+> =20
+> -int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
+> -                           SpaprOptionVector *ov, const char *name)
+> +int spapr_dt_ovec(void *fdt, int fdt_offset,
+> +                  SpaprOptionVector *ov, const char *name)
+>  {
+>      uint8_t vec[OV_MAXBYTES + 1];
+>      uint16_t vec_len;
+> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+> index 2bed517a2b..d4dee9e06a 100644
+> --- a/include/hw/ppc/spapr_ovec.h
+> +++ b/include/hw/ppc/spapr_ovec.h
+> @@ -72,8 +72,8 @@ void spapr_ovec_set(SpaprOptionVector *ov, long bitnr=
+);
+>  void spapr_ovec_clear(SpaprOptionVector *ov, long bitnr);
+>  bool spapr_ovec_test(SpaprOptionVector *ov, long bitnr);
+>  SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, in=
+t vector);
+> -int spapr_ovec_populate_dt(void *fdt, int fdt_offset,
+> -                           SpaprOptionVector *ov, const char *name);
+> +int spapr_dt_ovec(void *fdt, int fdt_offset,
+> +                  SpaprOptionVector *ov, const char *name);
+> =20
+>  /* migration */
+>  extern const VMStateDescription vmstate_spapr_ovec;
+>=20
+
 
