@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E4EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F176EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:03:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4679720674
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C067C20674
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:03:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UWo+NaER"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4679720674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PP9s1t2s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C067C20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCobr-0006Nq-9A
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:00:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46060)
+	id 1jCoeM-00007j-VT
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:03:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50291)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCoZi-0004aG-V1
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 13:58:23 -0400
+ (envelope-from <eblake@redhat.com>) id 1jCocr-0007nx-NH
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCoZh-0003TI-Uh
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 13:58:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50687
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1jCocq-0007JY-06
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:01:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45396
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCoZh-0003K3-PW
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 13:58:21 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCocp-0007GJ-Pf
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:01:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584122301;
+ s=mimecast20190719; t=1584122494;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IG4J0vLrYyluQnmz12sJ7wFaLiKfzpfk0xm3KnMd9G0=;
- b=UWo+NaERSPI74VHroVPA/S7UwIOEJboqDzh5F5BcD2e8+qQlH9Lhnfk+dsWuQ8eKR3bThd
- 9eUipsZiOupMuXF3jGuwHneaTuIXMnrZKSJgwsEPxEfLcW5nRCgqpaFDGxrEZCyKweGY1/
- g0cTRf63FkTtWnrzenoIre+LAGO/8P4=
+ bh=uYkzSkrBA8SBvnascjC3hrbAinwHpvUBwl9A4pXHbx0=;
+ b=PP9s1t2s390yksP0/B09DdTlUHJnVRLJEtsnWuzzEd/o8ToshCz7dGwhJdKLMT+03adh2q
+ 9HlLghlROUKXYNvUJTziMok02GzZDycyNgVRlVmCm7TfmZKW79LZAFJ205g5/JJilmP6Pr
+ 0RXSzH2EHBgGFCCVVYlT93P5dUQg2CY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-Wjb0-WcfMYawYZJl0HjjaQ-1; Fri, 13 Mar 2020 13:58:18 -0400
-X-MC-Unique: Wjb0-WcfMYawYZJl0HjjaQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-60-WzW7BqdfMK22wHVx3an3rg-1; Fri, 13 Mar 2020 14:01:32 -0400
+X-MC-Unique: WzW7BqdfMK22wHVx3an3rg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1CB9800D50;
- Fri, 13 Mar 2020 17:58:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BB3A8017CC;
+ Fri, 13 Mar 2020 18:01:31 +0000 (UTC)
 Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2ED9F5D9CA;
- Fri, 13 Mar 2020 17:58:16 +0000 (UTC)
-Subject: Re: [PATCH 2/3] hw/misc/ivshmem: Use one Error * variable instead of
- two
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82A765C1BB;
+ Fri, 13 Mar 2020 18:01:30 +0000 (UTC)
+Subject: Re: [PATCH 3/3] xen-block: Use one Error * variable instead of two
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200313170517.22480-1-armbru@redhat.com>
- <20200313170517.22480-3-armbru@redhat.com>
+ <20200313170517.22480-4-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <88a64410-e502-9b4b-3892-55fe764cc895@redhat.com>
-Date: Fri, 13 Mar 2020 12:58:15 -0500
+Message-ID: <193f91f8-0f79-4371-6341-b8fc5178e8be@redhat.com>
+Date: Fri, 13 Mar 2020 13:01:29 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200313170517.22480-3-armbru@redhat.com>
+In-Reply-To: <20200313170517.22480-4-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,14 +97,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/13/20 12:05 PM, Markus Armbruster wrote:
-> Commit fe44dc9180 "migration: disallow migrate_add_blocker during
-> migration" accidentally added a second Error * variable.  Use the
-> first one instead.
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   hw/misc/ivshmem.c | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
+>   hw/block/xen-block.c | 5 +----
+>   1 file changed, 1 insertion(+), 4 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
