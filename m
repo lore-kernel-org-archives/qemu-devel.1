@@ -2,90 +2,85 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191B9C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E74CC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1846206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9A042072C
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HR+CBC7V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1846206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OjYuXkFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9A042072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCliT-0002of-1U
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46783)
+	id 1jClmg-00056R-09
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jClhk-0001sd-E7
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:54:29 -0400
+ (envelope-from <armbru@redhat.com>) id 1jCllx-0004Tr-Pw
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jClhi-0004iP-CJ
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:54:28 -0400
-Received: from mail-pg1-x529.google.com ([2607:f8b0:4864:20::529]:37972)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jClhi-0004h0-73
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:54:26 -0400
-Received: by mail-pg1-x529.google.com with SMTP id x7so5116603pgh.5
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 07:54:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6FsArFb4Vrvq32VdMV4+A17UUaORsh925W18m3nZ+bU=;
- b=HR+CBC7Vfu4Qw17TRM3f6/XXRv245HdJPQp80GnOqzWDZ7VG4wwtoyfXthZ2PepS8f
- GXNKiNRJuRRSNR74TKbHIk2KQgUKuk3OP3z2dCEzM+z3shP6bwjH1rysjEzU77BHFcLY
- 9D2SFn2z06fb9g9pberks7T7IbDlSoq1YdO01uYYiDqmV0Pkk39uQpoLhHgZwoyXDIWF
- GoVkE11L2zVtflDdXvhSwehJpmjh4LC3z8A1/hLXuThHtNSwtoy0yzXzeq8MLz6Q0AcW
- JKLGGaz9PQz62JTT0VoNbcdLNUL9eQEkOkftMZ9VWAymGkp9icA1pkDwRhiWW+O2666c
- U1sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6FsArFb4Vrvq32VdMV4+A17UUaORsh925W18m3nZ+bU=;
- b=kFFpKbl197KoDBnyb7cmvpVvQ5+fawJNtiQnISCvqZK1xDRtG9JCMayEN75j2tklLM
- a3HgFKcE/Ct3vHbs5PKOXBKuZ5syYtW8nb8LfEXATd+OsaPW1nVL4rnIlCenlERLWEif
- ayIHpCAYMzCWw4CcPiOD6dmKhBn5Ic8wpzut30e74p/RBq4hAw+2Wlts3+z+ffNjpjjO
- g40yjp8BsFyDG5hSuHkCVEutqq8O4BQ4kOWpVGxsJW4X7AJNSuk8GQMPEXj5I4NEsE9J
- h2GcuR4ZH3PviFSpkiSGxAhiNL9C+lFXEEIraEsMxrjNp02tWmrCvD1uWWNcQZZBBp+X
- 4DPQ==
-X-Gm-Message-State: ANhLgQ2iviv27/6eL46OQDnAXkMCkysLw7tGoQf3kvhMl7YTORy+0cuO
- k9DQeqoB/4DqX7OpqTTLv9dNNh2wpVk=
-X-Google-Smtp-Source: ADFU+vtSUNBfz5E77+a14l7ozCoEVmk0i+0j3/rNZYIf0WAdVWBKBNAzKgvkj+NoMYAIRsNKO7vgOg==
-X-Received: by 2002:a62:3487:: with SMTP id b129mr3098727pfa.150.1584111264817; 
- Fri, 13 Mar 2020 07:54:24 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- x190sm59562722pfb.96.2020.03.13.07.54.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Mar 2020 07:54:24 -0700 (PDT)
-Subject: Re: [PATCH 2/5] target/arm: MTE user mode disassembly
-To: =?UTF-8?Q?R=c3=a9mi_Denis-Courmont?= <remi@remlab.net>, qemu-arm@nongnu.org
-References: <20200313140023.83844-2-remi@remlab.net>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b72a1acc-eec1-376a-0fef-caa55799d517@linaro.org>
-Date: Fri, 13 Mar 2020 07:54:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <armbru@redhat.com>) id 1jCllv-00024w-Tl
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:58:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48095
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCllv-0001ys-Do
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:58:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584111526;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AnEEI9lRDz1igZrOmLkKBnx2/JAww6P0U4b/hLUgobw=;
+ b=OjYuXkFQHjHWewSqlL6X9eocC2352Aj3mH8GF8+K9qsVwcPa8az25qJnNxSvec4VzQ9Lw1
+ NQCg/FSRVOI4OidQtQ+2UI8VhKHe9OnYco/z2+7oPZTQS96c/8k6Bh0JSsyRm8fv31i6a4
+ iS559XfxJVNeoMZ0wL12q8qIz8fWIwQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-mA0yGK7PPCOUnLaQKR1RbQ-1; Fri, 13 Mar 2020 10:58:44 -0400
+X-MC-Unique: mA0yGK7PPCOUnLaQKR1RbQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A43FA0CC0;
+ Fri, 13 Mar 2020 14:58:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 262718B570;
+ Fri, 13 Mar 2020 14:58:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A73E511386A6; Fri, 13 Mar 2020 15:58:35 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v9 02/10] scripts: Coccinelle script to use
+ ERRP_AUTO_PROPAGATE()
+References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+ <20200312085936.9552-3-vsementsov@virtuozzo.com>
+Date: Fri, 13 Mar 2020 15:58:35 +0100
+In-Reply-To: <20200312085936.9552-3-vsementsov@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Thu, 12 Mar 2020 11:59:28 +0300")
+Message-ID: <87imj8i9no.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200313140023.83844-2-remi@remlab.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::529
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,37 +92,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, armbru@redhat.com,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/13/20 7:00 AM, Rémi Denis-Courmont wrote:
-> +/* Extract an Allocation Tag from an address */
-> +static void gen_extract_tag(TCGv_i64 dest, TCGv_i64 source)
-> +{
-> +    TCGv_i64 sign = tcg_temp_new_i64();
-> +
-> +    /* See ARMv8.5-A AllocationTagFromAddress pseudocode */
-> +    tcg_gen_extract_i64(sign, source, 55, 1);
-> +    tcg_gen_extract_i64(dest, source, 56, 4);
-> +    tcg_gen_add_i64(dest, dest, sign);
-> +    tcg_gen_andi_i64(dest, dest, 0xf);
-> +    tcg_temp_free_i64(sign);
-> +}
+I tried this script on the whole tree.  Observations:
 
-In addition to everything else, I see that you're working from quite an old
-beta version of the memtag spec.
+* $ git-diff --shortstat \*.[ch]
+   333 files changed, 3480 insertions(+), 4586 deletions(-)
 
-Please grab the most recent Arm ARM, F.a:
-https://developer.arm.com/docs/ddi0487/latest
+* Twelve functions have "several definitions of Error * local variable".
 
-The current version does not really distinguish between logical and physical
-tags, so there is no add:
+  Eight declare such a variable within a loop.  Reported because
+  Coccinelle matches along control flow, not just along text.  Ignore.
 
-bits(4) AArch64.AllocationTagFromAddress(bits(64) tagged_address)
-    return tagged_address<59:56>;
+  Remaining four:
 
+  * ivshmem_common_realize()
 
-r~
+    Two variables (messed up in commit fe44dc91807), should be replaced
+    by one.
+
+  * qmp_query_cpu_model_expansion() two times
+
+    Three declarations in separate blocks; two should be replaced by
+    &error_abort, one moved to the function block.
+
+  * xen_block_device_destroy()
+
+    Two declarations in seperate blocks; should be replaced by a single
+    one.
+
+  Separate manual cleanup patches, ideally applied before running
+  Coccinelle to keep Coccinelle's changes as simple and safe as
+  possible.  I'll post patches.  Only the one for
+  xen_block_device_destroy() affects by this series.
+
+* No function "propagates to errp several times"
+
+  I tested the rule does detect this as advertized by feeding it an
+  obvious example.  We're good.
+
+* ERRP_AUTO_PROPAGATE() inserted 744 times, always right at the
+  beginning of a function.
+
+* As far as I can tell, all changed functions have ERRP_AUTO_PROPAGATE()
+  inserted.  Good.
+
+* Almost 1100 error propagations dropped:error_propagate() removed,
+  error_propagate_prepend() replaced by just error_prepend().
+
+* Four error_propagate() are transformed.  Two instances each in
+  aspeed_soc_ast2600_realize() and aspeed_soc_realize().  Pattern:
+
+     {
+    +    ERRP_AUTO_PROPAGATE();
+         ...
+    -    Error *err =3D NULL, *local_err =3D NULL;
+    +    Error *local_err =3D NULL;
+         ...
+
+             object_property_set_T(...,=20
+    -                              &err);
+    +                              errp);
+             object_property_set_T(...,
+                                   &local_err);
+    -        error_propagate(&err, local_err);
+    -        if (err) {
+    -            error_propagate(errp, err);
+    +        error_propagate(errp, local_err);
+    +        if (*errp) {
+                 return;
+             }
+
+  This is what error.h calls "Receive and accumulate multiple errors
+  (first one wins)".
+
+  Result:
+
+        ERRP_AUTO_PROPAGATE();
+        ...
+        Error *local_err =3D NULL;
+        ...
+
+            object_property_set_T(..., errp);
+            object_property_set_T(..., &local_err);
+            error_propagate(errp, local_err);
+            if (*errp) {
+                return;
+            }
+
+  Could be done without the accumulation:
+
+        ERRP_AUTO_PROPAGATE();
+        ...
+
+            object_property_set_T(..., errp);
+            if (*errp) {
+                return;
+            }
+            object_property_set_T(..., errp);
+            if (*errp) {
+                return;
+            }
+
+  I find this a bit easier to understand.  Matter of taste.  If we want
+  to change to this, do it manually and separately.  I'd do it on top.
+
+* Some 90 propagations remain.
+
+  Some of them could use cleanup, e.g. file_memory_backend_set_pmem(),
+  css_clear_io_interrupt().  Out of scope for this series.
+
+  Some move errors around in unusual ways, e.g. in block/nbd.c.  Could
+  use review.  Out of scope for this series.
+
+  I spotted three that should be transformed, but aren't:
+
+  - qcrypto_block_luks_store_key()
+
+    I believe g_autoptr() confuses Coccinelle.  Undermines all our
+    Coccinelle use, not just this patch.  I think we need to update
+    scripts/cocci-macro-file.h for it.
+
+  - armsse_realize()
+
+    Something in this huge function confuses Coccinelle, but I don't
+    know what exactly.  If I delete most of it, the error_propagate()
+    transforms okay.  If I delete less, Coccinelle hangs.
+
+  - apply_cpu_model()
+
+    Gets transformed fine if I remove the #ifndef CONFIG_USER_ONLY.  I
+    have no idea why the #if spooks Coccinelle here, but not elsewhere.
+
+  None of these three affects this series.  No need to hold it back for
+  further investigation.
+
+* 30 error_free() and two warn_reportf_err() are transformed.  Patterns:
+
+    -    error_free(local_err);
+    -    local_err =3D NULL;
+    +    error_free_errp(errp);
+
+  and
+
+    -    error_free(local_err);
+    +    error_free_errp(errp);
+
+  and
+
+    -    warn_report_err(local_err);
+    -    local_err =3D NULL;
+    +    warn_report_errp(errp);
+
+  Good.
+
+* Many error_free(), error_reportf_err() and warn_reportf_err() remain.
+  None of them have an argument of the form *errp.  Such arguments would
+  have to be reviewed for possible interference with
+  ERRP_AUTO_PROPAGATE().
+
+* Almost 700 Error *err =3D NULL removed.  Almost 600 remain.
+
+* Error usage in rdma.c is questionable / wrong.  Out of scope for this
+  series.
+
+As far as I can tell, your Coccinelle script is working as intended,
+except for three missed error propagations noted above.  We can proceed
+with this series regardless, if we want.  I'd prefer to integrate my
+forthcoming cleanup to xen_block_device_destroy(), though.
+
 
