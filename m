@@ -2,96 +2,80 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA36C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A0BC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 10:07:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E6FD20746
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:53:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6FD20746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DBCA6206E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 10:07:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EcRmOc1a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBCA6206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCh0V-0000HE-Hp
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:53:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47109)
+	id 1jChDo-0008Ek-0n
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 06:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1jCgzn-0008Fm-SG
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:52:48 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jChC9-0006ol-DE
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 06:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1jCgzm-0008H2-R7
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:52:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46010
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1jCgzm-0008EN-Lc
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:52:46 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02D9p1TW049935
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 05:52:45 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yqx4dk0p4-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 05:52:45 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 13 Mar 2020 09:52:43 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Mar 2020 09:52:41 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02D9qel141549862
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 09:52:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 73B7B4C040;
- Fri, 13 Mar 2020 09:52:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 372F54C04A;
- Fri, 13 Mar 2020 09:52:39 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.48.117])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Mar 2020 09:52:38 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v9] fixup! Fix subcode/pbt
-Date: Fri, 13 Mar 2020 05:52:32 -0400
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
-References: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
+ (envelope-from <imammedo@redhat.com>) id 1jChC7-0002AF-EX
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 06:05:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34771
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jChC7-00023z-83
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 06:05:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584093926;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5/1mZfVV49bdl7SXFTqOMP7K9pzC66yUxjwlZxpbdQQ=;
+ b=EcRmOc1avu4XGUHcU0T+qaKJV7DkXvdQzlpp4TRViEOJimgVAUOaFrr9VxpHnfZQz7PThG
+ Xt1kV9tCfTp1lpNOFbl05Vz6t9+nuPAsqGWMyRY3XzPyj06Y1wk1WUWb2Pi26PbvXNjypl
+ cjg4EaVDwDDe785IChviDPDmBaJauPw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-0v_5aIvYN7iMr96XomRlAw-1; Fri, 13 Mar 2020 06:05:24 -0400
+X-MC-Unique: 0v_5aIvYN7iMr96XomRlAw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97B6710509DF;
+ Fri, 13 Mar 2020 10:05:23 +0000 (UTC)
+Received: from localhost (ovpn-200-60.brq.redhat.com [10.40.200.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D0D97386F;
+ Fri, 13 Mar 2020 10:05:17 +0000 (UTC)
+Date: Fri, 13 Mar 2020 11:05:16 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <20200313110516.6f4ca2b2@redhat.com>
+In-Reply-To: <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200312172745.1b7b2222@redhat.com>
+ <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031309-0008-0000-0000-0000035C8B9A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031309-0009-0000-0000-00004A7DD829
-Message-Id: <20200313095232.2392-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-13_04:2020-03-11,
- 2020-03-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- priorityscore=1501 mlxlogscore=809 clxscore=1015 adultscore=0 mlxscore=0
- suspectscore=1 phishscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130050
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,59 +87,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- hw/s390x/ipl.h      | 11 +++++++----
- target/s390x/diag.c |  2 +-
- 2 files changed, 8 insertions(+), 5 deletions(-)
+On Thu, 12 Mar 2020 19:28:31 +0200
+Liran Alon <liran.alon@oracle.com> wrote:
 
-diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index 95e3183c9cccf8b6..f799f7cfcf4763b1 100644
---- a/hw/s390x/ipl.h
-+++ b/hw/s390x/ipl.h
-@@ -261,15 +261,18 @@ static inline bool ipl_valid_pv_header(IplParameterBlock *iplb)
-         return true;
- }
- 
--static inline bool iplb_valid(IplParameterBlock *iplb)
-+static inline bool iplb_valid(IplParameterBlock *iplb, uint64_t subcode)
- {
-     switch (iplb->pbt) {
-     case S390_IPL_TYPE_FCP:
--        return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_FCP_LEN;
-+        return (subcode == DIAG308_SET &&
-+                be32_to_cpu(iplb->len) >= S390_IPLB_MIN_FCP_LEN);
-     case S390_IPL_TYPE_CCW:
--        return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_CCW_LEN;
-+        return (subcode == DIAG308_SET &&
-+                be32_to_cpu(iplb->len) >= S390_IPLB_MIN_CCW_LEN);
-     case S390_IPL_TYPE_PV:
--        if (be32_to_cpu(iplb->len) < S390_IPLB_MIN_PV_LEN) {
-+        if (subcode != DIAG308_PV_SET ||
-+            be32_to_cpu(iplb->len) < S390_IPLB_MIN_PV_LEN) {
-             return false;
-         }
-         if (!ipl_valid_pv_header(iplb)) {
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index b1ca81633b83bbdc..d4f33db5c23c818d 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -118,7 +118,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- 
-         cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
- 
--        if (!iplb_valid(iplb)) {
-+        if (!iplb_valid(iplb, subcode)) {
-             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
-             goto out;
-         }
--- 
-2.25.1
+> On 12/03/2020 18:27, Igor Mammedov wrote:
+> > On Wed, 11 Mar 2020 19:08:26 +0200
+> > Liran Alon <liran.alon@oracle.com> wrote:  
+> >> +
+[...]
+> > we typically do not version ACPI table changes (there might be exceptions
+> > but it should be a justified one).
+> > ACPI tables are considered to be a part of firmware (even though they are
+> > generated by QEMU) so on QEMU upgrade user gets a new firmware along with
+> > new ACPI tables.  
+> 
+> Hmm... I would have expected as a QEMU user that upgrading QEMU may 
+> update my firmware exposed table (Such as ACPI),
+> but only if I don't specify I wish to run on a specific machine-type. In 
+> that case, I would've expect to be exposed with exact same firmware 
+> information.
+That would be ideal but it's not the case with current QEMU, even with
+specific machine type user will get new firmware when it's started with
+upgraded QEMU which usually ships with new firmware.
+
+mgmt layer theoretically can take care of maintaining different firmwares
+on host and explicitly specify which should be used (though I'm not aware
+of any doing it)
+
+another issue with adding flags consistently for every acpi related
+change would complicate code quite a bit making it hard to read/maintain,
+hence flags are used only when we have to introduce them (i.e when it
+would break guest).
+
+> I understood that this was one of the main reasons why ACPI/SMBIOS 
+> generation was moved from SeaBIOS to QEMU.
+
+If I recall correctly, Michael moved table to QEMU so we won't have to
+extend ABI for constantly growing ACPI interface and then maintain it
+forever, which indeed would require using compat machinery for every
+knob (which is unsustainable).
+
+[...]
 
 
