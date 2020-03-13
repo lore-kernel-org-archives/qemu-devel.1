@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE25C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D99C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01682206E9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:04:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AA83206E9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:05:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N40Qzfdd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01682206E9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sGAmcWUm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AA83206E9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCqXf-0003n8-49
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 16:04:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39420)
+	id 1jCqYN-0004RK-OT
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 16:05:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jCqWY-0002SE-1U
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:03:15 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jCqWD-0001tJ-98
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jCqWX-0008VG-1O
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:03:13 -0400
-Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:46734)
+ (envelope-from <alistair23@gmail.com>) id 1jCqWC-0006LI-De
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:02:53 -0400
+Received: from mail-ua1-x944.google.com ([2607:f8b0:4864:20::944]:40537)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jCqWW-0008RI-SW; Fri, 13 Mar 2020 16:03:12 -0400
-Received: by mail-vk1-xa43.google.com with SMTP id s139so3008130vka.13;
- Fri, 13 Mar 2020 13:03:12 -0700 (PDT)
+ id 1jCqWC-0006GW-9L; Fri, 13 Mar 2020 16:02:52 -0400
+Received: by mail-ua1-x944.google.com with SMTP id t20so4024204uao.7;
+ Fri, 13 Mar 2020 13:02:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=+AMKrNV8pQ5JeLYHHAPiXeeRhvz9n2pjmBLgaO+ouSw=;
- b=N40Qzfddch3qZyldQfuH1n680Y219RPZaxfIjp65f8hHZfZB/5w53nU1s1pep7Y/yo
- ZDjE0xcwmhb2hudLix0JvLUolOFOX2NihEXIrToBw/y/An8x+LXqPZU3hnCl9YdxMK0E
- ArzpsoSPrfHz1FBZ1N+KuR/ezoVhXQK7yrsZIEgwErqy3LYWSreWBjXQegU6vj58eXL0
- O/eWNCDuBE6h/VlukC1nbwKGw4NMqk2IaE9gHY/MK/jrAtcc4wIdja64DkfnukWnZSg/
- 0NVTjt35/Q98vk4aZTSeVKmPhymU0Tl5ysw5bw2i7sXmmW9wqCtJ7ymtZVn8eRRz8ZLd
- v+nQ==
+ bh=EJAgTsZDjRWSNhnci3sJyFanyp6C7GxUwv+MDth0iHE=;
+ b=sGAmcWUm8BbOrcmKzw4vSb1xCqcAcZjipuPT/3sBHqSO4YmYBDzfOUOPdGr5y/igRa
+ MSUoC1q+vgazjAimYJLWQvIxkha9REl8zlrl2DRMZEBMn8IjFRqAMEjyGHuhA3Yf0s3l
+ xIuMWgKBUyQHRhR8qDlXgeIJg2N7o6S1Pr+CP6890BwfQnX1FwB09QPR/TtHfaqzAXkS
+ QHzbqniqjTsAr2MEtF2QBtH9+98Tdyao86eNZHDgYB3nEB6WZIvkYdkncu6r9vjmyxKl
+ tCQrFlO3vbbJcidavgCvJ/Hvhd5361EZkQ27QVwlb+9SCeespw8qZNWH1CdbXhiaB5m0
+ SVOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=+AMKrNV8pQ5JeLYHHAPiXeeRhvz9n2pjmBLgaO+ouSw=;
- b=TZvQ+P/Qd3mV1Yztevg9EC++XjTCe75tvkb1rEEDGxsOTMzQeLTHTYyeZuZIG2x8mK
- De3TPpYP9Mm1J6vyYROQmf7nHLPPFYQa7OSpEgMfWKyYoS4bA/WVH2pux8kc0uJzbWuG
- AYKdn4IQxUypvRlrcuBJUtxNMfiLDH8KU77XCU1oW54ZcDzF1v1BKEs3RjEeW2NhI5B7
- MS1afXK8MwNL+OeNpxspuPHuhCBxiwnZBhdYGOKphlcQ1obKJQAVlAGwbr58Hmc4fnd8
- iABcJPB9e8Dyum3T8FDriOwkgJ/Ddi/B/PsAtYakUN7pU+g47qUnN3Cqw2MhWP93B8uW
- mqoA==
-X-Gm-Message-State: ANhLgQ21Q/xajcTBTK4uhijlJsn9UlkxKZzdAOkw30RCYPkrHUQeBr9M
- Adj4cL8JI3/Q3U58dB96l+ulpJIRawjAwwTPzaF48mSH
-X-Google-Smtp-Source: ADFU+vvhsWbz1sUVQQ83PHvkTJKNsllisjVhdd/dXDv8tkh5teOi4R5U12lngcxs0+xv5SZidzy7V0PkpZCut0lL/WE=
-X-Received: by 2002:a1f:5806:: with SMTP id m6mr9995562vkb.37.1584129792299;
- Fri, 13 Mar 2020 13:03:12 -0700 (PDT)
+ bh=EJAgTsZDjRWSNhnci3sJyFanyp6C7GxUwv+MDth0iHE=;
+ b=qFXyhL+QH4qbN2wfEPIxse8ywr9LpNzCVVSQihMa4B57wSotLOqU830We9/qTfJFNj
+ 4Akq3eyeAtvqakpVweuFC0bRf6QPl+fFnM3H/cy9R7TipPFpsEXmyVWDN7GU46EjJ94F
+ C7AGQU3z3wCoxXFhk12GUlOMpcazskt1RNDnBOYZmhgTUDGG7wIb4kwTbSmpZ0cBZ3GU
+ By3Ndn0VPNEKYGQF2f/pUnFGPEpJsqvBEERIuiWPdSwX9TRXPY6Z32+4bC3fA7cPnyRA
+ WsfOsyXLVHd/447nBPSfszJDuV6+hkyCWPD6DfZhrEljjgCk0J2Sp07GWCMELS+rzT6n
+ Pfiw==
+X-Gm-Message-State: ANhLgQ08ljhNQplRr21v09nRUBZdwOqfDSOqHbMxF7/l3qgXe23ak9w8
+ X9osddQpYHRbXon9Oa2vfqr2mTbYIGYQ21kY45Q=
+X-Google-Smtp-Source: ADFU+vvEUrg39LheZyXUmZE5o0J7DoxQN3jWp8dSUG5l0jzhuZOou4gTrZuLwnwcOHLyoQQfCG1L11oHhmri8LbjnEI=
+X-Received: by 2002:ab0:143:: with SMTP id 61mr9443992uak.85.1584129771516;
+ Fri, 13 Mar 2020 13:02:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200313183652.10258-1-philmd@redhat.com>
- <20200313183652.10258-11-philmd@redhat.com>
-In-Reply-To: <20200313183652.10258-11-philmd@redhat.com>
+ <20200313183652.10258-10-philmd@redhat.com>
+In-Reply-To: <20200313183652.10258-10-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 13 Mar 2020 13:02:46 -0700
-Message-ID: <CAKmqyKPcUFuwoGaYFruUFe7=0uxZPykRpsGA1e+Os0APLZ-jjw@mail.gmail.com>
-Subject: Re: [PATCH 10/14] arch_init: Remove unused 'qapi-commands-misc.h'
- include
+Date: Fri, 13 Mar 2020 13:02:25 -0700
+Message-ID: <CAKmqyKMh07W06BqTC43hE3CsrkgJJHuP6K1dexqJ1XpSy2OCnQ@mail.gmail.com>
+Subject: Re: [PATCH 09/14] exec: Drop redundant #ifdeffery
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::a43
+X-Received-From: 2607:f8b0:4864:20::944
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,11 +107,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 13, 2020 at 11:44 AM Philippe Mathieu-Daud=C3=A9
+On Fri, Mar 13, 2020 at 11:38 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
->
-> Commit ffaee83bcb2 moved qmp_query_target but forgot to remove
-> this include.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -121,21 +117,24 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  arch_init.c | 1 -
->  1 file changed, 1 deletion(-)
+>  exec.c | 4 ----
+>  1 file changed, 4 deletions(-)
 >
-> diff --git a/arch_init.c b/arch_init.c
-> index 705d0b94ad..074fa621b6 100644
-> --- a/arch_init.c
-> +++ b/arch_init.c
-> @@ -27,7 +27,6 @@
->  #include "sysemu/arch_init.h"
->  #include "hw/pci/pci.h"
->  #include "hw/audio/soundhw.h"
-> -#include "qapi/qapi-commands-misc.h"
->  #include "qapi/error.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
+> diff --git a/exec.c b/exec.c
+> index 7bc9828c5b..f258502966 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -185,10 +185,6 @@ struct DirtyBitmapSnapshot {
+>      unsigned long dirty[];
+>  };
+>
+> -#endif
+> -
+> -#if !defined(CONFIG_USER_ONLY)
+> -
+>  static void phys_map_node_reserve(PhysPageMap *map, unsigned nodes)
+>  {
+>      static unsigned alloc_hint =3D 16;
 > --
 > 2.21.1
 >
