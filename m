@@ -2,119 +2,102 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0468DC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 15:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761D2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 15:26:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6A4B20724
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 15:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D05520724
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 15:26:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="c7J6HBYn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A4B20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mBUq0z5n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D05520724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCm9Z-0008Hc-QN
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 11:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51542)
+	id 1jCmCb-0001qk-By
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 11:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCm8w-0007jv-9M
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 11:22:35 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jCmBn-0001Dg-PE
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 11:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jCm8u-0001da-Qb
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 11:22:34 -0400
-Received: from mail-eopbgr80102.outbound.protection.outlook.com
- ([40.107.8.102]:34131 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <liran.alon@oracle.com>) id 1jCmBl-0007NZ-Qa
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 11:25:31 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48498)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jCm8o-0001IQ-M6; Fri, 13 Mar 2020 11:22:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CIey0oznz+qCprk4288EBt5tjDEfjePZSmy0+1p3DN8MOl6qiTaFtcbvUgOq8tdx8aAMDBsR+dr4clO2zcV/c6p4zhoQnN00kT21tyZzg90HCL911fE5/HX91R3VBvovTh3cRJGfeUJ0lr03Hx0T+wwOl/htYJZXaDUE0b8zumCkP4CjtlBpVUUtJ+tvHJRo4eorqGdCmKN8PI6yjTH5NLefZ+QxNu1jdpy29849agL3Xo+s7trBYriuDRO2GN/5YUUta+fG9JspgglBOkDLEa1E0uzY834zg/o+0+NaOYWPo2dl406NqepaggG9AxKkem9SmLJnQcQycyhe3UQaMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3ozPcNGfHBvybrytey+bcnSRpaYwzW3wTsBVuXKBqC8=;
- b=oAvTl/mPrU248ZzRwQCxrWibsSZICA5KTB++zbIdRwDHO5Eu/a91aMPCOrjIGZ0blT+36GW75mW7XxLjcnK6I0T2/QHih7sYS3dPXQ1OgAxTbGMyjnUl3Xx0kLUvRcZi+Vs0OdDDz07OHo/0aiKTJc6x5ul+uu2oFweVLiPehAxnlkrFWi4F9DRCxH4n+qf1FkDK9qKREVap7EDqdJNlKbEecH6W35Ji7/xxT42gynf6Ho+IwK0Nwv15/Hh+FIfTmaEIVh2oIyDR8m7UmalYpEuy08Pf6PSABSufSj2eyTMkgcnrN7uyOisrTq1p3i0AEizpfgA+5+FEUv1bRZp1gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3ozPcNGfHBvybrytey+bcnSRpaYwzW3wTsBVuXKBqC8=;
- b=c7J6HBYnvMDXFVOBcjmQ8alBZicmkBxfM91BNd/BIIQ9cLtOv6A+0VvxkZioPUNpOtiDmZfOOElBuSEIeQ52Us8v8UmoF5DvvxAOrzb4PdVgdHcLfC0QoAA4BWX1yza8LcV0IF4vHiwLAxHsaHPpayK8tH7LDrOI9zalmrBlPsE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3174.eurprd08.prod.outlook.com (52.135.163.145) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2793.17; Fri, 13 Mar 2020 15:22:24 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2814.016; Fri, 13 Mar 2020
- 15:22:24 +0000
-Subject: Re: [PATCH v9 02/10] scripts: Coccinelle script to use
- ERRP_AUTO_PROPAGATE()
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
- <20200312085936.9552-3-vsementsov@virtuozzo.com>
- <87imj8i9no.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200313182221096
-Message-ID: <9b1d8ba0-4dd2-e0a6-ec82-cd0c0dd2a8ff@virtuozzo.com>
-Date: Fri, 13 Mar 2020 18:22:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <87imj8i9no.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR0401CA0051.eurprd04.prod.outlook.com
- (2603:10a6:3:19::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jCmBl-0007LF-Gs
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 11:25:29 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DF9UTB160957;
+ Fri, 13 Mar 2020 15:25:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=tclsZajvaVycaXppwOme7wLKuPOkDhycbQU3ro4odMo=;
+ b=mBUq0z5n3X4Wm7iLXH/HEo62DV0E+xJZCG6EKOH7oMC69OFec5brSvRjCZInGCYj6dGi
+ IebWgfbwf4vKKn2wVT8W8EWf9xtRq8mweTSH3ZPpuRkmpwKXTg6pwwxHovIqhdKBSKcU
+ IED2QXQECHMdCS14Mu0fiEMUHqBRcuP+YDdSASAM+j49nIJdcKjNKJYOlz+rFHe0TA+1
+ 9XzDGWm7W29ofLToOt9SA0EBGefVu2ceZfHHm9SoYVDYM2adBaIklPPZjIdtTJDeb/+e
+ I+wNC+xbP8tA99VYKcbipEZe9QOK8RPhHpTB3ukiZ8+pMOXdWyfUIHoqcAMQil7VonwJ +A== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2yqtavmd86-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Mar 2020 15:25:26 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DFKS1d130890;
+ Fri, 13 Mar 2020 15:25:26 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 2yqtacvknd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Mar 2020 15:25:26 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02DFPPxB009915;
+ Fri, 13 Mar 2020 15:25:25 GMT
+Received: from Lirans-MacBook-Pro.local (/10.74.124.83)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 13 Mar 2020 08:25:25 -0700
+Subject: Re: [PATCH v3 10/16] hw/i386/vmport: Add support for CMD_GETTIME
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-11-liran.alon@oracle.com>
+ <20200312195652-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <0bc7dac9-41a6-5af2-a1d5-ef1e79f92eea@oracle.com>
+Date: Fri, 13 Mar 2020 17:25:20 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0401CA0051.eurprd04.prod.outlook.com (2603:10a6:3:19::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.18 via Frontend Transport; Fri, 13 Mar 2020 15:22:23 +0000
-X-Tagtoolbar-Keys: D20200313182221096
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6f1f120f-2202-4e38-693a-08d7c76254e0
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3174:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB31749908D7661289F7DE275BC1FA0@AM6PR08MB3174.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 034119E4F6
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(39850400004)(346002)(396003)(376002)(136003)(366004)(199004)(86362001)(8676002)(31696002)(36756003)(66476007)(8936002)(66946007)(66556008)(52116002)(4326008)(16576012)(5660300002)(6486002)(54906003)(6916009)(81156014)(31686004)(316002)(81166006)(2616005)(186003)(7416002)(956004)(16526019)(478600001)(2906002)(26005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3174;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ayCf00+rbVgsj2PlzrCPTifkW9JPauNrUqqsBsQ4+cqU486woIvdiOcmEmow+/X6oaE2gBjfWLA9qWfeM3qVWxMIMA0ny/jcljFZIu9SXo1uwKs4kUePm64zgkreiLQYySc10HqPBzNReXk4bFvZPf6Eo/Of1Quw88bECOjih58EfKlUSvjXA0UcLY+qmgvFZ1TEGhGIliP2I2XL9OJhJVMLMlpWq2Qg48krNw2uhrATVPsZm3WL3sDoEWtuXcFUhrtO6Lp+sVLCVFh0psfjE2l9wx1l+ojxt5IRIwcQY0gSdJHei0auzYGHJ+ztBLl/KRjfu9UGYtTWVUhF3CloftcZoRLw33Sih/yp/BdWwW0cF3nP2LD++8Ym5N7KzwGkeYjNIpVhH42LKM8S7dEsZC9/K5bhNzcztB1Xcd56ADGb0y4dBCWDyQ4Q/CjIPuKO
-X-MS-Exchange-AntiSpam-MessageData: 5inl1qr8b2140FMVWn7S2Fzh3kviQDuHoHrMLYfXbNue9H0O913hAm4W3o8QBJvVICz9+gE+CsxCXjLjnnU1uIa9uesQpyUkxy8mshdzfq6ayZQpTrN1aCxuNWk+nqmH5F+QRNmaTvfnevQO2Wl4VA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f1f120f-2202-4e38-693a-08d7c76254e0
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 15:22:24.3278 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +bY3Eu95RdWmemYdovQJ4Pj1BA26l26C2teLY7WsOvPa8+6/6V0UmsZFKADbU1SKZtn1GtIgKNkDxTbefkkHlJ6+cvJdP8h0XYgwLfUoJbM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3174
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.102
+In-Reply-To: <20200312195652-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ suspectscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 mlxscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003130080
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ suspectscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 adultscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003130080
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,196 +109,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-13.03.2020 17:58, Markus Armbruster wrote:
-> I tried this script on the whole tree.  Observations:
-> 
-> * $ git-diff --shortstat \*.[ch]
->     333 files changed, 3480 insertions(+), 4586 deletions(-)
-> 
-> * Twelve functions have "several definitions of Error * local variable".
-> 
->    Eight declare such a variable within a loop.  Reported because
->    Coccinelle matches along control flow, not just along text.  Ignore.
-> 
->    Remaining four:
-> 
->    * ivshmem_common_realize()
-> 
->      Two variables (messed up in commit fe44dc91807), should be replaced
->      by one.
-> 
->    * qmp_query_cpu_model_expansion() two times
-> 
->      Three declarations in separate blocks; two should be replaced by
->      &error_abort, one moved to the function block.
-> 
->    * xen_block_device_destroy()
-> 
->      Two declarations in seperate blocks; should be replaced by a single
->      one.
-> 
->    Separate manual cleanup patches, ideally applied before running
->    Coccinelle to keep Coccinelle's changes as simple and safe as
->    possible.  I'll post patches.  Only the one for
->    xen_block_device_destroy() affects by this series.
-> 
-> * No function "propagates to errp several times"
-> 
->    I tested the rule does detect this as advertized by feeding it an
->    obvious example.  We're good.
-> 
-> * ERRP_AUTO_PROPAGATE() inserted 744 times, always right at the
->    beginning of a function.
-> 
-> * As far as I can tell, all changed functions have ERRP_AUTO_PROPAGATE()
->    inserted.  Good.
-> 
-> * Almost 1100 error propagations dropped:error_propagate() removed,
->    error_propagate_prepend() replaced by just error_prepend().
-> 
-> * Four error_propagate() are transformed.  Two instances each in
->    aspeed_soc_ast2600_realize() and aspeed_soc_realize().  Pattern:
-> 
->       {
->      +    ERRP_AUTO_PROPAGATE();
->           ...
->      -    Error *err = NULL, *local_err = NULL;
->      +    Error *local_err = NULL;
->           ...
-> 
->               object_property_set_T(...,
->      -                              &err);
->      +                              errp);
->               object_property_set_T(...,
->                                     &local_err);
->      -        error_propagate(&err, local_err);
->      -        if (err) {
->      -            error_propagate(errp, err);
->      +        error_propagate(errp, local_err);
->      +        if (*errp) {
->                   return;
->               }
-> 
->    This is what error.h calls "Receive and accumulate multiple errors
->    (first one wins)".
-> 
->    Result:
-> 
->          ERRP_AUTO_PROPAGATE();
->          ...
->          Error *local_err = NULL;
->          ...
-> 
->              object_property_set_T(..., errp);
->              object_property_set_T(..., &local_err);
->              error_propagate(errp, local_err);
->              if (*errp) {
->                  return;
->              }
-> 
->    Could be done without the accumulation:
-> 
->          ERRP_AUTO_PROPAGATE();
->          ...
-> 
->              object_property_set_T(..., errp);
->              if (*errp) {
->                  return;
->              }
->              object_property_set_T(..., errp);
->              if (*errp) {
->                  return;
->              }
-> 
->    I find this a bit easier to understand.  Matter of taste.  If we want
->    to change to this, do it manually and separately.  I'd do it on top.
-> 
-> * Some 90 propagations remain.
-> 
->    Some of them could use cleanup, e.g. file_memory_backend_set_pmem(),
->    css_clear_io_interrupt().  Out of scope for this series.
-> 
->    Some move errors around in unusual ways, e.g. in block/nbd.c.  Could
->    use review.  Out of scope for this series.
-> 
->    I spotted three that should be transformed, but aren't:
-> 
->    - qcrypto_block_luks_store_key()
-> 
->      I believe g_autoptr() confuses Coccinelle.  Undermines all our
->      Coccinelle use, not just this patch.  I think we need to update
->      scripts/cocci-macro-file.h for it.
-> 
->    - armsse_realize()
-> 
->      Something in this huge function confuses Coccinelle, but I don't
->      know what exactly.  If I delete most of it, the error_propagate()
->      transforms okay.  If I delete less, Coccinelle hangs.
-> 
->    - apply_cpu_model()
-> 
->      Gets transformed fine if I remove the #ifndef CONFIG_USER_ONLY.  I
->      have no idea why the #if spooks Coccinelle here, but not elsewhere.
-> 
->    None of these three affects this series.  No need to hold it back for
->    further investigation.
-> 
-> * 30 error_free() and two warn_reportf_err() are transformed.  Patterns:
-> 
->      -    error_free(local_err);
->      -    local_err = NULL;
->      +    error_free_errp(errp);
-> 
->    and
-> 
->      -    error_free(local_err);
->      +    error_free_errp(errp);
-> 
->    and
-> 
->      -    warn_report_err(local_err);
->      -    local_err = NULL;
->      +    warn_report_errp(errp);
-> 
->    Good.
-> 
-> * Many error_free(), error_reportf_err() and warn_reportf_err() remain.
->    None of them have an argument of the form *errp.  Such arguments would
->    have to be reviewed for possible interference with
->    ERRP_AUTO_PROPAGATE().
-> 
-> * Almost 700 Error *err = NULL removed.  Almost 600 remain.
-> 
-> * Error usage in rdma.c is questionable / wrong.  Out of scope for this
->    series.
-> 
-> As far as I can tell, your Coccinelle script is working as intended,
-> except for three missed error propagations noted above.  We can proceed
-> with this series regardless, if we want.  I'd prefer to integrate my
-> forthcoming cleanup to xen_block_device_destroy(), though.
-> 
 
-Great investigation!!!
+On 13/03/2020 2:04, Michael S. Tsirkin wrote:
+> On Thu, Mar 12, 2020 at 06:54:25PM +0200, Liran Alon wrote:
+>> This command is used by guest to gettimeofday() from host.
+>> See usage example in open-vm-tools TimeSyncReadHost() function.
+>>
+>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>>   hw/i386/vmport.c         | 21 +++++++++++++++++++++
+>>   include/hw/i386/vmport.h |  1 +
+>>   2 files changed, 22 insertions(+)
+>>
+>> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+>> index 3fb8a8bd458a..c5b659c59343 100644
+>> --- a/hw/i386/vmport.c
+>> +++ b/hw/i386/vmport.c
+>> @@ -66,6 +66,7 @@ typedef struct VMPortState {
+>>   
+>>       uint32_t vmware_vmx_version;
+>>       uint8_t vmware_vmx_type;
+>> +    uint32_t max_time_lag_us;
+>>   
+>>       uint32_t compat_flags;
+>>   } VMPortState;
+>> @@ -168,6 +169,20 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
+>>       return ram_size;
+>>   }
+>>   
+>> +static uint32_t vmport_cmd_time(void *opaque, uint32_t addr)
+>> +{
+>> +    X86CPU *cpu = X86_CPU(current_cpu);
+>> +    qemu_timeval tv;
+>> +
+>> +    if (qemu_gettimeofday(&tv) < 0) {
+>> +        return UINT32_MAX;
+>> +    }
+>> +
+>> +    cpu->env.regs[R_EBX] = (uint32_t)tv.tv_usec;
+>> +    cpu->env.regs[R_ECX] = port_state->max_time_lag_us;
+>> +    return (uint32_t)tv.tv_sec;
+>> +}
+>> +
+>>   /* vmmouse helpers */
+>>   void vmmouse_get_data(uint32_t *data)
+>>   {
+> That's a very weird thing to return to the guest.
+> For example it's not monotonic across migrations.
+That's the VMware PV interface... I didn't design it. :P
+Regarding how it handles the fact time is not monotonic across 
+migrations, see big comment at the start of 
+services/plugins/timeSync/timeSync.c in open-vm-tools regarding the 
+time-sync algorithm used by VMware Tools.
+Specifically:
+"""
+During normal operation this plugin only steps the time forward and only 
+if the error is greater than one second.
+"""
+> And what does max_time_lag_us refer to, anyway?
+According to the comment in open-vm-tools TimeSyncReadHost():
+"""
+maximum time lag allowed (config option), which is a threshold that 
+keeps the tools from being over eager about resetting the time when it 
+is only a little bit off.
+"""
 
-I'm for proceeding as is, or with your cleanup for xen_block_device_destroy().
-Still, script converts xen_block_device_destroy correctly anyway, resulting code
-will be the same and we are OK without cleanup as well.
+Looking at open-vm-tools timeSync.c code, it defines the threshold of 
+how far guest time can be from host time before deciding to do a "step 
+correction".
+A "step correction" is defined as explicitly setting the time in the 
+guest to the time in the host.
+>
+>
+> So please add documentation about what this does.
+You are right. I agree.
+I think it would be best to just point to open-vm-tools 
+services/plugins/timeSync/timeSync.c.
+Do you agree or should I copy some paragraphs from there?
+> If there's no document to refer to then pls write
+> code comments or a document under docs/ - this does not
+> belong in commit log.
+>
+>
+>
+>> @@ -214,6 +229,7 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
+>>       vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
+>>       if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
+>>           vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid, NULL);
+>> +        vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
+>>       }
+>>   }
+>>   
+>> @@ -249,6 +265,11 @@ static Property vmport_properties[] = {
+>>        * 5 - ACE 1.x (Deprecated)
+>>        */
+>>       DEFINE_PROP_UINT8("vmware-vmx-type", VMPortState, vmware_vmx_type, 2),
+>> +    /*
+>> +     * Max amount of time lag that can go uncorrected.
+> What does uncorrected mean?
+You are right this is a bad phrasing taken from open-vm-tools.
+It should mean "How far we allow guest time to go from host time before 
+guest VMware Tools will sync it to host time".
+How you prefer to phrase this?
+>
+>> +     * Value taken from VMware Workstation 5.5.
+>
+> How do we know this makes sense for KVM? That has significantly
+> different runtime characteristics.
+This is just a threshold as you can understand from the above reply of 
+mine (I should rephrase the comments to make this clearer).
+So we just chose a threshold that makes sense for common workloads.
+One of the reasons to put this as a property, is to still allow user to 
+override it.
+>
+>
+> Also, the version returns ESX server, why does it make
+> sense to take some values from workstation?
+I believe (don't remember) that ESXi was observed to return similar value.
+Most of our workloads that runs with this came from ESXi and we never 
+examined an issue regarding this in our production environment.
+Which makes sense as this is just a thresthold that specifies when guest 
+time should be synced to host time.
+You prefer I would just remove this comment?
 
--- 
-Best regards,
-Vladimir
+Thanks,
+-Liran
+
+>
+>> +     **/
+>> +    DEFINE_PROP_UINT32("max-time-lag", VMPortState, max_time_lag_us, 1000000),
+>>   
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>> diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+>> index 7f33512ca6f0..50416c8c8f3e 100644
+>> --- a/include/hw/i386/vmport.h
+>> +++ b/include/hw/i386/vmport.h
+>> @@ -8,6 +8,7 @@ typedef enum {
+>>       VMPORT_CMD_GETVERSION       = 10,
+>>       VMPORT_CMD_GETBIOSUUID      = 19,
+>>       VMPORT_CMD_GETRAMSIZE       = 20,
+>> +    VMPORT_CMD_GETTIME          = 23,
+>>       VMPORT_CMD_VMMOUSE_DATA     = 39,
+>>       VMPORT_CMD_VMMOUSE_STATUS   = 40,
+>>       VMPORT_CMD_VMMOUSE_COMMAND  = 41,
+>> -- 
+>> 2.20.1
 
