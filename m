@@ -2,103 +2,101 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BC4C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFD6C4CECE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:32:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34CC1206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:27:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E5D8206E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:32:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nq5mukDE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34CC1206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TwzqGirn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E5D8206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCnA5-00052y-EV
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 12:27:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55108)
+	id 1jCnF0-0007mk-31
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 12:32:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jCn9O-0004Y6-UG
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:27:08 -0400
+ (envelope-from <peterx@redhat.com>) id 1jCnDi-0006vM-Hx
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:31:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jCn9N-0002ch-6L
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:27:06 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:33354)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jCn9M-0002Wg-UV
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:27:05 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DGMmFE010874;
- Fri, 13 Mar 2020 16:27:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=mPzz1Rj0eMtldZtOwkZRCP7afKaYbjg99oEtLsmhb6E=;
- b=nq5mukDEnrGo1G+xcqFWE3QlmYMTarlPMrArCyiG8dx0XNdGPF8kqdEGxPEDlqg5S6K6
- B43NzvJjFNCUoOiVp/wOMMculTKHzDwqsK2JCjt1Ki6MgWt7T3ogRXP3QgPYhyjdLuY0
- SclqfDvKF+4bwMVvCvBpgz8iN3GLXlV15JupFGw6db0xD/titFI8qA6qlF22uRvEbMyg
- ZXvOPLkxYZOGITadb31uUSlmBMaLEQOBM3u2gOHGxBqYthHAiSwVSt0n/YZeMktj5gk4
- QmSd298HO4K3k9ky/0PJAyM6RJrBCuwwIY4TIqIFWlBZzbez96KDx7cy5jjfvQ5AEPMU mw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2yqtaevpnw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 16:27:02 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DGNM1V038105;
- Fri, 13 Mar 2020 16:27:02 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3020.oracle.com with ESMTP id 2yqtawabxu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 16:27:02 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02DGQxfc012813;
- Fri, 13 Mar 2020 16:26:59 GMT
-Received: from [192.168.14.112] (/109.67.207.210)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 13 Mar 2020 09:26:59 -0700
-Subject: Re: [PATCH v3 10/16] hw/i386/vmport: Add support for CMD_GETTIME
+ (envelope-from <peterx@redhat.com>) id 1jCnDg-00018X-9g
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:31:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60920
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jCnDg-00013Q-1m
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:31:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584117090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oUnDahcSq0MihJJvtP3Q/wIOONC4J/4Ce5Q+y2Lgg8Y=;
+ b=TwzqGirnz/lbcztYmrgiATLtqAvZ/cIufcR8KBCzuCYxHhdVhIEKNECYWsa+uwBhvyf4f9
+ UIFruQd4RDmBrQS3wSllAi7mKKiWGqI0F1X0xZEMooPISsFm6FcYjTw6cys3UupwYjVcVm
+ X+zyI0RWa5dwBTWoLvGum6auM4H1Spo=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-ZiMpUIDLMkOfznplGjrVuA-1; Fri, 13 Mar 2020 12:31:26 -0400
+X-MC-Unique: ZiMpUIDLMkOfznplGjrVuA-1
+Received: by mail-qt1-f198.google.com with SMTP id r16so8162557qtt.13
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 09:31:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=EQaPLRXmdrF9tdq61pE5WBrDqlo3ZIt8r5XuHulLCAM=;
+ b=Rjz5Y3/9/jflqZ7tEgNx9VZy6/lACg9lQS6++RCBDQ4wNG5R/d+bKdIHcOng7ulvVL
+ eh4CTFtKwIY5Iaj/FvaO1QiLB0zmN1uqvLEABSfxXklH5eZ54CRpqhnH9rcM/LEJU9O2
+ wVJrdhzEPxNw3q+ZRZxOcUmeIBHu+34P1eEbHSN+bdH8pYgnU51INX6LaKWHctLTtRzm
+ CgwLe5uhnaQebFXq13ezW/eOeTo9uXFPWshH3HHWTySnGxiFf9OTdHFnBgJM/GBkNHX+
+ Zdk3r6LJqx8P2j6ErDcQivr/Gjj6deBrAJvB9K+SEtH5ed1kqXGSOaRGK3dW+b6q9kkb
+ /xIg==
+X-Gm-Message-State: ANhLgQ2Sxbt9s2CgV8vqrEZdgyNwIehHCK3n8ANVy3VMmd1MId8LnfgI
+ pmQszRl7lqqAt4eUa/xrBo6CXi1XkuFEUEgADqIXQhblNTbf717uokZIZPgKMhdPeyQOT8mgwQW
+ +c8RdMBPkxc/2Q+c=
+X-Received: by 2002:ac8:1aed:: with SMTP id h42mr13848530qtk.43.1584117085095; 
+ Fri, 13 Mar 2020 09:31:25 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vs5QB47HaGYveRzVLCq5L3AY/Ccre9w6hsSkxjJbavRPyIWM1i3+PzbyG/JjB8AZjXULgX/7A==
+X-Received: by 2002:ac8:1aed:: with SMTP id h42mr13848488qtk.43.1584117084660; 
+ Fri, 13 Mar 2020 09:31:24 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id p24sm10343322qtq.37.2020.03.13.09.31.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 13 Mar 2020 09:31:23 -0700 (PDT)
+Date: Fri, 13 Mar 2020 12:31:22 -0400
+From: Peter Xu <peterx@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200312165431.82118-1-liran.alon@oracle.com>
- <20200312165431.82118-11-liran.alon@oracle.com>
- <20200312195652-mutt-send-email-mst@kernel.org>
- <0bc7dac9-41a6-5af2-a1d5-ef1e79f92eea@oracle.com>
- <20200313113049-mutt-send-email-mst@kernel.org>
-From: Liran Alon <liran.alon@oracle.com>
-Message-ID: <3c0d9308-f56c-0766-9815-241a28d9a246@oracle.com>
-Date: Fri, 13 Mar 2020 18:26:54 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
+Message-ID: <20200313163122.GB95517@xz-x1>
+References: <20200226094357.25061-1-jasowang@redhat.com>
+ <20200226142839.4263de9b.pasic@linux.ibm.com>
+ <20200226083654-mutt-send-email-mst@kernel.org>
+ <20200226163618.31aa86ed.pasic@linux.ibm.com>
+ <20200226115009-mutt-send-email-mst@kernel.org>
+ <20200227140215.2d12149c.pasic@linux.ibm.com>
+ <20200227104233-mutt-send-email-mst@kernel.org>
+ <20200313134446.782c5f7c.pasic@linux.ibm.com>
+ <20200313112902-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200313113049-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- bulkscore=0 phishscore=0
- suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003130083
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- impostorscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0 spamscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130083
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+In-Reply-To: <20200313112902-mutt-send-email-mst@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,136 +108,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Mar 13, 2020 at 11:29:59AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Mar 13, 2020 at 01:44:46PM +0100, Halil Pasic wrote:
+> > [..]
+> > > >=20
+> > > > CCing Tom. @Tom does vhost-vsock work for you with SEV and current =
+qemu?
+> > > >=20
+> > > > Also, one can specify iommu_platform=3Don on a device that ain't a =
+part of
+> > > > a secure-capable VM, just for the fun of it. And that breaks
+> > > > vhost-vsock. Or is setting iommu_platform=3Don only valid if
+> > > > qemu-system-s390x is protected virtualization capable?
+> > > >=20
+> > > > BTW, I don't have a strong opinion on the fixes tag. We currently d=
+o not
+> > > > recommend setting iommu_platform, and thus I don't think we care to=
+o
+> > > > much about past qemus having problems with it.
+> > > >=20
+> > > > Regards,
+> > > > Halil
+> > >=20
+> > >=20
+> > > Let's just say if we do have a Fixes: tag we want to set it correctly=
+ to
+> > > the commit that needs this fix.
+> > >=20
+> >=20
+> > I finally did some digging regarding the performance degradation. For
+> > s390x the performance degradation on vhost-net was introduced by commit
+> > 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Before
+> > IOMMUTLBEntry.addr_mask used to be based on plen, which in turn was
+> > calculated as the rest of the memory regions size (from address), and
+> > covered most of the guest address space. That is we didn't have a whole
+> > lot of IOTLB API overhead.
+> >=20
+> > With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xfff which=
+ comes
+> > as ~TARGET_PAGE_MASK from flatview_do_translate(). To have things worki=
+ng
+> > properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the level o=
+f
+> > 076a93d797 and 076a93d797~1.
+>=20
+> Peter, what's your take on this one?
 
-On 13/03/2020 17:47, Michael S. Tsirkin wrote:
-> On Fri, Mar 13, 2020 at 05:25:20PM +0200, Liran Alon wrote:
->>>> @@ -168,6 +169,20 @@ static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
->>>>        return ram_size;
->>>>    }
->>>> +static uint32_t vmport_cmd_time(void *opaque, uint32_t addr)
->>>> +{
->>>> +    X86CPU *cpu = X86_CPU(current_cpu);
->>>> +    qemu_timeval tv;
->>>> +
->>>> +    if (qemu_gettimeofday(&tv) < 0) {
->>>> +        return UINT32_MAX;
->>>> +    }
->>>> +
->>>> +    cpu->env.regs[R_EBX] = (uint32_t)tv.tv_usec;
->>>> +    cpu->env.regs[R_ECX] = port_state->max_time_lag_us;
->>>> +    return (uint32_t)tv.tv_sec;
->>>> +}
->>>> +
->>>>    /* vmmouse helpers */
->>>>    void vmmouse_get_data(uint32_t *data)
->>>>    {
->>> That's a very weird thing to return to the guest.
->>> For example it's not monotonic across migrations.
->> That's the VMware PV interface... I didn't design it. :P
->> Regarding how it handles the fact time is not monotonic across migrations,
->> see big comment at the start of services/plugins/timeSync/timeSync.c in
->> open-vm-tools regarding the time-sync algorithm used by VMware Tools.
->> Specifically:
->> """
->> During normal operation this plugin only steps the time forward and only if
->> the error is greater than one second.
-> Looks like guest assumes this time only moves forward.
-> So something needs to be done to avoid it moving
-> backward across migrations.
-Where do you see this assumption in guest code? I don't think this is true.
-Guest code seems to handle this by making sure to only step the time 
-forward.
-Read carefully services/plugins/timeSync/timeSync.c and point me to what 
-I'm missing if you think otherwise (i.e. I missed something).
->> """
->>> And what does max_time_lag_us refer to, anyway?
->> According to the comment in open-vm-tools TimeSyncReadHost():
->> """
->> maximum time lag allowed (config option), which is a threshold that keeps
->> the tools from being over eager about resetting the time when it is only a
->> little bit off.
->> """
->>
->> Looking at open-vm-tools timeSync.c code, it defines the threshold of how
->> far guest time can be from host time before deciding to do a "step
->> correction".
->> A "step correction" is defined as explicitly setting the time in the guest
->> to the time in the host.
->>>
->>> So please add documentation about what this does.
->> You are right. I agree.
->> I think it would be best to just point to open-vm-tools
->> services/plugins/timeSync/timeSync.c.
->> Do you agree or should I copy some paragraphs from there?
-> Neither. Their documentation will be from guest point of view.  Please
-> look at that code and write documentation from host point of view.
-> Your documentation for the lag parameter is I think a good
-> example of how to do it.
-Ok. Will try to phrase something for v4.
->
->>> If there's no document to refer to then pls write
->>> code comments or a document under docs/ - this does not
->>> belong in commit log.
->>>
->>>
->>>
->>>> @@ -214,6 +229,7 @@ static void vmport_realizefn(DeviceState *dev, Error **errp)
->>>>        vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
->>>>        if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
->>>>            vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid, NULL);
->>>> +        vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
->>>>        }
->>>>    }
->>>> @@ -249,6 +265,11 @@ static Property vmport_properties[] = {
->>>>         * 5 - ACE 1.x (Deprecated)
->>>>         */
->>>>        DEFINE_PROP_UINT8("vmware-vmx-type", VMPortState, vmware_vmx_type, 2),
->>>> +    /*
->>>> +     * Max amount of time lag that can go uncorrected.
->>> What does uncorrected mean?
->> You are right this is a bad phrasing taken from open-vm-tools.
->> It should mean "How far we allow guest time to go from host time before
->> guest VMware Tools will sync it to host time".
->> How you prefer to phrase this?
-> Sounds like a good explanation. Maybe we allow -> can
-> since "we" is hypervisor and it's actually under guest control.
-Ok. Will add this to v4.
->
->
->>>> +     * Value taken from VMware Workstation 5.5.
->>> How do we know this makes sense for KVM? That has significantly
->>> different runtime characteristics.
->> This is just a threshold as you can understand from the above reply of mine
->> (I should rephrase the comments to make this clearer).
->> So we just chose a threshold that makes sense for common workloads.
->> One of the reasons to put this as a property, is to still allow user to
->> override it.
-> Well close to 100% of users will have no idea what to set it to.
-I agree. :) That's why there is a default value.
->
->
->>>
->>> Also, the version returns ESX server, why does it make
->>> sense to take some values from workstation?
->> I believe (don't remember) that ESXi was observed to return similar value.
->> Most of our workloads that runs with this came from ESXi and we never
->> examined an issue regarding this in our production environment.
->> Which makes sense as this is just a thresthold that specifies when guest
->> time should be synced to host time.
->> You prefer I would just remove this comment?
-> Maybe add " TODO: should this depend on vmare-vmx-type? ".
+Commit 076a93d797 was one of the patchset where we want to provide
+sensible IOTLB entries and also that should start to work with huge
+pages.  Frankly speaking after a few years I forgot the original
+motivation of that whole thing, but IIRC there's a patch that was
+trying to speedup especially for vhost but I noticed it's not merged:
 
-Ok. Will add to v4.
+https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00574.html
+
+Regarding to the current patch, I'm not sure I understand it
+correctly, but is that performance issue only happens when (1) there's
+no intel-iommu device, and (2) there is iommu_platform=3Don specified
+for the vhost backend?
+
+If so, I'd confess I am not too surprised if this fails the boot with
+vhost-vsock because after all we speicified iommu_platform=3Don
+explicitly in the cmdline, so if we want it to work we can simply
+remove that iommu_platform=3Don when vhost-vsock doesn't support it
+yet...  I thougth iommu_platform=3Don was added for that case - when we
+want to force IOMMU to be enabled from host side, and it should always
+be used with a vIOMMU device.
+
+However I also agree that from performance POV this patch helps for
+this quite special case.
 
 Thanks,
--Liran
 
+--=20
+Peter Xu
 
 
