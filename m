@@ -6,83 +6,83 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E31CCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B01AFC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA52F206F1
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:06:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C19F206F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:07:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8sDtSqZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA52F206F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bpk592PQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C19F206F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCXpw-000285-Rv
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 20:06:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34826)
+	id 1jCXqv-0004Wy-Ng
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 20:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36211)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jCXp7-0000Xe-30
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:05:10 -0400
+ (envelope-from <mst@redhat.com>) id 1jCXqI-0003Kf-Pk
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jCXp5-0007wC-AO
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:05:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24191
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1jCXqH-0001Af-O4
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:06:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21214
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCXp5-0007ux-5U
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:05:07 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCXqH-0001A3-Hq
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:06:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584057906;
+ s=mimecast20190719; t=1584057980;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0xRf9fwELkla6GyjtcXPfUMQevxEIiO2WERKGJZ54/4=;
- b=G8sDtSqZoysDwWM3op88dGwTCeIlAMibUE6qbg2gz6gK/DAl9iLYqvjojMfy8F7avjcTS9
- NHgmVwpttvqjRZ6vj4cv3Y5Ie4CmpbqC2HV0JzWUDPN1wzzSrTfFt3aFouWRJF2htW/rIK
- nYzwxVSqr7z84/uQ8OCMf0+Qd0htyms=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-IX_MXkI0O4W9xnqLHOZ5Rg-1; Thu, 12 Mar 2020 20:05:04 -0400
-X-MC-Unique: IX_MXkI0O4W9xnqLHOZ5Rg-1
-Received: by mail-wr1-f70.google.com with SMTP id n11so2895429wrs.13
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 17:05:04 -0700 (PDT)
+ bh=5wkBkrLPtaNbKE6fo9mKv9F/Z+gimgYA+hpYGJYsU2U=;
+ b=Bpk592PQt7z2veOrHohjGR1b8CiUkOrcNylidftuL/UKyX81eRfejQLqFcJblLUAqo1VbD
+ oxgVZrr2+YRRjlH2AnD0FnuCmkaK8PhgEGh7z/PFsiHLMEQvz3+rcOosmCM4hWxTUG+XWe
+ lJQVjhTCMWy/HJTBCGshMl+a9WYcmXk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-ttCZ6cVVOwKfCpRHoBmnCA-1; Thu, 12 Mar 2020 20:06:19 -0400
+X-MC-Unique: ttCZ6cVVOwKfCpRHoBmnCA-1
+Received: by mail-wr1-f69.google.com with SMTP id j17so3397000wru.19
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 17:06:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=sIzHWnsSzSJnWhGA9CmZfB2zY/pjM+U+sIQTGE7JyzY=;
- b=rUd0WAch/oWdJrfGygERBCORi069RnlG5W4b2AssdOpDWU8M9PeWFAXo1a8/1ulCUR
- AP/E54HXTFNGviky42bGc/YbycADX5vVkiygDiEXeWmrAiMxehzzJ0wqia8cSRQZ3Xyl
- JGMEZaEPXacR3TUQQjIXoZ1o6mQ/mxFPQxOw+FGi5xjhFHHYKZpg4ePRLwAsW3z2katG
- zaUG2HlJPm1pBogGtRGv80Y+Yi6u3MPalhXm2Zv7H4nO8cx3dT7OA7mydprJx7IjBSuB
- jLZfRi4UB46bfB9sD36kAAIvg3nE2cb/9UZVRGt4jSmc1kB/VT6/tkbfe/rj07ppzKYw
- ymOQ==
-X-Gm-Message-State: ANhLgQ0VT0jss2dpzvIr/GOElwDWV3wTW2dropMeGix7NvgpqWLZpUeF
- 5HfRoUhwQSqwGdC0jJFOWCSs04MQ3Xat7L8I2KYWoH8jv9YOAsU2XDlpSXtjWGwVKU2ggZxRSXs
- k9GNijnzf2sWiDFI=
-X-Received: by 2002:a7b:c413:: with SMTP id k19mr6862624wmi.184.1584057903221; 
- Thu, 12 Mar 2020 17:05:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtdfDNA49OGnMmKu+1QVCdMn1tEJBROiOXjAeIL6TUL0L6QEs2znRMAm2U4jEPS/Sqoq/Ldsg==
-X-Received: by 2002:a7b:c413:: with SMTP id k19mr6862563wmi.184.1584057902582; 
- Thu, 12 Mar 2020 17:05:02 -0700 (PDT)
+ bh=q2X+t0E8XeMLXyYG++iN5sUs/z0ZRVCm6c40Vin5RJs=;
+ b=TlsgTiwVClDP7XVgIxHhM9Po4vENqp9uumkrzrgnIKuk4EnFmDCeI53sCouNM5rCHi
+ glxG5SdByxbrdon5U+IjJduzAElQs3JZcfKN9c4nJ/rHOo28UpWOqsfncicD42EnTKy9
+ GbYU1cZicKZo9nfChjsWIjq/PzS6n54Uz9P1LJNXvsbs9aE/YhnIcVhUxExr2VOYwU1F
+ taZW5Twc7qPdHd5AxhGcVatwjVXpgpbt9b5Fmxb4+yCnYA680t/COZOJ8xNFdLN82gv4
+ wE8udSGK71A7QZBxyXJ03qNf6+JElyqtoWLYnNBRZDc3+R6XKnse+xRD3cEkPsagT1QA
+ mQHw==
+X-Gm-Message-State: ANhLgQ2chLdkU6IQ+oIagwGUL+xEXl1KeurIXG3WSEPiqy45j6eWTTQl
+ zFxswmhvUrYgHs5oStOSOFhJ41SD9Jg37GFaxYnAJUd5XvE1mCyZ+VypwNUGGpsfxx24aHgPKtc
+ aPKSQAD3gGV90QNQ=
+X-Received: by 2002:a1c:8149:: with SMTP id c70mr7219923wmd.123.1584057977991; 
+ Thu, 12 Mar 2020 17:06:17 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvV3T+EVHi43Z7iHXmb55I4LoyDfIo80LdRUsgdM/zT41J5jQm7qbwwTgxz8OBV1NNDNwDnKw==
+X-Received: by 2002:a1c:8149:: with SMTP id c70mr7219907wmd.123.1584057977757; 
+ Thu, 12 Mar 2020 17:06:17 -0700 (PDT)
 Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id s7sm38702176wrm.13.2020.03.12.17.05.00
+ by smtp.gmail.com with ESMTPSA id q7sm24687078wrd.54.2020.03.12.17.06.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 17:05:01 -0700 (PDT)
-Date: Thu, 12 Mar 2020 20:04:58 -0400
+ Thu, 12 Mar 2020 17:06:17 -0700 (PDT)
+Date: Thu, 12 Mar 2020 20:06:14 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v3 10/16] hw/i386/vmport: Add support for CMD_GETTIME
-Message-ID: <20200312195652-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v3 11/16] hw/i386/vmport: Add support for CMD_GETTIMEFULL
+Message-ID: <20200312200518-mutt-send-email-mst@kernel.org>
 References: <20200312165431.82118-1-liran.alon@oracle.com>
- <20200312165431.82118-11-liran.alon@oracle.com>
+ <20200312165431.82118-12-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200312165431.82118-11-liran.alon@oracle.com>
+In-Reply-To: <20200312165431.82118-12-liran.alon@oracle.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -90,7 +90,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,35 +109,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 06:54:25PM +0200, Liran Alon wrote:
-> This command is used by guest to gettimeofday() from host.
-> See usage example in open-vm-tools TimeSyncReadHost() function.
+On Thu, Mar 12, 2020 at 06:54:26PM +0200, Liran Alon wrote:
+> Similar to CMD_GETTIME but lacks the 136-year overflow issue,
+> by returning full 64-bit of host uSeconds.
 >=20
 > Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
 > Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
->  hw/i386/vmport.c         | 21 +++++++++++++++++++++
+>  hw/i386/vmport.c         | 17 +++++++++++++++++
 >  include/hw/i386/vmport.h |  1 +
->  2 files changed, 22 insertions(+)
+>  2 files changed, 18 insertions(+)
 >=20
 > diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> index 3fb8a8bd458a..c5b659c59343 100644
+> index c5b659c59343..7e57eda4b526 100644
 > --- a/hw/i386/vmport.c
 > +++ b/hw/i386/vmport.c
-> @@ -66,6 +66,7 @@ typedef struct VMPortState {
-> =20
->      uint32_t vmware_vmx_version;
->      uint8_t vmware_vmx_type;
-> +    uint32_t max_time_lag_us;
-> =20
->      uint32_t compat_flags;
->  } VMPortState;
-> @@ -168,6 +169,20 @@ static uint32_t vmport_cmd_ram_size(void *opaque, ui=
-nt32_t addr)
->      return ram_size;
+> @@ -183,6 +183,22 @@ static uint32_t vmport_cmd_time(void *opaque, uint32=
+_t addr)
+>      return (uint32_t)tv.tv_sec;
 >  }
 > =20
-> +static uint32_t vmport_cmd_time(void *opaque, uint32_t addr)
+> +static uint32_t vmport_cmd_time_full(void *opaque, uint32_t addr)
 > +{
 > +    X86CPU *cpu =3D X86_CPU(current_cpu);
 > +    qemu_timeval tv;
@@ -146,75 +138,43 @@ nt32_t addr)
 > +        return UINT32_MAX;
 > +    }
 > +
+> +    cpu->env.regs[R_ESI] =3D (uint32_t)((uint64_t)tv.tv_sec >> 32);
+> +    cpu->env.regs[R_EDX] =3D (uint32_t)tv.tv_sec;
 > +    cpu->env.regs[R_EBX] =3D (uint32_t)tv.tv_usec;
 > +    cpu->env.regs[R_ECX] =3D port_state->max_time_lag_us;
-> +    return (uint32_t)tv.tv_sec;
+> +    return VMPORT_MAGIC;
 > +}
 > +
 >  /* vmmouse helpers */
 >  void vmmouse_get_data(uint32_t *data)
 >  {
 
-That's a very weird thing to return to the guest.
-For example it's not monotonic across migrations.
-And what does max_time_lag_us refer to, anyway?
+And with usec precision, same comments apply in an even stronger way.
 
 
-So please add documentation about what this does.
-If there's no document to refer to then pls write
-code comments or a document under docs/ - this does not
-belong in commit log.
-
-
-
-> @@ -214,6 +229,7 @@ static void vmport_realizefn(DeviceState *dev, Error =
+> @@ -230,6 +246,7 @@ static void vmport_realizefn(DeviceState *dev, Error =
 **errp)
->      vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size, NULL);
 >      if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
 >          vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid=
 , NULL);
-> +        vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
+>          vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
+> +        vmport_register(VMPORT_CMD_GETTIMEFULL, vmport_cmd_time_full, NU=
+LL);
 >      }
 >  }
 > =20
-> @@ -249,6 +265,11 @@ static Property vmport_properties[] =3D {
->       * 5 - ACE 1.x (Deprecated)
->       */
->      DEFINE_PROP_UINT8("vmware-vmx-type", VMPortState, vmware_vmx_type, 2=
-),
-> +    /*
-> +     * Max amount of time lag that can go uncorrected.
-
-What does uncorrected mean?
-
-> +     * Value taken from VMware Workstation 5.5.
-
-
-How do we know this makes sense for KVM? That has significantly
-different runtime characteristics.
-
-
-Also, the version returns ESX server, why does it make
-sense to take some values from workstation?
-
-> +     **/
-> +    DEFINE_PROP_UINT32("max-time-lag", VMPortState, max_time_lag_us, 100=
-0000),
-> =20
->      DEFINE_PROP_END_OF_LIST(),
->  };
 > diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
-> index 7f33512ca6f0..50416c8c8f3e 100644
+> index 50416c8c8f3e..5d19963ed417 100644
 > --- a/include/hw/i386/vmport.h
 > +++ b/include/hw/i386/vmport.h
-> @@ -8,6 +8,7 @@ typedef enum {
->      VMPORT_CMD_GETVERSION       =3D 10,
->      VMPORT_CMD_GETBIOSUUID      =3D 19,
->      VMPORT_CMD_GETRAMSIZE       =3D 20,
-> +    VMPORT_CMD_GETTIME          =3D 23,
+> @@ -12,6 +12,7 @@ typedef enum {
 >      VMPORT_CMD_VMMOUSE_DATA     =3D 39,
 >      VMPORT_CMD_VMMOUSE_STATUS   =3D 40,
 >      VMPORT_CMD_VMMOUSE_COMMAND  =3D 41,
+> +    VMPORT_CMD_GETTIMEFULL      =3D 46,
+>      VMPORT_ENTRIES
+>  } VMPortCommand;
+> =20
 > --=20
 > 2.20.1
 
