@@ -1,96 +1,97 @@
 Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263A7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:10:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB0AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:11:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8FF7206E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:10:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FE7zzI63"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FF7206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A3D92206E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:11:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D92206E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ehu.eus
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCXtv-0000ZT-1d
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 20:10:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39200)
+	id 1jCXuw-0001pW-TW
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 20:11:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jCXt8-0007Vp-Bc
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:09:19 -0400
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jCXuB-0000ub-6J
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:10:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jCXt7-0004Z6-6Y
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:09:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53578
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <unai.martinezcorral@ehu.eus>) id 1jCXu8-0006Ys-DN
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:10:21 -0400
+Received: from smtp.lg.ehu.es ([158.227.0.66]:9243 helo=smtp.ehu.eus)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jCXt7-0004XG-2P
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:09:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584058156;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EfZ65XEJbZi87jFA7uKtuBsbEs9VRwVoIR6Q2qTTe9M=;
- b=FE7zzI63ySBLN/tU1yPFxWA1kEHIf7UQkmR5SqwtIRahkoK3BYgYGg8eMaBxLgNsA2qD6G
- T6njQOEN4wYOSfj8g5VFvOHZuc7UjtC0yZZdXwv7G66NDnc7P9CbtscpyLj/SemYr7Wos2
- oJo2AQr62p98YPzDPp4uD/YqszX/kmM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-yWOLee8SOMKu5oOZOle9og-1; Thu, 12 Mar 2020 20:09:14 -0400
-X-MC-Unique: yWOLee8SOMKu5oOZOle9og-1
-Received: by mail-wr1-f71.google.com with SMTP id c16so3430656wrt.2
- for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 17:09:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/nb8v9fUR57iCXN9CyWS3DlE/aBydWOPaKhUlQg0PeM=;
- b=bE9i1sDHZyhzLXlDCMYjR4bZT8MoEGIGhjsQOY5vYCbw3/58lNoVf3/XWndw3ntWBk
- z+xNlrxRHvlt503Pgt9X4F2VMO3Nk5SsadKI+w6iAZ2c38NSYMrSM+5Cg39BbWDpjAwI
- VePzHjzqQYK8vpCqQ35kzY1S7TV0ZGsqwRn5RO2TqDWmC7vh4jVBGJsUZ0ayI0USEFJn
- adeSe74BEHhqi++gvmZ9HLxMRSConBAoJfIsrzhN9jMRFWsUwrlA4r7dYbrEz6ot2WnT
- 1w8BXRY2cPxakCUvAb3wPJQbWeCNnzpTSW0ENSVwEw/n61eYHo0st4Io6ZmXA5Nhrdh6
- mfnQ==
-X-Gm-Message-State: ANhLgQ28Qmgb7AJsTA+NMZvjSFt/GC/m1Mx6MJH9oPIGaxgJ0EG22BPc
- cNKP9B9cWZihYKmEFnNMiHs9C+1zBf3Rzj7cA6RcGgeVL4tIL4OXyYeEMnwJxD3lIv4UQIGvHku
- nOtwr1P/AMnoTelE=
-X-Received: by 2002:adf:b189:: with SMTP id q9mr13413463wra.169.1584058153593; 
- Thu, 12 Mar 2020 17:09:13 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtH7wrPcUx2GlWcUvBhovvpbFu243B69IlE/KGbTerSEW101fiXmAEoBNOul6QfD9ObDZw1IQ==
-X-Received: by 2002:adf:b189:: with SMTP id q9mr13413423wra.169.1584058153303; 
- Thu, 12 Mar 2020 17:09:13 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-2-19.red.bezeqint.net. [79.178.2.19])
- by smtp.gmail.com with ESMTPSA id k18sm27291692wru.94.2020.03.12.17.09.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Mar 2020 17:09:12 -0700 (PDT)
-Date: Thu, 12 Mar 2020 20:09:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v3 12/16] hw/i386/vmport: Add support for CMD_GET_VCPU_INFO
-Message-ID: <20200312200658-mutt-send-email-mst@kernel.org>
-References: <20200312165431.82118-1-liran.alon@oracle.com>
- <20200312165431.82118-13-liran.alon@oracle.com>
+ (Exim 4.71) (envelope-from <unai.martinezcorral@ehu.eus>)
+ id 1jCXu6-0006I1-Va
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:10:19 -0400
+Received: from imsva2.lgp.ehu.es (imsva2.lgp.ehu.es [10.0.3.246])
+ by postfix.smtp2.imsva2 (Postfix) with ESMTPS id 21D187412
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 01:10:10 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6BBF95A04F
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 01:10:09 +0100 (CET)
+Received: from imsva2.lgp.ehu.es (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 60C525A045
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 01:10:09 +0100 (CET)
+Received: from smtp.ehu.eus (unknown [10.0.100.76])
+ by imsva2.lgp.ehu.es (Postfix) with ESMTPS
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 01:10:09 +0100 (CET)
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com
+ [209.85.166.177]) by smtp2 (Postfix) with ESMTPSA id 28BE07412
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 01:10:09 +0100 (CET)
+Received: by mail-il1-f177.google.com with SMTP id d14so6718776ilq.10
+ for <qemu-devel@nongnu.org>; Thu, 12 Mar 2020 17:10:08 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ0MxJATzrAQzTBDcufiTh1K98rhb5d5axPHGXaijMS82XnP5OFC
+ mP48SaF4DMJWA8GRNeGpGE+9JR6Mhf+/McRugA==
+X-Google-Smtp-Source: ADFU+vvL3Ftx/Z/KNCqKfe0I3Rq9r7t6cRu0MamP5frAc7Gvuo4Ve5RXMfj9Fyg24yFkoxE8+d8+xUpstPgQmwH1JjY=
+X-Received: by 2002:a05:6e02:86:: with SMTP id
+ l6mr10938187ilm.22.1584058207596; 
+ Thu, 12 Mar 2020 17:10:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200312165431.82118-13-liran.alon@oracle.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200309191200.GA60@669c1c222ef4>
+ <20200309192021.GD65@669c1c222ef4>
+ <0d0b5735-85f0-0325-abb9-c90e4bdfc5cd@vivier.eu>
+In-Reply-To: <0d0b5735-85f0-0325-abb9-c90e4bdfc5cd@vivier.eu>
+From: Unai Martinez Corral <unai.martinezcorral@ehu.eus>
+Date: Fri, 13 Mar 2020 01:09:57 +0100
+X-Gmail-Original-Message-ID: <CAGZZdDFER9Eu0O29bKcWUx4pSLE8gRaLByY0ASRTPQ3Whe1Lrw@mail.gmail.com>
+Message-ID: <CAGZZdDFER9Eu0O29bKcWUx4pSLE8gRaLByY0ASRTPQ3Whe1Lrw@mail.gmail.com>
+Subject: Re: [PATCH v10 04/10] qemu-binfmt-conf.sh: add QEMU_CREDENTIAL and
+ QEMU_PERSISTENT
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: multipart/alternative; boundary="000000000000c47a4005a0b14af3"
+X-Greylist: ACL 191 matched, not delayed by milter-greylist-4.6.2 (smtp2
+ [10.0.100.76]); Fri, 13 Mar 2020 01:10:09 +0100 (CET)
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSVA-9.1.0.1631-8.5.0.1020-25288.001
+X-TM-AS-Result: No--1.409-7.0-31-10
+X-imss-scan-details: No--1.409-7.0-31-10
+X-TMASE-Version: IMSVA-9.1.0.1631-8.5.1020-25288.001
+X-TMASE-Result: 10--1.409400-10.000000
+X-TMASE-MatchedRID: DWyTxeVhwmOgBUTSh64wSUKGB4JJ2ELXgOjda/oQg4pNEfIB/J0c/ou3
+ renu5Y0wxesJnMEzEallElo+yZC/3G/pirVPFAXUvHKClHGjjr2lhc243Qzx9Wjliw+xvItdFOO
+ aygn1UTF1G0Py49F+F3CVOA5OEjiE0O4K4UYObiqnuuCqTEeAVAeCHewokHM/pyURDSVseYvEOb
+ 3Mgo89SC+we2BWmKLJm8pq/P5qixv8IGiYQaseULzgL/eLACDEAWQaZTMSP840fNYH/7Sdcqud2
+ 22l+s63m7kHB2bm1Nqv+BkntKx69E5diCa8ldUhJDuWzfvz/McGAD6h6FZmEdjPKewyT8Tfo8WM
+ kQWv6iXoC+VlRHhOyDzv8EzJ2ohvKsmEtKMlFWagbQVmZlKXfD6BJD4r15TRvl/7TaEFZrPHB8n
+ gAB/2PEjJLPe+r0+Y5iOW83GB3CpT0JhSyL/bVNgvXRlgpLvMvvna3aLRup85/5hpP58bIR0OJq
+ eI0to/o3CZ5PX7Lr1uGPNHJ5mNfcb8fthkdPb8M9UwWEBAXjgXMxM9iwxfu0qn/09w3T0kU+1Yw
+ Km80Y1WXGvUUmKP2w==
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-12:0,22:0,33:0,34:0-0
+X-Greylist: Sender IP whitelisted, Sender succeeded SMTP AUTH, not delayed by
+ milter-greylist-4.6.2 (postfix.smtp2.imsva2 [10.0.100.76]);
+ Fri, 13 Mar 2020 01:10:10 +0100 (CET)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 158.227.0.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,89 +103,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Reply-To: unai.martinezcorral@ehu.eus
+Cc: Unai Martinez-Corral <unai.martinezcorral@ehu.eus>, riku.voipio@iki.fi,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 06:54:27PM +0200, Liran Alon wrote:
-> Command currently returns that it is unimplemented by setting
-> the reserved-bit in it's return value.
->=20
-> Following patches will return various useful vCPU information
-> to guest.
->=20
-> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  hw/i386/vmport.c         | 14 ++++++++++++++
->  include/hw/i386/vmport.h |  1 +
->  2 files changed, 15 insertions(+)
->=20
-> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> index 7e57eda4b526..2ce78aaf7b4c 100644
-> --- a/hw/i386/vmport.c
-> +++ b/hw/i386/vmport.c
-> @@ -55,6 +55,13 @@
->  #define VMPORT_COMPAT_CMDS_V2                   \
->      (1 << VMPORT_COMPAT_CMDS_V2_BIT)
-> =20
-> +/* vCPU features reported by CMD_GET_VCPU_INFO */
-> +#define VCPU_INFO_SLC64_BIT             0
-> +#define VCPU_INFO_SYNC_VTSCS_BIT        1
-> +#define VCPU_INFO_HV_REPLAY_OK_BIT      2
-> +#define VCPU_INFO_LEGACY_X2APIC_BIT     3
-> +#define VCPU_INFO_RESERVED_BIT          31
-> +
->  #define VMPORT(obj) OBJECT_CHECK(VMPortState, (obj), TYPE_VMPORT)
-> =20
->  typedef struct VMPortState {
+--000000000000c47a4005a0b14af3
+Content-Type: text/plain; charset="UTF-8"
+
+2020/03/10 9:20, Laurent Vivier:
+
+> If variable are set to 'yes', how do you force the value to no with the
+> command line?
+>
+
+I believe you cannot. Do you mean the explanation should be reworded? Or
+that the feature should be implemented?
 
 
-Prefix with VMPORT_ please, and add comments.
+> Please, refresh my memory, why do we need these variables?
+> Do you have an use case?
+>
 
+See
+https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/20190306044620.GC75@03612eec87fc/
+I copy the relevant explanation below:
 
-> @@ -199,6 +206,11 @@ static uint32_t vmport_cmd_time_full(void *opaque, u=
-int32_t addr)
->      return VMPORT_MAGIC;
->  }
-> =20
-> +static uint32_t vmport_cmd_get_vcpu_info(void *opaque, uint32_t addr)
-> +{
-> +    return 1 << VCPU_INFO_RESERVED_BIT;
-> +}
-> +
->  /* vmmouse helpers */
->  void vmmouse_get_data(uint32_t *data)
->  {
-> @@ -247,6 +259,8 @@ static void vmport_realizefn(DeviceState *dev, Error =
-**errp)
->          vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get_bios_uuid=
-, NULL);
->          vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NULL);
->          vmport_register(VMPORT_CMD_GETTIMEFULL, vmport_cmd_time_full, NU=
-LL);
-> +        vmport_register(VMPORT_CMD_GET_VCPU_INFO, vmport_cmd_get_vcpu_in=
-fo,
-> +                        NULL);
->      }
->  }
-> =20
-> diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
-> index 5d19963ed417..34cc050b1ffa 100644
-> --- a/include/hw/i386/vmport.h
-> +++ b/include/hw/i386/vmport.h
-> @@ -13,6 +13,7 @@ typedef enum {
->      VMPORT_CMD_VMMOUSE_STATUS   =3D 40,
->      VMPORT_CMD_VMMOUSE_COMMAND  =3D 41,
->      VMPORT_CMD_GETTIMEFULL      =3D 46,
-> +    VMPORT_CMD_GET_VCPU_INFO    =3D 68,
->      VMPORT_ENTRIES
->  } VMPortCommand;
-> =20
-> --=20
-> 2.20.1
+The main use case is to provide defaults when this script is included
+> in a docker container. There are three actors involved:
+>
+> - Developers of QEMU providing some defaults in the script.
+> - Developer of a docker image including the script from upstream but
+> changing some defaults by setting envvars inside the container.
+> - User of the container that might want to override the settings
+> either by setting the envvars or through the command line.
+>
+> If the entrypoint to the docker image is any script that executes
+> qemu-binfmt-conf.sh at some point, the user cannot provide options
+> through the command line. Envvars allow to do so, without requiring
+> the user to customize the docker image.
+
+--000000000000c47a4005a0b14af3
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail=
+_attr">2020/03/10 9:20, Laurent Vivier:<br></div><blockquote class=3D"gmail=
+_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
+,204);padding-left:1ex">
+If variable are set to &#39;yes&#39;, how do you force the value to no with=
+ the<br>
+command line?<br></blockquote><div><br></div><div>I believe you cannot. Do =
+you mean the explanation should be reworded? Or that the feature should be =
+implemented? <br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
+ding-left:1ex">
+
+Please, refresh my memory, why do we need these variables?<br>
+Do you have an use case?<br></blockquote><div><br></div><div>See <a href=3D=
+"https://patchew.org/QEMU/20190306031221.GA53@03612eec87fc/20190306044620.G=
+C75@03612eec87fc/">https://patchew.org/QEMU/20190306031221.GA53@03612eec87f=
+c/20190306044620.GC75@03612eec87fc/</a> I copy the relevant explanation bel=
+ow:<br><br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.=
+8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">The main use c=
+ase is to provide defaults when this script is included<br>in a docker cont=
+ainer. There are three actors involved:<br><br>- Developers of QEMU providi=
+ng some defaults in the script.<br>- Developer of a docker image including =
+the script from upstream but<br>changing some defaults by setting envvars i=
+nside the container.<br>- User of the container that might want to override=
+ the settings<br>either by setting the envvars or through the command line.=
+<br><br>If the entrypoint to the docker image is any script that executes<b=
+r>qemu-binfmt-conf.sh at some point, the user cannot provide options<br>thr=
+ough the command line. Envvars allow to do so, without requiring<br>the use=
+r to customize the docker image.</blockquote></div><br></div></div>
+
+--000000000000c47a4005a0b14af3--
 
 
