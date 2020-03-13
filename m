@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6407CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 04:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9735DC2BAEE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 04:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22070206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 04:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6771D206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 04:06:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Gfs3wPNx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22070206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Nz5WkQo2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6771D206FA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCbb4-0004gw-AT
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 00:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44148)
+	id 1jCbb6-0004mI-Dp
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 00:06:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jCba7-0003Pg-7c
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 00:05:56 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jCba7-0003Ph-6y
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 00:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jCba6-000767-3i
+ (envelope-from <dgibson@ozlabs.org>) id 1jCba6-000768-3q
  for qemu-devel@nongnu.org; Fri, 13 Mar 2020 00:05:55 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:34433)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59867 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jCba5-0006rh-4P; Fri, 13 Mar 2020 00:05:54 -0400
+ id 1jCba5-0006rE-AX; Fri, 13 Mar 2020 00:05:54 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48dsYj2Hb5z9sSV; Fri, 13 Mar 2020 15:05:45 +1100 (AEDT)
+ id 48dsYj34s9z9sSW; Fri, 13 Mar 2020 15:05:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584072345;
- bh=lA1CWq6sTkYH0ckLD0jbjNno+xackfvWz9OnWzmHeU4=;
+ bh=4+vqW/+RBRo5X6Te37ypI3apVYu8PMdyc07IjtIT7Ng=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Gfs3wPNxtW/ijFL365hm7QA99qkUsyyvuShTxzbSp9UOZpQwIC0u+dR1K6Zr5VGoa
- ERxcdun0ujwsuMTjnZtKBwOjhC0XV6Qr8ZeZDxFYFHud/H2p2xgakJ1FPLEJoWgmwi
- 2ja21SIfHd1MOTbjebS3U8KIkaM1zRmRc8I2paR8=
+ b=Nz5WkQo2a7+N0qCHLKIu/aj1PsHVjdm5xcVcTbFYrlUUoWP2N1am8sM0yvxFALPGs
+ bcE6Z/31+a8yd8EVzDcZ+ycD6RzXo6OZops2iwvGZNQZ3fUmukCq0RVtr0Qk0ES0pS
+ 5vIsYgtRsI0/Y0tpCym1YiBrdJ+tDhUjgRA9Bwx4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org,
 	clg@kaod.org,
 	philmd@redhat.com
-Subject: [PATCH 2/4] spapr: Move creation of ibm,architecture-vec-5 property
-Date: Fri, 13 Mar 2020 15:05:37 +1100
-Message-Id: <20200313040539.819138-3-david@gibson.dropbear.id.au>
+Subject: [PATCH 4/4] spapr: Fold spapr_node0_size() into its only caller
+Date: Fri, 13 Mar 2020 15:05:39 +1100
+Message-Id: <20200313040539.819138-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200313040539.819138-1-david@gibson.dropbear.id.au>
 References: <20200313040539.819138-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,69 +76,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is currently called from spapr_dt_cas_updates() which is a hang over
-from when we created this only as a diff to the DT at CAS time.  Now that
-we fully rebuild the DT at CAS time, just create it alon with the rest
-of the properties in /chosen.
+The Real Mode Area (RMA) needs to fit within the NUMA node owning memory
+at address 0.  That's usually node 0, but can be a later one if there are
+some nodes which have no memory (only CPUs).
+
+This is currently handled by the spapr_node0_size() helper.  It has only
+one caller, so there's not a lot of point splitting it out.  It's also
+extremely easy to misread the code as clamping to the size of the smalles=
+t
+node rather than the first node with any memory.
+
+So, fold it into the caller, and add some commentary to make it a bit
+clearer exactly what it's doing.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 26 +++-----------------------
- 1 file changed, 3 insertions(+), 23 deletions(-)
+ hw/ppc/spapr.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 66289ffef5..fc28d9df25 100644
+index 6c32ec3c0a..6a42c0f1c9 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -889,22 +889,6 @@ static int spapr_rng_populate_dt(void *fdt)
-     return ret ? -1 : 0;
+@@ -295,20 +295,6 @@ static void spapr_dt_pa_features(SpaprMachineState *=
+spapr,
+     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
+ze)));
  }
 =20
--static int spapr_dt_cas_updates(SpaprMachineState *spapr, void *fdt,
--                                SpaprOptionVector *ov5_updates)
+-static hwaddr spapr_node0_size(MachineState *machine)
 -{
--    int offset;
--
--    offset =3D fdt_path_offset(fdt, "/chosen");
--    if (offset < 0) {
--        offset =3D fdt_add_subnode(fdt, 0, "chosen");
--        if (offset < 0) {
--            return offset;
+-    if (machine->numa_state->num_nodes) {
+-        int i;
+-        for (i =3D 0; i < machine->numa_state->num_nodes; ++i) {
+-            if (machine->numa_state->nodes[i].node_mem) {
+-                return MIN(pow2floor(machine->numa_state->nodes[i].node_=
+mem),
+-                           machine->ram_size);
+-            }
 -        }
 -    }
--    return spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
--                                  "ibm,architecture-vec-5");
+-    return machine->ram_size;
 -}
 -
- static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+ static void add_str(GString *s, const gchar *s1)
  {
-     MachineState *ms =3D MACHINE(spapr);
-@@ -1115,6 +1099,9 @@ static void spapr_dt_chosen(SpaprMachineState *spap=
-r, void *fdt)
+     g_string_append_len(s, s1, strlen(s1) + 1);
+@@ -2631,10 +2617,24 @@ static hwaddr spapr_rma_size(SpaprMachineState *s=
+papr, Error **errp)
+     MachineState *machine =3D MACHINE(spapr);
+     SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+     hwaddr rma_size =3D machine->ram_size;
+-    hwaddr node0_size =3D spapr_node0_size(machine);
 =20
-     spapr_dt_ov5_platform_support(spapr, fdt, chosen);
-=20
-+    _FDT(spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
-+                                "ibm,architecture-vec-5"));
+     /* RMA has to fit in the first NUMA node */
+-    rma_size =3D MIN(rma_size, node0_size);
++    if (machine->numa_state->num_nodes) {
++        /*
++         * It's possible for there to be some zero-memory nodes first
++         * in the list.  We need the RMA to fit inside the memory of
++         * the first node which actually has some memory.
++         */
++        int i;
 +
-     g_free(stdout_path);
-     g_free(bootlist);
- }
-@@ -1263,13 +1250,6 @@ void *spapr_build_fdt(SpaprMachineState *spapr, bo=
-ol reset, size_t space)
-         }
++        for (i =3D 0; i < machine->numa_state->num_nodes; ++i) {
++            if (machine->numa_state->nodes[i].node_mem !=3D 0) {
++                hwaddr node_size =3D machine->numa_state->nodes[i].node_=
+mem;
++                rma_size =3D MIN(rma_size, pow2floor(node_size));
++                break;
++            }
++        }
++    }
+=20
+     /*
+      * VRMA access is via a special 1TiB SLB mapping, so the RMA can
+@@ -2651,6 +2651,11 @@ static hwaddr spapr_rma_size(SpaprMachineState *sp=
+apr, Error **errp)
+         rma_size =3D MIN(rma_size, smc->rma_limit);
      }
 =20
--    /* ibm,client-architecture-support updates */
--    ret =3D spapr_dt_cas_updates(spapr, fdt, spapr->ov5_cas);
--    if (ret < 0) {
--        error_report("couldn't setup CAS properties fdt");
--        exit(1);
--    }
--
-     if (smc->dr_phb_enabled) {
-         ret =3D spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
-         if (ret < 0) {
++    /*
++     * RMA size must be a power of 2
++     */
++    rma_size =3D pow2floor(rma_size);
++
+     if (rma_size < MIN_RMA_SLOF) {
+         error_setg(errp,
+ "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real Mode Area me=
+mory)",
 --=20
 2.24.1
 
