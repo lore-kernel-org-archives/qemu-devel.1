@@ -2,83 +2,79 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 397BEC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9260AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7FCA2074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BCE52074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 20:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MSCU67Aq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7FCA2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dt/TD7BX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BCE52074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCr5o-0003vK-Vs
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 16:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40463)
+	id 1jCrFn-000641-IQ
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 16:49:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47118)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jCr4y-0003W2-88
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:38:53 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1jCrFC-0005eC-4o
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jCr4t-00067u-Kc
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:38:48 -0400
-Received: from mail-ua1-x941.google.com ([2607:f8b0:4864:20::941]:38605)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jCr4t-00066e-BF; Fri, 13 Mar 2020 16:38:43 -0400
-Received: by mail-ua1-x941.google.com with SMTP id h35so965087uae.5;
- Fri, 13 Mar 2020 13:38:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=y5nTm37lNM6rvNCuq8BQR+uIVRM4x/x9ANKWwZvhIbU=;
- b=MSCU67Aqis+8Ar3mVaEc0qjt+g/KBt3Op+5AYNeGrwBqc8y7R8DbiivebbJnbb62ru
- Td6bMZvlXUuPJcgm2qr1hdImXq3yDEYHBvXFnn+ZUfMgJw42mPQ1RCv+6oYEiDPkjwKE
- jQhTuptycu9ZtX7CIrtdMoRaUxigj4hhqpMvUr564onoRTW7/XH+yHj7MPv5k5PvgRUs
- j43M9yyNDnF05nGpfZ5/QD7S07c/sW9luNXZuId9D+TURTTAKjSd+PbOP5rDvERFzpP6
- +nj/Jjfjv0EXA3fomkkrqxIinh2aTlKccohxRHIdsM9AeAh4E9oBdQeE5CRzMeI7FI5R
- 2tdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=y5nTm37lNM6rvNCuq8BQR+uIVRM4x/x9ANKWwZvhIbU=;
- b=NTC6vEpMzeXT+NKi9ZBQLJci/U+1dO6Bqxo/oaDkcZCZT425aKtAVE8WJGfA4Kmg7H
- 2WNIwMsUcQjMvwXAyxJWi8hxKwkdp6o8hXFRsw/Yr1+Ms25wS9EI2h086cagb780bfnM
- zZLbgi3Mohne/bU6DEB0kFoKS5B/GR+nuywMIGvoDEhCY6DoYySssFeOe/WmjH4ABDCp
- u5GuKcXktLRl/GCu/2JmY7cLhSXGQtaluIgZbaN4eS8PC+spy9A2nemWXkZqwqNQcRT9
- XF59JVe1Yll2PDsh6mOHBB06CjY+WiV8zsPAsxFZk8qsKbKl3WTR4H4WJD1fY4H1VAm7
- Wizg==
-X-Gm-Message-State: ANhLgQ3Nu4KN/FpiqH2CpeWJ9uv1W0TUnptOC50OHDriNk9koSoJzpUY
- xGxRNjkaP5tiQLsXLiUuv7ODQ1t9Am9MnpJHw3g=
-X-Google-Smtp-Source: ADFU+vtWJGK60xXZS7woGtwE+HZfqpL+xYFsvXSR8sExMQTcR7N1qqKnT80i1DCzES9mLAVJwS5t1Ywxvx/2KKS5nmk=
-X-Received: by 2002:ab0:143:: with SMTP id 61mr9551975uak.85.1584131922158;
- Fri, 13 Mar 2020 13:38:42 -0700 (PDT)
+ (envelope-from <alex.williamson@redhat.com>) id 1jCrFA-0000SO-00
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:49:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57900
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1jCrF9-0000RH-PC
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 16:49:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584132558;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z4dvF73kaZ111+E9J06RzSJ+7R3u780xXum6KII9mcI=;
+ b=dt/TD7BXd9vHLdcOwFgmAt9qfIFJj8fux/4IyxNKJRDiDukYcbU306ZGm5THoFQfC9YPR6
+ D2x5VsquzAjCyYW6IvWiq7V2MyCtnDEBdBoZgEDEvf5Dqv2jjywM0mWKWzpzp0trlKQo3+
+ H14nRB4aDON0di9FwQAYdwcf34khGms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34--_UQoJQ1NUGD1xKYPVT83A-1; Fri, 13 Mar 2020 16:49:17 -0400
+X-MC-Unique: -_UQoJQ1NUGD1xKYPVT83A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6846FA0CC0;
+ Fri, 13 Mar 2020 20:49:14 +0000 (UTC)
+Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 76C8719757;
+ Fri, 13 Mar 2020 20:49:12 +0000 (UTC)
+Date: Fri, 13 Mar 2020 14:49:11 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v13 Kernel 7/7] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+Message-ID: <20200313144911.72e727d4@x1.home>
+In-Reply-To: <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
+References: <1584035607-23166-1-git-send-email-kwankhede@nvidia.com>
+ <1584035607-23166-8-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-6-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200312145900.2054-6-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 13 Mar 2020 13:38:15 -0700
-Message-ID: <CAKmqyKOiKUqzGSDd1+TvqhCT6pjeEXEX-QVzYhcaiRa-y4D98w@mail.gmail.com>
-Subject: Re: [PATCH v5 05/60] target/riscv: add vector stride load and store
- instructions
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::941
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,1130 +86,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 8:09 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Vector strided operations access the first memory element at the base add=
-ress,
-> and then access subsequent elements at address increments given by the by=
-te
-> offset contained in the x register specified by rs2.
->
-> Vector unit-stride operations access elements stored contiguously in memo=
-ry
-> starting from the base effective address. It can been seen as a special
-> case of strided operations.
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+On Thu, 12 Mar 2020 23:23:27 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Added a check such that only singleton IOMMU groups can pin pages.
+> From the point when vendor driver pins any pages, consider IOMMU group
+> dirty page scope to be limited to pinned pages.
+> 
+> To optimize to avoid walking list often, added flag
+> pinned_page_dirty_scope to indicate if all of the vfio_groups for each
+> vfio_domain in the domain_list dirty page scope is limited to pinned
+> pages. This flag is updated on first pinned pages request for that IOMMU
+> group and on attaching/detaching group.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  target/riscv/cpu.h                      |   6 +
->  target/riscv/helper.h                   | 105 ++++++
->  target/riscv/insn32.decode              |  32 ++
->  target/riscv/insn_trans/trans_rvv.inc.c | 340 ++++++++++++++++++++
->  target/riscv/translate.c                |   7 +
->  target/riscv/vector_helper.c            | 406 ++++++++++++++++++++++++
->  6 files changed, 896 insertions(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 505d1a8515..b6ebb9b0eb 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -369,6 +369,12 @@ typedef CPURISCVState CPUArchState;
->  typedef RISCVCPU ArchCPU;
->  #include "exec/cpu-all.h"
->
-> +/* share data between vector helpers and decode code */
-> +FIELD(VDATA, MLEN, 0, 8)
-> +FIELD(VDATA, VM, 8, 1)
-> +FIELD(VDATA, LMUL, 9, 2)
-> +FIELD(VDATA, NF, 11, 4)
+>  drivers/vfio/vfio.c             |  9 +++++-
+>  drivers/vfio/vfio_iommu_type1.c | 72 +++++++++++++++++++++++++++++++++++++++--
+>  include/linux/vfio.h            |  4 ++-
+>  3 files changed, 80 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index c8482624ca34..79108c1245a5 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -85,6 +85,7 @@ struct vfio_group {
+>  	atomic_t			opened;
+>  	wait_queue_head_t		container_q;
+>  	bool				noiommu;
+> +	unsigned int			dev_counter;
+>  	struct kvm			*kvm;
+>  	struct blocking_notifier_head	notifier;
+>  };
+> @@ -555,6 +556,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>  
+>  	mutex_lock(&group->device_lock);
+>  	list_add(&device->group_next, &group->device_list);
+> +	group->dev_counter++;
+>  	mutex_unlock(&group->device_lock);
+>  
+>  	return device;
+> @@ -567,6 +569,7 @@ static void vfio_device_release(struct kref *kref)
+>  	struct vfio_group *group = device->group;
+>  
+>  	list_del(&device->group_next);
+> +	group->dev_counter--;
+>  	mutex_unlock(&group->device_lock);
+>  
+>  	dev_set_drvdata(device->dev, NULL);
+> @@ -1895,6 +1898,9 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>  	if (!group)
+>  		return -ENODEV;
+>  
+> +	if (group->dev_counter > 1)
+> +		return -EINVAL;
 > +
->  FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
->  FIELD(TB_FLAGS, LMUL, 3, 2)
->  FIELD(TB_FLAGS, SEW, 5, 3)
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index 3c28c7e407..87dfa90609 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -78,3 +78,108 @@ DEF_HELPER_1(tlb_flush, void, env)
->  #endif
->  /* Vector functions */
->  DEF_HELPER_3(vsetvl, tl, env, tl, tl)
-> +DEF_HELPER_5(vlb_v_b, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_b_mask, void, ptr, ptr, tl, env, i32)
+>  	ret = vfio_group_add_container_user(group);
+>  	if (ret)
+>  		goto err_pin_pages;
+> @@ -1902,7 +1908,8 @@ int vfio_pin_pages(struct device *dev, unsigned long *user_pfn, int npage,
+>  	container = group->container;
+>  	driver = container->iommu_driver;
+>  	if (likely(driver && driver->ops->pin_pages))
+> -		ret = driver->ops->pin_pages(container->iommu_data, user_pfn,
+> +		ret = driver->ops->pin_pages(container->iommu_data,
+> +					     group->iommu_group, user_pfn,
+>  					     npage, prot, phys_pfn);
+>  	else
+>  		ret = -ENOTTY;
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 4f1f116feabc..18a284b230c0 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -71,6 +71,7 @@ struct vfio_iommu {
+>  	bool			v2;
+>  	bool			nesting;
+>  	bool			dirty_page_tracking;
+> +	bool			pinned_page_dirty_scope;
+>  };
+>  
+>  struct vfio_domain {
+> @@ -98,6 +99,7 @@ struct vfio_group {
+>  	struct iommu_group	*iommu_group;
+>  	struct list_head	next;
+>  	bool			mdev_group;	/* An mdev group */
+> +	bool			has_pinned_pages;
 
-Do you mind explaining why we have *_mask versions? I'm struggling to
-understand this.
+I'm afraid over time this name will be confusing, should we simply
+call it pinned_page_dirty_scope per vfio_group as well?   We might have
+to adapt this over time as we get new ways to dirty pages, but each
+group voting towards the same value being set on the vfio_iommu object
+seems like a good starting point.
 
-> +DEF_HELPER_5(vlb_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlb_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlh_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlw_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlw_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlw_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlw_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_b, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_b_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vle_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_b, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_b_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlbu_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlhu_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlwu_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlwu_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlwu_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vlwu_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_b, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_b_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsb_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsh_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsw_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsw_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsw_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vsw_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_b, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_b_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_h, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_h_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_w, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_w_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_d, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_5(vse_v_d_mask, void, ptr, ptr, tl, env, i32)
-> +DEF_HELPER_6(vlsb_v_b, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsb_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsb_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsb_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsh_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsh_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsh_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsw_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsw_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlse_v_b, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlse_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlse_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlse_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsbu_v_b, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsbu_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsbu_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlsbu_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlshu_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlshu_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlshu_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlswu_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vlswu_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssb_v_b, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssb_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssb_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssb_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssh_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssh_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssh_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssw_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vssw_v_d, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vsse_v_b, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vsse_v_h, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vsse_v_w, void, ptr, ptr, tl, tl, env, i32)
-> +DEF_HELPER_6(vsse_v_d, void, ptr, ptr, tl, tl, env, i32)
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 53340bdbc4..ef521152c5 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -25,6 +25,7 @@
->  %sh10    20:10
->  %csr    20:12
->  %rm     12:3
-> +%nf     29:3                     !function=3Dex_plus_1
->
->  # immediates:
->  %imm_i    20:s12
-> @@ -43,6 +44,8 @@
->  &u    imm rd
->  &shift     shamt rs1 rd
->  &atomic    aq rl rs2 rs1 rd
-> +&r2nfvm    vm rd rs1 nf
-> +&rnfvm     vm rd rs1 rs2 nf
->
->  # Formats 32:
->  @r       .......   ..... ..... ... ..... ....... &r                %rs2 =
-%rs1 %rd
-> @@ -62,6 +65,8 @@
->  @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
->  @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
->  @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-> +@r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
-> +@r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1=
- %rd
->  @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
->
->  @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-> @@ -210,5 +215,32 @@ fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r=
-2_rm
->  fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
->
->  # *** RV32V Extension ***
+>  };
+>  
+>  struct vfio_iova {
+> @@ -129,6 +131,10 @@ struct vfio_regions {
+>  static int put_pfn(unsigned long pfn, int prot);
+>  static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+>  
+> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+> +					       struct iommu_group *iommu_group);
 > +
-> +# *** Vector loads and stores are encoded within LOADFP/STORE-FP ***
-> +vlb_v      ... 100 . 00000 ..... 000 ..... 0000111 @r2_nfvm
-> +vlh_v      ... 100 . 00000 ..... 101 ..... 0000111 @r2_nfvm
-> +vlw_v      ... 100 . 00000 ..... 110 ..... 0000111 @r2_nfvm
-> +vle_v      ... 000 . 00000 ..... 111 ..... 0000111 @r2_nfvm
-> +vlbu_v     ... 000 . 00000 ..... 000 ..... 0000111 @r2_nfvm
-> +vlhu_v     ... 000 . 00000 ..... 101 ..... 0000111 @r2_nfvm
-> +vlwu_v     ... 000 . 00000 ..... 110 ..... 0000111 @r2_nfvm
-> +vsb_v      ... 000 . 00000 ..... 000 ..... 0100111 @r2_nfvm
-> +vsh_v      ... 000 . 00000 ..... 101 ..... 0100111 @r2_nfvm
-> +vsw_v      ... 000 . 00000 ..... 110 ..... 0100111 @r2_nfvm
-> +vse_v      ... 000 . 00000 ..... 111 ..... 0100111 @r2_nfvm
-> +
-> +vlsb_v     ... 110 . ..... ..... 000 ..... 0000111 @r_nfvm
-> +vlsh_v     ... 110 . ..... ..... 101 ..... 0000111 @r_nfvm
-> +vlsw_v     ... 110 . ..... ..... 110 ..... 0000111 @r_nfvm
-> +vlse_v     ... 010 . ..... ..... 111 ..... 0000111 @r_nfvm
-> +vlsbu_v    ... 010 . ..... ..... 000 ..... 0000111 @r_nfvm
-> +vlshu_v    ... 010 . ..... ..... 101 ..... 0000111 @r_nfvm
-> +vlswu_v    ... 010 . ..... ..... 110 ..... 0000111 @r_nfvm
-> +vssb_v     ... 010 . ..... ..... 000 ..... 0100111 @r_nfvm
-> +vssh_v     ... 010 . ..... ..... 101 ..... 0100111 @r_nfvm
-> +vssw_v     ... 010 . ..... ..... 110 ..... 0100111 @r_nfvm
-> +vsse_v     ... 010 . ..... ..... 111 ..... 0100111 @r_nfvm
-> +
-> +# *** new major opcode OP-V ***
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_=
-trans/trans_rvv.inc.c
-> index da82c72bbf..d85f2aec68 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -15,6 +15,8 @@
->   * You should have received a copy of the GNU General Public License alo=
-ng with
->   * this program.  If not, see <http://www.gnu.org/licenses/>.
->   */
-> +#include "tcg/tcg-op-gvec.h"
-> +#include "tcg/tcg-gvec-desc.h"
->
->  static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
+> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+>  /*
+>   * This code handles mapping and unmapping of user data buffers
+>   * into DMA'ble space using the IOMMU
+> @@ -579,11 +585,13 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+>  }
+>  
+>  static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> +				      struct iommu_group *iommu_group,
+>  				      unsigned long *user_pfn,
+>  				      int npage, int prot,
+>  				      unsigned long *phys_pfn)
 >  {
-> @@ -67,3 +69,341 @@ static bool trans_vsetvli(DisasContext *ctx, arg_vset=
-vli * a)
->      tcg_temp_free(dst);
->      return true;
+>  	struct vfio_iommu *iommu = iommu_data;
+> +	struct vfio_group *group;
+>  	int i, j, ret;
+>  	unsigned long remote_vaddr;
+>  	struct vfio_dma *dma;
+> @@ -662,8 +670,14 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  				   (vpfn->iova - dma->iova) >> pgshift, 1);
+>  		}
+>  	}
+> -
+>  	ret = i;
+> +
+> +	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
+> +	if (!group->has_pinned_pages) {
+> +		group->has_pinned_pages = true;
+> +		update_pinned_page_dirty_scope(iommu);
+> +	}
+> +
+>  	goto pin_done;
+>  
+>  pin_unwind:
+> @@ -946,8 +960,11 @@ static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+>  	npages = dma->size >> pgshift;
+>  	bitmap_size = dirty_bitmap_bytes(npages);
+>  
+> -	/* mark all pages dirty if all pages are pinned and mapped. */
+> -	if (dma->iommu_mapped)
+> +	/*
+> +	 * mark all pages dirty if any IOMMU capable device is not able
+> +	 * to report dirty pages and all pages are pinned and mapped.
+> +	 */
+> +	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
+>  		bitmap_set(dma->bitmap, 0, npages);
+>  
+>  	if (dma->bitmap) {
+> @@ -1430,6 +1447,51 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
+>  	return NULL;
 >  }
-> +
-> +/* vector register offset from env */
-> +static uint32_t vreg_ofs(DisasContext *s, int reg)
+>  
+> +static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+> +					       struct iommu_group *iommu_group)
 > +{
-> +    return offsetof(CPURISCVState, vreg) + reg * s->vlen / 8;
+> +	struct vfio_domain *domain;
+> +	struct vfio_group *group = NULL;
+> +
+> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+> +		group = find_iommu_group(domain, iommu_group);
+> +		if (group)
+> +			return group;
+> +	}
+> +
+> +	if (iommu->external_domain)
+> +		group = find_iommu_group(iommu->external_domain, iommu_group);
+> +
+> +	return group;
 > +}
 > +
-> +/* check functions */
-> +static bool vext_check_isa_ill(DisasContext *s, target_ulong isa)
+> +static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
 > +{
-> +    return !s->vill && ((s->misa & isa) =3D=3D isa);
+> +	struct vfio_domain *domain;
+> +	struct vfio_group *group;
+> +
+> +	list_for_each_entry(domain, &iommu->domain_list, next) {
+> +		list_for_each_entry(group, &domain->group_list, next) {
+> +			if (!group->has_pinned_pages) {
+> +				iommu->pinned_page_dirty_scope = false;
+> +				return;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (iommu->external_domain) {
+> +		domain = iommu->external_domain;
+> +		list_for_each_entry(group, &domain->group_list, next) {
+> +			if (!group->has_pinned_pages) {
+> +				iommu->pinned_page_dirty_scope = false;
+> +				return;
+> +			}
+> +		}
+> +	}
+> +
+> +	iommu->pinned_page_dirty_scope = true;
 > +}
+> +
+>  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
+>  				  phys_addr_t *base)
+>  {
+> @@ -1836,6 +1898,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  
+>  			list_add(&group->next,
+>  				 &iommu->external_domain->group_list);
+> +			update_pinned_page_dirty_scope(iommu);
+>  			mutex_unlock(&iommu->lock);
+>  
+>  			return 0;
+> @@ -1958,6 +2021,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  done:
+>  	/* Delete the old one and insert new iova list */
+>  	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+> +	update_pinned_page_dirty_scope(iommu);
+>  	mutex_unlock(&iommu->lock);
+>  	vfio_iommu_resv_free(&group_resv_regions);
+>  
 
-I don't think we need a new function to check ISA.
+At this point we've added an iommu backed group that can't possibly
+have pages pinned on behalf of this group yet, can't we just set
+iommu->pinned_page_dirty_scope = false?
 
-> +
-> +/*
-> + * There are two rules check here.
-> + *
-> + * 1. Vector register numbers are multiples of LMUL. (Section 3.2)
-> + *
-> + * 2. For all widening instructions, the destination LMUL value must als=
-o be
-> + *    a supported LMUL value. (Section 11.2=EF=BC=89
-> + */
-> +static bool vext_check_reg(DisasContext *s, uint32_t reg, bool widen)
-> +{
-> +    /*
-> +     * The destination vector register group results are arranged as if =
-both
-> +     * SEW and LMUL were at twice their current settings. (Section 11.2)=
-.
-> +     */
-> +    int legal =3D widen ? 2 << s->lmul : 1 << s->lmul;
-> +
-> +    return !((s->lmul =3D=3D 0x3 && widen) || (reg % legal));
+In the previous case, aren't we adding a non-iommu backed group, so
+should we presume the scope is pinned pages even before we have any?
+We could almost forego the iommu scope update, but it could be the
+first group added if we're going to preemptively assume the scope of
+the group.
 
-Where does this 3 come from?
+> @@ -1972,6 +2036,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  out_free:
+>  	kfree(domain);
+>  	kfree(group);
+> +	update_pinned_page_dirty_scope(iommu);
 
+This one looks like paranoia given how late we update when the group is
+added.
 
-> +}
-> +
-> +/*
-> + * There are two rules check here.
-> + *
-> + * 1. The destination vector register group for a masked vector instruct=
-ion can
-> + *    only overlap the source mask register (v0) when LMUL=3D1. (Section=
- 5.3)
-> + *
-> + * 2. In widen instructions and some other insturctions, like vslideup.v=
-x,
-> + *    there is no need to check whether LMUL=3D1.
-> + */
-> +static bool vext_check_overlap_mask(DisasContext *s, uint32_t vd, bool v=
-m,
-> +    bool force)
-> +{
-> +    return (vm !=3D 0 || vd !=3D 0) || (!force && (s->lmul =3D=3D 0));
-> +}
-> +
-> +/* The LMUL setting must be such that LMUL * NFIELDS <=3D 8. (Section 7.=
-8) */
-> +static bool vext_check_nf(DisasContext *s, uint32_t nf)
-> +{
-> +    return (1 << s->lmul) * nf <=3D 8;
-> +}
-> +
-> +/* common translation macro */
-> +#define GEN_VEXT_TRANS(NAME, SEQ, ARGTYPE, OP, CHECK)      \
-> +static bool trans_##NAME(DisasContext *s, arg_##ARGTYPE *a)\
-> +{                                                          \
-> +    if (CHECK(s, a)) {                                     \
-> +        return OP(s, a, SEQ);                              \
-> +    }                                                      \
-> +    return false;                                          \
-> +}
-> +
-> +/*
-> + *** unit stride load and store
-> + */
-> +typedef void gen_helper_ldst_us(TCGv_ptr, TCGv_ptr, TCGv,
-> +        TCGv_env, TCGv_i32);
-> +
-> +static bool ldst_us_trans(uint32_t vd, uint32_t rs1, uint32_t data,
-> +        gen_helper_ldst_us *fn, DisasContext *s)
-> +{
-> +    TCGv_ptr dest, mask;
-> +    TCGv base;
-> +    TCGv_i32 desc;
-> +
-> +    dest =3D tcg_temp_new_ptr();
-> +    mask =3D tcg_temp_new_ptr();
-> +    base =3D tcg_temp_new();
-> +
-> +    /*
-> +     * As simd_desc supports at most 256 bytes, and in this implementati=
-on,
-> +     * the max vector group length is 2048 bytes. So split it into two p=
-arts.
-> +     *
-> +     * The first part is vlen in bytes, encoded in maxsz of simd_desc.
-> +     * The second part is lmul, encoded in data of simd_desc.
-> +     */
-> +    desc =3D tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-> +
-> +    gen_get_gpr(base, rs1);
-> +    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
-> +    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
-> +
-> +    fn(dest, mask, base, cpu_env, desc);
-> +
-> +    tcg_temp_free_ptr(dest);
-> +    tcg_temp_free_ptr(mask);
-> +    tcg_temp_free(base);
-> +    tcg_temp_free_i32(desc);
-> +    return true;
-> +}
-> +
-> +static bool ld_us_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
-> +{
-> +    uint32_t data =3D 0;
-> +    gen_helper_ldst_us *fn;
-> +    static gen_helper_ldst_us * const fns[2][7][4] =3D {
-> +        /* masked unit stride load */
-> +        { { gen_helper_vlb_v_b_mask,  gen_helper_vlb_v_h_mask,
-> +            gen_helper_vlb_v_w_mask,  gen_helper_vlb_v_d_mask },
-> +          { NULL,                     gen_helper_vlh_v_h_mask,
-> +            gen_helper_vlh_v_w_mask,  gen_helper_vlh_v_d_mask },
-> +          { NULL,                     NULL,
-> +            gen_helper_vlw_v_w_mask,  gen_helper_vlw_v_d_mask },
-> +          { gen_helper_vle_v_b_mask,  gen_helper_vle_v_h_mask,
-> +            gen_helper_vle_v_w_mask,  gen_helper_vle_v_d_mask },
-> +          { gen_helper_vlbu_v_b_mask, gen_helper_vlbu_v_h_mask,
-> +            gen_helper_vlbu_v_w_mask, gen_helper_vlbu_v_d_mask },
-> +          { NULL,                     gen_helper_vlhu_v_h_mask,
-> +            gen_helper_vlhu_v_w_mask, gen_helper_vlhu_v_d_mask },
-> +          { NULL,                     NULL,
-> +            gen_helper_vlwu_v_w_mask, gen_helper_vlwu_v_d_mask } },
-> +        /* unmasked unit stride load */
-> +        { { gen_helper_vlb_v_b,  gen_helper_vlb_v_h,
-> +            gen_helper_vlb_v_w,  gen_helper_vlb_v_d },
-> +          { NULL,                gen_helper_vlh_v_h,
-> +            gen_helper_vlh_v_w,  gen_helper_vlh_v_d },
-> +          { NULL,                NULL,
-> +            gen_helper_vlw_v_w,  gen_helper_vlw_v_d },
-> +          { gen_helper_vle_v_b,  gen_helper_vle_v_h,
-> +            gen_helper_vle_v_w,  gen_helper_vle_v_d },
-> +          { gen_helper_vlbu_v_b, gen_helper_vlbu_v_h,
-> +            gen_helper_vlbu_v_w, gen_helper_vlbu_v_d },
-> +          { NULL,                gen_helper_vlhu_v_h,
-> +            gen_helper_vlhu_v_w, gen_helper_vlhu_v_d },
-> +          { NULL,                NULL,
-> +            gen_helper_vlwu_v_w, gen_helper_vlwu_v_d } }
-> +    };
-> +
-> +    fn =3D  fns[a->vm][seq][s->sew];
-> +    if (fn =3D=3D NULL) {
-> +        return false;
-> +    }
-> +
-> +    data =3D FIELD_DP32(data, VDATA, MLEN, s->mlen);
-> +    data =3D FIELD_DP32(data, VDATA, VM, a->vm);
-> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data =3D FIELD_DP32(data, VDATA, NF, a->nf);
-> +    return ldst_us_trans(a->rd, a->rs1, data, fn, s);
-> +}
-> +
-> +static bool ld_us_check(DisasContext *s, arg_r2nfvm* a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_nf(s, a->nf));
-> +}
-> +
-> +GEN_VEXT_TRANS(vlb_v, 0, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vlh_v, 1, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vlw_v, 2, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vle_v, 3, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vlbu_v, 4, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vlhu_v, 5, r2nfvm, ld_us_op, ld_us_check)
-> +GEN_VEXT_TRANS(vlwu_v, 6, r2nfvm, ld_us_op, ld_us_check)
-> +
-> +static bool st_us_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
-> +{
-> +    uint32_t data =3D 0;
-> +    gen_helper_ldst_us *fn;
-> +    static gen_helper_ldst_us * const fns[2][4][4] =3D {
-> +        /* masked unit stride load and store */
-> +        { { gen_helper_vsb_v_b_mask,  gen_helper_vsb_v_h_mask,
-> +            gen_helper_vsb_v_w_mask,  gen_helper_vsb_v_d_mask },
-> +          { NULL,                     gen_helper_vsh_v_h_mask,
-> +            gen_helper_vsh_v_w_mask,  gen_helper_vsh_v_d_mask },
-> +          { NULL,                     NULL,
-> +            gen_helper_vsw_v_w_mask,  gen_helper_vsw_v_d_mask },
-> +          { gen_helper_vse_v_b_mask,  gen_helper_vse_v_h_mask,
-> +            gen_helper_vse_v_w_mask,  gen_helper_vse_v_d_mask } },
-> +        /* unmasked unit stride store */
-> +        { { gen_helper_vsb_v_b,  gen_helper_vsb_v_h,
-> +            gen_helper_vsb_v_w,  gen_helper_vsb_v_d },
-> +          { NULL,                gen_helper_vsh_v_h,
-> +            gen_helper_vsh_v_w,  gen_helper_vsh_v_d },
-> +          { NULL,                NULL,
-> +            gen_helper_vsw_v_w,  gen_helper_vsw_v_d },
-> +          { gen_helper_vse_v_b,  gen_helper_vse_v_h,
-> +            gen_helper_vse_v_w,  gen_helper_vse_v_d } }
-> +    };
-> +
-> +    fn =3D  fns[a->vm][seq][s->sew];
-> +    if (fn =3D=3D NULL) {
-> +        return false;
-> +    }
-> +
-> +    data =3D FIELD_DP32(data, VDATA, MLEN, s->mlen);
-> +    data =3D FIELD_DP32(data, VDATA, VM, a->vm);
-> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data =3D FIELD_DP32(data, VDATA, NF, a->nf);
-> +    return ldst_us_trans(a->rd, a->rs1, data, fn, s);
-> +}
-> +
-> +static bool st_us_check(DisasContext *s, arg_r2nfvm* a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_nf(s, a->nf));
-> +}
-> +
-> +GEN_VEXT_TRANS(vsb_v, 0, r2nfvm, st_us_op, st_us_check)
-> +GEN_VEXT_TRANS(vsh_v, 1, r2nfvm, st_us_op, st_us_check)
-> +GEN_VEXT_TRANS(vsw_v, 2, r2nfvm, st_us_op, st_us_check)
-> +GEN_VEXT_TRANS(vse_v, 3, r2nfvm, st_us_op, st_us_check)
-> +
-> +/*
-> + *** stride load and store
-> + */
-> +typedef void gen_helper_ldst_stride(TCGv_ptr, TCGv_ptr, TCGv,
-> +        TCGv, TCGv_env, TCGv_i32);
-> +
-> +static bool ldst_stride_trans(uint32_t vd, uint32_t rs1, uint32_t rs2,
-> +        uint32_t data, gen_helper_ldst_stride *fn, DisasContext *s)
-> +{
-> +    TCGv_ptr dest, mask;
-> +    TCGv base, stride;
-> +    TCGv_i32 desc;
-> +
-> +    dest =3D tcg_temp_new_ptr();
-> +    mask =3D tcg_temp_new_ptr();
-> +    base =3D tcg_temp_new();
-> +    stride =3D tcg_temp_new();
-> +    desc =3D tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-> +
-> +    gen_get_gpr(base, rs1);
-> +    gen_get_gpr(stride, rs2);
-> +    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
-> +    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
-> +
-> +    fn(dest, mask, base, stride, cpu_env, desc);
-> +
-> +    tcg_temp_free_ptr(dest);
-> +    tcg_temp_free_ptr(mask);
-> +    tcg_temp_free(base);
-> +    tcg_temp_free(stride);
-> +    tcg_temp_free_i32(desc);
-> +    return true;
-> +}
-> +
-> +static bool ld_stride_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
-> +{
-> +    uint32_t data =3D 0;
-> +    gen_helper_ldst_stride *fn;
-> +    static gen_helper_ldst_stride * const fns[7][4] =3D {
-> +        { gen_helper_vlsb_v_b,  gen_helper_vlsb_v_h,
-> +          gen_helper_vlsb_v_w,  gen_helper_vlsb_v_d },
-> +        { NULL,                 gen_helper_vlsh_v_h,
-> +          gen_helper_vlsh_v_w,  gen_helper_vlsh_v_d },
-> +        { NULL,                 NULL,
-> +          gen_helper_vlsw_v_w,  gen_helper_vlsw_v_d },
-> +        { gen_helper_vlse_v_b,  gen_helper_vlse_v_h,
-> +          gen_helper_vlse_v_w,  gen_helper_vlse_v_d },
-> +        { gen_helper_vlsbu_v_b, gen_helper_vlsbu_v_h,
-> +          gen_helper_vlsbu_v_w, gen_helper_vlsbu_v_d },
-> +        { NULL,                 gen_helper_vlshu_v_h,
-> +          gen_helper_vlshu_v_w, gen_helper_vlshu_v_d },
-> +        { NULL,                 NULL,
-> +          gen_helper_vlswu_v_w, gen_helper_vlswu_v_d },
-> +    };
-> +
-> +    fn =3D  fns[seq][s->sew];
-> +    if (fn =3D=3D NULL) {
-> +        return false;
-> +    }
-> +
-> +    data =3D FIELD_DP32(data, VDATA, MLEN, s->mlen);
-> +    data =3D FIELD_DP32(data, VDATA, VM, a->vm);
-> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data =3D FIELD_DP32(data, VDATA, NF, a->nf);
-> +    return ldst_stride_trans(a->rd, a->rs1, a->rs2, data, fn, s);
-> +}
-> +
-> +static bool ld_stride_check(DisasContext *s, arg_rnfvm* a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_nf(s, a->nf));
-> +}
-> +
-> +GEN_VEXT_TRANS(vlsb_v, 0, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlsh_v, 1, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlsw_v, 2, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlse_v, 3, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlsbu_v, 4, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlshu_v, 5, rnfvm, ld_stride_op, ld_stride_check)
-> +GEN_VEXT_TRANS(vlswu_v, 6, rnfvm, ld_stride_op, ld_stride_check)
-> +
-> +static bool st_stride_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
-> +{
-> +    uint32_t data =3D 0;
-> +    gen_helper_ldst_stride *fn;
-> +    static gen_helper_ldst_stride * const fns[4][4] =3D {
-> +        /* masked stride store */
-> +        { gen_helper_vssb_v_b,  gen_helper_vssb_v_h,
-> +          gen_helper_vssb_v_w,  gen_helper_vssb_v_d },
-> +        { NULL,                 gen_helper_vssh_v_h,
-> +          gen_helper_vssh_v_w,  gen_helper_vssh_v_d },
-> +        { NULL,                 NULL,
-> +          gen_helper_vssw_v_w,  gen_helper_vssw_v_d },
-> +        { gen_helper_vsse_v_b,  gen_helper_vsse_v_h,
-> +          gen_helper_vsse_v_w,  gen_helper_vsse_v_d }
-> +    };
-> +
-> +    data =3D FIELD_DP32(data, VDATA, MLEN, s->mlen);
-> +    data =3D FIELD_DP32(data, VDATA, VM, a->vm);
-> +    data =3D FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data =3D FIELD_DP32(data, VDATA, NF, a->nf);
-> +    fn =3D  fns[seq][s->sew];
-> +    if (fn =3D=3D NULL) {
-> +        return false;
-> +    }
-> +
-> +    return ldst_stride_trans(a->rd, a->rs1, a->rs2, data, fn, s);
-> +}
-> +
-> +static bool st_stride_check(DisasContext *s, arg_rnfvm* a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_nf(s, a->nf));
-> +}
-> +
-> +GEN_VEXT_TRANS(vssb_v, 0, rnfvm, st_stride_op, st_stride_check)
-> +GEN_VEXT_TRANS(vssh_v, 1, rnfvm, st_stride_op, st_stride_check)
-> +GEN_VEXT_TRANS(vssw_v, 2, rnfvm, st_stride_op, st_stride_check)
-> +GEN_VEXT_TRANS(vsse_v, 3, rnfvm, st_stride_op, st_stride_check)
-
-Looks good
-
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index af07ac4160..852545b77e 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -61,6 +61,7 @@ typedef struct DisasContext {
->      uint8_t lmul;
->      uint8_t sew;
->      uint16_t vlen;
-> +    uint16_t mlen;
->      bool vl_eq_vlmax;
->  } DisasContext;
->
-> @@ -548,6 +549,11 @@ static void decode_RV32_64C(DisasContext *ctx, uint1=
-6_t opcode)
->      }
+>  	mutex_unlock(&iommu->lock);
+>  	return ret;
 >  }
->
-> +static int ex_plus_1(DisasContext *ctx, int nf)
-> +{
-> +    return nf + 1;
-> +}
-> +
->  #define EX_SH(amount) \
->      static int ex_shift_##amount(DisasContext *ctx, int imm) \
->      {                                         \
-> @@ -784,6 +790,7 @@ static void riscv_tr_init_disas_context(DisasContextB=
-ase *dcbase, CPUState *cs)
->      ctx->vill =3D FIELD_EX32(tb_flags, TB_FLAGS, VILL);
->      ctx->sew =3D FIELD_EX32(tb_flags, TB_FLAGS, SEW);
->      ctx->lmul =3D FIELD_EX32(tb_flags, TB_FLAGS, LMUL);
-> +    ctx->mlen =3D 1 << (ctx->sew  + 3 - ctx->lmul);
->      ctx->vl_eq_vlmax =3D FIELD_EX32(tb_flags, TB_FLAGS, VL_EQ_VLMAX);
+> @@ -2176,6 +2241,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  		vfio_iommu_iova_free(&iova_copy);
+>  
+>  detach_group_done:
+> +	update_pinned_page_dirty_scope(iommu);
+
+We only need to do this if the group we're removing does not have
+pinned page dirty scope, right?  I think we have all the info here to
+make that optimization.
+
+>  	mutex_unlock(&iommu->lock);
 >  }
->
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index 2afe716f2a..ebfabd2946 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -18,8 +18,10 @@
->
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> +#include "exec/memop.h"
->  #include "exec/exec-all.h"
->  #include "exec/helper-proto.h"
-> +#include "tcg/tcg-gvec-desc.h"
->  #include <math.h>
->
->  target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
-> @@ -51,3 +53,407 @@ target_ulong HELPER(vsetvl)(CPURISCVState *env, targe=
-t_ulong s1,
->      env->vstart =3D 0;
->      return vl;
->  }
-> +
-> +/*
-> + * Note that vector data is stored in host-endian 64-bit chunks,
-> + * so addressing units smaller than that needs a host-endian fixup.
-> + */
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +#define H1(x)   ((x) ^ 7)
-> +#define H1_2(x) ((x) ^ 6)
-> +#define H1_4(x) ((x) ^ 4)
-> +#define H2(x)   ((x) ^ 3)
-> +#define H4(x)   ((x) ^ 1)
-> +#define H8(x)   ((x))
-> +#else
-> +#define H1(x)   (x)
-> +#define H1_2(x) (x)
-> +#define H1_4(x) (x)
-> +#define H2(x)   (x)
-> +#define H4(x)   (x)
-> +#define H8(x)   (x)
-> +#endif
+>  
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index e42a711a2800..da29802d6276 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -72,7 +72,9 @@ struct vfio_iommu_driver_ops {
+>  					struct iommu_group *group);
+>  	void		(*detach_group)(void *iommu_data,
+>  					struct iommu_group *group);
+> -	int		(*pin_pages)(void *iommu_data, unsigned long *user_pfn,
+> +	int		(*pin_pages)(void *iommu_data,
+> +				     struct iommu_group *group,
+> +				     unsigned long *user_pfn,
+>  				     int npage, int prot,
+>  				     unsigned long *phys_pfn);
+>  	int		(*unpin_pages)(void *iommu_data,
 
-Looks good. Overall this looks good. Do you mind splitting this patch
-up a little bit more? It's difficult to review such a long and complex
-patch.
-
-Alistair
-
-> +
-> +static inline uint32_t vext_nf(uint32_t desc)
-> +{
-> +    return FIELD_EX32(simd_data(desc), VDATA, NF);
-> +}
-> +
-> +static inline uint32_t vext_mlen(uint32_t desc)
-> +{
-> +    return FIELD_EX32(simd_data(desc), VDATA, MLEN);
-> +}
-> +
-> +static inline uint32_t vext_vm(uint32_t desc)
-> +{
-> +    return FIELD_EX32(simd_data(desc), VDATA, VM);
-> +}
-> +
-> +static inline uint32_t vext_lmul(uint32_t desc)
-> +{
-> +    return FIELD_EX32(simd_data(desc), VDATA, LMUL);
-> +}
-> +
-> +/*
-> + * Get vector group length in bytes. Its range is [64, 2048].
-> + *
-> + * As simd_desc support at most 256, the max vlen is 512 bits.
-> + * So vlen in bytes is encoded as maxsz.
-> + */
-> +static inline uint32_t vext_maxsz(uint32_t desc)
-> +{
-> +    return simd_maxsz(desc) << vext_lmul(desc);
-> +}
-> +
-> +/*
-> + * This function checks watchpoint before real load operation.
-> + *
-> + * In softmmu mode, the TLB API probe_access is enough for watchpoint ch=
-eck.
-> + * In user mode, there is no watchpoint support now.
-> + *
-> + * It will trigger an exception if there is no mapping in TLB
-> + * and page table walk can't fill the TLB entry. Then the guest
-> + * software can return here after process the exception or never return.
-> + */
-> +static void probe_pages(CPURISCVState *env, target_ulong addr,
-> +        target_ulong len, uintptr_t ra, MMUAccessType access_type)
-> +{
-> +    target_ulong pagelen =3D -(addr | TARGET_PAGE_MASK);
-> +    target_ulong curlen =3D MIN(pagelen, len);
-> +
-> +    probe_access(env, addr, curlen, access_type,
-> +            cpu_mmu_index(env, false), ra);
-> +    if (len > curlen) {
-> +        addr +=3D curlen;
-> +        curlen =3D len - curlen;
-> +        probe_access(env, addr, curlen, access_type,
-> +                cpu_mmu_index(env, false), ra);
-> +    }
-> +}
-> +
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +static void vext_clear(void *tail, uint32_t cnt, uint32_t tot)
-> +{
-> +    /*
-> +     * Split the remaining range to two parts.
-> +     * The first part is in the last uint64_t unit.
-> +     * The second part start from the next uint64_t unit.
-> +     */
-> +    int part1 =3D 0, part2 =3D tot - cnt;
-> +    if (cnt % 8) {
-> +        part1 =3D 8 - (cnt % 8);
-> +        part2 =3D tot - cnt - part1;
-> +        memset(tail & ~(7ULL), 0, part1);
-> +        memset((tail + 8) & ~(7ULL), 0, part2);
-> +    } else {
-> +        memset(tail, 0, part2);
-> +    }
-> +}
-> +#else
-> +static void vext_clear(void *tail, uint32_t cnt, uint32_t tot)
-> +{
-> +    memset(tail, 0, tot - cnt);
-> +}
-> +#endif
-> +
-> +static void clearb(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-> +{
-> +    int8_t *cur =3D ((int8_t *)vd + H1(idx));
-> +    vext_clear(cur, cnt, tot);
-> +}
-> +
-> +static void clearh(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-> +{
-> +    int16_t *cur =3D ((int16_t *)vd + H2(idx));
-> +    vext_clear(cur, cnt, tot);
-> +}
-> +
-> +static void clearl(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-> +{
-> +    int32_t *cur =3D ((int32_t *)vd + H4(idx));
-> +    vext_clear(cur, cnt, tot);
-> +}
-> +
-> +static void clearq(void *vd, uint32_t idx, uint32_t cnt, uint32_t tot)
-> +{
-> +    int64_t *cur =3D (int64_t *)vd + idx;
-> +    vext_clear(cur, cnt, tot);
-> +}
-> +
-> +
-> +static inline int vext_elem_mask(void *v0, int mlen, int index)
-> +{
-> +    int idx =3D (index * mlen) / 64;
-> +    int pos =3D (index * mlen) % 64;
-> +    return (((uint64_t *)v0)[idx] >> pos) & 1;
-> +}
-> +
-> +/* elements operations for load and store */
-> +typedef void (*vext_ldst_elem_fn)(CPURISCVState *env, target_ulong addr,
-> +        uint32_t idx, void *vd, uintptr_t retaddr);
-> +typedef void (*vext_ld_clear_elem)(void *vd, uint32_t idx,
-> +        uint32_t cnt, uint32_t tot);
-> +
-> +#define GEN_VEXT_LD_ELEM(NAME, MTYPE, ETYPE, H, LDSUF)     \
-> +static void NAME(CPURISCVState *env, abi_ptr addr,         \
-> +        uint32_t idx, void *vd, uintptr_t retaddr)         \
-> +{                                                          \
-> +    MTYPE data;                                            \
-> +    ETYPE *cur =3D ((ETYPE *)vd + H(idx));                   \
-> +    data =3D cpu_##LDSUF##_data_ra(env, addr, retaddr);      \
-> +    *cur =3D data;                                           \
-> +}                                                          \
-> +
-> +GEN_VEXT_LD_ELEM(ldb_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(ldb_h, int8_t,  int16_t, H2, ldsb)
-> +GEN_VEXT_LD_ELEM(ldb_w, int8_t,  int32_t, H4, ldsb)
-> +GEN_VEXT_LD_ELEM(ldb_d, int8_t,  int64_t, H8, ldsb)
-> +GEN_VEXT_LD_ELEM(ldh_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(ldh_w, int16_t, int32_t, H4, ldsw)
-> +GEN_VEXT_LD_ELEM(ldh_d, int16_t, int64_t, H8, ldsw)
-> +GEN_VEXT_LD_ELEM(ldw_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(ldw_d, int32_t, int64_t, H8, ldl)
-> +GEN_VEXT_LD_ELEM(lde_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(lde_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(lde_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(lde_d, int64_t, int64_t, H8, ldq)
-> +GEN_VEXT_LD_ELEM(ldbu_b, uint8_t,  uint8_t,  H1, ldub)
-> +GEN_VEXT_LD_ELEM(ldbu_h, uint8_t,  uint16_t, H2, ldub)
-> +GEN_VEXT_LD_ELEM(ldbu_w, uint8_t,  uint32_t, H4, ldub)
-> +GEN_VEXT_LD_ELEM(ldbu_d, uint8_t,  uint64_t, H8, ldub)
-> +GEN_VEXT_LD_ELEM(ldhu_h, uint16_t, uint16_t, H2, lduw)
-> +GEN_VEXT_LD_ELEM(ldhu_w, uint16_t, uint32_t, H4, lduw)
-> +GEN_VEXT_LD_ELEM(ldhu_d, uint16_t, uint64_t, H8, lduw)
-> +GEN_VEXT_LD_ELEM(ldwu_w, uint32_t, uint32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(ldwu_d, uint32_t, uint64_t, H8, ldl)
-> +
-> +#define GEN_VEXT_ST_ELEM(NAME, ETYPE, H, STSUF)          \
-> +static void NAME(CPURISCVState *env, abi_ptr addr,       \
-> +        uint32_t idx, void *vd, uintptr_t retaddr)       \
-> +{                                                        \
-> +    ETYPE data =3D *((ETYPE *)vd + H(idx));                \
-> +    cpu_##STSUF##_data_ra(env, addr, data, retaddr);     \
-> +}
-> +GEN_VEXT_ST_ELEM(stb_b, int8_t,  H1, stb)
-> +GEN_VEXT_ST_ELEM(stb_h, int16_t, H2, stb)
-> +GEN_VEXT_ST_ELEM(stb_w, int32_t, H4, stb)
-> +GEN_VEXT_ST_ELEM(stb_d, int64_t, H8, stb)
-> +GEN_VEXT_ST_ELEM(sth_h, int16_t, H2, stw)
-> +GEN_VEXT_ST_ELEM(sth_w, int32_t, H4, stw)
-> +GEN_VEXT_ST_ELEM(sth_d, int64_t, H8, stw)
-> +GEN_VEXT_ST_ELEM(stw_w, int32_t, H4, stl)
-> +GEN_VEXT_ST_ELEM(stw_d, int64_t, H8, stl)
-> +GEN_VEXT_ST_ELEM(ste_b, int8_t,  H1, stb)
-> +GEN_VEXT_ST_ELEM(ste_h, int16_t, H2, stw)
-> +GEN_VEXT_ST_ELEM(ste_w, int32_t, H4, stl)
-> +GEN_VEXT_ST_ELEM(ste_d, int64_t, H8, stq)
-> +
-> +/*
-> + *** stride: access vector element from strided memory
-> + */
-> +static void vext_ldst_stride(void *vd, void *v0, target_ulong base,
-> +        target_ulong stride, CPURISCVState *env, uint32_t desc, uint32_t=
- vm,
-> +        vext_ldst_elem_fn ldst_elem, vext_ld_clear_elem clear_elem,
-> +        uint32_t esz, uint32_t msz, uintptr_t ra, MMUAccessType access_t=
-ype)
-> +{
-> +    uint32_t i, k;
-> +    uint32_t nf =3D vext_nf(desc);
-> +    uint32_t mlen =3D vext_mlen(desc);
-> +    uint32_t vlmax =3D vext_maxsz(desc) / esz;
-> +
-> +    if (env->vl =3D=3D 0) {
-> +        return;
-> +    }
-> +    /* probe every access*/
-> +    for (i =3D 0; i < env->vl; i++) {
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        probe_pages(env, base + stride * i, nf * msz, ra, access_type);
-> +    }
-> +    /* do real access */
-> +    for (i =3D 0; i < env->vl; i++) {
-> +        k =3D 0;
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        while (k < nf) {
-> +            target_ulong addr =3D base + stride * i + k * msz;
-> +            ldst_elem(env, addr, i + k * vlmax, vd, ra);
-> +            k++;
-> +        }
-> +    }
-> +    /* clear tail elements */
-> +    if (clear_elem) {
-> +        for (k =3D 0; k < nf; k++) {
-> +            clear_elem(vd, env->vl + k * vlmax, env->vl * esz, vlmax * e=
-sz);
-> +        }
-> +    }
-> +}
-> +
-> +#define GEN_VEXT_LD_STRIDE(NAME, MTYPE, ETYPE, LOAD_FN, CLEAR_FN)       =
-\
-> +void HELPER(NAME)(void *vd, void * v0, target_ulong base,               =
-\
-> +        target_ulong stride, CPURISCVState *env, uint32_t desc)         =
-\
-> +{                                                                       =
-\
-> +    uint32_t vm =3D vext_vm(desc);                                      =
-  \
-> +    vext_ldst_stride(vd, v0, base, stride, env, desc, vm, LOAD_FN,      =
-\
-> +        CLEAR_FN, sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_LOAD);=
-\
-> +}
-> +
-> +GEN_VEXT_LD_STRIDE(vlsb_v_b,  int8_t,   int8_t,   ldb_b,  clearb)
-> +GEN_VEXT_LD_STRIDE(vlsb_v_h,  int8_t,   int16_t,  ldb_h,  clearh)
-> +GEN_VEXT_LD_STRIDE(vlsb_v_w,  int8_t,   int32_t,  ldb_w,  clearl)
-> +GEN_VEXT_LD_STRIDE(vlsb_v_d,  int8_t,   int64_t,  ldb_d,  clearq)
-> +GEN_VEXT_LD_STRIDE(vlsh_v_h,  int16_t,  int16_t,  ldh_h,  clearh)
-> +GEN_VEXT_LD_STRIDE(vlsh_v_w,  int16_t,  int32_t,  ldh_w,  clearl)
-> +GEN_VEXT_LD_STRIDE(vlsh_v_d,  int16_t,  int64_t,  ldh_d,  clearq)
-> +GEN_VEXT_LD_STRIDE(vlsw_v_w,  int32_t,  int32_t,  ldw_w,  clearl)
-> +GEN_VEXT_LD_STRIDE(vlsw_v_d,  int32_t,  int64_t,  ldw_d,  clearq)
-> +GEN_VEXT_LD_STRIDE(vlse_v_b,  int8_t,   int8_t,   lde_b,  clearb)
-> +GEN_VEXT_LD_STRIDE(vlse_v_h,  int16_t,  int16_t,  lde_h,  clearh)
-> +GEN_VEXT_LD_STRIDE(vlse_v_w,  int32_t,  int32_t,  lde_w,  clearl)
-> +GEN_VEXT_LD_STRIDE(vlse_v_d,  int64_t,  int64_t,  lde_d,  clearq)
-> +GEN_VEXT_LD_STRIDE(vlsbu_v_b, uint8_t,  uint8_t,  ldbu_b, clearb)
-> +GEN_VEXT_LD_STRIDE(vlsbu_v_h, uint8_t,  uint16_t, ldbu_h, clearh)
-> +GEN_VEXT_LD_STRIDE(vlsbu_v_w, uint8_t,  uint32_t, ldbu_w, clearl)
-> +GEN_VEXT_LD_STRIDE(vlsbu_v_d, uint8_t,  uint64_t, ldbu_d, clearq)
-> +GEN_VEXT_LD_STRIDE(vlshu_v_h, uint16_t, uint16_t, ldhu_h, clearh)
-> +GEN_VEXT_LD_STRIDE(vlshu_v_w, uint16_t, uint32_t, ldhu_w, clearl)
-> +GEN_VEXT_LD_STRIDE(vlshu_v_d, uint16_t, uint64_t, ldhu_d, clearq)
-> +GEN_VEXT_LD_STRIDE(vlswu_v_w, uint32_t, uint32_t, ldwu_w, clearl)
-> +GEN_VEXT_LD_STRIDE(vlswu_v_d, uint32_t, uint64_t, ldwu_d, clearq)
-> +
-> +#define GEN_VEXT_ST_STRIDE(NAME, MTYPE, ETYPE, STORE_FN)                =
-\
-> +void HELPER(NAME)(void *vd, void *v0, target_ulong base,                =
-\
-> +        target_ulong stride, CPURISCVState *env, uint32_t desc)         =
-\
-> +{                                                                       =
-\
-> +    uint32_t vm =3D vext_vm(desc);                                      =
-  \
-> +    vext_ldst_stride(vd, v0, base, stride, env, desc, vm, STORE_FN,     =
-\
-> +        NULL, sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_STORE);   =
-\
-> +}
-> +
-> +GEN_VEXT_ST_STRIDE(vssb_v_b, int8_t,  int8_t,  stb_b)
-> +GEN_VEXT_ST_STRIDE(vssb_v_h, int8_t,  int16_t, stb_h)
-> +GEN_VEXT_ST_STRIDE(vssb_v_w, int8_t,  int32_t, stb_w)
-> +GEN_VEXT_ST_STRIDE(vssb_v_d, int8_t,  int64_t, stb_d)
-> +GEN_VEXT_ST_STRIDE(vssh_v_h, int16_t, int16_t, sth_h)
-> +GEN_VEXT_ST_STRIDE(vssh_v_w, int16_t, int32_t, sth_w)
-> +GEN_VEXT_ST_STRIDE(vssh_v_d, int16_t, int64_t, sth_d)
-> +GEN_VEXT_ST_STRIDE(vssw_v_w, int32_t, int32_t, stw_w)
-> +GEN_VEXT_ST_STRIDE(vssw_v_d, int32_t, int64_t, stw_d)
-> +GEN_VEXT_ST_STRIDE(vsse_v_b, int8_t,  int8_t,  ste_b)
-> +GEN_VEXT_ST_STRIDE(vsse_v_h, int16_t, int16_t, ste_h)
-> +GEN_VEXT_ST_STRIDE(vsse_v_w, int32_t, int32_t, ste_w)
-> +GEN_VEXT_ST_STRIDE(vsse_v_d, int64_t, int64_t, ste_d)
-> +
-> +/*
-> + *** unit-stride: access elements stored contiguously in memory
-> + */
-> +
-> +/* unmasked unit-stride load and store operation*/
-> +static inline void vext_ldst_us(void *vd, target_ulong base,
-> +        CPURISCVState *env, uint32_t desc,
-> +        vext_ldst_elem_fn ldst_elem,
-> +        vext_ld_clear_elem clear_elem,
-> +        uint32_t esz, uint32_t msz, uintptr_t ra,
-> +        MMUAccessType access_type)
-> +{
-> +    uint32_t i, k;
-> +    uint32_t nf =3D vext_nf(desc);
-> +    uint32_t vlmax =3D vext_maxsz(desc) / esz;
-> +
-> +    if (env->vl =3D=3D 0) {
-> +        return;
-> +    }
-> +    /* probe every access */
-> +    probe_pages(env, base, env->vl * nf * msz, ra, access_type);
-> +    /* load bytes from guest memory */
-> +    for (i =3D 0; i < env->vl; i++) {
-> +        k =3D 0;
-> +        while (k < nf) {
-> +            target_ulong addr =3D base + (i * nf + k) * msz;
-> +            ldst_elem(env, addr, i + k * vlmax, vd, ra);
-> +            k++;
-> +        }
-> +    }
-> +    /* clear tail elements */
-> +    if (clear_elem) {
-> +        for (k =3D 0; k < nf; k++) {
-> +            clear_elem(vd, env->vl + k * vlmax, env->vl * esz, vlmax * e=
-sz);
-> +        }
-> +    }
-> +}
-> +
-> +/*
-> + * masked unit-stride load and store operation will be a special case of=
- stride,
-> + * stride =3D NF * sizeof (MTYPE)
-> + */
-> +
-> +#define GEN_VEXT_LD_US(NAME, MTYPE, ETYPE, LOAD_FN, CLEAR_FN)           =
-\
-> +void HELPER(NAME##_mask)(void *vd, void *v0, target_ulong base,         =
-\
-> +        CPURISCVState *env, uint32_t desc)                              =
-\
-> +{                                                                       =
-\
-> +    uint32_t stride =3D vext_nf(desc) * sizeof(MTYPE);                  =
-  \
-> +    vext_ldst_stride(vd, v0, base, stride, env, desc, false, LOAD_FN,   =
-\
-> +        CLEAR_FN, sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_LOAD);=
-\
-> +}                                                                       =
-\
-> +                                                                        =
-\
-> +void HELPER(NAME)(void *vd, void *v0, target_ulong base,                =
-\
-> +        CPURISCVState *env, uint32_t desc)                              =
-\
-> +{                                                                       =
-\
-> +    vext_ldst_us(vd, base, env, desc, LOAD_FN, CLEAR_FN,                =
-\
-> +        sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_LOAD);          =
-\
-> +}
-> +
-> +GEN_VEXT_LD_US(vlb_v_b,  int8_t,   int8_t,   ldb_b,  clearb)
-> +GEN_VEXT_LD_US(vlb_v_h,  int8_t,   int16_t,  ldb_h,  clearh)
-> +GEN_VEXT_LD_US(vlb_v_w,  int8_t,   int32_t,  ldb_w,  clearl)
-> +GEN_VEXT_LD_US(vlb_v_d,  int8_t,   int64_t,  ldb_d,  clearq)
-> +GEN_VEXT_LD_US(vlh_v_h,  int16_t,  int16_t,  ldh_h,  clearh)
-> +GEN_VEXT_LD_US(vlh_v_w,  int16_t,  int32_t,  ldh_w,  clearl)
-> +GEN_VEXT_LD_US(vlh_v_d,  int16_t,  int64_t,  ldh_d,  clearq)
-> +GEN_VEXT_LD_US(vlw_v_w,  int32_t,  int32_t,  ldw_w,  clearl)
-> +GEN_VEXT_LD_US(vlw_v_d,  int32_t,  int64_t,  ldw_d,  clearq)
-> +GEN_VEXT_LD_US(vle_v_b,  int8_t,   int8_t,   lde_b,  clearb)
-> +GEN_VEXT_LD_US(vle_v_h,  int16_t,  int16_t,  lde_h,  clearh)
-> +GEN_VEXT_LD_US(vle_v_w,  int32_t,  int32_t,  lde_w,  clearl)
-> +GEN_VEXT_LD_US(vle_v_d,  int64_t,  int64_t,  lde_d,  clearq)
-> +GEN_VEXT_LD_US(vlbu_v_b, uint8_t,  uint8_t,  ldbu_b, clearb)
-> +GEN_VEXT_LD_US(vlbu_v_h, uint8_t,  uint16_t, ldbu_h, clearh)
-> +GEN_VEXT_LD_US(vlbu_v_w, uint8_t,  uint32_t, ldbu_w, clearl)
-> +GEN_VEXT_LD_US(vlbu_v_d, uint8_t,  uint64_t, ldbu_d, clearq)
-> +GEN_VEXT_LD_US(vlhu_v_h, uint16_t, uint16_t, ldhu_h, clearh)
-> +GEN_VEXT_LD_US(vlhu_v_w, uint16_t, uint32_t, ldhu_w, clearl)
-> +GEN_VEXT_LD_US(vlhu_v_d, uint16_t, uint64_t, ldhu_d, clearq)
-> +GEN_VEXT_LD_US(vlwu_v_w, uint32_t, uint32_t, ldwu_w, clearl)
-> +GEN_VEXT_LD_US(vlwu_v_d, uint32_t, uint64_t, ldwu_d, clearq)
-> +
-> +#define GEN_VEXT_ST_US(NAME, MTYPE, ETYPE, STORE_FN)                    =
-\
-> +void HELPER(NAME##_mask)(void *vd, void *v0, target_ulong base,         =
-\
-> +        CPURISCVState *env, uint32_t desc)                              =
-\
-> +{                                                                       =
-\
-> +    uint32_t stride =3D vext_nf(desc) * sizeof(MTYPE);                  =
-  \
-> +    vext_ldst_stride(vd, v0, base, stride, env, desc, false, STORE_FN,  =
-\
-> +        NULL, sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_STORE);   =
-\
-> +}                                                                       =
-\
-> +                                                                        =
-\
-> +void HELPER(NAME)(void *vd, void *v0, target_ulong base,                =
-\
-> +        CPURISCVState *env, uint32_t desc)                              =
-\
-> +{                                                                       =
-\
-> +    vext_ldst_us(vd, base, env, desc, STORE_FN, NULL,                   =
-\
-> +        sizeof(ETYPE), sizeof(MTYPE), GETPC(), MMU_DATA_STORE);         =
-\
-> +}
-> +
-> +GEN_VEXT_ST_US(vsb_v_b, int8_t,  int8_t , stb_b)
-> +GEN_VEXT_ST_US(vsb_v_h, int8_t,  int16_t, stb_h)
-> +GEN_VEXT_ST_US(vsb_v_w, int8_t,  int32_t, stb_w)
-> +GEN_VEXT_ST_US(vsb_v_d, int8_t,  int64_t, stb_d)
-> +GEN_VEXT_ST_US(vsh_v_h, int16_t, int16_t, sth_h)
-> +GEN_VEXT_ST_US(vsh_v_w, int16_t, int32_t, sth_w)
-> +GEN_VEXT_ST_US(vsh_v_d, int16_t, int64_t, sth_d)
-> +GEN_VEXT_ST_US(vsw_v_w, int32_t, int32_t, stw_w)
-> +GEN_VEXT_ST_US(vsw_v_d, int32_t, int64_t, stw_d)
-> +GEN_VEXT_ST_US(vse_v_b, int8_t,  int8_t , ste_b)
-> +GEN_VEXT_ST_US(vse_v_h, int16_t, int16_t, ste_h)
-> +GEN_VEXT_ST_US(vse_v_w, int32_t, int32_t, ste_w)
-> +GEN_VEXT_ST_US(vse_v_d, int64_t, int64_t, ste_d)
-> --
-> 2.23.0
->
 
