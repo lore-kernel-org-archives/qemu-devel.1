@@ -2,100 +2,84 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60193C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E756C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C7A5206BE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:37:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 267F5206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 16:37:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SXkMetIV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C7A5206BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o2mHRIr3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267F5206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33915 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCnJB-0003bS-BY
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 12:37:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36049)
+	id 1jCnJL-0003sX-AY
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 12:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jCnHj-0001yb-87
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:35:44 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jCnIM-0002Vy-R8
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jCnHg-0000P1-V9
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:35:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56325
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCnHg-0000Ll-RC
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:35:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584117340;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ydkFaQ6HWDnOmhWTy3Ayfm89ZRA5mGgO0FgQtAUwKO4=;
- b=SXkMetIVBn2i7QdLMc4UXxf03NkY+ZpMF7Rx1iV59RqpZ+tFsL2ttiGwIN5M33WlySowIM
- NvZzee9jLfnzQEqk7nuhLEsp4W+Zry1kxagc75yeAgaOhnmxahddbAdXbqZUBD1tVDMp/t
- zGlHtxjODY7QZFXXgpl9Gu0V26vJMoU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166--4k17SNEPkykEE6xoRUcAQ-1; Fri, 13 Mar 2020 12:35:23 -0400
-X-MC-Unique: -4k17SNEPkykEE6xoRUcAQ-1
-Received: by mail-wr1-f69.google.com with SMTP id b11so4545602wru.21
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 09:35:23 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jCnIL-00028W-Gd
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:36:22 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:51500)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jCnIL-00025I-9O
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 12:36:21 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id a132so10703112wme.1
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 09:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=PjPArpij9CHiSdkRHfeUwTYaHoGk21oZ1d/rkTCBO/k=;
+ b=o2mHRIr3Z9240oZZXcmfkkYVA5+CUvcofcMeIrZGZVXLb9s0vUvvXW9HJsfwpg+psT
+ 62Y1OS9yjvFkhxmcMxcIGh/CxQbzui0HIEt+OQDrD/pTefoRxVlcrFt/woqmgT1nEdS9
+ /5qDnOp95B+XrSa/OMNW8PCerso73ohzKtMWhBGvYIAaj+QUaV65UqcOgQyt9pmJ0W3U
+ W7i3CxbCt/p/iiU7rvkzZ2by7iTRphNN5MSaks3lV7CuZ3EjFwKaobErwSStldNbeMar
+ omHQqeH7UxoqmhetNYnGC+YHuUhMJ2dX828pemg85GUN9ADKUBhK+abOSFG8IJ2FxEbd
+ Wvrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=dxLTxNr05a/f3DhSwzgbOALYF9tvIKTm8VfVQlXaGqk=;
- b=POnf8/4enXIR4O3UZm0doCHPuvRq2PcqgJJx24j1MpNZbkwCSjifStQeiwW8vph5nQ
- Yh/HpOYLzADgsF6v3TqH9kGIZXvG4JWz4WPm2YNplfqBYcWX9SzQ/nwIUUo/+1DjjBmg
- pjg7BeKH+JA2BNbuYRcj876mCe2OKSZV08LmpIJhQywc9pPttYm6W07fcUHdBcfSEdR6
- pEbvqq8wKqZFeyfnxGvGiIy8scaloIcBWgto1FucviQAlTTElEilOLyzts+tqcCj8gzv
- SZxnYnQ4m6+BkYrk8gMXxltwF5BNRpuYiNRq94fgYbUrbJCbVvhdmteNpa0jDLyqlvLk
- 77Bw==
-X-Gm-Message-State: ANhLgQ20+IeUgxZyObl3YnV0hhGaKTkFzQY46989E0mAYlhPr4PZz+Ox
- vIchXZ3+RNwZ4Xg11SIMCcHvVKWlIlG34+0ZBxMvylFtHF1PI+dMJQSsTudRlwwjL2wyry0wvTL
- SJcADj5THOMQZHYI=
-X-Received: by 2002:a1c:6885:: with SMTP id d127mr11728621wmc.33.1584117322353; 
- Fri, 13 Mar 2020 09:35:22 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs3aQXEKcdsoA4AgVR2iXPO/SbCaJ/hccdLzdfTT+4fb07gcMWjXI/XvkRvgr6dvzi6xe0T+Q==
-X-Received: by 2002:a1c:6885:: with SMTP id d127mr11728602wmc.33.1584117322058; 
- Fri, 13 Mar 2020 09:35:22 -0700 (PDT)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id k126sm17549516wme.4.2020.03.13.09.35.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Mar 2020 09:35:21 -0700 (PDT)
-Subject: Re: [PATCH 2/3] MAINTAINERS: Adjust maintainer's email
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- qemu-devel@nongnu.org, peter.maydell@linaro.org
-References: <1584061252-16635-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1584061252-16635-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bf500781-f951-c9f2-839b-c9a7684a0dc6@redhat.com>
-Date: Fri, 13 Mar 2020 17:35:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=PjPArpij9CHiSdkRHfeUwTYaHoGk21oZ1d/rkTCBO/k=;
+ b=WXgvMXWXsJXLchXX2s3VrGIlVFqcp/srznG5dlvTUhxvzkl99TfLLGpXCYRVgDdGIw
+ MqoVrvqPkWQ/xUf13zaE232khiCDfNZcF4xWEYTMZTWvhbgs2rHVDsZC1iXlj/+51EJZ
+ BWECN8LSYXuAYbqBSS6D78qUFHueXsSsk5EZLA1wGC2IefjawgwbSfPRK3vFywkoURzr
+ s/DnjXlj2Lys2Us6xagNZHe8VnFe2OuofJpTnsOnxZmmC8B4Z8tPaDGfRV8bJ84viRSm
+ g8An8OCc+Yxv52cyNwCOvoNTzm0VwamBxxajq+oprPiDqpsgHJq4T8FLZRc56ev+RMuV
+ ebtw==
+X-Gm-Message-State: ANhLgQ0C0y3ncwWexmWswHHLVubC/SfevmjFaILaJs0JPA//esAlgs4l
+ P6dzR6Im0Spr6DbzzZ7vxrRZfYi5/ytiQg==
+X-Google-Smtp-Source: ADFU+vtEVt0uSD0WZl3x20TmVwATojPjuM5PnfaOn2f0vGGRzdN6sOMErW5OlSISYyQPsPbT6WCULg==
+X-Received: by 2002:a1c:ac88:: with SMTP id v130mr7755493wme.34.1584117378392; 
+ Fri, 13 Mar 2020 09:36:18 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id z19sm18210993wma.41.2020.03.13.09.36.17
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 13 Mar 2020 09:36:17 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] docs/conf.py: Raise ConfigError for bad Sphinx Python version
+Date: Fri, 13 Mar 2020 16:36:16 +0000
+Message-Id: <20200313163616.30674-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <1584061252-16635-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,110 +91,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/13/20 2:00 AM, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->=20
-> For some longish time I've been using multiple email addresses
-> for mailing list communication, and would like to consolidate it
-> into a single email address that is the most convenient to me.
-> My other emails, from rt-rk.com and wavecomp.com domains remain
-> active and I will respond from them too, if needed, but I would
-> like to manage almost all communication using gmail.com account.
->=20
-> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> ---
->   .mailmap    |  5 +++--
->   MAINTAINERS | 12 ++++++------
->   2 files changed, 9 insertions(+), 8 deletions(-)
->=20
-> diff --git a/.mailmap b/.mailmap
-> index 76154c7..e431d1f 100644
-> --- a/.mailmap
-> +++ b/.mailmap
-> @@ -39,8 +39,9 @@ Julia Suvorova <jusual@mail.ru> Julia Suvorova via Qemu=
--devel <qemu-devel@nongnu
->   Justin Terry (VM) <juterry@microsoft.com> Justin Terry (VM) via Qemu-de=
-vel <qemu-devel@nongnu.org>
->  =20
->   # Next, replace old addresses by a more recent one.
-> -Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@mips.c=
-om>
-> -Aleksandar Markovic <amarkovic@wavecomp.com> <aleksandar.markovic@imgtec=
-.com>
-> +Aleksandar Markovic <aleksandar.m.mail@gmail.com> <aleksandar.markovic@m=
-ips.com>
-> +Aleksandar Markovic <aleksandar.m.mail@gmail.com> <aleksandar.markovic@i=
-mgtec.com>
-> +Aleksandar Markovic <aleksandar.m.mail@gmail.com> <amarkovic@wavecomp.co=
-m>
->   Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
->   Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ib=
-m.com>
->   James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4fba8b8..8411c96 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -209,7 +209,7 @@ F: hw/microblaze/
->   F: disas/microblaze.c
->  =20
->   MIPS TCG CPUs
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   R: Aurelien Jarno <aurelien@aurel32.net>
->   R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->   S: Maintained
-> @@ -1016,7 +1016,7 @@ F: hw/display/jazz_led.c
->   F: hw/dma/rc4030.c
->  =20
->   Malta
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->   R: Aurelien Jarno <aurelien@aurel32.net>
->   S: Maintained
-> @@ -1029,14 +1029,14 @@ F: tests/acceptance/linux_ssh_mips_malta.py
->   F: tests/acceptance/machine_mips_malta.py
->  =20
->   Mipssim
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->   S: Odd Fixes
->   F: hw/mips/mips_mipssim.c
->   F: hw/net/mipsnet.c
->  =20
->   R4000
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   R: Aurelien Jarno <aurelien@aurel32.net>
->   R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->   S: Obsolete
-> @@ -1044,7 +1044,7 @@ F: hw/mips/mips_r4k.c
->  =20
->   Fulong 2E
->   M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   S: Odd Fixes
->   F: hw/mips/mips_fulong2e.c
->   F: hw/isa/vt82c686.c
-> @@ -2508,7 +2508,7 @@ F: tcg/i386/
->   F: disas/i386.c
->  =20
->   MIPS TCG target
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> +M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->   R: Aurelien Jarno <aurelien@aurel32.net>
->   R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->   S: Maintained
->=20
+Raise ConfigError rather than VersionRequirementError when we detect
+that the Python being used by Sphinx is too old.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Currently the way we flag the Python version problem up to the user
+causes Sphinx to print an unnecessary Python stack trace as well as
+the information about the problem; in most versions of Sphinx this is
+unavoidable.
+
+The upstream Sphinx developers kindly added a feature to allow
+conf.py to report errors to the user without the backtrace:
+  https://github.com/sphinx-doc/sphinx/commit/be608ca2313fc08eb842f3dc19d0f5d2d8227d08
+but the exception type they chose for this was ConfigError.
+
+Switch to ConfigError, which won't make any difference with currently
+deployed Sphinx versions, but will be prettier one day when the user
+is using a Sphinx version with the new feature.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I don't think that commit is in a released Sphinx yet.
+---
+ docs/conf.py | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/docs/conf.py b/docs/conf.py
+index 960043cb860..87b5f07f589 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -29,14 +29,15 @@
+ import os
+ import sys
+ import sphinx
+-from sphinx.errors import VersionRequirementError
++from sphinx.errors import ConfigError
+ 
+ # Make Sphinx fail cleanly if using an old Python, rather than obscurely
+ # failing because some code in one of our extensions doesn't work there.
+-# Unfortunately this doesn't display very neatly (there's an unavoidable
+-# Python backtrace) but at least the information gets printed...
++# In newer versions of Sphinx this will display nicely; in older versions
++# Sphinx will also produce a Python backtrace but at least the information
++# gets printed...
+ if sys.version_info < (3,5):
+-    raise VersionRequirementError(
++    raise ConfigError(
+         "QEMU requires a Sphinx that uses Python 3.5 or better\n")
+ 
+ # The per-manual conf.py will set qemu_docdir for a single-manual build;
+-- 
+2.20.1
 
 
