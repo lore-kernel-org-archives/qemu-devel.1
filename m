@@ -7,83 +7,86 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F24AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 489E3C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:47:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F9F0206E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:45:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16688206E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:47:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZGShbtDv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9F0206E7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VM4bxa6D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16688206E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCpJV-0007Hz-5R
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:45:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59337)
+	id 1jCpKs-0001R9-9U
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:47:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jCpGO-0001i2-Tx
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:42:30 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCpC5-0001Ol-HU
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jCpGK-0005jT-9X
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:42:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50973
+ (envelope-from <philmd@redhat.com>) id 1jCpC4-00050q-Em
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36626
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpGK-0005iX-5D
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:42:24 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCpC4-0004zS-Ax
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:38:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584124943;
+ s=mimecast20190719; t=1584124679;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=icvsAljHCvMOvrCYpqizBXKfThlHp6MVycf3qobY6O0=;
- b=ZGShbtDvIXZBGM9kSuPYsiwpYYVhnSxv8Bf3Zozx6NHk8LoalaKcr+WLfUTs291A6UWp3/
- nLCuCbc9W3w7nrtP6HhRavFawGmucJmrwwVWlxbjZputdLkeye0Z/nHKZk0q2UrRPqtTg9
- cauVttPNGKuxUra1vc77t1OHrQJh0po=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-oFgS-J4_M9uE2arrU2rRFw-1; Fri, 13 Mar 2020 14:42:21 -0400
-X-MC-Unique: oFgS-J4_M9uE2arrU2rRFw-1
-Received: by mail-wr1-f71.google.com with SMTP id c6so4685936wrm.18
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:42:21 -0700 (PDT)
+ bh=JMDYkzt1lBUpYc+oo4cCc5AD+w7GESjUgDgAA86mAF8=;
+ b=VM4bxa6DRv0uNq5P7wk/GXuYvq9XDuaYSHfKILQslr+GNq9SR7Qawv9pl1H1iqY6H8jQQm
+ p/a3rl3ZZkTaHOCyIlzAIxEKjMrPlXyLkf9dxTjuipnkn2e18zIuULy8lcFEc0y8N1lhx/
+ umexmI5HMAsi+VmvxHfMdlrvRpFLlc8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-VRkWHfuEMXekQnZrAjC58g-1; Fri, 13 Mar 2020 14:37:58 -0400
+X-MC-Unique: VRkWHfuEMXekQnZrAjC58g-1
+Received: by mail-wr1-f72.google.com with SMTP id b12so4758883wro.4
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 11:37:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tWYpPXM4ob5O9NHPJVJk5pAHGrKHnH0gc4Gbe7NXkpg=;
- b=ZLyYAJusKGdUKGg0qHoNlpeXaNUAg/YAda8xs7hDa/5HVjnn2bX1mDCzhOo4ftBrps
- hYE/S11CX3Q9UDQanOYoaAFFDM7p94tJr7p32EvCRNXIAwmUg9luaaC4xilYI600/VgD
- 1jHUoz4ZqnbhIba5iFh8jsa4jckUM0xuWIq5nGGMl6PR8TdW6gOnEktnObUJMxNhqpE9
- 50Afnwv7xO+reXhAMCITleeW64qw0cMKf2ljhXvghFh5HkhIfydMfjZ72BoZYGOwJ0G0
- 5qTjcA6xWwu35BWJywgFaVzBlNICkM8s5r6jC3213TMx+HpGnjSRNn0TeJiyoWxXnEv0
- 1Nyg==
-X-Gm-Message-State: ANhLgQ0bIK0ZQGKwjii+hyAB8yhN8ciAjOlYZgh7PSy572hJfg6zuuN0
- PqB284Tpr34/VWULItrmEUAQ3L9IL0K4Zk0TWQ4uX7/7z5lCu4qqRUJCZMQxdKe/+LA1nPu+Vri
- epKaYAicQJWCxopg=
-X-Received: by 2002:a5d:5512:: with SMTP id b18mr18771695wrv.215.1584124940660; 
- Fri, 13 Mar 2020 11:42:20 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs0VUlU5DssYZDnreWuJZwLltrmFuSNqz/2k0gHNsivWnegCyHm4fcmYUDpkxcEbESKsDvhrw==
-X-Received: by 2002:a5d:5512:: with SMTP id b18mr18771675wrv.215.1584124940326; 
- Fri, 13 Mar 2020 11:42:20 -0700 (PDT)
+ bh=IUJwu5mIghgObyHS7qfpHw05F+W1fo3IIale5ma1lsg=;
+ b=VGUH3brrYyImdCzzzt0NPQ2LZt33ThXv6nAYus48ao51ZGSH8JUUPcc1CPADMIYF42
+ GRYf/980taCzc3r2thvhpdpWOzzK2Hbacb7m0Twj0tfXBSslF+jImyO5Nrg8Shf/2f7j
+ vzEMTFxrXotXUJTVPEhfnnVNDlxdXaIos/wu/P6bsrn3mmA0Fvv1Pr2hbZA1fZgCx9w3
+ JR3ImWvy60EmaNDtYx2eyAu2h8Uz/eIeB5MhtKF/ph3yRy3byNwYX03/xulEE7RGHSmZ
+ Bq7nCGRt1lwoYXmpyw3mfPrJYh4k/2LenIoxUaMR1vLp4w4ricALdQ8sY/PCVXziFy17
+ aY+Q==
+X-Gm-Message-State: ANhLgQ3cKJJbzojP79gWFD8iwZQPOHiDspE1qExiloAuuKsYDjqLP7nU
+ WCEfzCzW8s/8/bk1jYbu8mqUuDCVOwOvHuqqftx9AvTzQvQL6Vpzo8wTNZlA+29wc0XKbBHuBCt
+ v8EooiOObwF5iaw0=
+X-Received: by 2002:a05:6000:12d2:: with SMTP id
+ l18mr18412656wrx.240.1584124676641; 
+ Fri, 13 Mar 2020 11:37:56 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuQgtDba68GKbgL+OtxixjWPY6YDPO3kDmuQFbZyGRp3cq7WJ2+l5hb5NCjjxv5ygLu7MTvmw==
+X-Received: by 2002:a05:6000:12d2:: with SMTP id
+ l18mr18412615wrx.240.1584124676447; 
+ Fri, 13 Mar 2020 11:37:56 -0700 (PDT)
 Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id f15sm17861272wmj.25.2020.03.13.11.42.18
+ by smtp.gmail.com with ESMTPSA id l18sm10978168wrr.17.2020.03.13.11.37.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Mar 2020 11:42:19 -0700 (PDT)
+ Fri, 13 Mar 2020 11:37:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/9] qapi/misc: Move query-uuid command with block code
-Date: Fri, 13 Mar 2020 19:41:49 +0100
-Message-Id: <20200313184153.11275-6-philmd@redhat.com>
+Subject: [PATCH 12/14] target/i386: Restrict CpuClass::get_crash_info() to
+ system-mode
+Date: Fri, 13 Mar 2020 19:36:50 +0100
+Message-Id: <20200313183652.10258-13-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200313184153.11275-1-philmd@redhat.com>
-References: <20200313184153.11275-1-philmd@redhat.com>
+In-Reply-To: <20200313183652.10258-1-philmd@redhat.com>
+References: <20200313183652.10258-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -91,8 +94,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,135 +106,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Ben Warren <ben@skyportsystems.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Igor Mammedov <imammedo@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- qapi/block-core.json | 30 ++++++++++++++++++++++++++++++
- qapi/misc.json       | 30 ------------------------------
- block/iscsi.c        |  2 +-
- stubs/uuid.c         |  2 +-
- 4 files changed, 32 insertions(+), 32 deletions(-)
+ target/i386/cpu.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 91586fb1fb..5c3fa6c5d0 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5415,3 +5415,33 @@
- { 'command': 'blockdev-snapshot-delete-internal-sync',
-   'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
-   'returns': 'SnapshotInfo' }
-+
-+##
-+# @UuidInfo:
-+#
-+# Guest UUID information (Universally Unique Identifier).
-+#
-+# @UUID: the UUID of the guest
-+#
-+# Since: 0.14.0
-+#
-+# Notes: If no UUID was specified for the guest, a null UUID is returned.
-+##
-+{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
-+
-+##
-+# @query-uuid:
-+#
-+# Query the guest UUID information.
-+#
-+# Returns: The @UuidInfo for the guest
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-uuid" }
-+# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
-+#
-+##
-+{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true =
-}
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 74cbe253f2..18cd0719f3 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -65,36 +65,6 @@
- ##
- { 'command': 'query-kvm', 'returns': 'KvmInfo' }
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 92fafa2659..a84553e50c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6778,6 +6778,7 @@ static void x86_cpu_register_feature_bit_props(X86CPU=
+ *cpu,
+     x86_cpu_register_bit_prop(cpu, name, w, bitnr);
+ }
 =20
--##
--# @UuidInfo:
--#
--# Guest UUID information (Universally Unique Identifier).
--#
--# @UUID: the UUID of the guest
--#
--# Since: 0.14.0
--#
--# Notes: If no UUID was specified for the guest, a null UUID is returned.
--##
--{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
--
--##
--# @query-uuid:
--#
--# Query the guest UUID information.
--#
--# Returns: The @UuidInfo for the guest
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-uuid" }
--# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
--#
--##
--{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true =
-}
--
- ##
- # @IOThreadInfo:
- #
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 682abd8e09..68ed5cf3f8 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -42,7 +42,7 @@
- #include "qemu/uuid.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-block-core.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "crypto/secret.h"
-diff --git a/stubs/uuid.c b/stubs/uuid.c
-index 67f182fa3a..9ef75fdae4 100644
---- a/stubs/uuid.c
-+++ b/stubs/uuid.c
-@@ -1,5 +1,5 @@
- #include "qemu/osdep.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-block-core.h"
- #include "qemu/uuid.h"
++#if !defined(CONFIG_USER_ONLY)
+ static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
+ {
+     X86CPU *cpu =3D X86_CPU(cs);
+@@ -6821,6 +6822,7 @@ static void x86_cpu_get_crash_info_qom(Object *obj, V=
+isitor *v,
+                                      errp);
+     qapi_free_GuestPanicInformation(panic_info);
+ }
++#endif /* !CONFIG_USER_ONLY */
 =20
- UuidInfo *qmp_query_uuid(Error **errp)
+ static void x86_cpu_initfn(Object *obj)
+ {
+@@ -6866,8 +6868,10 @@ static void x86_cpu_initfn(Object *obj)
+                         x86_cpu_get_unavailable_features,
+                         NULL, NULL, NULL, &error_abort);
+=20
++#if !defined(CONFIG_USER_ONLY)
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         x86_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL=
+);
++#endif
+=20
+     for (w =3D 0; w < FEATURE_WORDS; w++) {
+         int bitnr;
+@@ -7180,7 +7184,6 @@ static void x86_cpu_common_class_init(ObjectClass *oc=
+, void *data)
+     cc->cpu_exec_interrupt =3D x86_cpu_exec_interrupt;
+ #endif
+     cc->dump_state =3D x86_cpu_dump_state;
+-    cc->get_crash_info =3D x86_cpu_get_crash_info;
+     cc->set_pc =3D x86_cpu_set_pc;
+     cc->synchronize_from_tb =3D x86_cpu_synchronize_from_tb;
+     cc->gdb_read_register =3D x86_cpu_gdb_read_register;
+@@ -7191,6 +7194,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc=
+, void *data)
+     cc->asidx_from_attrs =3D x86_asidx_from_attrs;
+     cc->get_memory_mapping =3D x86_cpu_get_memory_mapping;
+     cc->get_phys_page_attrs_debug =3D x86_cpu_get_phys_page_attrs_debug;
++    cc->get_crash_info =3D x86_cpu_get_crash_info;
+     cc->write_elf64_note =3D x86_cpu_write_elf64_note;
+     cc->write_elf64_qemunote =3D x86_cpu_write_elf64_qemunote;
+     cc->write_elf32_note =3D x86_cpu_write_elf32_note;
 --=20
 2.21.1
 
