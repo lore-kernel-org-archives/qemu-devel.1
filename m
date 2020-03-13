@@ -2,84 +2,80 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C2EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E28C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:33:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3CCB2072C
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:23:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B800920749
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 18:33:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIQKUnDF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3CCB2072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xare2t6L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B800920749
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCoyR-0001wj-Qa
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42327)
+	id 1jCp7r-0006Yv-Vz
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 14:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCoxQ-0001TZ-1N
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:22:53 -0400
+ (envelope-from <alistair23@gmail.com>) id 1jCp76-0005Lw-1B
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCoxO-0001lA-LY
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:22:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27836
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCoxO-0001kL-H8
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:22:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584123769;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=u5pc1o0CYSnkcwssMQCSspofANKey0GbbhNPo8ipDNc=;
- b=WIQKUnDFJ0STG9M9kVQJH4BWJEkb2nK/Y6NdGgRIsdcWknEcEHSQZHremwUjwlBQTbTWJX
- UoUflCEzPvHn7hwv5REp3Ogt9q4ddDF0XkMrKoznOT+6NcMEyaE6tFfWJRJEa9DJBRJoUL
- /yWsmnXqtGaJNUFCxXjaeKijLCyRp3s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-peoWszRbOG6Bf0xYD_6o1A-1; Fri, 13 Mar 2020 14:22:48 -0400
-X-MC-Unique: peoWszRbOG6Bf0xYD_6o1A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 200EA190A7A3;
- Fri, 13 Mar 2020 18:22:47 +0000 (UTC)
-Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B076E5C1B5;
- Fri, 13 Mar 2020 18:22:43 +0000 (UTC)
-Subject: Re: [PATCH v4 7/7] qemu-img: Deprecate use of -b without -F
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20200312192822.3739399-1-eblake@redhat.com>
- <20200312192822.3739399-8-eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <7a5735a8-0003-150a-a332-635a7349f767@redhat.com>
-Date: Fri, 13 Mar 2020 13:22:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <alistair23@gmail.com>) id 1jCp74-000334-6O
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 14:32:51 -0400
+Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:40134)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1jCp73-00031M-23; Fri, 13 Mar 2020 14:32:50 -0400
+Received: by mail-ua1-x942.google.com with SMTP id t20so3914995uao.7;
+ Fri, 13 Mar 2020 11:32:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YeVTQOf6rtHWhmWd6q33ZsNwxEbBRUt5T26QVD7T45E=;
+ b=Xare2t6LOXCCiRVHvD1QaxW41w5cV67Ti/5iUeWqAsue5NTL2d2P7pxUET9o668UFX
+ JUqdVj7tSHn0PghH569qtfAHodeSSaRtFVdXc6fmokfPpTjo83dYKwPl0LXNUVSsuMem
+ ILsviY4rR5xfo73jW3mraymShAulWxaUyvt1jM/eQLvgJK7RHXtBJtCbsPTZ5926z+u+
+ C4Ydl8KdmRoKIsTAakZ6sObY+InLgmMM4vf4mxnAe+GPo4nrRDNRO7K3pIY+c4vO77Wu
+ l6zlLwyzqvwA0SHE/3zFOADWDfxHeH+TEiJmeRQL1CGQjOXIa/7jQ97ezl4T1J2L8hX5
+ NU2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YeVTQOf6rtHWhmWd6q33ZsNwxEbBRUt5T26QVD7T45E=;
+ b=kX5aSh1EgI9ybVx6k2XJYBg7WyMvXE8JKPrTcGOUjB99skBlxxBpcPjlSnWgpvKfdz
+ 6u9cbrlyBR0wZwjiKBISi69fx7h3SlZxJQy4w/U7+fjTKnUd0/2JpeZpThnO9hCLoF3s
+ stg+Rf0NTGRSEC1iDZT+5NPoajETDApmwTyivGOVG8dxZj/BKwxHkzS7uoXmam4/zAkr
+ JqLLet0+Y2yFwJnSxAtZUP2Z0tCpuct81ImHIZTrGfVxmk04MF5DGEKeieDifZkrYtrY
+ euwiwweBxiDYWdthnSyD1qm5j0mg9cAcQm5RUSCOBnnFHhGB9nCUaCTu99kUZ7Akqsyi
+ tEfQ==
+X-Gm-Message-State: ANhLgQ0+ePf1UZwwjdyooTEn1pujJeevUhM426ibhUMN3utHjb5K1kd7
+ 0gXSrQzwCTQFSODPhRm6QtZ3d4NEO3aYfYZZqec=
+X-Google-Smtp-Source: ADFU+vu5f13DtUswJwOEUXBneNM5E60MeXMzyOBDV/MxkvTjesbqkGztkY0f55yEXyyxCzTCcKVkqpJ8C1mE5me4rgg=
+X-Received: by 2002:a9f:3311:: with SMTP id o17mr9495641uab.30.1584124366851; 
+ Fri, 13 Mar 2020 11:32:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200312192822.3739399-8-eblake@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200313005508.1906-1-coreyw7@fb.com>
+ <20200313005508.1906-2-coreyw7@fb.com>
+In-Reply-To: <20200313005508.1906-2-coreyw7@fb.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 13 Mar 2020 11:32:20 -0700
+Message-ID: <CAKmqyKMK+nharq3_FbUFKACjg7yODjT7cg6VTqAWLjQ5U4fhOg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] riscv: sifive_e: Support changing CPU type
+To: Corey Wharton <coreyw7@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::942
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,84 +87,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
- kchamart@redhat.com, libvir-list@redhat.com, mreitz@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/12/20 2:28 PM, Eric Blake wrote:
-> Creating an image that requires format probing of the backing image is
-> inherently unsafe (we've had several CVEs over the years based on
-> probes leaking information to the guest on a subsequent boot, although
-> these days tools like libvirt are aware of the issue enough to prevent
-> the worst effects).  However, if our probing algorithm ever changes,
-> or if other tools like libvirt determine a different probe result than
-> we do, then subsequent use of that backing file under a different
-> format will present corrupted data to the guest.  Start a deprecation
-> clock so that future qemu-img can refuse to create unsafe backing
-> chains that would rely on probing.  The warnings are intentionally
-> emitted from the block layer rather than qemu-img (thus, all paths
-> into image creation or rewriting perform the check).
-> 
-> However, there is one time where probing is safe: if we probe raw,
-> then it is safe to record that implicitly in the image (but we still
-> warn, as it's better to teach the user to supply -F always than to
-> make them guess when it is safe).
-> 
-> iotest 114 specifically wants to create an unsafe image for later
-> amendment rather than defaulting to our new default of recording a
-> probed format, so it needs an update.  While touching it, expand it to
-> cover all of the various warnings enabled by this patch.  iotest 290
-> also shows a change to qcow messages; note that the fact that we now
-> make a probed format of 'raw' explicit now results in a double
-> warning, but no one should be creating new qcow images so it is not
-> worth cleaning up.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On Thu, Mar 12, 2020 at 5:58 PM Corey Wharton <coreyw7@fb.com> wrote:
+>
+> Allows the CPU to be changed from the default via the -cpu command
+> line option.
+>
+> Signed-off-by: Corey Wharton <coreyw7@fb.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
->   docs/system/deprecated.rst | 19 +++++++++++++++++++
-
-Squash this in per Kashyap's v3 review comments:
-
-diff --git i/docs/system/deprecated.rst w/docs/system/deprecated.rst
-index b541d52c7dc0..54a50c45e190 100644
---- i/docs/system/deprecated.rst
-+++ w/docs/system/deprecated.rst
-@@ -388,18 +388,19 @@ qemu-img backing file without format (since 5.0.0)
-  The use of ``qemu-img create``, ``qemu-img rebase``, or ``qemu-img
-  convert`` to create or modify an image that depends on a backing file
-  now recommends that an explicit backing format be provided.  This is
--for safety: if qemu probes a different format than what you thought,
-+for safety: if QEMU probes a different format than what you thought,
-  the data presented to the guest will be corrupt; similarly, presenting
-  a raw image to a guest allows a potential security exploit if a future
--probe sees a non-raw image based on guest writes.  To avoid the
--warning message, or even future refusal to create an unsafe image, you
--must pass ``-o backing_fmt=`` (or the shorthand ``-F`` during create)
--to specify the intended backing format.  You may use ``qemu-img rebase
---u`` to retroactively add a backing format to an existing image.
--However, be aware that there are already potential security risks to
--blindly using ``qemu-img info`` to probe the format of an untrusted
--backing image, when deciding what format to add into an existing
--image.
-+probe sees a non-raw image based on guest writes.
-+
-+To avoid the warning message, or even future refusal to create an
-+unsafe image, you must pass ``-o backing_fmt=`` (or the shorthand
-+``-F`` during create) to specify the intended backing format.  You may
-+use ``qemu-img rebase -u`` to retroactively add a backing format to an
-+existing image.  However, be aware that there are already potential
-+security risks to blindly using ``qemu-img info`` to probe the format
-+of an untrusted backing image, when deciding what format to add into
-+an existing image.
-
-  ``qemu-img convert -n -o`` (since 4.2.0)
-  ''''''''''''''''''''''''''''''''''''''''
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+>  hw/riscv/sifive_e.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index a254cad489..b0a611adb9 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -123,7 +123,7 @@ static void riscv_sifive_e_soc_init(Object *obj)
+>      object_initialize_child(obj, "cpus", &s->cpus,
+>                              sizeof(s->cpus), TYPE_RISCV_HART_ARRAY,
+>                              &error_abort, NULL);
+> -    object_property_set_str(OBJECT(&s->cpus), SIFIVE_E_CPU, "cpu-type",
+> +    object_property_set_str(OBJECT(&s->cpus), ms->cpu_type, "cpu-type",
+>                              &error_abort);
+>      object_property_set_int(OBJECT(&s->cpus), ms->smp.cpus, "num-harts",
+>                              &error_abort);
+> @@ -220,6 +220,7 @@ static void riscv_sifive_e_machine_init(MachineClass *mc)
+>      mc->desc = "RISC-V Board compatible with SiFive E SDK";
+>      mc->init = riscv_sifive_e_init;
+>      mc->max_cpus = 1;
+> +    mc->default_cpu_type = SIFIVE_E_CPU;
+>  }
+>
+>  DEFINE_MACHINE("sifive_e", riscv_sifive_e_machine_init)
+> --
+> 2.21.1
+>
+>
 
