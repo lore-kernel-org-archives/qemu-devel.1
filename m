@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E41C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36452C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:29:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FDC12073E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:28:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FDC12073E
+	by mail.kernel.org (Postfix) with ESMTPS id 095D520724
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 08:29:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095D520724
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCfgE-0004Y0-OD
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 04:28:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57007)
+	id 1jCfhQ-0006Rk-8T
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 04:29:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jCfdC-0000cg-CZ
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:25:23 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jCfcy-0008RO-Qr
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jCfdA-0005Lw-Sx
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:25:22 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:51540
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jCfcx-0004xE-Nu
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 04:25:08 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:51520
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jCfd7-0005Fy-RI; Fri, 13 Mar 2020 04:25:17 -0400
+ id 1jCfcv-0004sW-Fa; Fri, 13 Mar 2020 04:25:05 -0400
 Received: from host86-185-91-43.range86-185.btcentralplus.com ([86.185.91.43]
  helo=kentang.home) by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jCfdO-0007Mr-Kv; Fri, 13 Mar 2020 08:25:40 +0000
+ id 1jCfdH-0007Mr-P2; Fri, 13 Mar 2020 08:25:29 +0000
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: jsnow@redhat.com, philmd@redhat.com, amarkovic@wavecomp.com,
  mst@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
  balaton@eik.bme.hu
-Date: Fri, 13 Mar 2020 08:24:42 +0000
-Message-Id: <20200313082444.2439-6-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 13 Mar 2020 08:24:40 +0000
+Message-Id: <20200313082444.2439-4-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200313082444.2439-1-mark.cave-ayland@ilande.co.uk>
 References: <20200313082444.2439-1-mark.cave-ayland@ilande.co.uk>
@@ -51,7 +51,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.185.91.43
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 5/7] via-ide: initialise IDE controller in legacy mode
+Subject: [PATCH 3/7] pci: Honour wmask when resetting PCI_INTERRUPT_LINE
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
@@ -72,46 +72,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to both the VT82C686B and VT8231 datasheets the VIA Southbridge IDE
-controller is initialised in legacy mode.
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-This allows Linux to correctly determine that legacy rather than PCI IRQ routing
-should be used since the boot console text in the fulong2e test image changes from:
+The pci_do_device_reset() function (called from pci_device_reset)
+clears the PCI_INTERRUPT_LINE config reg of devices on the bus but did
+this without taking wmask into account. We'll have a device model now
+that needs to set a constant value for this reg and this patch allows
+to do that without additional workaround in device emulation to
+reverse the effect of this PCI bus reset function.
 
-scsi0 : pata_via
-scsi1 : pata_via
-ata1: PATA max UDMA/100 cmd 0xffffffffbfd04050 ctl 0xffffffffbfd04062 \
-  bmdma 0xffffffffbfd04040 irq 14
-ata2: PATA max UDMA/100 cmd 0xffffffffbfd04058 ctl 0xffffffffbfd04066 \
-  bmdma 0xffffffffbfd04048 irq 14
-
-to:
-
-scsi0 : pata_via
-scsi1 : pata_via
-ata1: PATA max UDMA/100 cmd 0xffffffffbfd001f0 ctl 0xffffffffbfd003f6 \
-  bmdma 0xffffffffbfd04040 irq 14
-ata2: PATA max UDMA/100 cmd 0xffffffffbfd00170 ctl 0xffffffffbfd00376 \
-  bmdma 0xffffffffbfd04048 irq 15
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Suggested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ide/via.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/pci/pci.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 8363bd4802..c8835de01b 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -167,7 +167,7 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
-     uint8_t *pci_conf = dev->config;
-     int i;
- 
--    pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
-+    pci_config_set_prog_interface(pci_conf, 0x8a); /* legacy mode */
-     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-     dev->wmask[PCI_INTERRUPT_LINE] = 0;
- 
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index e1ed6677e1..b5bc842fac 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -302,8 +302,11 @@ static void pci_do_device_reset(PCIDevice *dev)
+     pci_word_test_and_clear_mask(dev->config + PCI_STATUS,
+                                  pci_get_word(dev->wmask + PCI_STATUS) |
+                                  pci_get_word(dev->w1cmask + PCI_STATUS));
++    /* Some devices make bits of PCI_INTERRUPT_LINE read only */
++    pci_byte_test_and_clear_mask(dev->config + PCI_INTERRUPT_LINE,
++                              pci_get_word(dev->wmask + PCI_INTERRUPT_LINE) |
++                              pci_get_word(dev->w1cmask + PCI_INTERRUPT_LINE));
+     dev->config[PCI_CACHE_LINE_SIZE] = 0x0;
+-    dev->config[PCI_INTERRUPT_LINE] = 0x0;
+     for (r = 0; r < PCI_NUM_REGIONS; ++r) {
+         PCIIORegion *region = &dev->io_regions[r];
+         if (!region->size) {
 -- 
 2.20.1
 
