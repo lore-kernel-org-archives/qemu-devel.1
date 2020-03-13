@@ -2,145 +2,103 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7293FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5363C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:24:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4472D2073E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:23:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4472D2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 720C9206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:24:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HuOo5SpX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 720C9206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jClDl-0003vA-Dd
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:23:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45437)
+	id 1jClEN-0004mo-JK
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:24:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jClD3-0003WX-VK
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:22:46 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jClDc-0003vH-KJ
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jClD2-0005ui-N0
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:22:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63986)
+ (envelope-from <liran.alon@oracle.com>) id 1jClDa-0007YI-7q
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:23:20 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:47880)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jClD2-0005rk-Fj
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:22:44 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02DEMdpA065325
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 10:22:43 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yr125jjpd-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 10:22:42 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 13 Mar 2020 14:22:06 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Mar 2020 14:22:03 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02DEM1dp52690988
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 14:22:01 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 77780A4060;
- Fri, 13 Mar 2020 14:22:01 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 40174A405B;
- Fri, 13 Mar 2020 14:22:01 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Mar 2020 14:22:01 +0000 (GMT)
-Subject: Re: [PATCH v9 09/15] s390x: protvirt: Set guest IPL PSW
-To: Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-10-frankja@linux.ibm.com>
- <20200313135733.634c0008@p-imbrenda>
- <10063e5d-7c4f-da0b-fe20-c8d94c958111@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Fri, 13 Mar 2020 15:22:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jClDZ-0007SR-Un
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:23:18 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DEJXu7048241;
+ Fri, 13 Mar 2020 14:23:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=wYOQNEkO65w4tMQnCURdZSNMWZnjFYSVG5V6BBcmE+0=;
+ b=HuOo5SpXpmxF76P3G19rZOCorjS4WMkeScRdGFHGzXZrvDopAp28bDtKHRBFmF7h5htc
+ aengtQT3GP3jZD94KJt6GAHGg25MaRNmdadTF7O1L+K16ads5gORn96SZGpHRM+HiPKv
+ 6F6NFlH/YWUoiiWlUx998lamLTv84OIY57RJSihJ5Sk3bHf9M+jAF7yoKPA51BZTKqgo
+ wkCvBTP+Le3VXePdZr0pV9PPfC+dPawFaTkQIaTW9I0lsDh8Ab2CqQH8AU74LcQk7Z9Z
+ DMVRCEn+MY9qlOsG3s5Ble9ei4TThd9OVF7hOzSoMNP64ihCN/EJArDOZTSCqTLYwchk wQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2yqtavm3am-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Mar 2020 14:23:15 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02DEJR2B165579;
+ Fri, 13 Mar 2020 14:23:14 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2yqtaw0mmp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Mar 2020 14:23:14 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02DENC61021485;
+ Fri, 13 Mar 2020 14:23:13 GMT
+Received: from [192.168.14.112] (/109.67.207.210)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 13 Mar 2020 07:23:12 -0700
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200312172745.1b7b2222@redhat.com>
+ <8b3f3166-cc60-eae2-c20d-ad4a593c3e30@oracle.com>
+ <20200313110516.6f4ca2b2@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <6430a6e3-b4ba-07e0-7f12-057216066946@oracle.com>
+Date: Fri, 13 Mar 2020 16:23:07 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <10063e5d-7c4f-da0b-fe20-c8d94c958111@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200313110516.6f4ca2b2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031314-0020-0000-0000-000003B3D2BC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031314-0021-0000-0000-0000220C2B46
-Message-Id: <0c99e480-3d2a-41c9-abc1-139b9ed562ee@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-13_05:2020-03-12,
- 2020-03-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- priorityscore=1501 malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=650
- spamscore=0 suspectscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130074
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ bulkscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003130075
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9558
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ suspectscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 adultscore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003130075
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,33 +110,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Elad Gabay <elad.gabay@oracle.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 13/03/2020 12:05, Igor Mammedov wrote:
+> On Thu, 12 Mar 2020 19:28:31 +0200
+> Liran Alon <liran.alon@oracle.com> wrote:
+>
+>> On 12/03/2020 18:27, Igor Mammedov wrote:
+>>> On Wed, 11 Mar 2020 19:08:26 +0200
+>>> Liran Alon <liran.alon@oracle.com> wrote:
+>>>> +
+> [...]
+>>> we typically do not version ACPI table changes (there might be exceptions
+>>> but it should be a justified one).
+>>> ACPI tables are considered to be a part of firmware (even though they are
+>>> generated by QEMU) so on QEMU upgrade user gets a new firmware along with
+>>> new ACPI tables.
+>> Hmm... I would have expected as a QEMU user that upgrading QEMU may
+>> update my firmware exposed table (Such as ACPI),
+>> but only if I don't specify I wish to run on a specific machine-type. In
+>> that case, I would've expect to be exposed with exact same firmware
+>> information.
+> That would be ideal but it's not the case with current QEMU, even with
+> specific machine type user will get new firmware when it's started with
+> upgraded QEMU which usually ships with new firmware.
+>
+> mgmt layer theoretically can take care of maintaining different firmwares
+> on host and explicitly specify which should be used (though I'm not aware
+> of any doing it)
+>
+> another issue with adding flags consistently for every acpi related
+> change would complicate code quite a bit making it hard to read/maintain,
+> hence flags are used only when we have to introduce them (i.e when it
+> would break guest).
+>
+>> I understood that this was one of the main reasons why ACPI/SMBIOS
+>> generation was moved from SeaBIOS to QEMU.
+> If I recall correctly, Michael moved table to QEMU so we won't have to
+> extend ABI for constantly growing ACPI interface and then maintain it
+> forever, which indeed would require using compat machinery for every
+> knob (which is unsustainable).
+>
+> [...]
+>
+Ok. Thanks very much for expressing your opinion.
+So I would just remove flag and submit v2 without it.
 
-On 13.03.20 15:21, Janosch Frank wrote:
-[..]
->>> +    } else {
->>> +        s390_cpu_set_state(S390_CPU_STATE_LOAD, cpu);
->>> +    }
->>>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->>>  }
->>>  #endif
->>
->> I don't understand why you set the state to S390_CPU_STATE_LOAD and
->> then immediately afterwards to S390_CPU_STATE_OPERATING, especially
->> considering that both do the same
->>
-> 
-> Have a look at the specs, wee need to set the load state before setting
-> the cpu to operating.
-> 
-> I can add a comment to make it clearer if you want.
+-Liran
 
-Yes please. I stumbled over this as well before I read the specs.
+
 
 
