@@ -2,82 +2,76 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1CBC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B5AC4CECE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07B1F206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:43:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlnBWd6F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B1F206B7
+	by mail.kernel.org (Postfix) with ESMTPS id A171920746
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:43:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A171920746
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jClWh-00061M-6b
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:43:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35166)
+	id 1jClWr-0006IT-SS
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:43:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60017)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1jClTJ-0000CE-4w
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:39:34 -0400
+ (envelope-from <bounces@canonical.com>) id 1jCkAI-0001j6-SM
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 09:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1jClTI-0006B4-3O
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 10:39:32 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:40714)
+ (envelope-from <bounces@canonical.com>) id 1jCkAH-00061H-3I
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 09:15:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37502)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1jClTH-00067m-U1; Fri, 13 Mar 2020 10:39:32 -0400
-Received: by mail-qk1-x744.google.com with SMTP id m2so12814821qka.7;
- Fri, 13 Mar 2020 07:39:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=44w/yXzypDOsT7HO0jyj2OMeDtD4ttnIYtGEriwFSuc=;
- b=TlnBWd6FmTE86knBjLg7vroxAjkmzetACv+SXTozHvzgA2lf92b5HKu/a8/0omz/KC
- c0d/+zXe67Arp13XN/SoM1cnmPHp+5uqciTehNt5HPJGsI0f8vbG9jxeghvvH1c2747l
- 5+G4aanf99K/H1RKokzro5FJw95HefjOJTEGgNlcStX1owEns63jTsYxpfRwpoO+1A9U
- FQNIiAoh/19fi3CRrPXAJxKakjtw7WRUFIyz+lCDaXnSLvg/9+XkV+XZr5k/hvtyGb0L
- BdE175lRLkqwUol9xC9iIbI8B/LFVE4se9pf2/FUt3bsmelcELxqLfy/6/wTshW8TJ9d
- 0edA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=44w/yXzypDOsT7HO0jyj2OMeDtD4ttnIYtGEriwFSuc=;
- b=LseWe5gQTcGjSl88mG85B3SDdce05Ve+KZx7+NZLkqiWBYxOWCERo/hX+KPL1mkEsk
- 9UTCQF21RyY10EfaRcPIeRd4MCw0M7p2tilSaziE014nn4hFWPYwAcKJQxtK8/aGaXdx
- ZxlfRmDZD+FGJ/rKT6GpoZJptd4EM7f1zUpFs6gYbgFlZDQMO56sqRkdqIagMcbD4hod
- qeayHadiqW/Wj/XCIPAq+xf23DDqzx7YnWB9JgpIJEsWa44DiDjdI8PXHiMWGwkEgKQL
- bltBAEDMO1v1LG4IhvQ8f8S3Iyr8Bj0duAmmFxCO1VmUaalv8f6kb8KN4QWe1NJDli4n
- 65nA==
-X-Gm-Message-State: ANhLgQ1KqR6iwWwvepxfQZr80c5vtQ4qc+1JfqsPZnuznSYQJAZt1vmS
- 0zSf4isL2IHRfHDayNk/8LosGHb+OGolgz8TTsw=
-X-Google-Smtp-Source: ADFU+vtsj11dQDDpuIXzfmmG+DxL1oS6r1O5lhlqPfZUWlf87RTNuXSKLcb4nUhSlvFyemveYds4NOxTdw21QSY5Z/0=
-X-Received: by 2002:a25:84c6:: with SMTP id x6mr5471940ybm.56.1584110370891;
- Fri, 13 Mar 2020 07:39:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jCkAF-0005w0-83
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 09:15:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jCkAA-0004lN-PQ
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 13:15:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B73F72E80AB
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 13:15:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200313005508.1906-1-coreyw7@fb.com>
- <20200313005508.1906-2-coreyw7@fb.com>
-In-Reply-To: <20200313005508.1906-2-coreyw7@fb.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 13 Mar 2020 22:39:20 +0800
-Message-ID: <CAEUhbmVP__C6F8J+c0pcjcqCCp-q1waO=Kgr6k+QAd+3HLnj+A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] riscv: sifive_e: Support changing CPU type
-To: Corey Wharton <coreyw7@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::744
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Mar 2020 13:09:06 -0000
+From: carlosedp <carlosedp@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=david@redhat.com; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: boeroboy carlosedp davidhildenbrand ivmn th-huth
+X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
+X-Launchpad-Bug-Modifier: carlosedp (carlosedp)
+References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
+Message-Id: <158410494615.28539.8403459740910769647.malone@gac.canonical.com>
+Subject: [Bug 1847232] Re: qemu TCG in s390x mode issue with calculating HASH
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9e4b3a75a31aabaeace7730d3a987020996ee635
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Fri, 13 Mar 2020 10:36:05 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,26 +80,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 13, 2020 at 8:57 AM Corey Wharton <coreyw7@fb.com> wrote:
->
-> Allows the CPU to be changed from the default via the -cpu command
-> line option.
->
-> Signed-off-by: Corey Wharton <coreyw7@fb.com>
-> ---
->  hw/riscv/sifive_e.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
+Tried applying the -cpu parameter into Qemu 4.1.1 but I got:
 
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+qemu-system-riscv64: unable to find CPU model 'qemu'
+
+My command is:
+
+qemu-system-riscv64 \
+    -machine virt \
+    -cpu qemu,vx=3Doff \
+    -nographic \
+    -smp 4 \
+    -m 4G \
+    -bios fw_payload.bin \
+    -device virtio-blk-device,drive=3Dhd0 \
+    -object rng-random,filename=3D/dev/urandom,id=3Drng0 \
+    -device virtio-rng-device,rng=3Drng0 \
+    -drive file=3Driscv64-debianrootfs-qemu.qcow2,format=3Dqcow2,id=3Dhd0 \
+    -device virtio-net-device,netdev=3Dusernet \
+    -netdev user,id=3Dusernet,hostfwd=3Dtcp::22222-:22"
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847232
+
+Title:
+  qemu TCG in s390x mode issue with calculating HASH
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  When using go on s390x on Debian x64 (buster) (host) and debian s390x
+  (sid) (guest) I run into the following problem :
+
+  The following occurs while trying to build a custom project :
+
+  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
+  Get
+  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
+0150613233007-fe3947df716e.mod:
+  local error: tls: bad record MAC
+
+  Doing a git bisect I find that this problem only occurs on and after
+  commit 08ef92d556c584c7faf594ff3af46df456276e1b
+
+  Before that commit, all works fine. Past this commit, build always
+  fails.
+
+  Without any proof, It looks like a hash calculation bug related to
+  using z/Arch vector facilities...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
 
