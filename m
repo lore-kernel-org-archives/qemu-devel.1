@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34329C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BDBC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:02:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E39920749
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:02:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E39920749
+	by mail.kernel.org (Postfix) with ESMTPS id B0C47206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:02:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C47206FA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCj1A-0007Zx-7y
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 08:02:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56207)
+	id 1jCj1H-0007kE-Ut
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 08:02:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jCj0O-0006qJ-9I
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:01:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1jCj0O-0006qK-71
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jCj0K-0003PL-H3
+ (envelope-from <bounces@canonical.com>) id 1jCj0K-0003PG-Gx
  for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:01:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51478)
+Received: from indium.canonical.com ([91.189.90.7]:51480)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jCj0J-0003LW-Su
+ id 1jCj0J-0003La-St
  for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:01:28 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jCj0G-0004JD-Jl
+ id 1jCj0G-0004JH-Qa
  for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 12:01:24 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 332522E80CB
+ by loganberry.canonical.com (Postfix) with ESMTP id C63052E80C9
  for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 12:01:24 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Mar 2020 11:42:57 -0000
+Date: Fri, 13 Mar 2020 11:45:59 -0000
 From: John Boero <1847232@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Commenters: boeroboy davidhildenbrand ivmn th-huth
 X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
 X-Launchpad-Bug-Modifier: John Boero (boeroboy)
 References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
-Message-Id: <158409977730.18756.8898708141347821171.malone@chaenomeles.canonical.com>
+Message-Id: <158409995913.28364.13713361453780276271.malone@gac.canonical.com>
 Subject: [Bug 1847232] Re: qemu TCG in s390x mode issue with calculating HASH
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e2a9fb84568a5c36df903141ef05a9f9ad044b9b
+X-Launchpad-Hash: 24a4aeb36e9b7713e70fcf022793ee94e6599d22
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,12 +83,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you so much!  I've been hitting the same issue with s390x.
-
-Maybe an endian issue with hardware vx?
-
-** Bug watch added: github.com/moby/moby/issues #40240
-   https://github.com/moby/moby/issues/40240
+Also affects RISC-V apparently.
+https://github.com/moby/moby/issues/40240
 
 -- =
 
