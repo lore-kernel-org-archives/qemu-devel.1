@@ -6,42 +6,43 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B637C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0457FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60BA92074A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:25:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60BA92074A
+	by mail.kernel.org (Postfix) with ESMTPS id CCD202074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:25:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD202074A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCrni-0002eI-HA
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:25:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46625)
+	id 1jCrny-0003AV-Vn
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:25:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jCrly-0007lx-Mr
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:23:16 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jCrlw-0000Kq-0Q
+ (envelope-from <balaton@eik.bme.hu>) id 1jCrlw-0007hN-Fh
  for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:23:14 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:57645)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <balaton@eik.bme.hu>) id 1jCrlv-0000IL-2v
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:23:12 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:57651)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jCrlr-0008UM-Ec; Fri, 13 Mar 2020 17:23:09 -0400
+ id 1jCrlr-0008Ud-Fl; Fri, 13 Mar 2020 17:23:08 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 019D7747E13;
+ by localhost (Postfix) with SMTP id 03ECA747E1C;
  Fri, 13 Mar 2020 22:23:06 +0100 (CET)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 71609747E04; Fri, 13 Mar 2020 22:23:05 +0100 (CET)
-Message-Id: <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
+ id 778B0747E14; Fri, 13 Mar 2020 22:23:05 +0100 (CET)
+Message-Id: <7679b82b4f26fdb16f00c3b130f8e6a807724f73.1584134074.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1584134074.git.balaton@eik.bme.hu>
 References: <cover.1584134074.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH 2/8] hw/ide: Get rid of piix4_init function
+Subject: [PATCH 3/8] hw/ide: Remove now unneded #include "hw/pci/pci.h" from
+ hw/ide.h
 Date: Fri, 13 Mar 2020 22:14:34 +0100
 To: qemu-devel@nongnu.org,
     qemu-block@nongnu.org
@@ -68,84 +69,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This removes pci_piix4_ide_init() function similar to clean up done to
-other ide devices.
+After previous patches we don't need hw/pci/pci.h any more in
+hw/ide.h. Some files depended on implicit inclusion by this header
+which are also fixed up here.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ide/piix.c    | 12 +-----------
- hw/isa/piix4.c   |  5 ++++-
- include/hw/ide.h |  1 -
- 3 files changed, 5 insertions(+), 13 deletions(-)
+ hw/ide/ahci_internal.h        | 1 +
+ include/hw/ide.h              | 1 -
+ include/hw/ide/pci.h          | 1 +
+ include/hw/misc/macio/macio.h | 1 +
+ 4 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-index 8bcd6b72c2..3b2de4c312 100644
---- a/hw/ide/piix.c
-+++ b/hw/ide/piix.c
-@@ -208,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
-     }
- }
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 73424516da..bab0459774 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -27,6 +27,7 @@
+ #include "hw/ide/ahci.h"
+ #include "hw/ide/internal.h"
+ #include "hw/sysbus.h"
++#include "hw/pci/pci.h"
  
--/* hd_table must contain 4 block drivers */
--/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
--PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
--{
--    PCIDevice *dev;
--
--    dev = pci_create_simple(bus, devfn, "piix4-ide");
--    pci_ide_create_devs(dev, hd_table);
--    return dev;
--}
--
- /* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
- static void piix3_ide_class_init(ObjectClass *klass, void *data)
- {
-@@ -247,6 +236,7 @@ static const TypeInfo piix3_ide_xen_info = {
-     .class_init    = piix3_ide_class_init,
- };
- 
-+/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
- static void piix4_ide_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 7edec5e149..0ab4787658 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -35,6 +35,7 @@
- #include "hw/timer/i8254.h"
- #include "hw/rtc/mc146818rtc.h"
- #include "hw/ide.h"
-+#include "hw/ide/pci.h"
- #include "migration/vmstate.h"
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
-@@ -255,10 +256,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
-         *isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
-     }
- 
-+    pci = pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
-     hd = g_new(DriveInfo *, ide_drives);
-     ide_drive_get(hd, ide_drives);
--    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-+    pci_ide_create_devs(pci, hd);
-     g_free(hd);
-+
-     pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
-     if (smbus) {
-         *smbus = piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
+ #define AHCI_MEM_BAR_SIZE         0x1000
+ #define AHCI_MAX_PORTS            32
 diff --git a/include/hw/ide.h b/include/hw/ide.h
-index 883bbaeb9b..21bd8f23f1 100644
+index 21bd8f23f1..d52c211f32 100644
 --- a/include/hw/ide.h
 +++ b/include/hw/ide.h
-@@ -12,7 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
-                         DriveInfo *hd0, DriveInfo *hd1);
+@@ -2,7 +2,6 @@
+ #define HW_IDE_H
  
- /* ide-pci.c */
--PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
- int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
+ #include "hw/isa/isa.h"
+-#include "hw/pci/pci.h"
+ #include "exec/memory.h"
  
- /* ide-mmio.c */
+ #define MAX_IDE_DEVS	2
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index a9f2c33e68..98ffa7dfcd 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -2,6 +2,7 @@
+ #define HW_IDE_PCI_H
+ 
+ #include "hw/ide/internal.h"
++#include "hw/pci/pci.h"
+ 
+ #define BM_STATUS_DMAING 0x01
+ #define BM_STATUS_ERROR  0x02
+diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+index 070a694eb5..87335a991c 100644
+--- a/include/hw/misc/macio/macio.h
++++ b/include/hw/misc/macio/macio.h
+@@ -27,6 +27,7 @@
+ #define MACIO_H
+ 
+ #include "hw/char/escc.h"
++#include "hw/pci/pci.h"
+ #include "hw/ide/internal.h"
+ #include "hw/intc/heathrow_pic.h"
+ #include "hw/misc/macio/cuda.h"
 -- 
 2.21.1
 
