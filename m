@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A800AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80434C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:40:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F119206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:40:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48DD3206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 14:40:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="QJp5mv80"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F119206B7
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HPmn5hWc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48DD3206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jClUI-0001LZ-Ki
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:40:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60804)
+	id 1jClUY-0001oa-Fx
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 10:40:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=2341787188=bbhushan2@marvell.com>)
- id 1jCf3T-0005sK-5q
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:48:28 -0400
+ id 1jCeYw-0007PB-1T
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:16:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=2341787188=bbhushan2@marvell.com>)
- id 1jCf3S-0001Rw-4Y
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:48:27 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:30980)
+ id 1jCeYu-00061E-T3
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:16:53 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:21802
+ helo=mx0b-0016f401.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=2341787188=bbhushan2@marvell.com>)
- id 1jCf3P-0001Ka-6m; Fri, 13 Mar 2020 03:48:23 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
- by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02D7kdkY020456; Fri, 13 Mar 2020 00:48:20 -0700
+ id 1jCeYr-0005wT-Uc; Fri, 13 Mar 2020 03:16:50 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+ by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02D7Ar5H000993; Fri, 13 Mar 2020 00:16:47 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
  h=from : to : cc :
  subject : date : message-id : mime-version : content-type; s=pfpt0818;
- bh=5x5XWt7UJuZnrVK7KO1KvYL06RXOteeFnKHck+rpKoo=;
- b=QJp5mv80e26+gJ6Tpv9f4df72fcxDsL8hZUnEMzkZrtyCzgFKRsE20L6xxTmaMUx+Yoq
- 5M+fpguaAwy56tHiBz7GQxyA8b/Q2LHkzmen3PINsixuuV9dzWZkN72YXAHr1l3B/+WT
- W4pO6sF7MjF6cWPDPh0xyc+al1ayZtkRcVqxL5CMrE4iFhUVQevqvAUG4Q0TbuN5iH4d
- xJJR+LkvgLjLaVsU/UauREff6ZODlfuO6WhgfH5KeWf/eTspP18BOPWtEDoiNZgvnmeS
- Q85Lr1BAhI+1wcneeH4uIgxPYIPDONdMqzBGNYCDPy7wLqX7hIzvlURnwAUoM/0UhkoZ /w== 
+ bh=t1nHDW03GnsfZ0SAAaMapgUkcZPgjRWuz4lGz3NWJ88=;
+ b=HPmn5hWc7j6oDa3SF51nBnQp1pEWsdLcvHhaHUoYCCjyYIiiejqELIZgC+vqJq8JUOPU
+ 5dsdPxSZnDmk+pCfLuRgawWwDgreCamzn2opAGCMkN+LNvXFbFNaMielos31jw/17tQA
+ kGZ+Gkjdfz/skbj6D8l9+iw2GNC2dO2zKc24d6EBfCLTbVeAg5SKEwV1Da8nKbMqNAN5
+ jKzMdDt6mqc9KagFf179n4OHnckGqYdkFMw74K7gIbnXQ2OXgFiWSTSOP0XKpWu6QszV
+ JRQ+2auUDdif6Q1GpilUy4moscwFjEXP7OfIC/ArkPCuscHs8mvr/wYc4gGw0av42qdz Iw== 
 Received: from sc-exch02.marvell.com ([199.233.58.182])
- by mx0b-0016f401.pphosted.com with ESMTP id 2yqt7f2vnk-2
+ by mx0a-0016f401.pphosted.com with ESMTP id 2yqt7t2s57-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Fri, 13 Mar 2020 00:48:20 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH02.marvell.com
+ Fri, 13 Mar 2020 00:16:47 -0700
+Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH02.marvell.com
  (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 13 Mar
- 2020 00:48:17 -0700
-Received: from bbhushan2.marvell.com (10.93.176.43) by SC-EXCH04.marvell.com
- (10.93.176.84) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Fri, 13 Mar 2020 00:48:13 -0700
+ 2020 00:16:46 -0700
+Received: from bbhushan2.marvell.com (10.93.176.43) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Fri, 13 Mar 2020 00:16:42 -0700
 From: Bharat Bhushan <bbhushan2@marvell.com>
 To: <peter.maydell@linaro.org>, <peterx@redhat.com>,
  <eric.auger.pro@gmail.com>, <alex.williamson@redhat.com>,
  <kevin.tian@intel.com>, <mst@redhat.com>, <tnowicki@marvell.com>,
  <drjones@redhat.com>, <linuc.decode@gmail.com>,
  <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <bharatb.linux@gmail.com>
-Subject: [PATCH v7 0/5] virtio-iommu: VFIO integration
-Date: Fri, 13 Mar 2020 13:18:06 +0530
-Message-ID: <20200313074811.27175-1-bbhushan2@marvell.com>
+Subject: [PATCH V6 0/5] virtio-iommu: VFIO integration
+Date: Fri, 13 Mar 2020 12:46:39 +0530
+Message-ID: <20200313071639.26595-1-bbhushan2@marvell.com>
 X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-13_03:2020-03-11,
+ definitions=2020-03-13_02:2020-03-11,
  2020-03-13 signatures=0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 67.231.156.173
+X-Received-From: 67.231.148.174
 X-Mailman-Approved-At: Fri, 13 Mar 2020 10:36:05 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,7 +98,7 @@ This patch series integrates VFIO with virtio-iommu.
 This is only applicable for PCI pass-through with virtio-iommu.
 
 This series is available at:
-https://github.com/bharat-bhushan-devel/qemu.git virtio-iommu-vfio-integration-v7
+https://github.com/bharat-bhushan-devel/qemu.git virtio-iommu-vfio-integration-v6
 
 This is tested with assigning more than one pci devices to Virtual Machine.
 
@@ -107,9 +108,6 @@ This series is based on:
     https://github.com/eauger/qemu/tree/v4.2-virtio-iommu-v16
 
   - Linux 5.6.0-rc4
-
-v6->v7:
-  - corrected email-address
 
 v5->v6:
   - Rebase to v16 version from Eric
