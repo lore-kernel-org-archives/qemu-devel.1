@@ -2,77 +2,56 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29633C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50879C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8A6C20746
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:31:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnarlCla"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A6C20746
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2482E20724
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 12:34:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2482E20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCjTH-0003rl-4D
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 08:31:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33181)
+	id 1jCjW0-0006g8-Bp
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 08:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jCjSJ-0002zz-Oa
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:30:25 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jCjV7-0006G7-UL
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jCjSH-0003ZW-NR
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:30:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55748
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jCjV6-0007zg-PS
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:33:17 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39488 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jCjSH-0003Vj-GE
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 08:30:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584102620;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=A1ldnhv11nZfha8GgNJ8X+vMuJA7v4vHSd/9cFLvZBE=;
- b=VnarlClaXYjJ8A9JW67C9EUTB9/CFUKZ7ZwVQuAbGKv2ghk1DYaIgVGnrkJNWVkcJPJVAq
- aVSVNVE8vkCp/lEHQ+x4hlBze7DVZ5GPSK4Ng69v4XBNnEPPRWqRAcqXMdwhkbMWmcbFjk
- jtprnMMNeD94lL69c3ibvoAkcvprsts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-nr0s2XdzP1em65DXBOKYSA-1; Fri, 13 Mar 2020 08:30:18 -0400
-X-MC-Unique: nr0s2XdzP1em65DXBOKYSA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A5A1107ACC7
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 12:30:17 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-92.ams2.redhat.com
- [10.36.117.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DDA61001925;
- Fri, 13 Mar 2020 12:30:16 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com,
- yvugenfi@redhat.com
-Subject: [PATCH] exec/rom_reset: Free rom data during inmigrate skip
-Date: Fri, 13 Mar 2020 12:30:14 +0000
-Message-Id: <20200313123014.206828-1-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jCjV6-0007ru-Ct; Fri, 13 Mar 2020 08:33:16 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 43E7045E502A98DD8788;
+ Fri, 13 Mar 2020 20:33:08 +0800 (CST)
+Received: from huawei.com (10.133.205.93) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Fri, 13 Mar 2020
+ 20:32:58 +0800
+From: Chen Qun <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH v4] hw/net/imx_fec: write TGSR and TCSR3 in imx_enet_write()
+Date: Fri, 13 Mar 2020 20:32:42 +0800
+Message-ID: <20200313123242.13236-1-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [10.133.205.93]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,74 +63,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, zhang.zhanghailiang@huawei.com,
+ Jason Wang <jasowang@redhat.com>, Peter Chubb <peter.chubb@nicta.com.au>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+The current code causes clang static code analyzer generate warning:
+hw/net/imx_fec.c:858:9: warning: Value stored to 'value' is never read
+        value =3D value & 0x0000000f;
+        ^       ~~~~~~~~~~~~~~~~~~
+hw/net/imx_fec.c:864:9: warning: Value stored to 'value' is never read
+        value =3D value & 0x000000fd;
+        ^       ~~~~~~~~~~~~~~~~~~
 
-Commit 355477f8c73e9 skips rom reset when we're an incoming migration
-so as not to overwrite shared ram in the ignore-shared migration
-optimisation.
-However, it's got an unexpected side effect that because it skips
-freeing the ROM data, when rom_reset gets called later on, after
-migration (e.g. during a reboot), the ROM does get reset to the original
-file contents.  Because of seabios/x86's weird reboot process
-this confuses a reboot into hanging after a migration.
+According to the definition of the function, the two =E2=80=9Cvalue=E2=80=
+=9D assignments
+ should be written to registers.
 
-Fixes: 355477f8c73e9 ("migration: do not rom_reset() during incoming migrat=
-ion")
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1809380
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
- hw/core/loader.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Peter Chubb <peter.chubb@nicta.com.au>
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index d1b78f60cd..4e583eb3bd 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1119,19 +1119,24 @@ static void rom_reset(void *unused)
- {
-     Rom *rom;
-=20
--    /*
--     * We don't need to fill in the RAM with ROM data because we'll fill
--     * the data in during the next incoming migration in all cases.  Note
--     * that some of those RAMs can actually be modified by the guest on AR=
-M
--     * so this is probably the only right thing to do here.
--     */
--    if (runstate_check(RUN_STATE_INMIGRATE))
--        return;
--
-     QTAILQ_FOREACH(rom, &roms, next) {
-         if (rom->fw_file) {
-             continue;
-         }
-+        /*
-+         * We don't need to fill in the RAM with ROM data because we'll fi=
-ll
-+         * the data in during the next incoming migration in all cases.  N=
-ote
-+         * that some of those RAMs can actually be modified by the guest o=
-n ARM
-+         * so this is probably the only right thing to do here.
-+         */
-+        if (runstate_check(RUN_STATE_INMIGRATE) && rom->data) {
-+            /*
-+             * Free it so that a rom_reset after migration doesn't overwri=
-te a
-+             * potentially modified 'rom'.
-+             */
-+            rom_free_data(rom);
-+        }
-+
-         if (rom->data =3D=3D NULL) {
-             continue;
-         }
+v1->v2:
+  The register 'ENET_TGSR' write-1-to-clear timer flag.
+  The register 'ENET_TCSRn' 7bit(TF) write-1-to-clear timer flag.
+
+v2->v3:
+  Optimize code style, based on discussions with Peter.
+
+v3->v4:
+  Delete reserved bits write zero(Base on Peter's comments).
+---
+ hw/net/imx_fec.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 6a124a154a..5c145a8197 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -855,13 +855,15 @@ static void imx_enet_write(IMXFECState *s, uint32_t=
+ index, uint32_t value)
+         break;
+     case ENET_TGSR:
+         /* implement clear timer flag */
+-        value =3D value & 0x0000000f;
++        s->regs[index] &=3D ~(value & 0x0000000f); /* all bits W1C */
+         break;
+     case ENET_TCSR0:
+     case ENET_TCSR1:
+     case ENET_TCSR2:
+     case ENET_TCSR3:
+-        value =3D value & 0x000000fd;
++        s->regs[index] &=3D ~(value & 0x00000080); /* W1C bits */
++        s->regs[index] &=3D ~0x0000007d; /* writable fields */
++        s->regs[index] |=3D (value & 0x0000007d);
+         break;
+     case ENET_TCCR0:
+     case ENET_TCCR1:
 --=20
-2.24.1
+2.23.0
+
 
 
