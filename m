@@ -7,95 +7,97 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC32FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 19:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32890C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 19:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A88A0206E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 19:56:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF5AE206E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 19:58:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h519DuGn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88A0206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrQeKPQz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF5AE206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCqPn-0001ks-Tg
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 15:56:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57201)
+	id 1jCqS1-00048k-3i
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 15:58:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jCqOh-0000q9-69
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:55:08 -0400
+ (envelope-from <philmd@redhat.com>) id 1jCqQw-0002sh-CP
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jCqOg-0007rA-4Q
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:55:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53575
+ (envelope-from <philmd@redhat.com>) id 1jCqQt-0000vS-PS
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:57:25 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53630
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCqOg-0007q0-0J
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:55:06 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jCqQt-0000q9-Lq
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 15:57:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584129305;
+ s=mimecast20190719; t=1584129443;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nU5HJ/N4mUaFWYfXDlSPC9zoFS/qgaa6S1E362DAaOE=;
- b=h519DuGn6mktj9COilt2Qu2F2gQXlSH+KFSmCVTnwoMV7auRqXy714KS0vVtfsZkHo7uyp
- NYNfQQfhYTpquDXSspuoWBfN3+RPAvKfVNxihZU9RKsVaXHnCXf88JrUl3D1yC0U4/XSuP
- 4D0BVZ/pIVob7++pHlJYCfknMr6rQJU=
+ bh=9UFKTi1jkHxCDRgfhLIXb2EAUsNxhIhfkcd+L8LX5Sk=;
+ b=PrQeKPQzils7Z5T0fHFLIT9Ns0jwhj2W9vO1/Ai14h2wyxCr2JDw69bQZuEhsrffLgtO/t
+ /nS02eA0qHgP1dOAB+ukw87T3ZLaSUIN9Zj+hMPJEpPkyIhOoNjMOSF2z9pHVzIEzsrlyH
+ FAOuFBXRrKvxwg8CjAA0+BPTRFzl4kM=
 Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
  [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-j2Dk-mYaMg-JT_XHajYsdA-1; Fri, 13 Mar 2020 15:55:03 -0400
-X-MC-Unique: j2Dk-mYaMg-JT_XHajYsdA-1
-Received: by mail-wm1-f72.google.com with SMTP id a11so1418377wmm.9
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 12:55:03 -0700 (PDT)
+ us-mta-299-gjxSffxGPUO1guJmJWLXcw-1; Fri, 13 Mar 2020 15:57:21 -0400
+X-MC-Unique: gjxSffxGPUO1guJmJWLXcw-1
+Received: by mail-wm1-f72.google.com with SMTP id s15so1772243wmc.0
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 12:57:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=rEJ/mJdFEeqdZaHP67zf/vqjkCs4hte8zSS5RY0rfH0=;
- b=uhowlqZ4WePiocpWa4eudSHOKVDm0rWxx77JXYIoBGRS1kqzZuLVcQaq24F1A7jENt
- 1JXmWlEv9Vn70xTvmB/ahovPlIxSSwQCrjn6sBquu8zyFTaTK3re23R3LOxXfmHEdeZG
- SYQLuDSxBc4iPgvti62MPwtoQ7aAgSBwRx3fpVuMe0wpY/08gSwbWPfV/znyhMiqyWiP
- urUrbE8R0pCU8nWrOK9kQvPKaqe0muavLhmSQt0tbGlH5GSHcuQPN4veVbOIDH8hjKjo
- f0baGp2y1G0JZaWUh3PwRnVBCju+mP/cTbZIDh2W/K0Kkmp2EJu+TQTtquL7D1Cmg88l
- 6/AQ==
-X-Gm-Message-State: ANhLgQ2nU7EQoARX20zH6nIwuHgxLf7/kZMxYZYsRnz/taWfNQqw51eX
- NVt2JvcTSCt5DHrPqdGoW00+/65nMlcQcPsXX2LVLIm0thSYwz2SIVNUPbp2a75JP7OlX9Y5oBm
- fdPn8c3XPMid0MuU=
-X-Received: by 2002:a7b:c05a:: with SMTP id u26mr12121624wmc.74.1584129302333; 
- Fri, 13 Mar 2020 12:55:02 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvhWL+UJ2XEpTUyBWv+OOfsmxptDI6kOMA5wZgC897lb1l3EzIlK+/W/bpNdmrH3GFL9vbOfg==
-X-Received: by 2002:a7b:c05a:: with SMTP id u26mr12121603wmc.74.1584129302096; 
- Fri, 13 Mar 2020 12:55:02 -0700 (PDT)
+ bh=lUjd4xxVbhE6YF9T5EkQrO4WbvP2UBVOAbNFXlKIq70=;
+ b=pADPehzKM0NC7cQx1hkHMtLC4MXDKovM4NZ2elqL5q2mcDUdGTn+DVH04k1PiscyH2
+ Klpdedus/ChskCZRFF7z8hptEI0FlWlvzn6OnqsYZt3VhSqQCjAmong9v56rrKOFcVY6
+ 0wh8E8wXRtSQmrcx2DNjVxUPiVo0/fWh6U4eVatczs8p4nBpVXZ23N/HoLQQxqsACgg0
+ +8wXYFztMm9zRGB7iyUDC+SYns+viWY83zsdAdzyvQMqQN8OFGj9NYyjkzFIfY156J/+
+ Zy3IcOCk6XE/eWnZkCEZBSEhrFJlnlIpfmuWo6Dm+CuXlAf+WRYPYzB+oyhwtHW2PRiC
+ 6dMA==
+X-Gm-Message-State: ANhLgQ1TCb8c2L6/1jrXgLPeV8ReAqOHAXIeKQ3FEaSSay3Rb+HGfRx5
+ cVKDe7CnJBSDSTNV1reEgb9sHXG8Cu+YdL1qYkHq0Y+8SdwMelyCqMFMK65jZc447BFsm9HMM9Z
+ GgipbqByFqIU90yk=
+X-Received: by 2002:a05:600c:2c06:: with SMTP id
+ q6mr7040411wmg.52.1584129440089; 
+ Fri, 13 Mar 2020 12:57:20 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtGNAnISMgpGmBLF0qt2v93YeGFuvutbQkQAZ2mFj7EwlH7zEtLtpEtgRD2UU1H9Kmm95W7VQ==
+X-Received: by 2002:a05:600c:2c06:: with SMTP id
+ q6mr7040393wmg.52.1584129439803; 
+ Fri, 13 Mar 2020 12:57:19 -0700 (PDT)
 Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id e7sm61391147wrt.70.2020.03.13.12.55.01
+ by smtp.gmail.com with ESMTPSA id a1sm22662329wro.72.2020.03.13.12.57.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Mar 2020 12:55:01 -0700 (PDT)
-Subject: Re: [PATCH v3 05/16] hw/i386/vmport: Introduce vmware-vmx-version
- property
+ Fri, 13 Mar 2020 12:57:19 -0700 (PDT)
+Subject: Re: [PATCH v3 07/16] hw/i386/vmport: Introduce vmport.h
 To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
 References: <20200312165431.82118-1-liran.alon@oracle.com>
- <20200312165431.82118-6-liran.alon@oracle.com>
+ <20200312165431.82118-8-liran.alon@oracle.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a744b4ff-27a5-7512-e9e7-d2ec345f4db7@redhat.com>
-Date: Fri, 13 Mar 2020 20:55:00 +0100
+Message-ID: <13b98a16-6465-e1c9-5f52-0f338c60fbd5@redhat.com>
+Date: Fri, 13 Mar 2020 20:57:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200312165431.82118-6-liran.alon@oracle.com>
+In-Reply-To: <20200312165431.82118-8-liran.alon@oracle.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,71 +109,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Nikita Leshenko <nikita.leshchenko@oracle.com>,
- rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/12/20 5:54 PM, Liran Alon wrote:
-> vmware-vmx-version is a number returned from CMD_GETVERSION which specifi=
-es
-> to guest VMware Tools the the host VMX version. If the host reports a num=
-ber
-> that is different than what the guest VMware Tools expects, it may force
-> guest to upgrade VMware Tools. (See comment above VERSION_MAGIC and
-> VmCheck_IsVirtualWorld() function in open-vm-tools open-source code).
+> No functional change. This is mere refactoring.
 >=20
-> For better readability and allow maintaining compatability for guests
-> which may expect different vmware-vmx-version, make vmware-vmx-version a
-> VMPort object property. This would allow user to control it's value via
-> "-global vmport.vmware-vmx-version=3DX".
->=20
-> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
 > Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
->   hw/i386/vmport.c | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
-> index e67c7bb2afea..8e662303d5d3 100644
-> --- a/hw/i386/vmport.c
-> +++ b/hw/i386/vmport.c
-> @@ -60,6 +60,8 @@ typedef struct VMPortState {
->       VMPortReadFunc *func[VMPORT_ENTRIES];
->       void *opaque[VMPORT_ENTRIES];
->  =20
-> +    uint32_t vmware_vmx_version;
-> +
->       uint32_t compat_flags;
->   } VMPortState;
->  =20
-> @@ -138,7 +140,7 @@ static uint32_t vmport_cmd_get_version(void *opaque, =
-uint32_t addr)
->       X86CPU *cpu =3D X86_CPU(current_cpu);
->  =20
->       cpu->env.regs[R_EBX] =3D VMPORT_MAGIC;
-> -    return 6;
-> +    return port_state->vmware_vmx_version;
->   }
->  =20
->   static uint32_t vmport_cmd_ram_size(void *opaque, uint32_t addr)
-> @@ -200,6 +202,11 @@ static Property vmport_properties[] =3D {
->                       VMPORT_COMPAT_READ_SET_EAX_BIT, true),
->       DEFINE_PROP_BIT("x-signal-unsupported-cmd", VMPortState, compat_fla=
-gs,
->                       VMPORT_COMPAT_SIGNAL_UNSUPPORTED_CMD_BIT, true),
-> +
-> +    /* Default value taken from open-vm-tools code VERSION_MAGIC definit=
-ion */
-> +    DEFINE_PROP_UINT32("vmware-vmx-version", VMPortState,
-> +                       vmware_vmx_version, 6),
-> +
->       DEFINE_PROP_END_OF_LIST(),
->   };
->  =20
->=20
+>   hw/i386/pc.c             |  1 +
+>   hw/i386/vmmouse.c        |  1 +
+>   hw/i386/vmport.c         |  1 +
+>   include/hw/i386/pc.h     | 13 -------------
+>   include/hw/i386/vmport.h | 16 ++++++++++++++++
+
+What about moving it to hw/i386/vmport.h (no under include/)?
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>   5 files changed, 19 insertions(+), 13 deletions(-)
+>   create mode 100644 include/hw/i386/vmport.h
+>=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 6ab4acb0c62e..6ac71e1af32b 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -31,6 +31,7 @@
+>   #include "hw/i386/apic.h"
+>   #include "hw/i386/topology.h"
+>   #include "hw/i386/fw_cfg.h"
+> +#include "hw/i386/vmport.h"
+>   #include "sysemu/cpus.h"
+>   #include "hw/block/fdc.h"
+>   #include "hw/ide.h"
+> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+> index e8e62bd96b8c..49a546fd3bb6 100644
+> --- a/hw/i386/vmmouse.c
+> +++ b/hw/i386/vmmouse.c
+> @@ -26,6 +26,7 @@
+>   #include "qapi/error.h"
+>   #include "ui/console.h"
+>   #include "hw/i386/pc.h"
+> +#include "hw/i386/vmport.h"
+>   #include "hw/input/i8042.h"
+>   #include "hw/qdev-properties.h"
+>   #include "migration/vmstate.h"
+> diff --git a/hw/i386/vmport.c b/hw/i386/vmport.c
+> index ead2f2d5326f..e9ea5fe7f765 100644
+> --- a/hw/i386/vmport.c
+> +++ b/hw/i386/vmport.c
+> @@ -31,6 +31,7 @@
+>   #include "qemu/osdep.h"
+>   #include "hw/isa/isa.h"
+>   #include "hw/i386/pc.h"
+> +#include "hw/i386/vmport.h"
+>   #include "hw/input/i8042.h"
+>   #include "hw/qdev-properties.h"
+>   #include "sysemu/hw_accel.h"
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d5ac76d54e1f..60c988c4a5aa 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -134,19 +134,6 @@ typedef struct PCMachineClass {
+>  =20
+>   GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
+>  =20
+> -/* vmport.c */
+> -#define TYPE_VMPORT "vmport"
+> -typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
+> -
+> -static inline void vmport_init(ISABus *bus)
+> -{
+> -    isa_create_simple(bus, TYPE_VMPORT);
+> -}
+> -
+> -void vmport_register(unsigned char command, VMPortReadFunc *func, void *=
+opaque);
+> -void vmmouse_get_data(uint32_t *data);
+> -void vmmouse_set_data(const uint32_t *data);
+> -
+>   /* pc.c */
+>   extern int fd_bootchk;
+>  =20
+> diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+> new file mode 100644
+> index 000000000000..f0c1e985ca08
+> --- /dev/null
+> +++ b/include/hw/i386/vmport.h
+> @@ -0,0 +1,16 @@
+> +#ifndef HW_VMPORT_H
+> +#define HW_VMPORT_H
+> +
+> +#define TYPE_VMPORT "vmport"
+> +typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
+> +
+> +static inline void vmport_init(ISABus *bus)
+> +{
+> +    isa_create_simple(bus, TYPE_VMPORT);
+> +}
+> +
+> +void vmport_register(unsigned char command, VMPortReadFunc *func, void *=
+opaque);
+> +void vmmouse_get_data(uint32_t *data);
+> +void vmmouse_set_data(const uint32_t *data);
+> +
+> +#endif
+>=20
 
 
