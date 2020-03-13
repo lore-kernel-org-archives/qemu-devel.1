@@ -2,113 +2,88 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5ADC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE51C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 945B22074E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:55:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945B22074E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 27AC52074E
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:56:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FD2j9sA1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27AC52074E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCsH7-0007cO-R4
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:55:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51645)
+	id 1jCsI3-00006K-DR
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jCsGL-0006wq-5d
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:54:39 -0400
+ (envelope-from <armbru@redhat.com>) id 1jCsGR-00077V-Ox
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:54:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jCsGJ-0004ey-3L
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:54:37 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:52365)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jCsGE-00043G-EM; Fri, 13 Mar 2020 17:54:30 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M2wCg-1j9aSX1QB2-003Qbb; Fri, 13 Mar 2020 22:53:49 +0100
-Subject: Re: [PATCH v4 00/21] linux-user: generate syscall_nr.sh
-To: qemu-devel@nongnu.org
-References: <20200310103403.3284090-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9cd132f9-d60b-5102-c56e-d6ccaa82c82d@vivier.eu>
-Date: Fri, 13 Mar 2020 22:53:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <armbru@redhat.com>) id 1jCsGN-0004ve-2P
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:54:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31405
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCsGM-0004t6-Qq
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:54:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584136477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NvrbxEp0ORNjN4T28u8DpDcF2uEiVqe5w/63L03txyY=;
+ b=FD2j9sA1HsQ4AwrYvkCmYPr5cb42r+EhBK7EeQRnoaciiuds/bpDz5Xu3CrpoJotZT7yQg
+ xWj43cvbSI1qE1M2BIsDQAUR0NBUsUNasw5ngXn8wH6/cpDxaj3jzbsIy4Szd4Px1hLSz+
+ ronyL4qbiAvibixQCd0guC7R4i9sU5I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-dbVRRJwyPVqPHVlfE5CTUg-1; Fri, 13 Mar 2020 17:54:30 -0400
+X-MC-Unique: dbVRRJwyPVqPHVlfE5CTUg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C7351060DF6;
+ Fri, 13 Mar 2020 21:54:28 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 293AA5C1B0;
+ Fri, 13 Mar 2020 21:54:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A69B611386A6; Fri, 13 Mar 2020 22:54:20 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v9 02/10] scripts: Coccinelle script to use
+ ERRP_AUTO_PROPAGATE()
+References: <20200312085936.9552-1-vsementsov@virtuozzo.com>
+ <20200312085936.9552-3-vsementsov@virtuozzo.com>
+ <874kuto7hq.fsf@dusky.pond.sub.org>
+ <4a70c6ee-10a2-fdc3-f8df-88c05340398b@virtuozzo.com>
+ <875zf8gt2m.fsf@dusky.pond.sub.org>
+ <7c6f9a91-76cf-242d-8166-0693ec14b24d@virtuozzo.com>
+Date: Fri, 13 Mar 2020 22:54:20 +0100
+In-Reply-To: <7c6f9a91-76cf-242d-8166-0693ec14b24d@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Fri, 13 Mar 2020 19:12:17 +0300")
+Message-ID: <87blozex9v.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200310103403.3284090-1-laurent@vivier.eu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Fd8pGYGm++++Ao154BFe1jq+D1lMMqrp0uKrcP2osvmYcmBZsJq
- jlRoFAKMRghpyb3fySGfKre+eeJHyCm3ee/rJLw3/FapiQD+RkX7uMyobCi+4hJvY8q7U2j
- 3lzEok7HvzxsGeogt56lPiCka7EFX4Strl1vRAXtnRDjqZk2m/9a6iKa+vYqh3zpPxAV/Cl
- TZ8nA0GXjRd1KLYBrF2BA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gvDN4/qCOEg=:tGzrsbK+8IX8fg/HKFt2Fu
- urxji1JrvyOpHxqk0w1gC2M1EqBg8kT3wDRIYpSYzcOXuRpN68huplp8V3M4uS0b9S+oNb75O
- lAL9s1g7JuYKNIhQZFlxk9ABjkKv9tb4IWCI2Sb4wTUqc4CPVRTk6QiJeJLL5aq+eFgQAm9TK
- 2cO+qaiJEFcvC4lkQaAtEswfmlnsLAiyieUxS+3PDjNJ6cMTn36aAj8E1UUM81fOBhvzaCn+i
- JWKl+aXb1X5VUPIW1LFvUBaxxlwLEYIqtPSAXE8Men/InGniIaUJfyjHSOJWuu42mccNWuxHs
- QjjP9rzwsnsOkEth+iErqszZt5pJZvKlKVSFSM/9xVBdB/oPyMnLxNbaY7tQLXxqgU0D12/EE
- jcAHPRhCHqR7nJ2TdJK0CwwRW4qR0OQ4GoTXHsLgLKwNIGQ0PA2nRx01NIjm70jbm8aAzM3m9
- h2AmDwthB7UQ7NiW+Fg3LBilkack1ZeqsKHb5/hhFPXezCaFPcVJc8u/+UGCqv6Ro2Jw5h77w
- 6WJmENukX+6DNiwYPqiFQIL0YQ1J72NNDwvJ0DAnpQqe9pT04V3+8+PYJgQl8CWj9jjvP4Fop
- IUD73Fosnz1qDLZZlM8wWN3EOafQfjZsESrTwYS3hAxr6cBFcGAeK/dGRhZ0Nb/Zfo6SWMzs7
- HH0a9Et2CHs1PfN2p3L6C1p0tKh+YBkKUk1Oh9VJ8locIaD/H91NqxIgajLcvuSL2h+fQSpGx
- xJ/NQvsqlzGxoB81jjQ8/aBEP8NixkTtDo1aM4Pr7NKlAOlsJpqJtDT9/pa0/qqqWacYdOfZJ
- neVr0/3bNxuK4sX5KmOazY8YQ8Enz+M3fBGlj9/4iLiiJinh8mhOHF6zJo/fKPuwcG9wz93
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,266 +95,1229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Taylor Simpson <tsimpson@quicinc.com>, qemu-s390x@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
+ Laszlo Ersek <lersek@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 10/03/2020 à 11:33, Laurent Vivier a écrit :
-> This series copies the files syscall.tbl from linux v5.5 and generates
-> the file syscall_nr.h from them.
-> 
-> This is done for all the QEMU targets that have a syscall.tbl
-> in the linux source tree: mips, mips64, i386, x86_64, sparc, s390x,
-> ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.
-> 
-> tilegx and cris are depecrated in linux (tilegx has no maintainer in QEMU)
-> 
-> aarch64, nios2, openrisc and riscv have no syscall.tbl in linux and files
-> are generated manually with the help of a script from the asm-generic/unistd.h
-> 
-> Define do_arch_prctl() with -TARGET_ENOSYS for i386 as the syscall number
-> is defined now.
-> 
-> I have also removed all syscalls in s390x/syscall_nr.h defined for
-> !defined(TARGET_S390X).
-> 
-> I have added a script to copy all these files from linux and updated
-> them at the end of the series with their latest version for today.
-> 
-> Two patches manage the special case for mips O32 that needs
-> to know the number of arguments. We find them in strace sources.
-> 
-> v4:
->     generate syscall_nr.h for hppa32, not 64
-> 
-> v3:
->    Add a patch to define do_arch_prctl() for i386
-> 
-> v2:
->     fix a typo (double comma) in $(call quiet-command)
->     add a script to remove dependencies to syscall_nr.h in source directory
-> 
-> ppc, mips64:
-> 
->         we don't need to split syscall_nr.h as it is generated
->         according TARGET_SYSTBL_ABI to TARGET_ABI_DIR
->         and generated values are incorrect according to the file name.
-> 
-> arm:
-> 
->         manage TARGET_NR_arm_sync_file_range
-> 
-> Once the syscall_nr.h are built in the build directory, the following script
-> allows to compare them with the original one (first argument is the path
-> to build directory), it must be run from the source directory:
-> 
-> cat > check_syscall_nr.sh <<EOF
-> BUILD="$1"
-> 
-> ARCHS="i386 alpha arm hppa i386 m68k microblaze s390x sh4 sparc sparc64 xtensa ppc"
-> 
-> syscall_nr_diff()
-> {
->         arch=$1
->         target=$2
->         syscall_nr=linux-user/$arch/syscall_nr.h
->         offset=$3
->         REFERENCE=$(git log -1 --format=format:%h -- $syscall_nr)^
->         if [ "$offset" = "" ] ; then
->                 git show $REFERENCE:$syscall_nr | \
->                         sed 's/[[:blank:]]\/\*[^*]*\*\///' | \
->                         sed 's/(\([^)]*\))/\1/'  > /tmp/old
->         else
->                 git show $REFERENCE:$syscall_nr | \
->                         sed 's/[[:blank:]]\/\*[^*]*\*\///' | \
->                         sed "s/TARGET_NR_Linux/$offset/" > /tmp/old
->         fi
->         diff -wu --color=always /tmp/old \
->                                 $BUILD/$target/$syscall_nr | less -R
-> }
-> 
-> for arch in $ARCHS ; do
->         syscall_nr_diff $arch $arch-linux-user
-> done
-> 
-> syscall_nr_diff ppc    ppc64-linux-user
-> 
-> syscall_nr_diff mips   mips-linux-user    4000
-> syscall_nr_diff mips64 mips64-linux-user  5000
-> syscall_nr_diff mips64 mipsn32-linux-user 6000
-> EOF
-> 
-> Laurent Vivier (21):
->   linux-user: introduce parameters to generate syscall_nr.h
->   linux-user,alpha: add syscall table generation support
->   linux-user,hppa: add syscall table generation support
->   linux-user,m68k: add syscall table generation support
->   linux-user,xtensa: add syscall table generation support
->   linux-user,sh4: add syscall table generation support
->   linux-user,microblaze: add syscall table generation support
->   linux-user,arm: add syscall table generation support
->   linux-user,ppc: add syscall table generation support
->   linux-user,s390x: remove syscall definitions for !TARGET_S390X
->   linux-user,s390x: add syscall table generation support
->   linux-user,sparc,sparc64: add syscall table generation support
->   linux-user,x86_64,i386: cleanup TARGET_NR_arch_prctl
->   linux-user,i386: add syscall table generation support
->   linux-user,x86_64: add syscall table generation support
->   linux-user,mips: add syscall table generation support
->   linux-user,mips64: add syscall table generation support
->   linux-user,scripts: add a script to update syscall.tbl
->   linux-user: update syscall.tbl from linux 0bf999f9c5e7
->   linux-user,mips: move content of mips_syscall_args
->   linux-user,mips: update syscall-args-o32.c.inc
-> 
->  MAINTAINERS                            |   1 +
->  Makefile.target                        |   3 +-
->  configure                              |  35 ++
->  linux-user/Makefile.objs               |  19 +-
->  linux-user/alpha/Makefile.objs         |   5 +
->  linux-user/alpha/syscall.tbl           | 479 ++++++++++++++++
->  linux-user/alpha/syscall_nr.h          | 492 -----------------
->  linux-user/alpha/syscallhdr.sh         |  32 ++
->  linux-user/arm/Makefile.objs           |   8 +
->  linux-user/arm/syscall.tbl             | 453 +++++++++++++++
->  linux-user/arm/syscall_nr.h            | 447 ---------------
->  linux-user/arm/syscallhdr.sh           |  31 ++
->  linux-user/hppa/Makefile.objs          |   5 +
->  linux-user/hppa/syscall.tbl            | 437 +++++++++++++++
->  linux-user/hppa/syscall_nr.h           | 358 ------------
->  linux-user/hppa/syscallhdr.sh          |  32 ++
->  linux-user/i386/Makefile.objs          |   5 +
->  linux-user/i386/syscall_32.tbl         | 444 +++++++++++++++
->  linux-user/i386/syscall_nr.h           | 387 -------------
->  linux-user/i386/syscallhdr.sh          |  28 +
->  linux-user/i386/target_cpu.h           |   4 +-
->  linux-user/m68k/Makefile.objs          |   5 +
->  linux-user/m68k/syscall.tbl            | 439 +++++++++++++++
->  linux-user/m68k/syscall_nr.h           | 434 ---------------
->  linux-user/m68k/syscallhdr.sh          |  32 ++
->  linux-user/microblaze/Makefile.objs    |   5 +
->  linux-user/microblaze/syscall.tbl      | 445 +++++++++++++++
->  linux-user/microblaze/syscall_nr.h     | 442 ---------------
->  linux-user/microblaze/syscallhdr.sh    |  32 ++
->  linux-user/mips/Makefile.objs          |   5 +
->  linux-user/mips/cpu_loop.c             | 440 +--------------
->  linux-user/mips/syscall-args-o32.c.inc | 436 +++++++++++++++
->  linux-user/mips/syscall_nr.h           | 425 ---------------
->  linux-user/mips/syscall_o32.tbl        | 427 +++++++++++++++
->  linux-user/mips/syscallhdr.sh          |  36 ++
->  linux-user/mips64/Makefile.objs        |  12 +
->  linux-user/mips64/syscall_n32.tbl      | 378 +++++++++++++
->  linux-user/mips64/syscall_n64.tbl      | 354 ++++++++++++
->  linux-user/mips64/syscall_nr.h         | 725 -------------------------
->  linux-user/mips64/syscallhdr.sh        |  33 ++
->  linux-user/ppc/Makefile.objs           |   6 +
->  linux-user/ppc/signal.c                |   2 +-
->  linux-user/ppc/syscall.tbl             | 521 ++++++++++++++++++
->  linux-user/ppc/syscall_nr.h            | 402 --------------
->  linux-user/ppc/syscallhdr.sh           |  34 ++
->  linux-user/s390x/Makefile.objs         |   5 +
->  linux-user/s390x/syscall.tbl           | 442 +++++++++++++++
->  linux-user/s390x/syscall_nr.h          | 398 --------------
->  linux-user/s390x/syscallhdr.sh         |  32 ++
->  linux-user/sh4/Makefile.objs           |   5 +
->  linux-user/sh4/syscall.tbl             | 442 +++++++++++++++
->  linux-user/sh4/syscall_nr.h            | 441 ---------------
->  linux-user/sh4/syscallhdr.sh           |  32 ++
->  linux-user/sparc/Makefile.objs         |   5 +
->  linux-user/sparc/syscall.tbl           | 485 +++++++++++++++++
->  linux-user/sparc/syscall_nr.h          | 363 -------------
->  linux-user/sparc/syscallhdr.sh         |  32 ++
->  linux-user/sparc64/Makefile.objs       |   5 +
->  linux-user/sparc64/syscall.tbl         | 485 +++++++++++++++++
->  linux-user/sparc64/syscall_nr.h        | 366 -------------
->  linux-user/sparc64/syscallhdr.sh       |  32 ++
->  linux-user/syscall.c                   |  25 +-
->  linux-user/x86_64/Makefile.objs        |   5 +
->  linux-user/x86_64/syscall_64.tbl       | 404 ++++++++++++++
->  linux-user/x86_64/syscall_nr.h         | 356 ------------
->  linux-user/x86_64/syscallhdr.sh        |  28 +
->  linux-user/xtensa/Makefile.objs        |   5 +
->  linux-user/xtensa/syscall.tbl          | 410 ++++++++++++++
->  linux-user/xtensa/syscall_nr.h         | 469 ----------------
->  linux-user/xtensa/syscallhdr.sh        |  32 ++
->  scripts/update-mips-syscall-args.sh    |  57 ++
->  scripts/update-syscalltbl.sh           |  49 ++
->  72 files changed, 8227 insertions(+), 6958 deletions(-)
->  create mode 100644 linux-user/alpha/Makefile.objs
->  create mode 100644 linux-user/alpha/syscall.tbl
->  delete mode 100644 linux-user/alpha/syscall_nr.h
->  create mode 100644 linux-user/alpha/syscallhdr.sh
->  create mode 100644 linux-user/arm/Makefile.objs
->  create mode 100644 linux-user/arm/syscall.tbl
->  delete mode 100644 linux-user/arm/syscall_nr.h
->  create mode 100644 linux-user/arm/syscallhdr.sh
->  create mode 100644 linux-user/hppa/Makefile.objs
->  create mode 100644 linux-user/hppa/syscall.tbl
->  delete mode 100644 linux-user/hppa/syscall_nr.h
->  create mode 100644 linux-user/hppa/syscallhdr.sh
->  create mode 100644 linux-user/i386/Makefile.objs
->  create mode 100644 linux-user/i386/syscall_32.tbl
->  delete mode 100644 linux-user/i386/syscall_nr.h
->  create mode 100644 linux-user/i386/syscallhdr.sh
->  create mode 100644 linux-user/m68k/Makefile.objs
->  create mode 100644 linux-user/m68k/syscall.tbl
->  delete mode 100644 linux-user/m68k/syscall_nr.h
->  create mode 100644 linux-user/m68k/syscallhdr.sh
->  create mode 100644 linux-user/microblaze/Makefile.objs
->  create mode 100644 linux-user/microblaze/syscall.tbl
->  delete mode 100644 linux-user/microblaze/syscall_nr.h
->  create mode 100644 linux-user/microblaze/syscallhdr.sh
->  create mode 100644 linux-user/mips/Makefile.objs
->  create mode 100644 linux-user/mips/syscall-args-o32.c.inc
->  delete mode 100644 linux-user/mips/syscall_nr.h
->  create mode 100644 linux-user/mips/syscall_o32.tbl
->  create mode 100644 linux-user/mips/syscallhdr.sh
->  create mode 100644 linux-user/mips64/Makefile.objs
->  create mode 100644 linux-user/mips64/syscall_n32.tbl
->  create mode 100644 linux-user/mips64/syscall_n64.tbl
->  delete mode 100644 linux-user/mips64/syscall_nr.h
->  create mode 100644 linux-user/mips64/syscallhdr.sh
->  create mode 100644 linux-user/ppc/Makefile.objs
->  create mode 100644 linux-user/ppc/syscall.tbl
->  delete mode 100644 linux-user/ppc/syscall_nr.h
->  create mode 100644 linux-user/ppc/syscallhdr.sh
->  create mode 100644 linux-user/s390x/Makefile.objs
->  create mode 100644 linux-user/s390x/syscall.tbl
->  delete mode 100644 linux-user/s390x/syscall_nr.h
->  create mode 100755 linux-user/s390x/syscallhdr.sh
->  create mode 100644 linux-user/sh4/Makefile.objs
->  create mode 100644 linux-user/sh4/syscall.tbl
->  delete mode 100644 linux-user/sh4/syscall_nr.h
->  create mode 100644 linux-user/sh4/syscallhdr.sh
->  create mode 100644 linux-user/sparc/Makefile.objs
->  create mode 100644 linux-user/sparc/syscall.tbl
->  delete mode 100644 linux-user/sparc/syscall_nr.h
->  create mode 100644 linux-user/sparc/syscallhdr.sh
->  create mode 100644 linux-user/sparc64/Makefile.objs
->  create mode 100644 linux-user/sparc64/syscall.tbl
->  delete mode 100644 linux-user/sparc64/syscall_nr.h
->  create mode 100644 linux-user/sparc64/syscallhdr.sh
->  create mode 100644 linux-user/x86_64/Makefile.objs
->  create mode 100644 linux-user/x86_64/syscall_64.tbl
->  delete mode 100644 linux-user/x86_64/syscall_nr.h
->  create mode 100644 linux-user/x86_64/syscallhdr.sh
->  create mode 100644 linux-user/xtensa/Makefile.objs
->  create mode 100644 linux-user/xtensa/syscall.tbl
->  delete mode 100644 linux-user/xtensa/syscall_nr.h
->  create mode 100644 linux-user/xtensa/syscallhdr.sh
->  create mode 100755 scripts/update-mips-syscall-args.sh
->  create mode 100755 scripts/update-syscalltbl.sh
-> 
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Applied the whole series to my linux-user branch.
+> 13.03.2020 18:42, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>
+>>> 12.03.2020 19:36, Markus Armbruster wrote:
+>>>> I may have a second look tomorrow with fresher eyes, but let's get thi=
+s
+>>>> out now as is.
+>>>>
+>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>
+>>>>> Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate an=
+d
+>>>>> does corresponding changes in code (look for details in
+>>>>> include/qapi/error.h)
+>>>>>
+>>>>> Usage example:
+>>>>> spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>>>>>    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff =
+\
+>>>>>    --max-width 80 FILES...
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>>>> ---
+>>>>>
+>>>>> Cc: Eric Blake <eblake@redhat.com>
+>>>>> Cc: Kevin Wolf <kwolf@redhat.com>
+>>>>> Cc: Max Reitz <mreitz@redhat.com>
+>>>>> Cc: Greg Kurz <groug@kaod.org>
+>>>>> Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>
+>>>>> Cc: Stefano Stabellini <sstabellini@kernel.org>
+>>>>> Cc: Anthony Perard <anthony.perard@citrix.com>
+>>>>> Cc: Paul Durrant <paul@xen.org>
+>>>>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>>>>> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+>>>>> Cc: Laszlo Ersek <lersek@redhat.com>
+>>>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>>>> Cc: Stefan Berger <stefanb@linux.ibm.com>
+>>>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>>>> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+>>>>> Cc: qemu-devel@nongnu.org
+>>>>> Cc: qemu-block@nongnu.org
+>>>>> Cc: xen-devel@lists.xenproject.org
+>>>>>
+>>>>>    scripts/coccinelle/auto-propagated-errp.cocci | 327 ++++++++++++++=
+++++
+>>>>>    include/qapi/error.h                          |   3 +
+>>>>>    MAINTAINERS                                   |   1 +
+>>>>>    3 files changed, 331 insertions(+)
+>>>>>    create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+>>>>>
+>>>>> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/=
+coccinelle/auto-propagated-errp.cocci
+>>>>> new file mode 100644
+>>>>> index 0000000000..7dac2dcfa4
+>>>>> --- /dev/null
+>>>>> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+>>>>> @@ -0,0 +1,327 @@
+>>>>> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+>>>>> +//
+>>>>> +// Copyright (c) 2020 Virtuozzo International GmbH.
+>>>>> +//
+>>>>> +// This program is free software; you can redistribute it and/or
+>>>>> +// modify it under the terms of the GNU General Public License as
+>>>>> +// published by the Free Software Foundation; either version 2 of th=
+e
+>>>>> +// License, or (at your option) any later version.
+>>>>> +//
+>>>>> +// This program is distributed in the hope that it will be useful,
+>>>>> +// but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>> +// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>>> +// GNU General Public License for more details.
+>>>>> +//
+>>>>> +// You should have received a copy of the GNU General Public License
+>>>>> +// along with this program.  If not, see
+>>>>> +// <http://www.gnu.org/licenses/>.
+>>>>> +//
+>>>>> +// Usage example:
+>>>>> +// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>>>>> +//  --macro-file scripts/cocci-macro-file.h --in-place \
+>>>>> +//  --no-show-diff --max-width 80 FILES...
+>>>>> +//
+>>>>> +// Note: --max-width 80 is needed because coccinelle default is less
+>>>>> +// than 80, and without this parameter coccinelle may reindent some
+>>>>> +// lines which fit into 80 characters but not to coccinelle default,
+>>>>> +// which in turn produces extra patch hunks for no reason.
+>>>>
+>>>> This is about unwanted reformatting of parameter lists due to the ___
+>>>> chaining hack.  --max-width 80 makes that less likely, but not
+>>>> impossible.
+>>>>
+>>>> We can search for unwanted reformatting of parameter lists.  I think
+>>>> grepping diffs for '^\+.*Error \*\*' should do the trick.  For the who=
+le
+>>>> tree, I get one false positive (not a parameter list), and one hit:
+>>>>
+>>>>       @@ -388,8 +388,10 @@ static void object_post_init_with_type(O
+>>>>            }
+>>>>        }
+>>>>
+>>>>       -void object_apply_global_props(Object *obj, const GPtrArray *pr=
+ops, Error **errp)
+>>>>       +void object_apply_global_props(Object *obj, const GPtrArray *pr=
+ops,
+>>>>       +                               Error **errp)
+>>>>        {
+>>>>       +    ERRP_AUTO_PROPAGATE();
+>>>>            int i;
+>>>>
+>>>>            if (!props) {
+>>>>
+>>>> Reformatting, but not unwanted.
+>>>
+>>> Yes, I saw it. This line is 81 character length, so it's OK to fix it i=
+n one hunk with
+>>> ERRP_AUTO_PROPAGATE addition even for non-automatic patch.
+>>
+>> Agree.
+>>
+>>>>
+>>>> The --max-width 80 hack is good enough for me.
+>>>>
+>>>> It does result in slightly long transformed lines, e.g. this one in
+>>>> replication.c:
+>>>>
+>>>>       @@ -113,7 +113,7 @@ static int replication_open(BlockDriverS
+>>>>                s->mode =3D REPLICATION_MODE_PRIMARY;
+>>>>                top_id =3D qemu_opt_get(opts, REPLICATION_TOP_ID);
+>>>>                if (top_id) {
+>>>>       -            error_setg(&local_err, "The primary side does not s=
+upport option top-id");
+>>>>       +            error_setg(errp, "The primary side does not support=
+ option top-id");
+>>>>                    goto fail;
+>>>>                }
+>>>>            } else if (!strcmp(mode, "secondary")) {
+>>>>
+>>>> v8 did break this line (that's how I found it).  However, v9 still
+>>>> shortens the line, just not below the target.  All your + lines look
+>>>> quite unlikely to lengthen lines.  Let's not worry about this.
+>>>>
+>>>>> +// Switch unusual Error ** parameter names to errp
+>>>>> +// (this is necessary to use ERRP_AUTO_PROPAGATE).
+>>>>> +//
+>>>>> +// Disable optional_qualifier to skip functions with
+>>>>> +// "Error *const *errp" parameter.
+>>>>> +//
+>>>>> +// Skip functions with "assert(_errp && *_errp)" statement, because
+>>>>> +// that signals unusual semantics, and the parameter name may well
+>>>>> +// serve a purpose. (like nbd_iter_channel_error()).
+>>>>> +//
+>>>>> +// Skip util/error.c to not touch, for example, error_propagate() an=
+d
+>>>>> +// error_propagate_prepend().
+>>>>> +@ depends on !(file in "util/error.c") disable optional_qualifier@
+>>>>> +identifier fn;
+>>>>> +identifier _errp !=3D errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(...,
+>>>>> +-   Error **_errp
+>>>>> ++   Error **errp
+>>>>> +    ,...)
+>>>>> + {
+>>>>> +(
+>>>>> +     ... when !=3D assert(_errp && *_errp)
+>>>>> +&
+>>>>> +     <...
+>>>>> +-    _errp
+>>>>> ++    errp
+>>>>> +     ...>
+>>>>> +)
+>>>>> + }
+>>>>> +
+>>>>> +// Add invocation of ERRP_AUTO_PROPAGATE to errp-functions where
+>>>>> +// necessary
+>>>>> +//
+>>>>> +// Note, that without "when any" the final "..." does not mach
+>>>>> +// something matched by previous pattern, i.e. the rule will not mat=
+ch
+>>>>> +// double error_prepend in control flow like in
+>>>>> +// vfio_set_irq_signaling().
+>>>>> +//
+>>>>> +// Note, "exists" says that we want apply rule even if it matches no=
+t
+>>>>> +// on all possible control flows (otherwise, it will not match
+>>>>> +// standard pattern when error_propagate() call is in if branch).
+>>>>> +@ disable optional_qualifier exists@
+>>>>> +identifier fn, local_err;
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error **errp, ...)
+>>>>> + {
+>>>>> ++   ERRP_AUTO_PROPAGATE();
+>>>>> +    ...  when !=3D ERRP_AUTO_PROPAGATE();
+>>>>> +(
+>>>>> +(
+>>>>> +    error_append_hint(errp, ...);
+>>>>> +|
+>>>>> +    error_prepend(errp, ...);
+>>>>> +|
+>>>>> +    error_vprepend(errp, ...);
+>>>>> +)
+>>>>> +    ... when any
+>>>>> +|
+>>>>> +    Error *local_err =3D NULL;
+>>>>> +    ...
+>>>>> +(
+>>>>> +    error_propagate_prepend(errp, local_err, ...);
+>>>>> +|
+>>>>> +    error_propagate(errp, local_err);
+>>>>> +)
+>>>>> +    ...
+>>>>> +)
+>>>>> + }
+>>>>> +
+>>>>> +
+>>>>> +// Match functions with propagation of local error to errp.
+>>>>> +// We want to refer these functions in several following rules, but =
+I
+>>>>> +// don't know a proper way to inherit a function, not just its name
+>>>>> +// (to not match another functions with same name in following rules=
+).
+>>>>> +// Not-proper way is as follows: rename errp parameter in functions
+>>>>> +// header and match it in following rules. Rename it back after all
+>>>>> +// transformations.
+>>>>> +//
+>>>>> +// The simplest case of propagation scheme is single definition of
+>>>>> +// local_err with at most one error_propagate_prepend or
+>>>>> +// error_propagate on each control-flow. Still, we want to match mor=
+e
+>>>>> +// complex schemes too. We'll warn them with help of further rules.
+>>>>
+>>>> I think what we actually want is to examine instances of this pattern =
+to
+>>>> figure out whether and how we want to transform them.  Perhaps:
+>>>>
+>>>>       // The common case is a single definition of local_err with at m=
+ost one
+>>>>       // error_propagate_prepend() or error_propagate() on each contro=
+l-flow
+>>>>       // path. Instances of this case we convert with this script. Fun=
+ctions
+>>>
+>>> For me, sounds a bit like "other things we don't convert".
+>>> Actually we convert other things too.
+>>
+>> What other patterns of error propagation do we convert?
+>
+> Something like in xen_block_device_destroy, why not? Otherwise, it's bett=
+er to avoid
+> matching things like xen_block_device_destroy, not just warn them.
+> But I'd prefer to proceed now as is to fit into 5.0.. Too much time alrea=
+dy
+> spent on this. So, I'm OK with your wording too.
 
-Thanks,
-Laurent
+Let's scratch "Instances of this case we convert with this script."
+
+>>>>       // with multiple definitions or propagates we want to examine
+>>>>       // manually. Later rules emit warnings to guide us to them.
+>>>>
+>>>>> +@rule1 disable optional_qualifier exists@
+>>>>> +identifier fn, local_err;
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error **
+>>>>> +-    errp
+>>>>> ++    ____
+>>>>> +    , ...)
+>>>>> + {
+>>>>> +     ...
+>>>>> +     Error *local_err =3D NULL;
+>>>>> +     ...
+>>>>> +(
+>>>>> +     error_propagate_prepend(errp, local_err, ...);
+>>>>> +|
+>>>>> +     error_propagate(errp, local_err);
+>>>>> +)
+>>>>> +     ...
+>>>>> + }
+>>>>> +
+>>>>> +
+>>>>> +// Warn several Error * definitions.
+>>>>> +@check1 disable optional_qualifier exists@
+>>>>> +identifier fn =3D rule1.fn, local_err, local_err2;
+>>>>
+>>>> Elsewhere, you use just rule.fn instead of fn =3D rule1.fn.  Any
+>>>> particular reason for the difference?
+>>>
+>>> I didn't find other way to ref check1.fn in next python rule. It just d=
+on't
+>>> work if I write here just rule1.fn.
+>>>
+>>>>
+>>>> With the ___ chaining hack, I doubt we still need "=3D rule1.fn" or
+>>>> "rule1.fn".  If I replace "fn =3D rule1.fn" and "rule.fn" by just "fn"
+>>>> everywhere, then apply the script to the complete tree, I get the same
+>>>> result.
+>>>
+>>> I think, it's more efficient to reuse names from previous rules. I thin=
+k it should
+>>> work faster (more information, less extra matching).
+>>
+>> Nope.  With my hacked up script (patch appended) Coccinelle is actually
+>> *faster* for the .[ch] touched by this series: with your unmodified
+>> script, it takes a bit over 12s on my box, with mine around 7s.  Output
+>> is identical.
+>>
+>> Never guess performance, always measure it :)
+>
+> Hmm, whole tree results would be better proof
+>
+>>
+>> Two notes on my script:
+>>
+>> * Unlike yours, it recognizes double-propagation in my test case.
+>>    Discussed below.
+>>
+>> * Its "several definitions of" warning includes positions.  That turned
+>>    out to be useless, but I've been too lazy to take that out again.
+>>
+>>>>
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     ...
+>>>>> +     Error *local_err =3D NULL;
+>>>>> +     ... when any
+>>>>> +     Error *local_err2 =3D NULL;
+>>>>> +     ... when any
+>>>>> + }
+
+This flags functions that have more than one declaration along any
+control flow path.  It doesn't flag this one:
+
+    void gnat(bool b, Error **errp)
+    {
+        if (b) {
+            Error *local_err =3D NULL;
+            foo(arg, &local_err);
+            error_propagate(errp, local_err);
+        } else {
+            Error *local_err =3D NULL;
+            bar(arg, &local_err);
+            error_propagate(errp, local_err);
+        }
+    }
+
+The Coccinelle script does the right thing for this one regardless.
+
+I'd prefer to have such functions flagged, too.  But spending time on
+convincing Coccinelle to do it for me is not worthwhile; I can simply
+search the diff produced by Coccinelle for deletions of declarations
+that are not indented exactly four spaces.
+
+But if we keep this rule, we should adjust its comment
+
+    // Warn several Error * definitions.
+
+because it sure suggests it also catches functions like the one I gave
+above.
+
+>>>>> +
+>>>>> +@ script:python @
+>>>>> +fn << check1.fn;
+>>>>> +@@
+>>>>> +
+>>>>> +print('Warning: function {} has several definitions of '
+>>>>> +      'Error * local variable'.format(fn))
+>>>>> +
+>>>>> +// Warn several propagations in control flow.
+>>>>> +@check2 disable optional_qualifier exists@
+>>>>> +identifier fn =3D rule1.fn;
+>>>>> +symbol errp;
+>>>>> +position p1, p2;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     ...
+>>>>> +(
+>>>>> +     error_propagate_prepend(errp, ...);@p1
+>>>>> +|
+>>>>> +     error_propagate(errp, ...);@p1
+>>>>> +)
+>>>>> +     ...
+>>>>> +(
+>>>>> +     error_propagate_prepend(errp, ...);@p2
+>>>>> +|
+>>>>> +     error_propagate(errp, ...);@p2
+>>>>> +)
+>>>>> +     ... when any
+>>>>> + }
+>>>>> +
+>>>>
+>>>> Hmm, we don't catch the example I used in review of v8:
+>>>>
+>>>>       extern foo(int, Error **);
+>>>>       extern bar(int, Error **);
+>>>>
+>>>>       void frob(Error **errp)
+>>>>       {
+>>>>           Error *local_err =3D NULL;
+>>>>           int arg;
+>>>>
+>>>>           foo(arg, errp);
+>>>>           bar(arg, &local_err);
+>>>>           error_propagate(errp, local_err);
+>>>>           bar(arg + 1, &local_err);
+>>>>           error_propagate(errp, local_err);
+>>>>       }
+>>>>
+>>>> I believe this is because rule1 does not match here.
+>>>
+>>> Yes, rule1 wants at least one code flow with non-doubled propagation.
+>>>
+>>>>
+>>>> If I change the rule as follows, it catches the example:
+>>>>
+>>>>       @@ -157,24 +157,23 @@ print('Warning: function {} has several de=
+finitions of '
+>>>>
+>>>>        // Warn several propagations in control flow.
+>>>>        @check2 disable optional_qualifier exists@
+>>>>       -identifier fn =3D rule1.fn;
+>>>>       -symbol errp;
+>>>>       +identifier fn, _errp;
+>>>>        position p1, p2;
+>>>>        @@
+>>>>
+>>>>       - fn(..., Error ** ____, ...)
+>>>>       + fn(..., Error **_errp, ...)
+>>>>         {
+>>>>             ...
+>>>>        (
+>>>>       -     error_propagate_prepend(errp, ...);@p1
+>>>>       +     error_propagate_prepend(_errp, ...);@p1
+>>>>        |
+>>>>       -     error_propagate(errp, ...);@p1
+>>>>       +     error_propagate(_errp, ...);@p1
+>>>>        )
+>>>>             ...
+>>>>        (
+>>>>       -     error_propagate_prepend(errp, ...);@p2
+>>>>       +     error_propagate_prepend(_errp, ...);@p2
+>>>>        |
+>>>>       -     error_propagate(errp, ...);@p2
+>>>>       +     error_propagate(_errp, ...);@p2
+>>>>        )
+>>>>             ... when any
+>>>>         }
+>>>>
+>>>> To my mild surprise, it still doesn't find anything in our tree.
+>>>>
+>>>> Should we decouple the previous rule from rule1, too?  I tested the
+>>>> following on the whole tree:
+>>>
+>>> I don't think so. Why to check what we are not going to convert? If we =
+want
+>>> to check side things, it's better to do it in other coccinelle script..
+>>
+>> Misunderstanding?  The rules are still chained together via the ___
+>> hack, just not via function name, because that's unreliable and
+>> redundant.
+>
+> Strange.. Then, how can it match something not matched by rule1?
+
+I think I got confused when I wrote the "Misunderstanding?" paragraph.
+
+Let me try again.
+
+First rule check2.
+
+The common case is a at most one propagation to @errp along any control
+flow path.  We trust your Coccinelle script to convert that alright.
+
+Any other propagation to @errp I want to review.  Whether the script
+attempts a conversion or not is unimportant, as long as it points me to
+the function to review.
+
+Rule rule1 matches functions that propagate to @errp once along at least
+one control flow path.
+
+Unchained from rule rule1, rule check2 flags any function that
+propagates to @errp multiple times along any control flow path.
+
+Chained to rule1, it flags only functions that also have a path with
+single propagation.
+
+In other words, the unchained rule flags *all* multi-propagations to
+@errp, while the chained rule flags only the ones the script attempts to
+convert.  The former is much more useful to me.
+
+Now rule check1.  It flags functions with multiple declarations along
+any control flow path.  Again, chaining it to rule1 restricts it to the
+functions we attempt to convert.  Makes it less useful to me.  However,
+because my desire to review multiple declarations in function we don't
+attempt to convert is lower than my desire to review multiple
+propagations to @errp in such functions, chaining check1 is tolerable
+for me.  But why chain check1 if we don't chain check2?
+
+>
+>>
+>>>>
+>>>>       @@ -136,10 +136,10 @@ symbol errp;
+>>>>
+>>>>        // Warn several Error * definitions.
+>>>>        @check1 disable optional_qualifier exists@
+>>>>       -identifier fn =3D rule1.fn, local_err, local_err2;
+>>>>       +identifier fn, _errp, local_err, local_err2;
+>>>>        @@
+>>>>
+>>>>       - fn(..., Error ** ____, ...)
+>>>>       + fn(..., Error **_errp, ...)
+>>>>         {
+>>>>             ...
+>>>>             Error *local_err =3D NULL;
+>>>>
+>>>> Warnings remain unchanged.
+>>>>
+>>>>> +@ script:python @
+>>>>> +fn << check2.fn;
+>>>>> +p1 << check2.p1;
+>>>>> +p2 << check2.p2;
+>>>>> +@@
+>>>>> +
+>>>>> +print('Warning: function {} propagates to errp several times in '
+>>>>> +      'one control flow: at {}:{} and then at {}:{}'.format(
+>>>>> +          fn, p1[0].file, p1[0].line, p2[0].file, p2[0].line))
+>>>>> +
+>>>>> +// Convert special case with goto separately.
+>>>>> +// I tried merging this into the following rule the obvious way, but
+>>>>> +// it made Coccinelle hang on block.c
+>>>>> +//
+>>>>> +// Note interesting thing: if we don't do it here, and try to fixup
+>>>>> +// "out: }" things later after all transformations (the rule will be
+>>>>> +// the same, just without error_propagate() call), coccinelle fails =
+to
+>>>>> +// match this "out: }".
+>>>>> +@ disable optional_qualifier@
+>>>>> +identifier rule1.fn, rule1.local_err, out;
+>>>>
+>>>> As explained above, I doubt the need for rule1.fn.  We do need
+>>>> rule1.local_err to avoid unwanted transformations.  More of the same
+>>>> below.
+>>>
+>>> Logically, I want to inherit from rule1. So why not to stress it by inh=
+eriting
+>>> fn variable? It's just a correct thing to do.
+>>> And I hope it helps coccinelle to work more efficiently.
+>>>
+>>>>
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     <...
+>>>>> +-    goto out;
+>>>>> ++    return;
+>>>>> +     ...>
+>>>>> +- out:
+>>>>> +-    error_propagate(errp, local_err);
+>>>>> + }
+>>>>> +
+>>>>> +// Convert most of local_err related stuff.
+>>>>> +//
+>>>>> +// Note, that we update everything related to matched by rule1
+>>>>> +// function name and local_err name. We may match something not
+>>>>> +// related to the pattern matched by rule1. For example, local_err m=
+ay
+>>>>> +// be defined with the same name in different blocks inside one
+>>>>> +// function, and in one block follow the propagation pattern and in
+>>>>> +// other block doesn't. Or we may have several functions with the sa=
+me
+>>>>> +// name (for different configurations).
+>>>>> +//
+>>>>> +// Note also that errp-cleaning functions
+>>>>> +//   error_free_errp
+>>>>> +//   error_report_errp
+>>>>> +//   error_reportf_errp
+>>>>> +//   warn_report_errp
+>>>>> +//   warn_reportf_errp
+>>>>> +// are not yet implemented. They must call corresponding Error* -
+>>>>> +// freeing function and then set *errp to NULL, to avoid further
+>>>>> +// propagation to original errp (consider ERRP_AUTO_PROPAGATE in use=
+).
+>>>>> +// For example, error_free_errp may look like this:
+>>>>> +//
+>>>>> +//    void error_free_errp(Error **errp)
+>>>>> +//    {
+>>>>> +//        error_free(*errp);
+>>>>> +//        *errp =3D NULL;
+>>>>> +//    }
+>>>>> +@ disable optional_qualifier exists@
+>>>>> +identifier rule1.fn, rule1.local_err;
+>>>>> +expression list args;
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     <...
+>>>>> +(
+>>>>> +-    Error *local_err =3D NULL;
+>>>>> +|
+>>>>> +
+>>>>> +// Convert error clearing functions
+>>>>> +(
+>>>>> +-    error_free(local_err);
+>>>>> ++    error_free_errp(errp);
+>>>>> +|
+>>>>> +-    error_report_err(local_err);
+>>>>> ++    error_report_errp(errp);
+>>>>> +|
+>>>>> +-    error_reportf_err(local_err, args);
+>>>>> ++    error_reportf_errp(errp, args);
+>>>>> +|
+>>>>> +-    warn_report_err(local_err);
+>>>>> ++    warn_report_errp(errp);
+>>>>> +|
+>>>>> +-    warn_reportf_err(local_err, args);
+>>>>> ++    warn_reportf_errp(errp, args);
+>>>>> +)
+>>>>> +?-    local_err =3D NULL;
+>>>>> +
+>>>>> +|
+>>>>> +-    error_propagate_prepend(errp, local_err, args);
+>>>>> ++    error_prepend(errp, args);
+>>>>> +|
+>>>>> +-    error_propagate(errp, local_err);
+>>>>> +|
+>>>>> +-    &local_err
+>>>>> ++    errp
+>>>>> +)
+>>>>> +     ...>
+>>>>> + }
+>>>>> +
+>>>>> +// Convert remaining local_err usage. For example, different kinds o=
+f
+>>>>> +// error checking in if conditionals. We can't merge this into
+>>>>> +// previous hunk, as this conflicts with other substitutions in it (=
+at
+>>>>> +// least with "- local_err =3D NULL").
+>>>>> +@ disable optional_qualifier@
+>>>>> +identifier rule1.fn, rule1.local_err;
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     <...
+>>>>> +-    local_err
+>>>>> ++    *errp
+>>>>> +     ...>
+>>>>> + }
+>>>>> +
+>>>>> +// Always use the same pattern for checking error
+>>>>> +@ disable optional_qualifier@
+>>>>> +identifier rule1.fn;
+>>>>> +symbol errp;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error ** ____, ...)
+>>>>> + {
+>>>>> +     <...
+>>>>> +-    *errp !=3D NULL
+>>>>> ++    *errp
+>>>>> +     ...>
+>>>>> + }
+>>>>> +
+>>>>> +// Revert temporary ___ identifier.
+>>>>> +@ disable optional_qualifier@
+>>>>> +identifier rule1.fn;
+>>>>> +@@
+>>>>> +
+>>>>> + fn(..., Error **
+>>>>> +-   ____
+>>>>> ++   errp
+>>>>> +    , ...)
+>>>>> + {
+>>>>> +     ...
+>>>>> + }
+>>>>> diff --git a/include/qapi/error.h b/include/qapi/error.h
+>>>>> index 30140d9bfe..56c133520d 100644
+>>>>> --- a/include/qapi/error.h
+>>>>> +++ b/include/qapi/error.h
+>>>>> @@ -214,6 +214,9 @@
+>>>>>     *         }
+>>>>>     *         ...
+>>>>>     *     }
+>>>>> + *
+>>>>> + * For mass-conversion use script
+>>>>> + *   scripts/coccinelle/auto-propagated-errp.cocci
+>>>>>     */
+>>>>>      #ifndef ERROR_H
+>>>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>>>> index 857f969aa1..047f1b9714 100644
+>>>>> --- a/MAINTAINERS
+>>>>> +++ b/MAINTAINERS
+>>>>> @@ -1998,6 +1998,7 @@ F: include/qemu/error-report.h
+>>>>>    F: qapi/error.json
+>>>>>    F: util/error.c
+>>>>>    F: util/qemu-error.c
+>>>>> +F: scripts/coccinelle/*err*.cocci
+>>>>>      GDB stub
+>>>>>    M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>
+>>
+>>
+>>  From 42a08c529024337d1b859839c9ce7f797f784555 Mon Sep 17 00:00:00 2001
+>> From: Markus Armbruster <armbru@redhat.com>
+>> Date: Fri, 13 Mar 2020 14:27:57 +0100
+>> Subject: [PATCH] fixup! scripts: Coccinelle script to use
+>>   ERRP_AUTO_PROPAGATE()
+>>
+>> ---
+>>   scripts/coccinelle/auto-propagated-errp.cocci | 37 ++++++++++---------
+>>   1 file changed, 20 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coc=
+cinelle/auto-propagated-errp.cocci
+>> index 7dac2dcfa4..43b0b0e63b 100644
+>> --- a/scripts/coccinelle/auto-propagated-errp.cocci
+>> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+>> @@ -136,45 +136,48 @@ symbol errp;
+>>     // Warn several Error * definitions.
+>>   @check1 disable optional_qualifier exists@
+>> -identifier fn =3D rule1.fn, local_err, local_err2;
+>> +identifier fn, _errp, local_err, local_err2;
+>> +position p1, p2;
+>
+>
+> Hmm, seems like I forget to define ____ as symbol in my patch
+
+Coccinelle defaults to symbol.
+
+>>   @@
+>>   - fn(..., Error ** ____, ...)
+>> + fn(..., Error **_errp, ...)
+>
+> Ahmm.. it will break compilation?
+>
+> Or, how will it work when _errp defined as meta variable is only in "+...=
+" line? Should it be symbol instead, or just not defined?
+
+Misunderstanding?  It's a diff between your .cocci and mine.  My version
+is
+
+    // Warn several Error * definitions.
+    @check1 disable optional_qualifier exists@
+    identifier fn, _errp, local_err, local_err2;
+    position p1, p2;
+    @@
+
+     fn(..., Error **_errp, ...)
+     {
+         ...
+         Error *local_err =3D NULL;@p1
+         ... when any
+         Error *local_err2 =3D NULL;@p2
+         ... when any
+     }
+
+    @ script:python @
+    fn << check1.fn;
+    p1 << check1.p1;
+    p2 << check1.p2;
+    @@
+
+>>    {
+>>        ...
+>> -     Error *local_err =3D NULL;
+>> +     Error *local_err =3D NULL;@p1
+>
+> Why to do -/+ here? Nothing changed..
+>
+>>        ... when any
+>> -     Error *local_err2 =3D NULL;
+>> +     Error *local_err2 =3D NULL;@p2
+>>        ... when any
+>>    }
+>>     @ script:python @
+>>   fn << check1.fn;
+>> +p1 << check1.p1;
+>> +p2 << check1.p2;
+>>   @@
+>>     print('Warning: function {} has several definitions of '
+>> -      'Error * local variable'.format(fn))
+>> +      'Error * local variable: at {}:{} and then at {}:{}'.format(
+>> +          fn, p1[0].file, p1[0].line, p2[0].file, p2[0].line))
+>>     // Warn several propagations in control flow.
+>>   @check2 disable optional_qualifier exists@
+>> -identifier fn =3D rule1.fn;
+>> -symbol errp;
+>> +identifier fn, _errp;
+>>   position p1, p2;
+>>   @@
+>>   - fn(..., Error ** ____, ...)
+>> + fn(..., Error **_errp, ...)
+>>    {
+>>        ...
+>>   (
+>> -     error_propagate_prepend(errp, ...);@p1
+>> +     error_propagate_prepend(_errp, ...);@p1
+>>   |
+>> -     error_propagate(errp, ...);@p1
+>> +     error_propagate(_errp, ...);@p1
+>>   )
+>>        ...
+>>   (
+>> -     error_propagate_prepend(errp, ...);@p2
+>> +     error_propagate_prepend(_errp, ...);@p2
+>>   |
+>> -     error_propagate(errp, ...);@p2
+>> +     error_propagate(_errp, ...);@p2
+>>   )
+>
+> You change some occurrences of errp to _errp, but not all. It breaks comp=
+ilation.
+>
+>>        ... when any
+>>    }
+>> @@ -198,7 +201,7 @@ print('Warning: function {} propagates to errp sever=
+al times in '
+>>   // the same, just without error_propagate() call), coccinelle fails to
+>>   // match this "out: }".
+>>   @ disable optional_qualifier@
+>> -identifier rule1.fn, rule1.local_err, out;
+>> +identifier fn, rule1.local_err, out;
+>
+> Hmm. If it improves performance it is strange.. But I can live with this =
+change.
+>
+>>   symbol errp;
+>>   @@
+>>   @@ -239,7 +242,7 @@ symbol errp;
+>>   //        *errp =3D NULL;
+>>   //    }
+>>   @ disable optional_qualifier exists@
+>> -identifier rule1.fn, rule1.local_err;
+>> +identifier fn, rule1.local_err;
+>>   expression list args;
+>>   symbol errp;
+>>   @@
+>> @@ -287,7 +290,7 @@ symbol errp;
+>>   // previous hunk, as this conflicts with other substitutions in it (at
+>>   // least with "- local_err =3D NULL").
+>>   @ disable optional_qualifier@
+>> -identifier rule1.fn, rule1.local_err;
+>> +identifier fn, rule1.local_err;
+>>   symbol errp;
+>>   @@
+>>   @@ -301,7 +304,7 @@ symbol errp;
+>>     // Always use the same pattern for checking error
+>>   @ disable optional_qualifier@
+>> -identifier rule1.fn;
+>> +identifier fn;
+>>   symbol errp;
+>>   @@
+>>   @@ -315,7 +318,7 @@ symbol errp;
+>>     // Revert temporary ___ identifier.
+>>   @ disable optional_qualifier@
+>> -identifier rule1.fn;
+>> +identifier fn;
+>>   @@
+>>      fn(..., Error **
+>>
+
+I append my hacked up version of auto-propagated-errp.cocci.  It
+produces the same patch as yours for the complete tree.
+
+
+
+// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+//
+// Copyright (c) 2020 Virtuozzo International GmbH.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see
+// <http://www.gnu.org/licenses/>.
+//
+// Usage example:
+// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+//  --macro-file scripts/cocci-macro-file.h --in-place \
+//  --no-show-diff --max-width 80 FILES...
+//
+// Note: --max-width 80 is needed because coccinelle default is less
+// than 80, and without this parameter coccinelle may reindent some
+// lines which fit into 80 characters but not to coccinelle default,
+// which in turn produces extra patch hunks for no reason.
+
+// Switch unusual Error ** parameter names to errp
+// (this is necessary to use ERRP_AUTO_PROPAGATE).
+//
+// Disable optional_qualifier to skip functions with
+// "Error *const *errp" parameter.
+//
+// Skip functions with "assert(_errp && *_errp)" statement, because
+// that signals unusual semantics, and the parameter name may well
+// serve a purpose. (like nbd_iter_channel_error()).
+//
+// Skip util/error.c to not touch, for example, error_propagate() and
+// error_propagate_prepend().
+@ depends on !(file in "util/error.c") disable optional_qualifier@
+identifier fn;
+identifier _errp !=3D errp;
+@@
+
+ fn(...,
+-   Error **_errp
++   Error **errp
+    ,...)
+ {
+(
+     ... when !=3D assert(_errp && *_errp)
+&
+     <...
+-    _errp
++    errp
+     ...>
+)
+ }
+
+// Add invocation of ERRP_AUTO_PROPAGATE to errp-functions where
+// necessary
+//
+// Note, that without "when any" the final "..." does not mach
+// something matched by previous pattern, i.e. the rule will not match
+// double error_prepend in control flow like in
+// vfio_set_irq_signaling().
+//
+// Note, "exists" says that we want apply rule even if it matches not
+// on all possible control flows (otherwise, it will not match
+// standard pattern when error_propagate() call is in if branch).
+@ disable optional_qualifier exists@
+identifier fn, local_err;
+symbol errp;
+@@
+
+ fn(..., Error **errp, ...)
+ {
++   ERRP_AUTO_PROPAGATE();
+    ...  when !=3D ERRP_AUTO_PROPAGATE();
+(
+(
+    error_append_hint(errp, ...);
+|
+    error_prepend(errp, ...);
+|
+    error_vprepend(errp, ...);
+)
+    ... when any
+|
+    Error *local_err =3D NULL;
+    ...
+(
+    error_propagate_prepend(errp, local_err, ...);
+|
+    error_propagate(errp, local_err);
+)
+    ...
+)
+ }
+
+
+// Match functions with propagation of local error to errp.
+// We want to refer these functions in several following rules, but I
+// don't know a proper way to inherit a function, not just its name
+// (to not match another functions with same name in following rules).
+// Not-proper way is as follows: rename errp parameter in functions
+// header and match it in following rules. Rename it back after all
+// transformations.
+//
+// The simplest case of propagation scheme is single definition of
+// local_err with at most one error_propagate_prepend or
+// error_propagate on each control-flow. Still, we want to match more
+// complex schemes too. We'll warn them with help of further rules.
+@rule1 disable optional_qualifier exists@
+identifier fn, local_err;
+symbol errp;
+@@
+
+ fn(..., Error **
+-    errp
++    ____
+    , ...)
+ {
+     ...
+     Error *local_err =3D NULL;
+     ...
+(
+     error_propagate_prepend(errp, local_err, ...);
+|
+     error_propagate(errp, local_err);
+)
+     ...
+ }
+
+
+// Warn several Error * definitions.
+@check1 disable optional_qualifier exists@
+identifier fn, _errp, local_err, local_err2;
+position p1, p2;
+@@
+
+ fn(..., Error **_errp, ...)
+ {
+     ...
+     Error *local_err =3D NULL;@p1
+     ... when any
+     Error *local_err2 =3D NULL;@p2
+     ... when any
+ }
+
+@ script:python @
+fn << check1.fn;
+p1 << check1.p1;
+p2 << check1.p2;
+@@
+
+print('Warning: function {} has several definitions of '
+      'Error * local variable: at {}:{} and then at {}:{}'.format(
+          fn, p1[0].file, p1[0].line, p2[0].file, p2[0].line))
+
+// Warn several propagations in control flow.
+@check2 disable optional_qualifier exists@
+identifier fn, _errp;
+position p1, p2;
+@@
+
+ fn(..., Error **_errp, ...)
+ {
+     ...
+(
+     error_propagate_prepend(_errp, ...);@p1
+|
+     error_propagate(_errp, ...);@p1
+)
+     ...
+(
+     error_propagate_prepend(_errp, ...);@p2
+|
+     error_propagate(_errp, ...);@p2
+)
+     ... when any
+ }
+
+@ script:python @
+fn << check2.fn;
+p1 << check2.p1;
+p2 << check2.p2;
+@@
+
+print('Warning: function {} propagates to errp several times in '
+      'one control flow: at {}:{} and then at {}:{}'.format(
+          fn, p1[0].file, p1[0].line, p2[0].file, p2[0].line))
+
+// Convert special case with goto separately.
+// I tried merging this into the following rule the obvious way, but
+// it made Coccinelle hang on block.c
+//
+// Note interesting thing: if we don't do it here, and try to fixup
+// "out: }" things later after all transformations (the rule will be
+// the same, just without error_propagate() call), coccinelle fails to
+// match this "out: }".
+@ disable optional_qualifier@
+identifier fn, rule1.local_err, out;
+symbol errp;
+@@
+
+ fn(..., Error ** ____, ...)
+ {
+     <...
+-    goto out;
++    return;
+     ...>
+- out:
+-    error_propagate(errp, local_err);
+ }
+
+// Convert most of local_err related stuff.
+//
+// Note, that we update everything related to matched by rule1
+// function name and local_err name. We may match something not
+// related to the pattern matched by rule1. For example, local_err may
+// be defined with the same name in different blocks inside one
+// function, and in one block follow the propagation pattern and in
+// other block doesn't. Or we may have several functions with the same
+// name (for different configurations).
+//
+// Note also that errp-cleaning functions
+//   error_free_errp
+//   error_report_errp
+//   error_reportf_errp
+//   warn_report_errp
+//   warn_reportf_errp
+// are not yet implemented. They must call corresponding Error* -
+// freeing function and then set *errp to NULL, to avoid further
+// propagation to original errp (consider ERRP_AUTO_PROPAGATE in use).
+// For example, error_free_errp may look like this:
+//
+//    void error_free_errp(Error **errp)
+//    {
+//        error_free(*errp);
+//        *errp =3D NULL;
+//    }
+@ disable optional_qualifier exists@
+identifier fn, rule1.local_err;
+expression list args;
+symbol errp;
+@@
+
+ fn(..., Error ** ____, ...)
+ {
+     <...
+(
+-    Error *local_err =3D NULL;
+|
+
+// Convert error clearing functions
+(
+-    error_free(local_err);
++    error_free_errp(errp);
+|
+-    error_report_err(local_err);
++    error_report_errp(errp);
+|
+-    error_reportf_err(local_err, args);
++    error_reportf_errp(errp, args);
+|
+-    warn_report_err(local_err);
++    warn_report_errp(errp);
+|
+-    warn_reportf_err(local_err, args);
++    warn_reportf_errp(errp, args);
+)
+?-    local_err =3D NULL;
+
+|
+-    error_propagate_prepend(errp, local_err, args);
++    error_prepend(errp, args);
+|
+-    error_propagate(errp, local_err);
+|
+-    &local_err
++    errp
+)
+     ...>
+ }
+
+// Convert remaining local_err usage. For example, different kinds of
+// error checking in if conditionals. We can't merge this into
+// previous hunk, as this conflicts with other substitutions in it (at
+// least with "- local_err =3D NULL").
+@ disable optional_qualifier@
+identifier fn, rule1.local_err;
+symbol errp;
+@@
+
+ fn(..., Error ** ____, ...)
+ {
+     <...
+-    local_err
++    *errp
+     ...>
+ }
+
+// Always use the same pattern for checking error
+@ disable optional_qualifier@
+identifier fn;
+symbol errp;
+@@
+
+ fn(..., Error ** ____, ...)
+ {
+     <...
+-    *errp !=3D NULL
++    *errp
+     ...>
+ }
+
+// Revert temporary ___ identifier.
+@ disable optional_qualifier@
+identifier fn;
+@@
+
+ fn(..., Error **
+-   ____
++   errp
+    , ...)
+ {
+     ...
+ }
 
 
