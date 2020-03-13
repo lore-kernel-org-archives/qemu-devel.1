@@ -2,80 +2,90 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59E9C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD5EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:05:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 733AE2074E
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:04:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5D642074E
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aW9ofLqz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 733AE2074E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Lm+Qu8Xr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D642074E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCuHX-0001wh-KX
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:03:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48439)
+	id 1jCuIn-0003OB-Ua
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:05:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1jCuGp-0001UF-W9
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:03:18 -0400
+ (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
+ id 1jCuHq-0002Kh-Lm
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1jCuGn-0005DE-Fd
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:03:15 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:44266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1jCuGn-0005Bt-9v; Fri, 13 Mar 2020 20:03:13 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id e138so1626811vsc.11;
- Fri, 13 Mar 2020 17:03:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ivad3kgq3pd0RWqlEOq1n5K2bnpZeBXHNH1FVNYvEkQ=;
- b=aW9ofLqzCEoVe/Y4OPUZ9NQRmIXmurVMGR5uKXBgowiYIjrom+kqhSGxcy9VbpbvM1
- D4/6wkqRCxYnBaYl/72LluYDstExpISSiW2M+ACIGY4fzDPgfxvuqZLmaeDDP77ptPVP
- C9sK3ZCicSM15RCUe0v/j983Tawtw4hsQQiu8mH9HxYHGDnoGm7jb34qzMWLc3+WuiY2
- 2BsIBK9OPRT/0VFwfdCDnlU+AmzVkaX/FbMJ8MEPHASFqeEqBtjs92qNCPK8q9WIppMz
- WnR5xMkvbEOeb9WqaDoJtMe3YY3VksrD7YREgaQ9GBUAysYIjWzZKUQcDhN3fk8i6IS0
- jUgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ivad3kgq3pd0RWqlEOq1n5K2bnpZeBXHNH1FVNYvEkQ=;
- b=CdkmfoV3gyE20BSVGS+KdB3+AJMDRc02HgspyboIphCSF3YrFCmHn052+3IyApLYQ2
- xgaeyAjTKQaggDldNoWXxDDRD+Q/eDvALPXWo2oG8Frq/RtgDTP/uVEuTISIq1ecBOUz
- qQkG0rSgMFgCrK4j1of/NgIrdqA1hniOv/hJZvJ7A+6Di2q2+jMMOPwen83cJPM8l4vY
- xkQoQU621eFeB8BiryFAxaNFCFtMxNiLVGum6oSKELZDFcrIArhf73ZejsTsNJumiY7G
- kIcw+mRNXazbCNAqK0Ug1GsuZ2PXOsxLt9VxEtAadoVdj4bH/uTAPUSZ6ctMiAFb708P
- jD6Q==
-X-Gm-Message-State: ANhLgQ0Z5REhPBgWm1cnDMqpTQT/KW7c+CFAg2VhcWy1sib1kYQNz2Iy
- W8Nxx2Fp+E0r2YHV/2Iw7FDoieBDYBWFg2nyc74=
-X-Google-Smtp-Source: ADFU+vsgDuyettrI+48o2qoQNrdjPdHscrKLHo1DgGJHZH8ksSK5gf6sQLTKgKEjSGlu6BGgi4fP8ov98+xQH9xJQ10=
-X-Received: by 2002:a67:db81:: with SMTP id f1mr7158301vsk.151.1584144192402; 
- Fri, 13 Mar 2020 17:03:12 -0700 (PDT)
+ (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
+ id 1jCuHp-0002OG-DD
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:04:18 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:59684)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
+ id 1jCuHo-0001nP-N2; Fri, 13 Mar 2020 20:04:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1584144272; x=1615680272;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=BA949ONjqslxDLdDXXQETbLrZFzbaBvwbmBFsMoheIE=;
+ b=Lm+Qu8XrQ5TQq0n1RiIJwt9PW3fsk7EknbNnbaZhYaMTChBqlRf6bUBL
+ sIkq/zsSp5YPS5tWjAvGMLoL1NxecVOzwCWtnOwHa+I40H76m55rdfngg
+ 3gtNKxkG4jqThzhQvwggb7bgL7Z/13H7luyKoxoIUTLXDpdYn4sR/GfsF
+ SqlP8vbYlIFqejgiGWzkk9I2cM6pFNKmpZ6ddW3ooeA2DHDk6mh/Hqqw/
+ g/WHe0I0WMG+cRS9NtrKSMzXujFQxKStsfPg15WXbo+cbq7fErimRZ1HG
+ HO4fQvGXFg+1cKZHZ7bygxuTzsXq5V73axhpsSUUmnl2rIZJyQE4Gc6ff g==;
+IronPort-SDR: +DuUN8/TaHIlIrgKhJmON+h8j/ja2iAdmSmEx+9HbFvS6tA7Ui4a7QKL8pIheg2OWefgSroMof
+ 8TmNoEAT514nuD1zyVaym8qi87ONyzF/MbwUgapIWuiIuQbGVL9rq4vrC4FzFjG/hEK0hCcjm3
+ lczLtnk5il9Y+WZShJLLWF2xSibC2LS9PIH6o4LgpMVSOhha3q3LGf/p5BK6WDTFIu7+Hlr7rz
+ 8RB4cjk/EvFXNuw/g9s6vwriM0qk2j5r3TAW1BgCkRvmzIi00REmLhV/OHGzN0zij5xiGO/Nov
+ d4E=
+X-IronPort-AV: E=Sophos;i="5.70,550,1574092800"; d="scan'208";a="234512340"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 14 Mar 2020 08:04:26 +0800
+IronPort-SDR: Bnj/4CrGem5zmlGnefp00k5mvZ+ubM8CoO+Y6PbBDW17dJESs9hz41JBKx/yuU8+hg3M3qlbTx
+ +6C+AD29mt1veuO9lmp+EZVC9UALAHUoQYGTpkB8HgtlgXql6ZHX4h9/mUHaKKAb8mvhJUjz4S
+ u4heb0TKH7VlXtHKFdhIpKW7h5MSxEdg9Th/qaZ1LrATvm3rUmYRxpkaln6Qs6zQUneH1J/dKz
+ C88TA4CT9yhEavmUVEBa0mPamct6ycHnVEUJTokoUAl9xMrHqZWMfZ6PCKyNMmp3woaqq6eo64
+ HrHlVFU5Bc7YghjRh5eBzanR
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Mar 2020 16:56:10 -0700
+IronPort-SDR: do9pklDcTVONtt3Ttkx2h6vBFHADIsIAif4CCB5QDlN+o/p6M+q/C1FckioLzjSWNz0U36SnLS
+ NhPKL2bBRfeosFdyBAy5TeHWwfhqEEzMztmAvMj4gGJ1DigLDcUtsAbz8+zQ6Oxg8NHGJGoQT2
+ YBlEOQ8g29JsUZGcDm9LldIjeafU76kfgH3fnutCiPIZvNxoPZJn+dmNjC/bKN67v3bR5e8r3q
+ 3K7X2yec3FozD/cse42XhWDikvzCAMC3K+OfNC6d0cg5qs/dQtwCdSo/4CIXk6HmUWheSEQLLy
+ S6E=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip02.wdc.com with ESMTP; 13 Mar 2020 17:04:14 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org,
+	laurent@vivier.eu
+Subject: [PATCH v8 0/4]  linux-user: generate syscall_nr.sh for RISC-V
+Date: Fri, 13 Mar 2020 16:56:46 -0700
+Message-Id: <cover.1584143748.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-9-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200312145900.2054-9-zhiwei_liu@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 13 Mar 2020 17:02:46 -0700
-Message-ID: <CAKmqyKPPVVO8oxe8HDsQ+D4Cj1XuXASY5A1x1qfY606=16WZ2A@mail.gmail.com>
-Subject: Re: [PATCH v5 08/60] target/riscv: add vector amo operations
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.143.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,449 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Mar 12, 2020 at 8:15 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Vector AMOs operate as if aq and rl bits were zero on each element
-> with regard to ordering relative to other instructions in the same hart.
-> Vector AMOs provide no ordering guarantee between element operations
-> in the same vector AMO instruction
->
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  target/riscv/cpu.h                      |   1 +
->  target/riscv/helper.h                   |  29 +++++
->  target/riscv/insn32-64.decode           |  11 ++
->  target/riscv/insn32.decode              |  13 +++
->  target/riscv/insn_trans/trans_rvv.inc.c | 130 +++++++++++++++++++++
->  target/riscv/vector_helper.c            | 143 ++++++++++++++++++++++++
->  6 files changed, 327 insertions(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index b6ebb9b0eb..e069e55e81 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -374,6 +374,7 @@ FIELD(VDATA, MLEN, 0, 8)
->  FIELD(VDATA, VM, 8, 1)
->  FIELD(VDATA, LMUL, 9, 2)
->  FIELD(VDATA, NF, 11, 4)
-> +FIELD(VDATA, WD, 11, 1)
->
->  FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
->  FIELD(TB_FLAGS, LMUL, 3, 2)
-> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index 72ba4d9bdb..70a4b05f75 100644
-> --- a/target/riscv/helper.h
-> +++ b/target/riscv/helper.h
-> @@ -240,3 +240,32 @@ DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
->  DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
->  DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
->  DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
-> +#ifdef TARGET_RISCV64
-> +DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoaddw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoaddd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoxorw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoxord_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoandw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoandd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoorw_v_d,   void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoord_v_d,   void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamominw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomind_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamominuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamominud_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxud_v_d, void, ptr, ptr, tl, ptr, env, i32)
-> +#endif
-> +DEF_HELPER_6(vamoswapw_v_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoaddw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoxorw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoandw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamoorw_v_w,   void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamominw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamominuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
-> +DEF_HELPER_6(vamomaxuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
-> diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
-> index 380bf791bc..86153d93fa 100644
-> --- a/target/riscv/insn32-64.decode
-> +++ b/target/riscv/insn32-64.decode
-> @@ -57,6 +57,17 @@ amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
->  amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
->  amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
->
-> +#*** Vector AMO operations (in addition to Zvamo) ***
-> +vamoswapd_v     00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamoaddd_v      00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamoxord_v      00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamoandd_v      01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamoord_v       01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamomind_v      10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamomaxd_v      10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamominud_v     11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
-> +
->  # *** RV64F Standard Extension (in addition to RV32F) ***
->  fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
->  fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
-> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index b76c09c8c0..1330703720 100644
-> --- a/target/riscv/insn32.decode
-> +++ b/target/riscv/insn32.decode
-> @@ -44,6 +44,7 @@
->  &u    imm rd
->  &shift     shamt rs1 rd
->  &atomic    aq rl rs2 rs1 rd
-> +&rwdvm     vm wd rd rs1 rs2
->  &r2nfvm    vm rd rs1 nf
->  &rnfvm     vm rd rs1 rs2 nf
->
-> @@ -67,6 +68,7 @@
->  @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
->  @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
->  @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
-> +@r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
->  @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
->
->  @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
-> @@ -261,6 +263,17 @@ vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
->  vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
->  vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
->
-> +#*** Vector AMO operations are encoded under the standard AMO major opcode ***
-> +vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamoxorw_v      00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamoandw_v      01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamoorw_v       01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamominw_v      10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamomaxw_v      10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamominuw_v     11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
-> +
->  # *** new major opcode OP-V ***
->  vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
->  vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 9d9fc886d6..3c677160c5 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -600,3 +600,133 @@ GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
->  GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
->  GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
->  GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
-> +
-> +/*
-> + *** vector atomic operation
-> + */
-> +typedef void gen_helper_amo(TCGv_ptr, TCGv_ptr, TCGv, TCGv_ptr,
-> +        TCGv_env, TCGv_i32);
-> +
-> +static bool amo_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
-> +        uint32_t data, gen_helper_amo *fn, DisasContext *s)
-> +{
-> +    TCGv_ptr dest, mask, index;
-> +    TCGv base;
-> +    TCGv_i32 desc;
-> +
-> +    dest = tcg_temp_new_ptr();
-> +    mask = tcg_temp_new_ptr();
-> +    index = tcg_temp_new_ptr();
-> +    base = tcg_temp_new();
-> +    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
-> +
-> +    gen_get_gpr(base, rs1);
-> +    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
-> +    tcg_gen_addi_ptr(index, cpu_env, vreg_ofs(s, vs2));
-> +    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
-> +
-> +    fn(dest, mask, base, index, cpu_env, desc);
-> +
-> +    tcg_temp_free_ptr(dest);
-> +    tcg_temp_free_ptr(mask);
-> +    tcg_temp_free_ptr(index);
-> +    tcg_temp_free(base);
-> +    tcg_temp_free_i32(desc);
-> +    return true;
-> +}
-> +
-> +static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
-> +{
-> +    uint32_t data = 0;
-> +    gen_helper_amo *fn;
-> +    static gen_helper_amo *const fnsw[9] = {
-> +        /* no atomic operation */
-> +        gen_helper_vamoswapw_v_w,
-> +        gen_helper_vamoaddw_v_w,
-> +        gen_helper_vamoxorw_v_w,
-> +        gen_helper_vamoandw_v_w,
-> +        gen_helper_vamoorw_v_w,
-> +        gen_helper_vamominw_v_w,
-> +        gen_helper_vamomaxw_v_w,
-> +        gen_helper_vamominuw_v_w,
-> +        gen_helper_vamomaxuw_v_w
-> +    };
-> +#ifdef TARGET_RISCV64
-> +    static gen_helper_amo *const fnsd[18] = {
-> +        gen_helper_vamoswapw_v_d,
-> +        gen_helper_vamoaddw_v_d,
-> +        gen_helper_vamoxorw_v_d,
-> +        gen_helper_vamoandw_v_d,
-> +        gen_helper_vamoorw_v_d,
-> +        gen_helper_vamominw_v_d,
-> +        gen_helper_vamomaxw_v_d,
-> +        gen_helper_vamominuw_v_d,
-> +        gen_helper_vamomaxuw_v_d,
-> +        gen_helper_vamoswapd_v_d,
-> +        gen_helper_vamoaddd_v_d,
-> +        gen_helper_vamoxord_v_d,
-> +        gen_helper_vamoandd_v_d,
-> +        gen_helper_vamoord_v_d,
-> +        gen_helper_vamomind_v_d,
-> +        gen_helper_vamomaxd_v_d,
-> +        gen_helper_vamominud_v_d,
-> +        gen_helper_vamomaxud_v_d
-> +    };
-> +#endif
-> +
-> +    if (tb_cflags(s->base.tb) & CF_PARALLEL) {
-> +        gen_helper_exit_atomic(cpu_env);
-> +        s->base.is_jmp = DISAS_NORETURN;
-> +        return true;
-> +    } else {
-> +        fn = fnsw[seq];
-> +#ifdef TARGET_RISCV64
-> +        if (s->sew == 3) {
-> +            fn = fnsd[seq];
-> +        }
-> +#endif
-> +    }
-> +
-> +    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
-> +    data = FIELD_DP32(data, VDATA, VM, a->vm);
-> +    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-> +    data = FIELD_DP32(data, VDATA, WD, a->wd);
-> +    return amo_trans(a->rd, a->rs1, a->rs2, data, fn, s);
-> +}
-> +/*
-> + * There are two rules check here.
-> + *
-> + * 1. SEW must be at least as wide as the AMO memory element size.
-> + *
-> + * 2. If SEW is greater than XLEN, an illegal instruction exception is raised.
-> + */
-> +static bool amo_check(DisasContext *s, arg_rwdvm* a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV | RVA) &&
-> +            (!a->wd || vext_check_overlap_mask(s, a->rd, a->vm, false)) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            ((1 << s->sew) <= sizeof(target_ulong)) &&
-> +            ((1 << s->sew) >= 4));
-> +}
-> +
-> +GEN_VEXT_TRANS(vamoswapw_v, 0, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoaddw_v, 1, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoxorw_v, 2, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoandw_v, 3, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoorw_v, 4, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamominw_v, 5, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamomaxw_v, 6, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamominuw_v, 7, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamomaxuw_v, 8, rwdvm, amo_op, amo_check)
-> +#ifdef TARGET_RISCV64
-> +GEN_VEXT_TRANS(vamoswapd_v, 9, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoaddd_v, 10, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoxord_v, 11, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoandd_v, 12, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamoord_v, 13, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamomind_v, 14, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamomaxd_v, 15, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamominud_v, 16, rwdvm, amo_op, amo_check)
-> +GEN_VEXT_TRANS(vamomaxud_v, 17, rwdvm, amo_op, amo_check)
-> +#endif
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index 3841301b74..f9b409b169 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -94,6 +94,11 @@ static inline uint32_t vext_lmul(uint32_t desc)
->      return FIELD_EX32(simd_data(desc), VDATA, LMUL);
->  }
->
-> +static uint32_t vext_wd(uint32_t desc)
-> +{
-> +    return (simd_data(desc) >> 11) & 0x1;
-> +}
-> +
->  /*
->   * Get vector group length in bytes. Its range is [64, 2048].
->   *
-> @@ -685,3 +690,141 @@ GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, MO_LEUW, ldhu_w, clearl)
->  GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, MO_LEUW, ldhu_d, clearq)
->  GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, MO_LEUL, ldwu_w, clearl)
->  GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, MO_LEUL, ldwu_d, clearq)
-> +
-> +/*
-> + *** Vector AMO Operations (Zvamo)
-> + */
-> +typedef void (*vext_amo_noatomic_fn)(void *vs3, target_ulong addr,
-> +        uint32_t wd, uint32_t idx, CPURISCVState *env, uintptr_t retaddr);
-> +
-> +/* no atomic opreation for vector atomic insructions */
-> +#define DO_SWAP(N, M) (M)
-> +#define DO_AND(N, M)  (N & M)
-> +#define DO_XOR(N, M)  (N ^ M)
-> +#define DO_OR(N, M)   (N | M)
-> +#define DO_ADD(N, M)  (N + M)
+This series updates the RISC-V syscall_nr.sh based on the 5.5 kernel.
 
-Why don't these need to be atomic?
+There are two parts to this. One is just adding the new syscalls, the
+other part is updating the RV32 syscalls to match the fact that RV32 is
+a 64-bit time_t architectures (y2038) safe.
 
-> +
-> +#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF) \
-> +static void vext_##NAME##_noatomic_op(void *vs3,                \
-> +            target_ulong addr, uint32_t wd, uint32_t idx,       \
-> +                CPURISCVState *env, uintptr_t retaddr)          \
-> +{                                                               \
-> +    typedef int##ESZ##_t ETYPE;                                 \
-> +    typedef int##MSZ##_t MTYPE;                                 \
-> +    typedef uint##MSZ##_t UMTYPE __attribute__((unused));       \
-> +    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);                         \
-> +    MTYPE a = *pe3, b = cpu_ld##SUF##_data(env, addr);          \
-> +    a = DO_OP(a, b);                                            \
-> +    cpu_st##SUF##_data(env, addr, a);                           \
-> +    if (wd) {                                                   \
-> +        *pe3 = a;                                               \
-> +    }                                                           \
-> +}
-> +
-> +/* Signed min/max */
-> +#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
-> +#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
-> +
-> +/* Unsigned min/max */
-> +#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
-> +#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
-> +
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_w, 32, 32, H4, DO_SWAP, l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_w,  32, 32, H4, DO_ADD,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_w,  32, 32, H4, DO_XOR,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_w,  32, 32, H4, DO_AND,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_w,   32, 32, H4, DO_OR,   l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_w,  32, 32, H4, DO_MIN,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_w,  32, 32, H4, DO_MAX,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_w, 32, 32, H4, DO_MINU, l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_w, 32, 32, H4, DO_MAXU, l)
-> +#ifdef TARGET_RISCV64
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_d, 64, 32, H8, DO_SWAP, l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapd_v_d, 64, 64, H8, DO_SWAP, q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_d,  64, 32, H8, DO_ADD,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddd_v_d,  64, 64, H8, DO_ADD,  q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_d,  64, 32, H8, DO_XOR,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxord_v_d,  64, 64, H8, DO_XOR,  q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_d,  64, 32, H8, DO_AND,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandd_v_d,  64, 64, H8, DO_AND,  q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_d,   64, 32, H8, DO_OR,   l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamoord_v_d,   64, 64, H8, DO_OR,   q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_d,  64, 32, H8, DO_MIN,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomind_v_d,  64, 64, H8, DO_MIN,  q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_d,  64, 32, H8, DO_MAX,  l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxd_v_d,  64, 64, H8, DO_MAX,  q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_d, 64, 32, H8, DO_MINU, l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamominud_v_d, 64, 64, H8, DO_MINU, q)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
-> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
-> +#endif
+We need to make some changes to syscall.c to avoid warnings/errors
+during compliling with the new syscall.
 
-I'm confused why these are different to
+I did some RV32 user space testing after applying these patches. I ran the
+glibc testsuite in userspace and I don't see any regressions.
 
-> +
-> +static inline void vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
-> +        void *vs2, CPURISCVState *env, uint32_t desc,
-> +        vext_get_index_addr get_index_addr,
-> +        vext_amo_noatomic_fn noatomic_op,
-> +        vext_ld_clear_elem clear_elem,
-> +        uint32_t esz, uint32_t msz, uintptr_t ra)
-> +{
-> +    uint32_t i;
-> +    target_long addr;
-> +    uint32_t wd = vext_wd(desc);
-> +    uint32_t vm = vext_vm(desc);
-> +    uint32_t mlen = vext_mlen(desc);
-> +    uint32_t vlmax = vext_maxsz(desc) / esz;
-> +
-> +    for (i = 0; i < env->vl; i++) {
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_LOAD);
-> +        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_STORE);
-> +    }
-> +    for (i = 0; i < env->vl; i++) {
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        addr = get_index_addr(base, i, vs2);
-> +        noatomic_op(vs3, addr, wd, i, env, ra);
-> +    }
-> +    clear_elem(vs3, env->vl, env->vl * esz, vlmax * esz);
-> +}
-> +
-> +#define GEN_VEXT_AMO(NAME, MTYPE, ETYPE, INDEX_FN, CLEAR_FN)    \
-> +void HELPER(NAME)(void *vs3, void *v0, target_ulong base,       \
-> +        void *vs2, CPURISCVState *env, uint32_t desc)           \
-> +{                                                               \
-> +    vext_amo_noatomic(vs3, v0, base, vs2, env, desc,            \
-> +        INDEX_FN, vext_##NAME##_noatomic_op, CLEAR_FN,          \
-> +        sizeof(ETYPE), sizeof(MTYPE), GETPC());                 \
-> +}
-> +
-> +#ifdef TARGET_RISCV64
-> +GEN_VEXT_AMO(vamoswapw_v_d, int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoswapd_v_d, int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoaddw_v_d,  int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoaddd_v_d,  int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoxorw_v_d,  int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoxord_v_d,  int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoandw_v_d,  int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoandd_v_d,  int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoorw_v_d,   int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamoord_v_d,   int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamominw_v_d,  int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamomind_v_d,  int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamomaxw_v_d,  int32_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamomaxd_v_d,  int64_t,  int64_t,  idx_d, clearq)
-> +GEN_VEXT_AMO(vamominuw_v_d, uint32_t, uint64_t, idx_d, clearq)
-> +GEN_VEXT_AMO(vamominud_v_d, uint64_t, uint64_t, idx_d, clearq)
-> +GEN_VEXT_AMO(vamomaxuw_v_d, uint32_t, uint64_t, idx_d, clearq)
-> +GEN_VEXT_AMO(vamomaxud_v_d, uint64_t, uint64_t, idx_d, clearq)
-> +#endif
-> +GEN_VEXT_AMO(vamoswapw_v_w, int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamoaddw_v_w,  int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamoxorw_v_w,  int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamoandw_v_w,  int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamoorw_v_w,   int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamominw_v_w,  int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamomaxw_v_w,  int32_t,  int32_t,  idx_w, clearl)
-> +GEN_VEXT_AMO(vamominuw_v_w, uint32_t, uint32_t, idx_w, clearl)
-> +GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+v8:
+ - Add a g_assert_not_reached() in do_sys_futex
+v7:
+ - Update futuex_time64 support to work correctly
+v6:
+ - Split out futex patch and make it more robust
+v5:
+ - Addres comments raised on v4
+   - Don't require 64-bit host for * _time64 functions
 
-These?
+Alistair Francis (4):
+  linux-user: Protect more syscalls
+  linux-user/syscall: Add support for clock_gettime64/clock_settime64
+  linux-user: Support futex_time64
+  linux-user/riscv: Update the syscall_nr's to the 5.5 kernel
 
-Alistair
+ linux-user/riscv/syscall32_nr.h | 295 +++++++++++++++++++++++++++++++
+ linux-user/riscv/syscall64_nr.h | 301 ++++++++++++++++++++++++++++++++
+ linux-user/riscv/syscall_nr.h   | 294 +------------------------------
+ linux-user/strace.c             |   2 +
+ linux-user/syscall.c            | 247 ++++++++++++++++++++++++--
+ 5 files changed, 834 insertions(+), 305 deletions(-)
+ create mode 100644 linux-user/riscv/syscall32_nr.h
+ create mode 100644 linux-user/riscv/syscall64_nr.h
 
-> --
-> 2.23.0
->
+-- 
+2.25.1
+
 
