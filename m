@@ -2,80 +2,77 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB81C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 07:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B3AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 07:40:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 256AD206B1
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 07:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256AD206B1
+	by mail.kernel.org (Postfix) with ESMTPS id BB0D2206B1
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 07:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0D2206B1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCeun-0007tK-Ar
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 03:39:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45930)
+	id 1jCevv-0000ly-NK
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 03:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCeuC-0007Ua-UU
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:38:53 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jCeuz-0008Fj-VR
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jCeuB-00034o-T5
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:38:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47774
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1jCeuy-0005O8-Ra
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:39:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12400)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jCeuB-00033I-Nq
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:38:51 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02D7VUFk016779
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 03:38:51 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yr0c02h76-1
+ id 1jCeuy-0005LO-Jy
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 03:39:40 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02D7YTm1032277
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 03:39:39 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yquenq1ch-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 03:38:50 -0400
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 03:39:39 -0400
 Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 13 Mar 2020 07:38:49 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Fri, 13 Mar 2020 07:39:35 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Mar 2020 07:38:46 -0000
+ Fri, 13 Mar 2020 07:39:32 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02D7cjqb39846212
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02D7dWJD63176840
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Mar 2020 07:38:45 GMT
+ Fri, 13 Mar 2020 07:39:32 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3EA3EA405C;
- Fri, 13 Mar 2020 07:38:45 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EAFC5A405F;
+ Fri, 13 Mar 2020 07:39:31 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B1236A4064;
- Fri, 13 Mar 2020 07:38:44 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6C0D9A405B;
+ Fri, 13 Mar 2020 07:39:31 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Mar 2020 07:38:44 +0000 (GMT)
-Subject: Re: [PATCH v9 11/15] s390x: protvirt: Disable address checks for PV
- guest IO emulation
+ Fri, 13 Mar 2020 07:39:31 +0000 (GMT)
+Subject: Re: [PATCH v9 13/15] s390x: protvirt: Handle SIGP store status
+ correctly
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200311132151.172389-1-frankja@linux.ibm.com>
- <20200311132151.172389-12-frankja@linux.ibm.com>
- <e17fae02-5195-b4ed-9aca-63b8fb2b8a60@de.ibm.com>
- <46eb4e3f-6dac-c26c-d757-90696c0b095c@linux.ibm.com>
- <551d414a-419d-6422-1b9b-7fd51b0e9877@de.ibm.com>
- <3c2ced8e-e429-9be1-9067-faf248d0a2b2@linux.ibm.com>
+ <20200311132151.172389-14-frankja@linux.ibm.com>
+ <b89dafb1-d931-906a-671d-caf71d795873@de.ibm.com>
+ <d40bc40f-c217-f464-9f65-ea8899bbb899@linux.ibm.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -120,30 +117,30 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Fri, 13 Mar 2020 08:38:44 +0100
+Date: Fri, 13 Mar 2020 08:39:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <3c2ced8e-e429-9be1-9067-faf248d0a2b2@linux.ibm.com>
+In-Reply-To: <d40bc40f-c217-f464-9f65-ea8899bbb899@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 20031307-0028-0000-0000-000003E409E6
+x-cbid: 20031307-0008-0000-0000-0000035C7D4A
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031307-0029-0000-0000-000024A9541E
-Message-Id: <34555d04-170d-2ae7-7f32-143c5e328917@de.ibm.com>
+x-cbparentid: 20031307-0009-0000-0000-00004A7DC96E
+Message-Id: <31082618-8c87-db32-8421-de78fa97c959@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-13_02:2020-03-11,
+ definitions=2020-03-13_03:2020-03-11,
  2020-03-13 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- impostorscore=0 clxscore=1015 phishscore=0 adultscore=0 spamscore=0
- bulkscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003130039
+ lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0 clxscore=1015
+ adultscore=0 bulkscore=0 phishscore=0 mlxlogscore=966 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003130041
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,63 +159,45 @@ Sender: "Qemu-devel"
 
 
 
-On 12.03.20 17:17, Janosch Frank wrote:
-> On 3/12/20 5:10 PM, Christian Borntraeger wrote:
->>
->>
->> On 12.03.20 17:07, Janosch Frank wrote:
->>> On 3/12/20 4:41 PM, Christian Borntraeger wrote:
->>>> On 11.03.20 14:21, Janosch Frank wrote:
->>>>> IO instruction data is routed through SIDAD for protected guests, so
->>>>> adresses do not need to be checked, as this is kernel memory.
->>>>
->>>> Maybe also mention that the data structures for  the I/O instrutions
->>>> start at offset 0 of the SIDA?
+On 12.03.20 17:13, Janosch Frank wrote:
+> On 3/12/20 4:51 PM, Christian Borntraeger wrote:
+>> On 11.03.20 14:21, Janosch Frank wrote:
+>>> For protected VMs status storing is not done by QEMU anymore.
 >>>
->>> You mean in the comment for get_address_from_regs() or in the commit
->>> message? It would certainly make sense for get_address_from_regs().
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Reviewed-by: David Hildenbrand <david@redhat.com>
 >>
->> Maybe both?
 >>
+>>> ---
+>>>  target/s390x/helper.c | 6 ++++++
+>>>  1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+>>> index ed726849114f2f35..5022df8812d406c9 100644
+>>> --- a/target/s390x/helper.c
+>>> +++ b/target/s390x/helper.c
+>>> @@ -25,6 +25,7 @@
+>>>  #include "qemu/timer.h"
+>>>  #include "qemu/qemu-print.h"
+>>>  #include "hw/s390x/ioinst.h"
+>>> +#include "hw/s390x/pv.h"
+>>>  #include "sysemu/hw_accel.h"
+>>>  #include "sysemu/runstate.h"
+>>>  #ifndef CONFIG_USER_ONLY
+>>> @@ -246,6 +247,11 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+>>>      hwaddr len = sizeof(*sa);
+>>>      int i;
+>>>  
+>>> +    /* Storing will occur on next SIE entry for protected VMs */
+>>
+>> Maybe ... next SIE entry of the sending CPU .... 
+>> ?
 > 
-> This is what I have now:
-> 
-> s390x: protvirt: Disable address checks for PV guest IO emulation
-> 
-> IO instruction data is routed through SIDAD for protected guests, so
-> adresses do not need to be checked, as this is kernel memory which is
-> always available.
-> 
-> Also the instruction data always starts at offset 0 of the SIDAD.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> and
-> 
-> +    /*
-> 
-> 
-> +     * Addresses for protected guests are all offsets into the
-> 
-> 
-> +     * satellite block which holds the IO control structures. Those
-> 
-> 
-> +     * control structures are always starting at offset 0 and are
-> 
-> 
-> +     * always aligned and accessible. So we can return 0 here which
-> 
-> 
-> +     * will pass the following address checks.
-> 
-> 
-> +     */
-> 
+> Well that would be the current cpu, right?
+> So:
+> /* For PVMs storing will occur when this cpu enters SIE again */
 
-Looks perfect without the empty lines.
+ack.
 
 
