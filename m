@@ -2,42 +2,43 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB07C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3BFC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:46:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53A4A2074E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:44:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53A4A2074E
+	by mail.kernel.org (Postfix) with ESMTPS id C62E02074E
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C62E02074E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCs6S-0006ne-EF
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:44:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41512)
+	id 1jCs82-0008Av-PY
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:46:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jCs5A-00069h-4Z
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:43:04 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jCs6m-0007Gx-JI
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jCs58-0002xr-BM
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:43:03 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:56277)
+ (envelope-from <laurent@vivier.eu>) id 1jCs6l-0006sG-5y
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:44:44 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:34137)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jCs52-0002ro-Uh
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:43:02 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jCs6k-0006mt-Sy; Fri, 13 Mar 2020 17:44:43 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MILnm-1j9W2212LU-00ENuO; Fri, 13 Mar 2020 22:42:42 +0100
-Subject: Re: [PATCH v2] linux-user: fix socket() strace
-To: qemu-devel@nongnu.org
-References: <20200312165530.53450-1-laurent@vivier.eu>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mgvn9-1jovXU49dd-00hKdW; Fri, 13 Mar 2020 22:44:30 +0100
+Subject: Re: [PATCH] linux-user: Update TASK_UNMAPPED_BASE for aarch64
+To: Lirong Yuan <yuanzi@google.com>, qemu-devel@nongnu.org
+References: <20200313002813.3857-1-yuanzi@google.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,34 +82,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c5d806af-e3e7-346d-ebbe-70ca7e5a30bb@vivier.eu>
-Date: Fri, 13 Mar 2020 22:42:36 +0100
+Message-ID: <c0ec754a-9a74-fe2f-fc7f-3e9b2a405d51@vivier.eu>
+Date: Fri, 13 Mar 2020 22:44:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200312165530.53450-1-laurent@vivier.eu>
+In-Reply-To: <20200313002813.3857-1-yuanzi@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:S0g+Rra3bXpaFlx+1cYPmnAcYZk4W2dCjemYLCoubq40RcPNj4S
- g0FibvyDRLMIl3fyqL5TFET62lbzMUUg9tIej1U3v/if9qjBz4SCENshfUcZDJHh4QGHLFa
- TIQpl9Ce5j3EK3qu8VSQMiCE3jTJciKTzFLeo6bxQNYz+kKjkQiohaZcSDWgYvAIVd9khGg
- ZJsOAII4oPFZZSca3Zlqg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:z4tuBubEGB4=:onevCJKrQoyxcCI1Igij3m
- iE980nTCKXLSYanj3P+TsH/dzaMCBRJjnhxi0oTmeioQ9/RHDKMmNACT150FBmGH7PSkvmg2j
- zIj1c7rIeaZSEdvgf1OqKK1EQrjBHTPQ1EaQn4NxoBUmwRgAawo8c+LUQWrclEt1iI7i4qLqQ
- 4PmyyyRB2jpxMmLo68+PfVt6h51o0ynEr03O4D9wlILfz/YS+uaSuPaw0qnru2xHvNj+svoZY
- ygAIllVpnjw1ony7lq0g8B0addbXFza9f5+LsY8Le50iwWOYudRGrZWqu5Gy7KO4TdfUPtftl
- vHBHlHsq4+3Tv5ZRvr09wrxuYy0Gpv6cs91eFI//wNbzpw0bzs42DsWEyXx69ECq+IFHXuiSW
- wTe3Xrz94ggWJjktZCTbCu8OIMPZ4srbgyKrbRoI8SaB9i4ifhJ8eDdksnaC8PcjXS6ac47WY
- ZmWpc4ggDUTW9Y3Z8/2w2kUIiXDMoMUU2vSW4KsOqJfQ+xzJGQPTYLCsTNQPnb9X2MoCtoBDk
- z7OlpP0098EVeQHXzCL9MhyWNL5W8d0MSZvQS9SCxGN+k10tGXf3cZ5PzZFvhPkYtkSuDwHB/
- z95mjMkGLeCeJU2tP5L83Blo1q6Gn5LkdXZ42diJDucjJv3k6ey3K94VbaR5kWpKFF+wMLbac
- 3o+/fOmGTPlAU2B86uI4uz3XkJmxdgj9pWgoLf8kNE5bajXZReWDliOPImPFqkEogbhSklkf9
- gs2h8J5+HJprUPbH+5NnuICNJyo29k7Mb8m/dFnZFOLVriV0YKuGwTcqt4a9VPnrTlzzrtn9U
- jdGoncJJBOmQ4LGi/b8gbi5GbLeCgtVAkiDl7C5i2JcysJJPH5mXTQ8/8puf6rpmYvax5E1
+X-Provags-ID: V03:K1:ftXUeNe4XgCE+YIKqpVgE9eIsFw8v8wVm53Wo+yLHTaaD9CBCmg
+ 92pPZkzlJ2jUEt+LtR3PtV8yQfhZZR220Ozphwq/W1NsELz6I7QdJ3jEtUrX5fWNLq3huMR
+ 6VXk1aXMtqLZRCinFsCy5dimdxvD864WGVgt3LKLdXmXsZccg/5p3U6rJdb1VyrtkTaeC+c
+ O4N34RDMTY7TrZFczEKTA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:U2nMj/ss10c=:AcNmNGrKoJPRLCBdTpCkAa
+ ufaz6cytcnk7Ll10mKXEitpYetHp7OYPUSXI8IpGuxBOSdCReVv4FZktj7CFxhTitGCGREAP2
+ 0BoKu40vHmIWYq/zq1vP7GfdstJx2x2v5oeAVJTbtRSNrxTpLiWE3h57jEE2oc5h1MBPJRJmc
+ 9wj5jXZX3ISS5QshnjtDFTPlFW11zfwEsAxF4LD8Hz8BnRQZ5KaL0ygYDgz77HyHpppC/rSIr
+ jNaTxIGITKoRV0fI5V12XxBSMB3tYjl2DeUYtzwOErkljsqJVQHO9pLBygNTThsm31dc/JEsl
+ xc84MJrI+M1j2QLw41dDBPHfmnKshbySjugJ6fcfbqh4CnOlPDVIIgx0n7NrdT2gj6kkHhWyw
+ OM4n1cInBbMjJmR7YYyccI5YQlgNTpA3QPLFgLdJ0qLPkTUy9FUwhlZdPRfboh+tB95N8IxhJ
+ xZPEGnPRa27LFgpR0trd0Rdu+KzRa9ZRG3t5uDjjmmL44QPRshobSU9taUL8kGv0jmPNz9UCE
+ y8VcjazHYUs+I5MBgVFwwW7tucnNcJxRQPBgKlElUZWV22sV2M4BV89ZWJo6cliXlOC/UqaxL
+ lXHQDDXkIzlg9wDHibjbws2u6ua76CfPUNeFZnX2zh0z7f+BVNlDQGawUNCb4EdqOgm6JyJe7
+ SSLnPj+0mVwJ/SPfjIDa4TtqNigSXg1DqulbhAp8aBJNfTLYYbAJ39ogSnnjIR5si3tnvLRsz
+ E0Zcv7oNIHHm+mPLOI5HJojqz4bMRNvWEWUyGTX+fIBcwKuCPGWrhGZatoeRmgPDjpk5rwpYH
+ M+pk8goHmfZ+ZD8UqWemIjIMhvUQmKqS/IzBmG3Ue9jYrq62xj3Bh8ZrZs7aSXcYtybpp0p
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,54 +121,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-trivial@nongnu.org, jkz@google.com, riku.voipio@iki.fi, scw@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/03/2020 à 17:55, Laurent Vivier a écrit :
-> print_socket_type() doesn't manage flags and the correct type cannot
-> be displayed
+Le 13/03/2020 à 01:28, Lirong Yuan a écrit :
+> This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
+> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Lirong Yuan <yuanzi@google.com>
 > ---
+>  linux-user/mmap.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> Notes:
->     v2: replace gemu_log() by qemu_log() as it has been removed from qemu
-> 
->  linux-user/strace.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 4f7130b2ff63..69232f7e27b8 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -444,7 +444,7 @@ print_socket_domain(int domain)
->  static void
->  print_socket_type(int type)
->  {
-> -    switch (type) {
-> +    switch (type & TARGET_SOCK_TYPE_MASK) {
->      case TARGET_SOCK_DGRAM:
->          qemu_log("SOCK_DGRAM");
->          break;
-> @@ -464,6 +464,12 @@ print_socket_type(int type)
->          qemu_log("SOCK_PACKET");
->          break;
->      }
-> +    if (type & TARGET_SOCK_CLOEXEC) {
-> +        qemu_log("|SOCK_CLOEXEC");
-> +    }
-> +    if (type & TARGET_SOCK_NONBLOCK) {
-> +        qemu_log("|SOCK_NONBLOCK");
-> +    }
+> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+> index 8685f02e7e..e378033797 100644
+> --- a/linux-user/mmap.c
+> +++ b/linux-user/mmap.c
+> @@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
 >  }
 >  
->  static void
+>  #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
+> +#ifdef TARGET_AARCH64
+> +# define TASK_UNMAPPED_BASE  0x5500000000
+> +#else
+>  # define TASK_UNMAPPED_BASE  (1ul << 38)
+> +#endif
+>  #else
+>  # define TASK_UNMAPPED_BASE  0x40000000
+>  #endif
 > 
 
-Applied to my linux-user branch.
-
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
