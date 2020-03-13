@@ -2,63 +2,77 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE2BC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48139C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE2B206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:44:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE2B206EB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18730206EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:47:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rLGgjIke"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18730206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCZNN-00060W-Vx
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 21:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39803)
+	id 1jCZPr-0002vW-9B
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 21:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <longpeng2@huawei.com>) id 1jCZMo-0005bT-RI
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 21:44:03 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jCZOg-0001EB-F1
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 21:45:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <longpeng2@huawei.com>) id 1jCZMn-0003h6-HF
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 21:44:02 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3200 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
- id 1jCZMn-0003aB-69
- for qemu-devel@nongnu.org; Thu, 12 Mar 2020 21:44:01 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B1F04DF983B2DAA674EF;
- Fri, 13 Mar 2020 09:43:53 +0800 (CST)
-Received: from [10.173.228.124] (10.173.228.124) by smtp.huawei.com
- (10.3.19.205) with Microsoft SMTP Server (TLS) id 14.3.487.0; Fri, 13 Mar
- 2020 09:43:45 +0800
-Subject: Re: [RFC] cpus: avoid get stuck in pause_all_vcpus
-To: Paolo Bonzini <pbonzini@redhat.com>, <rth@twiddle.net>
-References: <20200310091443.1326-1-longpeng2@huawei.com>
- <8ed76f64-1a24-a278-51f3-19515e65ff39@redhat.com>
-From: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
- <longpeng2@huawei.com>
-Message-ID: <a6c8eac3-a714-ff6f-2bd6-1fa1d1037a81@huawei.com>
-Date: Fri, 13 Mar 2020 09:43:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <8ed76f64-1a24-a278-51f3-19515e65ff39@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.173.228.124]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+ (envelope-from <groeck7@gmail.com>) id 1jCZOe-0005xs-Fi
+ for qemu-devel@nongnu.org; Thu, 12 Mar 2020 21:45:58 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1jCZOe-0005wf-AX; Thu, 12 Mar 2020 21:45:56 -0400
+Received: by mail-pg1-x542.google.com with SMTP id u12so4007295pgb.10;
+ Thu, 12 Mar 2020 18:45:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=3nP+DcWKLTYYKct2ubngpCtOm7Ri8oAKLhdkhHkT/ig=;
+ b=rLGgjIkegX5yV1VDD79JbMlyf4SDYnGnD8z5g0DjCwoUKxCCnwYkwG+7gzascm6Z6G
+ lH7q9hcU62/ngF1mCiGrs1rOOuH0husYFzleirp5nqWeGCr+gPlKX9I0H7flcF4LhnCD
+ kvrPzd1WFyAoSg6Y7RTiyS8ueOzMJbUjJ9xjF/UakKlisymc2buTlU8tl8ooT6QxVlOl
+ xpjZV6XwP+RtIrZwoWemWTMRvGB6Nx/vHt3lleLUy/ZJpRq8o9KgGSqYp4S5pdUP0xnG
+ sRpbpBiddly475ryO05HWNtBoZ7TntOxAl0UJo+TSfssk4IwnLAUrJjU3BCEJyYt8zgf
+ iIdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=3nP+DcWKLTYYKct2ubngpCtOm7Ri8oAKLhdkhHkT/ig=;
+ b=dw4Vk8GkTSwMWSqg9GjKE/T6FuO/OP0w2F3qgXSgCnYyu/OvGDsqPAXLhRRtCAGGYF
+ 9wxyUG6rXTJlJr0RNE8uun52mpw3Qu/+Jqx4BnBSIlfw8zFDNfI7tlmdQPF9HsnoTCWr
+ 0yTOC7P6PLYN0k0c4JIpaqm+p/HC4y/jQXHrOoMFDGQWRh9SHKX2GrkcTfuFxrzAlOX/
+ wmOOo8TBx48kuQEg1XNxYSzVJpQk3NL1nsvxdw864Lto3pyUAZBxczLM50xL6qdJb9Pc
+ 1dftLJX9VLi0eVbXzjxYpcoFAxB/im6uAEyE2Rd8/45bzeRTO7ATtmr5B1u9LlR/Vg0k
+ 4AaA==
+X-Gm-Message-State: ANhLgQ0WWfkuk4mbcAtDf6/kc192OoeOsdAL0Y9vv7z4oSBA2zD/cJgv
+ +g0v/Lpr0NbgfGJ0X0BixiA=
+X-Google-Smtp-Source: ADFU+vvrjoIsw24JhGMBD9siWuTpZTwC6YGbSP5yBkjxlkii407UP2YFZLLv6mMuNhBeGkIG9jTB/A==
+X-Received: by 2002:a63:ef04:: with SMTP id u4mr10587087pgh.292.1584063955082; 
+ Thu, 12 Mar 2020 18:45:55 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id f19sm13741857pgn.42.2020.03.12.18.45.53
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 12 Mar 2020 18:45:54 -0700 (PDT)
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH v3 0/5] Wire up USB controllers in i.MX6 emulations
+Date: Thu, 12 Mar 2020 18:45:46 -0700
+Message-Id: <20200313014551.12554-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,115 +84,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, arei.gonglei@huawei.com,
- huangzhichao@huawei.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- "qemu-devel @ nongnu . org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Guenter Roeck <linux@roeck-us.net>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch series wires up the USB controllers on fsl-imx6 and fsl-imx6ul
+emulations.
 
+The first patch provides a basic implementation of the USB PHY controller
+used in i.MX28 and later chips. Only reset bit handling in the control
+register is actually implemented. Basic USB PHY support is needed to make
+the USB ports operational in Linux.
 
-On 2020/3/12 23:28, Paolo Bonzini wrote:
-> On 10/03/20 10:14, Longpeng(Mike) wrote:
->> From: Longpeng <longpeng2@huawei.com>
->>
->> We find an issue when repeat reboot in guest during migration, it cause the
->> migration thread never be waken up again.
->>
->> <main loop>                        |<migration_thread>
->>                                    |
->> LOCK BQL                           |
->> ...                                |
->> main_loop_should_exit              |
->>  pause_all_vcpus                   |
->>   1. set all cpus ->stop=true      |
->>      and then kick                 |
->>   2. return if all cpus is paused  |
->>      (by '->stopped == true'), else|
->>   3. qemu_cond_wait [BQL UNLOCK]   |
->>                                    |LOCK BQL
->>                                    |...
->>                                    |do_vm_stop
->>                                    | pause_all_vcpus
->>                                    |  (A)set all cpus ->stop=true
->>                                    |     and then kick
->>                                    |  (B)return if all cpus is paused
->>                                    |     (by '->stopped == true'), else
->>                                    |  (C)qemu_cond_wait [BQL UNLOCK]
->>   4. be waken up and LOCK BQL      |  (D)be waken up BUT wait for  BQL
->>   5. goto 2.                       |
->>  (BQL is still LOCKed)             |
->>  resume_all_vcpus                  |
->>   1. set all cpus ->stop=false     |
->>      and ->stopped=false           |
->> ...                                |
->> BQL UNLOCK                         |  (E)LOCK BQL
->>                                    |  (F)goto B. [but stopped is false now!]
->>                                    |Finally, sleep at step 3 forever.
->>
->>
->> Note: This patch is just for discuss this issue, I'm looking forward to
->>       your suggestions, thanks!
-> 
-> Thanks Mike,
-> 
-> the above sketch is really helpful.
-> 
-> I think the problem is not that pause_all_vcpus() is not pausing hard
-> enough; the problem is rather than resume_all_vcpus(), when used outside
-> vm_start(), should know about the race and do nothing if it happens.
-> 
-> Fortunately resume_all_vcpus does not release the BQL so it should be
-> enough to test once; translated to code, this would be the patch to fix it:
-> 
-> diff --git a/cpus.c b/cpus.c
-> index b4f8b84b61..1eb7533a91 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1899,6 +1899,10 @@ void resume_all_vcpus(void)
->  {
->      CPUState *cpu;
-> 
-> +    if (!runstate_is_running()) {
-> +        return;
-> +    }
-> +
-Hi Paolo,
+The second patch fixes USB and USB PHY interrupt numbers for i.MX6UL.
 
-The runstate of my above sketch is running, so maybe your patch can fix some
-other issues but not mine ?
+The third patch instantiates unimplemented pwm and can devices. This patch
+is necessary to avoid crashes in Linux when it tries to access those
+devices. The crashes are observed when trying to boot Linux v4.21 or later.
 
-main_loop_should_exit
-  ( *reset* requested )
-  pause_all_vcpus
-  resume_all_vcpus
-  if (!runstate_check(RUN_STATE_RUNNING) &&
-          !runstate_check(RUN_STATE_INMIGRATE)) {
-      runstate_set(RUN_STATE_PRELAUNCH);
-  ...
+The final two patches instantiate the USB controllers for i.mMX6 and
+i.MX6UL.
 
+v3:
+- Minor cleanup in patch 1/5 (see details in patch)
+- Added patch to fix USB and USB PHY interrupt numbers for fsl-imx6ul.
+- Added patch to instantiate unimplemented pwm and CAN devices.
+- Instantiate USB and USB PHY separately. They are logically different,
+  and the number of instances is not always the same.
 
-migration_completion
-  vm_stop_force_state(RUN_STATE_FINISH_MIGRATE);
-    vm_stop ( if runstate_is_running )
-      do_vm_stop
-        pause_all_vcpus ( if runstate_is_running )
+v2:
+- Implement and instantiate basic USB PHY implementation
+  instead of emulating a single USB PHY register
 
+----------------------------------------------------------------
+Guenter Roeck (5):
+      hw/usb: Add basic i.MX USB Phy support
+      hw/arm/fsl-imx6ul: Fix USB interrupt numbers
+      hw/arm/fsl-imx6ul: Instantiate unimplemented pwm and can devices
+      hw/arm/fsl-imx6ul: Wire up USB controllers
+      hw/arm/fsl-imx6: Wire up USB controllers
 
->      qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
->      CPU_FOREACH(cpu) {
->          cpu_resume(cpu);
-> 
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> .
-> 
-
----
-Regards,
-Longpeng(Mike)
+ MAINTAINERS                  |   2 +
+ hw/arm/Kconfig               |   1 +
+ hw/arm/fsl-imx6.c            |  36 +++++++
+ hw/arm/fsl-imx6ul.c          |  49 ++++++++++
+ hw/usb/Kconfig               |   5 +
+ hw/usb/Makefile.objs         |   2 +
+ hw/usb/imx-usb-phy.c         | 225 +++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/fsl-imx6.h    |   6 ++
+ include/hw/arm/fsl-imx6ul.h  |  16 ++-
+ include/hw/usb/imx-usb-phy.h |  53 ++++++++++
+ 10 files changed, 392 insertions(+), 3 deletions(-)
+ create mode 100644 hw/usb/imx-usb-phy.c
+ create mode 100644 include/hw/usb/imx-usb-phy.h
 
