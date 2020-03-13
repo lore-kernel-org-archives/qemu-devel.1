@@ -2,82 +2,113 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAD6C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45BACC10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C9812074A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:02:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLVXnxhD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9812074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 148FE2074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:06:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 148FE2074A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCsNe-0002s7-MI
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 18:02:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56009)
+	id 1jCsRU-0004HU-Az
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 18:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jCsMq-0002SA-3g
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:21 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jCsQu-0003rg-Eg
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:05:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jCsMo-0004Tl-7C
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48679
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCsMn-0004MJ-Hv
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584136876;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z+85ZI/QpsKxlLuONDNDAPRvMh4mNYZ9s0UVbCPuCGE=;
- b=cLVXnxhDGDav4XcBKPUwFnhqo8zZCzZ3YKKgT52v66Qc1yYdmGn4ZS0jt0kQKKByD654GO
- AxNkoRo3wGiOrndsq3nftZde7Tv+0Tn42KKmAiKjANN72MJ/66zyqUP6+3eJVkFfQ8qDHn
- bYcq8ixMClaL1QOAhCMoX2CtFWx/NGA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-qpR6Qvq2MvKMBn6DKKBDNA-1; Fri, 13 Mar 2020 18:01:14 -0400
-X-MC-Unique: qpR6Qvq2MvKMBn6DKKBDNA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33A9D800D6C;
- Fri, 13 Mar 2020 22:01:13 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
- [10.36.116.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2CA271A3;
- Fri, 13 Mar 2020 22:01:12 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1102111386A6; Fri, 13 Mar 2020 23:01:11 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] net: Complete qapi-fication of netdev_add
-References: <20200312211440.3767626-1-eblake@redhat.com>
-Date: Fri, 13 Mar 2020 23:01:10 +0100
-In-Reply-To: <20200312211440.3767626-1-eblake@redhat.com> (Eric Blake's
- message of "Thu, 12 Mar 2020 16:14:40 -0500")
-Message-ID: <877dznewyh.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <laurent@vivier.eu>) id 1jCsQt-00017G-B7
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:05:32 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:56117)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jCsQt-00014v-1n
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:05:31 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MrPVJ-1jhabs2P1b-00oXvH; Fri, 13 Mar 2020 23:05:23 +0100
+Subject: Re: [PATCH 0/4] linux-user: generate syscall_nr.h from linux unistd.h
+To: qemu-devel@nongnu.org
+References: <20200310110759.3331020-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <480afbc7-16b0-24dd-832d-dfdd7acdeb96@vivier.eu>
+Date: Fri, 13 Mar 2020 23:05:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200310110759.3331020-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:e6HW5M7U5irLPjXQHJ2Bp/uqLSN0ly2BABZ1Fw+ocYiyjLd6f0y
+ rprtg+u4BI6JKO4JhJOMDm9jKMAfxpiyypAn35lcsFZz/UMs1gDNj+uWuMb5ZGg7x4ipcTS
+ LRz6Qz7EtirwFIDAS501b5wic7ruORUM1Ta17jXQ2nU3VWJRYwCJg8xQislFF87g+o+TdPQ
+ yKMGCIWIjdAXj6chzZekw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8peiMimp78k=:alqGsc9bCGnAGQUIxqHfbz
+ 7HUkqdOUfSqQjh24lUks8MlykUgn79UTBQHv7ZOzrBDmdnivHc6dmqhIz9imJK+pbhpM+7QCi
+ uWgagVb1JIHuSwo4BuX+WMygDfD7FAajfJAlKJVCgKKRMGBotgD8DAzPC02WuFuyf3qSxZmx8
+ A6XE7SsvLshJiIRzvtSrFQkO33GKZIAYfiY1a5gajFU/c9Q3zIQSnzR4rpMBP9EVsHzjyFmjc
+ MmZwPoGYcxKihLV1QOzwpqIOYD2uorjHsrkwWGYbaU8H3hfOmCuVGs//2NeZfF1UMedIWVssM
+ GIaedmV+sHOGLrwZCfnRySMQPVQ2kxnZUn68a8pxBzfu3YeqqTvIOsbGRJA5kUuJ0z69knw3V
+ fhC15d1cmtb4diIDdiAL5Ut4/G6kpJb3G2MhGmL/5jx86o7q4w/y6angcoi4tgm+kFOo7FkrT
+ T2UQUhqtiwxv7z5ydLi43T0lmiDbSP0yFy1/TRY1CpFZioxs7pfJ9F+YeXkUQk7h6rVS1VuGt
+ vzt9CMkkyUMg205wYEpxfFFi61XESYd2HrzxBn/sGUSEdC3XY9TGUZRjRTN7QnB1pKGpOvD4a
+ mzpzM3IIvkHF0ljnv6iPOUeoAB751gDAI2c5C/DieRcf8d0Y8rZXvze5tmEhmtUtszOHhOfRp
+ tVAcBeQ+WYtXn2wYuL7TerlP7xWvPVkhRSAJ55bEdOdhBbPO1Jlhco8N8kmKIHjM+BZ0dXFQE
+ UVgXeTlvXajEq4gN3Iqs/iek4KwHsUb42wKCpGS2NAsfyXGp7LmMRZfJ9ZZKm0Es2ebnfZ90n
+ yu/TC94JQoMt7lCn91DRxttb5NRxRlX0T5edPYU8q4SLkyoGyclLDJRPfVf6hUxvwE56AnZ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,194 +120,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lekiravi@yandex-team.ru, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- armbru@redhat.com
+Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>, Alistair Francis <alistair.francis@wdc.com>,
+ Jia Liu <proljc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's too late in my day for a full review.  Just one observation for
-now.
+Le 10/03/2020 à 12:07, Laurent Vivier a écrit :
+> This series adds a script to generate syscall_nr.h for
+> architectures that don't use syscall.tbl but asm-generic/unistd.h
+> 
+> The script uses several cpp passes and filters result with a grep/sed/tr sequence.
+> The result must be checked before being used, so it's why the script is not
+> automatically run.
+> 
+> I have run the script, checked and added new files for arm64, nios2, openrisc.
+> 
+> I don't include result for riscv as Alistair is already working on a series
+> for this architecture and it needs some changes in syscall.c as some
+> syscalls are not defined.
+> 
+> We also need to add the _time64 variant of syscalls added by the update of the
+> syscall_nr.h.
+> 
+> Based-on: <20200310103403.3284090-1-laurent@vivier.eu>
+> 
+> Laurent Vivier (4):
+>   scripts: add a script to generate syscall_nr.h
+>   linux-user,aarch64: sync syscall numbers with kernel v5.5
+>   linux-user,nios2: sync syscall numbers with kernel v5.5
+>   linux-user,openrisc: sync syscall numbers with kernel v5.5
+> 
+>  linux-user/aarch64/syscall_nr.h  |  32 +-
+>  linux-user/nios2/syscall_nr.h    | 648 +++++++++++++++----------------
+>  linux-user/openrisc/syscall_nr.h | 307 +++------------
+>  scripts/gensyscalls.sh           |  94 +++++
+>  4 files changed, 499 insertions(+), 582 deletions(-)
+>  create mode 100755 scripts/gensyscalls.sh
+> 
 
-Eric Blake <eblake@redhat.com> writes:
+Applied the whole series to my linux-user branch.
 
-> We've had all the required pieces for doing a type-safe representation
-> of netdev_add as a flat union for quite some time now (since
-> 0e55c381f6 in v2.7.0, released in 2016), but did not make the final
-> switch to using it because of concern about whether a command-line
-> regression in accepting "1" in place of 1 for integer arguments would
-> be problematic.  Back then, we did not have the deprecation cycle to
-> allow us to make progress.  But now that we have waited so long, other
-> problems have crept in: for example, our desire to add
-> qemu-storage-daemon is hampered by the inability to express net
-> objects, and we are unable to introspect what we actually accept.
-> Additionally, our round-trip through QemuOpts silently eats any
-> argument that expands to an array, rendering dnssearch, hostfwd, and
-> guestfwd useless through QMP:
->
-> {"execute": "netdev_add", "arguments": { "id": "netdev0",
->   "type": "user", "dnssearch": [
->     { "str": "8.8.8.8" }, { "str": "8.8.4.4" }
->   ]}}
->
-> So without further ado, let's turn on proper QAPI.
->
-> There are a few places where the QMP 'netdev_add' command is now
-> more strict: anywhere that the QAPI lists an integer member, we
-> now require a strict JSON integer (previously, we allowed both
-> integers and strings, because the conversion from QMP to QemuOpts
-> back to QObject collapsed them into integers).  For example,
-> pre-patch, both of these examples succeed, but post-patch, the
-> second example now fails:
->
-> {'execute':'netdev_add',
->   'arguments':{'id':'net1', 'type':'hubport', 'hubid':1}}
-> {"return": {}}
-> {'execute':'netdev_add',
->   'arguments':{'id':'net2', 'type':'hubport', 'hubid':"2"}}
-> {"error": {"class": "GenericError", "desc": "Invalid parameter type for '=
-hubid', expected: integer"}}
->
-> But this stricter QMP is desirable, and introspection is sufficient
-> for any affected applications to make sure they use it correctly.
->
-> In qmp_netdev_add(), we still have to create a QemuOpts object
-> so that qmp_netdev_del() will be able to remove a hotplugged
-> network device; but the opts->head remains empty since we now
-> manage all parsing through the QAPI object rather than QemuOpts.
->
-> Reported-by: Alex Kirillov <lekiravi@yandex-team.ru>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qapi/net.json     | 14 +-------------
->  include/net/net.h |  1 -
->  monitor/misc.c    |  2 --
->  net/net.c         |  6 +++---
->  4 files changed, 4 insertions(+), 19 deletions(-)
->
-> diff --git a/qapi/net.json b/qapi/net.json
-> index 1cb9a7d782b4..cebb1b52e3b1 100644
-> --- a/qapi/net.json
-> +++ b/qapi/net.json
-> @@ -39,18 +39,8 @@
->  #
->  # Add a network backend.
->  #
-> -# @type: the type of network backend. Possible values are listed in
-> -#        NetClientDriver (excluding 'none' and 'nic')
-> -#
-> -# @id: the name of the new network backend
-> -#
->  # Additional arguments depend on the type.
->  #
-> -# TODO: This command effectively bypasses QAPI completely due to its
-> -#       "additional arguments" business.  It shouldn't have been added t=
-o
-> -#       the schema in this form.  It should be qapified properly, or
-> -#       replaced by a properly qapified command.
-> -#
->  # Since: 0.14.0
->  #
->  # Returns: Nothing on success
-> @@ -64,9 +54,7 @@
->  # <- { "return": {} }
->  #
->  ##
-> -{ 'command': 'netdev_add',
-> -  'data': {'type': 'str', 'id': 'str'},
-> -  'gen': false }                # so we can get the additional arguments
-> +{ 'command': 'netdev_add', 'data': 'Netdev', 'boxed': true }
->
->  ##
->  # @netdev_del:
-> diff --git a/include/net/net.h b/include/net/net.h
-> index e175ba9677dc..96e6eae8176e 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -203,7 +203,6 @@ void net_cleanup(void);
->  void hmp_host_net_add(Monitor *mon, const QDict *qdict);
->  void hmp_host_net_remove(Monitor *mon, const QDict *qdict);
->  void netdev_add(QemuOpts *opts, Error **errp);
-> -void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp);
->
->  int net_hub_id_for_client(NetClientState *nc, int *id);
->  NetClientState *net_hub_port_find(int hub_id);
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index c3bc34c099dd..41a86e7012a1 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -247,8 +247,6 @@ static void monitor_init_qmp_commands(void)
->                           qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
->      qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
->                           QCO_NO_OPTIONS);
-> -    qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-> -                         QCO_NO_OPTIONS);
->      qmp_register_command(&qmp_commands, "object-add", qmp_object_add,
->                           QCO_NO_OPTIONS);
->
-> diff --git a/net/net.c b/net/net.c
-> index 9e93c3f8a1e2..a2065aabede2 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1170,7 +1170,7 @@ void netdev_add(QemuOpts *opts, Error **errp)
->      net_client_init(opts, true, errp);
->  }
->
-> -void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp)
-> +void qmp_netdev_add(Netdev *netdev, Error **errp)
->  {
->      Error *local_err =3D NULL;
->      QemuOptsList *opts_list;
-> @@ -1181,12 +1181,12 @@ void qmp_netdev_add(QDict *qdict, QObject **ret, =
-Error **errp)
->          goto out;
->      }
->
-> -    opts =3D qemu_opts_from_qdict(opts_list, qdict, &local_err);
-> +    opts =3D qemu_opts_create(opts_list, netdev->id, 1, &local_err);
+Thanks,
+Laurent
 
-As oyu explain in your commit message, we still create a QemuOpts with
-the same ID, but no other parameters, because qmp_netdev_del() needs
-it.  I show it below.
-
->      if (local_err) {
->          goto out;
->      }
->
-> -    netdev_add(opts, &local_err);
-> +    net_client_init1(netdev, true, &local_err);
->      if (local_err) {
->          qemu_opts_del(opts);
->          goto out;
-       }
-
-   out:
-       error_propagate(errp, local_err);
-   }
-
-   void qmp_netdev_del(const char *id, Error **errp)
-   {
-       NetClientState *nc;
-       QemuOpts *opts;
-
-       nc =3D qemu_find_netdev(id);
-       if (!nc) {
-           error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-                     "Device '%s' not found", id);
-           return;
-       }
-
-       opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), id);
---->   if (!opts) {
-           error_setg(errp, "Device '%s' is not a netdev", id);
-           return;
-       }
-
-       qemu_del_net_client(nc);
-       qemu_opts_del(opts);
-   }
-
-We better check all other uses of option group "netdev".
 
 
