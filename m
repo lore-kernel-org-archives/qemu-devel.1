@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3DDC1975A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 444F3C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:00:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DAB6206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 00:58:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11ADF20637
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 01:00:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fb.com header.i=@fb.com header.b="j0b+BBHZ";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="ONOZsRGK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAB6206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=fb.com header.i=@fb.com header.b="dEYZB6vo";
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="IesTthM2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11ADF20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=fb.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCYes-0004ab-CO
-	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 20:58:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37051)
+	id 1jCYgW-0007zO-68
+	for qemu-devel@archiver.kernel.org; Thu, 12 Mar 2020 21:00:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=03412eee96=coreyw7@fb.com>) id 1jCYcM-0000nE-Af
+ (envelope-from <prvs=03412eee96=coreyw7@fb.com>) id 1jCYcM-0000nS-Ba
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:56:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=03412eee96=coreyw7@fb.com>) id 1jCYcL-0005PO-7s
+ (envelope-from <prvs=03412eee96=coreyw7@fb.com>) id 1jCYcL-0005PZ-9k
  for qemu-devel@nongnu.org; Thu, 12 Mar 2020 20:56:02 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:65422)
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:7300)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=03412eee96=coreyw7@fb.com>)
- id 1jCYcI-0005Ib-O1; Thu, 12 Mar 2020 20:55:58 -0400
+ id 1jCYcI-0005Ia-NO; Thu, 12 Mar 2020 20:55:58 -0400
 Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
  by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02D0qD8S025628; Thu, 12 Mar 2020 17:55:49 -0700
+ 02D0qD8T025628; Thu, 12 Mar 2020 17:55:49 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
  : content-type : mime-version; s=facebook;
- bh=z5i76bGEffOQrMkoMBClRukxuQsLtxLA5shXKZlaPV4=;
- b=j0b+BBHZz7Ui3FkuXTh72/pm85V4xexBsS4nNMugIdAjkJnauiXRULnglbxH0EGNepmG
- PV2ffjhV4l9GiuNcS3FWoY8VreRXYqcGc7MD0XUvBX35Te6woTcqJn82yeV3BE/TDTGv
- uQ1Yx8SI+igXajEd1N4QUDgTUakivtE+KH0= 
+ bh=jblf/wtaZkgMARGaAfEh+OyYkRvrqOM9fxNCdw32ll0=;
+ b=dEYZB6voWgx85XPdPx21As2iJoCFHOk7u9xpk0W4RdCKS92BUyLd4QakMAGii35q3jMW
+ S433x58HzdouQiJJjM5+iEvdPSmbrBw7x0jVAA3hSgI7J14AiJ+03CNOFBNd6OwgHytL
+ FJK7fKJJBM4WwvphTSSAc3Bzo3PcPovrPcE= 
 Received: from mail.thefacebook.com ([163.114.132.120])
- by mx0a-00082601.pphosted.com with ESMTP id 2yqt80sp8w-1
+ by mx0a-00082601.pphosted.com with ESMTP id 2yqt80sp8w-2
  (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
  Thu, 12 Mar 2020 17:55:49 -0700
 Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.98.9) by
@@ -56,34 +56,34 @@ Received: from NAM10-MW2-obe.outbound.protection.outlook.com (100.104.98.9) by
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.1847.3; Thu, 12 Mar 2020 17:55:46 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aTiuculLNhXt2BQzVLKG4PDOrFe6k/hdro1Qnw76NGfuf2J1n50IPnZfpoBXEUVl1bUSax1f/fVXqU7AaTvGIXccj9KBhmm3e8rTov0YHPIARYBC+FjmjFkIUJFemSLR87BLH/ox2OjrMdaf45c8lTBa+Jv140cxk80vV2MnuW0s0mYFwhj/cqG1s5x8dzmA9yCJR8X/Hduw5Mmhf1si72E4FmmE45pxfEeC8QxKvU2uag3GOD0Mkoi/8yqzsGaxDsZiPvMf/Wz8qmjZIWJ2inFIz6n28rteeTD1GzbvugzPCC4WlFQjjyIND7pP2nDsf8tK+7bJmnSEwZe1zs17iA==
+ b=TT1Sx0sXuQ6GAXh+TkqsEejCq4n7La/a5T94y5w3DlGRqs+FqlmYpATif195O8IBIsKwvgd+eXnXryGRFnu4b2Iyk8zlfeji/O54fR8EJ35AFu8lmjdl3OB+YNyNvdyPAJoKNkOgG0Irga6szRVkdBJfxrR4CSysFbh+RjxmMD66Qq6kEeCOm/2e4o5LSRI7jFALZYk5fG9iik0gujfMRdh1jClrUgoyYC1szZ0WEPLmUMMANxVMgqHoskvD8/x88Ro4m80l1uL8snvtaSUpElCR6PUXAB2N4haBpN3LozfdIG3RSuH6wO9I8HvhS4VpvuCmQdwHXeHeORSvvHV05A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z5i76bGEffOQrMkoMBClRukxuQsLtxLA5shXKZlaPV4=;
- b=bW+932d+A6XzXwbf58BFF60co7goFvTrMOOuBhFfgARuoG8s8YcSe6B3LGCd9xeqaaX5QEjBogi00dLWc3OD/9luuwBTv0tDfls1lKFzpjBrCu9VhCAMf6dmp+zrROFs4SPvhVeTwUjha2qHpzdhXUNLNc7sbQ05QPduTZUZ199O1dEh5BBAsoZ45p3BBC4yBanSwgT/wa3VKeEmctbJdWN7coXmLPDmYQ/fEtEEx+Jf/IZEienirF4b5w6fRg9NU/+x9gkr9019X9lLgRDeiwQO+mzbai7dJjmGo3YddKtM2rkt5EFCH4vaRlQcPkpdUwif6fv7Qq3bj5vQqWcmEQ==
+ bh=jblf/wtaZkgMARGaAfEh+OyYkRvrqOM9fxNCdw32ll0=;
+ b=R8JltQC0bDrNom52WGTEK2YOeekB9Sufyiy1zWI39OpQTtQMcmxB68kfXk4RM29gCbKreF8EHlGRAaQrrvVfNTiIvWp35EHmJmUrHDAm8q6q3ZNPDZsasQNBlv5ZP7760+ypMekHyJDvGsismD7CrltpZViXBAaPs07iC0S4+7GYtqOh4wbXjuIDTHzbBL7FT0UQcykfj53TU3lqglpDYDh3B6luRIk2AiRwxDeqhp7oFSqvngnH9h93huGDkIEHX4NMAOalPGy/vqevVhZqoPrvPkPc8PGE6xvnzlGY123veNpQkSyGcbplz6UjghK19GHNoFe3D/EtRqZuQmJjvw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
  header.d=fb.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
  s=selector2-fb-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z5i76bGEffOQrMkoMBClRukxuQsLtxLA5shXKZlaPV4=;
- b=ONOZsRGKtLXUOmbECM3TLdtkCfRXi4hvgOWwvPNzmkggeA6uvP1iToLmrBBANYLU5uubVHFaV5gLisK1WFnF9lw5wRBx+nlGeSwuc+DxEsYVTnPBYkjC6HIjCnjmjgKDWpLYEpZZqf3f7UJG+def1ltBcMFl7H0UFUZIA1g1ozU=
+ bh=jblf/wtaZkgMARGaAfEh+OyYkRvrqOM9fxNCdw32ll0=;
+ b=IesTthM2zWyEC++GGP+TRAQEBrLfYh76wbAm2rzFCxdBYU/nRD34cc1XfHULT63PQehSCnZIPWXb7ATLdl0shH3WXj+ZHob6oh0VZmx3M8NfgVcroiZYJupZ9a0crYHhM2ZToxAHqL5n1YMbtmw7kqaC/2YvQoYm6uY/vD1+Fmk=
 Received: from BLAPR15MB4035.namprd15.prod.outlook.com (2603:10b6:208:27b::8)
  by BLAPR15MB3796.namprd15.prod.outlook.com (2603:10b6:208:254::17)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.14; Fri, 13 Mar
- 2020 00:55:32 +0000
+ 2020 00:55:35 +0000
 Received: from BLAPR15MB4035.namprd15.prod.outlook.com
  ([fe80::1005:cae:8f47:227c]) by BLAPR15MB4035.namprd15.prod.outlook.com
  ([fe80::1005:cae:8f47:227c%7]) with mapi id 15.20.2814.007; Fri, 13 Mar 2020
- 00:55:32 +0000
+ 00:55:35 +0000
 From: Corey Wharton <coreyw7@fb.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH 1/2] riscv: sifive_e: Support changing CPU type
-Date: Thu, 12 Mar 2020 17:55:07 -0700
-Message-Id: <20200313005508.1906-2-coreyw7@fb.com>
+Subject: [PATCH 2/2] target/riscv: Add a sifive-e34 cpu type
+Date: Thu, 12 Mar 2020 17:55:08 -0700
+Message-Id: <20200313005508.1906-3-coreyw7@fb.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200313005508.1906-1-coreyw7@fb.com>
 References: <20200313005508.1906-1-coreyw7@fb.com>
@@ -98,16 +98,16 @@ Received: from coreyw7-fedora-MJ09BKJM.thefacebook.com
  (2620:10d:c090:500::5:9b25) by CO1PR15CA0109.namprd15.prod.outlook.com
  (2603:10b6:101:21::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.17 via Frontend
- Transport; Fri, 13 Mar 2020 00:55:30 +0000
+ Transport; Fri, 13 Mar 2020 00:55:34 +0000
 X-Mailer: git-send-email 2.21.1
 X-Originating-IP: [2620:10d:c090:500::5:9b25]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 505aeb05-5904-4f78-5259-08d7c6e93b35
+X-MS-Office365-Filtering-Correlation-Id: 77a798c4-f692-46ac-a407-08d7c6e93d0d
 X-MS-TrafficTypeDiagnostic: BLAPR15MB3796:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BLAPR15MB3796ED370D7D77C420D3C97293FA0@BLAPR15MB3796.namprd15.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <BLAPR15MB379698CAFB62D7CB869F4C5A93FA0@BLAPR15MB3796.namprd15.prod.outlook.com>
 X-FB-Source: Internal
-X-MS-Oob-TLC-OOBClassifiers: OLM:112;
+X-MS-Oob-TLC-OOBClassifiers: OLM:1923;
 X-Forefront-PRVS: 034119E4F6
 X-Forefront-Antispam-Report: SFV:NSPM;
  SFS:(10019020)(376002)(136003)(39860400002)(396003)(346002)(366004)(199004)(4326008)(316002)(54906003)(16526019)(186003)(478600001)(36756003)(52116002)(86362001)(2616005)(6512007)(5660300002)(6666004)(8936002)(1076003)(6506007)(2906002)(66476007)(66946007)(6486002)(81166006)(8676002)(81156014)(66556008);
@@ -118,14 +118,14 @@ Received-SPF: None (protection.outlook.com: fb.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: r6KBaR2g/bRHMwnu7xqMvh/kcy01eA8qQFGXeG9sCnPdIwi3QJmI6CjvHFt+k0NuV/2+UYKBD4PvCT/iTuUOfY+2jFlqGw+NU+ZTOftk2dMdw/6Q4hYa/9kMQRXKmH3fxOumrbNLpOHK3F3GMZVgbB0z3JHW3dzL7Vr9eS5QsscMYhcqErxku5tR5rT0Ruxz2tvfM05GCXY04Yun9+4kIu6Ipw89Mc8CDohWHvFCQw3u64u4cDIFMNeVOV7VmpVX5HoONRTPVzoT8cDavbfhTmGqjoGpMK7BK3hAp3IiG6MnBbIEQboo29JoyG/Hu6yqVN/xTckVnj1RwtuKLuIXINc65h1jEsiLUGhSgxGTEVc35cs4tal8PUlkgC2VrWzASmXzpwHsELj5Y8mWUa0/pomJwOXo0RRHorWDh/iaBxLLeelqlTt8avrnlFmkpGzX
-X-MS-Exchange-AntiSpam-MessageData: BWjNfV95m/cz5Sgn6XHx2kh3OdJhe9jApnabEidNJthmuJ3bihemHo8pxR8yoASvlDNMJWxpCDv8DGo4I7B4GfL3Cls73tcNj+8VXx89Td1Xx7oL+VEYZglVeT9RQxdDPfBKYc9teth5MzePRWTVLSte5uAkt8IHHp997M90+oHB11TvwpTRs6Jd8h9wds1a
-X-MS-Exchange-CrossTenant-Network-Message-Id: 505aeb05-5904-4f78-5259-08d7c6e93b35
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 00:55:32.1275 (UTC)
+X-Microsoft-Antispam-Message-Info: Fy4o3BV5iymprob7z91osZexv5JywKJxM7ckMAqdrYTMHBva+of3MBdwnkwFNP124jf7At0n2ea7h921tlAAdMRe8IBrCmyKkWbhxEQ2I5YRBqNWxPhq37SULwwh56gTdNIYp1FgVEuxcyoh4opQ0UPO98d/Qi+wiKXD/iuhz4jQQqGm1UKPhHyZURK/6QL3VFRKPfsRvSjaAlYbzr6D5asChjLm2fUb7SAtXTVd5H3e/NcsJQ0q6n42Wu4jPwJd4ujBLImqkCWrUeNvhJyWRmzrAcp/2I81klSx1zL2G/mVakM5K6Om2syIKVnHpJ/WLGJPT5/uKsNqP2hy3ZyyyGG+NbLVoR6LBHzOw6ahwzICwuXIWIZdPJ9/UafouRuVAGWZS2lcF+mj5NjFswcv2OzLP9QPP24VUVfzhO3nMuT3DlMv2qQCxRKWcp1M6zEH
+X-MS-Exchange-AntiSpam-MessageData: ppJRxSHmxmQPm0M1ojFI7h/2ETockGg+VkOq+6efl1pCVRgkALu3oztx+SJ31p+oSEx2N2TP1KOZg0TFS9X6BEAx3Gxq21qfgfNg8IuZlVDQwsdJzO8Vyelp9WvYht46I3EcQKiRme9HTw7ptcmMjkuvy/Lpv2JAqx8TuiDgxOX4s+iLEY+TjHVbqOTOaLhC
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77a798c4-f692-46ac-a407-08d7c6e93d0d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2020 00:55:35.1791 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lmDAzG8DVxa3KIxYb9uDEvIc5EnYSkI7ZzzZ5j/BHOLR6MF3orm8G2Qf3bTo7z6y
+X-MS-Exchange-CrossTenant-UserPrincipalName: IM34fHCUW0sMMNaVlMs09JHJJNKZ7+4P6OaS+/OmyQaxqzLYD7UwTKKRmtxsI4re
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR15MB3796
 X-OriginatorOrg: fb.com
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
@@ -134,7 +134,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
 X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0
  suspectscore=0
  malwarescore=0 clxscore=1015 adultscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 phishscore=0 mlxlogscore=923 mlxscore=0
+ lowpriorityscore=0 impostorscore=0 phishscore=0 mlxlogscore=822 mlxscore=0
  bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2003020000 definitions=main-2003130002
 X-FB-Internal: deliver
@@ -159,35 +159,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allows the CPU to be changed from the default via the -cpu command
-line option.
+The sifive-e34 cpu type is the same as the sifive-e31 with the
+single precision floating-point extension enabled.
 
 Signed-off-by: Corey Wharton <coreyw7@fb.com>
 ---
- hw/riscv/sifive_e.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/riscv/cpu.c | 10 ++++++++++
+ target/riscv/cpu.h |  1 +
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index a254cad489..b0a611adb9 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -123,7 +123,7 @@ static void riscv_sifive_e_soc_init(Object *obj)
-     object_initialize_child(obj, "cpus", &s->cpus,
-                             sizeof(s->cpus), TYPE_RISCV_HART_ARRAY,
-                             &error_abort, NULL);
--    object_property_set_str(OBJECT(&s->cpus), SIFIVE_E_CPU, "cpu-type",
-+    object_property_set_str(OBJECT(&s->cpus), ms->cpu_type, "cpu-type",
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), ms->smp.cpus, "num-harts",
-                             &error_abort);
-@@ -220,6 +220,7 @@ static void riscv_sifive_e_machine_init(MachineClass *mc)
-     mc->desc = "RISC-V Board compatible with SiFive E SDK";
-     mc->init = riscv_sifive_e_init;
-     mc->max_cpus = 1;
-+    mc->default_cpu_type = SIFIVE_E_CPU;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index c0b7023100..d415cd06eb 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -164,6 +164,15 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+     set_feature(env, RISCV_FEATURE_PMP);
  }
  
- DEFINE_MACHINE("sifive_e", riscv_sifive_e_machine_init)
++static void rv32imafcu_nommu_cpu_init(Object *obj)
++{
++    CPURISCVState *env = &RISCV_CPU(obj)->env;
++    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVC);
++    set_priv_version(env, PRIV_VERSION_1_10_0);
++    set_resetvec(env, DEFAULT_RSTVEC);
++    set_feature(env, RISCV_FEATURE_PMP);
++}
++
+ #elif defined(TARGET_RISCV64)
+ 
+ static void riscv_base64_cpu_init(Object *obj)
+@@ -609,6 +618,7 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+ #if defined(TARGET_RISCV32)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init),
+     /* Depreacted */
+     DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 3dcdf92227..ae5a1d9dce 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -36,6 +36,7 @@
+ #define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
+ #define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
+ #define TYPE_RISCV_CPU_SIFIVE_E31       RISCV_CPU_TYPE_NAME("sifive-e31")
++#define TYPE_RISCV_CPU_SIFIVE_E34       RISCV_CPU_TYPE_NAME("sifive-e34")
+ #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
+ #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
+ #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
 -- 
 2.21.1
 
