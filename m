@@ -2,84 +2,82 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A7ACC10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAD6C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:02:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E95682074E
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 21:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C9812074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 22:02:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QnwZbMb+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E95682074E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLVXnxhD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9812074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCsJG-0001OF-51
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 17:57:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52928)
+	id 1jCsNe-0002s7-MI
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 18:02:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56009)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jCsIK-0000SJ-CK
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:56:42 -0400
+ (envelope-from <armbru@redhat.com>) id 1jCsMq-0002SA-3g
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jCsII-0003Jo-L5
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:56:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49354
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jCsMo-0004Tl-7C
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48679
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jCsIH-0003Gs-W2
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 17:56:38 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jCsMn-0004MJ-Hv
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 18:01:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584136596;
+ s=mimecast20190719; t=1584136876;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UE8q8jm2InBIGi9nrTkQ6TPQgR/9LnZNNUSLfordzQQ=;
- b=QnwZbMb+K2wETjtWoeqEj4vjpY7pzeaGY5iYQk4eq3+odGEd5WTdXXkFoyPQ6lqupIGeo1
- playWB7Xm7kjUVRbYKyt3wWUSzZXry1ENal1CH6RrW4ObFsBGNsCiYAxiVdco8Tb/9lqJx
- jvc+XlZLBG66nieGAiSI7r0TwASDVYk=
+ bh=Z+85ZI/QpsKxlLuONDNDAPRvMh4mNYZ9s0UVbCPuCGE=;
+ b=cLVXnxhDGDav4XcBKPUwFnhqo8zZCzZ3YKKgT52v66Qc1yYdmGn4ZS0jt0kQKKByD654GO
+ AxNkoRo3wGiOrndsq3nftZde7Tv+0Tn42KKmAiKjANN72MJ/66zyqUP6+3eJVkFfQ8qDHn
+ bYcq8ixMClaL1QOAhCMoX2CtFWx/NGA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-t2N4Gg6-N32WAZGhE8d4IA-1; Fri, 13 Mar 2020 17:56:34 -0400
-X-MC-Unique: t2N4Gg6-N32WAZGhE8d4IA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-240-qpR6Qvq2MvKMBn6DKKBDNA-1; Fri, 13 Mar 2020 18:01:14 -0400
+X-MC-Unique: qpR6Qvq2MvKMBn6DKKBDNA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49DE418A5500;
- Fri, 13 Mar 2020 21:56:33 +0000 (UTC)
-Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04F005DA2C;
- Fri, 13 Mar 2020 21:56:29 +0000 (UTC)
-Subject: Re: [PATCH 5/5] block/io: auto-no-fallback for write-zeroes
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200302100537.29058-1-vsementsov@virtuozzo.com>
- <20200302100537.29058-6-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5e7f5649-c349-7d8e-f2a0-203cc53aa8cb@redhat.com>
-Date: Fri, 13 Mar 2020 16:56:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33A9D800D6C;
+ Fri, 13 Mar 2020 22:01:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-34.ams2.redhat.com
+ [10.36.116.34])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2CA271A3;
+ Fri, 13 Mar 2020 22:01:12 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1102111386A6; Fri, 13 Mar 2020 23:01:11 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] net: Complete qapi-fication of netdev_add
+References: <20200312211440.3767626-1-eblake@redhat.com>
+Date: Fri, 13 Mar 2020 23:01:10 +0100
+In-Reply-To: <20200312211440.3767626-1-eblake@redhat.com> (Eric Blake's
+ message of "Thu, 12 Mar 2020 16:14:40 -0500")
+Message-ID: <877dznewyh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200302100537.29058-6-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,109 +89,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: lekiravi@yandex-team.ru, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 4:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> NBD driver may has max_pwrite_zeroes but doesn't has
-> max_pwrite_zeroes_no_fallback limit. This means, that (when
-> BDRV_REQ_NO_FALLBACK is supported) it is beneficial to try send request
-> with BDRV_REQ_NO_FALLBACK instead of splitting the request accordingly
-> to max_pwrite_zeroes.
-> 
-> If failed, fallback to old behavior.
+It's too late in my day for a full review.  Just one observation for
+now.
 
-Grammar:
+Eric Blake <eblake@redhat.com> writes:
 
-When BDRV_REQ_NO_FALLBACK is supported, the NBD driver supports a larger 
-request size.  Add code to try large zero requests with a NO_FALLBACK 
-request prior to having to split a request into chunks according to 
-max_pwrite_zeroes.
-
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> We've had all the required pieces for doing a type-safe representation
+> of netdev_add as a flat union for quite some time now (since
+> 0e55c381f6 in v2.7.0, released in 2016), but did not make the final
+> switch to using it because of concern about whether a command-line
+> regression in accepting "1" in place of 1 for integer arguments would
+> be problematic.  Back then, we did not have the deprecation cycle to
+> allow us to make progress.  But now that we have waited so long, other
+> problems have crept in: for example, our desire to add
+> qemu-storage-daemon is hampered by the inability to express net
+> objects, and we are unable to introspect what we actually accept.
+> Additionally, our round-trip through QemuOpts silently eats any
+> argument that expands to an array, rendering dnssearch, hostfwd, and
+> guestfwd useless through QMP:
+>
+> {"execute": "netdev_add", "arguments": { "id": "netdev0",
+>   "type": "user", "dnssearch": [
+>     { "str": "8.8.8.8" }, { "str": "8.8.4.4" }
+>   ]}}
+>
+> So without further ado, let's turn on proper QAPI.
+>
+> There are a few places where the QMP 'netdev_add' command is now
+> more strict: anywhere that the QAPI lists an integer member, we
+> now require a strict JSON integer (previously, we allowed both
+> integers and strings, because the conversion from QMP to QemuOpts
+> back to QObject collapsed them into integers).  For example,
+> pre-patch, both of these examples succeed, but post-patch, the
+> second example now fails:
+>
+> {'execute':'netdev_add',
+>   'arguments':{'id':'net1', 'type':'hubport', 'hubid':1}}
+> {"return": {}}
+> {'execute':'netdev_add',
+>   'arguments':{'id':'net2', 'type':'hubport', 'hubid':"2"}}
+> {"error": {"class": "GenericError", "desc": "Invalid parameter type for '=
+hubid', expected: integer"}}
+>
+> But this stricter QMP is desirable, and introspection is sufficient
+> for any affected applications to make sure they use it correctly.
+>
+> In qmp_netdev_add(), we still have to create a QemuOpts object
+> so that qmp_netdev_del() will be able to remove a hotplugged
+> network device; but the opts->head remains empty since we now
+> manage all parsing through the QAPI object rather than QemuOpts.
+>
+> Reported-by: Alex Kirillov <lekiravi@yandex-team.ru>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->   block/io.c | 30 ++++++++++++++++++++++++++----
->   1 file changed, 26 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index c64566b4cf..48d71b0883 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -1752,17 +1752,28 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->       int head = 0;
->       int tail = 0;
->   
-> -    int max_write_zeroes = MIN_NON_ZERO((flags & BDRV_REQ_NO_FALLBACK) ?
-> -                                        bs->bl.max_pwrite_zeroes_no_fallback :
-> -                                        bs->bl.max_pwrite_zeroes, INT_MAX);
-> +    int max_write_zeroes;
->       int alignment = MAX(bs->bl.pwrite_zeroes_alignment,
->                           bs->bl.request_alignment);
->       int max_transfer = MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFFER);
-> +    bool auto_no_fallback;
->   
->       if (!drv) {
->           return -ENOMEDIUM;
->       }
->   
-> +    if (!(flags & BDRV_REQ_NO_FALLBACK) &&
-> +        (bs->supported_zero_flags & BDRV_REQ_NO_FALLBACK) &&
-> +        bs->bl.max_pwrite_zeroes &&
-> +        bs->bl.max_pwrite_zeroes < bytes &&
-> +        (bs->bl.max_pwrite_zeroes < bs->bl.max_pwrite_zeroes_no_fallback ||
-> +         bs->bl.max_pwrite_zeroes_no_fallback == 0))
+>  qapi/net.json     | 14 +-------------
+>  include/net/net.h |  1 -
+>  monitor/misc.c    |  2 --
+>  net/net.c         |  6 +++---
+>  4 files changed, 4 insertions(+), 19 deletions(-)
+>
+> diff --git a/qapi/net.json b/qapi/net.json
+> index 1cb9a7d782b4..cebb1b52e3b1 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -39,18 +39,8 @@
+>  #
+>  # Add a network backend.
+>  #
+> -# @type: the type of network backend. Possible values are listed in
+> -#        NetClientDriver (excluding 'none' and 'nic')
+> -#
+> -# @id: the name of the new network backend
+> -#
+>  # Additional arguments depend on the type.
+>  #
+> -# TODO: This command effectively bypasses QAPI completely due to its
+> -#       "additional arguments" business.  It shouldn't have been added t=
+o
+> -#       the schema in this form.  It should be qapified properly, or
+> -#       replaced by a properly qapified command.
+> -#
+>  # Since: 0.14.0
+>  #
+>  # Returns: Nothing on success
+> @@ -64,9 +54,7 @@
+>  # <- { "return": {} }
+>  #
+>  ##
+> -{ 'command': 'netdev_add',
+> -  'data': {'type': 'str', 'id': 'str'},
+> -  'gen': false }                # so we can get the additional arguments
+> +{ 'command': 'netdev_add', 'data': 'Netdev', 'boxed': true }
+>
+>  ##
+>  # @netdev_del:
+> diff --git a/include/net/net.h b/include/net/net.h
+> index e175ba9677dc..96e6eae8176e 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -203,7 +203,6 @@ void net_cleanup(void);
+>  void hmp_host_net_add(Monitor *mon, const QDict *qdict);
+>  void hmp_host_net_remove(Monitor *mon, const QDict *qdict);
+>  void netdev_add(QemuOpts *opts, Error **errp);
+> -void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp);
+>
+>  int net_hub_id_for_client(NetClientState *nc, int *id);
+>  NetClientState *net_hub_port_find(int hub_id);
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index c3bc34c099dd..41a86e7012a1 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -247,8 +247,6 @@ static void monitor_init_qmp_commands(void)
+>                           qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
+>      qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
+>                           QCO_NO_OPTIONS);
+> -    qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+> -                         QCO_NO_OPTIONS);
+>      qmp_register_command(&qmp_commands, "object-add", qmp_object_add,
+>                           QCO_NO_OPTIONS);
+>
+> diff --git a/net/net.c b/net/net.c
+> index 9e93c3f8a1e2..a2065aabede2 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1170,7 +1170,7 @@ void netdev_add(QemuOpts *opts, Error **errp)
+>      net_client_init(opts, true, errp);
+>  }
+>
+> -void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp)
+> +void qmp_netdev_add(Netdev *netdev, Error **errp)
+>  {
+>      Error *local_err =3D NULL;
+>      QemuOptsList *opts_list;
+> @@ -1181,12 +1181,12 @@ void qmp_netdev_add(QDict *qdict, QObject **ret, =
+Error **errp)
+>          goto out;
+>      }
+>
+> -    opts =3D qemu_opts_from_qdict(opts_list, qdict, &local_err);
+> +    opts =3D qemu_opts_create(opts_list, netdev->id, 1, &local_err);
 
-Why are we letting max_pwrite_zeroes_no_fallback ever be 0?  It might be 
-more convenient if it is always guaranteed to be >= max_pwrite_zeroes by 
-the block layer.
+As oyu explain in your commit message, we still create a QemuOpts with
+the same ID, but no other parameters, because qmp_netdev_del() needs
+it.  I show it below.
 
-> +    {
-> +        assert(drv->bdrv_co_pwrite_zeroes);
-> +        flags |= BDRV_REQ_NO_FALLBACK;
-> +        auto_no_fallback = true;
-> +    }
-> +
->       if ((flags & ~bs->supported_zero_flags) & BDRV_REQ_NO_FALLBACK) {
->           return -ENOTSUP;
->       }
-> @@ -1770,7 +1781,11 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->       assert(alignment % bs->bl.request_alignment == 0);
->       head = offset % alignment;
->       tail = (offset + bytes) % alignment;
-> -    max_write_zeroes = QEMU_ALIGN_DOWN(max_write_zeroes, alignment);
-> +    max_write_zeroes =
-> +        QEMU_ALIGN_DOWN(MIN_NON_ZERO((flags & BDRV_REQ_NO_FALLBACK) ?
-> +                                     bs->bl.max_pwrite_zeroes_no_fallback :
-> +                                     bs->bl.max_pwrite_zeroes, INT_MAX),
-> +                        alignment);
->       assert(max_write_zeroes >= bs->bl.request_alignment);
->   
->       while (bytes > 0 && !ret) {
-> @@ -1801,6 +1816,13 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
->           if (drv->bdrv_co_pwrite_zeroes) {
->               ret = drv->bdrv_co_pwrite_zeroes(bs, offset, num,
->                                                flags & bs->supported_zero_flags);
-> +            if (ret == -ENOTSUP && auto_no_fallback) {
-> +                flags &= ~BDRV_REQ_NO_FALLBACK;
-> +                max_write_zeroes =
-> +                    QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pwrite_zeroes,
-> +                                                 INT_MAX), alignment);
-> +                continue;
-> +            }
->               if (ret != -ENOTSUP && (flags & BDRV_REQ_FUA) &&
->                   !(bs->supported_zero_flags & BDRV_REQ_FUA)) {
->                   need_flush = true;
-> 
+>      if (local_err) {
+>          goto out;
+>      }
+>
+> -    netdev_add(opts, &local_err);
+> +    net_client_init1(netdev, true, &local_err);
+>      if (local_err) {
+>          qemu_opts_del(opts);
+>          goto out;
+       }
 
-Otherwise makes sense.
+   out:
+       error_propagate(errp, local_err);
+   }
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+   void qmp_netdev_del(const char *id, Error **errp)
+   {
+       NetClientState *nc;
+       QemuOpts *opts;
+
+       nc =3D qemu_find_netdev(id);
+       if (!nc) {
+           error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+                     "Device '%s' not found", id);
+           return;
+       }
+
+       opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), id);
+--->   if (!opts) {
+           error_setg(errp, "Device '%s' is not a netdev", id);
+           return;
+       }
+
+       qemu_del_net_client(nc);
+       qemu_opts_del(opts);
+   }
+
+We better check all other uses of option group "netdev".
 
 
