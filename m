@@ -2,105 +2,61 @@ Return-Path: <SRS0=s522=46=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1521C10DCE
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 025B4C10DCE
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:34:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A6B1206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:23:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqTxe265"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A6B1206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CCD3F2073E
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Mar 2020 09:34:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD3F2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCgXe-0002Yb-NF
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55703)
+	id 1jCgi0-0005Zm-Vc
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 05:34:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jCgWv-00029o-JZ
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:58 -0400
+ (envelope-from <groug@kaod.org>) id 1jCghR-00055c-MG
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:33:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jCgWu-0006M6-K0
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47928
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1jCghQ-00023K-6w
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:33:49 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:48765)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jCgWu-0006KB-GY
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:22:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584091375;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T8V3AWdy4+WE+ZqPdYu6cuPN0NWV4yxGlgYXsnIFD6s=;
- b=OqTxe2651ETH6WR04bDW3plg3WZdoxV++fVWgGXuJ2qy5D3xXiiORU38UdRinGhifY2Ct+
- dAlvNL5SnAlOk0KJEmV1J8XoRIgpkSqrpTx+ezwGnS1oXaI7UDvSRnIzSBrh2NE+D9A3m3
- L8dWp4buFA4As6eWtCEVDATGRTQdUlM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-vCZAYp4zPmCn-VJDg7KRFg-1; Fri, 13 Mar 2020 05:22:54 -0400
-X-MC-Unique: vCZAYp4zPmCn-VJDg7KRFg-1
-Received: by mail-wm1-f72.google.com with SMTP id a23so3187956wmm.8
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 02:22:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=T8V3AWdy4+WE+ZqPdYu6cuPN0NWV4yxGlgYXsnIFD6s=;
- b=bo7jioI+BoeQXRDdGL9eGxXIfUhuMvZ5343Kf+ShlJH3CZO5WSnLKjHSj3DhF68HG2
- DZmVsc3Rc6reZAXNLRMRlJmPc8R9CQh42zPkVjxqG855N9Vls2xSIyqdRyz2h0H9EB50
- qlbP4wXgHk1xGSeT3jcmuCr/f1fSEjgjJtgxD/QNGVyQRxkCG+doqEeIOwMM7p+RyOx8
- 4KzZn1cIwsr/IaCFc4twDGI+SxPWMnTgRKD82IoD4zbOKv4IIxOFH0ctFMxopP+R5GME
- OkSIzrNZ/GDzs/H0KHtxpYGyXcFL5UJg0STJH2Vho0TMTpqcHkfQyFbquZwxPJqODjLc
- pIWA==
-X-Gm-Message-State: ANhLgQ1gV4Domu6lGHL0Pm/i/kEyRlkBEAFYWn6fRdKO0uVhm6dYurAK
- npvCWPqfyE44Jb3OFFdZdBO5fCdCcexE4UQzlHQ128noXbh2NsG1zMvprNsaJc1F1Gilf7kjEfY
- 8Gk9lbg2jBz96mHU=
-X-Received: by 2002:a05:600c:286:: with SMTP id
- 6mr9847429wmk.101.1584091372862; 
- Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsDU1/0D5s3SZeXTx3NzU2MhGnrbHWC5Yu1f5/X7Q+70cU5vXJpwo8Jop//gEuDU4CTg3nhIA==
-X-Received: by 2002:a05:600c:286:: with SMTP id
- 6mr9847405wmk.101.1584091372669; 
- Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7de8:5d90:2370:d1ac?
- ([2001:b07:6468:f312:7de8:5d90:2370:d1ac])
- by smtp.gmail.com with ESMTPSA id 61sm29764493wrd.58.2020.03.13.02.22.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Mar 2020 02:22:52 -0700 (PDT)
-Subject: Re: [RFC] cpus: avoid get stuck in pause_all_vcpus
-To: "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)"
- <longpeng2@huawei.com>
-References: <20200310091443.1326-1-longpeng2@huawei.com>
- <8ed76f64-1a24-a278-51f3-19515e65ff39@redhat.com>
- <a6c8eac3-a714-ff6f-2bd6-1fa1d1037a81@huawei.com>
- <e4dc19fd-bee2-251f-1fef-b41cd6da6c23@redhat.com>
- <e7a49ec8-6a71-78a9-05c6-f6967e1d55f2@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b380490-dafc-39ef-1bf7-d3f4e54c14ad@redhat.com>
-Date: Fri, 13 Mar 2020 10:22:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jCghP-0001P5-VB
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 05:33:48 -0400
+Received: from player786.ha.ovh.net (unknown [10.110.208.83])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 1F9072736DE
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 10:33:38 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id 4737A108A0D3C;
+ Fri, 13 Mar 2020 09:33:34 +0000 (UTC)
+Date: Fri, 13 Mar 2020 10:33:30 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 4/4] spapr: Fold spapr_node0_size() into its only caller
+Message-ID: <20200313103330.125530ee@bahia.home>
+In-Reply-To: <20200313040539.819138-5-david@gibson.dropbear.id.au>
+References: <20200313040539.819138-1-david@gibson.dropbear.id.au>
+ <20200313040539.819138-5-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <e7a49ec8-6a71-78a9-05c6-f6967e1d55f2@huawei.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 6012868454024780262
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddvjedgtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 178.32.119.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,25 +68,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel @ nongnu . org" <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, arei.gonglei@huawei.com,
- huangzhichao@huawei.com, rth@twiddle.net
+Cc: qemu-ppc@nongnu.org, philmd@redhat.com, clg@kaod.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/03/20 09:36, Longpeng (Mike, Cloud Infrastructure Service Product
-Dept.) wrote:
->> You're right, do_vm_stop sets the runstate after pause_all_vcpus.  We
->> can move that before and it should fix your case too.
->>
-> Uh, it seems to work. So can I send a patch based on your suggestion ? Or feel
-> free to do if you want to fix it by yourself.
+On Fri, 13 Mar 2020 15:05:39 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> The Real Mode Area (RMA) needs to fit within the NUMA node owning memory
+> at address 0.  That's usually node 0, but can be a later one if there are
+> some nodes which have no memory (only CPUs).
 > 
+> This is currently handled by the spapr_node0_size() helper.  It has only
+> one caller, so there's not a lot of point splitting it out.  It's also
+> extremely easy to misread the code as clamping to the size of the smallest
+> node rather than the first node with any memory.
+> 
+> So, fold it into the caller, and add some commentary to make it a bit
+> clearer exactly what it's doing.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c | 37 +++++++++++++++++++++----------------
+>  1 file changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 6c32ec3c0a..6a42c0f1c9 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -295,20 +295,6 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
+>      _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
+>  }
+>  
+> -static hwaddr spapr_node0_size(MachineState *machine)
+> -{
+> -    if (machine->numa_state->num_nodes) {
+> -        int i;
+> -        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+> -            if (machine->numa_state->nodes[i].node_mem) {
+> -                return MIN(pow2floor(machine->numa_state->nodes[i].node_mem),
+> -                           machine->ram_size);
+> -            }
+> -        }
+> -    }
+> -    return machine->ram_size;
+> -}
+> -
+>  static void add_str(GString *s, const gchar *s1)
+>  {
+>      g_string_append_len(s, s1, strlen(s1) + 1);
+> @@ -2631,10 +2617,24 @@ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
+>      MachineState *machine = MACHINE(spapr);
+>      SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>      hwaddr rma_size = machine->ram_size;
+> -    hwaddr node0_size = spapr_node0_size(machine);
+>  
+>      /* RMA has to fit in the first NUMA node */
+> -    rma_size = MIN(rma_size, node0_size);
+> +    if (machine->numa_state->num_nodes) {
+> +        /*
+> +         * It's possible for there to be some zero-memory nodes first
+> +         * in the list.  We need the RMA to fit inside the memory of
+> +         * the first node which actually has some memory.
+> +         */
+> +        int i;
+> +
+> +        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+> +            if (machine->numa_state->nodes[i].node_mem != 0) {
+> +                hwaddr node_size = machine->numa_state->nodes[i].node_mem;
+> +                rma_size = MIN(rma_size, pow2floor(node_size));
+> +                break;
+> +            }
+> +        }
+> +    }
+>  
+>      /*
+>       * VRMA access is via a special 1TiB SLB mapping, so the RMA can
+> @@ -2651,6 +2651,11 @@ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
+>          rma_size = MIN(rma_size, smc->rma_limit);
+>      }
+>  
+> +    /*
+> +     * RMA size must be a power of 2
+> +     */
+> +    rma_size = pow2floor(rma_size);
+> +
 
-Yes, please.
+The patch is identical to the last spin, for which I had
+a comment already:
 
-Paolo
+-----------------------------------------------------------------------
+On Wed, 4 Mar 2020 12:25:55 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Tue, Mar 03, 2020 at 11:32:49AM +0100, Greg Kurz wrote:
+
+[...]
+
+> > In any case, it would probably help to mention somewhere
+> > why the rounding is introduced by this patch.
+> 
+> Drat.  I meant to sort out your comment on the last spin better than
+> this, but got part way through and forgot what I was doing.
+>
+-----------------------------------------------------------------------
+
+I still think that the rounding introduced by this patch deserves
+some explanations in the changelog...
+
+>      if (rma_size < MIN_RMA_SLOF) {
+>          error_setg(errp,
+>  "pSeries SLOF firmware requires >= %ldMiB guest RMA (Real Mode Area memory)",
 
 
