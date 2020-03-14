@@ -2,95 +2,92 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 140EBC0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BA2C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0B420784
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF3820784
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:28:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPA69H4+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0B420784
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1nK+wEt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF3820784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDBTy-0001XN-1y
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 14:25:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39501)
+	id 1jDBWH-0002qy-I1
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 14:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jDBTB-0000rD-NS
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:10 -0400
+ (envelope-from <mst@redhat.com>) id 1jDBVj-0002SX-1m
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:27:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jDBTA-0007kA-Mn
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:09 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31854
+ (envelope-from <mst@redhat.com>) id 1jDBVh-00079t-LD
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:27:46 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40495
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDBTA-0007ip-IV
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:08 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDBVh-00077w-GG
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:27:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584210308;
+ s=mimecast20190719; t=1584210465;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BHxABOPYrTd5jeH4kQ73qkR1EKA7pAk8OhssJ55BfO0=;
- b=VPA69H4+6PiJ8kcZ8qNdxnzik3ZWv0vR4DtCQVhhKZWAfWzp3rrhI3Vcw5LtAk8Rur9eLi
- cfnJ+ETKEKfIxOxYKoobhu9p7mPwYxV5jyxYNRxcumtjcUjY4gT2BVLWv2dMCM8+5K9A3j
- axNojTRyokSh3kCRcvWU9tRS6QxVV+g=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-TLrcpO8PMNmYOtzw39Wn6w-1; Sat, 14 Mar 2020 14:25:06 -0400
-X-MC-Unique: TLrcpO8PMNmYOtzw39Wn6w-1
-Received: by mail-wr1-f72.google.com with SMTP id c6so6219211wrm.18
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 11:25:06 -0700 (PDT)
+ bh=1KkC3J2vHT5ODGQByAOEXWwJj6vw8GW2WGOXF7v633c=;
+ b=B1nK+wEtiTsTW/I+KpqTNBeoN7tg6uZQRVcAWxBNwSwpboBZoEnDiE+V1wmxm0XTHoSIU/
+ lj6uDD/PTwrgl+65aJ4LySU+XO4E6Mu1vxHnCLwJIzgWi47xFyKz51JhhbtYm8SofanS/h
+ hkZeHo9H4+vylajgEXNxnCrBBVmwajg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-MBXO8376NY2lh3NjO11Hkg-1; Sat, 14 Mar 2020 14:27:40 -0400
+X-MC-Unique: MBXO8376NY2lh3NjO11Hkg-1
+Received: by mail-wm1-f72.google.com with SMTP id z26so4050205wmk.1
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 11:27:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=Acr2+zOvPR3PR1E65IrotLByvZr1MWpy53iUxFf29n4=;
- b=b//Y7uFjROu/tqAJlrZn0f2XJIGBnuoztpjptB3P+AZ3KnzuLHPueNAw2lqJ63mWVH
- DdbIUNtKyBgvtkuc1APuC9ChfbBwTnZtAxINFsyxMDS9FYE/61ZQimz6lLNoSAAuj6+i
- YQ7NTFkf6wTIPBwl+5xe8gFpTqyh5Whw86pBUd1jmVIYshNJUnTZS3MQ7sNm+urq5r6G
- j0DOesHfIrzQDCc/idymqVW8TScNnbp24J0a/JYOPP692AngSAS+zri7cLNfgLNvDFtj
- d5f7tDTaDviISqQv0sSH15aZlhALTDPHseYTNXbzUjhI+wc43EuDQkoOPv86Mctxn3Ih
- WRoA==
-X-Gm-Message-State: ANhLgQ1RrORQ4ds/krvKupNqZHU7YIpDhNGlowupGsIzyqaIF2/5JerS
- oo9PNdEHD0GofF1dSWA0aOsfZLw5XaeM5gTU3THJ76BvrJs6TtOxlacn4U0FtsoCUIGsVY4kZrk
- 62E0trF3mQkZCJac=
-X-Received: by 2002:adf:9d8f:: with SMTP id p15mr24652321wre.160.1584210305273; 
- Sat, 14 Mar 2020 11:25:05 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvlUh91wmcMMIKTh+kVxgbWGDCjrilei4ihGgfdPGR/g1JuXFerJUkbiE2iICP3G1MmPGLEDA==
-X-Received: by 2002:adf:9d8f:: with SMTP id p15mr24652305wre.160.1584210305090; 
- Sat, 14 Mar 2020 11:25:05 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=2StV+w+XHy2WUEiTo1l/BRbato+66GHf31YhceTJyFk=;
+ b=sE6Zc/OjoSgX3/JxayVR3htSecvYFEMpTfbhnNCDOwf+ysiOSv7M7BpuiAYuU6dwBI
+ mflIfSeu2wj1fYBAx0KZpw0yL3x5q+xAMB5JtsNlf4ZhmdJ2nA5pwA+xMD0w77ItQtT/
+ xt8qLq0m33MyvAly/sxL51sjcGADfoLRzanpyo2E6zFWmSIIjXhIoCmzBADQYt+87L5x
+ alXbtjDMNvgrxQcjLRBE4CZ3Z22VYpA5na+93iqYUnmf33Tp0rCia8kZcoZ2MCd6vY2c
+ o7kU5VTKV91Pb4YeTyyU9TZXVp4fj0Uus9m89nigKgbmEbi8mBYzsFmqD9mV8PluCSXK
+ 57cg==
+X-Gm-Message-State: ANhLgQ21yd2XmXV2ZDR+soQ8USm9WX5aVYOf5xP9PWHbwv20uyDnVsqe
+ K1GYRcGm3yVJqP/lyvPrPO+w9t4I00/5X/jZDP1lXkAcPwJL3D7Q56+AIbqN+bjG9Q7GuZgZB7w
+ rzTfqR9ztiWX6gY4=
+X-Received: by 2002:adf:f58f:: with SMTP id f15mr26375714wro.16.1584210458712; 
+ Sat, 14 Mar 2020 11:27:38 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvv3oYC786lvL7eiKhVpE7gCtgMJeWpCeiQDZ3pDZPGE+j8vVoDWg1bPniYnGQ0wAfCSppGdQ==
+X-Received: by 2002:adf:f58f:: with SMTP id f15mr26375695wro.16.1584210458475; 
+ Sat, 14 Mar 2020 11:27:38 -0700 (PDT)
 Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
  by smtp.gmail.com with ESMTPSA id
- w1sm20743305wmc.11.2020.03.14.11.25.03
+ l8sm22696256wmj.2.2020.03.14.11.27.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Mar 2020 11:25:04 -0700 (PDT)
-Date: Sat, 14 Mar 2020 14:25:01 -0400
+ Sat, 14 Mar 2020 11:27:37 -0700 (PDT)
+Date: Sat, 14 Mar 2020 14:27:35 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 07/16] hw/i386/vmport: Introduce vmport.h
-Message-ID: <20200314142319-mutt-send-email-mst@kernel.org>
-References: <20200312165431.82118-1-liran.alon@oracle.com>
- <20200312165431.82118-8-liran.alon@oracle.com>
- <13b98a16-6465-e1c9-5f52-0f338c60fbd5@redhat.com>
- <d81dc7a5-2b20-1792-c1df-ecdb8a964fa7@oracle.com>
- <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 0/3]: acpi: Add Windows ACPI Emulated Device Table
+ (WAET)
+Message-ID: <20200314142708-mutt-send-email-mst@kernel.org>
+References: <20200313145009.144820-1-liran.alon@oracle.com>
+ <158411510863.16773.11681485784155170393@39012742ff91>
 MIME-Version: 1.0
-In-Reply-To: <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
+In-Reply-To: <158411510863.16773.11681485784155170393@39012742ff91>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -107,52 +104,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net, Liran Alon <liran.alon@oracle.com>,
- qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: pbonzini@redhat.com, rth@twiddle.net, liran.alon@oracle.com,
+ ehabkost@redhat.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Mar 14, 2020 at 09:31:31AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 3/13/20 11:38 PM, Liran Alon wrote:
-> > On 13/03/2020 21:57, Philippe Mathieu-Daud=E9 wrote:
-> > > On 3/12/20 5:54 PM, Liran Alon wrote:
-> > > > No functional change. This is mere refactoring.
-> > > >=20
-> > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> > > > ---
-> > > > =A0 hw/i386/pc.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
-> > > > =A0 hw/i386/vmmouse.c=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
-> > > > =A0 hw/i386/vmport.c=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
-> > > > =A0 include/hw/i386/pc.h=A0=A0=A0=A0 | 13 -------------
-> > > > =A0 include/hw/i386/vmport.h | 16 ++++++++++++++++
-> > >=20
-> > > What about moving it to hw/i386/vmport.h (no under include/)?
-> > >=20
-> > > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > >=20
-> > >=20
-> > Can you explain the logic that separates between hw/i386/*.h to
-> > include/hw/i386/*.h?
+On Fri, Mar 13, 2020 at 08:58:30AM -0700, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200313145009.144820-1-liran.alon@=
+oracle.com/
 >=20
-> Headers in the include/hw/ namespace can be consumed by all machine targe=
-ts.
-> If this is a target-specific device, having it local to the target
-> (hw/i386/) protect generic code (and other targets) of using it. This hel=
-ps
-> detecting wrong dependencies between components.
-
-I think it's true. However when headers were moved to include we
-weren't always able to do this correctly. So some i386
-specific headers are under include.
-
-
-> > If it makes sense, sure I will move it. I just don't know what is the
-> > convention here.
 >=20
-> Michael/Paolo/Eduardo what do you recommend?
+>=20
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below fo=
+r
+> more information:
+>=20
+> Subject: [PATCH v2 0/3]: acpi: Add Windows ACPI Emulated Device Table (WA=
+ET)
+> Message-id: 20200313145009.144820-1-liran.alon@oracle.com
+> Type: series
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> e9129fb acpi: unit-test: Update WAET ACPI Table expected binaries
+> 76eaa7a acpi: Add Windows ACPI Emulated Device Table (WAET)
+> 041dfae acpi: unit-test: Ignore diff in WAET ACPI table
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/3 Checking commit 041dfaefd37e (acpi: unit-test: Ignore diff in WAET AC=
+PI table)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #17:=20
+> new file mode 100644
+>=20
+> total: 0 errors, 1 warnings, 3 lines checked
+>=20
+> Patch 1/3 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 2/3 Checking commit 76eaa7ac6ef4 (acpi: Add Windows ACPI Emulated Device =
+Table (WAET))
+> ERROR: line over 90 characters
+> #43: FILE: hw/i386/acpi-build.c:2520:
+> + * Spec: http://download.microsoft.com/download/7/E/7/7E7662CF-CBEA-470B=
+-A97E-CE7CE0D98DC2/WAET.docx
+>=20
+> WARNING: Block comments use a leading /* on a separate line
+> #61: FILE: hw/i386/acpi-build.c:2538:
+> +    build_append_int_noprefix(table_data, 1 << 1 /* ACPI PM timer good *=
+/, 4);
+
+Looks like a false positive - this is not a block comment.
+What's going on?
 
 
+> total: 1 errors, 1 warnings, 43 lines checked
+>=20
+> Patch 2/3 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 3/3 Checking commit e9129fbd5cf2 (acpi: unit-test: Update WAET ACPI Table=
+ expected binaries)
+> =3D=3D=3D OUTPUT END =3D=3D=3D
+>=20
+> Test command exited with code: 1
+>=20
+>=20
+> The full log is available at
+> http://patchew.org/logs/20200313145009.144820-1-liran.alon@oracle.com/tes=
+ting.checkpatch/?type=3Dmessage.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
 
 
