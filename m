@@ -2,77 +2,82 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6239C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7A5C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79DD32073C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:28:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DAD120782
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TvZa+8/u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79DD32073C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dbGR7lsQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DAD120782
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDAaR-0000wr-Hg
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:28:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42896)
+	id 1jDAaU-000143-Hg
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42919)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jDAZZ-0007oN-OD
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:42 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jDAZb-0007ph-3F
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jDAZY-0005AL-Nt
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:41 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37642)
+ (envelope-from <groeck7@gmail.com>) id 1jDAZZ-0005HN-QS
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:43 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:34855)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jDAZY-00052P-II; Sat, 14 Mar 2020 13:27:40 -0400
-Received: by mail-pg1-x543.google.com with SMTP id a32so6072310pga.4;
- Sat, 14 Mar 2020 10:27:40 -0700 (PDT)
+ id 1jDAZZ-0005Ck-L2; Sat, 14 Mar 2020 13:27:41 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id mq3so6013306pjb.0;
+ Sat, 14 Mar 2020 10:27:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=3Wr1iKY+3+Cwn9cBDpqiD25J8x1QXx5pF5dgf5Mmwr8=;
- b=TvZa+8/uX6LVj++QGlIRcVw/HWoQqHrP/tl5FsO7x3QPXD0Png4zeuDY6vV1j5wXIc
- /XRDZBeg1jZxseIgZA2SvAnBsspusKQW0PFlbrYn0DewXAGKeLwzmfi4fqNNGg8zE7Eu
- ZoSdALnhttf9C0mnafW56jfANWYAPVUbH6clkfp5i3O9Fn+ZRdkD6zSXrQa88b+eSy0G
- SIdYlNuFNjzPApv7axU6Y10PA5w44B/FqowemM1e4lgvVLu7vQFr8qVj1mULcRSJc2o+
- 3WusOZqcFnXAf6hE7qw03aXkpQNcBX78AHGJDqFVZ2TIjt+rfNFrUUAl7bxXyln+Udup
- F0jw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=c8+NrFQrAejVqIlPEDdLPF0zMrwlZfTWj58V1G1hCUA=;
+ b=dbGR7lsQPCDshwtJzx3Drr6UAo6Y2pGWsFHRrTfhNI66LFd27ReqQXyEobLrLjWUm+
+ awxge4BdHKq5ABtwOqJy/BBSM6Q+Z4Bl/5kZiw1mKWhkMdVdqy6mGfKD4TuLA+bcTlFl
+ 3okIeaC2QO8w3friQaZYtVyFRZ3flegwzLf/Ys7jfa2+PBZYBTMn7OPL+Uwbp0TDI7dD
+ HvvNth4GzwT+3qeRw87ZFoF/G8e9xC9+whumuwRxNz0dyLunnzWGojYX6SVWCx2sHgT8
+ 7U9ZvDRpZRYRMvoM7qM5OFUVOjF/2yv3ldPk4Z2QMZ+jJ/AucctIpV+APX4hPrwFBORX
+ jUFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=3Wr1iKY+3+Cwn9cBDpqiD25J8x1QXx5pF5dgf5Mmwr8=;
- b=dmmq5O6yVDRT9ccfJOEo6InIiLFMsCBAhTIpeHFUAhjYp9WoVsy8Er9KRd7sAquPny
- uu8Yz87KlIDZQ6yI3b/QE58VQrjqKrCDAhnm1Hq5bNicfGnpq1b79qC/emzVhYGY744Y
- pB75L22S61JPo3yNZNZXBADthuPF5PMNagv48ffAp7qLn4KGzJZh5edzxMM3Z0CFF/zR
- JCh3YRWtEcDZCRIMDyFfTtMEcEicfY/wA6ulF9Hula5O5DFILErS3kufy4RveBCu0k3v
- ZANhP5Dj8V2PHTjOnhYKSjhPYfhg0kjBdRWMnf3e5YE6hQtmualtq3G/Q+9xzuQoIJUL
- eEsg==
-X-Gm-Message-State: ANhLgQ3Gh83RRZMh7Wd6mJJ9KfY3aodBayqR7xgS0mGX6q6ayhBa6MSb
- OUztMeWTsL7kr9UiZ3Th5Sw=
-X-Google-Smtp-Source: ADFU+vuB/OZDKxYu4r4LW3AHL9m4y3WVqXMVFJuQ9ftl7kvfNOt91m2APoE5zJ+5Hv/ojRsSpSV9AQ==
-X-Received: by 2002:a63:c042:: with SMTP id z2mr18695934pgi.160.1584206859137; 
- Sat, 14 Mar 2020 10:27:39 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=c8+NrFQrAejVqIlPEDdLPF0zMrwlZfTWj58V1G1hCUA=;
+ b=XC/sLKbilfvZcGB+jQrW2Nrd778hHJ0oqpgEvUlpGJ0uZv11qbxFTfZjc/rXS52tdC
+ ERkJMA6ai/VTERVb9MS3DMUci/noK+ef5Tcr+0i8ku5q58SLHNz4vU0/L5JFr2hPUXuB
+ f8gDa9QeUMblUfa4vS8JXFUQupE4o8QkFxCkPCu2gU4G2odXZTL93Ax/R1I/g6ySTFE7
+ /bvtvAvSdIHXBJP8tZCYKlIQqNm+SpCZ57LdLIowlAjVaS0X2+NYEH6AKhuZTWxgXhKb
+ jsFhHPcr29E5zas5RrLln9bGy0t6T8r1JR2u3UKLO0p0Qe5/YChQKVN2mA+Qp8/8F0CE
+ 8yyw==
+X-Gm-Message-State: ANhLgQ1JgVIG8mjFGmzYlXQi8NqV36FOACv40iV00uLfVNpEr1DYckXx
+ 8FgJUmqCWfuU97bI3HGffCo=
+X-Google-Smtp-Source: ADFU+vvyws8tljqxmR2rM/DH5asTs/OyQlrZu/48h3C0kWgirMsDQG/NEMI9aICeH/IStgMpIOai4g==
+X-Received: by 2002:a17:90a:21ac:: with SMTP id
+ q41mr16370472pjc.41.1584206860560; 
+ Sat, 14 Mar 2020 10:27:40 -0700 (PDT)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id g5sm11126496pfo.192.2020.03.14.10.27.38
+ by smtp.gmail.com with ESMTPSA id 31sm5067556pgt.2.2020.03.14.10.27.39
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 14 Mar 2020 10:27:38 -0700 (PDT)
+ Sat, 14 Mar 2020 10:27:40 -0700 (PDT)
 From: Guenter Roeck <linux@roeck-us.net>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 0/8] hw/arm: Implement i.MX watchdog support
-Date: Sat, 14 Mar 2020 10:27:28 -0700
-Message-Id: <20200314172736.24528-1-linux@roeck-us.net>
+Subject: [PATCH 1/8] hw: Move i.MX watchdog driver to hw/watchdog
+Date: Sat, 14 Mar 2020 10:27:29 -0700
+Message-Id: <20200314172736.24528-2-linux@roeck-us.net>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200314172736.24528-1-linux@roeck-us.net>
+References: <20200314172736.24528-1-linux@roeck-us.net>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,57 +96,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current i.MX watchdog implementation only supports resets.
-This patch series implements the full watchdog, including optional
-pretimeout support.
+In preparation for a full implementation, move i.MX watchdog driver
+from hw/misc to hw/watchdog. While at it, add the watchdog files
+to MAINTAINERS.
 
-Notable changes:
-- The existing i.MX watchdog emulation (which only emulates syste resets)
-  is moved from hw/misc to hw/watchdog and renamed to match the naming
-  convention in hw/watchdog (patch 1/8).
-- Full watchdog support is implemented in patch 2/8.
-- The watchdog is wired up for i.MX25 and i.MX31 emulations (patch 3/8 and
-  4/8).
-- The watchdog interrupt (for pretimeout support) is connected for
-  i.MX6, i.MX6UL, and i.MX7 emulations (patch 5/8, 6/8, and 8/8).
-- For i.MX7, various devices are wired up as unimplemented
-  devices (patch 7/8). This was necessary to avoid crashes when
-  booting recent Linux kernels.
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ MAINTAINERS                                         | 2 ++
+ hw/misc/Makefile.objs                               | 1 -
+ hw/watchdog/Kconfig                                 | 5 +++++
+ hw/watchdog/Makefile.objs                           | 1 +
+ hw/{misc/imx2_wdt.c => watchdog/wdt_imx2.c}         | 2 +-
+ include/hw/arm/fsl-imx6.h                           | 2 +-
+ include/hw/arm/fsl-imx6ul.h                         | 2 +-
+ include/hw/arm/fsl-imx7.h                           | 2 +-
+ include/hw/{misc/imx2_wdt.h => watchdog/wdt_imx2.h} | 0
+ 9 files changed, 12 insertions(+), 5 deletions(-)
+ rename hw/{misc/imx2_wdt.c => watchdog/wdt_imx2.c} (98%)
+ rename include/hw/{misc/imx2_wdt.h => watchdog/wdt_imx2.h} (100%)
 
-The code was tested with all available emulations.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 32867bc636..d1197014e8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -603,8 +603,10 @@ S: Odd Fixes
+ F: hw/arm/fsl-imx25.c
+ F: hw/arm/imx25_pdk.c
+ F: hw/misc/imx25_ccm.c
++F: hw/watchdog/wdt_imx2.c
+ F: include/hw/arm/fsl-imx25.h
+ F: include/hw/misc/imx25_ccm.h
++F: include/hw/watchdog/wdt_imx2.h
+ 
+ i.MX31 (kzm)
+ M: Peter Chubb <peter.chubb@nicta.com.au>
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 68aae2eabb..b25181b711 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -44,7 +44,6 @@ common-obj-$(CONFIG_IMX) += imx6_ccm.o
+ common-obj-$(CONFIG_IMX) += imx6ul_ccm.o
+ obj-$(CONFIG_IMX) += imx6_src.o
+ common-obj-$(CONFIG_IMX) += imx7_ccm.o
+-common-obj-$(CONFIG_IMX) += imx2_wdt.o
+ common-obj-$(CONFIG_IMX) += imx7_snvs.o
+ common-obj-$(CONFIG_IMX) += imx7_gpr.o
+ common-obj-$(CONFIG_IMX) += imx_rngc.o
+diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
+index 2118d897c9..2c225b4b17 100644
+--- a/hw/watchdog/Kconfig
++++ b/hw/watchdog/Kconfig
+@@ -14,3 +14,8 @@ config WDT_IB700
+ 
+ config WDT_DIAG288
+     bool
++
++config WDT_IMX2
++    bool
++    default y
++    depends on IMX
+diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
+index 3f536d1cad..dd9b37f642 100644
+--- a/hw/watchdog/Makefile.objs
++++ b/hw/watchdog/Makefile.objs
+@@ -4,3 +4,4 @@ common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
+ common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
+ common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
+ common-obj-$(CONFIG_ASPEED_SOC) += wdt_aspeed.o
++common-obj-$(CONFIG_WDT_IMX) += wdt_imx2.o
+diff --git a/hw/misc/imx2_wdt.c b/hw/watchdog/wdt_imx2.c
+similarity index 98%
+rename from hw/misc/imx2_wdt.c
+rename to hw/watchdog/wdt_imx2.c
+index 2aedfe803a..ad1ef02e9e 100644
+--- a/hw/misc/imx2_wdt.c
++++ b/hw/watchdog/wdt_imx2.c
+@@ -14,7 +14,7 @@
+ #include "qemu/module.h"
+ #include "sysemu/watchdog.h"
+ 
+-#include "hw/misc/imx2_wdt.h"
++#include "hw/watchdog/wdt_imx2.h"
+ 
+ #define IMX2_WDT_WCR_WDA    BIT(5)      /* -> External Reset WDOG_B */
+ #define IMX2_WDT_WCR_SRS    BIT(4)      /* -> Software Reset Signal */
+diff --git a/include/hw/arm/fsl-imx6.h b/include/hw/arm/fsl-imx6.h
+index 60eadccb42..5b02dc1f4b 100644
+--- a/include/hw/arm/fsl-imx6.h
++++ b/include/hw/arm/fsl-imx6.h
+@@ -21,7 +21,7 @@
+ #include "hw/cpu/a9mpcore.h"
+ #include "hw/misc/imx6_ccm.h"
+ #include "hw/misc/imx6_src.h"
+-#include "hw/misc/imx2_wdt.h"
++#include "hw/watchdog/wdt_imx2.h"
+ #include "hw/char/imx_serial.h"
+ #include "hw/timer/imx_gpt.h"
+ #include "hw/timer/imx_epit.h"
+diff --git a/include/hw/arm/fsl-imx6ul.h b/include/hw/arm/fsl-imx6ul.h
+index eda389aec7..91c746918a 100644
+--- a/include/hw/arm/fsl-imx6ul.h
++++ b/include/hw/arm/fsl-imx6ul.h
+@@ -24,7 +24,7 @@
+ #include "hw/misc/imx7_snvs.h"
+ #include "hw/misc/imx7_gpr.h"
+ #include "hw/intc/imx_gpcv2.h"
+-#include "hw/misc/imx2_wdt.h"
++#include "hw/watchdog/wdt_imx2.h"
+ #include "hw/gpio/imx_gpio.h"
+ #include "hw/char/imx_serial.h"
+ #include "hw/timer/imx_gpt.h"
+diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
+index 706aef2e7e..3a0041c4c2 100644
+--- a/include/hw/arm/fsl-imx7.h
++++ b/include/hw/arm/fsl-imx7.h
+@@ -26,7 +26,7 @@
+ #include "hw/misc/imx7_snvs.h"
+ #include "hw/misc/imx7_gpr.h"
+ #include "hw/misc/imx6_src.h"
+-#include "hw/misc/imx2_wdt.h"
++#include "hw/watchdog/wdt_imx2.h"
+ #include "hw/gpio/imx_gpio.h"
+ #include "hw/char/imx_serial.h"
+ #include "hw/timer/imx_gpt.h"
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/watchdog/wdt_imx2.h
+similarity index 100%
+rename from include/hw/misc/imx2_wdt.h
+rename to include/hw/watchdog/wdt_imx2.h
+-- 
+2.17.1
 
-----------------------------------------------------------------
-Guenter Roeck (8):
-      hw: Move i.MX watchdog driver to hw/watchdog
-      hw/watchdog: Implement full i.MX watchdog support
-      hw/arm/fsl-imx25: Wire up watchdog
-      hw/arm/fsl-imx31: Wire up watchdog
-      hw/arm/fsl-imx6: Connect watchdog interrupts
-      hw/arm/fsl-imx6ul: Connect watchdog interrupts
-      hw/arm/fsl-imx7: Instantiate various unimplemented devices
-      hw/arm/fsl-imx7: Connect watchdog interrupts
-
- MAINTAINERS                    |   2 +
- hw/arm/fsl-imx25.c             |  10 ++
- hw/arm/fsl-imx31.c             |   6 +
- hw/arm/fsl-imx6.c              |   9 ++
- hw/arm/fsl-imx6ul.c            |  10 ++
- hw/arm/fsl-imx7.c              |  35 ++++++
- hw/misc/Makefile.objs          |   1 -
- hw/misc/imx2_wdt.c             |  90 --------------
- hw/watchdog/Kconfig            |   5 +
- hw/watchdog/Makefile.objs      |   1 +
- hw/watchdog/wdt_imx2.c         | 262 +++++++++++++++++++++++++++++++++++++++++
- include/hw/arm/fsl-imx25.h     |   5 +
- include/hw/arm/fsl-imx31.h     |   4 +
- include/hw/arm/fsl-imx6.h      |   2 +-
- include/hw/arm/fsl-imx6ul.h    |   2 +-
- include/hw/arm/fsl-imx7.h      |  23 +++-
- include/hw/misc/imx2_wdt.h     |  33 ------
- include/hw/watchdog/wdt_imx2.h |  78 ++++++++++++
- 18 files changed, 451 insertions(+), 127 deletions(-)
- delete mode 100644 hw/misc/imx2_wdt.c
- create mode 100644 hw/watchdog/wdt_imx2.c
- delete mode 100644 include/hw/misc/imx2_wdt.h
- create mode 100644 include/hw/watchdog/wdt_imx2.h
 
