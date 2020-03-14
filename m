@@ -6,87 +6,90 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5448BC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD2EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F0EB2074C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:15:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 168912074C
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:27:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AtLXhXyx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F0EB2074C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q4NQ6wA+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168912074C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCvOg-0001uu-8m
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 21:15:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38164)
+	id 1jCvZy-0003x9-5M
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 21:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44052)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jCvO0-0001Pg-Na
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:14:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCvZO-0003VI-Aq
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jCvNz-0000jL-KW
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:14:44 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34811)
+ (envelope-from <richard.henderson@linaro.org>) id 1jCvZN-0002GB-5q
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:26:30 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41923)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jCvNy-0000cJ-Tx
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:14:43 -0400
-Received: by mail-pg1-x542.google.com with SMTP id t3so6024037pgn.1
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 18:14:42 -0700 (PDT)
+ id 1jCvZM-0002Dc-V0
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:26:29 -0400
+Received: by mail-pl1-x644.google.com with SMTP id t14so5134222plr.8
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 18:26:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=kj10wAiQN54knhz52NrqN83UQ+U53gbi2GtsyNThp0Y=;
- b=AtLXhXyxcZsr3QfREdZN0rqFiDGgBpj2EvZK1JUR6eIcapYl+dBk6xPNB1zYayrJBH
- 3xk52gwiaZhJV/kfQHMzUQ0wkxjHzrw0ZfQBKVoZcHXBcxbgCLOIH3FqTSvydgpt9InA
- TQ1VvGChTt9Pnh8m4pgzfHnGkW+krlDaxKm2RLnj/kcyVKnXOGPXemiJv5AiPLrgGZPi
- kIkNJ9dsIGRBgbOat6dzOAFsVKqsz+LaIPYYr5b/vXgN3WVHFDhOJFrsAJ3uMQFWzOw1
- MjFPS0Y8U3f/3YFpFHihoLDM6AXdqcmQTWdzzteAIP2xerhPkLI5YDL4MuTd4W4DuURC
- Kgeg==
+ bh=j3M4CdeK1AwG3wYfx15EhDeO/eLOhzMp4aiaEQ5mNbE=;
+ b=q4NQ6wA+laRAt0j9GcFCJ3ZxAr7cmHxnop1IVenbLvCQww9dW4ZtB/skh9BWhQI4Vy
+ OGuAPs27et7N2l8J5gNOzlvI4bS23xuCISmwtIx1bMRKvzyVBMk9afMs4MDIbUkfb6uE
+ wrxGxxbrPu0TtRPBrTsvXhpyWF6qSWfLNXueMCzAC+CVYlzjHU1qTUaldfhdEWzlHXck
+ ahofCaISA+D5IBz1BUTYD7MMpPjHPR+1ni+STwXNYZa2zVuuWrDmlZ8RYWTsIjm2XPab
+ 2ZyU8SF9Yrz6bJq8FL6Q5MYLc7fsSrv230VBsQAJ6VwNNJqURs4AiKyn66tqgNkWvjlb
+ mGXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=kj10wAiQN54knhz52NrqN83UQ+U53gbi2GtsyNThp0Y=;
- b=ALWh+dNrYdRp38EU6R+dPORjnWMMeMzT7bTpPs6ahzTqpZOHg0P9KVaoxvSlAaqHMq
- Q3KgzkktT3dqljo3hRI9QcGfJXChG01D2wFB5JJhMpbXN/MlfVcd9RsiKnKyyo+gfjkQ
- +xgokg6yKS+GoymkhaFLDNFI23tj8q22HN5jZNCxC8cDnXvpTnqJBTvF8O0rIRFF3+xD
- gIr0PS+IE0aTZaoWnPNF1A+tcFvCcj/kiS9dYGv2B5fzEu7WPPUbpNoYsWx3aKKInL2Y
- O6gwLc8OJuBv89ocdkGUGTb9oqCGzLpLzjqwN9hLqcKWDHYTqMSEh0ncmbojiC/GgXF+
- lcVw==
-X-Gm-Message-State: ANhLgQ2E9GzSvSlwbopwakp2xydUV6UDz5GgGsQF9qVnM9j7pi33CKZM
- wbYy6hhVbYNgBkjvwgRCLe6Ojg==
-X-Google-Smtp-Source: ADFU+vsDdHZqotyCkdEg1zqRU4GbRJC5oIow62gJK6qYjLxO1Rv9FDs/PX6wVFq1Sa7zgYrv8kc/Mg==
-X-Received: by 2002:a62:68c2:: with SMTP id d185mr4594351pfc.16.1584148481235; 
- Fri, 13 Mar 2020 18:14:41 -0700 (PDT)
+ bh=j3M4CdeK1AwG3wYfx15EhDeO/eLOhzMp4aiaEQ5mNbE=;
+ b=eZolsYkKUCJekDOEes6cI/EE4Wi3MZ6vttJsbGRkTCv/8o99CrM1P6w4sgg+B3fb10
+ QWqrriqyIbzGHH/eIRHBjrnGBRSuYLQ7uSglkdkywhlH6chnqdOTXjqgick5X36viDSV
+ KEfzYcOHpMSAYRbZXAnpPXEYtPZwrzZ9gP2P+ALkkXyaCUReXD/dS7QvEaghbvMdtlme
+ Rs2TsSE21CkWuV51Btj1WAQnHzMv8KwH/cwajLREDOvzLvxwC9B8S+bphs8MLEo1TCHt
+ LLl4QTimA01cPq1zEvBylxP1lRdMfwuBk+nVKp33R6gU3uGUUEgTOX6yNAFAnvfMF6Sj
+ QLew==
+X-Gm-Message-State: ANhLgQ2J5Lvg6vkpRxbLqbsc2CGp4oOW2uKY6oMZm/tw60ueAkihqu2B
+ z16ZkLlf1+dY9TdbVpsq2FudqA==
+X-Google-Smtp-Source: ADFU+vtI3t/zOtO/YkAVluVT2EcabrtxXWemUkuiaD8A+vwuzV0op51XNazy2LvjhQnq0zIPaI4G8A==
+X-Received: by 2002:a17:902:d915:: with SMTP id
+ c21mr16080497plz.239.1584149187509; 
+ Fri, 13 Mar 2020 18:26:27 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- ci14sm2124730pjb.37.2020.03.13.18.14.39
+ 13sm59083883pfi.78.2020.03.13.18.26.26
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Mar 2020 18:14:40 -0700 (PDT)
-Subject: Re: [PATCH v5 04/60] target/riscv: add vector configure instruction
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
+ Fri, 13 Mar 2020 18:26:26 -0700 (PDT)
+Subject: Re: [PATCH v5 05/60] target/riscv: add vector stride load and store
+ instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, Alistair Francis <alistair23@gmail.com>
 References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-5-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-6-zhiwei_liu@c-sky.com>
+ <CAKmqyKOiKUqzGSDd1+TvqhCT6pjeEXEX-QVzYhcaiRa-y4D98w@mail.gmail.com>
+ <445d93e8-1d2c-9877-84a3-ed62a5920d89@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <13770c17-b7cc-eee0-205d-e04544a23312@linaro.org>
-Date: Fri, 13 Mar 2020 18:14:37 -0700
+Message-ID: <392b9e62-0ff7-de49-f5dc-793bc38ba484@linaro.org>
+Date: Fri, 13 Mar 2020 18:26:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200312145900.2054-5-zhiwei_liu@c-sky.com>
+In-Reply-To: <445d93e8-1d2c-9877-84a3-ed62a5920d89@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,37 +101,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/12/20 7:58 AM, LIU Zhiwei wrote:
-> +static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
-> +{
-> +    TCGv s1, s2, dst;
-> +    s2 = tcg_temp_new();
-> +    dst = tcg_temp_new();
-> +
-> +    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-> +    if (a->rs1 == 0) {
-> +        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-> +        s1 = tcg_const_tl(RV_VLEN_MAX);
-> +    } else {
-> +        s1 = tcg_temp_new();
-> +        gen_get_gpr(s1, a->rs1);
-> +    }
-> +    gen_get_gpr(s2, a->rs2);
-> +    gen_helper_vsetvl(dst, cpu_env, s1, s2);
-> +    gen_set_gpr(a->rd, dst);
-> +    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-> +    exit_tb(ctx);
+On 3/13/20 2:32 PM, LIU Zhiwei wrote:
+>>> +/* check functions */
+>>> +static bool vext_check_isa_ill(DisasContext *s, target_ulong isa)
+>>> +{
+>>> +    return !s->vill && ((s->misa & isa) == isa);
+>>> +}
+>> I don't think we need a new function to check ISA.
+> I don't think so.
+> 
+> Although there is a riscv_has_ext(env, isa) in cpu.h, it is not proper in this
+> file,
+> as it is in translation time and  usually DisasContext   is used here instead
+> of CPURISCVState.
 
-You can use lookup_and_goto_ptr here.  But either way,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+In translate.c we have has_ext() for this purpose.
+
+I think you don't need to test has_ext(s, RVV) at all,
+because in cpu_get_tb_cpu_state(), you already tested
+RVV, and set VILL if RVV was not present.
+
+Thus testing vill here is sufficient.  A comment here
+to remind us of that fact would be appropriate.
+
+For those few cases where you have an extension beyond
+RVV, e.g. amo_check() I think you should simply use
+has_ext() like so:
+
+static bool amo_check(DisasContext *s, arg_rwdvm *a)
+{
+    return (!s->vill &&
+            has_ext(s, RVA) &&
+            ...);
+}
 
 
 r~
-
 
