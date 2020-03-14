@@ -2,100 +2,106 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A6C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FBBAC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 12:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45A682076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3A842076F
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 12:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cxcKEWoT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A682076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="zAZQYoo3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3A842076F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD5QS-0003Wq-Cy
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 07:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33306)
+	id 1jD5g2-00073e-7k
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 08:14:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jD5Pl-00032m-Tt
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:14 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jD5fU-0006e4-6S
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 08:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jD5Pk-0000N5-SG
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37794
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jD5Pk-0000MV-Ow
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584187032;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/RDGrCEDAnanedxqDRAPayWeL+3o1d/ZHi8nvCpSYCQ=;
- b=cxcKEWoTvzoufnEnipYAp432IQkaIM4OcaSiGi4JJ2euQ6U939Ww1XcAi8E1dx+Aaov2VU
- CaXM5tPnYqVB/Hbz5MeL8h/GLGL+IzRq9ZL5LY/P7OlH4o/umSkspHZZRnWmR2yAepNv6g
- +Uy93d+lPUleB1VITVcfsUTNjRJTnjE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-uHpijvfJM0ukZCpY0eLJKw-1; Sat, 14 Mar 2020 07:57:08 -0400
-X-MC-Unique: uHpijvfJM0ukZCpY0eLJKw-1
-Received: by mail-wr1-f69.google.com with SMTP id u18so5800097wrn.11
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 04:57:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/RDGrCEDAnanedxqDRAPayWeL+3o1d/ZHi8nvCpSYCQ=;
- b=Ldio1ycuArkuoEy105wPE6bXG8F5enm+2753Xrj9TD9vmAYoO3v1bgGQR2nhQSkosz
- qtkM4Am4BuHsBk0HwKGrYPvqTqcGGhvkab+r+3LIxJFbQiR3xH+tijQwBTB30UIN0/tk
- 0InoBBYiMz+swiTi0DJUXU/vzqvltBXdE0JK+fRfb06qSpU8wU+E+V8IjxlVpWOdq3bJ
- oWmvHBDdSWAY6lQdEgc6sbTxcCx9efCHWPuwVyVx9S/hi9f2nxp70aMRb9Rp6F8RJ3wW
- V2rAe0EQBur/5LN/6pbPAa3kUBvyvg/GJYa3GUsc5wRoLrVYCQ9K0EdjvzTPpYsciliQ
- QUYA==
-X-Gm-Message-State: ANhLgQ3YgwZS2skE0ykmglq0AQynkg2CONFZyDuNeIPsWntB3kKaFHuT
- oEtQ7pRDo2kATxL+w4vHFo1cNGb+D+bIzWxEVjcjVc70axehDQeff4C6pVEXQYvwAMldD26nYbq
- 9MTn0+YSOae3L1WE=
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr24224768wro.386.1584187027676; 
- Sat, 14 Mar 2020 04:57:07 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsZygnv+c0/s3Zg9yoN8czLoU36+Mn3N5U+B6997si62TFYDxL9m68VQ5XzeGI/LuScXUcPdA==
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr24224734wro.386.1584187027381; 
- Sat, 14 Mar 2020 04:57:07 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.174.5])
- by smtp.gmail.com with ESMTPSA id n2sm16375368wrr.62.2020.03.14.04.57.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Mar 2020 04:57:06 -0700 (PDT)
-Subject: Re: [PATCH 0/8] Misc hw/ide legacy clean up
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <cover.1584134074.git.balaton@eik.bme.hu>
- <22f580a9-7919-773a-c1a9-cc59af7166da@ilande.co.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <402c7097-2198-d43a-1064-22261408eb9b@redhat.com>
-Date: Sat, 14 Mar 2020 12:54:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <liran.alon@oracle.com>) id 1jD5fS-00027V-MP
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 08:13:27 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56314)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jD5fS-00025i-DD
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 08:13:26 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ECDNgB175995;
+ Sat, 14 Mar 2020 12:13:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=XtjLorMcHVca248IdYZlYThr7IJkdJ+VQNzeFjgBflI=;
+ b=zAZQYoo3U+x+1Fe7WVbE1hfhcDlwuLxJX6TFEzyjIn/ydePCL67rxL/eswkU7vGzn+QL
+ QERRX+buJPshiCUuh4Ro37Ab7IYUhgVrD6giPCpUYUlvFp4dW61dnWaQQ6Z2WIPALbt0
+ TsmxC4uxX+YWyxejCVG+4sQWjnKhzf3o2DVukBNO5wyWGPzsP8W/yTT6QHMNV/7uQCZD
+ 6u41+s+4XsTIWF/cGezZTGlgKndI+OYWFKmNdkzB0XPbBvLdO020VWXSjUzWcY4qpIVL
+ nrMgxAMACsN/vn9VkSxbRWC0wkRusI6+UXsJIaYZ0yPZAId2HcpLv4EotGAoF4mzFvIH 8Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2yrppqrx65-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sat, 14 Mar 2020 12:13:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02ECCj7t180799;
+ Sat, 14 Mar 2020 12:13:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2yrpkgucs9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sat, 14 Mar 2020 12:13:23 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02ECDKGs026272;
+ Sat, 14 Mar 2020 12:13:20 GMT
+Received: from [192.168.14.112] (/109.67.207.210)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sat, 14 Mar 2020 05:13:20 -0700
+Subject: Re: [PATCH v3 07/16] hw/i386/vmport: Introduce vmport.h
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-8-liran.alon@oracle.com>
+ <13b98a16-6465-e1c9-5f52-0f338c60fbd5@redhat.com>
+ <d81dc7a5-2b20-1792-c1df-ecdb8a964fa7@oracle.com>
+ <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <2cf0d523-ff41-43f4-f1a8-a29d8235ee2e@oracle.com>
+Date: Sat, 14 Mar 2020 14:13:17 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <22f580a9-7919-773a-c1a9-cc59af7166da@ilande.co.uk>
+In-Reply-To: <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9559
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ phishscore=0
+ malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003140068
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9559
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ bulkscore=0
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003140068
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+ 02ECDNgB175995
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,61 +113,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- philmd@redhat.com, Artyom Tarasenko <atar4qemu@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/03/20 12:45, Mark Cave-Ayland wrote:
-> On 13/03/2020 21:14, BALATON Zoltan wrote:
-> 
->> These are some clean ups to remove more legacy init functions and
->> lessen dependence on include/hw/ide.h with some simplifications in
->> board code. There should be no functional change.
->>
->> BALATON Zoltan (8):
->>   hw/ide: Get rid of piix3_init functions
->>   hw/ide: Get rid of piix4_init function
->>   hw/ide: Remove now unneded #include "hw/pci/pci.h" from hw/ide.h
->>   hw/ide: Move MAX_IDE_BUS define to one header
->>   hw/ide/pci.c: Coding style update to fix checkpatch errors
->>   hw/ide: Do ide_drive_get() within pci_ide_create_devs()
->>   hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
->>   hw/ide: Remove unneeded inclusion of hw/ide.h
->>
->>  hw/alpha/dp264.c              | 15 +++------------
->>  hw/hppa/hppa_sys.h            |  1 -
->>  hw/hppa/machine.c             |  3 ---
->>  hw/i386/pc_piix.c             | 20 +++++++++-----------
->>  hw/ide/ahci_internal.h        |  1 +
->>  hw/ide/pci.c                  | 10 ++++++----
->>  hw/ide/piix.c                 | 31 +------------------------------
->>  hw/isa/piix4.c                | 14 +++++---------
->>  hw/mips/mips_fulong2e.c       |  6 +-----
->>  hw/mips/mips_malta.c          |  6 ++----
->>  hw/mips/mips_r4k.c            |  4 +---
->>  hw/ppc/mac_newworld.c         |  2 --
->>  hw/ppc/mac_oldworld.c         |  2 --
->>  hw/ppc/prep.c                 |  3 ---
->>  hw/sparc64/sun4u.c            |  7 +------
->>  include/hw/ide.h              |  6 ------
->>  include/hw/ide/internal.h     |  3 +++
->>  include/hw/ide/pci.h          |  3 ++-
->>  include/hw/misc/macio/macio.h |  1 +
->>  include/hw/southbridge/piix.h |  3 +--
->>  20 files changed, 37 insertions(+), 104 deletions(-)
-> 
-> This looks like a good clean-up to me, but certainly it would be good to get a second
-> opinion from people more familiar with the IDE code internals.
-> 
-> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Yes, it looks good to me.  Thanks!
-
-Paolo
-
+On 14/03/2020 10:31, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/13/20 11:38 PM, Liran Alon wrote:
+>> On 13/03/2020 21:57, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 3/12/20 5:54 PM, Liran Alon wrote:
+>>>> No functional change. This is mere refactoring.
+>>>>
+>>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>>>> ---
+>>>> =C2=A0 hw/i386/pc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+>>>> =C2=A0 hw/i386/vmmouse.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 1 +
+>>>> =C2=A0 hw/i386/vmport.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 1 +
+>>>> =C2=A0 include/hw/i386/pc.h=C2=A0=C2=A0=C2=A0=C2=A0 | 13 -----------=
+--
+>>>> =C2=A0 include/hw/i386/vmport.h | 16 ++++++++++++++++
+>>>
+>>> What about moving it to hw/i386/vmport.h (no under include/)?
+>>>
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>
+>>>
+>> Can you explain the logic that separates between hw/i386/*.h to=20
+>> include/hw/i386/*.h?
+>
+> Headers in the include/hw/ namespace can be consumed by all machine=20
+> targets.
+But this doesn't seem true for headers in include/hw/i386/*.h...
+It contains things that are target-specific. E.g. ioapic.h, x86-iommu.h,=20
+intel_iommu.h and etc.
+I still don't quite understand the separation between these directories.=20
+It seems both are i386-specific and one of them shouldn't exists.
+> If this is a target-specific device, having it local to the target=20
+> (hw/i386/) protect generic code (and other targets) of using it. This=20
+> helps detecting wrong dependencies between components.
+>
+>> If it makes sense, sure I will move it. I just don't know what is the=20
+>> convention here.
+>
+> Michael/Paolo/Eduardo what do you recommend?
+>
 
