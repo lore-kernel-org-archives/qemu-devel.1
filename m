@@ -2,116 +2,101 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAB6C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 10:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C747C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 10:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F094D2076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 10:46:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F094D2076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CDF502076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 10:50:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5W6nqzp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF502076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD4Jm-0002Au-35
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 06:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54365)
+	id 1jD4Mr-0003HT-2M
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 06:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jD4Id-0001fM-94
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 06:45:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1jD4MG-0002rn-T3
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 06:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jD4Ic-00074i-8E
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 06:45:47 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:58373)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jD4IZ-0006b2-Jy; Sat, 14 Mar 2020 06:45:43 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mleo0-1jdqXb1Ip8-00ijFU; Sat, 14 Mar 2020 11:45:29 +0100
-Subject: Re: [PATCH] linux-user: Update TASK_UNMAPPED_BASE for aarch64
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Lirong Yuan <yuanzi@google.com>
-References: <20200313002813.3857-1-yuanzi@google.com>
- <CAL1e-=ghc+6GRMd3NToF6+DeAz1VSR6bxuKd7dBtSJwrj50ovQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <e7ce2848-fb44-3837-65bc-6b449c0e518e@vivier.eu>
-Date: Sat, 14 Mar 2020 11:45:27 +0100
+ (envelope-from <philmd@redhat.com>) id 1jD4MF-00020H-0K
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 06:49:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52766
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jD4ME-0001ub-Rc
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 06:49:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584182969;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NfO/M4brf4+7T7glQwVoHtNUfxwN6OeN9W90pyrCnzk=;
+ b=M5W6nqzpJGco9bgxRZnF/qSrY8Gflk0HeSKDrNKIK0cg+iCc8J+S2a2eqwgHR7XC0oj1qS
+ 6++RDlC5hT7PdFwFBUOS6+g3ZLje3FpJifKRdoE5oqD0ypjZtBZkcrnEGZVKgGAm7ZtKr2
+ ucqJK7eFnvoqsrk9AmgrHKuQbJQ9OFA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-RDWURmVLMIWfXvZekt5e3Q-1; Sat, 14 Mar 2020 06:49:27 -0400
+X-MC-Unique: RDWURmVLMIWfXvZekt5e3Q-1
+Received: by mail-ed1-f71.google.com with SMTP id l8so10475550edq.1
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 03:49:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8FAM4Zu4yvg/94X1ywcwgdfMhh+dMstbs52PzkgQVCQ=;
+ b=SVzlPwR7uuIhltmUtMShqeSMSS4YHbWIZ01XI3q3LLjadozctwggNIhjIsvDVuoi/B
+ OsvX9JdkUHW6aeFjoJ3wy5wbJopZOO4aZZs3fJbDvufw7pWsK4kuy9cgxrlt6IHL89HC
+ Mrk1tZ000R9K1ouzrsAUrP7MkhjuSVf8IJIqO/+emvS8hj1hKf3invk16oZGzV/Jbb6u
+ r3KBvquHYHT/a4zJlhJq9uudsd4DRLx3J+a8IWcUQn0V+Lic/YsG09o1aaO5tEv5b9Rf
+ 7IAK6xM1uPuTXix+IpX975TdNeckOKelL0bTBGES9wOMt4T9wdHH/9ZSS1mBtH3wnAFP
+ CqHg==
+X-Gm-Message-State: ANhLgQ2QV6QAHxKFHYquyQxLzDjXdeKuLWO+EtFg/5YMUcJhJ+XRfQCI
+ EvVOq51hC3qPqt4gzuMxl8kNZJZGNjRjHQC32eE5mHyms/2H6Ce2S7Virn4CI7mywAroDMOT/LQ
+ Mo1xlr5tv4hrUtDs=
+X-Received: by 2002:a50:f787:: with SMTP id h7mr17956772edn.301.1584182966412; 
+ Sat, 14 Mar 2020 03:49:26 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vurrR/8ogmKuTsI79Df7XQ//heSze1XuBFK+OgeArWl8FHOhKikz6f4vaRdIEHVhtign17lAQ==
+X-Received: by 2002:a50:f787:: with SMTP id h7mr17956755edn.301.1584182966135; 
+ Sat, 14 Mar 2020 03:49:26 -0700 (PDT)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id s22sm1519206eja.84.2020.03.14.03.49.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 14 Mar 2020 03:49:25 -0700 (PDT)
+Subject: Re: [PATCH 8/9] hw/core: Add qdev stub for user-mode
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+References: <20200313184607.11792-1-philmd@redhat.com>
+ <20200313184607.11792-9-philmd@redhat.com>
+ <7775dd60-7c5d-e973-162d-5eb742b41c07@redhat.com>
+Message-ID: <9118c5b3-196b-9002-dcb8-1d3b91b59fc3@redhat.com>
+Date: Sat, 14 Mar 2020 11:49:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=ghc+6GRMd3NToF6+DeAz1VSR6bxuKd7dBtSJwrj50ovQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <7775dd60-7c5d-e973-162d-5eb742b41c07@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VzEor/DJ5yzzBXUE6V4I7y++ZMjtrp0nidUxOS19/bJDR9MhjA3
- 5NC9iPiorrRGR5DoGVq/YOyz8jydJWwYY51V2V/zP1Fkttnnpsf0/099VrRWEhkbf9gM60r
- oW5fLGq/E3N1dKPPYmfXS6IoXIop40hezmoR4mVHloQbhZMpeDZO86W03Hi9FWsxvMTL0La
- XwVo9t/YcduGOGIQBYe6Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DTCnKlfU29Q=:tWHSEThzoSWtx6ZKlQd1dB
- +EGohxChyHwrqLJSLqq05gg2OnO3ZQ2MYIUhVz8aBn6t+j6I/qQAfIYyqsagfO4EmaGhTd5PY
- bYl7I2e5//MrMOSt8dyqyS2e1vRIn5WtF6926mf/yp0elwZZMf+DpFBchXuFZP7V5Ga4amArB
- RAyTVS7mrlQliHhsjO6VHCtbC6RPMN6lMt2kywDQDtp2NNZpjLlEr7d4q1FGZRyj+uGGh6FW9
- J5CLdKJTL/H9LLxc/f+yLJUWxqkSCER7V5goA2vVnYS+K7akqZF3/Jsv8+JjgxDNe9EuMJm0d
- DKPrk+KndwVMciM5MX93gElfNOuQZ6toEu4IQ+lQSI/NNFqRCX6e7G+bsF2JzDuqXmtViKI8I
- iQQ5yxI4jxHxQPCoPrho1tVVc8ozVKXG9BRgVjdn9nt5Gn92hsWn8yxslr4/u05iscms0ae6E
- lKGUstXIiHpEMTMbQo3gJSdy5RivemcmaP37Moxi0D+RU/GHm5fby6XZlEfcH6xj+RBK5VkaS
- N8xRI6PFzGH15P6Kq6s/D2Iw1bUnaRORuQjngMtSmYcuGT8jx8jl7omK6ST58tSYWxmnNPF4G
- 7QZtEp9mfqpEUEcfJd7xR52++EGbpuuqosW+MOsDok6KxRv7w5ADhrPIDpC2ne+ILvCrJ0rXu
- FgEfc9kCJQw7540vYzps12sVP4xQ14qW4HdbbO0DHXn8qjyP9vJDQIGSh60CWtyQiBht51BlI
- MedomMnUDJW5shTtol8pgSg2Pc4TD1ZVycGA2nd3a5+v5N9GY2LqWp85jGAUCpae08MriWdR2
- x2/5jtgGtOMgo9snkVtyddjpgtWaImd70MaSakk6Riagiyr2cb4xDkGyWBcN1lRn6kmdP76
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,47 +108,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Josh Kunz <jkz@google.com>,
- Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
- Shu-Chun Weng <scw@google.com>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 14/03/2020 à 04:06, Aleksandar Markovic a écrit :
-> On Fri, Mar 13, 2020 at 1:28 AM Lirong Yuan <yuanzi@google.com> wrote:
+On 3/14/20 10:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 3/13/20 7:46 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> While user-mode does not use peripherals (devices), it uses a
+>> CPU which is a device.
+>> In the next commit we will reduce the QAPI generated code for
+>> user-mode. Since qdev.c calls qapi_event_send_device_deleted(),
+>> let's add a stub for it.
 >>
->> This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
->> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
->>
->> Signed-off-by: Lirong Yuan <yuanzi@google.com>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >> ---
->>  linux-user/mmap.c | 4 ++++
->>  1 file changed, 4 insertions(+)
+>> =C2=A0 hw/core/qdev-stubs.c=C2=A0 | 20 ++++++++++++++++++++
+>> =C2=A0 hw/core/Makefile.objs |=C2=A0 1 +
+>> =C2=A0 2 files changed, 21 insertions(+)
+>> =C2=A0 create mode 100644 hw/core/qdev-stubs.c
 >>
->> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->> index 8685f02e7e..e378033797 100644
->> --- a/linux-user/mmap.c
->> +++ b/linux-user/mmap.c
->> @@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
->>  }
+>> diff --git a/hw/core/qdev-stubs.c b/hw/core/qdev-stubs.c
+>> new file mode 100644
+>> index 0000000000..0819dcba12
+>> --- /dev/null
+>> +++ b/hw/core/qdev-stubs.c
+>> @@ -0,0 +1,20 @@
+>> +/*
+>> + * QAPI qdev stubs
+>> + *
+>> + * Copyright (c) 2020 Red Hat, Inc.
+>> + *
+>> + * Author:
+>> + *=C2=A0=C2=A0 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or=
+=20
+>> later.
+>> + * See the COPYING file in the top-level directory.
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/qapi-events-qdev.h"
+>> +
+>> +void qapi_event_send_device_deleted(bool has_device,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const ch=
+ar *device, const char=20
+>> *path)
+>> +{
+>> +}
+>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+>> index 6215e7c208..89bf247173 100644
+>> --- a/hw/core/Makefile.objs
+>> +++ b/hw/core/Makefile.objs
+>> @@ -8,6 +8,7 @@ common-obj-y +=3D vmstate-if.o
+>> =C2=A0 # irq.o needed for qdev GPIO handling:
+>> =C2=A0 common-obj-y +=3D irq.o
+>> +common-obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D qdev-stubs.o
+>=20
+> This should be:
+>=20
+>  =C2=A0=C2=A0 obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D qdev-stubs.o
+
+Actually I moved it to stub-obj-y which makes things easier.
+
+>=20
+> (not common).
+>=20
+>> =C2=A0 common-obj-$(CONFIG_SOFTMMU) +=3D reset.o
+>> =C2=A0 common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
+>> =C2=A0 common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
 >>
->>  #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
->> +#ifdef TARGET_AARCH64
->> +# define TASK_UNMAPPED_BASE  0x5500000000
-> 
-> Hi, Lirong,
-> 
-> Can you point from which line of the file you linked to did you
-> arrive to the value 0x5500000000?
-> 
-> Second question: What about other targets?
 
-Personally, I prefer to not change the value for other targets if it is
-not required by someone that had some problems with the current value.
-
-It needs to be changed carefully and to be well tested after change.
-
-Thanks,
-Laurent
 
