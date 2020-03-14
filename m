@@ -2,82 +2,81 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B98D7C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C24C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:30:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84DE32072A
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:30:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 785C22072A
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:30:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NI3wVZCb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84DE32072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBdvXm6K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785C22072A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDAc2-0004eS-H8
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:30:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43013)
+	id 1jDAc9-0004pe-Lr
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:30:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jDAZf-0007uK-8R
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:48 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jDAZk-00086s-Jo
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jDAZe-0005fe-0r
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:47 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35297)
+ (envelope-from <groeck7@gmail.com>) id 1jDAZj-0006At-HE
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:52 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33785)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jDAZd-0005bN-RT; Sat, 14 Mar 2020 13:27:45 -0400
-Received: by mail-pl1-x644.google.com with SMTP id g6so5823204plt.2;
- Sat, 14 Mar 2020 10:27:45 -0700 (PDT)
+ id 1jDAZj-00068E-B9; Sat, 14 Mar 2020 13:27:51 -0400
+Received: by mail-pf1-x444.google.com with SMTP id n7so7243349pfn.0;
+ Sat, 14 Mar 2020 10:27:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=subG/z3bNILDIEvYewk5eSNFesd3qE7G7IFPvac0eEI=;
- b=NI3wVZCblmZ2Xq7P/3SbzDIFFrpFEZPoLDLihtIsO8fF9+E5br8dg+2PSuNlN4hdxM
- cPmD6Tp43fwsFayfn87VB0Vr3VuWfKNDUbIymOCzueuv5CXu72AA59SxLIr6VqMJu3Th
- vVQX2ko4QE5Ye+8nimEnswtoGoRcdi5/+B24DRRtgb4KCziVI+Hh+RGbZTLNL0mdERII
- JHkHlmC3mLWRINdSft8y+pBu+xmkKi8ZOKNk3w926ZLXZ4GdfIM3obTxU4wDYCmql1Yo
- SbIvbXZyOCE3dQy+tUGh869Df5Np/7WIp1y2IWUIocwxWkUFut4qyrt5cc62dRQYLBPd
- RH7w==
+ bh=2yvrzU4TfZKPLfKcAijb7xS2WSEBvTCKiwAF8gWuxus=;
+ b=iBdvXm6Kp49rDZXAqy0db/ArZEH7T9otnlsN3BUzh5zl7wbHdta3ie5yDW1fE/qjA8
+ mDxlEkSYSn78d5Ec1gUJsPbQBH0Y9TkvSV0kwfnYdaVe5tS9O1Yy9e5XAxIe77BAVGk+
+ WDuNpF2RNX+JHQinZPuKzf4Et4nPb/nuZfRFtsRJjP6yjnqq2b6Budlsjzcm+VrQ5FIX
+ nvSsnlpoviPc5trI+ZVzWNo20beIebaf/Bf7g0w/HJu8pZnCP9njKhcXLIJy1Ft59mn0
+ hi/hZtZMejzkeqN1Cp8DQFT+DrELqdPXXthibuBAcL+d9nYBpXSyxWuolIUOiSP66xKe
+ Cgqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=subG/z3bNILDIEvYewk5eSNFesd3qE7G7IFPvac0eEI=;
- b=dYb8EB97V2fTT+2MU63B8X6JdqszHS6ZuVp+mVoA1DK5SkzYVSp2F9r9YFiCNKhAIu
- plQYL3xsoAKAJzSWnFcRYi8dXR79KK8xt6y92JB8diiLaxJCed7gIVf+LJYHEKMLGCSw
- vxIp16DH+lz8CZVM6VbRdaoUt+T5lIAaOw3emKLwVCr6VoTshk4DkSJZDV7qqcwfrwri
- MpFQvuNfEEBjAaoGVxXvjv43OhcKqmP45DyarSSDB61vZ0EZc+ekwBDDf/DKSFHXFAs3
- Qg63+eV/18x//QP53DRTDlFP8eI2fCJ4ZuHl8Cvg1E6YOnG2Me1X+nMnUF2wcaxv6X7w
- PPmA==
-X-Gm-Message-State: ANhLgQ0pr9X1EWNN0YECyO4eSZG02IfO+/PRKfHRf377rf79W6WmPDVd
- TOJ3Ei0EAQelxzhytro+z8A=
-X-Google-Smtp-Source: ADFU+vu5kx8vBZXKOpz4inqal6ve8z3KD7WNh3fFc8ZdROVKASHMa5g7lTzl5dgJ0W2YpkYlGl7L7g==
-X-Received: by 2002:a17:90a:1f0b:: with SMTP id
- u11mr2578087pja.18.1584206864938; 
- Sat, 14 Mar 2020 10:27:44 -0700 (PDT)
+ bh=2yvrzU4TfZKPLfKcAijb7xS2WSEBvTCKiwAF8gWuxus=;
+ b=LGGtFJGWTNeIPTpNTJNN9ZZZH5P/bib8ojt0HV7yOlAmE2Jm7OIho+s7WGp2OTVlZM
+ CkUHLt9OwVs13BJQpa1YTjRy2ObXOrV+9jaltsp1YdqdZIX7hExwUvcFjK4Ox08uF5JX
+ lHEwBDoYFYTzRS8kT9gaip70K0dGY9r1rwaUwcaL6MEHJANjOUa5mA/NJ83KbmAcRFSf
+ kfL8A9Z78EtytHVKzb9C6aiERAj7/nvJngeOX3OibJgLKHP+Mu5++MKxFt23ptWevAVL
+ QAhMqpRpTVdLBAQyV/FBKsPyPfpjuoVEISsJZONzou5QfXWJbOO2vMWI7MCVyNXuPeOv
+ PlRQ==
+X-Gm-Message-State: ANhLgQ3lwnK8cMi3fLnjZ/WJM7px5NiEbHTVzuVyI6d2hNz090/QXa0E
+ Q3DkwOnZsqdR5KhmlJxce7A=
+X-Google-Smtp-Source: ADFU+vtLewS5G4NuIpA3nj3oljUuFDksk8gmeHvKa5p843ExmPZkvwVhNENjanfcbUYsy6gUJZtOpQ==
+X-Received: by 2002:a62:1417:: with SMTP id 23mr18441250pfu.55.1584206870508; 
+ Sat, 14 Mar 2020 10:27:50 -0700 (PDT)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id f3sm52268026pgg.46.2020.03.14.10.27.44
+ by smtp.gmail.com with ESMTPSA id g19sm61543370pfh.134.2020.03.14.10.27.49
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 14 Mar 2020 10:27:44 -0700 (PDT)
+ Sat, 14 Mar 2020 10:27:50 -0700 (PDT)
 From: Guenter Roeck <linux@roeck-us.net>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 4/8] hw/arm/fsl-imx31: Wire up watchdog
-Date: Sat, 14 Mar 2020 10:27:32 -0700
-Message-Id: <20200314172736.24528-5-linux@roeck-us.net>
+Subject: [PATCH 8/8] hw/arm/fsl-imx7: Connect watchdog interrupts
+Date: Sat, 14 Mar 2020 10:27:36 -0700
+Message-Id: <20200314172736.24528-9-linux@roeck-us.net>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200314172736.24528-1-linux@roeck-us.net>
 References: <20200314172736.24528-1-linux@roeck-us.net>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,67 +95,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With this patch, the watchdog on i.MX31 emulations is fully operational.
+i.MX7 supports watchdog pretimeout interupts. With this commit,
+the watchdog in mcimx7d-sabre is fully operational, including
+pretimeout support.
 
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- hw/arm/fsl-imx31.c         | 6 ++++++
- include/hw/arm/fsl-imx31.h | 4 ++++
- 2 files changed, 10 insertions(+)
+ hw/arm/fsl-imx7.c         | 11 +++++++++++
+ include/hw/arm/fsl-imx7.h |  5 +++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 55e90d104b..cec7d0dd1b 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -63,6 +63,8 @@ static void fsl_imx31_init(Object *obj)
-         sysbus_init_child_obj(obj, "gpio[*]", &s->gpio[i], sizeof(s->gpio[i]),
-                               TYPE_IMX_GPIO);
+diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+index 29382776b2..6c539c8b23 100644
+--- a/hw/arm/fsl-imx7.c
++++ b/hw/arm/fsl-imx7.c
+@@ -447,11 +447,22 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+             FSL_IMX7_WDOG3_ADDR,
+             FSL_IMX7_WDOG4_ADDR,
+         };
++        static const int FSL_IMX7_WDOGn_IRQ[FSL_IMX7_NUM_WDTS] = {
++            FSL_IMX7_WDOG1_IRQ,
++            FSL_IMX7_WDOG2_IRQ,
++            FSL_IMX7_WDOG3_IRQ,
++            FSL_IMX7_WDOG4_IRQ,
++        };
+ 
++        object_property_set_bool(OBJECT(&s->wdt[i]), true, "pretimeout-support",
++                                 &error_abort);
+         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized",
+                                  &error_abort);
+ 
+         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0, FSL_IMX7_WDOGn_ADDR[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->wdt[i]), 0,
++                           qdev_get_gpio_in(DEVICE(&s->a7mpcore),
++                                            FSL_IMX7_WDOGn_IRQ[i]));
      }
+ 
+     /*
+diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
+index 47826da2b7..da977f9ffb 100644
+--- a/include/hw/arm/fsl-imx7.h
++++ b/include/hw/arm/fsl-imx7.h
+@@ -228,6 +228,11 @@ enum FslIMX7IRQs {
+     FSL_IMX7_USB2_IRQ     = 42,
+     FSL_IMX7_USB3_IRQ     = 40,
+ 
++    FSL_IMX7_WDOG1_IRQ    = 78,
++    FSL_IMX7_WDOG2_IRQ    = 79,
++    FSL_IMX7_WDOG3_IRQ    = 10,
++    FSL_IMX7_WDOG4_IRQ    = 109,
 +
-+    sysbus_init_child_obj(obj, "wdt", &s->wdt, sizeof(s->wdt), TYPE_IMX2_WDT);
- }
- 
- static void fsl_imx31_realize(DeviceState *dev, Error **errp)
-@@ -205,6 +207,10 @@ static void fsl_imx31_realize(DeviceState *dev, Error **errp)
-                                             gpio_table[i].irq));
-     }
- 
-+    /* Watchdog */
-+    object_property_set_bool(OBJECT(&s->wdt), true, "realized", &error_abort);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt), 0, FSL_IMX31_WDT_ADDR);
-+
-     /* On a real system, the first 16k is a `secure boot rom' */
-     memory_region_init_rom(&s->secure_rom, NULL, "imx31.secure_rom",
-                            FSL_IMX31_SECURE_ROM_SIZE, &err);
-diff --git a/include/hw/arm/fsl-imx31.h b/include/hw/arm/fsl-imx31.h
-index ac5ca9826a..dd8561b309 100644
---- a/include/hw/arm/fsl-imx31.h
-+++ b/include/hw/arm/fsl-imx31.h
-@@ -25,6 +25,7 @@
- #include "hw/timer/imx_epit.h"
- #include "hw/i2c/imx_i2c.h"
- #include "hw/gpio/imx_gpio.h"
-+#include "hw/watchdog/wdt_imx2.h"
- #include "exec/memory.h"
- #include "target/arm/cpu.h"
- 
-@@ -49,6 +50,7 @@ typedef struct FslIMX31State {
-     IMXEPITState   epit[FSL_IMX31_NUM_EPITS];
-     IMXI2CState    i2c[FSL_IMX31_NUM_I2CS];
-     IMXGPIOState   gpio[FSL_IMX31_NUM_GPIOS];
-+    IMX2WdtState   wdt;
-     MemoryRegion   secure_rom;
-     MemoryRegion   rom;
-     MemoryRegion   iram;
-@@ -87,6 +89,8 @@ typedef struct FslIMX31State {
- #define FSL_IMX31_GPIO1_SIZE            0x4000
- #define FSL_IMX31_GPIO2_ADDR            0x53FD0000
- #define FSL_IMX31_GPIO2_SIZE            0x4000
-+#define FSL_IMX31_WDT_ADDR              0x53FDC000
-+#define FSL_IMX31_WDT_SIZE              0x4000
- #define FSL_IMX31_AVIC_ADDR             0x68000000
- #define FSL_IMX31_AVIC_SIZE             0x100
- #define FSL_IMX31_SDRAM0_ADDR           0x80000000
+     FSL_IMX7_PCI_INTA_IRQ = 125,
+     FSL_IMX7_PCI_INTB_IRQ = 124,
+     FSL_IMX7_PCI_INTC_IRQ = 123,
 -- 
 2.17.1
 
