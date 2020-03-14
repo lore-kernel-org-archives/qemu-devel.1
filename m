@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B91C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBA0C1975A
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 689982073C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 689982073C
+	by mail.kernel.org (Postfix) with ESMTPS id B21942073C
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21942073C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD2JH-000249-KK
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:38:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54540)
+	id 1jD2JI-00026H-Un
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:38:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54529)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jD2HD-0006cy-7D
+ (envelope-from <pannengyuan@huawei.com>) id 1jD2HC-0006cx-SH
  for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jD2HC-0004fE-4q
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:11 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53342 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1jD2HB-0004bk-H5
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:10 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:53340 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jD2HB-0004M0-P3; Sat, 14 Mar 2020 04:36:10 -0400
+ id 1jD2HA-0004M2-QT
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:09 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 125627FA44D9298E9226;
+ by Forcepoint Email with ESMTP id 07CC86648574A9F8CC6D;
  Sat, 14 Mar 2020 16:36:03 +0800 (CST)
 Received: from localhost.huawei.com (10.175.104.216) by
  DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 14 Mar 2020 16:35:54 +0800
+ 14.3.487.0; Sat, 14 Mar 2020 16:35:53 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v5 3/4] hw/misc/macio: fix incorrect creation of mos6522's
- subclasses
-Date: Sat, 14 Mar 2020 16:47:29 +0800
-Message-ID: <20200314084730.25876-4-pannengyuan@huawei.com>
+Subject: [PATCH v5 2/4] mac_via: fix incorrect creation of mos6522 device in
+ mac_via
+Date: Sat, 14 Mar 2020 16:47:28 +0800
+Message-ID: <20200314084730.25876-3-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200314084730.25876-1-pannengyuan@huawei.com>
 References: <20200314084730.25876-1-pannengyuan@huawei.com>
@@ -66,95 +67,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- Pan Nengyuan <pannengyuan@huawei.com>, Mark
- Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- euler.robot@huawei.com, David Gibson <david@gibson.dropbear.id.au>
+ Pan Nengyuan <pannengyuan@huawei.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent
+ Vivier <laurent@vivier.eu>, euler.robot@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are two other places where we create mos6522's subclasses but forgot to realize
-it. This patch do the realize in these places to fix that.
+This patch fix a bug in mac_via where it failed to actually realize devices it was using.
+And move the init codes which inits the mos6522 objects and properties on them from realize()
+into init(). However, we keep qdev_set_parent_bus in realize(), otherwise it will cause
+device-introspect-test test fail. Then do the realize mos6522 device in the mac_vir_realize.
 
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
+Cc: Laurent Vivier <laurent@vivier.eu>
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org
 ---
-v5:
-- Also fix incorrect creation of mos6522's subclasses on two other places.
-  Not sure if there is a conversion plan, we still keep sysbus_init_child_obj in init()
-  in this patch as it was.
+v4->v3:
+- split v3 into two patches, this patch fix incorrect creation of mos6522, move inits and props
+  from realize into init.
+v5->v4:
+- remove redundant code.
+- As discussion in https://patchwork.kernel.org/patch/11421229/, we still keep 
+  qdev_set_parent_bus in realize().
 ---
- hw/misc/macio/cuda.c | 11 +++++++++--
- hw/misc/macio/pmu.c  | 11 +++++++++--
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ hw/misc/mac_via.c | 40 +++++++++++++++++++++++++++-------------
+ 1 file changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/hw/misc/macio/cuda.c b/hw/misc/macio/cuda.c
-index e0cc0aac5d..ee780a8288 100644
---- a/hw/misc/macio/cuda.c
-+++ b/hw/misc/macio/cuda.c
-@@ -36,6 +36,7 @@
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
- #include "trace.h"
- 
- /* Bits in B data register: all active low */
-@@ -524,11 +525,17 @@ static void cuda_realize(DeviceState *dev, Error **errp)
-     CUDAState *s = CUDA(dev);
-     SysBusDevice *sbd;
-     MOS6522State *ms;
--    DeviceState *d;
-+    DeviceState *d = DEVICE(&s->mos6522_cuda);
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+index b7d0012794..d208f0b18a 100644
+--- a/hw/misc/mac_via.c
++++ b/hw/misc/mac_via.c
+@@ -868,24 +868,24 @@ static void mac_via_reset(DeviceState *dev)
+ static void mac_via_realize(DeviceState *dev, Error **errp)
+ {
+     MacVIAState *m = MAC_VIA(dev);
+-    MOS6522State *ms;
      struct tm tm;
+     int ret;
 +    Error *err = NULL;
-+
-+    object_property_set_bool(OBJECT(d), true, "realized", &err);
+ 
+-    /* Init VIAs 1 and 2 */
+-    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
+-                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
++    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
++    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
+ 
+-    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+-                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
++    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
 +    if (err != NULL) {
 +        error_propagate(errp, err);
 +        return;
 +    }
  
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_cuda);
-     ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
-     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
-diff --git a/hw/misc/macio/pmu.c b/hw/misc/macio/pmu.c
-index b8466a4a3f..ae55992288 100644
---- a/hw/misc/macio/pmu.c
-+++ b/hw/misc/macio/pmu.c
-@@ -43,6 +43,7 @@
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qapi/error.h"
- #include "trace.h"
- 
- 
-@@ -741,11 +742,17 @@ static void pmu_realize(DeviceState *dev, Error **errp)
-     PMUState *s = VIA_PMU(dev);
-     SysBusDevice *sbd;
-     MOS6522State *ms;
--    DeviceState *d;
-+    DeviceState *d = DEVICE(&s->mos6522_pmu);;
-     struct tm tm;
-+    Error *err = NULL;
-+
-+    object_property_set_bool(OBJECT(d), true, "realized", &err);
+-    /* Pass through mos6522 output IRQs */
+-    ms = MOS6522(&m->mos6522_via1);
+-    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
+-                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+-    ms = MOS6522(&m->mos6522_via2);
+-    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+-                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
++    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized", &err);
 +    if (err != NULL) {
 +        error_propagate(errp, err);
 +        return;
 +    }
  
-     /* Pass IRQ from 6522 */
--    d = DEVICE(&s->mos6522_pmu);
-     ms = MOS6522(d);
-     sbd = SYS_BUS_DEVICE(s);
-     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(ms));
+     /* Pass through mos6522 input IRQs */
+     qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+@@ -948,6 +948,20 @@ static void mac_via_init(Object *obj)
+     /* ADB */
+     qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+                         TYPE_ADB_BUS, DEVICE(obj), "adb.0");
++
++    /* Init VIAs 1 and 2 */
++    object_initialize_child(OBJECT(m), "via1", &m->mos6522_via1,
++                            sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1,
++                            &error_abort, NULL);
++    object_initialize_child(OBJECT(m), "via2", &m->mos6522_via2,
++                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2,
++                            &error_abort, NULL);
++
++    /* Pass through mos6522 output IRQs */
++    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(&m->mos6522_via1),
++                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
++    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(&m->mos6522_via2),
++                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
+ }
+ 
+ static void postload_update_cb(void *opaque, int running, RunState state)
 -- 
 2.18.2
 
