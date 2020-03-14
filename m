@@ -2,117 +2,100 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A1BC0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E93C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:19:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB5B32072A
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:35:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB5B32072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 21B0D20751
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:19:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0FAy24o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21B0D20751
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDAgs-0000cc-Ue
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46308)
+	id 1jDBNd-0006lk-9R
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 14:19:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jDAgF-0008WS-EQ
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:34:36 -0400
+ (envelope-from <mst@redhat.com>) id 1jDBMy-0006EP-3G
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jDAgD-0000rm-RU
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:34:35 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51049)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jDAgD-0000ow-Ic; Sat, 14 Mar 2020 13:34:33 -0400
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N3sNa-1jMD9O2HB2-00zjuH; Sat, 14 Mar 2020 18:34:18 +0100
-Subject: Re: [PATCH] linux-user: Update TASK_UNMAPPED_BASE for aarch64
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20200313002813.3857-1-yuanzi@google.com>
- <CAL1e-=ghc+6GRMd3NToF6+DeAz1VSR6bxuKd7dBtSJwrj50ovQ@mail.gmail.com>
- <e7ce2848-fb44-3837-65bc-6b449c0e518e@vivier.eu>
- <CAL1e-=hwWP4ztFuLeXsywzz_JvE-j7_1U2CNsU=p7pFS9eva2w@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <1a654687-0809-b142-7116-5958c51d8cd1@vivier.eu>
-Date: Sat, 14 Mar 2020 18:34:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <mst@redhat.com>) id 1jDBMv-0000HC-HN
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:18:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56162
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDBMv-0000Ai-Aq
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:18:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584209920;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kUgTNr0H0/JSBJjEYVR12JgdzWy84UQtuE7u2d+2kMc=;
+ b=A0FAy24ojw6YhOBPL+ZVHQ2ebRh0jV1nXZvB5A2rfLxjEaXjwkxpg/B7MKTFjzk84uxyR0
+ 8npqml7sbsRcLqzYFwhPpJUSc4L9hFAIm8LBfMU0RIt3Vr8FiGZGA1HHBl55OCfaqJJWao
+ GLaAXHqMYlp8t6NfIeAeaJqubEozmQU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-BJkt3-CDMe6v8eJbLYy_4g-1; Sat, 14 Mar 2020 14:18:36 -0400
+X-MC-Unique: BJkt3-CDMe6v8eJbLYy_4g-1
+Received: by mail-wr1-f70.google.com with SMTP id o9so6271823wrw.14
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 11:18:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JsMidcAh4+41u0NxG/5sCM6Yds79JFRSq6ZsIkV8NhU=;
+ b=ljYMetjCbi2xS1bZ2+CZC3F4KxQI5b5/LXERxvbelms+s0LZ1cu8gaXbOJYP0gnjWK
+ qd2d2AHbUVkloUmjNbVycTGBJgBZanX1j91Go7rQ8tUJBaa6rhCd/R05I1uXuWSrLBvN
+ WFg+3RQAsRoVeBqUpAaGriyFrFcx5+IcHcvHhu35RG+sI7BQDc03FhIs/JTDxMDwhC/d
+ o86arRzNttIZ7A08afBYXvvlcCXnOzi8wzJHxr6q1qyByi2NbpndU10Czm6Fo/z7DHra
+ sWqEMTNekBgxSYCMFQzENeFPz0hhdpWxbodXzpar9v/f8WR2PALCYk4WrZat1OzXFH0o
+ zpiA==
+X-Gm-Message-State: ANhLgQ0V9i/r3iBlSzh/U4FTD7JG71s/WLRlPiqVpCVzxXbIhxAj5W8V
+ bzEpOc3jeUt/EVcVwcWKWKRJqaM6kqhRvasOX328g6mCGI0Wn/k1BqGMT8rffYYpndkRjRBHiNA
+ 7XN9DlR5YkTUIMEU=
+X-Received: by 2002:adf:fa87:: with SMTP id h7mr14311879wrr.50.1584209915129; 
+ Sat, 14 Mar 2020 11:18:35 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vt5tCwZO4+py0pwNIVfSG/nnIWkFeQE2XK4zceuwHn+6Xw/HSnGEZlhJtnDhDaZziIjDaMZQw==
+X-Received: by 2002:adf:fa87:: with SMTP id h7mr14311855wrr.50.1584209914833; 
+ Sat, 14 Mar 2020 11:18:34 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
+ by smtp.gmail.com with ESMTPSA id
+ n186sm1692774wme.25.2020.03.14.11.18.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 14 Mar 2020 11:18:33 -0700 (PDT)
+Date: Sat, 14 Mar 2020 14:18:30 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v3 10/16] hw/i386/vmport: Add support for CMD_GETTIME
+Message-ID: <20200313170914-mutt-send-email-mst@kernel.org>
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-11-liran.alon@oracle.com>
+ <20200312195652-mutt-send-email-mst@kernel.org>
+ <0bc7dac9-41a6-5af2-a1d5-ef1e79f92eea@oracle.com>
+ <20200313113049-mutt-send-email-mst@kernel.org>
+ <3c0d9308-f56c-0766-9815-241a28d9a246@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=hwWP4ztFuLeXsywzz_JvE-j7_1U2CNsU=p7pFS9eva2w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:t9Ezj9zvWQqK/iJyG6ZvaV1QlWLJoXtPxGJPCkaBTS5zNYNgx0w
- bAb45wim6vIWWrSybYnw0td8BQZpICGk6iwOgUXmeK+ddOlFAZlY/+1yr46Ie+gkPlEurQI
- jMjvTGKo6ND8PscC8hNJrNcV7Gc1rQzuiPm/Eih0hJ4aEwid4Y3iCeGSXD4dfIUyC+JrSix
- dbHoHOZxkOlr5TbzurDtQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:V1pYdUk8wWE=:FR2AryxJ8dysWAG4Rq+Mne
- 6aryX5cR5Li5EjQpZWraFAzS8+RiOd+JyjJy9b7OcF6TehRjqo8Hj/PlncdIPIXTwQgT/Kk8m
- /S+wz+EMRNetxQZ0TJ7vY3TmIIFVOpJSwsUJhzm7uauF6mm+sTiTQL6ytqD2U2ola0B01l7df
- GB2skA3J2JWkDSylEfJY3LNvFJF+D1raqHfh7pJe0heKjpCd5vS6P5Egdp0zSIJ0sThgmirFe
- Vu7j4LxPmgagilBClw9S3ModNipU4FlQ9c/9t7KhFSbqoVJdE8z5+9VgoXhi79vGWI4YYDR3L
- NvUEFIbCTXJvalvifBP45NS+z4u+g1FgKX4JfNSe7ptYvOayg9Q8wQrvO00LyxlxWumu54EwC
- HPYlzhepmKgq7ld4MQ9B9Od8V7ILkQ/YHn6jwUwYzuAj/4ymn1eGCM9UZMDfxWtQJkWE5RAoM
- BTIeRZjqm1hJqNVMBphZCh2oNiGYjN9aiznYg6tdvI7+vs7h0nqJ/rlVNHQiYOYKqcG7JJdoc
- 7NimHjJLOJXytcMWu6veQYYwbnA8FP5AWXAvPSTiKxRhj1nnaTSGm/LW7LyEQkkwQiex461hb
- tle8RJ5/b/jeCzMiwWHAdzS50iP84OR7H6EryD9yqh/NDDiTyOealeAbHhdEsug8Bi4jBVne7
- Jmbg4+5hhY6qDFBD8DrUrV4v8SIf6pF7slumscTBc4bhVxpnKxKNyDI8hI4MGIgwe9BKqXKA2
- R8sshMKSuLL6HQS3henUptj1GoyBxlo9cT6N6C/A8whpJdCoOC/ASE6VWQW0GbTXsmbVLT72y
- I9TjieoId+enjjxrqtnEv+7bAHrxNlSWOROoN+uS4/RyYszu0q+2aSJSJAFXuY5PRLXBTWg
+In-Reply-To: <3c0d9308-f56c-0766-9815-241a28d9a246@oracle.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,58 +107,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>,
- Lirong Yuan <yuanzi@google.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Josh Kunz <jkz@google.com>, Shu-Chun Weng <scw@google.com>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 14/03/2020 à 18:01, Aleksandar Markovic a écrit :
-> On Sat, Mar 14, 2020 at 11:45 AM Laurent Vivier <laurent@vivier.eu> wrote:
->>
->> Le 14/03/2020 à 04:06, Aleksandar Markovic a écrit :
->>> On Fri, Mar 13, 2020 at 1:28 AM Lirong Yuan <yuanzi@google.com> wrote:
->>>>
->>>> This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
->>>> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
->>>>
->>>> Signed-off-by: Lirong Yuan <yuanzi@google.com>
->>>> ---
->>>>  linux-user/mmap.c | 4 ++++
->>>>  1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->>>> index 8685f02e7e..e378033797 100644
->>>> --- a/linux-user/mmap.c
->>>> +++ b/linux-user/mmap.c
->>>> @@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
->>>>  }
->>>>
->>>>  #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
->>>> +#ifdef TARGET_AARCH64
->>>> +# define TASK_UNMAPPED_BASE  0x5500000000
->>>
->>> Hi, Lirong,
->>>
->>> Can you point from which line of the file you linked to did you
->>> arrive to the value 0x5500000000?
->>>
->>> Second question: What about other targets?
->>
->> Personally, I prefer to not change the value for other targets if it is
->> not required by someone that had some problems with the current value.
->>
->> It needs to be changed carefully and to be well tested after change.
->>
-> 
-> Sure, but again, from where " 0x5500000000" comes from?
+On Fri, Mar 13, 2020 at 06:26:54PM +0200, Liran Alon wrote:
+>=20
+> On 13/03/2020 17:47, Michael S. Tsirkin wrote:
+> > On Fri, Mar 13, 2020 at 05:25:20PM +0200, Liran Alon wrote:
+> > > > > @@ -168,6 +169,20 @@ static uint32_t vmport_cmd_ram_size(void *op=
+aque, uint32_t addr)
+> > > > >        return ram_size;
+> > > > >    }
+> > > > > +static uint32_t vmport_cmd_time(void *opaque, uint32_t addr)
+> > > > > +{
+> > > > > +    X86CPU *cpu =3D X86_CPU(current_cpu);
+> > > > > +    qemu_timeval tv;
+> > > > > +
+> > > > > +    if (qemu_gettimeofday(&tv) < 0) {
+> > > > > +        return UINT32_MAX;
+> > > > > +    }
+> > > > > +
+> > > > > +    cpu->env.regs[R_EBX] =3D (uint32_t)tv.tv_usec;
+> > > > > +    cpu->env.regs[R_ECX] =3D port_state->max_time_lag_us;
+> > > > > +    return (uint32_t)tv.tv_sec;
+> > > > > +}
+> > > > > +
+> > > > >    /* vmmouse helpers */
+> > > > >    void vmmouse_get_data(uint32_t *data)
+> > > > >    {
+> > > > That's a very weird thing to return to the guest.
+> > > > For example it's not monotonic across migrations.
+> > > That's the VMware PV interface... I didn't design it. :P
+> > > Regarding how it handles the fact time is not monotonic across migrat=
+ions,
+> > > see big comment at the start of services/plugins/timeSync/timeSync.c =
+in
+> > > open-vm-tools regarding the time-sync algorithm used by VMware Tools.
+> > > Specifically:
+> > > """
+> > > During normal operation this plugin only steps the time forward and o=
+nly if
+> > > the error is greater than one second.
+> > Looks like guest assumes this time only moves forward.
+> > So something needs to be done to avoid it moving
+> > backward across migrations.
+> Where do you see this assumption in guest code? I don't think this is tru=
+e.
+> Guest code seems to handle this by making sure to only step the time
+> forward.
 
-The URL is in the comment, but more precisely I guess:
+Exactly. So if host time moved backward e.g. by 100s, then for 100s
+time is not correcting. Which possibly vmware has a way to mitigate
+against e.g. by synchronising host time using their
+management app.
 
- https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h#L164
+> Read carefully services/plugins/timeSync/timeSync.c and point me to what =
+I'm
+> missing if you think otherwise (i.e. I missed something).
 
-Thanks,
-Laurent
+I'm just going by what you write in a patch.
+
+> > > """
+> > > > And what does max_time_lag_us refer to, anyway?
+> > > According to the comment in open-vm-tools TimeSyncReadHost():
+> > > """
+> > > maximum time lag allowed (config option), which is a threshold that k=
+eeps
+> > > the tools from being over eager about resetting the time when it is o=
+nly a
+> > > little bit off.
+> > > """
+> > >=20
+> > > Looking at open-vm-tools timeSync.c code, it defines the threshold of=
+ how
+> > > far guest time can be from host time before deciding to do a "step
+> > > correction".
+> > > A "step correction" is defined as explicitly setting the time in the =
+guest
+> > > to the time in the host.
+> > > >=20
+> > > > So please add documentation about what this does.
+> > > You are right. I agree.
+> > > I think it would be best to just point to open-vm-tools
+> > > services/plugins/timeSync/timeSync.c.
+> > > Do you agree or should I copy some paragraphs from there?
+> > Neither. Their documentation will be from guest point of view.  Please
+> > look at that code and write documentation from host point of view.
+> > Your documentation for the lag parameter is I think a good
+> > example of how to do it.
+> Ok. Will try to phrase something for v4.
+> >=20
+> > > > If there's no document to refer to then pls write
+> > > > code comments or a document under docs/ - this does not
+> > > > belong in commit log.
+> > > >=20
+> > > >=20
+> > > >=20
+> > > > > @@ -214,6 +229,7 @@ static void vmport_realizefn(DeviceState *dev=
+, Error **errp)
+> > > > >        vmport_register(VMPORT_CMD_GETRAMSIZE, vmport_cmd_ram_size=
+, NULL);
+> > > > >        if (s->compat_flags & VMPORT_COMPAT_CMDS_V2) {
+> > > > >            vmport_register(VMPORT_CMD_GETBIOSUUID, vmport_cmd_get=
+_bios_uuid, NULL);
+> > > > > +        vmport_register(VMPORT_CMD_GETTIME, vmport_cmd_time, NUL=
+L);
+> > > > >        }
+> > > > >    }
+> > > > > @@ -249,6 +265,11 @@ static Property vmport_properties[] =3D {
+> > > > >         * 5 - ACE 1.x (Deprecated)
+> > > > >         */
+> > > > >        DEFINE_PROP_UINT8("vmware-vmx-type", VMPortState, vmware_v=
+mx_type, 2),
+> > > > > +    /*
+> > > > > +     * Max amount of time lag that can go uncorrected.
+> > > > What does uncorrected mean?
+> > > You are right this is a bad phrasing taken from open-vm-tools.
+> > > It should mean "How far we allow guest time to go from host time befo=
+re
+> > > guest VMware Tools will sync it to host time".
+> > > How you prefer to phrase this?
+> > Sounds like a good explanation. Maybe we allow -> can
+> > since "we" is hypervisor and it's actually under guest control.
+> Ok. Will add this to v4.
+> >=20
+> >=20
+> > > > > +     * Value taken from VMware Workstation 5.5.
+> > > > How do we know this makes sense for KVM? That has significantly
+> > > > different runtime characteristics.
+> > > This is just a threshold as you can understand from the above reply o=
+f mine
+> > > (I should rephrase the comments to make this clearer).
+> > > So we just chose a threshold that makes sense for common workloads.
+> > > One of the reasons to put this as a property, is to still allow user =
+to
+> > > override it.
+> > Well close to 100% of users will have no idea what to set it to.
+> I agree. :) That's why there is a default value.
+> >=20
+> >=20
+> > > >=20
+> > > > Also, the version returns ESX server, why does it make
+> > > > sense to take some values from workstation?
+> > > I believe (don't remember) that ESXi was observed to return similar v=
+alue.
+> > > Most of our workloads that runs with this came from ESXi and we never
+> > > examined an issue regarding this in our production environment.
+> > > Which makes sense as this is just a thresthold that specifies when gu=
+est
+> > > time should be synced to host time.
+> > > You prefer I would just remove this comment?
+> > Maybe add " TODO: should this depend on vmare-vmx-type? ".
+>=20
+> Ok. Will add to v4.
+>=20
+> Thanks,
+> -Liran
+>=20
 
 
