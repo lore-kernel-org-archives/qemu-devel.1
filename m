@@ -2,63 +2,89 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D671C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 09:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CF2C1975A
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 09:16:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35BEA20674
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 09:16:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35BEA20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AAE620674
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 09:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AAE620674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD2uA-0002h7-C3
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 05:16:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41347)
+	id 1jD2uJ-0002uV-6Y
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 05:16:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41453)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jD2tJ-0001wd-Kf
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 05:15:34 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD2tR-00024g-Ph
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 05:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jD2tI-0006G5-ID
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 05:15:33 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34127)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jD2tI-0005xL-4F; Sat, 14 Mar 2020 05:15:32 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07440776|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_regular_dialog|0.163918-0.000573851-0.835508;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03267; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.H.I-jki_1584177323; 
-Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H.I-jki_1584177323)
- by smtp.aliyun-inc.com(10.147.42.253);
- Sat, 14 Mar 2020 17:15:24 +0800
-Subject: Re: [PATCH v5 39/60] target/riscv: vector floating-point classify
- instructions
-To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-40-zhiwei_liu@c-sky.com>
- <6710853a-3354-1064-a7f8-4c2378bd680d@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <de78aac2-42d6-52ec-8e7c-5e59ef1e06fd@c-sky.com>
-Date: Sat, 14 Mar 2020 17:15:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD2tQ-0006ue-HJ
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 05:15:41 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:54282
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jD2tQ-0006dP-AG; Sat, 14 Mar 2020 05:15:40 -0400
+Received: from host86-185-91-43.range86-185.btcentralplus.com ([86.185.91.43]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1jD2ti-0006P0-PR; Sat, 14 Mar 2020 09:16:03 +0000
+To: John Snow <jsnow@redhat.com>, philmd@redhat.com, amarkovic@wavecomp.com,
+ mst@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ balaton@eik.bme.hu
+References: <20200313082444.2439-1-mark.cave-ayland@ilande.co.uk>
+ <842b7c37-74bc-d5e1-070d-69dd74bf8caf@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <a472d8fb-cff9-66e5-3456-5ff4c670eb32@ilande.co.uk>
+Date: Sat, 14 Mar 2020 09:15:28 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <6710853a-3354-1064-a7f8-4c2378bd680d@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <842b7c37-74bc-d5e1-070d-69dd74bf8caf@redhat.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.185.91.43
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 0/7] via-ide: fixes and improvements
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,77 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 13/03/2020 17:57, John Snow wrote:
+
+> On 3/13/20 4:24 AM, Mark Cave-Ayland wrote:
+>> Following on from the earlier thread "Implement "non 100% native mode"
+>> in via-ide", here is an updated patchset based upon the test cases
+>> sent to me off-list.
+>>
+>> The VIA IDE controller is similar to early versions of the PIIX
+>> controller in that the primary and secondary IDE channels are hardwired
+>> to IRQs 14 and 15 respectively. Guest OSs typically handle this by
+>> either switching the controller to legacy mode, or using native mode and
+>> using a combination of PCI device/vendor ID and/or checking various
+>> registers in PCI configuration space to detect this condition and apply
+>> a special fixed IRQ 14/15 routing.
+>>
+>> This patchset effectively updates the VIA IDE PCI device to follow the
+>> behaviour in the datasheet in two ways: fixing some PCI configuration
+>> space register defaults and behaviours, and always using legacy IRQ 14/15
+>> routing, and once applied allows all our known test images to boot
+>> correctly.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>
+>>
+>> BALATON Zoltan (2):
+>>   ide/via: Get rid of via_ide_init()
+>>   pci: Honour wmask when resetting PCI_INTERRUPT_LINE
+>>
+>> Mark Cave-Ayland (5):
+>>   via-ide: move registration of VMStateDescription to DeviceClass
+>>   via-ide: ensure that PCI_INTERRUPT_LINE is hard-wired to its default
+>>     value
+>>   via-ide: initialise IDE controller in legacy mode
+>>   via-ide: allow guests to write to PCI_CLASS_PROG
+>>   via-ide: always use legacy IRQ 14/15 routing
+>>
+>>  hw/ide/via.c            | 21 +++++----------------
+>>  hw/mips/mips_fulong2e.c |  5 ++++-
+>>  hw/pci/pci.c            |  5 ++++-
+>>  include/hw/ide.h        |  1 -
+>>  4 files changed, 13 insertions(+), 19 deletions(-)
+>>
+> 
+> Does this supersede everything else so far? (Except the two cmd646
+> related series, four patches total, which are already staged)
+
+Yes, that's correct. It passes all our tests, and even better allows the fulong2e CD
+image at the link Zoltan posted to boot.
+
+So I believe it's good unless Alexander has any objections?
 
 
-On 2020/3/14 17:10, Richard Henderson wrote:
-> On 3/12/20 7:58 AM, LIU Zhiwei wrote:
->> +/* Vector Floating-Point Classify Instruction */
->> +static uint16_t fclass_f16(uint16_t frs1, float_status *s)
->> +{
->> +    float16 f = frs1;
->> +    bool sign = float16_is_neg(f);
->> +
->> +    if (float16_is_infinity(f)) {
->> +        return sign ? 1 << 0 : 1 << 7;
->> +    } else if (float16_is_zero(f)) {
->> +        return sign ? 1 << 3 : 1 << 4;
->> +    } else if (float16_is_zero_or_denormal(f)) {
->> +        return sign ? 1 << 2 : 1 << 5;
->> +    } else if (float16_is_any_nan(f)) {
->> +        float_status s = { }; /* for snan_bit_is_one */
->> +        return float16_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
->> +    } else {
->> +        return sign ? 1 << 1 : 1 << 6;
->> +    }
->> +}
->> +static uint32_t fclass_s(uint32_t frs1, float_status *s)
->> +{
->> +    float32 f = frs1;
->> +    bool sign = float32_is_neg(f);
->> +
->> +    if (float32_is_infinity(f)) {
->> +        return sign ? 1 << 0 : 1 << 7;
->> +    } else if (float32_is_zero(f)) {
->> +        return sign ? 1 << 3 : 1 << 4;
->> +    } else if (float32_is_zero_or_denormal(f)) {
->> +        return sign ? 1 << 2 : 1 << 5;
->> +    } else if (float32_is_any_nan(f)) {
->> +        float_status s = { }; /* for snan_bit_is_one */
->> +        return float32_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
->> +    } else {
->> +        return sign ? 1 << 1 : 1 << 6;
->> +    }
->> +}
->> +static uint64_t fclass_d(uint64_t frs1, float_status *s)
->> +{
->> +    float64 f = frs1;
->> +    bool sign = float64_is_neg(f);
->> +
->> +    if (float64_is_infinity(f)) {
->> +        return sign ? 1 << 0 : 1 << 7;
->> +    } else if (float64_is_zero(f)) {
->> +        return sign ? 1 << 3 : 1 << 4;
->> +    } else if (float64_is_zero_or_denormal(f)) {
->> +        return sign ? 1 << 2 : 1 << 5;
->> +    } else if (float64_is_any_nan(f)) {
->> +        float_status s = { }; /* for snan_bit_is_one */
->> +        return float64_is_quiet_nan(f, &s) ? 1 << 9 : 1 << 8;
->> +    } else {
->> +        return sign ? 1 << 1 : 1 << 6;
->> +    }
->> +}
-> These need to be moved out of fpu_helper.c so they can be shared.
-I will add an internals.h and move the declaration to internals.h.
+ATB,
 
-Zhiwei
-
->
-> r~
-
+Mark.
 
