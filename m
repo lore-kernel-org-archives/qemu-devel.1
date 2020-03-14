@@ -2,81 +2,117 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A247BC0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A1BC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:35:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BC112072A
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:33:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoySPURP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC112072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id AB5B32072A
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 17:35:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB5B32072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDAey-00083w-MR
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:33:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43102)
+	id 1jDAgs-0000cc-Ue
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 13:35:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jDAZj-00082t-84
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:52 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDAgF-0008WS-EQ
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jDAZi-00065i-5T
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:27:51 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46700)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jDAZh-00061R-VS; Sat, 14 Mar 2020 13:27:50 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c19so7217362pfo.13;
- Sat, 14 Mar 2020 10:27:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=2n/COS3qYgLsHbDGJU6WOfdiW+A/GtOTi3uv6vUIC3g=;
- b=AoySPURPuyVp2LwWXvkOn2cxOBeeTh6zfa6lXZOsVNCagJDUg7XRbSGlxYfPNr28Fj
- edKcVq40zFd1SRhRy5J5/X67SEPROC9LWyPKmQd5a352cILk31JgAyTOwKZzPIic9/WA
- v3GB+ScypneSOBGBdwI0ZxarqsjOZoIu4AMc0fT3JGV0KYkcdjbtMh4TrzAjzIAqCTsp
- GMtgZ6WoELZap5xp/saBu89aA0PfMkL5EhkZ9wWgtztiVWEu1+MoZgfka/ATHQDUlQ8y
- XJcN9Pk/ICFwnwSvk4/FTsRzHac+eKVeXMK49fma7viqguBORKjJrorfu+5dHc0WKdZ2
- 0e1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=2n/COS3qYgLsHbDGJU6WOfdiW+A/GtOTi3uv6vUIC3g=;
- b=U48AjTZSCRvuYAUeG861bbeb6UTuyVBcOe7mtd2GloZd5gD7NdWQZ4MAPEzbE0QTry
- vm3+MbEa01qLIBIzsXhFqiDn6jXLhspcn1ChQzMIhM02BUyJwR2vYCwHXGHc42qER++r
- Rdf8hF7sa2XhZu5yrARsjPH/U1CQERqKLi/xFh0l3/F6SFZ0Ux8lUnFRrqV4+BMl0GxJ
- hORnP3+U40mjPzwRue56pCNPjpsTEqEGcLpzq2Nva3SA/FtcN2O/WQ1Ozgxxbv/Qdson
- d2ic1g18UQzx6R+EOCtXLSPvfnti4612UdXHl/VJqgqMoXKb9Bk8b13uYAC0iyx/b3Kx
- cw6Q==
-X-Gm-Message-State: ANhLgQ09MYwUjeMtpnERlgQ/BoWw69MbeTyuEd4agXIuqkCCkDYNCDSf
- BBnHS1fd7GEOu7/rmzmiidI=
-X-Google-Smtp-Source: ADFU+vsyrtRKvB7VzSW3PqpUQXMEXMCTxtz7wWpN5HWmYnmtcIWYwm/b9Jitx3ey8yeBbP1kTL+XGQ==
-X-Received: by 2002:a62:447:: with SMTP id 68mr19788701pfe.174.1584206869187; 
- Sat, 14 Mar 2020 10:27:49 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id k8sm25559727pfk.1.2020.03.14.10.27.48
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 14 Mar 2020 10:27:48 -0700 (PDT)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 7/8] hw/arm/fsl-imx7: Instantiate various unimplemented devices
-Date: Sat, 14 Mar 2020 10:27:35 -0700
-Message-Id: <20200314172736.24528-8-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200314172736.24528-1-linux@roeck-us.net>
-References: <20200314172736.24528-1-linux@roeck-us.net>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+ (envelope-from <laurent@vivier.eu>) id 1jDAgD-0000rm-RU
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 13:34:35 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:51049)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1jDAgD-0000ow-Ic; Sat, 14 Mar 2020 13:34:33 -0400
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N3sNa-1jMD9O2HB2-00zjuH; Sat, 14 Mar 2020 18:34:18 +0100
+Subject: Re: [PATCH] linux-user: Update TASK_UNMAPPED_BASE for aarch64
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20200313002813.3857-1-yuanzi@google.com>
+ <CAL1e-=ghc+6GRMd3NToF6+DeAz1VSR6bxuKd7dBtSJwrj50ovQ@mail.gmail.com>
+ <e7ce2848-fb44-3837-65bc-6b449c0e518e@vivier.eu>
+ <CAL1e-=hwWP4ztFuLeXsywzz_JvE-j7_1U2CNsU=p7pFS9eva2w@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1a654687-0809-b142-7116-5958c51d8cd1@vivier.eu>
+Date: Sat, 14 Mar 2020 18:34:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <CAL1e-=hwWP4ztFuLeXsywzz_JvE-j7_1U2CNsU=p7pFS9eva2w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:t9Ezj9zvWQqK/iJyG6ZvaV1QlWLJoXtPxGJPCkaBTS5zNYNgx0w
+ bAb45wim6vIWWrSybYnw0td8BQZpICGk6iwOgUXmeK+ddOlFAZlY/+1yr46Ie+gkPlEurQI
+ jMjvTGKo6ND8PscC8hNJrNcV7Gc1rQzuiPm/Eih0hJ4aEwid4Y3iCeGSXD4dfIUyC+JrSix
+ dbHoHOZxkOlr5TbzurDtQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:V1pYdUk8wWE=:FR2AryxJ8dysWAG4Rq+Mne
+ 6aryX5cR5Li5EjQpZWraFAzS8+RiOd+JyjJy9b7OcF6TehRjqo8Hj/PlncdIPIXTwQgT/Kk8m
+ /S+wz+EMRNetxQZ0TJ7vY3TmIIFVOpJSwsUJhzm7uauF6mm+sTiTQL6ytqD2U2ola0B01l7df
+ GB2skA3J2JWkDSylEfJY3LNvFJF+D1raqHfh7pJe0heKjpCd5vS6P5Egdp0zSIJ0sThgmirFe
+ Vu7j4LxPmgagilBClw9S3ModNipU4FlQ9c/9t7KhFSbqoVJdE8z5+9VgoXhi79vGWI4YYDR3L
+ NvUEFIbCTXJvalvifBP45NS+z4u+g1FgKX4JfNSe7ptYvOayg9Q8wQrvO00LyxlxWumu54EwC
+ HPYlzhepmKgq7ld4MQ9B9Od8V7ILkQ/YHn6jwUwYzuAj/4ymn1eGCM9UZMDfxWtQJkWE5RAoM
+ BTIeRZjqm1hJqNVMBphZCh2oNiGYjN9aiznYg6tdvI7+vs7h0nqJ/rlVNHQiYOYKqcG7JJdoc
+ 7NimHjJLOJXytcMWu6veQYYwbnA8FP5AWXAvPSTiKxRhj1nnaTSGm/LW7LyEQkkwQiex461hb
+ tle8RJ5/b/jeCzMiwWHAdzS50iP84OR7H6EryD9yqh/NDDiTyOealeAbHhdEsug8Bi4jBVne7
+ Jmbg4+5hhY6qDFBD8DrUrV4v8SIf6pF7slumscTBc4bhVxpnKxKNyDI8hI4MGIgwe9BKqXKA2
+ R8sshMKSuLL6HQS3henUptj1GoyBxlo9cT6N6C/A8whpJdCoOC/ASE6VWQW0GbTXsmbVLT72y
+ I9TjieoId+enjjxrqtnEv+7bAHrxNlSWOROoN+uS4/RyYszu0q+2aSJSJAFXuY5PRLXBTWg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,97 +124,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-devel@nongnu.org,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>, Guenter Roeck <linux@roeck-us.net>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>,
+ Lirong Yuan <yuanzi@google.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Josh Kunz <jkz@google.com>, Shu-Chun Weng <scw@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instantiating PWM, CAN, CAAM, and OCOTP devices is necessary to avoid
-crashes when booting mainline Linux.
+Le 14/03/2020 à 18:01, Aleksandar Markovic a écrit :
+> On Sat, Mar 14, 2020 at 11:45 AM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Le 14/03/2020 à 04:06, Aleksandar Markovic a écrit :
+>>> On Fri, Mar 13, 2020 at 1:28 AM Lirong Yuan <yuanzi@google.com> wrote:
+>>>>
+>>>> This change updates TASK_UNMAPPED_BASE (the base address for guest programs) for aarch64. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
+>>>> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
+>>>>
+>>>> Signed-off-by: Lirong Yuan <yuanzi@google.com>
+>>>> ---
+>>>>  linux-user/mmap.c | 4 ++++
+>>>>  1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+>>>> index 8685f02e7e..e378033797 100644
+>>>> --- a/linux-user/mmap.c
+>>>> +++ b/linux-user/mmap.c
+>>>> @@ -184,7 +184,11 @@ static int mmap_frag(abi_ulong real_start,
+>>>>  }
+>>>>
+>>>>  #if HOST_LONG_BITS == 64 && TARGET_ABI_BITS == 64
+>>>> +#ifdef TARGET_AARCH64
+>>>> +# define TASK_UNMAPPED_BASE  0x5500000000
+>>>
+>>> Hi, Lirong,
+>>>
+>>> Can you point from which line of the file you linked to did you
+>>> arrive to the value 0x5500000000?
+>>>
+>>> Second question: What about other targets?
+>>
+>> Personally, I prefer to not change the value for other targets if it is
+>> not required by someone that had some problems with the current value.
+>>
+>> It needs to be changed carefully and to be well tested after change.
+>>
+> 
+> Sure, but again, from where " 0x5500000000" comes from?
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- hw/arm/fsl-imx7.c         | 24 ++++++++++++++++++++++++
- include/hw/arm/fsl-imx7.h | 16 ++++++++++++++++
- 2 files changed, 40 insertions(+)
+The URL is in the comment, but more precisely I guess:
 
-diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
-index 119b281a50..29382776b2 100644
---- a/hw/arm/fsl-imx7.c
-+++ b/hw/arm/fsl-imx7.c
-@@ -459,6 +459,30 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
-      */
-     create_unimplemented_device("sdma", FSL_IMX7_SDMA_ADDR, FSL_IMX7_SDMA_SIZE);
- 
-+    /*
-+     * CAAM
-+     */
-+    create_unimplemented_device("caam", FSL_IMX7_CAAM_ADDR, FSL_IMX7_CAAM_SIZE);
-+
-+    /*
-+     * PWM
-+     */
-+    create_unimplemented_device("pwm1", FSL_IMX7_PWM1_ADDR, FSL_IMX7_PWMn_SIZE);
-+    create_unimplemented_device("pwm2", FSL_IMX7_PWM2_ADDR, FSL_IMX7_PWMn_SIZE);
-+    create_unimplemented_device("pwm3", FSL_IMX7_PWM3_ADDR, FSL_IMX7_PWMn_SIZE);
-+    create_unimplemented_device("pwm4", FSL_IMX7_PWM4_ADDR, FSL_IMX7_PWMn_SIZE);
-+
-+    /*
-+     * CAN
-+     */
-+    create_unimplemented_device("can1", FSL_IMX7_CAN1_ADDR, FSL_IMX7_CANn_SIZE);
-+    create_unimplemented_device("can2", FSL_IMX7_CAN2_ADDR, FSL_IMX7_CANn_SIZE);
-+
-+    /*
-+     * OCOTP
-+     */
-+    create_unimplemented_device("octop", FSL_IMX7_OCOTP_ADDR,
-+                                FSL_IMX7_OCOTP_SIZE);
- 
-     object_property_set_bool(OBJECT(&s->gpr), true, "realized",
-                              &error_abort);
-diff --git a/include/hw/arm/fsl-imx7.h b/include/hw/arm/fsl-imx7.h
-index 3a0041c4c2..47826da2b7 100644
---- a/include/hw/arm/fsl-imx7.h
-+++ b/include/hw/arm/fsl-imx7.h
-@@ -113,6 +113,9 @@ enum FslIMX7MemoryMap {
-     FSL_IMX7_IOMUXC_GPR_ADDR      = 0x30340000,
-     FSL_IMX7_IOMUXCn_SIZE         = 0x1000,
- 
-+    FSL_IMX7_OCOTP_ADDR           = 0x30350000,
-+    FSL_IMX7_OCOTP_SIZE           = 0x10000,
-+
-     FSL_IMX7_ANALOG_ADDR          = 0x30360000,
-     FSL_IMX7_SNVS_ADDR            = 0x30370000,
-     FSL_IMX7_CCM_ADDR             = 0x30380000,
-@@ -124,11 +127,24 @@ enum FslIMX7MemoryMap {
-     FSL_IMX7_ADC2_ADDR            = 0x30620000,
-     FSL_IMX7_ADCn_SIZE            = 0x1000,
- 
-+    FSL_IMX7_PWM1_ADDR            = 0x30660000,
-+    FSL_IMX7_PWM2_ADDR            = 0x30670000,
-+    FSL_IMX7_PWM3_ADDR            = 0x30680000,
-+    FSL_IMX7_PWM4_ADDR            = 0x30690000,
-+    FSL_IMX7_PWMn_SIZE            = 0x10000,
-+
-     FSL_IMX7_PCIE_PHY_ADDR        = 0x306D0000,
-     FSL_IMX7_PCIE_PHY_SIZE        = 0x10000,
- 
-     FSL_IMX7_GPC_ADDR             = 0x303A0000,
- 
-+    FSL_IMX7_CAAM_ADDR            = 0x30900000,
-+    FSL_IMX7_CAAM_SIZE            = 0x40000,
-+
-+    FSL_IMX7_CAN1_ADDR            = 0x30A00000,
-+    FSL_IMX7_CAN2_ADDR            = 0x30A10000,
-+    FSL_IMX7_CANn_SIZE            = 0x10000,
-+
-     FSL_IMX7_I2C1_ADDR            = 0x30A20000,
-     FSL_IMX7_I2C2_ADDR            = 0x30A30000,
-     FSL_IMX7_I2C3_ADDR            = 0x30A40000,
--- 
-2.17.1
+ https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h#L164
+
+Thanks,
+Laurent
 
 
