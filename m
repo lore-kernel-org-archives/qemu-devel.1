@@ -2,90 +2,62 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9192EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1462EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:37:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F7812074C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:24:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EJW6XenR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F7812074C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1B252074D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:37:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B252074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCubq-0002sh-HE
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:24:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36531)
+	id 1jCunk-0005Mb-Tk
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:37:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1jCub3-0002Nt-IQ
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:24:10 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCunA-0004qa-2M
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1jCub2-0006Ls-5a
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:24:09 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21913
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jCun6-0005F3-67
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:36:39 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54649)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1jCub1-0006FX-SF
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:24:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584145445;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nxWnAEPLEiUzXFHAqL0Ai9O4rz6YI2uPE+84nS05Td4=;
- b=EJW6XenRgL1BCOoeTNPEbM3kX2zB3h5EOID9Yh2U826usCv00XiUz8S5RhmE28GApBXu/i
- 8jBzC/jPWzY+4+Cjh8uwdB+0UV2tCHclPQK4LfuhFDUTxpjnPZbem7gqHubWoXAdjuanD6
- jj1Pes4L1XSASn8QUwRWx/uv7LxbsWc=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-Y77bQ9JHOf60e9RQlqmozQ-1; Fri, 13 Mar 2020 20:24:04 -0400
-X-MC-Unique: Y77bQ9JHOf60e9RQlqmozQ-1
-Received: by mail-ot1-f70.google.com with SMTP id s8so6989747otd.13
- for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 17:24:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=nxWnAEPLEiUzXFHAqL0Ai9O4rz6YI2uPE+84nS05Td4=;
- b=RyrC7JVxcF1EzD3ftL3QYj1hoVTRoI3JFJJ8N1o6qRhE2ezSxKEP5FJ6akqK021mgS
- 3qu0w1BC2wxZiGhtIiXTmPZIoq8KgHsWZkrp0hOrwYpnoewmisfUDa1nEGFmw6ymGbk4
- qHUHsV3MMYmHCdfSRXka6fz9D2snDK8ZzwkoEtMNrd/pJPqcFA4S+XFR0pUCDPlRbGC+
- c8JBjjcPf1vJd9VK87qEaWS0qUabS45DZGI+OkHycf8ghSL6nJs0gnaYp+VRx1iZ5Sgf
- fW0je5f3SzYdwZVtaxxYHDfkfHhfllJQ40Am20F7J7ULB6IdZlLFpTWhv28GGUjolSU2
- aAbA==
-X-Gm-Message-State: ANhLgQ1AAdhhKP/fTyMEQsLqGPxGj1O4j9OZFtVVGPqLNQrUxMv5v2ul
- nIPJKvbWj3W7krsw2WfM1M2ML/GPpId1b55drSp4HFWsdp91MJCqlB/zVTgb+3Mn8GJZ/LDknKB
- Vr4CQVECDEGwjEK80wsq/Ue5Egq2Aexs=
-X-Received: by 2002:a9d:748c:: with SMTP id t12mr12843485otk.38.1584145443478; 
- Fri, 13 Mar 2020 17:24:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuJjBjIkeV/Nd7EC6KHlSGeZesjD0w0mw99Z8mI/DeGI4PEK4H9ylBSAD2SXIMrrwr9AcTX1plrLwusR90A7oc=
-X-Received: by 2002:a9d:748c:: with SMTP id t12mr12843468otk.38.1584145443154; 
- Fri, 13 Mar 2020 17:24:03 -0700 (PDT)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jCun5-0004zk-HB; Fri, 13 Mar 2020 20:36:36 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_regular_dialog|0.315262-0.000689414-0.684049;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03307; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H.6w8My_1584146186; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H.6w8My_1584146186)
+ by smtp.aliyun-inc.com(10.147.41.137);
+ Sat, 14 Mar 2020 08:36:26 +0800
+Subject: Re: [PATCH v5 08/60] target/riscv: add vector amo operations
+To: Alistair Francis <alistair23@gmail.com>
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-9-zhiwei_liu@c-sky.com>
+ <CAKmqyKPPVVO8oxe8HDsQ+D4Cj1XuXASY5A1x1qfY606=16WZ2A@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <220da129-3d6b-9873-550d-cbcdd814f86b@c-sky.com>
+Date: Sat, 14 Mar 2020 08:36:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200313184153.11275-1-philmd@redhat.com>
- <20200313184153.11275-3-philmd@redhat.com>
-In-Reply-To: <20200313184153.11275-3-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Sat, 14 Mar 2020 01:23:52 +0100
-Message-ID: <CAMxuvaxRikWH9Y1cujGR02z=5Kmynnax5fYLqqBuQP4_0WxdSw@mail.gmail.com>
-Subject: Re: [PATCH 2/9] qapi/misc: Move add_client command with chardev code
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <CAKmqyKPPVVO8oxe8HDsQ+D4Cj1XuXASY5A1x1qfY606=16WZ2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,133 +69,476 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- Peter Lieven <pl@kamp.de>, Laurent Vivier <laurent@vivier.eu>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
 
-On Fri, Mar 13, 2020 at 7:42 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Without looking at the rest of the series, I fail to see the
-improvement, quite the opposite. A bit of context?
+On 2020/3/14 8:02, Alistair Francis wrote:
+> On Thu, Mar 12, 2020 at 8:15 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>> Vector AMOs operate as if aq and rl bits were zero on each element
+>> with regard to ordering relative to other instructions in the same hart.
+>> Vector AMOs provide no ordering guarantee between element operations
+>> in the same vector AMO instruction
+>>
+>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+>> ---
+>>   target/riscv/cpu.h                      |   1 +
+>>   target/riscv/helper.h                   |  29 +++++
+>>   target/riscv/insn32-64.decode           |  11 ++
+>>   target/riscv/insn32.decode              |  13 +++
+>>   target/riscv/insn_trans/trans_rvv.inc.c | 130 +++++++++++++++++++++
+>>   target/riscv/vector_helper.c            | 143 ++++++++++++++++++++++++
+>>   6 files changed, 327 insertions(+)
+>>
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index b6ebb9b0eb..e069e55e81 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -374,6 +374,7 @@ FIELD(VDATA, MLEN, 0, 8)
+>>   FIELD(VDATA, VM, 8, 1)
+>>   FIELD(VDATA, LMUL, 9, 2)
+>>   FIELD(VDATA, NF, 11, 4)
+>> +FIELD(VDATA, WD, 11, 1)
+>>
+>>   FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
+>>   FIELD(TB_FLAGS, LMUL, 3, 2)
+>> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+>> index 72ba4d9bdb..70a4b05f75 100644
+>> --- a/target/riscv/helper.h
+>> +++ b/target/riscv/helper.h
+>> @@ -240,3 +240,32 @@ DEF_HELPER_5(vlhuff_v_w, void, ptr, ptr, tl, env, i32)
+>>   DEF_HELPER_5(vlhuff_v_d, void, ptr, ptr, tl, env, i32)
+>>   DEF_HELPER_5(vlwuff_v_w, void, ptr, ptr, tl, env, i32)
+>>   DEF_HELPER_5(vlwuff_v_d, void, ptr, ptr, tl, env, i32)
+>> +#ifdef TARGET_RISCV64
+>> +DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoaddw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoaddd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoxorw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoxord_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoandw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoandd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoorw_v_d,   void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoord_v_d,   void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamominw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomind_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamominuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamominud_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxud_v_d, void, ptr, ptr, tl, ptr, env, i32)
+>> +#endif
+>> +DEF_HELPER_6(vamoswapw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoaddw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoxorw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoandw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamoorw_v_w,   void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamominw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamominuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+>> +DEF_HELPER_6(vamomaxuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+>> diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+>> index 380bf791bc..86153d93fa 100644
+>> --- a/target/riscv/insn32-64.decode
+>> +++ b/target/riscv/insn32-64.decode
+>> @@ -57,6 +57,17 @@ amomax_d   10100 . . ..... ..... 011 ..... 0101111 @atom_st
+>>   amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
+>>   amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
+>>
+>> +#*** Vector AMO operations (in addition to Zvamo) ***
+>> +vamoswapd_v     00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamoaddd_v      00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamoxord_v      00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamoandd_v      01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamoord_v       01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamomind_v      10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamomaxd_v      10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamominud_v     11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+>> +
+>>   # *** RV64F Standard Extension (in addition to RV32F) ***
+>>   fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
+>>   fcvt_lu_s  1100000  00011 ..... ... ..... 1010011 @r2_rm
+>> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+>> index b76c09c8c0..1330703720 100644
+>> --- a/target/riscv/insn32.decode
+>> +++ b/target/riscv/insn32.decode
+>> @@ -44,6 +44,7 @@
+>>   &u    imm rd
+>>   &shift     shamt rs1 rd
+>>   &atomic    aq rl rs2 rs1 rd
+>> +&rwdvm     vm wd rd rs1 rs2
+>>   &r2nfvm    vm rd rs1 nf
+>>   &rnfvm     vm rd rs1 rs2 nf
+>>
+>> @@ -67,6 +68,7 @@
+>>   @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
+>>   @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... &r2nfvm %nf %rs1 %rd
+>>   @r_nfvm  ... ... vm:1 ..... ..... ... ..... ....... &rnfvm %nf %rs2 %rs1 %rd
+>> +@r_wdvm  ..... wd:1 vm:1 ..... ..... ... ..... ....... &rwdvm %rs2 %rs1 %rd
+>>   @r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
+>>
+>>   @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+>> @@ -261,6 +263,17 @@ vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
+>>   vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
+>>   vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
+>>
+>> +#*** Vector AMO operations are encoded under the standard AMO major opcode ***
+>> +vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamoxorw_v      00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamoandw_v      01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamoorw_v       01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamominw_v      10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamomaxw_v      10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamominuw_v     11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+>> +
+>>   # *** new major opcode OP-V ***
+>>   vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>>   vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+>> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+>> index 9d9fc886d6..3c677160c5 100644
+>> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+>> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+>> @@ -600,3 +600,133 @@ GEN_VEXT_TRANS(vleff_v, 3, r2nfvm, ldff_op, ld_us_check)
+>>   GEN_VEXT_TRANS(vlbuff_v, 4, r2nfvm, ldff_op, ld_us_check)
+>>   GEN_VEXT_TRANS(vlhuff_v, 5, r2nfvm, ldff_op, ld_us_check)
+>>   GEN_VEXT_TRANS(vlwuff_v, 6, r2nfvm, ldff_op, ld_us_check)
+>> +
+>> +/*
+>> + *** vector atomic operation
+>> + */
+>> +typedef void gen_helper_amo(TCGv_ptr, TCGv_ptr, TCGv, TCGv_ptr,
+>> +        TCGv_env, TCGv_i32);
+>> +
+>> +static bool amo_trans(uint32_t vd, uint32_t rs1, uint32_t vs2,
+>> +        uint32_t data, gen_helper_amo *fn, DisasContext *s)
+>> +{
+>> +    TCGv_ptr dest, mask, index;
+>> +    TCGv base;
+>> +    TCGv_i32 desc;
+>> +
+>> +    dest = tcg_temp_new_ptr();
+>> +    mask = tcg_temp_new_ptr();
+>> +    index = tcg_temp_new_ptr();
+>> +    base = tcg_temp_new();
+>> +    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
+>> +
+>> +    gen_get_gpr(base, rs1);
+>> +    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
+>> +    tcg_gen_addi_ptr(index, cpu_env, vreg_ofs(s, vs2));
+>> +    tcg_gen_addi_ptr(mask, cpu_env, vreg_ofs(s, 0));
+>> +
+>> +    fn(dest, mask, base, index, cpu_env, desc);
+>> +
+>> +    tcg_temp_free_ptr(dest);
+>> +    tcg_temp_free_ptr(mask);
+>> +    tcg_temp_free_ptr(index);
+>> +    tcg_temp_free(base);
+>> +    tcg_temp_free_i32(desc);
+>> +    return true;
+>> +}
+>> +
+>> +static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
+>> +{
+>> +    uint32_t data = 0;
+>> +    gen_helper_amo *fn;
+>> +    static gen_helper_amo *const fnsw[9] = {
+>> +        /* no atomic operation */
+>> +        gen_helper_vamoswapw_v_w,
+>> +        gen_helper_vamoaddw_v_w,
+>> +        gen_helper_vamoxorw_v_w,
+>> +        gen_helper_vamoandw_v_w,
+>> +        gen_helper_vamoorw_v_w,
+>> +        gen_helper_vamominw_v_w,
+>> +        gen_helper_vamomaxw_v_w,
+>> +        gen_helper_vamominuw_v_w,
+>> +        gen_helper_vamomaxuw_v_w
+>> +    };
+>> +#ifdef TARGET_RISCV64
+>> +    static gen_helper_amo *const fnsd[18] = {
+>> +        gen_helper_vamoswapw_v_d,
+>> +        gen_helper_vamoaddw_v_d,
+>> +        gen_helper_vamoxorw_v_d,
+>> +        gen_helper_vamoandw_v_d,
+>> +        gen_helper_vamoorw_v_d,
+>> +        gen_helper_vamominw_v_d,
+>> +        gen_helper_vamomaxw_v_d,
+>> +        gen_helper_vamominuw_v_d,
+>> +        gen_helper_vamomaxuw_v_d,
+>> +        gen_helper_vamoswapd_v_d,
+>> +        gen_helper_vamoaddd_v_d,
+>> +        gen_helper_vamoxord_v_d,
+>> +        gen_helper_vamoandd_v_d,
+>> +        gen_helper_vamoord_v_d,
+>> +        gen_helper_vamomind_v_d,
+>> +        gen_helper_vamomaxd_v_d,
+>> +        gen_helper_vamominud_v_d,
+>> +        gen_helper_vamomaxud_v_d
+>> +    };
+>> +#endif
+>> +
+>> +    if (tb_cflags(s->base.tb) & CF_PARALLEL) {
+>> +        gen_helper_exit_atomic(cpu_env);
+>> +        s->base.is_jmp = DISAS_NORETURN;
+>> +        return true;
+>> +    } else {
+>> +        fn = fnsw[seq];
+>> +#ifdef TARGET_RISCV64
+>> +        if (s->sew == 3) {
+>> +            fn = fnsd[seq];
+>> +        }
+>> +#endif
+>> +    }
+>> +
+>> +    data = FIELD_DP32(data, VDATA, MLEN, s->mlen);
+>> +    data = FIELD_DP32(data, VDATA, VM, a->vm);
+>> +    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
+>> +    data = FIELD_DP32(data, VDATA, WD, a->wd);
+>> +    return amo_trans(a->rd, a->rs1, a->rs2, data, fn, s);
+>> +}
+>> +/*
+>> + * There are two rules check here.
+>> + *
+>> + * 1. SEW must be at least as wide as the AMO memory element size.
+>> + *
+>> + * 2. If SEW is greater than XLEN, an illegal instruction exception is raised.
+>> + */
+>> +static bool amo_check(DisasContext *s, arg_rwdvm* a)
+>> +{
+>> +    return (vext_check_isa_ill(s, RVV | RVA) &&
+>> +            (!a->wd || vext_check_overlap_mask(s, a->rd, a->vm, false)) &&
+>> +            vext_check_reg(s, a->rd, false) &&
+>> +            vext_check_reg(s, a->rs2, false) &&
+>> +            ((1 << s->sew) <= sizeof(target_ulong)) &&
+>> +            ((1 << s->sew) >= 4));
+>> +}
+>> +
+>> +GEN_VEXT_TRANS(vamoswapw_v, 0, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoaddw_v, 1, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoxorw_v, 2, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoandw_v, 3, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoorw_v, 4, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamominw_v, 5, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamomaxw_v, 6, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamominuw_v, 7, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamomaxuw_v, 8, rwdvm, amo_op, amo_check)
+>> +#ifdef TARGET_RISCV64
+>> +GEN_VEXT_TRANS(vamoswapd_v, 9, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoaddd_v, 10, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoxord_v, 11, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoandd_v, 12, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamoord_v, 13, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamomind_v, 14, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamomaxd_v, 15, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamominud_v, 16, rwdvm, amo_op, amo_check)
+>> +GEN_VEXT_TRANS(vamomaxud_v, 17, rwdvm, amo_op, amo_check)
+>> +#endif
+>> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+>> index 3841301b74..f9b409b169 100644
+>> --- a/target/riscv/vector_helper.c
+>> +++ b/target/riscv/vector_helper.c
+>> @@ -94,6 +94,11 @@ static inline uint32_t vext_lmul(uint32_t desc)
+>>       return FIELD_EX32(simd_data(desc), VDATA, LMUL);
+>>   }
+>>
+>> +static uint32_t vext_wd(uint32_t desc)
+>> +{
+>> +    return (simd_data(desc) >> 11) & 0x1;
+>> +}
+>> +
+>>   /*
+>>    * Get vector group length in bytes. Its range is [64, 2048].
+>>    *
+>> @@ -685,3 +690,141 @@ GEN_VEXT_LDFF(vlhuff_v_w, uint16_t, uint32_t, MO_LEUW, ldhu_w, clearl)
+>>   GEN_VEXT_LDFF(vlhuff_v_d, uint16_t, uint64_t, MO_LEUW, ldhu_d, clearq)
+>>   GEN_VEXT_LDFF(vlwuff_v_w, uint32_t, uint32_t, MO_LEUL, ldwu_w, clearl)
+>>   GEN_VEXT_LDFF(vlwuff_v_d, uint32_t, uint64_t, MO_LEUL, ldwu_d, clearq)
+>> +
+>> +/*
+>> + *** Vector AMO Operations (Zvamo)
+>> + */
+>> +typedef void (*vext_amo_noatomic_fn)(void *vs3, target_ulong addr,
+>> +        uint32_t wd, uint32_t idx, CPURISCVState *env, uintptr_t retaddr);
+>> +
+>> +/* no atomic opreation for vector atomic insructions */
+>> +#define DO_SWAP(N, M) (M)
+>> +#define DO_AND(N, M)  (N & M)
+>> +#define DO_XOR(N, M)  (N ^ M)
+>> +#define DO_OR(N, M)   (N | M)
+>> +#define DO_ADD(N, M)  (N + M)
+> Why don't these need to be atomic?
+>
+>> +
+>> +#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF) \
+>> +static void vext_##NAME##_noatomic_op(void *vs3,                \
+>> +            target_ulong addr, uint32_t wd, uint32_t idx,       \
+>> +                CPURISCVState *env, uintptr_t retaddr)          \
+>> +{                                                               \
+>> +    typedef int##ESZ##_t ETYPE;                                 \
+>> +    typedef int##MSZ##_t MTYPE;                                 \
+>> +    typedef uint##MSZ##_t UMTYPE __attribute__((unused));       \
+>> +    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);                         \
+>> +    MTYPE a = *pe3, b = cpu_ld##SUF##_data(env, addr);          \
+>> +    a = DO_OP(a, b);                                            \
+>> +    cpu_st##SUF##_data(env, addr, a);                           \
+>> +    if (wd) {                                                   \
+>> +        *pe3 = a;                                               \
+>> +    }                                                           \
+>> +}
+>> +
+>> +/* Signed min/max */
+>> +#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
+>> +#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
+>> +
+>> +/* Unsigned min/max */
+>> +#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
+>> +#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
+>> +
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_w, 32, 32, H4, DO_SWAP, l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_w,  32, 32, H4, DO_ADD,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_w,  32, 32, H4, DO_XOR,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_w,  32, 32, H4, DO_AND,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_w,   32, 32, H4, DO_OR,   l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_w,  32, 32, H4, DO_MIN,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_w,  32, 32, H4, DO_MAX,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_w, 32, 32, H4, DO_MINU, l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_w, 32, 32, H4, DO_MAXU, l)
+>> +#ifdef TARGET_RISCV64
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_d, 64, 32, H8, DO_SWAP, l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoswapd_v_d, 64, 64, H8, DO_SWAP, q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_d,  64, 32, H8, DO_ADD,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoaddd_v_d,  64, 64, H8, DO_ADD,  q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_d,  64, 32, H8, DO_XOR,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoxord_v_d,  64, 64, H8, DO_XOR,  q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_d,  64, 32, H8, DO_AND,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoandd_v_d,  64, 64, H8, DO_AND,  q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_d,   64, 32, H8, DO_OR,   l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamoord_v_d,   64, 64, H8, DO_OR,   q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_d,  64, 32, H8, DO_MIN,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomind_v_d,  64, 64, H8, DO_MIN,  q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_d,  64, 32, H8, DO_MAX,  l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxd_v_d,  64, 64, H8, DO_MAX,  q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_d, 64, 32, H8, DO_MINU, l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamominud_v_d, 64, 64, H8, DO_MINU, q)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
+>> +GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
+>> +#endif
+> I'm confused why these are different to
+>
+>> +
+>> +static inline void vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
+>> +        void *vs2, CPURISCVState *env, uint32_t desc,
+>> +        vext_get_index_addr get_index_addr,
+>> +        vext_amo_noatomic_fn noatomic_op,
+>> +        vext_ld_clear_elem clear_elem,
+>> +        uint32_t esz, uint32_t msz, uintptr_t ra)
+>> +{
+>> +    uint32_t i;
+>> +    target_long addr;
+>> +    uint32_t wd = vext_wd(desc);
+>> +    uint32_t vm = vext_vm(desc);
+>> +    uint32_t mlen = vext_mlen(desc);
+>> +    uint32_t vlmax = vext_maxsz(desc) / esz;
+>> +
+>> +    for (i = 0; i < env->vl; i++) {
+>> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
+>> +            continue;
+>> +        }
+>> +        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_LOAD);
+>> +        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_STORE);
+>> +    }
+>> +    for (i = 0; i < env->vl; i++) {
+>> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
+>> +            continue;
+>> +        }
+>> +        addr = get_index_addr(base, i, vs2);
+>> +        noatomic_op(vs3, addr, wd, i, env, ra);
+>> +    }
+>> +    clear_elem(vs3, env->vl, env->vl * esz, vlmax * esz);
+>> +}
+>> +
+>> +#define GEN_VEXT_AMO(NAME, MTYPE, ETYPE, INDEX_FN, CLEAR_FN)    \
+>> +void HELPER(NAME)(void *vs3, void *v0, target_ulong base,       \
+>> +        void *vs2, CPURISCVState *env, uint32_t desc)           \
+>> +{                                                               \
+>> +    vext_amo_noatomic(vs3, v0, base, vs2, env, desc,            \
+>> +        INDEX_FN, vext_##NAME##_noatomic_op, CLEAR_FN,          \
+>> +        sizeof(ETYPE), sizeof(MTYPE), GETPC());                 \
+>> +}
+>> +
+>> +#ifdef TARGET_RISCV64
+>> +GEN_VEXT_AMO(vamoswapw_v_d, int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoswapd_v_d, int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoaddw_v_d,  int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoaddd_v_d,  int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoxorw_v_d,  int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoxord_v_d,  int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoandw_v_d,  int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoandd_v_d,  int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoorw_v_d,   int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamoord_v_d,   int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamominw_v_d,  int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamomind_v_d,  int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamomaxw_v_d,  int32_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamomaxd_v_d,  int64_t,  int64_t,  idx_d, clearq)
+>> +GEN_VEXT_AMO(vamominuw_v_d, uint32_t, uint64_t, idx_d, clearq)
+>> +GEN_VEXT_AMO(vamominud_v_d, uint64_t, uint64_t, idx_d, clearq)
+>> +GEN_VEXT_AMO(vamomaxuw_v_d, uint32_t, uint64_t, idx_d, clearq)
+>> +GEN_VEXT_AMO(vamomaxud_v_d, uint64_t, uint64_t, idx_d, clearq)
+>> +#endif
+>> +GEN_VEXT_AMO(vamoswapw_v_w, int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamoaddw_v_w,  int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamoxorw_v_w,  int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamoandw_v_w,  int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamoorw_v_w,   int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamominw_v_w,  int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamomaxw_v_w,  int32_t,  int32_t,  idx_w, clearl)
+>> +GEN_VEXT_AMO(vamominuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+>> +GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
+> These?
+GEN_VEXT_AMO is to generate atomic helper functions.
+GEN_VEXT_AMO_NOATOMIC_OP is  to generate a function to process just one 
+element in the vector register groups,
+which will be used in atomic helper functions.
 
-> ---
->  qapi/char.json     | 32 ++++++++++++++++++++++++++++++++
->  qapi/misc.json     | 32 --------------------------------
->  monitor/qmp-cmds.c |  1 +
->  3 files changed, 33 insertions(+), 32 deletions(-)
+Once before there were to macros for atomic operation, 
+GEN_VEXT_AMO_ATOMIC_OP and GEN_VEXT_AMO_NOATOMIC_OP.
+Therefore two OPS were available for atomic instructions elements. When 
+needs paralell, it will use ATOMIC_OP, otherwise
+use the NOATOMIC_OP.
+
+However GEN_VEXT_AMO_ATOMIC_OP needs call some atomic helpers in TCG 
+runtime.
+The atomic helpers are designed for atomic TCG IR. I can only use them 
+with very cautiously.
+
+As Richard suggests, I should not use the atomic helpers in vector 
+helpers.  An atomic op will be
+replaced by an atomic exit exception and a noatomic op.
+
+That's the reason why I name it GEN_VEXT_AMO_NOATOMIC_OP. If in the 
+future,  the proper
+atomic APIs were created, I will also add  a GEN_VEXT_AMO_ATOMIC_OP 
+macro here.
+
+Zhiwei
+
 >
-> diff --git a/qapi/char.json b/qapi/char.json
-> index 6907b2bfdb..8b7baf11eb 100644
-> --- a/qapi/char.json
-> +++ b/qapi/char.json
-> @@ -572,3 +572,35 @@
->  { 'event': 'VSERPORT_CHANGE',
->    'data': { 'id': 'str',
->              'open': 'bool' } }
-> +
-> +##
-> +# @add_client:
-> +#
-> +# Allow client connections for VNC, Spice and socket based
-> +# character devices to be passed in to QEMU via SCM_RIGHTS.
-> +#
-> +# @protocol: protocol name. Valid names are "vnc", "spice" or the
-> +#            name of a character device (eg. from -chardev id=3DXXXX)
-> +#
-> +# @fdname: file descriptor name previously passed via 'getfd' command
-> +#
-> +# @skipauth: whether to skip authentication. Only applies
-> +#            to "vnc" and "spice" protocols
-> +#
-> +# @tls: whether to perform TLS. Only applies to the "spice"
-> +#       protocol
-> +#
-> +# Returns: nothing on success.
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "add_client", "arguments": { "protocol": "vnc",
-> +#                                              "fdname": "myclient" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +{ 'command': 'add_client',
-> +  'data': { 'protocol': 'str', 'fdname': 'str', '*skipauth': 'bool',
-> +            '*tls': 'bool' } }
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index c18fe681fb..e84e6823e9 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -39,38 +39,6 @@
->  { 'enum': 'LostTickPolicy',
->    'data': ['discard', 'delay', 'slew' ] }
+> Alistair
 >
-> -##
-> -# @add_client:
-> -#
-> -# Allow client connections for VNC, Spice and socket based
-> -# character devices to be passed in to QEMU via SCM_RIGHTS.
-> -#
-> -# @protocol: protocol name. Valid names are "vnc", "spice" or the
-> -#            name of a character device (eg. from -chardev id=3DXXXX)
-> -#
-> -# @fdname: file descriptor name previously passed via 'getfd' command
-> -#
-> -# @skipauth: whether to skip authentication. Only applies
-> -#            to "vnc" and "spice" protocols
-> -#
-> -# @tls: whether to perform TLS. Only applies to the "spice"
-> -#       protocol
-> -#
-> -# Returns: nothing on success.
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "add_client", "arguments": { "protocol": "vnc",
-> -#                                              "fdname": "myclient" } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'add_client',
-> -  'data': { 'protocol': 'str', 'fdname': 'str', '*skipauth': 'bool',
-> -            '*tls': 'bool' } }
-> -
->  ##
->  # @NameInfo:
->  #
-> diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-> index 864cbfa32e..67d95b4af7 100644
-> --- a/monitor/qmp-cmds.c
-> +++ b/monitor/qmp-cmds.c
-> @@ -31,6 +31,7 @@
->  #include "sysemu/block-backend.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-block.h"
-> +#include "qapi/qapi-commands-char.h"
->  #include "qapi/qapi-commands-control.h"
->  #include "qapi/qapi-commands-machine.h"
->  #include "qapi/qapi-commands-misc.h"
-> --
-> 2.21.1
->
+>> --
+>> 2.23.0
+>>
 
 
