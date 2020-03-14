@@ -2,91 +2,86 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93407C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 15:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B57FC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 16:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52D252076A
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 15:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C34920781
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 16:51:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T1FdWBxW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D252076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzV4jrFI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C34920781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD8hT-0003Ur-Gf
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 11:27:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39044)
+	id 1jDA0G-00024I-HS
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 12:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jD8gp-0002u8-6x
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 11:27:04 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1jD9zZ-0001Zg-M3
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 12:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jD8gn-00052l-UX
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 11:27:02 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52529)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1jD9zY-00079N-2D
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 12:50:29 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36017)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jD8gn-00050R-M5
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 11:27:01 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 11so13009209wmo.2
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 08:27:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=8urM7fjhYUuOPh9InO+PZN7OPZ1xSvShLOU4AUd2NuY=;
- b=T1FdWBxWhgMhm+C3uX9/tOuSi9T8RA8DrZuPRyU85PpbUdUpvRC7TALNYv19zndLkG
- iDMd+K2+/rSqd43/I76F9Nj/3eDa03rZebMUuWl8SOOVqifKcHUDdUk/wd11PdU4nzas
- Z0yPr382skpHLl8fA4UItsQowJI0pXJ4iZNk9h8msy9oJ7+IrKOhtzXNxUgUL4I3isw3
- SIaDvQNFPsWJ/xE3NsaogogQCYlblxLfaAuNZsqH/rby1NGClBP2I7QQGpjIw9/O45R/
- mykatcq3WIkJd9PbmoxkT8OO1LLw9h/SouGA0gNDerDDduQY3Pvr/og399OBwa5qbxzp
- 7TpQ==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jD9zX-00074K-Td
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 12:50:28 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k18so13053552oib.3
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 09:50:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ektfUbo1SBT4U2kfnVdISmux4RrqxQnRFs9BuEs5sJg=;
+ b=pzV4jrFI4wsCIz24TMfbIWEqFBPhldlKHmYhVbwu/d2MgOk29tesQryrLxwtkrVxjR
+ BZjj7lJxrTO7T0bCmWaZldZUX4QCWxLD3NaAITojY5GBxv4j/WCValSDBJALVfzJAQeJ
+ FV9+SsmUFsJBZowS0bag2wQo4mmjR71B3iJY4WlqlX1SOAJ4vArSfVq+USCz4TRqjIY5
+ 9yDixbGdAH2mjG1IuIGkt0HvrFuYVV8Pt7ccDSb/bj+AK2u9G0Q2NlC67GQeuAH+e2s2
+ Uiipyt+Bk39kD2RwqhRLhU0izjqpYBogtE6Br/mE4Zq2fFxAzoFGJ1lNUtY9sYTKVcu7
+ bbQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=8urM7fjhYUuOPh9InO+PZN7OPZ1xSvShLOU4AUd2NuY=;
- b=b/PgwWWXnERgAmaD1BfJbrScIhbRSjOUkbML+CqxhzJ2Zv9OSB/VKIsD1uBA9ibkAu
- 5tHlfKO5JyuFtI5RYDqdGVKmWwJHPmFMsbGY0LcPWe+SdrMUFqTexh2Lyt942Vd1mjmJ
- DOUYPpr/XsjUJUcvibzXE3tU16wda8WevwDW+CPj7AmRnYVlhqNLLV0L+8zZAYmSZto5
- fU+MOW+xC0KaytvME1svWwm3zfxdMiH0mFIMWyOvxq3OBo3EinSVM/5l9Pcid5T0mmui
- 2pWA2CUkgzNEN21NtYwA6XQfYZxxiwfiy7C4NiCpX7CRmBn9N26H9srQ+DVlJxcnKrI7
- gJiA==
-X-Gm-Message-State: ANhLgQ3GUcmX+XHvgWx8vW9vr3wAfQimjCguJKiHYYwIBtUkXbRV/EZ6
- BnopstdQ9xa9mtBhVgGszuvTYA==
-X-Google-Smtp-Source: ADFU+vusAQy0G9cVtT7//VB2EXBhsHs1mIHYtUfRX8qdxiSoMMUTlF7CNPbIP4B6DTAOS7FADFZcdQ==
-X-Received: by 2002:a7b:c0c7:: with SMTP id s7mr16558733wmh.187.1584199620197; 
- Sat, 14 Mar 2020 08:27:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m11sm37950077wrn.92.2020.03.14.08.26.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Mar 2020 08:26:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9CD2C1FF7E;
- Sat, 14 Mar 2020 15:26:57 +0000 (GMT)
-References: <20200312193616.438922-1-crosa@redhat.com>
- <20200312193616.438922-3-crosa@redhat.com>
-User-agent: mu4e 1.3.9; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH 2/5] tests/docker: make "buildah bud" output similar to
- "docker build"
-In-reply-to: <20200312193616.438922-3-crosa@redhat.com>
-Date: Sat, 14 Mar 2020 15:26:57 +0000
-Message-ID: <87h7yrneim.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ektfUbo1SBT4U2kfnVdISmux4RrqxQnRFs9BuEs5sJg=;
+ b=ufqk9l/mB3gxvuljRMYWclu3zv5J3JXMjPfLivSFV5loOR6vCm7FmvT706Nnn2Z1cv
+ YyPNsFSjN9wCuZvmsOMbTi3a/Tr31FMsNUbSoowqzA4b0Ywi/Y+0bX6MO6KtH7qL84YT
+ jrxeSnsBVSNaIP3E3slTMcUKJqvHRzrikTcA2TRR+fgN0Jm7M8Ev8EoGqL976Z0ff11d
+ 992XiWjoBDO3xvYa9LuJx0MABrKLtabhnTDfy0G1q4Mw8abWrle9u1EiTa50PawJATZx
+ 6JAxDB8wMBDJVegiH1I7UuFlc+Jwn6041QXhzPEzpxTMqJz6gqvoRSEnknAinW0QsbVq
+ GtwA==
+X-Gm-Message-State: ANhLgQ1Y+GeFcg7n1c4rdA8nV1+jW4BCl+Rr0uQ8MwJzmwcisxvyZhG4
+ uxYwIhtTdIL1fhvmnCpSX2vJZwZI1mk1leR5FKE=
+X-Google-Smtp-Source: ADFU+vtIM9QK0TpJ+kR9QBhkN2sR4UWxWoxP6nQJoeMAseRaF5IcS06NGEds2BIfXLBFBmqI/sml5f3wOxYsxDZQqiw=
+X-Received: by 2002:aca:3c45:: with SMTP id j66mr11722831oia.62.1584204625852; 
+ Sat, 14 Mar 2020 09:50:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20200228032613.1049955-1-jiaxun.yang@flygoat.com>
+ <20200303004137.1099502-1-jiaxun.yang@flygoat.com>
+ <6b4a7564-eac6-7bd3-b1c0-e9c7ac4e0c80@redhat.com>
+ <CAL1e-=gEtCtAnsnkO4_E8rqje=n1bHXY_+BXC5P2h5Ld0umNtQ@mail.gmail.com>
+ <d9f08408-9c1e-36d9-869b-bac250c6f027@redhat.com>
+ <170d9007c8b.13c0df0018230.8565583190152644951@flygoat.com>
+In-Reply-To: <170d9007c8b.13c0df0018230.8565583190152644951@flygoat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 14 Mar 2020 17:50:14 +0100
+Message-ID: <CAL1e-=hty0caX_odd_ere0E6rx3yXdhhSx=Dxm7Z+uN=SR84jg@mail.gmail.com>
+Subject: Re: [PATCH v1] mips/mips_malta: Allow more than 2G RAM
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,58 +93,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
- Erik Skultety <eskultet@redhat.com>, Wainer Moschetta <wmoschet@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Yunqiang Su <ysu@wavecomp.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paul Burton <paul.burton@mips.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Cleber Rosa <crosa@redhat.com> writes:
-
-> Podman users will most often be using buildah to build containers.
-> Among the differences between "buildah bud|build-using-dockerfile" and
-> a traditional "docker build" is that buildah does not run a container
-> during build.
+On Sat, Mar 14, 2020 at 1:28 PM Jiaxun Yang <jiaxun.yang@flygoat.com> wrote=
+:
 >
-> To the best of my knowledge and experiments, this means that runtime
-> variables, such as ENV from one base image will not propagate into
-> another.  The end result is that the location for the cross compiler
-> binaries, defined in the base "qemu/debian9-mxe" image, are not passed
-> through this image.  Consequently, the cross compilers are not on PATH
-> and the build fails.
 >
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-
-Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tests/docker/dockerfiles/debian-win32-cross.docker | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/tests/docker/dockerfiles/debian-win32-cross.docker b/tests/d=
-ocker/dockerfiles/debian-win32-cross.docker
-> index 9d7053e59d..d16d6431bc 100644
-> --- a/tests/docker/dockerfiles/debian-win32-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-win32-cross.docker
-> @@ -9,7 +9,7 @@ MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20=20
->  ENV TARGET i686
->=20=20
-> -ENV PATH $PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/bin
-> +ENV PATH $PATH:/usr/lib/mxe/usr/bin:/usr/lib/mxe/usr/$TARGET-w64-mingw32=
-.shared/bin
->=20=20
->  ENV PKG_CONFIG_PATH \
->      $PKG_CONFIG_PATH:/usr/lib/mxe/usr/$TARGET-w64-mingw32.shared/lib/pkg=
-config
+>  ---- =E5=9C=A8 =E6=98=9F=E6=9C=9F=E5=85=AD, 2020-03-14 17:09:08 Philippe=
+ Mathieu-Daud=C3=A9 <philmd@redhat.com> =E6=92=B0=E5=86=99 ----
+>  > Hi Aleksandar,
+>  >
+>
+>  > >>
+>  > >> This is annoying, because the CoreLV/CoreFPGA core cards only have =
+4
+>  > >> DIMM slots for PC-100 SDRAM, and the Memory Controller of the GT=E2=
+=80=9364120A
+>  > >> north bridge accept at most 256 MiB per SCS for address decoding, s=
+o we
+>  > >> have a maximum of 1 GiB on 32-bit boards.
+>  > >>
+>  > >> In 64-bit emulation we use the a 20Kc core, provided by the Core20K=
+ core
+>  > >> card which doesn't use the GT=E2=80=9364120A but the Bonito64. So t=
+he model is
+>  > >> incorrect... The Bonito64 indeed allow more memory.
+>  > >>
+>  > >> Maybe it is time to consider that for 64-bit targets, since we are =
+not
+>  > >> modelling a Malta core board, we can name it the official 'virt' ma=
+chine...
+>  > >>
+>  > >
+>  > > Philippe, I almost agree 100% with you wrt last three paragraphs.
+>  > > (in any case, I know much less than you about details of GT-64120A
+>  > > and Bonito64, but I trust you).
+>  > >
+>  > > The only area I have a slightly different opinion is that I believe =
+we
+>  > > should never declare Malta as a virtual board, and try to be within =
+the
+>  > > boundaries of physical capabilities of real boards, even if in softw=
+are
+>  > > (QEMU) we could "enhance" some features.
+>  > >
+>  > > If we want MIPS virtual board, than we should devise a full blown
+>  > > virtual board, similar to what was already done for MIPS Android
+>  > > emulator. I really don't want some real/virtual frankenstein in QEMU
+>  > > upstream just because it is convenient for let's say a particular
+>  > > test setup.
+>
+> So probably it's time to work on a "virt" machine. What style would you p=
+refer?
+> PC-like or SoC style?
+>
 
+It is time, agreed.
 
---=20
-Alex Benn=C3=A9e
+Let's explore multiple alternatives, analyze pros and cons, and not rush
+into conclusions. There are several important factors to take into account:
+presence of kernel and QEMU support for involved devices, target users,
+other virtual machines in QEMU, relation to the general QEMU architecture,
+available time resources, etc.
+
+> In fact we've got two pseudo board (mips, mipssim) for MIPS,
+> but non of them seems modern enough.
+>
+
+They are terribly outdated, true.
+
+> I can launch a Loongson-3 style board after dealing with Kernel code clea=
+n-up.
+>
+
+Absolutely! You would be welcomed.
+
+Yours,
+Aleksandar
+
+>  >
+>  > IIUC today all distributions supporting MIPS ports are building their
+>  > MIPS packages on QEMU instances because it is faster than the native
+>  > MIPS hardware they have.
+>  >
+>  > Since one (or two?) years, some binaries (Linux kernel? QEMU?) are
+>  > failing to link because the amount of guest memory is restricted to 2G=
+B
+>  > (probably advance of linker techniques, now linkers use more memory).
+>  >
+>  > YunQiang, is this why you suggested this change?
+>  >
+>  > See:
+>  > - https://www.mail-archive.com/debian-mips@lists.debian.org/msg10912.h=
+tml
+>  > -
+>  > https://alioth-lists.debian.net/pipermail/pkg-rust-maintainers/2019-Ja=
+nuary/004844.html
+>  >
+>  > I believe most of the QEMU Malta board users don't care it is a Malta
+>  > board, they only care it is a fast emulated MIPS machine.
+>  > Unfortunately it is the default board.
+>
+> Yeah. That's the truth.
+>
+>  >
+>  > However 32-bit MIPS port is being dropped on Debian:
+>  > https://lists.debian.org/debian-mips/2019/07/msg00010.html
+>
+> mipsel (MIPS 32-bit Little Endian) is still alive. I believe Debian won't=
+ give up it as long as i386
+> still exist.
+>
+>  >
+>  > Maybe we can sync with the Malta users, ask them to switch to the Bost=
+on
+>  > machines to build 64-bit packages, then later reduce the Malta board t=
+o 1GB.
+>  > (The Boston board is more recent, but was not available at the time
+>  > users started to use QEMU to build 64-bit packages).
+>  >
+>  > Might it be easier starting introducing a malta-5.0 machine restricted
+>  > to 1GB?
+>  >
+>  > >
+>  > > Aleksandar
+>  > >
+>  > >>>            exit(1);
+>  > >>>        }
+>  > >>> +#endif
+>  > >>>
+>  > >>>        /* register RAM at high address where it is undisturbed by =
+IO */
+>  > >>>        memory_region_add_subregion(system_memory, 0x80000000, mach=
+ine->ram);
+>  > >>>
+>  > >>
+>  > >>
+>  > >
+>  >
+>  >
+>
+>
+> --
+> Jiaxun Yang
+>
 
