@@ -2,87 +2,100 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50624C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A6C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A5552076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:47:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A5552076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 45A682076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:57:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cxcKEWoT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A682076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD5Ft-0001Xf-Sj
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 07:47:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57683)
+	id 1jD5QS-0003Wq-Cy
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 07:57:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD5F9-00010W-HH
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:46:16 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jD5Pl-00032m-Tt
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD5F8-0001Vf-CM
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:46:15 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:54468
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jD5F5-0000xh-QH; Sat, 14 Mar 2020 07:46:11 -0400
-Received: from host86-185-91-43.range86-185.btcentralplus.com ([86.185.91.43]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jD5FF-00070z-PD; Sat, 14 Mar 2020 11:46:26 +0000
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ (envelope-from <pbonzini@redhat.com>) id 1jD5Pk-0000N5-SG
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:13 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37794
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jD5Pk-0000MV-Ow
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:57:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584187032;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/RDGrCEDAnanedxqDRAPayWeL+3o1d/ZHi8nvCpSYCQ=;
+ b=cxcKEWoTvzoufnEnipYAp432IQkaIM4OcaSiGi4JJ2euQ6U939Ww1XcAi8E1dx+Aaov2VU
+ CaXM5tPnYqVB/Hbz5MeL8h/GLGL+IzRq9ZL5LY/P7OlH4o/umSkspHZZRnWmR2yAepNv6g
+ +Uy93d+lPUleB1VITVcfsUTNjRJTnjE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-uHpijvfJM0ukZCpY0eLJKw-1; Sat, 14 Mar 2020 07:57:08 -0400
+X-MC-Unique: uHpijvfJM0ukZCpY0eLJKw-1
+Received: by mail-wr1-f69.google.com with SMTP id u18so5800097wrn.11
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 04:57:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/RDGrCEDAnanedxqDRAPayWeL+3o1d/ZHi8nvCpSYCQ=;
+ b=Ldio1ycuArkuoEy105wPE6bXG8F5enm+2753Xrj9TD9vmAYoO3v1bgGQR2nhQSkosz
+ qtkM4Am4BuHsBk0HwKGrYPvqTqcGGhvkab+r+3LIxJFbQiR3xH+tijQwBTB30UIN0/tk
+ 0InoBBYiMz+swiTi0DJUXU/vzqvltBXdE0JK+fRfb06qSpU8wU+E+V8IjxlVpWOdq3bJ
+ oWmvHBDdSWAY6lQdEgc6sbTxcCx9efCHWPuwVyVx9S/hi9f2nxp70aMRb9Rp6F8RJ3wW
+ V2rAe0EQBur/5LN/6pbPAa3kUBvyvg/GJYa3GUsc5wRoLrVYCQ9K0EdjvzTPpYsciliQ
+ QUYA==
+X-Gm-Message-State: ANhLgQ3YgwZS2skE0ykmglq0AQynkg2CONFZyDuNeIPsWntB3kKaFHuT
+ oEtQ7pRDo2kATxL+w4vHFo1cNGb+D+bIzWxEVjcjVc70axehDQeff4C6pVEXQYvwAMldD26nYbq
+ 9MTn0+YSOae3L1WE=
+X-Received: by 2002:adf:ecc7:: with SMTP id s7mr24224768wro.386.1584187027676; 
+ Sat, 14 Mar 2020 04:57:07 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsZygnv+c0/s3Zg9yoN8czLoU36+Mn3N5U+B6997si62TFYDxL9m68VQ5XzeGI/LuScXUcPdA==
+X-Received: by 2002:adf:ecc7:: with SMTP id s7mr24224734wro.386.1584187027381; 
+ Sat, 14 Mar 2020 04:57:07 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.174.5])
+ by smtp.gmail.com with ESMTPSA id n2sm16375368wrr.62.2020.03.14.04.57.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 14 Mar 2020 04:57:06 -0700 (PDT)
+Subject: Re: [PATCH 0/8] Misc hw/ide legacy clean up
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
  qemu-block@nongnu.org
 References: <cover.1584134074.git.balaton@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <22f580a9-7919-773a-c1a9-cc59af7166da@ilande.co.uk>
-Date: Sat, 14 Mar 2020 11:45:53 +0000
+ <22f580a9-7919-773a-c1a9-cc59af7166da@ilande.co.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <402c7097-2198-d43a-1064-22261408eb9b@redhat.com>
+Date: Sat, 14 Mar 2020 12:54:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <cover.1584134074.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <22f580a9-7919-773a-c1a9-cc59af7166da@ilande.co.uk>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.185.91.43
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 0/8] Misc hw/ide legacy clean up
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,59 +108,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, philmd@redhat.com, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ philmd@redhat.com, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/03/2020 21:14, BALATON Zoltan wrote:
-
-> These are some clean ups to remove more legacy init functions and
-> lessen dependence on include/hw/ide.h with some simplifications in
-> board code. There should be no functional change.
+On 14/03/20 12:45, Mark Cave-Ayland wrote:
+> On 13/03/2020 21:14, BALATON Zoltan wrote:
 > 
-> BALATON Zoltan (8):
->   hw/ide: Get rid of piix3_init functions
->   hw/ide: Get rid of piix4_init function
->   hw/ide: Remove now unneded #include "hw/pci/pci.h" from hw/ide.h
->   hw/ide: Move MAX_IDE_BUS define to one header
->   hw/ide/pci.c: Coding style update to fix checkpatch errors
->   hw/ide: Do ide_drive_get() within pci_ide_create_devs()
->   hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
->   hw/ide: Remove unneeded inclusion of hw/ide.h
+>> These are some clean ups to remove more legacy init functions and
+>> lessen dependence on include/hw/ide.h with some simplifications in
+>> board code. There should be no functional change.
+>>
+>> BALATON Zoltan (8):
+>>   hw/ide: Get rid of piix3_init functions
+>>   hw/ide: Get rid of piix4_init function
+>>   hw/ide: Remove now unneded #include "hw/pci/pci.h" from hw/ide.h
+>>   hw/ide: Move MAX_IDE_BUS define to one header
+>>   hw/ide/pci.c: Coding style update to fix checkpatch errors
+>>   hw/ide: Do ide_drive_get() within pci_ide_create_devs()
+>>   hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
+>>   hw/ide: Remove unneeded inclusion of hw/ide.h
+>>
+>>  hw/alpha/dp264.c              | 15 +++------------
+>>  hw/hppa/hppa_sys.h            |  1 -
+>>  hw/hppa/machine.c             |  3 ---
+>>  hw/i386/pc_piix.c             | 20 +++++++++-----------
+>>  hw/ide/ahci_internal.h        |  1 +
+>>  hw/ide/pci.c                  | 10 ++++++----
+>>  hw/ide/piix.c                 | 31 +------------------------------
+>>  hw/isa/piix4.c                | 14 +++++---------
+>>  hw/mips/mips_fulong2e.c       |  6 +-----
+>>  hw/mips/mips_malta.c          |  6 ++----
+>>  hw/mips/mips_r4k.c            |  4 +---
+>>  hw/ppc/mac_newworld.c         |  2 --
+>>  hw/ppc/mac_oldworld.c         |  2 --
+>>  hw/ppc/prep.c                 |  3 ---
+>>  hw/sparc64/sun4u.c            |  7 +------
+>>  include/hw/ide.h              |  6 ------
+>>  include/hw/ide/internal.h     |  3 +++
+>>  include/hw/ide/pci.h          |  3 ++-
+>>  include/hw/misc/macio/macio.h |  1 +
+>>  include/hw/southbridge/piix.h |  3 +--
+>>  20 files changed, 37 insertions(+), 104 deletions(-)
 > 
->  hw/alpha/dp264.c              | 15 +++------------
->  hw/hppa/hppa_sys.h            |  1 -
->  hw/hppa/machine.c             |  3 ---
->  hw/i386/pc_piix.c             | 20 +++++++++-----------
->  hw/ide/ahci_internal.h        |  1 +
->  hw/ide/pci.c                  | 10 ++++++----
->  hw/ide/piix.c                 | 31 +------------------------------
->  hw/isa/piix4.c                | 14 +++++---------
->  hw/mips/mips_fulong2e.c       |  6 +-----
->  hw/mips/mips_malta.c          |  6 ++----
->  hw/mips/mips_r4k.c            |  4 +---
->  hw/ppc/mac_newworld.c         |  2 --
->  hw/ppc/mac_oldworld.c         |  2 --
->  hw/ppc/prep.c                 |  3 ---
->  hw/sparc64/sun4u.c            |  7 +------
->  include/hw/ide.h              |  6 ------
->  include/hw/ide/internal.h     |  3 +++
->  include/hw/ide/pci.h          |  3 ++-
->  include/hw/misc/macio/macio.h |  1 +
->  include/hw/southbridge/piix.h |  3 +--
->  20 files changed, 37 insertions(+), 104 deletions(-)
+> This looks like a good clean-up to me, but certainly it would be good to get a second
+> opinion from people more familiar with the IDE code internals.
+> 
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This looks like a good clean-up to me, but certainly it would be good to get a second
-opinion from people more familiar with the IDE code internals.
+Yes, it looks good to me.  Thanks!
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Paolo
 
-
-ATB,
-
-Mark.
 
