@@ -2,98 +2,95 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F0BC0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 140EBC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7180420751
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC0B420784
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 18:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xp+cgMDc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7180420751
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPA69H4+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0B420784
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDBRU-0000Gd-E7
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 14:23:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38233)
+	id 1jDBTy-0001XN-1y
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 14:25:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39501)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jDBQr-00088I-65
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:22:46 -0400
+ (envelope-from <mst@redhat.com>) id 1jDBTB-0000rD-NS
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jDBQp-00016y-8J
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:22:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27703
+ (envelope-from <mst@redhat.com>) id 1jDBTA-0007kA-Mn
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:09 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31854
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDBQp-00012r-4r
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:22:43 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDBTA-0007ip-IV
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 14:25:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584210162;
+ s=mimecast20190719; t=1584210308;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IQb+iBTnzwuymekHVpiE0GaqWaAtgh1LKmDD/jRfaRE=;
- b=Xp+cgMDcEuQEqXMVQFsj+rdSIcmkc0Fj3Hpnv5BjD2HpO3mwUoPE+evXf16yG27BNj7f0k
- vvngN7OHt+Bqf57KElgTbGG5/7LAUPgHM/TWsh2vUEnQmdRG3Etfdg2DLN0y7fqu00q9UI
- JSHMnRuND7sglDxzteDtVmNArkuLsR8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-CKnhZH5cNIuWvLSOmSkIbA-1; Sat, 14 Mar 2020 14:22:40 -0400
-X-MC-Unique: CKnhZH5cNIuWvLSOmSkIbA-1
-Received: by mail-wr1-f71.google.com with SMTP id u18so6211495wrn.11
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 11:22:40 -0700 (PDT)
+ bh=BHxABOPYrTd5jeH4kQ73qkR1EKA7pAk8OhssJ55BfO0=;
+ b=VPA69H4+6PiJ8kcZ8qNdxnzik3ZWv0vR4DtCQVhhKZWAfWzp3rrhI3Vcw5LtAk8Rur9eLi
+ cfnJ+ETKEKfIxOxYKoobhu9p7mPwYxV5jyxYNRxcumtjcUjY4gT2BVLWv2dMCM8+5K9A3j
+ axNojTRyokSh3kCRcvWU9tRS6QxVV+g=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-TLrcpO8PMNmYOtzw39Wn6w-1; Sat, 14 Mar 2020 14:25:06 -0400
+X-MC-Unique: TLrcpO8PMNmYOtzw39Wn6w-1
+Received: by mail-wr1-f72.google.com with SMTP id c6so6219211wrm.18
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 11:25:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=nvX4hyRK+FdnahxsvXMFwjI5fSn9UQUuLFLcGpb+YCs=;
- b=gou5pVFY7NkAgm10Ysz1lYpCmKndnXuSd4k4uC62pTUXpic2RidJjqzrPdbFBEYKEP
- 59vbW4SSl+DZy6sMJLRduhXiINbgEgImzSPW+YcXuBr3Uw1Md9JeHtHTyRt3z0IgNLOH
- YbNUmts+YlbFmo8skxvkjVWt1DiAcI1gIQBeWrZn1zzVR9luDul/EewAI8IjZ9DPpgTY
- ovmPzOzIu1e8e5gobNMUsNxff3z5magf0P+YqQINnKWEnfbdEQvHpjWP3y/9wkVfebDI
- DVx3ZNdBl5+SG+FYrCbfGqoLguAi/wHeZQSDkHMo609wxYzpKmhu1YBCOUxUdqukWsA2
- cFlQ==
-X-Gm-Message-State: ANhLgQ3GyfOIU7eO/6h2rysYTscoVHompY9e6FaZVf3Ctz+RBT9eewD0
- yfzLUywrdfRhFXSYkTAhgUfz8xRlR/1A7ZIiw31OSfQCww+VkRWul2JAbk5aq30QGezR4yWkw3B
- mf66AP0wLv6rSUbE=
-X-Received: by 2002:adf:f583:: with SMTP id f3mr6714649wro.243.1584210159505; 
- Sat, 14 Mar 2020 11:22:39 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvVREQqP5FW/+StaM0Ice/ouR7BrgiEMgy6Njnq+MZGD8V1g0t7DF5o0X//NdIQQkuxb9sqMQ==
-X-Received: by 2002:adf:f583:: with SMTP id f3mr6714632wro.243.1584210159250; 
- Sat, 14 Mar 2020 11:22:39 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=Acr2+zOvPR3PR1E65IrotLByvZr1MWpy53iUxFf29n4=;
+ b=b//Y7uFjROu/tqAJlrZn0f2XJIGBnuoztpjptB3P+AZ3KnzuLHPueNAw2lqJ63mWVH
+ DdbIUNtKyBgvtkuc1APuC9ChfbBwTnZtAxINFsyxMDS9FYE/61ZQimz6lLNoSAAuj6+i
+ YQ7NTFkf6wTIPBwl+5xe8gFpTqyh5Whw86pBUd1jmVIYshNJUnTZS3MQ7sNm+urq5r6G
+ j0DOesHfIrzQDCc/idymqVW8TScNnbp24J0a/JYOPP692AngSAS+zri7cLNfgLNvDFtj
+ d5f7tDTaDviISqQv0sSH15aZlhALTDPHseYTNXbzUjhI+wc43EuDQkoOPv86Mctxn3Ih
+ WRoA==
+X-Gm-Message-State: ANhLgQ1RrORQ4ds/krvKupNqZHU7YIpDhNGlowupGsIzyqaIF2/5JerS
+ oo9PNdEHD0GofF1dSWA0aOsfZLw5XaeM5gTU3THJ76BvrJs6TtOxlacn4U0FtsoCUIGsVY4kZrk
+ 62E0trF3mQkZCJac=
+X-Received: by 2002:adf:9d8f:: with SMTP id p15mr24652321wre.160.1584210305273; 
+ Sat, 14 Mar 2020 11:25:05 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvlUh91wmcMMIKTh+kVxgbWGDCjrilei4ihGgfdPGR/g1JuXFerJUkbiE2iICP3G1MmPGLEDA==
+X-Received: by 2002:adf:9d8f:: with SMTP id p15mr24652305wre.160.1584210305090; 
+ Sat, 14 Mar 2020 11:25:05 -0700 (PDT)
 Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
  by smtp.gmail.com with ESMTPSA id
- o3sm23896329wme.36.2020.03.14.11.22.37
+ w1sm20743305wmc.11.2020.03.14.11.25.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Mar 2020 11:22:38 -0700 (PDT)
-Date: Sat, 14 Mar 2020 14:22:36 -0400
+ Sat, 14 Mar 2020 11:25:04 -0700 (PDT)
+Date: Sat, 14 Mar 2020 14:25:01 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-Message-ID: <20200314142114-mutt-send-email-mst@kernel.org>
-References: <20200226094357.25061-1-jasowang@redhat.com>
- <20200226142839.4263de9b.pasic@linux.ibm.com>
- <20200226083654-mutt-send-email-mst@kernel.org>
- <20200226163618.31aa86ed.pasic@linux.ibm.com>
- <20200226115009-mutt-send-email-mst@kernel.org>
- <20200227140215.2d12149c.pasic@linux.ibm.com>
- <20200227104233-mutt-send-email-mst@kernel.org>
- <20200313134446.782c5f7c.pasic@linux.ibm.com>
- <a79eec52-ec68-31a8-f692-17da0723e36c@amd.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3 07/16] hw/i386/vmport: Introduce vmport.h
+Message-ID: <20200314142319-mutt-send-email-mst@kernel.org>
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-8-liran.alon@oracle.com>
+ <13b98a16-6465-e1c9-5f52-0f338c60fbd5@redhat.com>
+ <d81dc7a5-2b20-1792-c1df-ecdb8a964fa7@oracle.com>
+ <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a79eec52-ec68-31a8-f692-17da0723e36c@amd.com>
+In-Reply-To: <2f168ddb-34e3-a286-080c-261dcb8ee6bb@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -110,82 +107,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Tom Lendacky <thomas.lendacky@amd.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, Liran Alon <liran.alon@oracle.com>,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 13, 2020 at 03:27:59PM -0500, Brijesh Singh wrote:
+On Sat, Mar 14, 2020 at 09:31:31AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 3/13/20 11:38 PM, Liran Alon wrote:
+> > On 13/03/2020 21:57, Philippe Mathieu-Daud=E9 wrote:
+> > > On 3/12/20 5:54 PM, Liran Alon wrote:
+> > > > No functional change. This is mere refactoring.
+> > > >=20
+> > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > > > ---
+> > > > =A0 hw/i386/pc.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
+> > > > =A0 hw/i386/vmmouse.c=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
+> > > > =A0 hw/i386/vmport.c=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 1 +
+> > > > =A0 include/hw/i386/pc.h=A0=A0=A0=A0 | 13 -------------
+> > > > =A0 include/hw/i386/vmport.h | 16 ++++++++++++++++
+> > >=20
+> > > What about moving it to hw/i386/vmport.h (no under include/)?
+> > >=20
+> > > Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > >=20
+> > >=20
+> > Can you explain the logic that separates between hw/i386/*.h to
+> > include/hw/i386/*.h?
 >=20
-> On 3/13/20 7:44 AM, Halil Pasic wrote:
-> > [..]
-> >>> CCing Tom. @Tom does vhost-vsock work for you with SEV and current qe=
-mu?
-> >>>
-> >>> Also, one can specify iommu_platform=3Don on a device that ain't a pa=
-rt of
-> >>> a secure-capable VM, just for the fun of it. And that breaks
-> >>> vhost-vsock. Or is setting iommu_platform=3Don only valid if
-> >>> qemu-system-s390x is protected virtualization capable?
-> >>>
-> >>> BTW, I don't have a strong opinion on the fixes tag. We currently do =
-not
-> >>> recommend setting iommu_platform, and thus I don't think we care too
-> >>> much about past qemus having problems with it.
-> >>>
-> >>> Regards,
-> >>> Halil
-> >>
-> >> Let's just say if we do have a Fixes: tag we want to set it correctly =
-to
-> >> the commit that needs this fix.
-> >>
-> > I finally did some digging regarding the performance degradation. For
-> > s390x the performance degradation on vhost-net was introduced by commit
-> > 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Before
-> > IOMMUTLBEntry.addr_mask used to be based on plen, which in turn was
-> > calculated as the rest of the memory regions size (from address), and
-> > covered most of the guest address space. That is we didn't have a whole
-> > lot of IOTLB API overhead.
-> >
-> > With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xfff which=
- comes
-> > as ~TARGET_PAGE_MASK from flatview_do_translate(). To have things worki=
-ng
-> > properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the level o=
-f
-> > 076a93d797 and 076a93d797~1.
-> >
-> > Regarding vhost-vsock. It does not work with iommu_platform=3Don since =
-the
-> > very beginning (i.e. 8607f5c307 ("virtio: convert to use DMA api")). No=
-t
-> > sure if that is a good or a bad thing. (If the vhost driver in the kern=
-el
-> > would actually have to do the IOTLB translation, then failing in case
-> > where it does not support it seems sane. The problem is that
-> > ACCESS_PLATFORM is used for more than one thing (needs translation, and
-> > restricted memory access).)
-> >
-> > I don't think I've heard back from AMD whether vsock works with SEV or
-> > not... I don't have access to HW to test it myself.
->=20
->=20
-> I just tried vhost-vsock on AMD SEV machine and it does not work. I am
-> using FC31 (qemu 4.1.1.1.fc31).
+> Headers in the include/hw/ namespace can be consumed by all machine targe=
+ts.
+> If this is a target-specific device, having it local to the target
+> (hw/i386/) protect generic code (and other targets) of using it. This hel=
+ps
+> detecting wrong dependencies between components.
 
-Neither does vhost scsi - no ACCESS_PLATFORM support. But with Jason's
-patch I think both should work. Pls give it a try.
+I think it's true. However when headers were moved to include we
+weren't always able to do this correctly. So some i386
+specific headers are under include.
 
+
+> > If it makes sense, sure I will move it. I just don't know what is the
+> > convention here.
 >=20
-> > We (s390) don't require this being backported to the stable qemus,
-> > because for us iommu_platform=3Don becomes relevant with protected
-> > virtualization, and those qemu versions don't support it.
-> >
-> > Cheers,
-> > Halil
-> >
+> Michael/Paolo/Eduardo what do you recommend?
+
+
 
 
