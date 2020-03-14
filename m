@@ -6,77 +6,76 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 892F6C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 22:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 997A4C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 22:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45EF1206FA
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 22:13:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6325820880
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 22:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRSxhANS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45EF1206FA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aE6rKnHH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6325820880
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDF1q-0000Ax-93
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 18:13:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53668)
+	id 1jDF2X-0001KQ-Fs
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 18:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1jDF0g-00082O-8q
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 18:11:59 -0400
+ (envelope-from <groeck7@gmail.com>) id 1jDF1H-0008TA-F2
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 18:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1jDF0f-0004Ev-CD
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 18:11:58 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33004)
+ (envelope-from <groeck7@gmail.com>) id 1jDF1E-0006Ux-HT
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 18:12:34 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34646)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1jDF0d-0003xY-51; Sat, 14 Mar 2020 18:11:55 -0400
-Received: by mail-pl1-x644.google.com with SMTP id ay11so6008193plb.0;
- Sat, 14 Mar 2020 15:11:55 -0700 (PDT)
+ id 1jDF1C-0006HN-Gp; Sat, 14 Mar 2020 18:12:30 -0400
+Received: by mail-pl1-x643.google.com with SMTP id a23so6008760plm.1;
+ Sat, 14 Mar 2020 15:12:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hSbTguFnbSPnVNhgwZX9kYbh3M7M6mQXv6XGDFfse2s=;
- b=CRSxhANS18WOsWMbd0LU0IkAKnDr2aLbH1jsww7V31g38fjHBcYr5FtjfrX77FR2K0
- 0EiHAQcsq82Q2zmdaxzpMJAzJ8jTtRnmT134le2l5L33puL25QorCN8wPUoJ/ctDN5QL
- obNqxSYX0mQZGqFEP0dRbWJXvLSuMIEbu5ekqw4nTN4njsWcxx7EfkP+faqjKPLQZVJ+
- uS+Hk8tUjTpeuIPctU1gNYSznd5heK3yi3Vlx5j3hAbsq0FO9BstLT/9YZmGc4bnSSgZ
- OvmFdXR8xbOxxnQ1dTV5+fjyJQKRplhQ/B6ZK55pM1G5F1kqXYi1rH57a7TjbMYVM1KS
- GAEg==
+ bh=2QTG9RyRDEjbEhAr5jdniYj8cdMdxDQVT0nOjXBmeYM=;
+ b=aE6rKnHHZ8UTWHIkkKXJEA33ptKLVqrzNve5icHmvQ6eWgPASSMJE4SZCpf9kVjKwu
+ OPkv6NaQtmjPJRCSR3dpN44lYtozWNBRcUKXRnD36jmD2Ta7VqzAIQ6MFnPofYDSuyQm
+ Mmgdtz6+ruqUODpZus5KtWRGU12VW1RoJ59d3VwTJMEk49zyFFhAwXE5IMvoNAnVNHY6
+ 9ENKMChxpLYFz0p7D5VicawM3gfdprL5Uua7zXayUXMQCjrnwbjl4BqeRNj0TVhLPyZ1
+ FmOjtkgk68w4DdubDDb/8iz20vnpqGsUNf0Vh9BcOKaNGMJHfg8/oaJg4ocZqu9Tq/pp
+ JZ6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=hSbTguFnbSPnVNhgwZX9kYbh3M7M6mQXv6XGDFfse2s=;
- b=PzSbChOO1Jr3yfOwnRV6bHlieNK+gCF84+HHEZO3+vi9KWkV6f1D5DtpH2Ahn7Z6pv
- qAObvRPcFnG8MiEYK/PfxpwY5UnB0diBi9lcKt6NgRZwdJkWQi3BYz6Ee2DmwpXvzqpv
- RoePk2lvtgXcWfUfnpc/A668d2XGEVSKbfsxhGhRHtxnDjsXgSyMBVkD5XM5Y6ZRKlmL
- dmAL2D6da6hpFoCnp/e/V5WTiZPd+rhSZnjseoinkF91pDLr1k/yrWx+lwFpMmYQrigC
- WYAmCUts84nLMArtLr3dVOlIdBBAYVJqMcdE27zPtNNKO8Ps19ZD8vbws59dvDmtzZJO
- gz2A==
-X-Gm-Message-State: ANhLgQ1cl4AHRiJtcm4CUJhofYQXN+76Ebmpf1e4FFrqYiefl1VVk4+c
- suoGwVtAOgscRQDykmtsKlI=
-X-Google-Smtp-Source: ADFU+vtlWqaPzQiehzjBuYayXz3Xtf56JwnU7RHKpdgLDwhmFbYnplsYJSfeElc+lpxuBfk291MSnQ==
-X-Received: by 2002:a17:90a:cc0d:: with SMTP id
- b13mr707763pju.115.1584223913944; 
- Sat, 14 Mar 2020 15:11:53 -0700 (PDT)
+ bh=2QTG9RyRDEjbEhAr5jdniYj8cdMdxDQVT0nOjXBmeYM=;
+ b=Jx+mfwbef7Qn1UTOcCDtBd/BCi9NoPqoAixXGL9Fh4yEIhHTsCAOkJQFge8G0k/100
+ +NJgHMJGdfYFNc7CpGNDmFcfzSdFtuuURt6SzaWYckoojlBCUCH6lxjv65G1EONKFgG+
+ VFKZJNmJhFz4BRIzVbXnjJicbTmXkQSdZHTMRvc4omjP6SM7h++Fp9hZJ+sjccHTVgTH
+ gxjhbg543e28MCJLICZiloOpI9r5zYnBIWxaE4aEzDiYzktuVwmFAPmXnGE9fWOP46WG
+ V1k52ONhqLiCY4jnJv0VvrnA8yEC5ASUAVkQBMG/E6A1+0tl1c/19XiAphYLULr5SlMO
+ DP/A==
+X-Gm-Message-State: ANhLgQ0acHS6IM9BFdJlLejzaLBzts6tHb2U2VfRdL+VYfcsob0hZRsk
+ /INdu+zsHJzB3J88TYCgseZFQ3sk
+X-Google-Smtp-Source: ADFU+vv2zoyoA6Q55IBhM8Nevywibak3q+G768BTaezuxDdDvyckFEHnnJMjYaUn1h4egj9gX//Y0Q==
+X-Received: by 2002:a17:902:b903:: with SMTP id
+ bf3mr20060199plb.144.1584223942413; 
+ Sat, 14 Mar 2020 15:12:22 -0700 (PDT)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
  by smtp.gmail.com with ESMTPSA id
- d84sm11702719pfd.197.2020.03.14.15.11.52
+ j8sm15354066pjb.4.2020.03.14.15.12.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Mar 2020 15:11:53 -0700 (PDT)
-Subject: Re: [PATCH 1/8] hw: Move i.MX watchdog driver to hw/watchdog
+ Sat, 14 Mar 2020 15:12:21 -0700 (PDT)
+Subject: Re: [PATCH 3/8] hw/arm/fsl-imx25: Wire up watchdog
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>
 References: <20200314172736.24528-1-linux@roeck-us.net>
- <20200314172736.24528-2-linux@roeck-us.net>
- <2f4064d2-445c-19a4-b873-b9dd0b09ff1c@redhat.com>
- <60882898-e604-8474-627c-715bae9fd320@redhat.com>
+ <20200314172736.24528-4-linux@roeck-us.net>
+ <d449eaae-0a87-b221-d097-d90340029398@redhat.com>
 From: Guenter Roeck <linux@roeck-us.net>
 Autocrypt: addr=linux@roeck-us.net; keydata=
  xsFNBE6H1WcBEACu6jIcw5kZ5dGeJ7E7B2uweQR/4FGxH10/H1O1+ApmcQ9i87XdZQiB9cpN
@@ -121,18 +120,18 @@ Autocrypt: addr=linux@roeck-us.net; keydata=
  WkRwrSuCn7UG+qVWZeKEsFKFOkynOs3pVbcbq1pxbhk3TRWCGRU5JolI4ohy/7JV1TVbjiDI
  HP/aVnm6NC8of26P40Pg8EdAhajZnHHjA7FrJXsy3cyIGqvg9os4rNkUWmrCfLLsZDHD8FnU
  mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-Message-ID: <5f46193f-33b2-82b1-44fc-2c643f7b4b38@roeck-us.net>
-Date: Sat, 14 Mar 2020 15:11:51 -0700
+Message-ID: <838fb748-82c3-2369-2182-eaa3794efb66@roeck-us.net>
+Date: Sat, 14 Mar 2020 15:12:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <60882898-e604-8474-627c-715bae9fd320@redhat.com>
+In-Reply-To: <d449eaae-0a87-b221-d097-d90340029398@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,55 +150,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
-
-On 3/14/20 2:46 PM, Philippe Mathieu-Daudé wrote:
-
+On 3/14/20 2:48 PM, Philippe Mathieu-Daudé wrote:
 [ ... ]
-
-> Corrected hunk:
+> Here you also need:
 > 
 > -- >8 --
 > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index e5a876c8d1..c662d5f1e0 100644
+> index c662d5f1e0..4cf8fa4967 100644
 > --- a/hw/arm/Kconfig
 > +++ b/hw/arm/Kconfig
-> @@ -373,6 +373,7 @@ config FSL_IMX6
+> @@ -358,6 +358,7 @@ config FSL_IMX25
 >      select IMX
 >      select IMX_FEC
 >      select IMX_I2C
 > +    select WDT_IMX2
->      select SDHCI
+>      select DS1338
 > 
->  config ASPEED_SOC
-> @@ -410,6 +411,7 @@ config FSL_IMX7
->      select IMX
->      select IMX_FEC
->      select IMX_I2C
-> +    select WDT_IMX2
->      select PCI_EXPRESS_DESIGNWARE
->      select SDHCI
->      select UNIMP
-> @@ -423,6 +425,7 @@ config FSL_IMX6UL
->      select IMX
->      select IMX_FEC
->      select IMX_I2C
-> +    select WDT_IMX2
->      select SDHCI
->      select UNIMP
+>  config FSL_IMX31
+> ---
+> 
+> With it:
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
 
-Done. I also fixed
+Done.
 
->> +common-obj-$(CONFIG_WDT_IMX) += wdt_imx2.o
-
-to
-
->> +common-obj-$(CONFIG_WDT_IMX2) += wdt_imx2.o
-
-in patch 1/8 (that had slipped to patch 2/8).
-
-Thanks a lot for the feedback,
-
+Thanks,
 Guenter
 
