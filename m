@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79577C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE73AC1975A
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:20:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E6A82076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:06:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E6A82076D
+	by mail.kernel.org (Postfix) with ESMTPS id 9917A2076F
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 11:20:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9917A2076F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD4cJ-00073x-Ae
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 07:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36554)
+	id 1jD4qH-00011l-Qh
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 07:20:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jD4bi-0006cr-Gr
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:05:32 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jD4pU-0000ZU-9L
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jD4bg-0001Lr-OR
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:05:30 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:60907)
+ (envelope-from <laurent@vivier.eu>) id 1jD4pS-0005Y9-LB
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 07:19:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:44831)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1jD4bc-0001BJ-Nm; Sat, 14 Mar 2020 07:05:24 -0400
+ id 1jD4pS-0005XD-By; Sat, 14 Mar 2020 07:19:42 -0400
 Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N17cq-1jK6p53iQ6-012bM3; Sat, 14 Mar 2020 12:05:18 +0100
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N3bGP-1jMbAh3qD5-010Z29; Sat, 14 Mar 2020 12:19:37 +0100
 Subject: Re: [PATCH v8 3/4] linux-user: Support futex_time64
 To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
@@ -83,8 +83,8 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <388952b0-b874-66b6-9055-ebba14ad9cff@vivier.eu>
-Date: Sat, 14 Mar 2020 12:05:16 +0100
+Message-ID: <5b33e81e-e8ff-5222-e802-31690aa1a36c@vivier.eu>
+Date: Sat, 14 Mar 2020 12:19:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
@@ -92,25 +92,25 @@ In-Reply-To: <517832730838e1d0b5eda26781b280854d792f9e.1584143748.git.alistair.f
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hs4Ij7K0Pm5Dv7VSkpU/rmpWjKkfbT4DojVIzLiGNV1Evw6snmq
- adERTeTfeVutECx5S0N80rzAHPmAjl4sGQpxY4aP/rJOj6MhSTmKmtkhQspCbivMzZwbpUw
- Jk55PcJDVaAmuhjwUKVQVlTy2KF2XRGKC03MBtjPMtBJBzbajc4htOp9rhfXIPY9Txxn+qn
- Ft2S3pFahu4U1HjzlAslA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:J6y8AtXzB20=:iWZJVyTcJ7idM/hb+Vk13N
- iR103i03/uyrKwqWOcJej0l4et2FT7DkT6xVMjwiXl9wRGC2FAODPyr+7oWehAKiaQtMyfvvk
- liUlaB8bWT2P+upeg5XZ7yaxj7A7coUvhW73CttqiQycWkFAFhvyTDujq0yqQqj0hyXGQ83Bz
- zHrG3ZMykufPoVlw1Dz4J2Y62uySCQ+V8ar/4sukwNy7MYPEOFTT0d20KLLlbR7dFwVyDtnHW
- cM3gXPD845nNJbY3j75hNxUd0k4Bn4zCVz/Q3Cg8iqweHLxnGUI80zKXX4LCcIqopk/4Use6r
- BNbOhjumPPNVxnEBS3vy+nCPNRw1wWseDIy5rIKh6IcKHYAXnz19OeU7UHGjvoUW0WE63dTHT
- TMGGlgX/BzwDI8buYBw6Q8s8zSYM2uv5SY6rXaEw1ClJwGLTPoUWh0p39K738SzZRohuG27jd
- 16w9mWreP++1U7uztPl+Ht5WTCkAVVj5bP6JORzPIewzxNnFoIp/SY86a6QFjFlENhuIdeHVc
- Cc245hL1ym4bRUYbMJhv3Yw1y3Mf8BAs45ysELgZaRXesjOrxLmgVYNZkoHr8c9ueBV/zkXIf
- Di5sWCZAtZZFsAGeJLOipwV7e47GodX5RRcTy4lbhpdxK1CvgKRL+HfY4nLBwQ65oTSGTvodT
- FG/BzNnmXI/VmSO66oi07pXih+HpIoMVByW3T0JFxC+vazbxd4u0EerxWzWel4wLMc3w1lN2F
- IpCPCrLELFNg42pKWAYYi+57UhX7dcAEHccXHjDyE2BMXoHUeFk6T+71jK/sjBRRzfKYfxDgo
- +22bh9ULh3m5vRdFXlnC+2ttPswW/4wj58ZIr5mjpLY4zUi1Cj7bUWAPpt4P9egYXme9P3n
+X-Provags-ID: V03:K1:esGc8YyL/wVlB1zfrOiNrp74XNnT1/+wPIhOxyBJISie52nQ82F
+ V5LZd0IBmh4+SbCu1A2ZXL95zCjNLRJxK69Z3YvFzOFr/b4R+Kw3biGygbJmIl2JfU8a5oT
+ NPnWhBIGXydqZ857EcP2aTLNEjDE+LNG8x9MHQP7m5hy6wkmVllz4CLGf2wnT9PKh2OmCCT
+ +XmheV4HZ5diVJGWZAZ9w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:34T2+eQIMQM=:0LgDchGWSpKEA8OStiFx1X
+ ABktkpnH6plg9GTo8QLqIZgQGgxppAqfzXu+qL2MCY7c49kDtHlagDKQ8BTPX2NdG6gQeydGL
+ kPcMYal37Bxr3rjg3D4qK5soJDhUwCf9IGoN+uHvW5QB/J6ndMQc9qdz/LEYJGym3DhupfkLK
+ UNuryfZI6I58rp3GvaXxhYWkYNQKjcVTLUO6JAi8r4ENOMJ+keBBRx0THn0ZXIbqEoyoA4/QB
+ Kthpltc/GxsvUh/C/A7EeZmQlECsazhwYT5kgfRH2akStIvDIOmIXT+Qd0jXbP/t3B1am6De3
+ OI3kGux6LyVnmx6krycr9J1LD2ttijWJ0nLWlTk3j4m8v9Htef8ogOisTXmaZCH929B2Wz9Oh
+ OvMgDgtZZYidrk17VlImH7+Omlqu4J4QmYdLJaxsg1gQaTIvWppVTPwwzpOBDV+SK8Mevuu2N
+ G6MUoRrLOa6iDJ2/roXqYeowVBul5VIWNHAfefeR7oPo/HUGpcC8s6kTthJFLLwsaK73zUxVl
+ OKpW5BOBYmEWsYXo3WaPdmaOrWTK7TgNrGpioFUWE53xKo71wakD0vDkrGFyTuHMz++kw+ynq
+ /TQXSafor8MvCEKFriEmZ+CDV596AhdnwxERQSMCVjZQZtj4UFMGz0gHA9Pso98TfWcAZuoDB
+ ueTrFkZdnAB2RfjXOwxPBdEYrbNAWJ0yut5SLpIK6bPkIRBAAFL1satEMqU6U+yc4yhpb4HTE
+ sYy7t91ryvNXBMi2CANcHEKKq6XESREnTtHOxeMpNzoA9m9LG5zzCuBsklQky76KQBDSTiTnv
+ Ozl5rOi3LJ7t3nrKHZ+yghzhl5Xc3cSa2TRqipoxx5+0o5lypF3Ey01Ztb7AnuBDADX1XGD
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -364,5 +364,8 @@ Le 14/03/2020 à 00:56, Alistair Francis a écrit :
 >          ret = get_errno(sys_inotify_init());
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
 
