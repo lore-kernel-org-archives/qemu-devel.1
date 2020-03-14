@@ -2,94 +2,67 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FCDC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E7AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:19:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42E1F2074E
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:09:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="m/wsGEbo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E1F2074E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6695A2074C
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 00:19:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6695A2074C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCuMN-0007Jn-Du
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:08:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49694)
+	id 1jCuWr-0001dk-Kl
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 20:19:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
- id 1jCuI1-0002Yo-QE
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:04:33 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jCuWH-0001Bw-Hn
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
- id 1jCuHx-0003TX-Po
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:04:29 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:48956)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=335a9ddda=alistair.francis@wdc.com>)
- id 1jCuHx-0003HD-AF; Fri, 13 Mar 2020 20:04:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1584144265; x=1615680265;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=8GG7/NwTe/v0nhGWC/8JZ1QB6iMOX/J6IecX74Zct7I=;
- b=m/wsGEbocpDsnj0Kdm0aMmFI6A646jCeZCoe0CrsXCDbIGMBi8I5/kG3
- m7MK8EqV3wYCedR5COmZc16z47lGcgH55txydlyH8uDqmHeSa2Sp6aQfQ
- vCTQrDxDLZA4vEZGzdqmFk1ZhAlQKZKr/mCBp4uxIpkwdLVBErepH4iT8
- 85xRTEfok0lK94br7VxNo3W+NvDs7jXnFhlEs2mYAP4ULHoEoYQfkB0oM
- 5duXwutvJz/dIn/J6O34NXKxCtHHepthjSTd7zSOt7pu17mtGn6+YCbdX
- BkfepX7yUExxkNNfFG/QTQAqcBgwI3lW2kCnBU2eoRma8AkDD4Tnjj+2x A==;
-IronPort-SDR: Z3YEUlrfRZTgZ4Va3rN6Y69IkGx45mcNga6khvOQXQka08y7H6lW/VXajuIkuuzuLBnBesofhM
- Bct/2zzZB81sHV7woi9wGeUJpFsmT7q4D0wYjcYRWXZJk1qrWBJwwdZgl1Aqn+NtyhRtng+Zd/
- uQs3Etqx3ZRcKgo7km7TykQeIaKW+2QvtWDuPijORzpEoHOuQtJexUgFOkU3aCcz/F5foSuizl
- iM+PymNxdIiPivxFL90tYNNzDmoc85hkZxr77EA3Fj+cUMVuVXzrBsFPfE+oBbY+MwQuUm/fx4
- aD8=
-X-IronPort-AV: E=Sophos;i="5.70,550,1574092800"; d="scan'208";a="240748057"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 14 Mar 2020 08:04:23 +0800
-IronPort-SDR: UvjQ903FMkMij2w1oCO1LU+rKi3VkF/YD0Gm64fyI4RFSFKWdMbV+pTOaWpSofUrgoPllh5V/d
- fHYhy388XlnqQ8lbsfRxArCD2yjAx5BWNak6TwYGvqpMSrnrxG7fHMYO5+eQ0coEHOQnKR+2KE
- 2Qa75ebxW6cr8hvbQgp8qVIjnpg+Dgyz1sO2mJrDuvVDAdx5wZ1aVH3x6caMuk3g6Ag3a40QXT
- 0+vP3iDtC6YBAqTNVfrXVV33uSvMd6TMHIrr5qzKeN0V8lQ2My7hl3KI4fRs0wunCr+FJDXGQY
- s4ZCd7uOJqkrpC+veGhU+f2p
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Mar 2020 16:55:57 -0700
-IronPort-SDR: 57+F6DP/fsCfQsoZ5XRIgf4NIzXq54Q2krhi2CGFFFwVMJqqr7qvd4TnyArhN7trzL6mQfXR3h
- rUXBeQp7f1KXTS5SkUCcHiztu3aXBekXSh1HVjZX9EnSdMoLNPqhsDZLvQH1f1dqDOUOtep117
- 5/ye96u27+APz8au1xzZKlEatn23hzgpZRzeeZG8htB7HsqcixONNhFNnKhg2NSDOX72bg+ev6
- CTpMpJ7v44O82HSdUfXRbIKvjST3xjHrDPlWyeeROqrVnAMNdSNr6xsCCyU0mmfy6+KoZggXjG
- /00=
-WDCIronportException: Internal
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip01.wdc.com with ESMTP; 13 Mar 2020 17:04:23 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org,
-	laurent@vivier.eu
-Subject: [PATCH v8 4/4] linux-user/riscv: Update the syscall_nr's to the 5.5
- kernel
-Date: Fri, 13 Mar 2020 16:56:56 -0700
-Message-Id: <2be0f9fa31745bcbe01cd89b5f9c23568d146955.1584143748.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.25.1
+ (envelope-from <no-reply@patchew.org>) id 1jCuWF-0002yo-8s
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 20:19:13 -0400
+Resent-Date: Fri, 13 Mar 2020 20:19:13 -0400
+Resent-Message-Id: <E1jCuWF-0002yo-8s@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21109)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jCuWE-0002bK-Va; Fri, 13 Mar 2020 20:19:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584145139; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=V7Y/m0JWq5jdcxHibpjp1yfcsqsEZ6iN4fydpE0wyEOJ24GJM4XLn68hwkrBjh9sJIEtAgNfg9+AAkWiVnzzLljrRwvHUoSKnrvgH6BOH6rfY+YW6Qj6PZ8djvBlq5CPS1clIsHNKYLlkhxXxmjtgkzMK3lehNmNEPbNtVYU0jk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584145139;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=nMsWJiWnpGf90GhTIN9asCJCosJL5cOs2o+v5Xgz7iA=; 
+ b=HKhpdpR6QKPlDw3j+4m37zOaH0ok+GRYEybX1x6q8RL1EyJrvcVCFN1BnHpOjzkq5iPyaE0sg8UxEQT67VpAmFHyjd5X6nS/vXxhVY3sk4/uS5fL8Fz7BaGTvpsT/u/nM41GkPoovPUMgJsVGRsQDOxOSIrDPDLgX71b/sFLGxA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584145138003243.07732028742635;
+ Fri, 13 Mar 2020 17:18:58 -0700 (PDT)
 In-Reply-To: <cover.1584143748.git.alistair.francis@wdc.com>
-References: <cover.1584143748.git.alistair.francis@wdc.com>
+Subject: Re: [PATCH v8 0/4]  linux-user: generate syscall_nr.sh for RISC-V
+Message-ID: <158414513652.29765.9214965526138586973@39012742ff91>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.141.245
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alistair.francis@wdc.com
+Date: Fri, 13 Mar 2020 17:18:58 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,937 +74,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu,
+ alistair.francis@wdc.com, alistair23@gmail.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/riscv/syscall32_nr.h | 295 +++++++++++++++++++++++++++++++
- linux-user/riscv/syscall64_nr.h | 301 ++++++++++++++++++++++++++++++++
- linux-user/riscv/syscall_nr.h   | 294 +------------------------------
- 3 files changed, 598 insertions(+), 292 deletions(-)
- create mode 100644 linux-user/riscv/syscall32_nr.h
- create mode 100644 linux-user/riscv/syscall64_nr.h
-
-diff --git a/linux-user/riscv/syscall32_nr.h b/linux-user/riscv/syscall32_nr.h
-new file mode 100644
-index 0000000000..4fef73e954
---- /dev/null
-+++ b/linux-user/riscv/syscall32_nr.h
-@@ -0,0 +1,295 @@
-+/*
-+ * This file contains the system call numbers.
-+ */
-+#ifndef LINUX_USER_RISCV_SYSCALL32_NR_H
-+#define LINUX_USER_RISCV_SYSCALL32_NR_H
-+
-+#define TARGET_NR_io_setup 0
-+#define TARGET_NR_io_destroy 1
-+#define TARGET_NR_io_submit 2
-+#define TARGET_NR_io_cancel 3
-+#define TARGET_NR_setxattr 5
-+#define TARGET_NR_lsetxattr 6
-+#define TARGET_NR_fsetxattr 7
-+#define TARGET_NR_getxattr 8
-+#define TARGET_NR_lgetxattr 9
-+#define TARGET_NR_fgetxattr 10
-+#define TARGET_NR_listxattr 11
-+#define TARGET_NR_llistxattr 12
-+#define TARGET_NR_flistxattr 13
-+#define TARGET_NR_removexattr 14
-+#define TARGET_NR_lremovexattr 15
-+#define TARGET_NR_fremovexattr 16
-+#define TARGET_NR_getcwd 17
-+#define TARGET_NR_lookup_dcookie 18
-+#define TARGET_NR_eventfd2 19
-+#define TARGET_NR_epoll_create1 20
-+#define TARGET_NR_epoll_ctl 21
-+#define TARGET_NR_epoll_pwait 22
-+#define TARGET_NR_dup 23
-+#define TARGET_NR_dup3 24
-+#define TARGET_NR_fcntl64 25
-+#define TARGET_NR_inotify_init1 26
-+#define TARGET_NR_inotify_add_watch 27
-+#define TARGET_NR_inotify_rm_watch 28
-+#define TARGET_NR_ioctl 29
-+#define TARGET_NR_ioprio_set 30
-+#define TARGET_NR_ioprio_get 31
-+#define TARGET_NR_flock 32
-+#define TARGET_NR_mknodat 33
-+#define TARGET_NR_mkdirat 34
-+#define TARGET_NR_unlinkat 35
-+#define TARGET_NR_symlinkat 36
-+#define TARGET_NR_linkat 37
-+#define TARGET_NR_umount2 39
-+#define TARGET_NR_mount 40
-+#define TARGET_NR_pivot_root 41
-+#define TARGET_NR_nfsservctl 42
-+#define TARGET_NR_statfs64 43
-+#define TARGET_NR_fstatfs64 44
-+#define TARGET_NR_truncate64 45
-+#define TARGET_NR_ftruncate64 46
-+#define TARGET_NR_fallocate 47
-+#define TARGET_NR_faccessat 48
-+#define TARGET_NR_chdir 49
-+#define TARGET_NR_fchdir 50
-+#define TARGET_NR_chroot 51
-+#define TARGET_NR_fchmod 52
-+#define TARGET_NR_fchmodat 53
-+#define TARGET_NR_fchownat 54
-+#define TARGET_NR_fchown 55
-+#define TARGET_NR_openat 56
-+#define TARGET_NR_close 57
-+#define TARGET_NR_vhangup 58
-+#define TARGET_NR_pipe2 59
-+#define TARGET_NR_quotactl 60
-+#define TARGET_NR_getdents64 61
-+#define TARGET_NR_llseek 62
-+#define TARGET_NR_read 63
-+#define TARGET_NR_write 64
-+#define TARGET_NR_readv 65
-+#define TARGET_NR_writev 66
-+#define TARGET_NR_pread64 67
-+#define TARGET_NR_pwrite64 68
-+#define TARGET_NR_preadv 69
-+#define TARGET_NR_pwritev 70
-+#define TARGET_NR_sendfile64 71
-+#define TARGET_NR_signalfd4 74
-+#define TARGET_NR_vmsplice 75
-+#define TARGET_NR_splice 76
-+#define TARGET_NR_tee 77
-+#define TARGET_NR_readlinkat 78
-+#define TARGET_NR_fstatat64 79
-+#define TARGET_NR_fstat64 80
-+#define TARGET_NR_sync 81
-+#define TARGET_NR_fsync 82
-+#define TARGET_NR_fdatasync 83
-+#define TARGET_NR_sync_file_range 84
-+#define TARGET_NR_timerfd_create 85
-+#define TARGET_NR_acct 89
-+#define TARGET_NR_capget 90
-+#define TARGET_NR_capset 91
-+#define TARGET_NR_personality 92
-+#define TARGET_NR_exit 93
-+#define TARGET_NR_exit_group 94
-+#define TARGET_NR_waitid 95
-+#define TARGET_NR_set_tid_address 96
-+#define TARGET_NR_unshare 97
-+#define TARGET_NR_set_robust_list 99
-+#define TARGET_NR_get_robust_list 100
-+#define TARGET_NR_getitimer 102
-+#define TARGET_NR_setitimer 103
-+#define TARGET_NR_kexec_load 104
-+#define TARGET_NR_init_module 105
-+#define TARGET_NR_delete_module 106
-+#define TARGET_NR_timer_create 107
-+#define TARGET_NR_timer_getoverrun 109
-+#define TARGET_NR_timer_delete 111
-+#define TARGET_NR_syslog 116
-+#define TARGET_NR_ptrace 117
-+#define TARGET_NR_sched_setparam 118
-+#define TARGET_NR_sched_setscheduler 119
-+#define TARGET_NR_sched_getscheduler 120
-+#define TARGET_NR_sched_getparam 121
-+#define TARGET_NR_sched_setaffinity 122
-+#define TARGET_NR_sched_getaffinity 123
-+#define TARGET_NR_sched_yield 124
-+#define TARGET_NR_sched_get_priority_max 125
-+#define TARGET_NR_sched_get_priority_min 126
-+#define TARGET_NR_restart_syscall 128
-+#define TARGET_NR_kill 129
-+#define TARGET_NR_tkill 130
-+#define TARGET_NR_tgkill 131
-+#define TARGET_NR_sigaltstack 132
-+#define TARGET_NR_rt_sigsuspend 133
-+#define TARGET_NR_rt_sigaction 134
-+#define TARGET_NR_rt_sigprocmask 135
-+#define TARGET_NR_rt_sigpending 136
-+#define TARGET_NR_rt_sigqueueinfo 138
-+#define TARGET_NR_rt_sigreturn 139
-+#define TARGET_NR_setpriority 140
-+#define TARGET_NR_getpriority 141
-+#define TARGET_NR_reboot 142
-+#define TARGET_NR_setregid 143
-+#define TARGET_NR_setgid 144
-+#define TARGET_NR_setreuid 145
-+#define TARGET_NR_setuid 146
-+#define TARGET_NR_setresuid 147
-+#define TARGET_NR_getresuid 148
-+#define TARGET_NR_setresgid 149
-+#define TARGET_NR_getresgid 150
-+#define TARGET_NR_setfsuid 151
-+#define TARGET_NR_setfsgid 152
-+#define TARGET_NR_times 153
-+#define TARGET_NR_setpgid 154
-+#define TARGET_NR_getpgid 155
-+#define TARGET_NR_getsid 156
-+#define TARGET_NR_setsid 157
-+#define TARGET_NR_getgroups 158
-+#define TARGET_NR_setgroups 159
-+#define TARGET_NR_uname 160
-+#define TARGET_NR_sethostname 161
-+#define TARGET_NR_setdomainname 162
-+#define TARGET_NR_getrlimit 163
-+#define TARGET_NR_setrlimit 164
-+#define TARGET_NR_getrusage 165
-+#define TARGET_NR_umask 166
-+#define TARGET_NR_prctl 167
-+#define TARGET_NR_getcpu 168
-+#define TARGET_NR_getpid 172
-+#define TARGET_NR_getppid 173
-+#define TARGET_NR_getuid 174
-+#define TARGET_NR_geteuid 175
-+#define TARGET_NR_getgid 176
-+#define TARGET_NR_getegid 177
-+#define TARGET_NR_gettid 178
-+#define TARGET_NR_sysinfo 179
-+#define TARGET_NR_mq_open 180
-+#define TARGET_NR_mq_unlink 181
-+#define TARGET_NR_mq_notify 184
-+#define TARGET_NR_mq_getsetattr 185
-+#define TARGET_NR_msgget 186
-+#define TARGET_NR_msgctl 187
-+#define TARGET_NR_msgrcv 188
-+#define TARGET_NR_msgsnd 189
-+#define TARGET_NR_semget 190
-+#define TARGET_NR_semctl 191
-+#define TARGET_NR_semop 193
-+#define TARGET_NR_shmget 194
-+#define TARGET_NR_shmctl 195
-+#define TARGET_NR_shmat 196
-+#define TARGET_NR_shmdt 197
-+#define TARGET_NR_socket 198
-+#define TARGET_NR_socketpair 199
-+#define TARGET_NR_bind 200
-+#define TARGET_NR_listen 201
-+#define TARGET_NR_accept 202
-+#define TARGET_NR_connect 203
-+#define TARGET_NR_getsockname 204
-+#define TARGET_NR_getpeername 205
-+#define TARGET_NR_sendto 206
-+#define TARGET_NR_recvfrom 207
-+#define TARGET_NR_setsockopt 208
-+#define TARGET_NR_getsockopt 209
-+#define TARGET_NR_shutdown 210
-+#define TARGET_NR_sendmsg 211
-+#define TARGET_NR_recvmsg 212
-+#define TARGET_NR_readahead 213
-+#define TARGET_NR_brk 214
-+#define TARGET_NR_munmap 215
-+#define TARGET_NR_mremap 216
-+#define TARGET_NR_add_key 217
-+#define TARGET_NR_request_key 218
-+#define TARGET_NR_keyctl 219
-+#define TARGET_NR_clone 220
-+#define TARGET_NR_execve 221
-+#define TARGET_NR_mmap2 222
-+#define TARGET_NR_fadvise64_64 223
-+#define TARGET_NR_swapon 224
-+#define TARGET_NR_swapoff 225
-+#define TARGET_NR_mprotect 226
-+#define TARGET_NR_msync 227
-+#define TARGET_NR_mlock 228
-+#define TARGET_NR_munlock 229
-+#define TARGET_NR_mlockall 230
-+#define TARGET_NR_munlockall 231
-+#define TARGET_NR_mincore 232
-+#define TARGET_NR_madvise 233
-+#define TARGET_NR_remap_file_pages 234
-+#define TARGET_NR_mbind 235
-+#define TARGET_NR_get_mempolicy 236
-+#define TARGET_NR_set_mempolicy 237
-+#define TARGET_NR_migrate_pages 238
-+#define TARGET_NR_move_pages 239
-+#define TARGET_NR_rt_tgsigqueueinfo 240
-+#define TARGET_NR_perf_event_open 241
-+#define TARGET_NR_accept4 242
-+#define TARGET_NR_arch_specific_syscall 244
-+#define TARGET_NR_riscv_flush_icache (TARGET_NR_arch_specific_syscall + 15)
-+#define TARGET_NR_prlimit64 261
-+#define TARGET_NR_fanotify_init 262
-+#define TARGET_NR_fanotify_mark 263
-+#define TARGET_NR_name_to_handle_at 264
-+#define TARGET_NR_open_by_handle_at 265
-+#define TARGET_NR_syncfs 267
-+#define TARGET_NR_setns 268
-+#define TARGET_NR_sendmmsg 269
-+#define TARGET_NR_process_vm_readv 270
-+#define TARGET_NR_process_vm_writev 271
-+#define TARGET_NR_kcmp 272
-+#define TARGET_NR_finit_module 273
-+#define TARGET_NR_sched_setattr 274
-+#define TARGET_NR_sched_getattr 275
-+#define TARGET_NR_renameat2 276
-+#define TARGET_NR_seccomp 277
-+#define TARGET_NR_getrandom 278
-+#define TARGET_NR_memfd_create 279
-+#define TARGET_NR_bpf 280
-+#define TARGET_NR_execveat 281
-+#define TARGET_NR_userfaultfd 282
-+#define TARGET_NR_membarrier 283
-+#define TARGET_NR_mlock2 284
-+#define TARGET_NR_copy_file_range 285
-+#define TARGET_NR_preadv2 286
-+#define TARGET_NR_pwritev2 287
-+#define TARGET_NR_pkey_mprotect 288
-+#define TARGET_NR_pkey_alloc 289
-+#define TARGET_NR_pkey_free 290
-+#define TARGET_NR_statx 291
-+#define TARGET_NR_rseq 293
-+#define TARGET_NR_kexec_file_load 294
-+#define TARGET_NR_clock_gettime64 403
-+#define TARGET_NR_clock_settime64 404
-+#define TARGET_NR_clock_adjtime64 405
-+#define TARGET_NR_clock_getres_time64 406
-+#define TARGET_NR_clock_nanosleep_time64 407
-+#define TARGET_NR_timer_gettime64 408
-+#define TARGET_NR_timer_settime64 409
-+#define TARGET_NR_timerfd_gettime64 410
-+#define TARGET_NR_timerfd_settime64 411
-+#define TARGET_NR_utimensat_time64 412
-+#define TARGET_NR_pselect6_time64 413
-+#define TARGET_NR_ppoll_time64 414
-+#define TARGET_NR_io_pgetevents_time64 416
-+#define TARGET_NR_recvmmsg_time64 417
-+#define TARGET_NR_mq_timedsend_time64 418
-+#define TARGET_NR_mq_timedreceive_time64 419
-+#define TARGET_NR_semtimedop_time64 420
-+#define TARGET_NR_rt_sigtimedwait_time64 421
-+#define TARGET_NR_futex_time64 422
-+#define TARGET_NR_sched_rr_get_interval_time64 423
-+#define TARGET_NR_pidfd_send_signal 424
-+#define TARGET_NR_io_uring_setup 425
-+#define TARGET_NR_io_uring_enter 426
-+#define TARGET_NR_io_uring_register 427
-+#define TARGET_NR_open_tree 428
-+#define TARGET_NR_move_mount 429
-+#define TARGET_NR_fsopen 430
-+#define TARGET_NR_fsconfig 431
-+#define TARGET_NR_fsmount 432
-+#define TARGET_NR_fspick 433
-+#define TARGET_NR_pidfd_open 434
-+#define TARGET_NR_clone3 435
-+#define TARGET_NR_syscalls 436
-+
-+#endif /* LINUX_USER_RISCV_SYSCALL32_NR_H */
-diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
-new file mode 100644
-index 0000000000..cc82f3244f
---- /dev/null
-+++ b/linux-user/riscv/syscall64_nr.h
-@@ -0,0 +1,301 @@
-+/*
-+ * This file contains the system call numbers.
-+ */
-+#ifndef LINUX_USER_RISCV_SYSCALL64_NR_H
-+#define LINUX_USER_RISCV_SYSCALL64_NR_H
-+
-+#define TARGET_NR_io_setup 0
-+#define TARGET_NR_io_destroy 1
-+#define TARGET_NR_io_submit 2
-+#define TARGET_NR_io_cancel 3
-+#define TARGET_NR_io_getevents 4
-+#define TARGET_NR_setxattr 5
-+#define TARGET_NR_lsetxattr 6
-+#define TARGET_NR_fsetxattr 7
-+#define TARGET_NR_getxattr 8
-+#define TARGET_NR_lgetxattr 9
-+#define TARGET_NR_fgetxattr 10
-+#define TARGET_NR_listxattr 11
-+#define TARGET_NR_llistxattr 12
-+#define TARGET_NR_flistxattr 13
-+#define TARGET_NR_removexattr 14
-+#define TARGET_NR_lremovexattr 15
-+#define TARGET_NR_fremovexattr 16
-+#define TARGET_NR_getcwd 17
-+#define TARGET_NR_lookup_dcookie 18
-+#define TARGET_NR_eventfd2 19
-+#define TARGET_NR_epoll_create1 20
-+#define TARGET_NR_epoll_ctl 21
-+#define TARGET_NR_epoll_pwait 22
-+#define TARGET_NR_dup 23
-+#define TARGET_NR_dup3 24
-+#define TARGET_NR_fcntl 25
-+#define TARGET_NR_inotify_init1 26
-+#define TARGET_NR_inotify_add_watch 27
-+#define TARGET_NR_inotify_rm_watch 28
-+#define TARGET_NR_ioctl 29
-+#define TARGET_NR_ioprio_set 30
-+#define TARGET_NR_ioprio_get 31
-+#define TARGET_NR_flock 32
-+#define TARGET_NR_mknodat 33
-+#define TARGET_NR_mkdirat 34
-+#define TARGET_NR_unlinkat 35
-+#define TARGET_NR_symlinkat 36
-+#define TARGET_NR_linkat 37
-+#define TARGET_NR_umount2 39
-+#define TARGET_NR_mount 40
-+#define TARGET_NR_pivot_root 41
-+#define TARGET_NR_nfsservctl 42
-+#define TARGET_NR_statfs 43
-+#define TARGET_NR_fstatfs 44
-+#define TARGET_NR_truncate 45
-+#define TARGET_NR_ftruncate 46
-+#define TARGET_NR_fallocate 47
-+#define TARGET_NR_faccessat 48
-+#define TARGET_NR_chdir 49
-+#define TARGET_NR_fchdir 50
-+#define TARGET_NR_chroot 51
-+#define TARGET_NR_fchmod 52
-+#define TARGET_NR_fchmodat 53
-+#define TARGET_NR_fchownat 54
-+#define TARGET_NR_fchown 55
-+#define TARGET_NR_openat 56
-+#define TARGET_NR_close 57
-+#define TARGET_NR_vhangup 58
-+#define TARGET_NR_pipe2 59
-+#define TARGET_NR_quotactl 60
-+#define TARGET_NR_getdents64 61
-+#define TARGET_NR_lseek 62
-+#define TARGET_NR_read 63
-+#define TARGET_NR_write 64
-+#define TARGET_NR_readv 65
-+#define TARGET_NR_writev 66
-+#define TARGET_NR_pread64 67
-+#define TARGET_NR_pwrite64 68
-+#define TARGET_NR_preadv 69
-+#define TARGET_NR_pwritev 70
-+#define TARGET_NR_sendfile 71
-+#define TARGET_NR_pselect6 72
-+#define TARGET_NR_ppoll 73
-+#define TARGET_NR_signalfd4 74
-+#define TARGET_NR_vmsplice 75
-+#define TARGET_NR_splice 76
-+#define TARGET_NR_tee 77
-+#define TARGET_NR_readlinkat 78
-+#define TARGET_NR_newfstatat 79
-+#define TARGET_NR_fstat 80
-+#define TARGET_NR_sync 81
-+#define TARGET_NR_fsync 82
-+#define TARGET_NR_fdatasync 83
-+#define TARGET_NR_sync_file_range 84
-+#define TARGET_NR_timerfd_create 85
-+#define TARGET_NR_timerfd_settime 86
-+#define TARGET_NR_timerfd_gettime 87
-+#define TARGET_NR_utimensat 88
-+#define TARGET_NR_acct 89
-+#define TARGET_NR_capget 90
-+#define TARGET_NR_capset 91
-+#define TARGET_NR_personality 92
-+#define TARGET_NR_exit 93
-+#define TARGET_NR_exit_group 94
-+#define TARGET_NR_waitid 95
-+#define TARGET_NR_set_tid_address 96
-+#define TARGET_NR_unshare 97
-+#define TARGET_NR_futex 98
-+#define TARGET_NR_set_robust_list 99
-+#define TARGET_NR_get_robust_list 100
-+#define TARGET_NR_nanosleep 101
-+#define TARGET_NR_getitimer 102
-+#define TARGET_NR_setitimer 103
-+#define TARGET_NR_kexec_load 104
-+#define TARGET_NR_init_module 105
-+#define TARGET_NR_delete_module 106
-+#define TARGET_NR_timer_create 107
-+#define TARGET_NR_timer_gettime 108
-+#define TARGET_NR_timer_getoverrun 109
-+#define TARGET_NR_timer_settime 110
-+#define TARGET_NR_timer_delete 111
-+#define TARGET_NR_clock_settime 112
-+#define TARGET_NR_clock_gettime 113
-+#define TARGET_NR_clock_getres 114
-+#define TARGET_NR_clock_nanosleep 115
-+#define TARGET_NR_syslog 116
-+#define TARGET_NR_ptrace 117
-+#define TARGET_NR_sched_setparam 118
-+#define TARGET_NR_sched_setscheduler 119
-+#define TARGET_NR_sched_getscheduler 120
-+#define TARGET_NR_sched_getparam 121
-+#define TARGET_NR_sched_setaffinity 122
-+#define TARGET_NR_sched_getaffinity 123
-+#define TARGET_NR_sched_yield 124
-+#define TARGET_NR_sched_get_priority_max 125
-+#define TARGET_NR_sched_get_priority_min 126
-+#define TARGET_NR_sched_rr_get_interval 127
-+#define TARGET_NR_restart_syscall 128
-+#define TARGET_NR_kill 129
-+#define TARGET_NR_tkill 130
-+#define TARGET_NR_tgkill 131
-+#define TARGET_NR_sigaltstack 132
-+#define TARGET_NR_rt_sigsuspend 133
-+#define TARGET_NR_rt_sigaction 134
-+#define TARGET_NR_rt_sigprocmask 135
-+#define TARGET_NR_rt_sigpending 136
-+#define TARGET_NR_rt_sigtimedwait 137
-+#define TARGET_NR_rt_sigqueueinfo 138
-+#define TARGET_NR_rt_sigreturn 139
-+#define TARGET_NR_setpriority 140
-+#define TARGET_NR_getpriority 141
-+#define TARGET_NR_reboot 142
-+#define TARGET_NR_setregid 143
-+#define TARGET_NR_setgid 144
-+#define TARGET_NR_setreuid 145
-+#define TARGET_NR_setuid 146
-+#define TARGET_NR_setresuid 147
-+#define TARGET_NR_getresuid 148
-+#define TARGET_NR_setresgid 149
-+#define TARGET_NR_getresgid 150
-+#define TARGET_NR_setfsuid 151
-+#define TARGET_NR_setfsgid 152
-+#define TARGET_NR_times 153
-+#define TARGET_NR_setpgid 154
-+#define TARGET_NR_getpgid 155
-+#define TARGET_NR_getsid 156
-+#define TARGET_NR_setsid 157
-+#define TARGET_NR_getgroups 158
-+#define TARGET_NR_setgroups 159
-+#define TARGET_NR_uname 160
-+#define TARGET_NR_sethostname 161
-+#define TARGET_NR_setdomainname 162
-+#define TARGET_NR_getrlimit 163
-+#define TARGET_NR_setrlimit 164
-+#define TARGET_NR_getrusage 165
-+#define TARGET_NR_umask 166
-+#define TARGET_NR_prctl 167
-+#define TARGET_NR_getcpu 168
-+#define TARGET_NR_gettimeofday 169
-+#define TARGET_NR_settimeofday 170
-+#define TARGET_NR_adjtimex 171
-+#define TARGET_NR_getpid 172
-+#define TARGET_NR_getppid 173
-+#define TARGET_NR_getuid 174
-+#define TARGET_NR_geteuid 175
-+#define TARGET_NR_getgid 176
-+#define TARGET_NR_getegid 177
-+#define TARGET_NR_gettid 178
-+#define TARGET_NR_sysinfo 179
-+#define TARGET_NR_mq_open 180
-+#define TARGET_NR_mq_unlink 181
-+#define TARGET_NR_mq_timedsend 182
-+#define TARGET_NR_mq_timedreceive 183
-+#define TARGET_NR_mq_notify 184
-+#define TARGET_NR_mq_getsetattr 185
-+#define TARGET_NR_msgget 186
-+#define TARGET_NR_msgctl 187
-+#define TARGET_NR_msgrcv 188
-+#define TARGET_NR_msgsnd 189
-+#define TARGET_NR_semget 190
-+#define TARGET_NR_semctl 191
-+#define TARGET_NR_semtimedop 192
-+#define TARGET_NR_semop 193
-+#define TARGET_NR_shmget 194
-+#define TARGET_NR_shmctl 195
-+#define TARGET_NR_shmat 196
-+#define TARGET_NR_shmdt 197
-+#define TARGET_NR_socket 198
-+#define TARGET_NR_socketpair 199
-+#define TARGET_NR_bind 200
-+#define TARGET_NR_listen 201
-+#define TARGET_NR_accept 202
-+#define TARGET_NR_connect 203
-+#define TARGET_NR_getsockname 204
-+#define TARGET_NR_getpeername 205
-+#define TARGET_NR_sendto 206
-+#define TARGET_NR_recvfrom 207
-+#define TARGET_NR_setsockopt 208
-+#define TARGET_NR_getsockopt 209
-+#define TARGET_NR_shutdown 210
-+#define TARGET_NR_sendmsg 211
-+#define TARGET_NR_recvmsg 212
-+#define TARGET_NR_readahead 213
-+#define TARGET_NR_brk 214
-+#define TARGET_NR_munmap 215
-+#define TARGET_NR_mremap 216
-+#define TARGET_NR_add_key 217
-+#define TARGET_NR_request_key 218
-+#define TARGET_NR_keyctl 219
-+#define TARGET_NR_clone 220
-+#define TARGET_NR_execve 221
-+#define TARGET_NR_mmap 222
-+#define TARGET_NR_fadvise64 223
-+#define TARGET_NR_swapon 224
-+#define TARGET_NR_swapoff 225
-+#define TARGET_NR_mprotect 226
-+#define TARGET_NR_msync 227
-+#define TARGET_NR_mlock 228
-+#define TARGET_NR_munlock 229
-+#define TARGET_NR_mlockall 230
-+#define TARGET_NR_munlockall 231
-+#define TARGET_NR_mincore 232
-+#define TARGET_NR_madvise 233
-+#define TARGET_NR_remap_file_pages 234
-+#define TARGET_NR_mbind 235
-+#define TARGET_NR_get_mempolicy 236
-+#define TARGET_NR_set_mempolicy 237
-+#define TARGET_NR_migrate_pages 238
-+#define TARGET_NR_move_pages 239
-+#define TARGET_NR_rt_tgsigqueueinfo 240
-+#define TARGET_NR_perf_event_open 241
-+#define TARGET_NR_accept4 242
-+#define TARGET_NR_recvmmsg 243
-+#define TARGET_NR_arch_specific_syscall 244
-+#define TARGET_NR_riscv_flush_icache (TARGET_NR_arch_specific_syscall + 15)
-+#define TARGET_NR_wait4 260
-+#define TARGET_NR_prlimit64 261
-+#define TARGET_NR_fanotify_init 262
-+#define TARGET_NR_fanotify_mark 263
-+#define TARGET_NR_name_to_handle_at 264
-+#define TARGET_NR_open_by_handle_at 265
-+#define TARGET_NR_clock_adjtime 266
-+#define TARGET_NR_syncfs 267
-+#define TARGET_NR_setns 268
-+#define TARGET_NR_sendmmsg 269
-+#define TARGET_NR_process_vm_readv 270
-+#define TARGET_NR_process_vm_writev 271
-+#define TARGET_NR_kcmp 272
-+#define TARGET_NR_finit_module 273
-+#define TARGET_NR_sched_setattr 274
-+#define TARGET_NR_sched_getattr 275
-+#define TARGET_NR_renameat2 276
-+#define TARGET_NR_seccomp 277
-+#define TARGET_NR_getrandom 278
-+#define TARGET_NR_memfd_create 279
-+#define TARGET_NR_bpf 280
-+#define TARGET_NR_execveat 281
-+#define TARGET_NR_userfaultfd 282
-+#define TARGET_NR_membarrier 283
-+#define TARGET_NR_mlock2 284
-+#define TARGET_NR_copy_file_range 285
-+#define TARGET_NR_preadv2 286
-+#define TARGET_NR_pwritev2 287
-+#define TARGET_NR_pkey_mprotect 288
-+#define TARGET_NR_pkey_alloc 289
-+#define TARGET_NR_pkey_free 290
-+#define TARGET_NR_statx 291
-+#define TARGET_NR_io_pgetevents 292
-+#define TARGET_NR_rseq 293
-+#define TARGET_NR_kexec_file_load 294
-+#define TARGET_NR_pidfd_send_signal 424
-+#define TARGET_NR_io_uring_setup 425
-+#define TARGET_NR_io_uring_enter 426
-+#define TARGET_NR_io_uring_register 427
-+#define TARGET_NR_open_tree 428
-+#define TARGET_NR_move_mount 429
-+#define TARGET_NR_fsopen 430
-+#define TARGET_NR_fsconfig 431
-+#define TARGET_NR_fsmount 432
-+#define TARGET_NR_fspick 433
-+#define TARGET_NR_pidfd_open 434
-+#define TARGET_NR_clone3 435
-+#define TARGET_NR_syscalls 436
-+
-+#endif /* LINUX_USER_RISCV_SYSCALL64_NR_H */
-diff --git a/linux-user/riscv/syscall_nr.h b/linux-user/riscv/syscall_nr.h
-index 5c87282209..0a5a2f2fb1 100644
---- a/linux-user/riscv/syscall_nr.h
-+++ b/linux-user/riscv/syscall_nr.h
-@@ -6,300 +6,10 @@
- #ifndef LINUX_USER_RISCV_SYSCALL_NR_H
- #define LINUX_USER_RISCV_SYSCALL_NR_H
- 
--#define TARGET_NR_io_setup 0
--#define TARGET_NR_io_destroy 1
--#define TARGET_NR_io_submit 2
--#define TARGET_NR_io_cancel 3
--#define TARGET_NR_io_getevents 4
--#define TARGET_NR_setxattr 5
--#define TARGET_NR_lsetxattr 6
--#define TARGET_NR_fsetxattr 7
--#define TARGET_NR_getxattr 8
--#define TARGET_NR_lgetxattr 9
--#define TARGET_NR_fgetxattr 10
--#define TARGET_NR_listxattr 11
--#define TARGET_NR_llistxattr 12
--#define TARGET_NR_flistxattr 13
--#define TARGET_NR_removexattr 14
--#define TARGET_NR_lremovexattr 15
--#define TARGET_NR_fremovexattr 16
--#define TARGET_NR_getcwd 17
--#define TARGET_NR_lookup_dcookie 18
--#define TARGET_NR_eventfd2 19
--#define TARGET_NR_epoll_create1 20
--#define TARGET_NR_epoll_ctl 21
--#define TARGET_NR_epoll_pwait 22
--#define TARGET_NR_dup 23
--#define TARGET_NR_dup3 24
- #ifdef TARGET_RISCV32
--#define TARGET_NR_fcntl64 25
-+# include "syscall32_nr.h"
- #else
--#define TARGET_NR_fcntl 25
-+# include "syscall64_nr.h"
- #endif
--#define TARGET_NR_inotify_init1 26
--#define TARGET_NR_inotify_add_watch 27
--#define TARGET_NR_inotify_rm_watch 28
--#define TARGET_NR_ioctl 29
--#define TARGET_NR_ioprio_set 30
--#define TARGET_NR_ioprio_get 31
--#define TARGET_NR_flock 32
--#define TARGET_NR_mknodat 33
--#define TARGET_NR_mkdirat 34
--#define TARGET_NR_unlinkat 35
--#define TARGET_NR_symlinkat 36
--#define TARGET_NR_linkat 37
--#define TARGET_NR_renameat 38
--#define TARGET_NR_umount2 39
--#define TARGET_NR_mount 40
--#define TARGET_NR_pivot_root 41
--#define TARGET_NR_nfsservctl 42
--#define TARGET_NR_statfs 43
--#define TARGET_NR_fstatfs 44
--#define TARGET_NR_truncate 45
--#define TARGET_NR_ftruncate 46
--#define TARGET_NR_fallocate 47
--#define TARGET_NR_faccessat 48
--#define TARGET_NR_chdir 49
--#define TARGET_NR_fchdir 50
--#define TARGET_NR_chroot 51
--#define TARGET_NR_fchmod 52
--#define TARGET_NR_fchmodat 53
--#define TARGET_NR_fchownat 54
--#define TARGET_NR_fchown 55
--#define TARGET_NR_openat 56
--#define TARGET_NR_close 57
--#define TARGET_NR_vhangup 58
--#define TARGET_NR_pipe2 59
--#define TARGET_NR_quotactl 60
--#define TARGET_NR_getdents64 61
--#ifdef TARGET_RISCV32
--#define TARGET_NR__llseek 62
--#else
--#define TARGET_NR_lseek 62
--#endif
--#define TARGET_NR_read 63
--#define TARGET_NR_write 64
--#define TARGET_NR_readv 65
--#define TARGET_NR_writev 66
--#define TARGET_NR_pread64 67
--#define TARGET_NR_pwrite64 68
--#define TARGET_NR_preadv 69
--#define TARGET_NR_pwritev 70
--#define TARGET_NR_sendfile 71
--#define TARGET_NR_pselect6 72
--#define TARGET_NR_ppoll 73
--#define TARGET_NR_signalfd4 74
--#define TARGET_NR_vmsplice 75
--#define TARGET_NR_splice 76
--#define TARGET_NR_tee 77
--#define TARGET_NR_readlinkat 78
--#define TARGET_NR_newfstatat 79
--#define TARGET_NR_fstat 80
--#define TARGET_NR_sync 81
--#define TARGET_NR_fsync 82
--#define TARGET_NR_fdatasync 83
--#define TARGET_NR_sync_file_range 84
--#define TARGET_NR_timerfd_create 85
--#define TARGET_NR_timerfd_settime 86
--#define TARGET_NR_timerfd_gettime 87
--#define TARGET_NR_utimensat 88
--#define TARGET_NR_acct 89
--#define TARGET_NR_capget 90
--#define TARGET_NR_capset 91
--#define TARGET_NR_personality 92
--#define TARGET_NR_exit 93
--#define TARGET_NR_exit_group 94
--#define TARGET_NR_waitid 95
--#define TARGET_NR_set_tid_address 96
--#define TARGET_NR_unshare 97
--#define TARGET_NR_futex 98
--#define TARGET_NR_set_robust_list 99
--#define TARGET_NR_get_robust_list 100
--#define TARGET_NR_nanosleep 101
--#define TARGET_NR_getitimer 102
--#define TARGET_NR_setitimer 103
--#define TARGET_NR_kexec_load 104
--#define TARGET_NR_init_module 105
--#define TARGET_NR_delete_module 106
--#define TARGET_NR_timer_create 107
--#define TARGET_NR_timer_gettime 108
--#define TARGET_NR_timer_getoverrun 109
--#define TARGET_NR_timer_settime 110
--#define TARGET_NR_timer_delete 111
--#define TARGET_NR_clock_settime 112
--#define TARGET_NR_clock_gettime 113
--#define TARGET_NR_clock_getres 114
--#define TARGET_NR_clock_nanosleep 115
--#define TARGET_NR_syslog 116
--#define TARGET_NR_ptrace 117
--#define TARGET_NR_sched_setparam 118
--#define TARGET_NR_sched_setscheduler 119
--#define TARGET_NR_sched_getscheduler 120
--#define TARGET_NR_sched_getparam 121
--#define TARGET_NR_sched_setaffinity 122
--#define TARGET_NR_sched_getaffinity 123
--#define TARGET_NR_sched_yield 124
--#define TARGET_NR_sched_get_priority_max 125
--#define TARGET_NR_sched_get_priority_min 126
--#define TARGET_NR_sched_rr_get_interval 127
--#define TARGET_NR_restart_syscall 128
--#define TARGET_NR_kill 129
--#define TARGET_NR_tkill 130
--#define TARGET_NR_tgkill 131
--#define TARGET_NR_sigaltstack 132
--#define TARGET_NR_rt_sigsuspend 133
--#define TARGET_NR_rt_sigaction 134
--#define TARGET_NR_rt_sigprocmask 135
--#define TARGET_NR_rt_sigpending 136
--#define TARGET_NR_rt_sigtimedwait 137
--#define TARGET_NR_rt_sigqueueinfo 138
--#define TARGET_NR_rt_sigreturn 139
--#define TARGET_NR_setpriority 140
--#define TARGET_NR_getpriority 141
--#define TARGET_NR_reboot 142
--#define TARGET_NR_setregid 143
--#define TARGET_NR_setgid 144
--#define TARGET_NR_setreuid 145
--#define TARGET_NR_setuid 146
--#define TARGET_NR_setresuid 147
--#define TARGET_NR_getresuid 148
--#define TARGET_NR_setresgid 149
--#define TARGET_NR_getresgid 150
--#define TARGET_NR_setfsuid 151
--#define TARGET_NR_setfsgid 152
--#define TARGET_NR_times 153
--#define TARGET_NR_setpgid 154
--#define TARGET_NR_getpgid 155
--#define TARGET_NR_getsid 156
--#define TARGET_NR_setsid 157
--#define TARGET_NR_getgroups 158
--#define TARGET_NR_setgroups 159
--#define TARGET_NR_uname 160
--#define TARGET_NR_sethostname 161
--#define TARGET_NR_setdomainname 162
--#define TARGET_NR_getrlimit 163
--#define TARGET_NR_setrlimit 164
--#define TARGET_NR_getrusage 165
--#define TARGET_NR_umask 166
--#define TARGET_NR_prctl 167
--#define TARGET_NR_getcpu 168
--#define TARGET_NR_gettimeofday 169
--#define TARGET_NR_settimeofday 170
--#define TARGET_NR_adjtimex 171
--#define TARGET_NR_getpid 172
--#define TARGET_NR_getppid 173
--#define TARGET_NR_getuid 174
--#define TARGET_NR_geteuid 175
--#define TARGET_NR_getgid 176
--#define TARGET_NR_getegid 177
--#define TARGET_NR_gettid 178
--#define TARGET_NR_sysinfo 179
--#define TARGET_NR_mq_open 180
--#define TARGET_NR_mq_unlink 181
--#define TARGET_NR_mq_timedsend 182
--#define TARGET_NR_mq_timedreceive 183
--#define TARGET_NR_mq_notify 184
--#define TARGET_NR_mq_getsetattr 185
--#define TARGET_NR_msgget 186
--#define TARGET_NR_msgctl 187
--#define TARGET_NR_msgrcv 188
--#define TARGET_NR_msgsnd 189
--#define TARGET_NR_semget 190
--#define TARGET_NR_semctl 191
--#define TARGET_NR_semtimedop 192
--#define TARGET_NR_semop 193
--#define TARGET_NR_shmget 194
--#define TARGET_NR_shmctl 195
--#define TARGET_NR_shmat 196
--#define TARGET_NR_shmdt 197
--#define TARGET_NR_socket 198
--#define TARGET_NR_socketpair 199
--#define TARGET_NR_bind 200
--#define TARGET_NR_listen 201
--#define TARGET_NR_accept 202
--#define TARGET_NR_connect 203
--#define TARGET_NR_getsockname 204
--#define TARGET_NR_getpeername 205
--#define TARGET_NR_sendto 206
--#define TARGET_NR_recvfrom 207
--#define TARGET_NR_setsockopt 208
--#define TARGET_NR_getsockopt 209
--#define TARGET_NR_shutdown 210
--#define TARGET_NR_sendmsg 211
--#define TARGET_NR_recvmsg 212
--#define TARGET_NR_readahead 213
--#define TARGET_NR_brk 214
--#define TARGET_NR_munmap 215
--#define TARGET_NR_mremap 216
--#define TARGET_NR_add_key 217
--#define TARGET_NR_request_key 218
--#define TARGET_NR_keyctl 219
--#define TARGET_NR_clone 220
--#define TARGET_NR_execve 221
--#ifdef TARGET_RISCV32
--#define TARGET_NR_mmap2 222
--#define TARGET_NR_fadvise64_64 223
--#else
--#define TARGET_NR_mmap 222
--#define TARGET_NR_fadvise64 223
--#endif
--#define TARGET_NR_swapon 224
--#define TARGET_NR_swapoff 225
--#define TARGET_NR_mprotect 226
--#define TARGET_NR_msync 227
--#define TARGET_NR_mlock 228
--#define TARGET_NR_munlock 229
--#define TARGET_NR_mlockall 230
--#define TARGET_NR_munlockall 231
--#define TARGET_NR_mincore 232
--#define TARGET_NR_madvise 233
--#define TARGET_NR_remap_file_pages 234
--#define TARGET_NR_mbind 235
--#define TARGET_NR_get_mempolicy 236
--#define TARGET_NR_set_mempolicy 237
--#define TARGET_NR_migrate_pages 238
--#define TARGET_NR_move_pages 239
--#define TARGET_NR_rt_tgsigqueueinfo 240
--#define TARGET_NR_perf_event_open 241
--#define TARGET_NR_accept4 242
--#define TARGET_NR_recvmmsg 243
--#define TARGET_NR_arch_specific_syscall 244
--#define TARGET_NR_wait4 260
--#define TARGET_NR_prlimit64 261
--#define TARGET_NR_fanotify_init 262
--#define TARGET_NR_fanotify_mark 263
--#define TARGET_NR_name_to_handle_at 264
--#define TARGET_NR_open_by_handle_at 265
--#define TARGET_NR_clock_adjtime 266
--#define TARGET_NR_syncfs 267
--#define TARGET_NR_setns 268
--#define TARGET_NR_sendmmsg 269
--#define TARGET_NR_process_vm_readv 270
--#define TARGET_NR_process_vm_writev 271
--#define TARGET_NR_kcmp 272
--#define TARGET_NR_finit_module 273
--#define TARGET_NR_sched_setattr 274
--#define TARGET_NR_sched_getattr 275
--#define TARGET_NR_renameat2 276
--#define TARGET_NR_seccomp 277
--#define TARGET_NR_getrandom 278
--#define TARGET_NR_memfd_create 279
--#define TARGET_NR_bpf 280
--#define TARGET_NR_execveat 281
--#define TARGET_NR_userfaultfd 282
--#define TARGET_NR_membarrier 283
--#define TARGET_NR_mlock2 284
--#define TARGET_NR_copy_file_range 285
--#define TARGET_NR_preadv2 286
--#define TARGET_NR_pwritev2 287
--#define TARGET_NR_pkey_mprotect 288
--#define TARGET_NR_pkey_alloc 289
--#define TARGET_NR_pkey_free 290
--#define TARGET_NR_statx 291
--#define TARGET_NR_io_pgetevents 292
--#define TARGET_NR_rseq 293
--#define TARGET_NR_kexec_file_load 294
--
--#define TARGET_NR_syscalls (TARGET_NR_kexec_file_load + 1)
- 
- #endif
--- 
-2.25.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTg0MTQzNzQ4Lmdp
+dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2OCAwLzRdICBsaW51eC11c2VyOiBnZW5l
+cmF0ZSBzeXNjYWxsX25yLnNoIGZvciBSSVNDLVYKTWVzc2FnZS1pZDogY292ZXIuMTU4NDE0Mzc0
+OC5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
+fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozNjE3MDc5
+IGxpbnV4LXVzZXIvcmlzY3Y6IFVwZGF0ZSB0aGUgc3lzY2FsbF9ucidzIHRvIHRoZSA1LjUga2Vy
+bmVsCjUyNmFjZGEgbGludXgtdXNlcjogU3VwcG9ydCBmdXRleF90aW1lNjQKYjhhNjFmZSBsaW51
+eC11c2VyL3N5c2NhbGw6IEFkZCBzdXBwb3J0IGZvciBjbG9ja19nZXR0aW1lNjQvY2xvY2tfc2V0
+dGltZTY0CjY4NTQyMGUgbGludXgtdXNlcjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQoxLzQgQ2hlY2tpbmcgY29tbWl0IDY4NTQyMGUwN2YxYiAobGludXgtdXNl
+cjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzKQoyLzQgQ2hlY2tpbmcgY29tbWl0IGI4YTYxZmVmMGZk
+YyAobGludXgtdXNlci9zeXNjYWxsOiBBZGQgc3VwcG9ydCBmb3IgY2xvY2tfZ2V0dGltZTY0L2Ns
+b2NrX3NldHRpbWU2NCkKMy80IENoZWNraW5nIGNvbW1pdCA1MjZhY2RhZjA2ODYgKGxpbnV4LXVz
+ZXI6IFN1cHBvcnQgZnV0ZXhfdGltZTY0KQpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMg
+ZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
+OjI0ODoKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXgpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3Bl
+Y2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMjY6IEZJTEU6IGxpbnV4LXVzZXIvc3lz
+Y2FsbC5jOjI1MToKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXhfdGltZTY0KQoKV0FSTklORzogYXJj
+aGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzM3OiBGSUxFOiBs
+aW51eC11c2VyL3N5c2NhbGwuYzozMDM6CisjaWYgKGRlZmluZWQoVEFSR0VUX05SX2Z1dGV4KSAm
+JiBkZWZpbmVkKF9fTlJfZnV0ZXgpKSB8fCBcCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lm
+aWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNDM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
+bC5jOjMwOToKKyNpZiAoZGVmaW5lZChUQVJHRVRfTlJfZnV0ZXhfdGltZTY0KSAmJiBkZWZpbmVk
+KF9fTlJfZnV0ZXhfdGVpbTY0KSkKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcs
+JyAoY3R4OlZ4VikKIzQ0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMTA6Citfc3lzY2Fs
+bDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAg
+ICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhW
+KQojNDQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjMxMDoKK19zeXNjYWxsNihpbnQsc3lz
+X2Z1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQsb3AsaW50LHZhbCwKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
+Y3R4Ok94VikKIzQ0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMTA6Citfc3lzY2FsbDYo
+aW50LHN5c19mdXRleF90aW1lNjQsaW50ICosdWFkZHIsaW50LG9wLGludCx2YWwsCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0
+ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEw
+OgorX3N5c2NhbGw2KGludCxzeXNfZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQs
+dmFsLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNDQ6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjMxMDoKK19zeXNjYWxsNihpbnQsc3lzX2Z1dGV4X3RpbWU2NCxpbnQg
+Kix1YWRkcixpbnQsb3AsaW50LHZhbCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0
+eDpWeFYpCiM0NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEwOgorX3N5c2NhbGw2KGlu
+dCxzeXNfZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLAogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBy
+ZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQ0OiBGSUxFOiBsaW51eC11c2VyL3N5
+c2NhbGwuYzozMTA6Citfc3lzY2FsbDYoaW50LHN5c19mdXRleF90aW1lNjQsaW50ICosdWFkZHIs
+aW50LG9wLGludCx2YWwsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4
+Ok94VikKIzQ1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzozMTE6CisgICAgICAgICAgY29u
+c3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0
+ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzEx
+OgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIy
+LGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpPeFYpCiM0NTogRklMRTog
+bGludXgtdXNlci9zeXNjYWxsLmM6MzExOgorICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3Bl
+YyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
+dGhhdCAnLCcgKGN0eDpWeFYpCiM0NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MzExOgor
+ICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGlu
+dCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQoj
+NDU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjMxMToKKyAgICAgICAgICBjb25zdCBzdHJ1
+Y3QgdGltZXNwZWMgKix0aW1lb3V0LGludCAqLHVhZGRyMixpbnQsdmFsMykKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5H
+OiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTU6IEZJ
+TEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc3NjoKKyNpZiBkZWZpbmVkKF9fTlJfZnV0ZXgpCgpX
+QVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAoj
+NTk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MDoKKyNpZiBkZWZpbmVkKF9fTlJfZnV0
+ZXhfdGltZTY0KQoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhW
+KQojNjA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MToKK3NhZmVfc3lzY2FsbDYoaW50
+LGZ1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQsb3AsaW50LHZhbCwgXAogICAgICAgICAgICAg
+ICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM2
+MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgxOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0
+ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0
+eDpPeFYpCiM2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgxOgorc2FmZV9zeXNjYWxs
+NihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0
+ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM2MDogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6Nzgx
+Ogorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGludCAqLHVhZGRyLGludCxvcCxpbnQs
+dmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJP
+Ujogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM2MDogRklMRTogbGlu
+dXgtdXNlci9zeXNjYWxsLmM6NzgxOgorc2FmZV9zeXNjYWxsNihpbnQsZnV0ZXhfdGltZTY0LGlu
+dCAqLHVhZGRyLGludCxvcCxpbnQsdmFsLCBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywn
+IChjdHg6VnhWKQojNjA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MToKK3NhZmVfc3lz
+Y2FsbDYoaW50LGZ1dGV4X3RpbWU2NCxpbnQgKix1YWRkcixpbnQsb3AsaW50LHZhbCwgXAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzYwOiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGwuYzo3ODE6CitzYWZlX3N5c2NhbGw2KGludCxmdXRleF90aW1lNjQsaW50ICos
+dWFkZHIsaW50LG9wLGludCx2YWwsIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQg
+JywnIChjdHg6T3hWKQojNjE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjc4MjoKKyAgICAg
+ICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICosdGltZW91dCxpbnQgKix1YWRkcjIsaW50
+LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNjE6IEZJTEU6IGxpbnV4LXVz
+ZXIvc3lzY2FsbC5jOjc4MjoKKyAgICAgICAgICAgICAgY29uc3Qgc3RydWN0IHRpbWVzcGVjICos
+dGltZW91dCxpbnQgKix1YWRkcjIsaW50LHZhbDMpCiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAn
+LCcgKGN0eDpPeFYpCiM2MTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NzgyOgorICAgICAg
+ICAgICAgICBjb25zdCBzdHJ1Y3QgdGltZXNwZWMgKix0aW1lb3V0LGludCAqLHVhZGRyMixpbnQs
+dmFsMykKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzYxOiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3ODI6CisgICAgICAgICAgICAgIGNvbnN0IHN0cnVj
+dCB0aW1lc3BlYyAqLHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzYxOiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGwuYzo3ODI6CisgICAgICAgICAgICAgIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyAq
+LHRpbWVvdXQsaW50ICosdWFkZHIyLGludCx2YWwzKQogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBhcmNoaXRl
+Y3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojODQ6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjY5MTM6CisjaWYgZGVmaW5lZChfX05SX2Z1dGV4KQoKV0FSTklORzog
+YXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzkwOiBGSUxF
+OiBsaW51eC11c2VyL3N5c2NhbGwuYzo2OTE5OgorI2lmIGRlZmluZWQoX19OUl9mdXRleF90aW1l
+NjQpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZv
+aWRlZAojOTY6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY5MjU6CisjaWYgZGVmaW5lZChf
+X05SX2Z1dGV4KQoKV0FSTklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxk
+IGJlIGF2b2lkZWQKIzEwOTogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6NjkzODoKKyNpZiBk
+ZWZpbmVkKF9fTlJfZnV0ZXgpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5l
+cyBzaG91bGQgYmUgYXZvaWRlZAojMTE0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo2OTQz
+OgorI2lmIGRlZmluZWQoX19OUl9mdXRleF90aW1lNjQpCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUg
+c3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTIxOiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGwuYzo2OTUwOgorI2lmIGRlZmluZWQoX19OUl9mdXRleCkKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjcwMTM6
+CitzdGF0aWMgaW50IGRvX2Z1dGV4X3RpbWU2NCh0YXJnZXRfdWxvbmcgdWFkZHIsIGludCBvcCwg
+aW50IHZhbCwgdGFyZ2V0X3Vsb25nIHRpbWVvdXQsCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
+c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTc0OiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGwuYzo3MDE5OgorICAgIC8qID8/PyBXZSBhc3N1bWUgRlVURVhfKiBjb25zdGFudHMg
+YXJlIHRoZSBzYW1lIG9uIGJvdGggaG9zdAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlICog
+b24gc3Vic2VxdWVudCBsaW5lcwojMTc1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDIw
+OgorICAgIC8qID8/PyBXZSBhc3N1bWUgRlVURVhfKiBjb25zdGFudHMgYXJlIHRoZSBzYW1lIG9u
+IGJvdGggaG9zdAorICAgICAgIGFuZCB0YXJnZXQuICAqLwoKV0FSTklORzogQmxvY2sgY29tbWVu
+dHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0ZSBsaW5lCiMxNzU6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjcwMjA6CisgICAgICAgYW5kIHRhcmdldC4gICovCgpXQVJOSU5HOiBC
+bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTk5OiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDQ0OgorICAgICAgICAvKiBGb3IgRlVURVhfUkVR
+VUVVRSwgRlVURVhfQ01QX1JFUVVFVUUsIGFuZCBGVVRFWF9XQUtFX09QLCB0aGUKCldBUk5JTkc6
+IEJsb2NrIGNvbW1lbnRzIHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMKIzIwMDogRklMRTogbGlu
+dXgtdXNlci9zeXNjYWxsLmM6NzA0NToKKyAgICAgICAgLyogRm9yIEZVVEVYX1JFUVVFVUUsIEZV
+VEVYX0NNUF9SRVFVRVVFLCBhbmQgRlVURVhfV0FLRV9PUCwgdGhlCisgICAgICAgICAgIFRJTUVP
+VVQgcGFyYW1ldGVyIGlzIGludGVycHJldGVkIGFzIGEgdWludDMyX3QgYnkgdGhlIGtlcm5lbC4K
+CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUg
+bGluZQojMjAzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo3MDQ4OgorICAgICAgICAgICBz
+aW5jZSBpdCdzIG5vdCBjb21wYXJlZCB0byBndWVzdCBtZW1vcnkuICAqLwoKdG90YWw6IDI0IGVy
+cm9ycywgMTkgd2FybmluZ3MsIDIxMiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzQgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCjQvNCBDaGVja2luZyBjb21taXQgMzYxNzA3OTQyNjRjIChsaW51
+eC11c2VyL3Jpc2N2OiBVcGRhdGUgdGhlIHN5c2NhbGxfbnIncyB0byB0aGUgNS41IGtlcm5lbCkK
+V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
+UyBuZWVkIHVwZGF0aW5nPwojMTI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJy
+b3JzLCAxIHdhcm5pbmdzLCA4OTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC80IGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzL2NvdmVyLjE1ODQxNDM3NDguZ2l0LmFsaXN0YWlyLmZyYW5jaXNAd2RjLmNvbS90
+ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
