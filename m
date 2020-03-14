@@ -2,65 +2,94 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77962C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAB6C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:51:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 508442074B
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:50:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508442074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD1862074B
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 01:51:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hxNUKTZ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD1862074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jCvwt-0008QB-HC
-	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 21:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55165)
+	id 1jCvxt-0001IK-3V
+	for qemu-devel@archiver.kernel.org; Fri, 13 Mar 2020 21:51:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCvvv-0007Rv-99
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:49:48 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jCvwT-0008Cd-Iw
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jCvvt-0003da-KI
- for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:49:46 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42895)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jCvvt-0003C2-5V; Fri, 13 Mar 2020 21:49:45 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08528517|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.0909353-0.000417432-0.908647;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03268; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.H.8j2kg_1584150574; 
-Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H.8j2kg_1584150574)
- by smtp.aliyun-inc.com(10.147.44.145);
- Sat, 14 Mar 2020 09:49:35 +0800
-Subject: Re: [PATCH v5 05/60] target/riscv: add vector stride load and store
- instructions
-To: Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <alistair23@gmail.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jCvwS-0005kb-I5
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:50:21 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:52597)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jCvwS-0005gj-AX
+ for qemu-devel@nongnu.org; Fri, 13 Mar 2020 21:50:20 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id f15so5069763pjq.2
+ for <qemu-devel@nongnu.org>; Fri, 13 Mar 2020 18:50:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UCiInjJDQYoCkQCTjf1DHVbDt9m5uWJ7EptQOdDN1F0=;
+ b=hxNUKTZ6Bce6YZsEc4cH4jFU4qFu0yJushF+GyBFwX3m2L2sNu5MhJnI5NW0lHGaNN
+ cW7kVbz3LudDKsSqdO9dshnV1Z1JRjH0E+Osx/U1IZLWtjOiSBKjp3bBOgyONtbUNrBo
+ e79Y7q8PEHmhpni+QyP/PaBmqm5TrDUaixCjKRhkaNuMpAgzEsJedzuGGciL5VzjLmGE
+ ZF72U9pIiF1yUhxmD2OAuJVPrYAzR/zzG6cE/rcrBQnoI3y45dzuDDh2nQ+8kUCVFcrh
+ jVjwFuNoc52cq+iHA/vDtmHc/Ie8UUHT+lmXVcFFE+VaLMaI53mEhyZiL6Iv4uJ/f6x9
+ dXJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UCiInjJDQYoCkQCTjf1DHVbDt9m5uWJ7EptQOdDN1F0=;
+ b=N5MJGJ/3HzoEZhaQqc0VzoFONbLd8BtCCiwKtM08giV9D1vOBhOyqh11QQYc4YkQuA
+ jr3BJIXQGx4L/FVnnAUQ0tawHQq9gVbc7izfaUKz4hPODdD7ENuHe/tasl6zw827Tf4J
+ yKZdT8ZRzVxAEHEMvR5UXOFPKIiWDlRh1ueYALhThtT1ecAU3MOhWqTFnYH8z2+4k9cj
+ 3KPRDDWTZQrGmuPtZi/n5LW6KmKZ3MPBNX/5j9CvlrnRjp8ESKXk2ElAfFD71QKPHM9W
+ iWGUOIkGxz+zRVFvqTlMsllIjrawsXqD+11GWF2ogyLUv+L7xnaxR5CqsaMjNw/ffX/2
+ feRA==
+X-Gm-Message-State: ANhLgQ2LAQJ1+BBXXobO9PJwY/71nw7MDOESL25hW1ZuASai/4FBne1H
+ BX5JI5+2AWkQc8AZYJqztR6NHg==
+X-Google-Smtp-Source: ADFU+vtdB+XXlUBzFIDP2WOUZrQMhfLPBo4W1KRwBKK6uEb7iXZOIFgrMi9iN/BkpToEBWho5viP/A==
+X-Received: by 2002:a17:902:728d:: with SMTP id
+ d13mr15918961pll.92.1584150619409; 
+ Fri, 13 Mar 2020 18:50:19 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ e187sm2141568pfe.143.2020.03.13.18.50.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 13 Mar 2020 18:50:18 -0700 (PDT)
+Subject: Re: [PATCH v5 07/60] target/riscv: add fault-only-first unit stride
+ load
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
 References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-6-zhiwei_liu@c-sky.com>
- <CAKmqyKOiKUqzGSDd1+TvqhCT6pjeEXEX-QVzYhcaiRa-y4D98w@mail.gmail.com>
- <445d93e8-1d2c-9877-84a3-ed62a5920d89@c-sky.com>
- <392b9e62-0ff7-de49-f5dc-793bc38ba484@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <57edb267-4ef7-b8da-7c38-5ecb3596179b@c-sky.com>
-Date: Sat, 14 Mar 2020 09:49:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ <20200312145900.2054-8-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9d6ca94b-2097-678c-a890-8b413b6d69d0@linaro.org>
+Date: Fri, 13 Mar 2020 18:50:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <392b9e62-0ff7-de49-f5dc-793bc38ba484@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200312145900.2054-8-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,51 +101,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+> The unit-stride fault-only-fault load instructions are used to
+> vectorize loops with data-dependent exit conditions(while loops).
+> These instructions execute as a regular load except that they
+> will only take a trap on element 0.
+> 
+> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> ---
+>  target/riscv/helper.h                   |  22 +++++
+>  target/riscv/insn32.decode              |   7 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c |  69 +++++++++++++++
+>  target/riscv/vector_helper.c            | 111 ++++++++++++++++++++++++
+>  4 files changed, 209 insertions(+)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-On 2020/3/14 9:26, Richard Henderson wrote:
-> On 3/13/20 2:32 PM, LIU Zhiwei wrote:
->>>> +/* check functions */
->>>> +static bool vext_check_isa_ill(DisasContext *s, target_ulong isa)
->>>> +{
->>>> +    return !s->vill && ((s->misa & isa) == isa);
->>>> +}
->>> I don't think we need a new function to check ISA.
->> I don't think so.
->>
->> Although there is a riscv_has_ext(env, isa) in cpu.h, it is not proper in this
->> file,
->> as it is in translation time and  usually DisasContext   is used here instead
->> of CPURISCVState.
-> In translate.c we have has_ext() for this purpose.
-Yes, I will use it.
-> I think you don't need to test has_ext(s, RVV) at all,
-> because in cpu_get_tb_cpu_state(), you already tested
-> RVV, and set VILL if RVV was not present.
->
-> Thus testing vill here is sufficient.  A comment here
-> to remind us of that fact would be appropriate.
-Yes, I forgot it. I will keep the function and add a comment.
-> For those few cases where you have an extension beyond
-> RVV, e.g. amo_check() I think you should simply use
-> has_ext() like so:
->
-> static bool amo_check(DisasContext *s, arg_rwdvm *a)
-> {
->      return (!s->vill &&
->              has_ext(s, RVA) &&
->              ...);
-> }
-Yes, I will fix it in that patch.
->
-> r~
+r~
 
 
