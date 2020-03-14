@@ -2,59 +2,92 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBA0C1975A
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5859FC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B21942073C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21942073C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24CF92073C
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:38:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uUoO+8mA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CF92073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD2JI-00026H-Un
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54529)
+	id 1jD2JU-0002Ve-9q
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1jD2HC-0006cx-SH
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:12 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jD2HG-0006h0-VG
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1jD2HB-0004bk-H5
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:10 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53340 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1jD2HA-0004M2-QT
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:09 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 07CC86648574A9F8CC6D;
- Sat, 14 Mar 2020 16:36:03 +0800 (CST)
-Received: from localhost.huawei.com (10.175.104.216) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 14 Mar 2020 16:35:53 +0800
-From: Pan Nengyuan <pannengyuan@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v5 2/4] mac_via: fix incorrect creation of mos6522 device in
- mac_via
-Date: Sat, 14 Mar 2020 16:47:28 +0800
-Message-ID: <20200314084730.25876-3-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.18.2
-In-Reply-To: <20200314084730.25876-1-pannengyuan@huawei.com>
-References: <20200314084730.25876-1-pannengyuan@huawei.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1jD2HF-0004yd-Qo
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:14 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37930)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jD2HF-0004t0-Jr
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:36:13 -0400
+Received: by mail-pf1-x441.google.com with SMTP id z5so6745122pfn.5
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 01:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zewqT5/C3Y83vvxeyWUZWn8omH2OG4eAnBdgTFaVgTA=;
+ b=uUoO+8mAsOsfan9bQd9BuWga7Xb/N9ZFVdyXPZXSEA1FGAzs7tQFRUsPjraFV1i8R/
+ cTF5CWVGpMyvM0JSkJVpUwgIsISFy7nnxsTVv6f3fRrBUP/3M44Q88/F25qTH+P8ny9o
+ a4ogZt4dEHw+/KwNCQcnoG5XPtRun3p8GWKezkcp2V2866LPnEI42WMQPsRXzH7OfqUZ
+ iZZ0ozCD4dXOKgnLQxLezri1VQZLwEn3p8rACCuVH5WFOeAm8dfNB/yLOSv3iAIzce8c
+ eCH/tI+XdjOspBejIIbzI+8niBS5R2RQbHyPXK5A73tTLQ7z351WpV2BIR5lIiplQ2qv
+ PxLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zewqT5/C3Y83vvxeyWUZWn8omH2OG4eAnBdgTFaVgTA=;
+ b=IVQSiPglnoHaP+qu0Q6oTd6iZ/UnQsA6GywqqYTVLCG2N25SgQMJmlkF7Q5MF6nP+g
+ cZS+7nJE60X18+kT8zq4Nu2AGNtENvz0CKxYpGQBGd4YBhsW+Q+sycsdPgm52azqgwzQ
+ AVnA0WwO3LNI/R5ARack0+lZt3aJGfFYx9GQON1cvWYXW/LwpTPbHudAaq6gpqkzwzrw
+ FLqg0iI4HK0a85CnzD0FyRXgbh+gNaQX8avmjm0gyiZKKUqzEG7b3wOuMYJD9+10t5l0
+ 930X8eOqtGsHLKu51LLXvv7S+qwYbMGnGIe5g6syZ0DV1EMhDqp/y1UWKOA4vEMHP7aT
+ 6ksw==
+X-Gm-Message-State: ANhLgQ3CWaXXyr7BVWiu1gRYZ4tK5QuxqN3C8Dzj1+epONJPcyLzNP5P
+ oDgSS3lalMismuanyrvkMcSj5w==
+X-Google-Smtp-Source: ADFU+vv4JZ9dxc2jgYBn/k0lp44QS/DRuQp8rF7q05ysBnPGRklJm3sefbb2tUJtfyM31HnBYgogYQ==
+X-Received: by 2002:aa7:83d7:: with SMTP id j23mr17105617pfn.77.1584174972314; 
+ Sat, 14 Mar 2020 01:36:12 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ p4sm111341pfg.163.2020.03.14.01.36.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 14 Mar 2020 01:36:11 -0700 (PDT)
+Subject: Re: [PATCH v5 28/60] target/riscv: vector narrowing fixed-point clip
+ instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-29-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <149695d1-1bd2-2011-f467-ae35606dab40@linaro.org>
+Date: Sat, 14 Mar 2020 01:36:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.216]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+In-Reply-To: <20200312145900.2054-29-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,99 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- Pan Nengyuan <pannengyuan@huawei.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent
- Vivier <laurent@vivier.eu>, euler.robot@huawei.com
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch fix a bug in mac_via where it failed to actually realize devices it was using.
-And move the init codes which inits the mos6522 objects and properties on them from realize()
-into init(). However, we keep qdev_set_parent_bus in realize(), otherwise it will cause
-device-introspect-test test fail. Then do the realize mos6522 device in the mac_vir_realize.
+On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+> +static int8_t vnclip8(CPURISCVState *env, int16_t a, int8_t b)
+> +{
+> +    uint8_t round, shift = b & 0xf;
+> +    int16_t res;
+> +
+> +    round = get_round(env, a, shift);
+> +    res   = (a >> shift)  + round;
+> +    if (res > INT8_MAX) {
+> +        env->vxsat = 0x1;
+> +        return INT8_MAX;
+> +    } else if (res < INT8_MIN) {
+> +        env->vxsat = 0x1;
+> +        return INT8_MIN;
+> +    } else {
+> +        return res;
+> +    }
+> +}
+> +static int16_t vnclip16(CPURISCVState *env, int32_t a, int16_t b)
 
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
----
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
-v4->v3:
-- split v3 into two patches, this patch fix incorrect creation of mos6522, move inits and props
-  from realize into init.
-v5->v4:
-- remove redundant code.
-- As discussion in https://patchwork.kernel.org/patch/11421229/, we still keep 
-  qdev_set_parent_bus in realize().
----
- hw/misc/mac_via.c | 40 +++++++++++++++++++++++++++-------------
- 1 file changed, 27 insertions(+), 13 deletions(-)
+Likewise.
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index b7d0012794..d208f0b18a 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -868,24 +868,24 @@ static void mac_via_reset(DeviceState *dev)
- static void mac_via_realize(DeviceState *dev, Error **errp)
- {
-     MacVIAState *m = MAC_VIA(dev);
--    MOS6522State *ms;
-     struct tm tm;
-     int ret;
-+    Error *err = NULL;
- 
--    /* Init VIAs 1 and 2 */
--    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
--                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via1), sysbus_get_default());
-+    qdev_set_parent_bus(DEVICE(&m->mos6522_via2), sysbus_get_default());
- 
--    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
--                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
-+    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
--    /* Pass through mos6522 output IRQs */
--    ms = MOS6522(&m->mos6522_via1);
--    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
--                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
--    ms = MOS6522(&m->mos6522_via2);
--    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
--                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
-     /* Pass through mos6522 input IRQs */
-     qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
-@@ -948,6 +948,20 @@ static void mac_via_init(Object *obj)
-     /* ADB */
-     qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
-                         TYPE_ADB_BUS, DEVICE(obj), "adb.0");
-+
-+    /* Init VIAs 1 and 2 */
-+    object_initialize_child(OBJECT(m), "via1", &m->mos6522_via1,
-+                            sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1,
-+                            &error_abort, NULL);
-+    object_initialize_child(OBJECT(m), "via2", &m->mos6522_via2,
-+                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2,
-+                            &error_abort, NULL);
-+
-+    /* Pass through mos6522 output IRQs */
-+    object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(&m->mos6522_via1),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(&m->mos6522_via2),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
- }
- 
- static void postload_update_cb(void *opaque, int running, RunState state)
--- 
-2.18.2
 
+r~
 
