@@ -2,92 +2,103 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54310C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33550C0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:28:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A8E2074C
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3B9D2074C
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 08:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xOggvFNO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A8E2074C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anfM78Rm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B9D2074C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD29G-0001RF-8q
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:27:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49845)
+	id 1jD29i-00020c-TI
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 04:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jD28X-0000sT-Ox
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:14 -0400
+ (envelope-from <philmd@redhat.com>) id 1jD28t-0001B8-8T
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jD28W-0007Pc-S3
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:13 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40701)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jD28W-0007Ni-Lx
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:12 -0400
-Received: by mail-pf1-x443.google.com with SMTP id l184so6722848pfl.7
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 01:27:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ofI65jt8EpvfGgFPbqGu+r2iOExM/ICFwlma49Vh2d4=;
- b=xOggvFNORlE9IE5EfjqjnY6QrXdZUW49rbV/E6nq//Z91KwFQjdn8/kuvH1mZGgGa4
- 5SbnAlQ2/mxURxFKTHdYUZ9tujY59BpRtBloGHYwGGQvXApvTYcRfiSl8AXvosm5AOe0
- FbncWeiSWOZPSBjb9Lls+r4xzXTgZPrJUi0Ek6cds4/nGERhk/2dTcccxMkY41XGhUYx
- 7PlpFjT1scVe1gD8QxNPNfyc3vMOreFGXihMcb8Z/6FDxT6hQt6G4b58JVkWqDomOEke
- c/pq4V8EFszHYcIPxvX/ownlHayz0N7w5hxFJb/f0eT9+uiEHKqYmON93sorbI4BZyNk
- dKhw==
+ (envelope-from <philmd@redhat.com>) id 1jD28s-0000Wl-Am
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57563
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jD28s-0000Vg-67
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 04:27:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584174453;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/SA1V/AUcqNQiNqmh3zq2HzpbKLYphKvzfkhXJFJgfw=;
+ b=anfM78Rm2Df+6BSq3fwN+i9IuQMWWSxsrMEuKjm9Qo8NDCFQbIYs4VaurIGH9Vy/ApGszh
+ n+CBMUNr3uzNjavBzBsME/d2zSQVup4wmX9aduPr/aYNeiqpDXFCDXZ+r7Lyr7hyHnmHRU
+ kdXJvAq6VcSqwm1IFaqkAPtugGOvqLo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-Vy19727RM3mJD6YnNEqGfQ-1; Sat, 14 Mar 2020 04:27:31 -0400
+X-MC-Unique: Vy19727RM3mJD6YnNEqGfQ-1
+Received: by mail-wr1-f72.google.com with SMTP id x14so5573483wrv.23
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 01:27:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ofI65jt8EpvfGgFPbqGu+r2iOExM/ICFwlma49Vh2d4=;
- b=W7WSGwAsCCzAGshIOmH/yEIDHUmuBM4DjvQgYXZREMLKkSphwtF0EVEz8KL7HvsXLg
- 2lhTUDNJcfYFUpnt5iVxxAehQtww3SgJ8Cd0CWvPioZggGI4W5tU+znNVIl2kE7j6hvc
- wckC2yhvh9yAcrdBBnlzJFsrXBGUTo93Jm/bya7yhFEVJXdDK3vDyMQehsTOhXpK3NBC
- E3nkrWyiNFGv7EmezpaKcK2nsxy6r3TbdLLjgDg72/HZ3nqwYZ6o++yH5FjfOttNpxuw
- tSKrLJ6mU1e8lkS6xchzWM1/4Tv0qPJri1di/azfGs50/414I2+Ai2o5MpIg4ADalFm5
- IrSg==
-X-Gm-Message-State: ANhLgQ2vHpQnnCs/xWqAaqEGreW1Ms9VjA4nwrDTbNKpjTcuJORZJo69
- 628yN1XLdk0q+n4zLMUDuUDXog==
-X-Google-Smtp-Source: ADFU+vs+NLoS1mGh5ADNuVYmtyw/GfrtsYyIaMuMvdJKpU1Ht29Y1ODqrgNjeUjl0K0HKvOzcYAMQg==
-X-Received: by 2002:aa7:9a95:: with SMTP id w21mr3141451pfi.57.1584174431456; 
- Sat, 14 Mar 2020 01:27:11 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- y4sm31457233pfe.31.2020.03.14.01.27.10
+ bh=HjvanUfPksQl++xVgrNCOimtflzJz62BfwIfjKNLpqo=;
+ b=nW5/4qycIVGypr6CZB9ufLZBGqlcoLV5z15oAJcNX91iyjYMcuFtjgD+dWzL3DnlJx
+ JEjEmmIQpv+k0X5Fiel60YNrca8vvx5aitHsm+O4ZH6FI2KREXta2m7ZScGu24lEZyPJ
+ KFPwxNp3BAG/eUVh1SKCA/+A7bmmSATRgZS14YVVcegQlch9rLVwT43cVNkgD65iWvfl
+ 1pm9Y29ayl4Y9gfbQsptn251mQeTn7Igg9mT8+3BdNcF3RK5joscJ22GzvOA23QkXmt+
+ jHER6s7fNvG0vYTx8ilQqUUY7NtdikQFUEU4HjWqO6RGUW5keC89iskWMJbtQMsio3UR
+ zx1A==
+X-Gm-Message-State: ANhLgQ2LBeV4gD0XA7zMiTZkRd/z4pThtR0kRRYHzBhaaLwR+TqeWiAL
+ MU8NiLt0oPldhnEGvhqSyQKSd6wZEhn+kwPn68cpqXwiUJuR5wvCnwZtEC/2kzwIu3Ra6tRyK8v
+ noQA755zvVIDaVRg=
+X-Received: by 2002:a1c:408b:: with SMTP id
+ n133mr14628521wma.182.1584174450557; 
+ Sat, 14 Mar 2020 01:27:30 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vukYgAt3LeTeUs5ve7IUL9atv7Lp8NwlKc1cgDdNJ4FjT2qbZxVHq7O4PYDQraOVed1fNfUmw==
+X-Received: by 2002:a1c:408b:: with SMTP id
+ n133mr14628501wma.182.1584174450372; 
+ Sat, 14 Mar 2020 01:27:30 -0700 (PDT)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id w81sm20099934wmg.19.2020.03.14.01.27.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Mar 2020 01:27:10 -0700 (PDT)
-Subject: Re: [PATCH v5 25/60] target/riscv: vector single-width fractional
- multiply with rounding and saturation
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-26-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a32b5bbb-f6c5-fc3c-1ddb-32290a2cd830@linaro.org>
-Date: Sat, 14 Mar 2020 01:27:08 -0700
+ Sat, 14 Mar 2020 01:27:29 -0700 (PDT)
+Subject: Re: [PATCH v3 15/16] hw/i386/vmport: Add support for CMD_GETHZ
+To: Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-16-liran.alon@oracle.com>
+ <97784452-8270-e0ab-1164-d3a9fe567006@redhat.com>
+ <5a1a347a-102d-2c1e-bb27-e5b05408eb4a@oracle.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f2ab2600-3f52-46c5-04d4-67d9c554e2c2@redhat.com>
+Date: Sat, 14 Mar 2020 09:27:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200312145900.2054-26-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5a1a347a-102d-2c1e-bb27-e5b05408eb4a@oracle.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,38 +110,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: pbonzini@redhat.com, Nikita Leshenko <nikita.leshchenko@oracle.com>,
+ rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/12/20 7:58 AM, LIU Zhiwei wrote:
-> +/* Vector Single-Width Fractional Multiply with Rounding and Saturation */
-> +static inline int8_t vsmul8(CPURISCVState *env, int8_t a, int8_t b)
-> +{
-> +    uint8_t round;
-> +    int16_t res;
-> +
-> +    res = (int16_t)a * (int16_t)b;
-> +    round = get_round(env, res, 7);
-> +    res   = (res >> 7) + round;
-> +
-> +    if (res > INT8_MAX) {
-> +        env->vxsat = 0x1;
-> +        return INT8_MAX;
-> +    } else if (res < INT8_MIN) {
-> +        env->vxsat = 0x1;
-> +        return INT8_MIN;
-> +    } else {
-> +        return res;
-> +    }
-> +}
-> +static int16_t vsmul16(CPURISCVState *env, int16_t a, int16_t b)
+On 3/13/20 11:44 PM, Liran Alon wrote:
+> On 13/03/2020 22:07, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 3/12/20 5:54 PM, Liran Alon wrote:
+>>>
+>>> diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+>>> index 34cc050b1ffa..aee809521aa0 100644
+>>> --- a/include/hw/i386/vmport.h
+>>> +++ b/include/hw/i386/vmport.h
+>>> @@ -12,6 +12,7 @@ typedef enum {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_DATA=C2=A0=C2=A0=C2=
+=A0=C2=A0 =3D 39,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_STATUS=C2=A0=C2=A0 =
+=3D 40,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_COMMAND=C2=A0 =3D 41,
+>>> +=C2=A0=C2=A0=C2=A0 VMPORT_CMD_GETHZ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 45,
+>>
+>> Can you rename to something easier to read, such _GET_FREQS_HZ or nicer?
+>>
+> I actually prefer to stick with names similar to open-vm-tools. i.e.=20
+> Similar to the definitions in lib/include/backdoor_def.h.
+> This helps correlates a command in QEMU code to guest code (in=20
+> open-vm-tools) that interacts with it.
 
-With the same caveat for vxrm as before.  Oh, and watch the spacing between
-these functions.  I noticed before but didn't mention.
+Well, we don't have to follow bad examples ;)
 
+> I can rename to just VMPORT_CMD_GET_HZ (Similar to what you suggested=20
+> for previous commands).
 
-r~
+Thanks, this makes code review more easier.
+
+> But I don't have a strong opinion on this. If you still think=20
+> _GET_FREQ_HZ is preferred, I will rename to that.
+>=20
+> -Liran
+>=20
+
 
