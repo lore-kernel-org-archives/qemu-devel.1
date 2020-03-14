@@ -2,88 +2,78 @@ Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFF9C0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 13:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A275DC0044D
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 13:26:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D4E220751
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 13:22:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4E220751
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 614F620776
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 13:26:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYU2R31V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 614F620776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jD6kB-000348-SB
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 09:22:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45712)
+	id 1jD6nf-0004D7-Ld
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 09:25:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD6jb-0002ff-Nh
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:21:48 -0400
+ (envelope-from <stefanha@redhat.com>) id 1jD6n3-0003i2-Lq
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1jD6ja-0007Ki-In
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:21:47 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:54574
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jD6ja-0007Jc-D4
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:21:46 -0400
-Received: from host86-185-91-43.range86-185.btcentralplus.com ([86.185.91.43]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1jD6jt-0007O5-LX; Sat, 14 Mar 2020 13:22:11 +0000
-To: Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org
-References: <20200314084730.25876-1-pannengyuan@huawei.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <8c5ff9d4-83e8-4ee4-d6d1-27d1dda60b95@ilande.co.uk>
-Date: Sat, 14 Mar 2020 13:21:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <stefanha@redhat.com>) id 1jD6n1-000621-On
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:25:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26465
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jD6n1-0005zO-Ja
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 09:25:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584192318;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=1FycYQmNp/Y0y37KskpeGIGZS+QEQdxdNODFV8nVzb8=;
+ b=CYU2R31VxoMqgd1n6yojqTgGghSaWFNJMqhGmscdHusOmREPCfILByw+TKD1ggJJg/gMK7
+ q1SzfhYvwzEvuDmT4170KN+hHrm63kdOA4DGbJaPxXyoCaOyckt8bWY5uYaskZwJA6ppyR
+ 5O2nr5OsxWTZL1JU8RpKB3kkMjKIGmQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-6GQvYFD7NXq45W81mL--OA-1; Sat, 14 Mar 2020 09:25:11 -0400
+X-MC-Unique: 6GQvYFD7NXq45W81mL--OA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D16E107ACCC;
+ Sat, 14 Mar 2020 13:25:10 +0000 (UTC)
+Received: from localhost (ovpn-116-111.ams2.redhat.com [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11A8392D11;
+ Sat, 14 Mar 2020 13:25:09 +0000 (UTC)
+Date: Sat, 14 Mar 2020 13:25:08 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH] tools/virtiofsd: add support for --socket-group
+Message-ID: <20200314132508.GC313613@stefanha-x1.localdomain>
+References: <20200312104142.21259-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200314084730.25876-1-pannengyuan@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.185.91.43
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v5 0/4] delay timer_new from init to realize to fix
- memleaks.
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+In-Reply-To: <20200312104142.21259-1-alex.bennee@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,59 +85,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- euler.robot@huawei.com
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/03/2020 08:47, Pan Nengyuan wrote:
+--32u276st3Jlj2kUU
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> This series delay timer_new from init into realize to avoid memleaks when we call 'device_list_properties'.
-> And do timer_free only in s390x_cpu_finalize because it's hotplugable. However, mos6522_realize is never called
-> at all due to the incorrect creation of it. So we fix the incorrect creation in mac_via/cuda/pmu first, then 
-> move the timer_new to mos6522_realize().
-> 
-> v1:
->    - Delay timer_new() from init() to realize() to fix memleaks.
-> v2:
->    - Similarly to other cleanups, move timer_new into realize in target/s390x/cpu.c (Suggested by Philippe Mathieu-Daudé).
->    - Send these two patches as a series instead of send each as a single patch but with wrong subject in v1.
-> v3:
->    - It's not valid in mos6522 if we move timer_new from init to realize, because it's never called at all.
->      Thus, we remove null check in reset, and add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
->    - split patch by device to make it more clear.
-> v4:
->    - Also do timer_free on the error path in realize() and fix some coding style. Then use device_class_set_parent_unrealize to declare unrealize.
->    - split the mos6522 patch into two, one to fix incorrect creation of mos6522, the other to fix memleak.
-> 
-> v5: 
->    - Fix two other places where we create mos6522's subclasses but forgot to realize it(macio/cuda,macio/pmu). 
->      Otherwise, this will cause SEGVs during make check-qtest-ppc64.
->    - Remove timer_del on the error path of s390x_cpu_realize() and simply use errp instead a temporary variable.
-> 
-> Pan Nengyuan (4):
->   s390x: fix memleaks in cpu_finalize
->   mac_via: fix incorrect creation of mos6522 device in mac_via
->   hw/misc/macio: fix incorrect creation of mos6522's subclasses
->   hw/misc/mos6522: move timer_new from init() into realize() to avoid
->     memleaks
-> 
->  hw/misc/mac_via.c      | 40 +++++++++++++++++++++++++++-------------
->  hw/misc/macio/cuda.c   | 11 +++++++++--
->  hw/misc/macio/pmu.c    | 11 +++++++++--
->  hw/misc/mos6522.c      |  6 ++++++
->  target/s390x/cpu-qom.h |  1 +
->  target/s390x/cpu.c     | 30 ++++++++++++++++++++++++++----
->  6 files changed, 78 insertions(+), 21 deletions(-)
+On Thu, Mar 12, 2020 at 10:41:42AM +0000, Alex Benn=E9e wrote:
+> If you like running QEMU as a normal user (very common for TCG runs)
+> but you have to run virtiofsd as a root user you run into connection
+> problems. Adding support for an optional --socket-group allows the
+> users to keep using the command line.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v1
+>   - tweak documentation and commentary
+> ---
+>  docs/tools/virtiofsd.rst        |  4 ++++
+>  tools/virtiofsd/fuse_i.h        |  1 +
+>  tools/virtiofsd/fuse_lowlevel.c |  6 ++++++
+>  tools/virtiofsd/fuse_virtio.c   | 20 ++++++++++++++++++--
+>  4 files changed, 29 insertions(+), 2 deletions(-)
 
-I just gave this a test on qemu-system-ppc -M mac99 with both cuda and pmu, and also
-qemu-system-m68k for mac_via and I didn't see any crashes there, so:
+Dan's suggestion sounds like a good idea to me.
 
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+--32u276st3Jlj2kUU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-ATB,
+-----BEGIN PGP SIGNATURE-----
 
-Mark.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5s2zQACgkQnKSrs4Gr
+c8jpUQgApR8M8iXRNLlkR4oQeKasN0v0CbH/u45Bu0p/Lw3xm+qt4OPqDxBT7yZy
+M4u9Y59b2dMNyWKf0AsTndvOrNgmBvaEfOlBZ+xFuEJHhvW+pzGOuUTD8Jx0+wZQ
+oCPl/vgssGLrWwBlr7xxoLhZJvsVxi8j0HUP0lkKtrpkyNVHC42ETnHs+BKRzZam
+XswF3L2OjcYACFgbj9FzBeSql+w+HiT0YjloIoj75lTeDgmlDgGVm+Fr4e9Pgwi9
+F/4R2GjQbIivjr2wIWVQ7qfNjwrzfl+zr2mQTOKX80ii2PYniAz6hlrnTa4lJHd5
+zDgfFtVzFBLSiI+JC6rCj63GRwpYZA==
+=UgbL
+-----END PGP SIGNATURE-----
+
+--32u276st3Jlj2kUU--
+
 
