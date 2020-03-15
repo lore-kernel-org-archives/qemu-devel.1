@@ -2,82 +2,92 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF22C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB33C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:44:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95EF020637
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7621220575
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H35/ZS/Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95EF020637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFVAof5G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7621220575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDVPb-0002OA-KI
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40531)
+	id 1jDVRW-0003b8-H0
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:44:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDUXk-0005Zt-Rc
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:12 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDV0J-0004fO-BH
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDUXi-0002VF-Sq
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40140
+ (envelope-from <armbru@redhat.com>) id 1jDV0G-00009j-Mb
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:38 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60858
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXh-0002OT-Fo
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:05 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDV02-0007s2-Hy
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584283624;
+ s=mimecast20190719; t=1584285381;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oYE3kivzTU/MHGBvZenoCiESySyZ9Mfy3dijo0V7Q1w=;
- b=H35/ZS/YK7F3cbm/G3rM/fGitBDc8seyjQnhcXgQQf8VX82Hps5GjlG2wk1eQQmFd1BZRy
- aurBgtjVEEWjv+4V3rgwL2lBc5YqwsxJZqJdASYWkamURJgPzj0NcBvwgXwN7L1MiXNGOY
- t/DB4piNwtyTONn49Ts7jEcgJaiEZrA=
+ bh=xp0mNxx8vSLElIjzPs/XjkhTJqhGk6ULRRwbhaYwxfM=;
+ b=AFVAof5GtsQ0EVJJKMyAHDJvyazo12mbFdbUeUCK/OwwhQHbos8SpedMesh2CMSWgX9N2E
+ B1PsOQTEDgNZIrA9pIPkfYWIvE00O9Qi17GjVOA7tdsFAvJQA8nfstlF8EcURfpOPBcGZQ
+ beYbtsZ5OYvhNncD46/MTYpmEzhEhTY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-K2c0PiNiMNenA51JmdjBhQ-1; Sun, 15 Mar 2020 10:47:00 -0400
-X-MC-Unique: K2c0PiNiMNenA51JmdjBhQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-21-CrKpmww-M_-ZWq7Gh94jlQ-1; Sun, 15 Mar 2020 11:16:12 -0400
+X-MC-Unique: CrKpmww-M_-ZWq7Gh94jlQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0D3D107ACC4;
- Sun, 15 Mar 2020 14:46:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87F40800D4E;
+ Sun, 15 Mar 2020 15:16:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
  [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CA2391D88;
- Sun, 15 Mar 2020 14:46:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE7F48AC36;
+ Sun, 15 Mar 2020 15:16:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D8BD6113525E; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
+ id 20BF61138404; Sun, 15 Mar 2020 16:16:08 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 31/34] qapi: Implement deprecated-output=hide for QMP
- introspection
-Date: Sun, 15 Mar 2020 15:46:50 +0100
-Message-Id: <20200315144653.22660-32-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
-References: <20200315144653.22660-1-armbru@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
+ in mac_via
+References: <20200305065422.12707-1-pannengyuan@huawei.com>
+ <20200305065422.12707-3-pannengyuan@huawei.com>
+ <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
+ <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
+ <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
+ <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
+ <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
+ <871rq08tn9.fsf@dusky.pond.sub.org>
+ <eca27715-554d-2c2e-5e58-ffd01abb654c@ilande.co.uk>
+Date: Sun, 15 Mar 2020 16:16:08 +0100
+In-Reply-To: <eca27715-554d-2c2e-5e58-ffd01abb654c@ilande.co.uk> (Mark
+ Cave-Ayland's message of "Sat, 14 Mar 2020 13:19:37 +0000")
+Message-ID: <87fte98x8n.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,202 +99,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Pan Nengyuan <pannengyuan@huawei.com>,
+ Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This policy suppresses deprecated bits in output, and thus permits
-"testing the future".  Implement it for QMP command query-qmp-schema:
-suppress information on deprecated commands, events and object type
-members, i.e. anything that has the special feature flag "deprecated".
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/introspect.json       |   2 +-
- monitor/monitor-internal.h |   3 --
- monitor/misc.c             |   2 -
- monitor/qmp-cmds-control.c | 102 ++++++++++++++++++++++++++++++++-----
- qemu-storage-daemon.c      |   2 -
- 5 files changed, 90 insertions(+), 21 deletions(-)
+> On 10/03/2020 09:07, Markus Armbruster wrote:
+>
+>> Widespread QOM usage anti-pattern ahead; cc: QOM maintainers.
+>>=20
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>=20
+>>> On Mon, 9 Mar 2020 at 10:02, Pan Nengyuan <pannengyuan@huawei.com> wrot=
+e:
+>>>> On 3/9/2020 5:21 PM, Peter Maydell wrote:
+>>>>> Could you explain more? My thought is that we should be using
+>>>>> sysbus_init_child_obj() and we should be doing it in the init method.
+>>>>> Why does that break the tests ? It's the same thing various other
+>>>>> devices do.
+>>>>
+>>>> device-introspect-test do the follow check for each device type:
+>>>>
+>>>>     qtree_start =3D qtest_hmp(qts, "info qtree");
+>>>>     ...
+>>>>     qtest_qmp(qts, "{'execute': 'device-list-properties','arguments': =
+{'typename': %s}}", type);
+>>>>     ...
+>>>>     qtree_end =3D qtest_hmp(qts, "info qtree");
+>>>>     g_assert_cmpstr(qtree_start, =3D=3D, qtree_end);
+>>>>
+>>>> If we do qdev_set_parent_bus in init, it will check fail when type =3D=
+ 'mac_via'.
+>>>> mac_via_init() is called by q800_init(). But it will not be called in =
+qtest(-machine none) in the step qtree_start.
+>>>> And after we call 'device-list-properties', mac_via_init() was called =
+and set dev parent bus. We can find these
+>>>> devices in the qtree_end. So it break the test on the assert.
+>>>
+>>> Markus, do you know what's happening here? Why is
+>>> trying to use sysbus_init_child_obj() breaking the
+>>> device-introspect-test for this particular device,
+>>> but fine for the other places where we use it?
+>>> (Maybe we're accidentally leaking a reference to
+>>> something so the sub-device stays on the sysbus
+>>> when it should have removed itself when the
+>>> device was deinited ?)
+>>=20
+>> Two questions: (1) why does it break here, and (2) why doesn't it break
+>> elsewhere.
+>>=20
+>> First question: why does it break here?
+>>=20
+>> It breaks here because asking for help with "device_add mac_via,help"
+>> has a side effect visible in "info qtree".
+>>=20
+>>>> Here is the output:
+>>>>
+>>>> # Testing device 'mac_via'
+>> [Uninteresting stuff snipped...]
+>>=20
+>> "info qtree" before asking for help:
+>>=20
+>>>> qtree_start: bus: main-system-bus
+>>>>   type System
+>>=20
+>> "info qtree" after asking for help:
+>>=20
+>>>> qtree_end: bus: main-system-bus
+>>>>   type System
+>>>>   dev: mos6522-q800-via2, id ""
+>>>>     gpio-in "via2-irq" 8
+>>>>     gpio-out "sysbus-irq" 1
+>>>>     frequency =3D 0 (0x0)
+>>>>     mmio ffffffffffffffff/0000000000000010
+>>>>   dev: mos6522-q800-via1, id ""
+>>>>     gpio-in "via1-irq" 8
+>>>>     gpio-out "sysbus-irq" 1
+>>>>     frequency =3D 0 (0x0)
+>>>>     mmio ffffffffffffffff/0000000000000010
+>>=20
+>> How come?
+>>=20
+>> "device_add mac_via,help" shows properties of device "mac_via".  It does
+>> so even though "mac_via" is not available with device_add.  Useful
+>> because "info qtree" shows properties for such devices.
+>>=20
+>> These properties are defined dynamically, either for the instance
+>> (traditional) or the class.  The former typically happens in QOM
+>> TypeInfo method .instance_init(), the latter in .class_init().
+>>=20
+>> "Typically", because properties can be added elsewhere, too.  In
+>> particular, QOM properties not meant for device_add are often created in
+>> DeviceClass method .realize().  More on that below.
+>>=20
+>> To make properties created in .instance_init() visible in help, we need
+>> to create and destroy an instance.  This must be free of observable side
+>> effects.
+>>=20
+>> This has been such a fertile source of crashes that I added
+>> device-introspect-test:
+>>=20
+>> commit 2d1abb850fd15fd6eb75a92290be5f93b2772ec5
+>> Author: Markus Armbruster <armbru@redhat.com>
+>> Date:   Thu Oct 1 10:59:56 2015 +0200
+>>=20
+>>     device-introspect-test: New, covering device introspection
+>>    =20
+>>     The test doesn't check that the output makes any sense, only that QE=
+MU
+>>     survives.  Useful since we've had an astounding number of crash bugs
+>>     around there.
+>>    =20
+>>     In fact, we have a bunch of them right now: a few devices crash or
+>>     hang, and some leave dangling pointers behind.  The test skips testi=
+ng
+>>     the broken parts.  The next commits will fix them up, and drop the
+>>     skipping.
+>>    =20
+>>     Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>     Reviewed-by: Eric Blake <eblake@redhat.com>
+>>     Message-Id: <1443689999-12182-8-git-send-email-armbru@redhat.com>
+>>=20
+>> Now let's examine device "mac_via".  It defines properties both in its
+>> .class_init() and its .instance_init().
+>>=20
+>>     static void mac_via_class_init(ObjectClass *oc, void *data)
+>>     {
+>>         DeviceClass *dc =3D DEVICE_CLASS(oc);
+>>=20
+>>         dc->realize =3D mac_via_realize;
+>>         dc->reset =3D mac_via_reset;
+>>         dc->vmsd =3D &vmstate_mac_via;
+>> --->    device_class_set_props(dc, mac_via_properties);
+>>     }
+>>=20
+>> where
+>>=20
+>>     static Property mac_via_properties[] =3D {
+>>         DEFINE_PROP_DRIVE("drive", MacVIAState, blk),
+>>         DEFINE_PROP_END_OF_LIST(),
+>>     };
+>>=20
+>> And
+>>=20
+>>     static void mac_via_init(Object *obj)
+>>     {
+>>         SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+>>         MacVIAState *m =3D MAC_VIA(obj);
+>>         MOS6522State *ms;
+>>=20
+>>         /* MMIO */
+>>         memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
+>>         sysbus_init_mmio(sbd, &m->mmio);
+>>=20
+>>         memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
+>>                               &m->mos6522_via1, "via1", VIA_SIZE);
+>>         memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
+>>=20
+>>         memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
+>>                               &m->mos6522_via2, "via2", VIA_SIZE);
+>>         memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
+>>=20
+>>         /* ADB */
+>>         qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
+>>                             TYPE_ADB_BUS, DEVICE(obj), "adb.0");
+>>=20
+>>         /* Init VIAs 1 and 2 */
+>>         sysbus_init_child_obj(OBJECT(m), "via1", &m->mos6522_via1,
+>>                               sizeof(m->mos6522_via1), TYPE_MOS6522_Q800=
+_VIA1);
+>>         sysbus_init_child_obj(OBJECT(m), "via2", &m->mos6522_via2,
+>>                               sizeof(m->mos6522_via2), TYPE_MOS6522_Q800=
+_VIA2);
+>>=20
+>>         /* Pass through mos6522 output IRQs */
+>>         ms =3D MOS6522(&m->mos6522_via1);
+>>         object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
+>>                                   SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
+bort);
+>>         ms =3D MOS6522(&m->mos6522_via2);
+>>         object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
+>>                                   SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
+bort);
+>>     }
+>>=20
+>> Resulting help:
+>>=20
+>>   adb.0=3D<child<apple-desktop-bus>>
+>>   drive=3D<str>            - Node name or ID of a block device to use as=
+ a backend
+>>   irq[0]=3D<link<irq>>
+>>   irq[1]=3D<link<irq>>
+>>   mac-via[0]=3D<child<qemu:memory-region>>
+>>   via1=3D<child<mos6522-q800-via1>>
+>>   via1[0]=3D<child<qemu:memory-region>>
+>>   via2=3D<child<mos6522-q800-via2>>
+>>   via2[0]=3D<child<qemu:memory-region>>
+>>=20
+>> Observe that mac_via_init() has obvious side effects.  In particular, it
+>> creates two devices that are then visible in "info qtree", and that's
+>> caught by device-introspect-test.
+>>=20
+>> I believe these things need to be done in .realize().
+>
+> Thanks for the detailed explanation, Markus. I had to re-read this severa=
+l times to
+> think about the different scenerios that could occur here.
+>
+> From what you are saying above, my understanding is that the only thing t=
+hat
+> .instance_init() should do is add properties, so I can see that this work=
+s fine for
+> value properties and MemoryRegions. How would this would for reference pr=
+operties
+> such as gpios and links? Presumably these should be defined in .instance_=
+init() but
+> not connected until .realize()?
 
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index b1aabd4cfd..3ebd817866 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -48,7 +48,7 @@
- ##
- { 'command': 'query-qmp-schema',
-   'returns': [ 'SchemaInfo' ],
--  'gen': false }                # just to simplify qmp_query_json()
-+  'allow-preconfig': true }
-=20
- ##
- # @SchemaMetaType:
-diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-index 3e6baba88f..4d402ded85 100644
---- a/monitor/monitor-internal.h
-+++ b/monitor/monitor-internal.h
-@@ -180,7 +180,4 @@ void help_cmd(Monitor *mon, const char *name);
- void handle_hmp_command(MonitorHMP *mon, const char *cmdline);
- int hmp_compare_cmd(const char *name, const char *list);
-=20
--void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
--                                 Error **errp);
--
- #endif
-diff --git a/monitor/misc.c b/monitor/misc.c
-index c3bc34c099..0237c71140 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -243,8 +243,6 @@ static void monitor_init_qmp_commands(void)
-=20
-     qmp_init_marshal(&qmp_commands);
-=20
--    qmp_register_command(&qmp_commands, "query-qmp-schema",
--                         qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
-     qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
-                          QCO_NO_OPTIONS);
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-diff --git a/monitor/qmp-cmds-control.c b/monitor/qmp-cmds-control.c
-index 5cd9bb817c..bf5b711a7b 100644
---- a/monitor/qmp-cmds-control.c
-+++ b/monitor/qmp-cmds-control.c
-@@ -26,10 +26,14 @@
-=20
- #include "monitor-internal.h"
- #include "qemu-version.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-control.h"
-+#include "qapi/qapi-commands-introspect.h"
- #include "qapi/qapi-emit-events.h"
- #include "qapi/qapi-introspect.h"
-+#include "qapi/qapi-visit-introspect.h"
-+#include "qapi/qobject-input-visitor.h"
-=20
- /*
-  * Accept QMP capabilities in @list for @mon.
-@@ -153,17 +157,89 @@ EventInfoList *qmp_query_events(Error **errp)
-     return ev_list;
- }
-=20
--/*
-- * Minor hack: generated marshalling suppressed for this command
-- * ('gen': false in the schema) so we can parse the JSON string
-- * directly into QObject instead of first parsing it with
-- * visit_type_SchemaInfoList() into a SchemaInfoList, then marshal it
-- * to QObject with generated output marshallers, every time.  Instead,
-- * we do it in test-qobject-input-visitor.c, just to make sure
-- * qapi-gen.py's output actually conforms to the schema.
-- */
--void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
--                                 Error **errp)
--{
--    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
-+static void *split_off_generic_list(void *list,
-+                                    bool (*splitp)(void *elt),
-+                                    void **part)
-+{
-+    GenericList *keep =3D NULL, **keep_tailp =3D &keep;
-+    GenericList *split =3D NULL, **split_tailp =3D &split;
-+    GenericList *tail;
-+
-+    for (tail =3D list; tail; tail =3D tail->next) {
-+        if (splitp(tail)) {
-+            *split_tailp =3D tail;
-+            split_tailp =3D &tail->next;
-+        } else {
-+            *keep_tailp =3D tail;
-+            keep_tailp =3D &tail->next;
-+        }
-+    }
-+
-+    *keep_tailp =3D *split_tailp =3D NULL;
-+    *part =3D split;
-+    return keep;
-+}
-+
-+static bool is_in(const char *s, strList *list)
-+{
-+    strList *tail;
-+
-+    for (tail =3D list; tail; tail =3D tail->next) {
-+        if (!strcmp(tail->value, s)) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static bool is_entity_deprecated(void *link)
-+{
-+    return is_in("deprecated", ((SchemaInfoList *)link)->value->features);
-+}
-+
-+static bool is_member_deprecated(void *link)
-+{
-+    return is_in("deprecated",
-+                 ((SchemaInfoObjectMemberList *)link)->value->features);
-+}
-+
-+static SchemaInfoList *zap_deprecated(SchemaInfoList *schema)
-+{
-+    void *to_zap;
-+    SchemaInfoList *tail;
-+    SchemaInfo *ent;
-+
-+    schema =3D split_off_generic_list(schema, is_entity_deprecated, &to_za=
-p);
-+    qapi_free_SchemaInfoList(to_zap);
-+
-+    for (tail =3D schema; tail; tail =3D tail->next) {
-+        ent =3D tail->value;
-+        if (ent->meta_type =3D=3D SCHEMA_META_TYPE_OBJECT) {
-+            ent->u.object.members
-+                =3D split_off_generic_list(ent->u.object.members,
-+                                         is_member_deprecated, &to_zap);
-+            qapi_free_SchemaInfoObjectMemberList(to_zap);
-+        }
-+    }
-+
-+    return schema;
-+}
-+
-+SchemaInfoList *qmp_query_qmp_schema(Error **errp)
-+{
-+    QObject *obj =3D qobject_from_qlit(&qmp_schema_qlit);
-+    Visitor *v =3D qobject_input_visitor_new(obj);
-+    SchemaInfoList *schema =3D NULL;
-+
-+    /* test_visitor_in_qmp_introspect() ensures this can't fail */
-+    visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
-+    g_assert(schema);
-+
-+    qobject_unref(obj);
-+    visit_free(v);
-+
-+    if (compat_policy.deprecated_output =3D=3D COMPAT_POLICY_OUTPUT_HIDE) =
-{
-+        return zap_deprecated(schema);
-+    }
-+    return schema;
- }
-diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index dd128978cc..23433090a8 100644
---- a/qemu-storage-daemon.c
-+++ b/qemu-storage-daemon.c
-@@ -142,8 +142,6 @@ static QemuOptsList qemu_object_opts =3D {
- static void init_qmp_commands(void)
- {
-     qmp_init_marshal(&qmp_commands);
--    qmp_register_command(&qmp_commands, "query-qmp-schema",
--                         qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
-=20
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities"=
-,
---=20
-2.21.1
+Please understand that I'm operating at the limit of my expertise.  I
+might be talking nonsense.  Paolo seems to have a different opinion.  We
+need to reach some kind of common understanding of how QOM is supposed
+to be used.  Without that, we'll continue to fail at teaching it to its
+"mere" users.  Hopefully, this thread can get us a bit closer.
+
+Back to your question.  I think .instance_init() may do quite a bit more
+than adding properties.  What it must avoid is visible side effects, in
+particular guest-visible ones.
+
+With the right tools, you should be able to wire together components
+into a device in .instance_init(), exposing the complex device's
+properties.  Then make the complex device "visible" in .realize().
+
+Making "visible" is what .realize() is meant to do.  In unrealized
+state, devices have a ghost-like, "unreal" nature.  They must not affect
+the "real" stuff, like the machine and its (realized) devices.  Only
+.realize() makes them "real".
+
+One of the reasons for having this unrealized state is letting you build
+complex devices without having to worry about exposing it to "real"
+stuff in incomplete states.
+
+> If this is the case then how should object_property_add_alias() work sinc=
+e that not
+> only defines the property but also links to another object? qdev has a se=
+parate
+> concept of defining connectors vs. connecting them which feels like it wo=
+uld fit this
+> pattern.
+
+Clearer now?
+
+>> Second question: why doesn't it break elsewhere?
+>>=20
+>> We have >200 calls of sysbus_init_child_obj() in some 40 files.  I'm
+>> arbitrarily picking hw/arm/allwinner-a10.c for a closer look.
+>>=20
+>> It calls it from device allwinner-a10's .instance_init() method
+>> aw_a10_init().  Side effect, clearly wrong.
+>>=20
+>> But why doesn't it break device-introspect-test?  allwinner-a10 is a
+>> direct sub-type of TYPE_DEVICE.  Neither "info qtree" nor "info
+>> qom-tree" know how to show these.
+>>=20
+>> Perhaps the side effect is visible if I peek into QOM with just the
+>> right qom-list command.  Tell me, and I'll try to tighten
+>> device-introspect-test accordingly.
+>>=20
+>>=20
+>> Root cause of this issue: nobody knows how to use QOM correctly (first
+>> order approximation).  In particular, people are perenially confused on
+>> how to split work between .instance_init() and .realize().  We really,
+>> really, really need to provide some guidance there!  Right now, all we
+>> provide are hundreds of examples, many of them bad.
+>
+> I certainly understand now why sysbus_init_child_obj() is wrong. Is there=
+ any way to
+> detect this around object_new()/realize()? Perhaps take a snapshot of pro=
+perties
+> after object_new(), the same again after realize() and then write a warni=
+ng to stderr
+> if there are any differences? It would make issues like this more visible=
+ than they
+> would be in device-introspect-test.
+
+First we have to figure out what the actual rules are.  Then we can look
+for better ways to prevent and catch mistakes.
 
 
