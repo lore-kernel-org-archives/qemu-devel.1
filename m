@@ -2,93 +2,99 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B58AC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8518C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1CCA20722
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 802D820575
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fdKbR64r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1CCA20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SMWBykQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 802D820575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDLjF-00024j-2t
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 01:22:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52313)
+	id 1jDLwp-0004PI-IO
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 01:36:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDLiI-0001bi-SF
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:21:27 -0400
+ (envelope-from <mst@redhat.com>) id 1jDLvg-0003pr-1f
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDLiH-0001kI-FM
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:21:26 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37912)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDLiH-0001gg-8T
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:21:25 -0400
-Received: by mail-pg1-x544.google.com with SMTP id x7so7579838pgh.5
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 22:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OBUlZjZUThF1vXn4ShVzOeU+yEgCM+AMAza0oNowHco=;
- b=fdKbR64rrmEtzh64KA1vSr76Z2TBBTUZs70uTOBX3dvURZ8J7tdNijtV+lhAvElMmr
- MkFrMAjigMf15aNzxfRpUxer0RS42fmBkwU838USsH7bohgMrBYGjpfRIDyF8xIV5Svh
- 5Xe2zOGLyHMpbkjM/8YHYRBx6ritFO/Jx+3RKVFOM6r91Dm3nT48ry0YBxT8FUz2V3H2
- AeV94NaGcxPjjt0qHUVZls9/Uk78IGCs4vNWGjF5TwHwXkaUZLOKhaZyjlOMnMssowOy
- HMQi9Vj/tbKeT1m7E/NyTuGTfE6A+jVx35VL4roMAzcQSTNYP+Q5wcXOjbvfs65CqJy4
- FVzA==
+ (envelope-from <mst@redhat.com>) id 1jDLve-00048y-R2
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35783
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDLve-00046z-NM
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584250514;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=frOLOEjQaJJpWC0i8QNqpWU1shmwCAN5m76/pYmbrFs=;
+ b=SMWBykQ0hAHoxieT2M0TmbKyZ+lgpK18O5D0TYZz7u8qky6qgVPQqW1b0X5bROvKocNLy3
+ cwURZ46ghvYCw/+2Fgm4NFE5SdxNb9iIN1SHwbf59uVepjB2nvUzMPT/YVrhEg0sttQ51I
+ 5Lytw7cjwz4zzZL/ekIF0siGB7tRxoM=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-SLSX1MYtPCaazdoHI8A7nA-1; Sun, 15 Mar 2020 01:35:10 -0400
+X-MC-Unique: SLSX1MYtPCaazdoHI8A7nA-1
+Received: by mail-qv1-f69.google.com with SMTP id k16so12788301qvj.7
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 22:35:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OBUlZjZUThF1vXn4ShVzOeU+yEgCM+AMAza0oNowHco=;
- b=NbkWsWMPemDfKtG3g8RadCwM9atLxiggw2mHqlBtDLKQh849ZiaYOQULJHqZ+n8ezZ
- ooeCzTYlZYOnTG1t8m3CJjwuCU468M3B1lmPYxR+3nvyngXyLtqHoMvNj8vzfFr3qL+N
- Zac9dW4b/ViBQCVj06BRCDihs6ZG60qsH1XEqQUwTVjGjrBrcfkVdIIXVuA+umIb4UT+
- Su+jdXXhz6vbuJ1bWbor/totG2NgG6CCzm6gIGaLBwRQC2qQpArK2oiL3INLclnOWy0w
- 4yFxYbphdKOW2Rkolj31RT7H0deN+6ey+1RNK4HLU40Jg9jIovCSwLgfmsp73MBPO/i5
- g8dw==
-X-Gm-Message-State: ANhLgQ1seIi/Z2h1E2owVRTqZEIRsaK2DsuzMtfKhg8WpH06FFd9EjIP
- mdkW2xBA9L6a/vR0XBus/DNK1w==
-X-Google-Smtp-Source: ADFU+vtjOg5zE0nXpZhiWARMtYcU/wI7qBV/VB1NP+62X4DBSGwW5ZfQ9Kdi1LvMia0t4YNhi7/Srw==
-X-Received: by 2002:a63:fc1c:: with SMTP id j28mr21421430pgi.289.1584249684184; 
- Sat, 14 Mar 2020 22:21:24 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JQzodnifkdCqmGoXvx0OYAMgKt0DHS9Cmdey6a0SLow=;
+ b=GU11RTpehVEZPedgtBi50k9HcVVjfcT+nteppknQTjFP+PLzssOVr8TKD2yEHpSrGh
+ F6Qufo2j8vb1XSYXAYFIvchfem4lroRDFzg2nL/YYGsTeeF8ePNDVBNZLIW/8WB5UFtj
+ C/Y6DZtxIxjIttYFw/N2AI9vUN1nkgqw8yRm65A3i7F5hBsOZIIw2WYiK8IMDBtt/zLV
+ 8rhgR10dgcFHbWCq5SHokRAfi3+OjSKtDsK8687NfONSRmDeH85rhHFrWZwce0OdpjCe
+ nyEZUhMoS4DnYBBYCkeb1ul0VF4DqkUOyhBv07qrTZWpdb8xzXY+wJUycI1pqNblyZDE
+ g9lg==
+X-Gm-Message-State: ANhLgQ1wMVYRwTcfXJUJreWvjk5cDM+OoXqFTbsc9z0lYRBYWP7UbT4w
+ DNPCXbMzj2GVH0V/z15qGDkZzRbCeJ34VEecI3mt0nu3trzxsf9mkltYsmKI7Muz4D3f429RzCz
+ +EDI2lai5LithcOA=
+X-Received: by 2002:a05:620a:7f8:: with SMTP id
+ k24mr16827702qkk.228.1584250509777; 
+ Sat, 14 Mar 2020 22:35:09 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vshPGLVSe4vsDXxFTzsNzS8YJrxDCZs17lAU/MeRjnhBLwuDori4yumSCV3AZ821uIza/5+eQ==
+X-Received: by 2002:a05:620a:7f8:: with SMTP id
+ k24mr16827682qkk.228.1584250509497; 
+ Sat, 14 Mar 2020 22:35:09 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
  by smtp.gmail.com with ESMTPSA id
- v12sm7232846pgs.0.2020.03.14.22.21.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Mar 2020 22:21:23 -0700 (PDT)
-Subject: Re: [PATCH v5 54/60] target/riscv: integer extract instruction
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-55-zhiwei_liu@c-sky.com>
- <de89d8bc-f578-ac42-58f3-4f5822c8fcfb@linaro.org>
- <9687510d-ff07-b200-b597-1405b1ff828d@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f7003687-4352-15ba-79d8-268df025b611@linaro.org>
-Date: Sat, 14 Mar 2020 22:21:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ l188sm2774053qkc.106.2020.03.14.22.35.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 14 Mar 2020 22:35:08 -0700 (PDT)
+Date: Sun, 15 Mar 2020 01:35:02 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH 2/8] hw/ide: Get rid of piix4_init function
+Message-ID: <20200315013319-mutt-send-email-mst@kernel.org>
+References: <cover.1584134074.git.balaton@eik.bme.hu>
+ <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <9687510d-ff07-b200-b597-1405b1ff828d@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+In-Reply-To: <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,129 +106,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel@nongnu.org, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/14/20 10:15 PM, LIU Zhiwei wrote:
-> 
-> 
-> On 2020/3/15 10:53, Richard Henderson wrote:
->> On 3/12/20 7:58 AM, LIU Zhiwei wrote:
->>> +static bool trans_vext_x_v(DisasContext *s, arg_r *a)
->>> +{
->>> +    if (vext_check_isa_ill(s, RVV)) {
->>> +        TCGv_ptr src2;
->>> +        TCGv dest, src1;
->>> +        gen_helper_vext_x_v fns[4] = {
->>> +            gen_helper_vext_x_v_b, gen_helper_vext_x_v_h,
->>> +            gen_helper_vext_x_v_w, gen_helper_vext_x_v_d
->>> +        };
->>> +
->>> +        dest = tcg_temp_new();
->>> +        src1 = tcg_temp_new();
->>> +        src2 = tcg_temp_new_ptr();
->>> +
->>> +        gen_get_gpr(src1, a->rs1);
->>> +        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
->>> +
->>> +        fns[s->sew](dest, src2, src1, cpu_env);
->>> +        gen_set_gpr(a->rd, dest);
->>> +
->>> +        tcg_temp_free(dest);
->>> +        tcg_temp_free(src1);
->>> +        tcg_temp_free_ptr(src2);
->>> +        return true;
->>> +    }
->>> +    return false;
->>> +}
->> This entire operation can be performed inline easily.
->>
->> static void extract_element(TCGv dest, TCGv_ptr base,
->>                              int ofs, int sew)
->> {
->>      switch (sew) {
->>      case MO_8:
->>          tcg_gen_ld8u_tl(dest, base, ofs);
->>          break;
->>      case MO_16:
->>          tcg_gen_ld16u_tl(dest, base, ofs);
->>          break;
->>      default:
->>          tcg_gen_ld32u_tl(dest, base, ofs);
->>          break;
->> #if TARGET_LONG_BITS == 64
->>      case MO_64:
->>          tcg_gen_ld_i64(dest, base, ofs);
->>          break;
->> #endif
->>      }
->> }
->>
->> static bool trans_vext_x_v(DisasContext *s, arg_r *a)
->> {
->> ...
->>      if (a->rs1 == 0) {
->>          /* Special case vmv.x.s rd, vs2. */
->>          do_extract(dest, cpu_env,
->>                     vreg_ofs(s, a->rs2), s->sew);
->>      } else {
->>          int vlen = s->vlen >> (3 + s->sew);
->>          TCGv_i32 ofs = tcg_temp_new_i32();
->>          TCGv_ptr  base = tcg_temp_new_ptr();
->>          TCGv t_vlen, t_zero;
->>
->>          /* Mask the index to the length so that we do
->>             not produce an out-of-range load. */
->>          tcg_gen_trunc_tl_i32(ofs, cpu_gpr[a->rs1]);
->>          tcg_gen_andi_i32(ofs, ofs, vlen - 1);
->>
->>          /* Convert the index to an offset.  */
->>          tcg_gen_shli_i32(ofs, ofs, s->sew);
-> 
-> In  big endianess host, should I convert the index first before this statement.
-> 
-> #ifdef HOST_WORDS_BIGENDIAN
-> static void convert_idx(TCGv_i32 idx, int sew)
-> {
->     switch (sew) {
->     case MO_8:
->         tcg_gen_xori_i32(idx, idx, 7);
->         break;
->     case MO_16:
->         tcg_gen_xori_i32(idx, idx, 3);
->         break;
->     case MO_32:
->         tcg_gen_xori_i32(idx, idx, 1);
->         break;
->     default:
->         break;
->     }
-> }
-> #endif
-> 
-> 
-> When convert the index to an offset, use this function first
-> 
-> #ifdef HOST_WORDS_BIGENDIAN
->     convert_idx(ofs, s->sew)
-> #endif
+On Fri, Mar 13, 2020 at 10:14:34PM +0100, BALATON Zoltan wrote:
+> This removes pci_piix4_ide_init() function similar to clean up done to
+> other ide devices.
+>=20
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/ide/piix.c    | 12 +-----------
+>  hw/isa/piix4.c   |  5 ++++-
+>  include/hw/ide.h |  1 -
+>  3 files changed, 5 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+> index 8bcd6b72c2..3b2de4c312 100644
+> --- a/hw/ide/piix.c
+> +++ b/hw/ide/piix.c
+> @@ -208,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
+>      }
+>  }
+> =20
+> -/* hd_table must contain 4 block drivers */
+> -/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
+> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn)
+> -{
+> -    PCIDevice *dev;
+> -
+> -    dev =3D pci_create_simple(bus, devfn, "piix4-ide");
+> -    pci_ide_create_devs(dev, hd_table);
+> -    return dev;
+> -}
+> -
+>  /* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
+>  static void piix3_ide_class_init(ObjectClass *klass, void *data)
+>  {
+> @@ -247,6 +236,7 @@ static const TypeInfo piix3_ide_xen_info =3D {
+>      .class_init    =3D piix3_ide_class_init,
+>  };
+> =20
+> +/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
+>  static void piix4_ide_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index 7edec5e149..0ab4787658 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -35,6 +35,7 @@
+>  #include "hw/timer/i8254.h"
+>  #include "hw/rtc/mc146818rtc.h"
+>  #include "hw/ide.h"
+> +#include "hw/ide/pci.h"
+>  #include "migration/vmstate.h"
+>  #include "sysemu/reset.h"
+>  #include "sysemu/runstate.h"
+> @@ -255,10 +256,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus *=
+*isa_bus,
+>          *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+>      }
+> =20
+> +    pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
+>      hd =3D g_new(DriveInfo *, ide_drives);
+>      ide_drive_get(hd, ide_drives);
+> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
+> +    pci_ide_create_devs(pci, hd);
+>      g_free(hd);
+> +
 
-Yes, I forgot about endian adjust.
+Why not move pci_create_simple down, and declare a new variable?
+-    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
++    pci_dev =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
++    pci_ide_create_devs(pci_dev, hd);
 
-I would say
+makes it clearer what's going on imho.
 
-static void endian_adjust(TCGv_i32 ofs, int sew)
-{
-#ifdef HOST_WORDS_BIGENDIAN
-    tcg_gen_xori_i32(ofs, ofs, 7 >> sew);
-#endif
-}
+>      pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
+>      if (smbus) {
+>          *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
+> diff --git a/include/hw/ide.h b/include/hw/ide.h
+> index 883bbaeb9b..21bd8f23f1 100644
+> --- a/include/hw/ide.h
+> +++ b/include/hw/ide.h
+> @@ -12,7 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int io=
+base2, int isairq,
+>                          DriveInfo *hd0, DriveInfo *hd1);
+> =20
+>  /* ide-pci.c */
+> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
+fn);
+>  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
+> =20
+>  /* ide-mmio.c */
+> --=20
+> 2.21.1
 
-so that you don't need the ifdef at the use site.
-
-
-r~
 
