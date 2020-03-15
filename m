@@ -7,89 +7,89 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBFCC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF880C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:27:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7916205ED
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:24:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A95B205ED
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:27:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G8/Gw86y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7916205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Hgk9nf6X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A95B205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDTFp-0006CO-UV
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 09:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42002)
+	id 1jDTIK-0007CK-Lp
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 09:27:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jDTEF-0005mN-Gn
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:57 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jDTFs-0006Lm-3r
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jDTEE-0008Ne-6l
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:55 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:60478)
+ (envelope-from <liran.alon@oracle.com>) id 1jDTFq-0001nu-Tn
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:24:36 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:51520)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jDTED-0008Dg-TJ
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:54 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDMfcx039179;
- Sun, 15 Mar 2020 13:22:41 GMT
+ id 1jDTFq-0001ek-Kk
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:24:34 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDN3mE185377;
+ Sun, 15 Mar 2020 13:24:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : mime-version : content-transfer-encoding;
  s=corp-2020-01-29; bh=J6ZiGQ4x1tHeR62jp28UqNAh6TGJQMKqqCyEp5Ljjbk=;
- b=G8/Gw86yNA/M4mCbuhuFa7F0NDORdgnuLjkm2y7uxdPzSN/d1STqRy+thCV4qq2ZdJ2B
- l8hqeUls8+nLbqK3TN0V3pR/pk5gSkK4AXQ626L0tyRcdMv6c04iPv9VBij/Y2M+uSEs
- LHycgxOhqvWc+t/e4z5awvq+inTSKhfwSSoLaq90XTPshGWWHkD4eRsRqS2nfyQgehMy
- uVzzxzU+EKP2mA1+E8KhggYdvKNh34rh/7LrWFNea+thXQdd4hvsD4mo3ukvplSkKD35
- n1sEr3dGn4vm2YgdTNqmfHCfX5xu85Fy8qLV5ktboZ5n2TEChebCDfsHBDKTzxXzgxsU nQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 2yrppqub28-1
+ b=Hgk9nf6XuuvalRPjHosUzg+s3JBwSs0T66NGFKN04wNDchen4JL3kkI3y2eMq4c/Qt/P
+ ZMK+7SO8wORj67LuPT2fwT3PPUHQTxZDKGr7KjSypZF5x6fq/TPBrHWrvfgpRhFZz3ql
+ vwunMeNNOZbW/NIybgWfCx8nccEWR7wMOeiVQIOP/y5w+Rmyg2fDrKE5dFNkknYVVC3f
+ rXYXl1fgpA/iISVWjCbpeyV/xoCr25LvqTr5Jlso+XQMe1tWr0Wmigu3CyFK6Zxsdfnn
+ EHRrwa6r9DuvbSQDXrtspeMIlQOW/YxuErG7sa4FSsnqx7UTb23HppFB85vZzmZIn3Tb Ww== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2yrq7kk97h-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 15 Mar 2020 13:22:41 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDMcgJ190368;
- Sun, 15 Mar 2020 13:22:38 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 2ys8tn3pd8-1
+ Sun, 15 Mar 2020 13:24:23 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDNYU7013733;
+ Sun, 15 Mar 2020 13:24:23 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3020.oracle.com with ESMTP id 2ys926ew48-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 15 Mar 2020 13:22:38 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02FDMbev011865;
- Sun, 15 Mar 2020 13:22:37 GMT
+ Sun, 15 Mar 2020 13:24:23 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02FDOLWt013734;
+ Sun, 15 Mar 2020 13:24:21 GMT
 Received: from spark.ravello.local (/213.57.127.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Sun, 15 Mar 2020 06:22:37 -0700
+ with ESMTP ; Sun, 15 Mar 2020 06:24:21 -0700
 From: Liran Alon <liran.alon@oracle.com>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] hw/scsi/vmw_pvscsi: Remove assertion for kick after reset
-Date: Sun, 15 Mar 2020 15:24:47 +0200
-Message-Id: <20200315132447.113131-1-liran.alon@oracle.com>
+Date: Sun, 15 Mar 2020 15:26:34 +0200
+Message-Id: <20200315132634.113632-1-liran.alon@oracle.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- phishscore=0 mlxscore=0
- malwarescore=0 suspectscore=1 mlxlogscore=999 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003150074
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxlogscore=999
+ mlxscore=0 spamscore=0 bulkscore=0 adultscore=0 suspectscore=1
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003150074
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- bulkscore=0
- suspectscore=1 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1011
- impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 suspectscore=1
+ adultscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1011
+ malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2003150074
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,7 +101,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com
+Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com,
+ liran.alon@oracle.com, elazar@vastdata.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
