@@ -2,92 +2,64 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519CDC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CF8C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 06:15:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 134C72051A
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:45:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oTzdKUgD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134C72051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C29F206E9
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 06:15:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C29F206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDM5f-0006M4-Sj
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 01:45:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53687)
+	id 1jDMYU-0001Gw-Ph
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 02:15:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDM4J-0005mg-FT
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:13 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jDMXH-0000jZ-KV
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 02:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDM4I-0004K9-5A
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:11 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54624)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDM4H-0004Dc-Sy
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:10 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id np16so6287572pjb.4
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 22:44:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=uYlvfZRcyb9QoH0KfhkACBfYXYvVoV2t9YSk4TzZWPs=;
- b=oTzdKUgDbtb6yTguR7ygkUZm6IkCRafCeiIkL+EBYIw/wF0IFj6Lop2ZByhS6c/pD2
- 81Vevr1HQNDu3ZH0uWYkyRd3Jo9Fd7/kO8TOeArc5vOy2PyYjH5Fh5SB5MLAGFkWG39s
- fcdidqIReJbuSZuErBriK4ZCmtEJYoWYAATG8Kq7iMk37zpd4i+MFJBOrIDCjXT+ZXhA
- MiU5F7n2tVOMcx9yT7+b0RegUMKdgbTBbVB80+I69socdFmvMzAIESjKZzSgDhX9RNs4
- 9yeJ6q9Hh8uD/WPvaYMReBMwBxoYrn8fX4Dilfl8AJ2HeoobfJpFXDEQ23HJNUJkVls4
- w6fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uYlvfZRcyb9QoH0KfhkACBfYXYvVoV2t9YSk4TzZWPs=;
- b=VekZf4wCmS8pA/R9g6JgpwOimCYgSVT+zKKgKJ01hIlQc24IIg5Y7djtVhkMltSkUg
- NoDp+IR2TIQ/eVcMQp/w8YAgwTmCQmn+6JUNNDKBaiDU39/BW43jrJql8eUZvVh6Lu3n
- w7mI40YdZtBEmfLQFdHbEYLuhxBh5BSXvAzE44jqLw7Sxta0OkIZnjMGNB0REmvVQV9h
- U8M98dR2hRqKjbVr0iYyKMtK0jdOa3HYM3PMRzJPrS21qO8ZNG/dKeXSXZdmOs2DWSj1
- tv04IiMjp1LEfQiQcQRfSgy9IzIRHTRn0bWZaelD15KuglyO8Ko1mu9aFcyIbbfqYqJZ
- LCOA==
-X-Gm-Message-State: ANhLgQ0D4Tg/yX+J3arC9sNBBgzkip3ZEUaM+mY7ws0K6QwAdR6GSBhm
- 3bE3NTGlw7KgMY9jHl+Ih9cYYw==
-X-Google-Smtp-Source: ADFU+vtkrvkqdKBnoTpKn5/+7v0TcT/88yK+XiC+6XTOPN31/xeWATUVvmOqQuC5GnABszQrqlTSKQ==
-X-Received: by 2002:a17:902:9f85:: with SMTP id
- g5mr3387075plq.152.1584251048707; 
- Sat, 14 Mar 2020 22:44:08 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- k5sm13086142pgl.3.2020.03.14.22.44.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Mar 2020 22:44:07 -0700 (PDT)
-Subject: Re: [PATCH v5 58/60] target/riscv: vector register gather instruction
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jDMXF-00062U-Vp
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 02:14:07 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:33802)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jDMXF-0005Gj-FJ; Sun, 15 Mar 2020 02:14:05 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07456715|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_regular_dialog|0.0925119-0.000771813-0.906716;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H.gtnoy_1584252835; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H.gtnoy_1584252835)
+ by smtp.aliyun-inc.com(10.147.40.200);
+ Sun, 15 Mar 2020 14:13:55 +0800
+Subject: Re: [PATCH v5 56/60] target/riscv: floating-point scalar move
+ instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
 References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-59-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f9bebb0b-324f-c1fa-8bc1-e30a633285db@linaro.org>
-Date: Sat, 14 Mar 2020 22:44:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ <20200312145900.2054-57-zhiwei_liu@c-sky.com>
+ <8b9161d1-f64f-5677-70a7-ec197d9d3d43@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <04119654-2741-5bdb-a764-457dbc04161d@c-sky.com>
+Date: Sun, 15 Mar 2020 14:13:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200312145900.2054-59-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <8b9161d1-f64f-5677-70a7-ec197d9d3d43@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,64 +77,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/12/20 7:58 AM, LIU Zhiwei wrote:
-> +static bool vrgather_vx_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return (vext_check_isa_ill(s, RVV) &&
-> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
-> +            vext_check_reg(s, a->rd, false) &&
-> +            vext_check_reg(s, a->rs2, false) &&
-> +            (a->rd != a->rs2));
-> +}
-> +GEN_OPIVX_TRANS(vrgather_vx, vrgather_vx_check)
-> +GEN_OPIVI_TRANS(vrgather_vi, 1, vrgather_vx, vrgather_vx_check)
-
-The unmasked versions of these should use gvec_dup.
-
-For the immediate version, where we can validate the index at translation time,
-we can use tcg_gen_gvec_dup_mem, so that the host vector dup-from-memory
-instruction can be used.
-
-For the register version, we should re-use the code from vext.x.s where we load
-the element, bound the index and squash the value to zero for index >= VLMAX.
-Then use tcg_gen_gvec_dup_i64.
-
-For the masked versions, we should load the value, as above, and then re-use
-the vmerge helper with vs2 = vd, so that we get
-
-    vd[i] = v0[i].lsb ? val : vd[i]
 
 
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index 2219fdd6c5..5788e46dcf 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -4647,3 +4647,71 @@ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_b, uint8_t, H1, clearb)
->  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_h, uint16_t, H2, clearh)
->  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_w, uint32_t, H4, clearl)
->  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_d, uint64_t, H8, clearq)
-> +
-> +/* Vector Register Gather Instruction */
-> +#define GEN_VEXT_VRGATHER_VV(NAME, ETYPE, H, CLEAR_FN)                    \
-> +void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
-> +        CPURISCVState *env, uint32_t desc)                                \
-> +{                                                                         \
-> +    uint32_t mlen = vext_mlen(desc);                                      \
-> +    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
-> +    uint32_t vm = vext_vm(desc);                                          \
-> +    uint32_t vl = env->vl;                                                \
-> +    uint32_t index, i;                                                    \
-> +                                                                          \
-> +    for (i = 0; i < vl; i++) {                                            \
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
-> +            continue;                                                     \
-> +        }                                                                 \
-> +        index = *((ETYPE *)vs1 + H(i));                                   \
-> +        if (index >= vlmax) {
+On 2020/3/15 12:39, Richard Henderson wrote:
+> On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+>> ---
+>>   target/riscv/helper.h                   |  9 +++++
+>>   target/riscv/insn32.decode              |  2 ++
+>>   target/riscv/insn_trans/trans_rvv.inc.c | 47 +++++++++++++++++++++++++
+>>   target/riscv/vector_helper.c            | 36 +++++++++++++++++++
+>>   4 files changed, 94 insertions(+)
+>>
+>> diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+>> index 41cecd266c..7a689a5c07 100644
+>> --- a/target/riscv/helper.h
+>> +++ b/target/riscv/helper.h
+>> @@ -1111,3 +1111,12 @@ DEF_HELPER_3(vmv_s_x_b, void, ptr, tl, env)
+>>   DEF_HELPER_3(vmv_s_x_h, void, ptr, tl, env)
+>>   DEF_HELPER_3(vmv_s_x_w, void, ptr, tl, env)
+>>   DEF_HELPER_3(vmv_s_x_d, void, ptr, tl, env)
+>> +
+>> +DEF_HELPER_2(vfmv_f_s_b, i64, ptr, env)
+>> +DEF_HELPER_2(vfmv_f_s_h, i64, ptr, env)
+>> +DEF_HELPER_2(vfmv_f_s_w, i64, ptr, env)
+>> +DEF_HELPER_2(vfmv_f_s_d, i64, ptr, env)
+>> +DEF_HELPER_3(vfmv_s_f_b, void, ptr, i64, env)
+>> +DEF_HELPER_3(vfmv_s_f_h, void, ptr, i64, env)
+>> +DEF_HELPER_3(vfmv_s_f_w, void, ptr, i64, env)
+>> +DEF_HELPER_3(vfmv_s_f_d, void, ptr, i64, env)
+>> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+>> index 7e1efeec05..bfdce0979c 100644
+>> --- a/target/riscv/insn32.decode
+>> +++ b/target/riscv/insn32.decode
+>> @@ -557,6 +557,8 @@ viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
+>>   vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+>>   vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+>>   vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+>> +vfmv_f_s        001100 1 ..... 00000 001 ..... 1010111 @r2rd
+>> +vfmv_s_f        001101 1 00000 ..... 101 ..... 1010111 @r2
+>>   
+>>   vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+>>   vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+>> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+>> index 7720ffecde..99cd45b0aa 100644
+>> --- a/target/riscv/insn_trans/trans_rvv.inc.c
+>> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
+>> @@ -2269,3 +2269,50 @@ static bool trans_vmv_s_x(DisasContext *s, arg_vmv_s_x *a)
+>>       }
+>>       return false;
+>>   }
+>> +
+>> +/* Floating-Point Scalar Move Instructions */
+>> +typedef void (* gen_helper_vfmv_f_s)(TCGv_i64, TCGv_ptr, TCGv_env);
+>> +static bool trans_vfmv_f_s(DisasContext *s, arg_vfmv_f_s *a)
+>> +{
+>> +    if (vext_check_isa_ill(s, RVV)) {
+>> +        TCGv_ptr src2;
+>> +        gen_helper_vfmv_f_s fns[4] = {
+>> +            gen_helper_vfmv_f_s_b, gen_helper_vfmv_f_s_h,
+>> +            gen_helper_vfmv_f_s_w, gen_helper_vfmv_f_s_d
+>> +        };
+>> +
+>> +        src2 = tcg_temp_new_ptr();
+>> +        tcg_gen_addi_ptr(src2, cpu_env, vreg_ofs(s, a->rs2));
+>> +
+>> +        fns[s->sew](cpu_fpr[a->rd], src2, cpu_env);
+>> +
+>> +        tcg_temp_free_ptr(src2);
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
+> SEW == MO_8 should raise illegal instruction exception.
+I agree. But I didn't find a reference in Section 17.3 both in v0.7.1 
+and v0.8.
 
-The type of index should be ETYPE or uint64_t, and similar for vlmax just so
-they match.
+Perhaps I should refer
+
+"If the current SEW does not correspond to a supported IEEE floating-point
+type, an illegal instruction exception is raised."(Section 14)
 
 
-r~
+> Need a check for fp enabled.  Presumably
+>
+>      if (s->mstatus_fs == 0 || !has_ext(s, RVF)) {
+>          return false;
+>      }
+>
+> Need to mark_fs_dirty().
+Yes, I should.
+>
+> Like integer vmv.x.s, this can be done inline.  The nan-boxing is trivial as well.
+>
+> For 0.8, we will have to validate the nan-boxing for SEW=MO_64 && !RVD.  That's
+> still not hard to do inline.
+>
+I see it. Thanks.
+>
+>> +
+>> +typedef void (* gen_helper_vfmv_s_f)(TCGv_ptr, TCGv_i64, TCGv_env);
+>> +static bool trans_vfmv_s_f(DisasContext *s, arg_vfmv_s_f *a)
+>> +{
+>> +    if (vext_check_isa_ill(s, RVV | RVF) ||
+>> +        vext_check_isa_ill(s, RVV | RVD)) {
+>> +        TCGv_ptr dest;
+>> +        TCGv_i64 src1;
+>> +        gen_helper_vfmv_s_f fns[4] = {
+>> +            gen_helper_vfmv_s_f_b, gen_helper_vfmv_s_f_h,
+>> +            gen_helper_vfmv_s_f_w, gen_helper_vfmv_s_f_d
+>> +        };
+>> +
+>> +        src1 = tcg_temp_new_i64();
+>> +        dest = tcg_temp_new_ptr();
+>> +        tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
+>> +
+>> +        fns[s->sew](dest, src1, cpu_env);
+There is a mistake here.
+
+fns[s->sew](dest, cpu_fpr[a->rs1], cpu_env);
+>> +
+>> +        tcg_temp_free_i64(src1);
+>> +        tcg_temp_free_ptr(dest);
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
+> Again, SEW == MO_8 is illegal.  Missing fp enable check.
+>
+> I don't believe RVD without RVF is legal; you should not need to check for both.
+Reasonable.
+>
+> Missing nan-boxing for SEW==MO_64 && FLEN==32 (!RVD).  Which I think should be
+> done here inline, so that the uint64_t passed to the helper is always correct.
+I think all float registers have been NAN-boxed in QEMU target/riscv.
+
+As float registers are  always 64bits.  If FLEN is 32, a float register 
+has been NAN-boxed in FLW or VFMV.F.S
+
+Should I NAN-boxed the float register explicitly here ?
+
+Zhiwei
+>
+> r~
+
 
