@@ -2,93 +2,99 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A31C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6739EC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81B5520663
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:21:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2238720663
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:23:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mOBYid6N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81B5520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UAltgL50"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2238720663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDah9-0002Gd-EI
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 17:21:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47437)
+	id 1jDajB-0003JJ-3u
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 17:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDabn-0000Wi-0f
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:15:44 -0400
+ (envelope-from <mst@redhat.com>) id 1jDaed-0001iQ-TH
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDabk-0000xA-Q9
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:15:42 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:52898)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDabj-0000sQ-5i
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:15:40 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id ng8so85588pjb.2
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 14:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=fGiEToJDmHZ23wWB7KN3N5rVEv/XWprEkoFFYikdSe8=;
- b=mOBYid6Nc33aUg9Uic9D4nURfIZuS5liqqLzTpwfyqsgJpCOwd1ZON1izO2tGOsFvw
- nMUaPfmNxIktZ7mem13xLSGmNrnpJbVdFZ+P3Nl32Bkm4cjPaX6UJS0e9hcCwvdJJGTt
- 7dsgvcVWzf6bGufAsLUr/B33PMbVf77MLbr8o5WhrZBSyENWtshP2ONSPQVOaXRuWX5s
- aozKWajJi/ZJhdz08wbhSi8CxPzVK04kUH2xfdA8B0CuUgsVSWdwyl9CQWAzUbgj4cRr
- jDEjI+EfwnmqJa6JW2EJ/j3WTyFaGGHMUzssVFPJGgU7SBhXfE1TNMgNE3ekzvpw5bi2
- zfKw==
+ (envelope-from <mst@redhat.com>) id 1jDaec-0006JS-Sd
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:18:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59584
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDaec-0006Hc-Ns
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 17:18:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584307118;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VTyMKLYginLmm1txRqrZAcoPUUw7zuPYpuhvlLcE+Mg=;
+ b=UAltgL50dzRyoFGX977SklvRfhzfI99Zm6rmS6g7lyHg7UXgcchUCFHCZv/qcg9N1NRyPH
+ heJLZEORwUamvHMD768NX61nWF7myn0DbaPi/WAia4LFnHGF3zWNPNB31zCTth8dUszOYB
+ fDPI+1i41XqNxHTSHiX2ICegrftOAv0=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-l0wHGmGnND2MUQST8YtbRQ-1; Sun, 15 Mar 2020 17:18:34 -0400
+X-MC-Unique: l0wHGmGnND2MUQST8YtbRQ-1
+Received: by mail-qt1-f198.google.com with SMTP id l1so14974890qtp.10
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 14:18:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fGiEToJDmHZ23wWB7KN3N5rVEv/XWprEkoFFYikdSe8=;
- b=NyYB4BhXBCTGo1kECbph6le++ImhnPCW/eT/MJYAmSJPIdPYFBhWn5XNLlIA8PPwHs
- F2SdWZyRIICi1kbi7P48DDbYZbICAelcgoTBVusaKOjfYEa6152HDQBdMdPRaew58Wa8
- iCH8JuXsZ8N5RL9kmZXv3xrfjEFWSn06pK2xSZAMIzWuUhVkoH/kuyPKVDXD2PUheyLJ
- +SLoZebwUwtkSqOF1IYVu5rcbQf4HdpqzYnTVx3+6eaBvwx5CJ6Iy7Q3IMFUyere0eJm
- bZj/We106kZbmxfFQCmZ4/yAo7YHrjvB1q6o2vnLsU4JFu6WUOUiUWLuLbM2/PZsr0q9
- wOhw==
-X-Gm-Message-State: ANhLgQ2ETEgctOUa2kpzUynqUjQ1eLn0qVDZsMBZ47FvWyPqaV7hZm07
- 04DWcMeNdUCMwxB3mSlR6TSrWw==
-X-Google-Smtp-Source: ADFU+vtGBhOHzvlZDDV8H+GNptvGtN2DuALeXVdl6lE48caCTErwMB1OzBoTHnkSJE6RtjY8AjgkuQ==
-X-Received: by 2002:a17:90a:1f45:: with SMTP id
- y5mr21511321pjy.170.1584306937116; 
- Sun, 15 Mar 2020 14:15:37 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=h0ZLWa4J+akCTWIhwwIIfIUSHOcDh0fyuuNzQcX4V88=;
+ b=gZ93G29mqp8Nx1DVSnuxLU23bIaSxNPmZ+0r8GajGkOrg+MwiYw+vMMcmlHwb77vbv
+ iP8+goVw0t5tfwCRpZTwRiJ+E/HBGZQre6f9lKkldCf2CFSsdV+q+djkqzIgq7PrkutJ
+ VLvRM5GJSXtgeIPwXxU1dSxeD3qmDGHA0s3FFUvdTnevyGWNHIBvpwOxvTtPXTtAEWrK
+ hYW6KPykhGJT+5Fk5QWMVoiH2+Q0JHhfyS4b71tSDrMNwOYPX9Xb0WSLertK9/CTFzsl
+ uvZoTg1uUUfZ4EH6apUgdZlo82mI1WXpH73eW34ZQiasJRAWwdbMLlNWVj2gdMSsbAjJ
+ 4h7Q==
+X-Gm-Message-State: ANhLgQ3DhVYsqvLXVzeh2cr5S3Z/O7l1hYNByMIYRIevhQxZynDPH3cB
+ VBiK/h0Py4P6xok91l4hK77QJAvQv9mQyHCxggNTHABG4C0x/I5sG5Fvp5DJWhY6+QkxO05YSBF
+ hW0RSxC9YRU1VR+E=
+X-Received: by 2002:a05:620a:1125:: with SMTP id
+ p5mr17517013qkk.103.1584307114186; 
+ Sun, 15 Mar 2020 14:18:34 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vu2/dmuQT9B483Bjtl/WLbAKU8WtdA8dbIAWb+7XjIQzwlsWbg45lkGP0dMxvbIByAsGKFRkw==
+X-Received: by 2002:a05:620a:1125:: with SMTP id
+ p5mr17516999qkk.103.1584307113984; 
+ Sun, 15 Mar 2020 14:18:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
  by smtp.gmail.com with ESMTPSA id
- z8sm11132970pjq.10.2020.03.15.14.15.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 14:15:36 -0700 (PDT)
-Subject: Re: [PATCH 1/9] target/i386: Restrict X86CPUFeatureWord to X86 targets
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200313184153.11275-1-philmd@redhat.com>
- <20200313184153.11275-2-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b604aa7f-e189-49cf-db51-3ee2cb323844@linaro.org>
-Date: Sun, 15 Mar 2020 14:15:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ q66sm225544qkd.47.2020.03.15.14.18.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 15 Mar 2020 14:18:33 -0700 (PDT)
+Date: Sun, 15 Mar 2020 17:18:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 0/2] Fix MAP_SYNC support when host has older glibc
+ version
+Message-ID: <20200315171719-mutt-send-email-mst@kernel.org>
+References: <20200311232342.1614944-1-ehabkost@redhat.com>
+ <7a2bc684-b07e-3825-10db-5f2bf0c33edf@redhat.com>
+ <20200315154604.GX1187748@habkost.net>
 MIME-Version: 1.0
-In-Reply-To: <20200313184153.11275-2-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+In-Reply-To: <20200315154604.GX1187748@habkost.net>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,36 +106,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Ben Warren <ben@skyportsystems.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ jtomko@redhat.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/13/20 11:41 AM, Philippe Mathieu-Daudé wrote:
-> Move out x86-specific structures from generic machine code.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  qapi/machine-target.json   | 45 ++++++++++++++++++++++++++++++++++++++
->  qapi/machine.json          | 42 -----------------------------------
->  target/i386/cpu.c          |  2 +-
->  target/i386/machine-stub.c | 22 +++++++++++++++++++
->  target/i386/Makefile.objs  |  3 ++-
->  5 files changed, 70 insertions(+), 44 deletions(-)
->  create mode 100644 target/i386/machine-stub.c
+On Sun, Mar 15, 2020 at 11:46:04AM -0400, Eduardo Habkost wrote:
+> On Sat, Mar 14, 2020 at 10:39:11AM +0100, Paolo Bonzini wrote:
+> > On 12/03/20 00:23, Eduardo Habkost wrote:
+> > > Changes v1 -> v2:
+> > > * Use -isystem for $PWD/linux-headers too
+> > >   Reported-by: "Michael S. Tsirkin" <mst@redhat.com>
+> > >=20
+> > > This is an alternative to the patch submitted at:
+> > >=20
+> > >   From: Jingqi Liu <jingqi.liu@intel.com>
+> > >   Subject: [PATCH] util: fix to get configuration macros in util/mmap=
+-alloc.c
+> > >   Date: Thu,  5 Mar 2020 23:41:42 +0800
+> > >   Message-Id: <20200305154142.63070-1-jingqi.liu@intel.com>
+> > >=20
+> > > Before moving the osdep.h include to the top of the file, we had
+> > > to address warnings triggered when <linux/mman.h> was included
+> > > after <sys/mman.h> (done in patch 1/2).
+> > >=20
+> > > Eduardo Habkost (2):
+> > >   Use -isystem for linux-headers dir
+> > >   mmap-alloc: Include osdep.h before checking CONFIG_LINUX
+> > >=20
+> > >  Makefile.target   | 2 +-
+> > >  configure         | 2 +-
+> > >  util/mmap-alloc.c | 7 +++----
+> > >  3 files changed, 5 insertions(+), 6 deletions(-)
+> > >=20
+> >=20
+> > Queued, thanks.
+>=20
+> Please don't queue patch 2/2.  It breaks the build on mips.
 
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
-r~
+I don't argue that it doesn't, but MIPS pretends to support features
+such as MAP_SYNC when in fact it does nothing.
+
+> --=20
+> Eduardo
+
 
