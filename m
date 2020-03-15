@@ -2,59 +2,70 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79ED7C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA26FC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:24:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C631205ED
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:11:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C631205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id B913B20578
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:24:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B913B20578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDS6y-0005Ep-Gx
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 08:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50259)
+	id 1jDSJc-0007kD-SL
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 08:24:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jDS42-0003zM-V2
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:08:20 -0400
+ (envelope-from <chengang@emindsoft.com.cn>) id 1jDSHh-0007Fd-O9
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jDS41-000424-QE
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:08:18 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:12387)
+ (envelope-from <chengang@emindsoft.com.cn>) id 1jDSHg-0004OU-0f
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:25 -0400
+Received: from lucky1.263xmail.com ([211.157.147.132]:43908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jDS3y-0003ey-Bd; Sun, 15 Mar 2020 08:08:14 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A4093747E04;
- Sun, 15 Mar 2020 13:08:09 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 75A0E747DFD; Sun, 15 Mar 2020 13:08:09 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 72FE2747DFA;
- Sun, 15 Mar 2020 13:08:09 +0100 (CET)
-Date: Sun, 15 Mar 2020 13:08:09 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 2/8] hw/ide: Get rid of piix4_init function
-In-Reply-To: <20200315013319-mutt-send-email-mst@kernel.org>
-Message-ID: <alpine.BSF.2.22.395.2003151305001.2802@zero.eik.bme.hu>
-References: <cover.1584134074.git.balaton@eik.bme.hu>
- <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
- <20200315013319-mutt-send-email-mst@kernel.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <chengang@emindsoft.com.cn>)
+ id 1jDSHf-0003t5-6L
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:23 -0400
+Received: from localhost (unknown [192.168.167.69])
+ by lucky1.263xmail.com (Postfix) with ESMTP id 61284B446B;
+ Sun, 15 Mar 2020 20:22:12 +0800 (CST)
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-ADDR-CHECKED4: 1
+X-ANTISPAM-LEVEL: 2
+X-ABS-CHECKED: 0
+Received: from localhost.localdomain (unknown [223.72.82.233])
+ by smtp.263.net (postfix) whith ESMTP id
+ P20071T140595485996800S1584274925344411_; 
+ Sun, 15 Mar 2020 20:22:11 +0800 (CST)
+X-UNIQUE-TAG: <74b4f6eec1cae0d7cd0169a97dbe721d>
+X-RL-SENDER: chengang@emindsoft.com.cn
+X-SENDER: chengang@emindsoft.com.cn
+X-LOGIN-NAME: chengang@emindsoft.com.cn
+X-FST-TO: riku.voipio@iki.fi
+X-SENDER-IP: 223.72.82.233
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+X-System-Flag: 0
+From: chengang@emindsoft.com.cn
+To: riku.voipio@iki.fi,
+	laurent@vivier.eu
+Subject: [PATCH v2] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
+Date: Sun, 15 Mar 2020 20:20:51 +0800
+Message-Id: <20200315122051.9360-1-chengang@emindsoft.com.cn>
+X-Mailer: git-send-email 2.24.0.308.g228f53135a
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 211.157.147.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,117 +77,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- John Snow <jsnow@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Chen Gang <chengang@emindsoft.com.cn>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 15 Mar 2020, Michael S. Tsirkin wrote:
-> On Fri, Mar 13, 2020 at 10:14:34PM +0100, BALATON Zoltan wrote:
->> This removes pci_piix4_ide_init() function similar to clean up done to
->> other ide devices.
->>
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>  hw/ide/piix.c    | 12 +-----------
->>  hw/isa/piix4.c   |  5 ++++-
->>  include/hw/ide.h |  1 -
->>  3 files changed, 5 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
->> index 8bcd6b72c2..3b2de4c312 100644
->> --- a/hw/ide/piix.c
->> +++ b/hw/ide/piix.c
->> @@ -208,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
->>      }
->>  }
->>
->> -/* hd_table must contain 4 block drivers */
->> -/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
->> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
->> -{
->> -    PCIDevice *dev;
->> -
->> -    dev = pci_create_simple(bus, devfn, "piix4-ide");
->> -    pci_ide_create_devs(dev, hd_table);
->> -    return dev;
->> -}
->> -
->>  /* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
->>  static void piix3_ide_class_init(ObjectClass *klass, void *data)
->>  {
->> @@ -247,6 +236,7 @@ static const TypeInfo piix3_ide_xen_info = {
->>      .class_init    = piix3_ide_class_init,
->>  };
->>
->> +/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
->>  static void piix4_ide_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc = DEVICE_CLASS(klass);
->> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
->> index 7edec5e149..0ab4787658 100644
->> --- a/hw/isa/piix4.c
->> +++ b/hw/isa/piix4.c
->> @@ -35,6 +35,7 @@
->>  #include "hw/timer/i8254.h"
->>  #include "hw/rtc/mc146818rtc.h"
->>  #include "hw/ide.h"
->> +#include "hw/ide/pci.h"
->>  #include "migration/vmstate.h"
->>  #include "sysemu/reset.h"
->>  #include "sysemu/runstate.h"
->> @@ -255,10 +256,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
->>          *isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
->>      }
->>
->> +    pci = pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
->>      hd = g_new(DriveInfo *, ide_drives);
->>      ide_drive_get(hd, ide_drives);
->> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
->> +    pci_ide_create_devs(pci, hd);
->>      g_free(hd);
->> +
->
-> Why not move pci_create_simple down, and declare a new variable?
-> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-> +    pci_dev = pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
-> +    pci_ide_create_devs(pci_dev, hd);
->
-> makes it clearer what's going on imho.
+From: Chen Gang <chengang@emindsoft.com.cn>
 
-Ends up there after patch 6. Do you still think a new variable would be 
-needed for this after that patch? It's pretty simple and clear without all 
-the hd array stuff even reusing pci variable. (Or I could rename pci to 
-pci_dev but really don't think it worth having two once used variable in 
-such a simple function. Normally such variables are called dev but in this 
-function that name is taken for a DeviceState *variable.)
+Another DRM_IOCTL_* commands will be done later.
 
-Regards,
-BALATON Zoltan
+Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+---
+ linux-user/ioctls.h        |  2 ++
+ linux-user/syscall.c       | 62 ++++++++++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h  | 15 +++++++++
+ linux-user/syscall_types.h | 11 +++++++
+ 4 files changed, 90 insertions(+)
 
->
->>      pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
->>      if (smbus) {
->>          *smbus = piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
->> diff --git a/include/hw/ide.h b/include/hw/ide.h
->> index 883bbaeb9b..21bd8f23f1 100644
->> --- a/include/hw/ide.h
->> +++ b/include/hw/ide.h
->> @@ -12,7 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
->>                          DriveInfo *hd0, DriveInfo *hd1);
->>
->>  /* ide-pci.c */
->> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
->>  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
->>
->>  /* ide-mmio.c */
->> --
->> 2.21.1
->
->
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 0defa1d8c1..3ae32cbfb1 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -574,6 +574,8 @@
+   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
+                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
+=20
++  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
++                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
+ #ifdef TARGET_TIOCSTART
+   IOCTL_IGNORE(TIOCSTART)
+   IOCTL_IGNORE(TIOCSTOP)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 8d27d10807..2eb7c91ab4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -112,6 +112,7 @@
+ #include <linux/if_alg.h>
+ #include <linux/rtc.h>
+ #include <sound/asound.h>
++#include <libdrm/drm.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+=20
+@@ -5196,6 +5197,67 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEn=
+try *ie, uint8_t *buf_temp,
+ }
+ #endif
+=20
++static inline abi_long target_to_host_drmversion(struct drm_version *hos=
+t_ver,
++                                                abi_long target_addr)
++{
++    struct target_drm_version *target_ver;
++
++    if (!lock_user_struct(VERIFY_READ, target_ver, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++    __get_user(host_ver->name_len, &target_ver->name_len);
++    host_ver->name =3D host_ver->name_len ? g2h(target_ver->name) : NULL=
+;
++    __get_user(host_ver->date_len, &target_ver->date_len);
++    host_ver->date =3D host_ver->date_len ? g2h(target_ver->date) : NULL=
+;
++    __get_user(host_ver->desc_len, &target_ver->desc_len);
++    host_ver->desc =3D host_ver->desc_len ? g2h(target_ver->desc) : NULL=
+;
++    unlock_user_struct(target_ver, target_addr, 0);
++    return 0;
++}
++
++static inline abi_long host_to_target_drmversion(abi_ulong target_addr,
++                                                 struct drm_version *hos=
+t_ver)
++{
++    struct target_drm_version *target_ver;
++
++    if (!lock_user_struct(VERIFY_WRITE, target_ver, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++    __put_user(host_ver->version_major, &target_ver->version_major);
++    __put_user(host_ver->version_minor, &target_ver->version_minor);
++    __put_user(host_ver->version_patchlevel, &target_ver->version_patchl=
+evel);
++    __put_user(host_ver->name_len, &target_ver->name_len);
++    __put_user(host_ver->date_len, &target_ver->date_len);
++    __put_user(host_ver->desc_len, &target_ver->desc_len);
++    unlock_user_struct(target_ver, target_addr, 0);
++    return 0;
++}
++
++static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
++                             int fd, int cmd, abi_long arg)
++{
++    struct drm_version *ver;
++    abi_long ret;
++
++    switch (ie->host_cmd) {
++    case DRM_IOCTL_VERSION:
++        ver =3D (struct drm_version *)buf_temp;
++        memset(ver, 0, sizeof(*ver));
++        ret =3D target_to_host_drmversion(ver, arg);
++        if (is_error(ret)) {
++            return ret;
++        }
++        ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, ver));
++        if (is_error(ret)) {
++            return ret;
++        }
++        ret =3D host_to_target_drmversion(arg, ver);
++        return ret;
++    }
++    return -TARGET_EFAULT;
++}
++
++
+ static IOCTLEntry ioctl_entries[] =3D {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 152ec637cb..3c261cff0e 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
+ #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
+ #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
+=20
++/* drm ioctls */
++#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
++
+ /* from asm/termbits.h */
+=20
+ #define TARGET_NCC 8
+@@ -2598,6 +2601,18 @@ struct target_mq_attr {
+     abi_long mq_curmsgs;
+ };
+=20
++struct target_drm_version {
++    int version_major;
++    int version_minor;
++    int version_patchlevel;
++    abi_ulong name_len;
++    abi_ulong name;
++    abi_ulong date_len;
++    abi_ulong date;
++    abi_ulong desc_len;
++    abi_ulong desc;
++};
++
+ #include "socket.h"
+=20
+ #include "errno_defs.h"
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e12c1661e..e2b0484f50 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
+ STRUCT(dm_target_msg,
+        TYPE_ULONGLONG) /* sector */
+=20
++STRUCT(drm_version,
++       TYPE_INT, /* version_major */
++       TYPE_INT, /* version_minor */
++       TYPE_INT, /* version_patchlevel */
++       TYPE_ULONG, /* name_len */
++       TYPE_PTRVOID, /* name */
++       TYPE_ULONG, /* date_len */
++       TYPE_PTRVOID, /* date */
++       TYPE_ULONG, /* desc_len */
++       TYPE_PTRVOID) /* desc */
++
+ STRUCT(file_clone_range,
+        TYPE_LONGLONG, /* src_fd */
+        TYPE_ULONGLONG, /* src_offset */
+--=20
+2.24.0.308.g228f53135a
+
+
+
 
