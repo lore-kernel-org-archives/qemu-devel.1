@@ -7,89 +7,89 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E042EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6D5C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0AEB205C9
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DD6A205C9
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 21:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCJmfP0i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0AEB205C9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F8LLSDYo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD6A205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDaR0-0004Fw-Ez
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 17:04:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
+	id 1jDaWi-0006ZX-JN
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 17:10:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDa9N-0007Bb-4w
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:46:22 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDaA2-0007Mx-HX
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDa9L-0001V5-Td
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:46:21 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43157)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDaA1-0002VJ-Bb
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:47:02 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:46010)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDa9L-0001TA-Ms
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:46:19 -0400
-Received: by mail-pl1-x643.google.com with SMTP id f8so6963637plt.10
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 13:46:19 -0700 (PDT)
+ id 1jDaA0-0002Nb-Cm
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:47:00 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b22so6955925pls.12
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 13:46:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=iFXp4zNmSDqQKJwjNyZbD2cn17LZUGny+MQasX8s9wk=;
- b=XCJmfP0i1fvapM5nqotmFRwsScJCqgbVxhwrUww3l/xWsprL8DCsdbn41PFjOkeuCz
- FvdGWZqiNaC/dMIJOuRoaHuAIgPGO+sKeTVeQCjD0iBD1vVTT7PTfQdcbBYsiOOuiQDM
- Wd69FvdRlO2H234TD2sVWj6pfhsx89AAsaEJ6iysIsNaiJfY4VN8vkBEX4Jusd3bqQjF
- WsUgOVwjrrfyHE0+qsAi+mHbdolKsp/Yaa4uHDj/5G7YcCIlUCym8ofMrolmHltbFWKM
- dfTwxXqP4/j8E7p4VeGRUQvsT1cMBQyK5yAUtGF6rfo70zL+CCCAKZDQx8bMTGFsuTUt
- W/SQ==
+ bh=6Khs/0XZvB9pqQYMEDwzvpGeETU8JRzc3/6wT/zCEJk=;
+ b=F8LLSDYokjrvKwG2NQoQYGcetH+fik9pnmkrqUH61GX0Ecp+Gb5MuTDhYkZ161ebLp
+ BPuoefzHvR+F0GAnsWcTsEjXYI9SHQ7bbjqKzOWWvsh+m0jDCjXFAqNdg/6sRvxbc9I7
+ IEK8ArLybbuVCbeqwIf1e999QdNRDKkzlXKTxhxMmWJjw3jI15NgFZInTA2mDJl2w2vi
+ V24ulgs1pjsnUeB6yvfFuczE4ynR5tufpqj1g3NIi2Mi7/PEhW131Oc8O2s/uOwY2bO1
+ roi17YX0kEfLTW3hBWopcWI8Vz5kqfQWEXq/nsD12VXWfzqt8ILK6Rh4OX2rvMGFbLfw
+ NP4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=iFXp4zNmSDqQKJwjNyZbD2cn17LZUGny+MQasX8s9wk=;
- b=FML17Lgx7V6dNCrCJZNVjo9hEDzI3/Kyd6pz3tigid3HpGwMiV/0pfH4Q3VXmKXPI1
- JFhiM6XyRK6PQSM2IwbDALE04SnIcy2tdjs3tkvrwCj/LgyyHy7ww5zVyNd6lowpOLzj
- 1Nq0wrj/LQMuT3GPbpQ+JiYoAEGeG/Btk3wuvK7IWkIjt8UlA8bCFON6OVPMv3oNhM7i
- kpFCny7vdbDffHAnGmFJthzJST9vWdObM1cMNvLeiHvAALpCtWQN0SDHPAs37mN+a5em
- e7Owz4RyqyWjDUgFHjb77NXbiPq5ImQ0raTAlibzeEUkK8Z1jHmyexGrNNbi/05oCalg
- XQrA==
-X-Gm-Message-State: ANhLgQ3Cg93IbG3UQXhpgQvR/auWYZm+W3rg/iNRpEOfN/qorj/ANIk1
- Xn1tbXez4+H8sH2TbMnUcMO56A==
-X-Google-Smtp-Source: ADFU+vsPw+Ai2GQY8mcs8tJcvUx7H9FxQhMgeeUGIQwJfp1TKTa7gtiZGs139/XFZWCwXXpzH8yRNg==
-X-Received: by 2002:a17:90a:d34b:: with SMTP id
- i11mr20522008pjx.180.1584305178521; 
- Sun, 15 Mar 2020 13:46:18 -0700 (PDT)
+ bh=6Khs/0XZvB9pqQYMEDwzvpGeETU8JRzc3/6wT/zCEJk=;
+ b=tWCiE53GQGerJUTBU8Bb/O6SuQSjllyRDjSldQnqz6hKPJuziDYzXWP2dxFwb7e0ef
+ yjxfQBIEuNzSqm/6DprSC30wMHKci9rnqY33hU+9lb0tnV02hpMjwvhHCkMP2FyewfM3
+ gVbAHIGrLf2w70TuyGN3Ol8gMqQh9RYMwNm9puxIQswLRW4TJzOzqWjKXIkpOlzyYhtq
+ McUynMvrbCbu+eFs5muL7H1PtoVzNOhhHCWyw8nv7HwFKOLTMl1GbB+jpIIQX3Z6/z65
+ rXT/1Hm2kkRvnTidw93d31V6RA9V36LJ0iZfBvxeMuv8RUChbZIXKxqf5BH5nIwyflUl
+ qg6g==
+X-Gm-Message-State: ANhLgQ0FGY5p8SYpFUfllqN8YN/HFSShCC0g2FOr4S/0OmAI68nn/cNf
+ JQaw9Xptx1QyXVMc0DlpLktE4g==
+X-Google-Smtp-Source: ADFU+vuJfz8Bo0sTahw3ewMurLHkMeVZW8PiA9ut4lbIj02rxUkZbRcyZ1v29XaQvf4kU30AvZePRQ==
+X-Received: by 2002:a17:90b:288:: with SMTP id
+ az8mr19863626pjb.25.1584305217951; 
+ Sun, 15 Mar 2020 13:46:57 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- o66sm51279474pfb.93.2020.03.15.13.46.16
+ b189sm8661705pfa.209.2020.03.15.13.46.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 13:46:17 -0700 (PDT)
-Subject: Re: [PATCH 12/14] target/i386: Restrict CpuClass::get_crash_info() to
- system-mode
+ Sun, 15 Mar 2020 13:46:57 -0700 (PDT)
+Subject: Re: [PATCH 13/14] target/s390x: Restrict CpuClass::get_crash_info()
+ to system-mode
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200313183652.10258-1-philmd@redhat.com>
- <20200313183652.10258-13-philmd@redhat.com>
+ <20200313183652.10258-14-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <75c44540-a833-4c35-d698-9e919c68c47c@linaro.org>
-Date: Sun, 15 Mar 2020 13:46:15 -0700
+Message-ID: <71ef67f7-3b14-8769-868c-ae339b84e364@linaro.org>
+Date: Sun, 15 Mar 2020 13:46:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200313183652.10258-13-philmd@redhat.com>
+In-Reply-To: <20200313183652.10258-14-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,8 +120,8 @@ Sender: "Qemu-devel"
 On 3/13/20 11:36 AM, Philippe Mathieu-Daudé wrote:
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  target/i386/cpu.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  target/s390x/cpu.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
