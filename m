@@ -2,101 +2,95 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB06EC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 22:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3262C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 22:38:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A5F72051A
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 22:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E50A2051A
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 22:38:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JPpM3F/8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5F72051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S7p11nb7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E50A2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDbtX-0001DT-DE
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 18:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49400)
+	id 1jDbuM-0001dn-AX
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 18:38:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDbkM-0005s6-AE
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:28:39 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDbpK-0007jH-7T
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDbkK-0006gt-64
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:28:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24607
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDbkK-0006Yk-1L
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:28:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584311315;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bGyGswra0vppqhzmM7kZUQGbb/i1eJCg5TX6PmB4si8=;
- b=JPpM3F/8EbW1TWOwKXV3dIBSShO6RfS46Fgfd5Y64DFlGgYc1KDzALgTPkPDARgjvMZ5V4
- 4fnHl8be02DfM71W1J679ElmkuCvnIZBM2gnlUDJOJ8sq+clKCcSLs5P5PW9nTwiCOFVfK
- ECNbgdrPVg3K6yKr2IKOEAvAyPrckLE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-ew91L9-uOPubMG3jOqC2lg-1; Sun, 15 Mar 2020 18:28:33 -0400
-X-MC-Unique: ew91L9-uOPubMG3jOqC2lg-1
-Received: by mail-wr1-f69.google.com with SMTP id g4so380538wrv.12
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 15:28:33 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDbpI-0006YI-W6
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:33:46 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:41793)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDbpI-0006Q4-6z
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 18:33:44 -0400
+Received: by mail-pg1-x541.google.com with SMTP id b1so8557450pgm.8
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 15:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=C8xrtjZPdhkGh9RyuMEXja32sZxVcrJKH8SOoPBFV+I=;
+ b=S7p11nb7RkRO3B2CKas/xZBbykefVMuGQavF9k2EpUSryb4hk0D7aR0ykRSR/ya3Vc
+ g3Jkp0sQuy3AlvNbiZ4DkN7PWuuQBoQAjKFHxJ9yEwzGUKqy2wLs/UPcoguqYEbHOUaD
+ +YIYh00mfewuYg5l+YaNFqbisx9f4IXkLx52Yarnoiy9wLpnCpXyEHXuIc+winQlkk3g
+ WcVXW6hSSm2XswORQWkwFn/5o7DvNSmncCExThyvk0iJo8q90FABr2I4K6oL2Rrl1PGk
+ 7e+B57NEQLXRmvq0O8ifOWBaXPmvVJctdB8Q5nv3S2XdrmRiMUjOipbwzfLC0HgM7lSE
+ uGwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=qKiK+efqrpk+y5Dkxh5f4OQ0f8fFMMyYobmm/4lpc5s=;
- b=p/nLKsWiQzRm7EFxJ6UhkM8vHPVGay96yGPvbzMu4Ibe8CYJrhBMO9X2pqqtvI5VrK
- M4k25A2ayN2bzNtID0NEMf5iueWqZs78qlGHnaj+c6coZlh96I/ptWW3nDNnVIBE52Vv
- uZrPrX1MuB85A1szv4JdwWzBcXkAPGfauxpfshvRmPCvuU95qHIF4u6Ax9qjbKzxrGS8
- iO6Yf7NLjXGOG3Dll6S7jHtUHB03444ACF+7hRgdS9PVsUMCvH7EWmcDGtIWKdfK1aHr
- 56dExeT8WSvMgwMUZ3pD0k6c+LmDTEEImFiPd5YqFhWwINsm1WWEBIP3c4z9NPjyhDia
- RfLA==
-X-Gm-Message-State: ANhLgQ2atgQN3hzwU0bmp/YxukxO0ATljtPhL8HBiX0ABmp7+NHB+bqj
- HS1GF/hUbOhbhnEY7U0i3hU9RvwlRFNf7tcpa12tjYXZVTnvaAlv4cVLUrpQlC0XnD8wwN+bqNO
- VGGLAn9JJDp2Qb+E=
-X-Received: by 2002:adf:e54d:: with SMTP id z13mr32862779wrm.277.1584311312290; 
- Sun, 15 Mar 2020 15:28:32 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvTtIuYwBgkd4R39m8bGvxYRQ4OoQPzMBKu+VnDiBvFWtiFHgMk41BSRsbFi4/3uBMccLgkLw==
-X-Received: by 2002:adf:e54d:: with SMTP id z13mr32862764wrm.277.1584311312107; 
- Sun, 15 Mar 2020 15:28:32 -0700 (PDT)
-Received: from [192.168.1.40] (191.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id h10sm16920764wrb.24.2020.03.15.15.28.30
+ bh=C8xrtjZPdhkGh9RyuMEXja32sZxVcrJKH8SOoPBFV+I=;
+ b=hdVik7lSApBUgw3NCd0IQOH88AowmeLDV0QFilTQlacEltvYmm/dpXVcl5ssx2wcEn
+ q6byeJaQjSwcNrW2EGU5W/7vShStSeIP4uJNmVXURUy6e6ZdXyW0U/dB9dFCLz/CMrgT
+ Xwybu9pQhW/BHMucQiPZGi5sGQPUAt5w8sH0v2EhPTl/PE2+0unq4R7bbF8K1nzcUQSW
+ Ye42wu1yV9Xk3zhvJP073J43tT/JV679mLj/Sx7C7MbWuNwZrZ/dXf0zRSb77C0HXSVL
+ eEj2xSvyS+I3rvfqL9nM/7gzurwFW0kSqwnW+/E89GGdK7/3qkX47z+rpm5ho/Aqj4Wb
+ yrZQ==
+X-Gm-Message-State: ANhLgQ2K1+CKcDp7alC5WSaQl9Y/SgPngKtDHEqiw4YZ//tfewf+yZAI
+ t4IAcQsYthq6Jp3N5+XeStfIfA==
+X-Google-Smtp-Source: ADFU+vv4ID1TV72I/f91ubBzIpArlK8S71wQ1JT6Z3mqMXjq0lOpmdWDq1J+3g+wmfbKprdmTM4tqQ==
+X-Received: by 2002:a62:e20a:: with SMTP id a10mr23092322pfi.270.1584311623231; 
+ Sun, 15 Mar 2020 15:33:43 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ 11sm13757742pfv.43.2020.03.15.15.33.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 15:28:31 -0700 (PDT)
-Subject: Re: [PATCH 1/9] hw/core/qdev-properties: Use qemu_strtol() in
- set_mac() handler
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200313184607.11792-1-philmd@redhat.com>
- <20200313184607.11792-2-philmd@redhat.com>
- <1037ec70-ff39-b195-a374-7cace38e9761@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d9002cff-8ae0-45e3-9a57-6a3cafdb034e@redhat.com>
-Date: Sun, 15 Mar 2020 23:28:29 +0100
+ Sun, 15 Mar 2020 15:33:42 -0700 (PDT)
+Subject: Re: [PATCH 01/14] Makefile: Only build virtiofsd if system-mode is
+ enabled
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200313183652.10258-1-philmd@redhat.com>
+ <20200313183652.10258-2-philmd@redhat.com>
+ <8f73d608-d28e-b896-b1f0-f95d599502f0@vivier.eu>
+ <d9b29b2b-58ff-512c-c426-0ffe7bcad295@linaro.org>
+ <29d183c5-6dc5-39a0-e8be-fa2e7f37d331@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c9c4a379-4710-b2c4-54ae-e33b02de5c64@linaro.org>
+Date: Sun, 15 Mar 2020 15:33:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1037ec70-ff39-b195-a374-7cace38e9761@linaro.org>
+In-Reply-To: <29d183c5-6dc5-39a0-e8be-fa2e7f37d331@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,41 +102,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/15/20 10:25 PM, Richard Henderson wrote:
-> On 3/13/20 11:45 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> +        if (qemu_strtol(str + pos, &p, 16, &val) < 0 || val > 0xff) {
->> +            goto inval;
->> +        }
->=20
-> This is doing more that *just* using qemu_strtol, it's also validating th=
-e
-> input.  I don't think you need to adjust the patch, just improve the comm=
-it
-> message.  With that,
->=20
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 3/15/20 3:16 PM, Philippe Mathieu-Daudé wrote:
+> On 3/15/20 8:40 PM, Richard Henderson wrote:
+>> On 3/13/20 3:28 PM, Laurent Vivier wrote:
+>>>>   ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+>>>> -HELPERS-y += virtiofsd$(EXESUF)
+>>>> -vhost-user-json-y += tools/virtiofsd/50-qemu-virtiofsd.json
+>>>> +HELPERS-$(CONFIG_SOFTMMU) += virtiofsd$(EXESUF)
+>>>> +vhost-user-json-$(CONFIG_SOFTMMU) += tools/virtiofsd/50-qemu-virtiofsd.json
+>> ...
+>>>
+>>> Why don't you do that instead?
+>>>
+>>>    ifeq
+>>> ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_SOFTMMU),yyyy)
+> 
+> This was my first option but checkpatch complained because it is 80 chars long...
+> 
+> I also tried:
+> 
+> ifeq \
+> ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_SOFTMMU),yyyy)
+> 
+> which is uglier and still too long.
+> 
+> Following qemu-bridge-helper syntax I also tried:
+> 
+> ifeq ($(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yy)
+> HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += virtiofsd$(EXESUF)
+> 
+> which is also too long ¯\_(ツ)_/¯
+> 
+> If you accept checkpatch complain I can use the form you prefer :)
 
-Correct. I'll add a comment, as currently we ignore incorrect input due=20
-to the implicit cast to uint8_t:
+Hmph.  Of the choices, I prefer the 80+ char line.
 
-struct MACAddr {
-     uint8_t a[6];
-};
 
-     mac->a[i] =3D strtol(str+pos, &p, 16);
-
-Thanks!
-
->=20
-> r~
->=20
-
+r~
 
