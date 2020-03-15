@@ -2,102 +2,82 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE03C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23542C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 694CA20575
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D50FB20575
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:54:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXj4Zq5f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694CA20575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hd88Wpg3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D50FB20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDVWf-0006UC-E1
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:50:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43419)
+	id 1jDVal-0000G3-NX
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDVPr-000370-D8
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:43:06 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDUXk-0005a5-Tj
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDVPo-00018k-8q
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:43:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24112
+ (envelope-from <armbru@redhat.com>) id 1jDUXi-0002VE-Sw
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53010
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDVPo-00017W-3I
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:43:00 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXh-0002O0-G8
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584286979;
+ s=mimecast20190719; t=1584283623;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NIGCkM51XQlfxMmDAatIAx5Vt//UG1UpBsd0CYNNos4=;
- b=VXj4Zq5fUld4yrgiBCzpiqpqc5mrkC82H46CKya/AoJjluL4KqmI20G4k3CDAKAzTLmhWp
- PmBtPkgHjH/fKWYwym2s3REWP+v7VwKB6AM73LTv3/gI15Ox3u0Yh7wmki4zCGmYmQe/fh
- kDOELzDa/JpzzOyB/2uw03teA+VBYiM=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-54nUOF0TNMuV1tLbT5UDgA-1; Sun, 15 Mar 2020 11:42:50 -0400
-X-MC-Unique: 54nUOF0TNMuV1tLbT5UDgA-1
-Received: by mail-ed1-f69.google.com with SMTP id y23so12500345edt.2
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 08:42:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=N53uPYUcvu4U37ONncaGwNuy7exmfC8pKn5402ejNOo=;
- b=rf0UPm1CARUetrPfQf0prx268trrVDJlnhSR88G4r2pj+Oe/eX6BJazb3HdT3ipeB6
- H/Be0bGVUQyqJoBAkMhCPeo6SqYeYTdjplHJwBL7PIIj8TM7ZaUEDH94VIc51NpRo5f/
- DsNV0qPB9FaX+dPDlHopupA6Dtl2ERJ4NJdlqux//wYuAsA3xubPSP+/jJmBFz+pJ8cn
- Z4s9tyUBComS3e5lKu2eyPKveJEW+vi3Vdryy0jlZK+KWr7npkK3lHOwNoEbfWDYTi10
- 2tni4i6JCjmLNJEla1zBWh89zziOYNuSpTutEv+peeMQDBmFwse16J70GZeJ2sdr07CF
- /goQ==
-X-Gm-Message-State: ANhLgQ1EmnzVImz/mqSDhB7DcnLUxK3ZSfDUAhjrXm8tMozmyi+joZaU
- XVM4nlX5qL2/YdeUdIs3aV/7sPDMQjfdwuF9ghEhxuFABZSpL4UfcT9aGDNw+mjgdAvnJTtmOOU
- zruBw9WgisO0M9lg=
-X-Received: by 2002:aa7:d8ca:: with SMTP id k10mr22129950eds.60.1584286968973; 
- Sun, 15 Mar 2020 08:42:48 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtM8XxuCzi1v4l5D247Xp5+/xHH7Ap0dfAuQxSY7BR3mgrBfb+dI7S19/Ie53psEwj7y5+tYw==
-X-Received: by 2002:aa7:d8ca:: with SMTP id k10mr22129935eds.60.1584286968490; 
- Sun, 15 Mar 2020 08:42:48 -0700 (PDT)
-Received: from [192.168.1.40] (191.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id i11sm5445250eds.23.2020.03.15.08.42.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 08:42:47 -0700 (PDT)
-Subject: Re: [PATCH 05/13] target/rx: CPU definitions
-To: qemu-devel@nongnu.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <richard.henderson@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
-References: <20200315132810.7022-1-f4bug@amsat.org>
- <20200315132810.7022-6-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <62d3ffcb-0ffe-006b-9007-7180ccedc0d1@redhat.com>
-Date: Sun, 15 Mar 2020 16:42:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=Q4A/AJyHeW/vuSJp9aHTHGS5Hyw0EJLtIruzM5HGBPo=;
+ b=hd88Wpg3fhyRHLkjEn4BLpDK9vSSihYLYBBUkifvo1y9Ea/esbe26TMFgFJvYc48qY/EKv
+ pAyXgq014zwQVM+BNDROxFmRhoaJYz94V+WizKAvbsX5nKhNLUyPkxiwDsPazUEoPusuup
+ k1QNkRRFqVprMv6Mos8Ny2VT4jUCBAg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-Lrl9JWceMouHRNAJQIZRLQ-1; Sun, 15 Mar 2020 10:46:59 -0400
+X-MC-Unique: Lrl9JWceMouHRNAJQIZRLQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44D85477;
+ Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
+ [10.36.116.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E1D3B5DA2C;
+ Sun, 15 Mar 2020 14:46:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9E97D11366F7; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 13/34] qapi: Consistently put @features parameter right
+ after @ifcond
+Date: Sun, 15 Mar 2020 15:46:32 +0100
+Message-Id: <20200315144653.22660-14-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
+References: <20200315144653.22660-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200315132810.7022-6-f4bug@amsat.org>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,822 +89,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yoshinori,
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/commands.py       |  6 +++---
+ scripts/qapi/doc.py            | 10 +++++-----
+ scripts/qapi/introspect.py     | 10 +++++-----
+ scripts/qapi/schema.py         | 36 ++++++++++++++++------------------
+ scripts/qapi/types.py          |  4 ++--
+ scripts/qapi/visit.py          |  4 ++--
+ tests/qapi-schema/test-qapi.py | 10 +++++-----
+ 7 files changed, 39 insertions(+), 41 deletions(-)
 
-On 3/15/20 2:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> From: Yoshinori Sato <ysato@users.sourceforge.jp>
->=20
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> [PMD: Use newer QOM style, split cpu-qom.h, restrict access to
->   extable array, use rx_cpu_tlb_fill() extracted from patch of
->   Yoshinori Sato 'Convert to CPUClass::tlb_fill', call cpu_reset
->   after qemu_init_vcpu, make rx_crname a function]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
-> Message-Id: <20200224141923.82118-7-ysato@users.sourceforge.jp>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->   target/rx/cpu-param.h   |  31 ++++++
->   target/rx/cpu-qom.h     |  43 ++++++++
->   target/rx/cpu.h         | 180 ++++++++++++++++++++++++++++++++
->   target/rx/cpu.c         | 226 ++++++++++++++++++++++++++++++++++++++++
->   target/rx/gdbstub.c     | 112 ++++++++++++++++++++
->   target/rx/translate.c   |  17 ++-
->   gdb-xml/rx-core.xml     |  70 +++++++++++++
->   target/rx/Makefile.objs |   1 -
->   8 files changed, 674 insertions(+), 6 deletions(-)
->   create mode 100644 target/rx/cpu-param.h
->   create mode 100644 target/rx/cpu-qom.h
->   create mode 100644 target/rx/cpu.h
->   create mode 100644 target/rx/cpu.c
->   create mode 100644 target/rx/gdbstub.c
->   create mode 100644 gdb-xml/rx-core.xml
->=20
-> diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
-> new file mode 100644
-> index 0000000000..5da87fbebe
-> --- /dev/null
-> +++ b/target/rx/cpu-param.h
-> @@ -0,0 +1,31 @@
-> +/*
-> + *  RX cpu parameters
-> + *
-> + *  Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOU=
-T
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef RX_CPU_PARAM_H
-> +#define RX_CPU_PARAM_H
-> +
-> +#define TARGET_LONG_BITS 32
-> +#define TARGET_PAGE_BITS 12
-> +
-> +#define TARGET_PHYS_ADDR_SPACE_BITS 32
-> +#define TARGET_VIRT_ADDR_SPACE_BITS 32
-> +
-> +#define NB_MMU_MODES 1
-> +#define MMU_MODE0_SUFFIX _all
-> +
-> +#endif
-> diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
-> new file mode 100644
-> index 0000000000..df43fcf103
-> --- /dev/null
-> +++ b/target/rx/cpu-qom.h
-> @@ -0,0 +1,43 @@
-> +/*
-> + * RX CPU
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato
-> + * SPDX-License-Identifier: LGPL-2.0+
-
-For the rest of your work you used GPL-2.0-or-later but here LGPL-2.0+,=20
-is this on purpose?
-
-> + */
-> +
-> +#ifndef RX_CPU_QOM_H
-> +#define RX_CPU_QOM_H
-> +
-> +#include "hw/core/cpu.h"
-> +
-> +#define TYPE_RX_CPU "rx-cpu"
-> +
-> +#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
-> +
-> +#define RXCPU_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
-> +#define RXCPU(obj) \
-> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
-> +#define RXCPU_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
-> +
-> +/*
-> + * RXCPUClass:
-> + * @parent_realize: The parent class' realize handler.
-> + * @parent_reset: The parent class' reset handler.
-> + *
-> + * A RX CPU model.
-> + */
-> +typedef struct RXCPUClass {
-> +    /*< private >*/
-> +    CPUClass parent_class;
-> +    /*< public >*/
-> +
-> +    DeviceRealize parent_realize;
-> +    void (*parent_reset)(CPUState *cpu);
-> +
-> +} RXCPUClass;
-> +
-> +#define CPUArchState struct CPURXState
-> +
-> +#endif
-> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-> new file mode 100644
-> index 0000000000..b716fc5789
-> --- /dev/null
-> +++ b/target/rx/cpu.h
-> @@ -0,0 +1,180 @@
-> +/*
-> + *  RX emulation definition
-> + *
-> + *  Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOU=
-T
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef RX_CPU_H
-> +#define RX_CPU_H
-> +
-> +#include "qemu/bitops.h"
-> +#include "qemu-common.h"
-> +#include "hw/registerfields.h"
-> +#include "cpu-qom.h"
-> +
-> +#include "exec/cpu-defs.h"
-> +
-> +/* PSW define */
-> +REG32(PSW, 0)
-> +FIELD(PSW, C, 0, 1)
-> +FIELD(PSW, Z, 1, 1)
-> +FIELD(PSW, S, 2, 1)
-> +FIELD(PSW, O, 3, 1)
-> +FIELD(PSW, I, 16, 1)
-> +FIELD(PSW, U, 17, 1)
-> +FIELD(PSW, PM, 20, 1)
-> +FIELD(PSW, IPL, 24, 4)
-> +
-> +/* FPSW define */
-> +REG32(FPSW, 0)
-> +FIELD(FPSW, RM, 0, 2)
-> +FIELD(FPSW, CV, 2, 1)
-> +FIELD(FPSW, CO, 3, 1)
-> +FIELD(FPSW, CZ, 4, 1)
-> +FIELD(FPSW, CU, 5, 1)
-> +FIELD(FPSW, CX, 6, 1)
-> +FIELD(FPSW, CE, 7, 1)
-> +FIELD(FPSW, CAUSE, 2, 6)
-> +FIELD(FPSW, DN, 8, 1)
-> +FIELD(FPSW, EV, 10, 1)
-> +FIELD(FPSW, EO, 11, 1)
-> +FIELD(FPSW, EZ, 12, 1)
-> +FIELD(FPSW, EU, 13, 1)
-> +FIELD(FPSW, EX, 14, 1)
-> +FIELD(FPSW, ENABLE, 10, 5)
-> +FIELD(FPSW, FV, 26, 1)
-> +FIELD(FPSW, FO, 27, 1)
-> +FIELD(FPSW, FZ, 28, 1)
-> +FIELD(FPSW, FU, 29, 1)
-> +FIELD(FPSW, FX, 30, 1)
-> +FIELD(FPSW, FLAGS, 26, 4)
-> +FIELD(FPSW, FS, 31, 1)
-> +
-> +enum {
-> +    NUM_REGS =3D 16,
-> +};
-> +
-> +typedef struct CPURXState {
-> +    /* CPU registers */
-> +    uint32_t regs[NUM_REGS];    /* general registers */
-> +    uint32_t psw_o;             /* O bit of status register */
-> +    uint32_t psw_s;             /* S bit of status register */
-> +    uint32_t psw_z;             /* Z bit of status register */
-> +    uint32_t psw_c;             /* C bit of status register */
-> +    uint32_t psw_u;
-> +    uint32_t psw_i;
-> +    uint32_t psw_pm;
-> +    uint32_t psw_ipl;
-> +    uint32_t bpsw;              /* backup status */
-> +    uint32_t bpc;               /* backup pc */
-> +    uint32_t isp;               /* global base register */
-> +    uint32_t usp;               /* vector base register */
-> +    uint32_t pc;                /* program counter */
-> +    uint32_t intb;              /* interrupt vector */
-> +    uint32_t fintv;
-> +    uint32_t fpsw;
-> +    uint64_t acc;
-> +
-> +    /* Fields up to this point are cleared by a CPU reset */
-> +    struct {} end_reset_fields;
-> +
-> +    /* Internal use */
-> +    uint32_t in_sleep;
-> +    uint32_t req_irq;           /* Requested interrupt no (hard) */
-> +    uint32_t req_ipl;           /* Requested interrupt level */
-> +    uint32_t ack_irq;           /* execute irq */
-> +    uint32_t ack_ipl;           /* execute ipl */
-> +    float_status fp_status;
-> +    qemu_irq ack;               /* Interrupt acknowledge */
-> +} CPURXState;
-> +
-> +/*
-> + * RXCPU:
-> + * @env: #CPURXState
-> + *
-> + * A RX CPU
-> + */
-> +struct RXCPU {
-> +    /*< private >*/
-> +    CPUState parent_obj;
-> +    /*< public >*/
-> +
-> +    CPUNegativeOffsetState neg;
-> +    CPURXState env;
-> +};
-> +
-> +typedef struct RXCPU RXCPU;
-> +typedef RXCPU ArchCPU;
-> +
-> +#define ENV_OFFSET offsetof(RXCPU, env)
-> +
-> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
-> +#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
-> +
-> +const char *rx_crname(uint8_t cr);
-> +void rx_cpu_do_interrupt(CPUState *cpu);
-> +bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-> +void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-> +int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-> +int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-> +hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-> +
-> +void rx_translate_init(void);
-> +int cpu_rx_signal_handler(int host_signum, void *pinfo,
-> +                           void *puc);
-> +
-> +void rx_cpu_list(void);
-> +void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-> +
-> +#define cpu_signal_handler cpu_rx_signal_handler
-> +#define cpu_list rx_cpu_list
-> +
-> +#include "exec/cpu-all.h"
-> +
-> +#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-> +#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-> +
-> +#define RX_CPU_IRQ 0
-> +#define RX_CPU_FIR 1
-> +
-> +static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *p=
-c,
-> +                                        target_ulong *cs_base, uint32_t =
-*flags)
-> +{
-> +    *pc =3D env->pc;
-> +    *cs_base =3D 0;
-> +    *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
-> +}
-> +
-> +static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-> +{
-> +    return 0;
-> +}
-> +
-> +static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-> +{
-> +    uint32_t psw =3D 0;
-> +    psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-> +    psw =3D FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-> +    psw =3D FIELD_DP32(psw, PSW, U,   env->psw_u);
-> +    psw =3D FIELD_DP32(psw, PSW, I,   env->psw_i);
-> +    psw =3D FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-> +    psw =3D FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-> +    psw =3D FIELD_DP32(psw, PSW, Z,   env->psw_z =3D=3D 0);
-> +    psw =3D FIELD_DP32(psw, PSW, C,   env->psw_c);
-> +    return psw;
-> +}
-> +
-> +#endif /* RX_CPU_H */
-> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-> new file mode 100644
-> index 0000000000..9c224a273c
-> --- /dev/null
-> +++ b/target/rx/cpu.c
-> @@ -0,0 +1,226 @@
-> +/*
-> + * QEMU RX CPU
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOU=
-T
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/qemu-print.h"
-> +#include "qapi/error.h"
-> +#include "cpu.h"
-> +#include "qemu-common.h"
-> +#include "migration/vmstate.h"
-> +#include "exec/exec-all.h"
-> +#include "hw/loader.h"
-> +#include "fpu/softfloat.h"
-> +
-> +static void rx_cpu_set_pc(CPUState *cs, vaddr value)
-> +{
-> +    RXCPU *cpu =3D RXCPU(cs);
-> +
-> +    cpu->env.pc =3D value;
-> +}
-> +
-> +static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *t=
-b)
-> +{
-> +    RXCPU *cpu =3D RXCPU(cs);
-> +
-> +    cpu->env.pc =3D tb->pc;
-> +}
-> +
-> +static bool rx_cpu_has_work(CPUState *cs)
-> +{
-> +    return cs->interrupt_request &
-> +        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-> +}
-> +
-> +static void rx_cpu_reset(CPUState *s)
-> +{
-> +    RXCPU *cpu =3D RXCPU(s);
-> +    RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
-> +    CPURXState *env =3D &cpu->env;
-> +    uint32_t *resetvec;
-> +
-> +    rcc->parent_reset(s);
-> +
-> +    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-> +
-> +    resetvec =3D rom_ptr(0xfffffffc, 4);
-> +    if (resetvec) {
-> +        /* In the case of kernel, it is ignored because it is not set. *=
-/
-> +        env->pc =3D ldl_p(resetvec);
-> +    }
-> +    rx_cpu_unpack_psw(env, 0, 1);
-> +    env->regs[0] =3D env->isp =3D env->usp =3D 0;
-> +    env->fpsw =3D 0;
-> +    set_flush_to_zero(1, &env->fp_status);
-> +    set_flush_inputs_to_zero(1, &env->fp_status);
-> +}
-> +
-> +static void rx_cpu_list_entry(gpointer data, gpointer user_data)
-> +{
-> +    ObjectClass *oc =3D data;
-> +
-> +    qemu_printf("  %s\n", object_class_get_name(oc));
-> +}
-> +
-> +void rx_cpu_list(void)
-> +{
-> +    GSList *list;
-> +    list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
-> +    qemu_printf("Available CPUs:\n");
-> +    g_slist_foreach(list, rx_cpu_list_entry, NULL);
-> +    g_slist_free(list);
-> +}
-> +
-> +static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
-> +{
-> +    ObjectClass *oc;
-> +    char *typename;
-> +
-> +    oc =3D object_class_by_name(cpu_model);
-> +    if (oc !=3D NULL && object_class_dynamic_cast(oc, TYPE_RX_CPU) !=3D =
-NULL &&
-> +        !object_class_is_abstract(oc)) {
-> +        return oc;
-> +    }
-> +    typename =3D g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
-> +    oc =3D object_class_by_name(typename);
-> +    g_free(typename);
-> +    if (oc !=3D NULL && object_class_is_abstract(oc)) {
-> +        oc =3D NULL;
-> +    }
-> +
-> +    return oc;
-> +}
-> +
-> +static void rx_cpu_realize(DeviceState *dev, Error **errp)
-> +{
-> +    CPUState *cs =3D CPU(dev);
-> +    RXCPUClass *rcc =3D RXCPU_GET_CLASS(dev);
-> +    Error *local_err =3D NULL;
-> +
-> +    cpu_exec_realizefn(cs, &local_err);
-> +    if (local_err !=3D NULL) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
-> +    qemu_init_vcpu(cs);
-> +    cpu_reset(cs);
-> +
-> +    rcc->parent_realize(dev, errp);
-> +}
-> +
-> +static void rx_cpu_set_irq(void *opaque, int no, int request)
-> +{
-> +    RXCPU *cpu =3D opaque;
-> +    CPUState *cs =3D CPU(cpu);
-> +    int irq =3D request & 0xff;
-> +
-> +    static const int mask[] =3D {
-> +        [RX_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
-> +        [RX_CPU_FIR] =3D CPU_INTERRUPT_FIR,
-> +    };
-> +    if (irq) {
-> +        cpu->env.req_irq =3D irq;
-> +        cpu->env.req_ipl =3D (request >> 8) & 0x0f;
-> +        cpu_interrupt(cs, mask[no]);
-> +    } else {
-> +        cpu_reset_interrupt(cs, mask[no]);
-> +    }
-> +}
-> +
-> +static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-> +{
-> +    info->mach =3D bfd_mach_rx;
-> +    info->print_insn =3D print_insn_rx;
-> +}
-> +
-> +static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-> +                            MMUAccessType access_type, int mmu_idx,
-> +                            bool probe, uintptr_t retaddr)
-> +{
-> +    uint32_t address, physical, prot;
-> +
-> +    /* Linear mapping */
-> +    address =3D physical =3D addr & TARGET_PAGE_MASK;
-> +    prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> +    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE)=
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 0e13e82989..bc30876c88 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -283,9 +283,9 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
 ;
-> +    return true;
-> +}
-> +
-> +static void rx_cpu_init(Object *obj)
-> +{
-> +    CPUState *cs =3D CPU(obj);
-> +    RXCPU *cpu =3D RXCPU(obj);
-> +    CPURXState *env =3D &cpu->env;
-> +
-> +    cpu_set_cpustate_pointers(cpu);
-> +    cs->env_ptr =3D env;
-> +    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
-> +}
-> +
-> +static void rx_cpu_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    CPUClass *cc =3D CPU_CLASS(klass);
-> +    RXCPUClass *rcc =3D RXCPU_CLASS(klass);
-> +
-> +    device_class_set_parent_realize(dc, rx_cpu_realize,
-> +                                    &rcc->parent_realize);
-> +
-> +    rcc->parent_reset =3D cc->reset;
-> +    cc->reset =3D rx_cpu_reset;
-> +
-> +    cc->class_by_name =3D rx_cpu_class_by_name;
-> +    cc->has_work =3D rx_cpu_has_work;
-> +    cc->do_interrupt =3D rx_cpu_do_interrupt;
-> +    cc->cpu_exec_interrupt =3D rx_cpu_exec_interrupt;
-> +    cc->dump_state =3D rx_cpu_dump_state;
-> +    cc->set_pc =3D rx_cpu_set_pc;
-> +    cc->synchronize_from_tb =3D rx_cpu_synchronize_from_tb;
-> +    cc->gdb_read_register =3D rx_cpu_gdb_read_register;
-> +    cc->gdb_write_register =3D rx_cpu_gdb_write_register;
-> +    cc->get_phys_page_debug =3D rx_cpu_get_phys_page_debug;
-> +    cc->disas_set_info =3D rx_cpu_disas_set_info;
-> +    cc->tcg_initialize =3D rx_translate_init;
-> +    cc->tlb_fill =3D rx_cpu_tlb_fill;
-> +
-> +    cc->gdb_num_core_regs =3D 26;
-> +    cc->gdb_core_xml_file =3D "rx-core.xml";
-> +}
-> +
-> +static const TypeInfo rx_cpu_info =3D {
-> +    .name =3D TYPE_RX_CPU,
-> +    .parent =3D TYPE_CPU,
-> +    .instance_size =3D sizeof(RXCPU),
-> +    .instance_init =3D rx_cpu_init,
-> +    .abstract =3D true,
-> +    .class_size =3D sizeof(RXCPUClass),
-> +    .class_init =3D rx_cpu_class_init,
-> +};
-> +
-> +static const TypeInfo rx62n_rx_cpu_info =3D {
-> +    .name =3D TYPE_RX62N_CPU,
-> +    .parent =3D TYPE_RX_CPU,
-> +};
-> +
-> +static void rx_cpu_register_types(void)
-> +{
-> +    type_register_static(&rx_cpu_info);
-> +    type_register_static(&rx62n_rx_cpu_info);
-> +}
-> +
-> +type_init(rx_cpu_register_types)
-> diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
-> new file mode 100644
-> index 0000000000..d76ca52e82
-> --- /dev/null
-> +++ b/target/rx/gdbstub.c
-> @@ -0,0 +1,112 @@
-> +/*
-> + * RX gdb server stub
-> + *
-> + * Copyright (c) 2019 Yoshinori Sato
-> + *
-> + * This program is free software; you can redistribute it and/or modify =
-it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOU=
-T
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License alo=
-ng with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "cpu.h"
-> +#include "exec/gdbstub.h"
-> +
-> +int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-> +{
-> +    RXCPU *cpu =3D RXCPU(cs);
-> +    CPURXState *env =3D &cpu->env;
-> +
-> +    switch (n) {
-> +    case 0 ... 15:
-> +        return gdb_get_regl(mem_buf, env->regs[n]);
-> +    case 16:
-> +        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
-usp);
-> +    case 17:
-> +        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
->isp);
-> +    case 18:
-> +        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
-> +    case 19:
-> +        return gdb_get_regl(mem_buf, env->pc);
-> +    case 20:
-> +        return gdb_get_regl(mem_buf, env->intb);
-> +    case 21:
-> +        return gdb_get_regl(mem_buf, env->bpsw);
-> +    case 22:
-> +        return gdb_get_regl(mem_buf, env->bpc);
-> +    case 23:
-> +        return gdb_get_regl(mem_buf, env->fintv);
-> +    case 24:
-> +        return gdb_get_regl(mem_buf, env->fpsw);
-> +    case 25:
-> +        return 0;
-> +    }
-> +    return 0;
-> +}
-> +
-> +int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-> +{
-> +    RXCPU *cpu =3D RXCPU(cs);
-> +    CPURXState *env =3D &cpu->env;
-> +    uint32_t psw;
-> +    switch (n) {
-> +    case 0 ... 15:
-> +        env->regs[n] =3D ldl_p(mem_buf);
-> +        if (n =3D=3D 0) {
-> +            if (env->psw_u) {
-> +                env->usp =3D env->regs[0];
-> +            } else {
-> +                env->isp =3D env->regs[0];
-> +            }
-> +        }
-> +        break;
-> +    case 16:
-> +        env->usp =3D ldl_p(mem_buf);
-> +        if (env->psw_u) {
-> +            env->regs[0] =3D ldl_p(mem_buf);
-> +        }
-> +        break;
-> +    case 17:
-> +        env->isp =3D ldl_p(mem_buf);
-> +        if (!env->psw_u) {
-> +            env->regs[0] =3D ldl_p(mem_buf);
-> +        }
-> +        break;
-> +    case 18:
-> +        psw =3D ldl_p(mem_buf);
-> +        rx_cpu_unpack_psw(env, psw, 1);
-> +        break;
-> +    case 19:
-> +        env->pc =3D ldl_p(mem_buf);
-> +        break;
-> +    case 20:
-> +        env->intb =3D ldl_p(mem_buf);
-> +        break;
-> +    case 21:
-> +        env->bpsw =3D ldl_p(mem_buf);
-> +        break;
-> +    case 22:
-> +        env->bpc =3D ldl_p(mem_buf);
-> +        break;
-> +    case 23:
-> +        env->fintv =3D ldl_p(mem_buf);
-> +        break;
-> +    case 24:
-> +        env->fpsw =3D ldl_p(mem_buf);
-> +        break;
-> +    case 25:
-> +        return 8;
-> +    default:
-> +        return 0;
-> +    }
-> +
-> +    return 4;
-> +}
-> diff --git a/target/rx/translate.c b/target/rx/translate.c
-> index 6b52424d0f..b3d7305f23 100644
-> --- a/target/rx/translate.c
-> +++ b/target/rx/translate.c
-> @@ -41,10 +41,17 @@ typedef struct DisasCompare {
->       TCGCond cond;
->   } DisasCompare;
->  =20
-> -const char rx_crname[][6] =3D {
-> -    "psw", "pc", "usp", "fpsw", "", "", "", "",
-> -    "bpsw", "bpc", "isp", "fintv", "intb", "", "", "",
-> -};
-> +const char *rx_crname(uint8_t cr)
-> +{
-> +    static const char *cr_names[] =3D {
-> +        "psw", "pc", "usp", "fpsw", "", "", "", "",
-> +        "bpsw", "bpc", "isp", "fintv", "intb", "", "", ""
-> +    };
-> +    if (cr >=3D ARRAY_SIZE(cr_names)) {
-> +        return "illegal";
-> +    }
-> +    return cr_names[cr];
-> +}
->  =20
->   /* Target-specific values for dc->base.is_jmp.  */
->   #define DISAS_JUMP    DISAS_TARGET_0
-> @@ -365,7 +372,7 @@ static void move_to_cr(DisasContext *ctx, TCGv val, i=
-nt cr)
->       if (cr >=3D 8 && !is_privileged(ctx, 0)) {
->           /* Some control registers can only be written in privileged mod=
-e. */
->           qemu_log_mask(LOG_GUEST_ERROR,
-> -                      "disallow control register write %s", rx_crname[cr=
-]);
-> +                      "disallow control register write %s", rx_crname(cr=
-));
->           return;
->       }
->       z =3D tcg_const_i32(0);
-> diff --git a/gdb-xml/rx-core.xml b/gdb-xml/rx-core.xml
-> new file mode 100644
-> index 0000000000..b5aa9ac4a8
-> --- /dev/null
-> +++ b/gdb-xml/rx-core.xml
-> @@ -0,0 +1,70 @@
-> +<?xml version=3D"1.0"?>
-> +<!-- Copyright (C) 2019 Free Software Foundation, Inc.
-> +
-> +     Copying and distribution of this file, with or without modification=
+                                       prefix=3Dself._prefix))
+         self._genc.add(gen_registry(self._regy.get_content(), self._prefix=
+))
+=20
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig):
+         if not gen:
+             return
+         # FIXME: If T is a user-defined type, the user is responsible
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 36e823338b..92f584edcf 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -249,8 +249,8 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+                                 texi_members(doc, 'Values',
+                                              member_func=3Dtexi_enum_value=
+)))
+=20
+-    def visit_object_type(self, name, info, ifcond, base, members, variant=
+s,
+-                          features):
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
+         doc =3D self.cur_doc
+         if base and base.is_implicit():
+             base =3D None
+@@ -262,9 +262,9 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+         self._gen.add(texi_type('Alternate', doc, ifcond,
+                                 texi_members(doc, 'Members')))
+=20
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig):
+         doc =3D self.cur_doc
+         self._gen.add(texi_msg('Command', doc, ifcond,
+                                texi_arguments(doc,
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 2e9e00aa1f..b54910510d 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -193,8 +193,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         self._gen_qlit('[' + element + ']', 'array', {'element-type': elem=
+ent},
+                        ifcond, None)
+=20
+-    def visit_object_type_flat(self, name, info, ifcond, members, variants=
 ,
-> +     are permitted in any medium without royalty provided the copyright
-> +     notice and this notice are preserved.  -->
-> +
-> +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-> +<feature name=3D"org.gnu.gdb.rx.core">
-> +  <reg name=3D"r0" bitsize=3D"32" type=3D"data_ptr"/>
-> +  <reg name=3D"r1" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r2" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r3" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r4" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r5" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r6" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r7" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r8" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r9" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r10" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r11" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r12" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r13" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r14" bitsize=3D"32" type=3D"uint32"/>
-> +  <reg name=3D"r15" bitsize=3D"32" type=3D"uint32"/>
-> +
-> +  <flags id=3D"psw_flags" size=3D"4">
-> +    <field name=3D"C" start=3D"0" end=3D"0"/>
-> +    <field name=3D"Z" start=3D"1" end=3D"1"/>
-> +    <field name=3D"S" start=3D"2" end=3D"2"/>
-> +    <field name=3D"O" start=3D"3" end=3D"3"/>
-> +    <field name=3D"I" start=3D"16" end=3D"16"/>
-> +    <field name=3D"U" start=3D"17" end=3D"17"/>
-> +    <field name=3D"PM" start=3D"20" end=3D"20"/>
-> +    <field name=3D"IPL" start=3D"24" end=3D"27"/>
-> +  </flags>
-> +
-> +  <flags id=3D"fpsw_flags" size=3D"4">
-> +    <field name=3D"RM" start=3D"0" end=3D"1"/>
-> +    <field name=3D"CV" start=3D"2" end=3D"2"/>
-> +    <field name=3D"CO" start=3D"3" end=3D"3"/>
-> +    <field name=3D"CZ" start=3D"4" end=3D"4"/>
-> +    <field name=3D"CU" start=3D"5" end=3D"5"/>
-> +    <field name=3D"CX" start=3D"6" end=3D"6"/>
-> +    <field name=3D"CE" start=3D"7" end=3D"7"/>
-> +    <field name=3D"DN" start=3D"8" end=3D"8"/>
-> +    <field name=3D"EV" start=3D"10" end=3D"10"/>
-> +    <field name=3D"EO" start=3D"11" end=3D"11"/>
-> +    <field name=3D"EZ" start=3D"12" end=3D"12"/>
-> +    <field name=3D"EU" start=3D"13" end=3D"13"/>
-> +    <field name=3D"EX" start=3D"14" end=3D"14"/>
-> +    <field name=3D"FV" start=3D"26" end=3D"26"/>
-> +    <field name=3D"FO" start=3D"27" end=3D"27"/>
-> +    <field name=3D"FZ" start=3D"28" end=3D"28"/>
-> +    <field name=3D"FU" start=3D"29" end=3D"29"/>
-> +    <field name=3D"FX" start=3D"30" end=3D"30"/>
-> +    <field name=3D"FS" start=3D"31" end=3D"31"/>
-> +  </flags>
-> +
-> +  <reg name=3D"usp" bitsize=3D"32" type=3D"data_ptr"/>
-> +  <reg name=3D"isp" bitsize=3D"32" type=3D"data_ptr"/>
-> +  <reg name=3D"psw" bitsize=3D"32" type=3D"psw_flags"/>
-> +  <reg name=3D"pc" bitsize=3D"32" type=3D"code_ptr"/>
-> +  <reg name=3D"intb" bitsize=3D"32" type=3D"data_ptr"/>
-> +  <reg name=3D"bpsw" bitsize=3D"32" type=3D"psw_flags"/>
-> +  <reg name=3D"bpc" bitsize=3D"32" type=3D"code_ptr"/>
-> +  <reg name=3D"fintv" bitsize=3D"32" type=3D"code_ptr"/>
-> +  <reg name=3D"fpsw" bitsize=3D"32" type=3D"fpsw_flags"/>
-> +  <reg name=3D"acc" bitsize=3D"64" type=3D"uint64"/>
-> +</feature>
-> diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
-> index aa6f2d2d6c..a0018d5bc5 100644
-> --- a/target/rx/Makefile.objs
-> +++ b/target/rx/Makefile.objs
-> @@ -1,5 +1,4 @@
->   obj-y +=3D translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
-> -obj-$(CONFIG_SOFTMMU) +=3D monitor.o
->  =20
->   DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
->  =20
->=20
+-                               features):
++    def visit_object_type_flat(self, name, info, ifcond, features,
++                               members, variants):
+         obj =3D {'members': [self._gen_member(m) for m in members]}
+         if variants:
+             obj.update(self._gen_variants(variants.tag_member.name,
+@@ -209,9 +209,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+                            for m in variants.variants]},
+                        ifcond, features)
+=20
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig):
+         arg_type =3D arg_type or self._schema.the_empty_object_type
+         ret_type =3D ret_type or self._schema.the_empty_object_type
+         obj =3D {'arg-type': self._use_type(arg_type),
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index 22238005ff..958756ecd6 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -115,20 +115,20 @@ class QAPISchemaVisitor:
+     def visit_array_type(self, name, info, ifcond, element_type):
+         pass
+=20
+-    def visit_object_type(self, name, info, ifcond, base, members, variant=
+s,
+-                          features):
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
+         pass
+=20
+-    def visit_object_type_flat(self, name, info, ifcond, members, variants=
+,
+-                               features):
++    def visit_object_type_flat(self, name, info, ifcond, features,
++                               members, variants):
+         pass
+=20
+     def visit_alternate_type(self, name, info, ifcond, features, variants)=
+:
+         pass
+=20
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig):
+         pass
+=20
+     def visit_event(self, name, info, ifcond, features, arg_type, boxed):
+@@ -436,12 +436,12 @@ class QAPISchemaObjectType(QAPISchemaType):
+=20
+     def visit(self, visitor):
+         super().visit(visitor)
+-        visitor.visit_object_type(self.name, self.info, self.ifcond,
+-                                  self.base, self.local_members, self.vari=
+ants,
+-                                  self.features)
+-        visitor.visit_object_type_flat(self.name, self.info, self.ifcond,
+-                                       self.members, self.variants,
+-                                       self.features)
++        visitor.visit_object_type(
++            self.name, self.info, self.ifcond, self.features,
++            self.base, self.local_members, self.variants)
++        visitor.visit_object_type_flat(
++            self.name, self.info, self.ifcond, self.features,
++            self.members, self.variants)
+=20
+=20
+ class QAPISchemaMember:
+@@ -745,12 +745,10 @@ class QAPISchemaCommand(QAPISchemaEntity):
+=20
+     def visit(self, visitor):
+         super().visit(visitor)
+-        visitor.visit_command(self.name, self.info, self.ifcond,
+-                              self.arg_type, self.ret_type,
+-                              self.gen, self.success_response,
+-                              self.boxed, self.allow_oob,
+-                              self.allow_preconfig,
+-                              self.features)
++        visitor.visit_command(
++            self.name, self.info, self.ifcond, self.features,
++            self.arg_type, self.ret_type, self.gen, self.success_response,
++            self.boxed, self.allow_oob, self.allow_preconfig)
+=20
+=20
+ class QAPISchemaEvent(QAPISchemaEntity):
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index d0d5c03646..3ad33af4ee 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -289,8 +289,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisito=
+r):
+             self._genh.add(gen_array(name, element_type))
+             self._gen_type_cleanup(name)
+=20
+-    def visit_object_type(self, name, info, ifcond, base, members, variant=
+s,
+-                          features):
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 6e5ed781d7..23d9194aa4 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -326,8 +326,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisit=
+or):
+             self._genh.add(gen_visit_decl(name))
+             self._genc.add(gen_visit_list(name, element_type))
+=20
+-    def visit_object_type(self, name, info, ifcond, base, members, variant=
+s,
+-                          features):
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.p=
+y
+index af5b57a0b1..8e09e54edb 100755
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -46,8 +46,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         print('array %s %s' % (name, element_type.name))
+         self._print_if(ifcond)
+=20
+-    def visit_object_type(self, name, info, ifcond, base, members, variant=
+s,
+-                          features):
++    def visit_object_type(self, name, info, ifcond, features,
++                          base, members, variants):
+         print('object %s' % name)
+         if base:
+             print('    base %s' % base.name)
+@@ -65,9 +65,9 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         self._print_if(ifcond)
+         self._print_features(features)
+=20
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
++    def visit_command(self, name, info, ifcond, features,
++                      arg_type, ret_type, gen, success_response, boxed,
++                      allow_oob, allow_preconfig):
+         print('command %s %s -> %s'
+               % (name, arg_type and arg_type.name,
+                  ret_type and ret_type.name))
+--=20
+2.21.1
 
 
