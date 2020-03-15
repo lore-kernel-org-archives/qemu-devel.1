@@ -2,99 +2,92 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8518C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 519CDC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 802D820575
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 134C72051A
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 05:45:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SMWBykQ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 802D820575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oTzdKUgD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134C72051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDLwp-0004PI-IO
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 01:36:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41273)
+	id 1jDM5f-0006M4-Sj
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 01:45:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1jDLvg-0003pr-1f
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDM4J-0005mg-FT
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1jDLve-00048y-R2
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35783
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1jDLve-00046z-NM
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:35:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584250514;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=frOLOEjQaJJpWC0i8QNqpWU1shmwCAN5m76/pYmbrFs=;
- b=SMWBykQ0hAHoxieT2M0TmbKyZ+lgpK18O5D0TYZz7u8qky6qgVPQqW1b0X5bROvKocNLy3
- cwURZ46ghvYCw/+2Fgm4NFE5SdxNb9iIN1SHwbf59uVepjB2nvUzMPT/YVrhEg0sttQ51I
- 5Lytw7cjwz4zzZL/ekIF0siGB7tRxoM=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-SLSX1MYtPCaazdoHI8A7nA-1; Sun, 15 Mar 2020 01:35:10 -0400
-X-MC-Unique: SLSX1MYtPCaazdoHI8A7nA-1
-Received: by mail-qv1-f69.google.com with SMTP id k16so12788301qvj.7
- for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 22:35:10 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDM4I-0004K9-5A
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:11 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54624)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDM4H-0004Dc-Sy
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 01:44:10 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id np16so6287572pjb.4
+ for <qemu-devel@nongnu.org>; Sat, 14 Mar 2020 22:44:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=uYlvfZRcyb9QoH0KfhkACBfYXYvVoV2t9YSk4TzZWPs=;
+ b=oTzdKUgDbtb6yTguR7ygkUZm6IkCRafCeiIkL+EBYIw/wF0IFj6Lop2ZByhS6c/pD2
+ 81Vevr1HQNDu3ZH0uWYkyRd3Jo9Fd7/kO8TOeArc5vOy2PyYjH5Fh5SB5MLAGFkWG39s
+ fcdidqIReJbuSZuErBriK4ZCmtEJYoWYAATG8Kq7iMk37zpd4i+MFJBOrIDCjXT+ZXhA
+ MiU5F7n2tVOMcx9yT7+b0RegUMKdgbTBbVB80+I69socdFmvMzAIESjKZzSgDhX9RNs4
+ 9yeJ6q9Hh8uD/WPvaYMReBMwBxoYrn8fX4Dilfl8AJ2HeoobfJpFXDEQ23HJNUJkVls4
+ w6fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JQzodnifkdCqmGoXvx0OYAMgKt0DHS9Cmdey6a0SLow=;
- b=GU11RTpehVEZPedgtBi50k9HcVVjfcT+nteppknQTjFP+PLzssOVr8TKD2yEHpSrGh
- F6Qufo2j8vb1XSYXAYFIvchfem4lroRDFzg2nL/YYGsTeeF8ePNDVBNZLIW/8WB5UFtj
- C/Y6DZtxIxjIttYFw/N2AI9vUN1nkgqw8yRm65A3i7F5hBsOZIIw2WYiK8IMDBtt/zLV
- 8rhgR10dgcFHbWCq5SHokRAfi3+OjSKtDsK8687NfONSRmDeH85rhHFrWZwce0OdpjCe
- nyEZUhMoS4DnYBBYCkeb1ul0VF4DqkUOyhBv07qrTZWpdb8xzXY+wJUycI1pqNblyZDE
- g9lg==
-X-Gm-Message-State: ANhLgQ1wMVYRwTcfXJUJreWvjk5cDM+OoXqFTbsc9z0lYRBYWP7UbT4w
- DNPCXbMzj2GVH0V/z15qGDkZzRbCeJ34VEecI3mt0nu3trzxsf9mkltYsmKI7Muz4D3f429RzCz
- +EDI2lai5LithcOA=
-X-Received: by 2002:a05:620a:7f8:: with SMTP id
- k24mr16827702qkk.228.1584250509777; 
- Sat, 14 Mar 2020 22:35:09 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vshPGLVSe4vsDXxFTzsNzS8YJrxDCZs17lAU/MeRjnhBLwuDori4yumSCV3AZ821uIza/5+eQ==
-X-Received: by 2002:a05:620a:7f8:: with SMTP id
- k24mr16827682qkk.228.1584250509497; 
- Sat, 14 Mar 2020 22:35:09 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-7-202.red.bezeqint.net. [79.180.7.202])
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uYlvfZRcyb9QoH0KfhkACBfYXYvVoV2t9YSk4TzZWPs=;
+ b=VekZf4wCmS8pA/R9g6JgpwOimCYgSVT+zKKgKJ01hIlQc24IIg5Y7djtVhkMltSkUg
+ NoDp+IR2TIQ/eVcMQp/w8YAgwTmCQmn+6JUNNDKBaiDU39/BW43jrJql8eUZvVh6Lu3n
+ w7mI40YdZtBEmfLQFdHbEYLuhxBh5BSXvAzE44jqLw7Sxta0OkIZnjMGNB0REmvVQV9h
+ U8M98dR2hRqKjbVr0iYyKMtK0jdOa3HYM3PMRzJPrS21qO8ZNG/dKeXSXZdmOs2DWSj1
+ tv04IiMjp1LEfQiQcQRfSgy9IzIRHTRn0bWZaelD15KuglyO8Ko1mu9aFcyIbbfqYqJZ
+ LCOA==
+X-Gm-Message-State: ANhLgQ0D4Tg/yX+J3arC9sNBBgzkip3ZEUaM+mY7ws0K6QwAdR6GSBhm
+ 3bE3NTGlw7KgMY9jHl+Ih9cYYw==
+X-Google-Smtp-Source: ADFU+vtkrvkqdKBnoTpKn5/+7v0TcT/88yK+XiC+6XTOPN31/xeWATUVvmOqQuC5GnABszQrqlTSKQ==
+X-Received: by 2002:a17:902:9f85:: with SMTP id
+ g5mr3387075plq.152.1584251048707; 
+ Sat, 14 Mar 2020 22:44:08 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- l188sm2774053qkc.106.2020.03.14.22.35.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Mar 2020 22:35:08 -0700 (PDT)
-Date: Sun, 15 Mar 2020 01:35:02 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH 2/8] hw/ide: Get rid of piix4_init function
-Message-ID: <20200315013319-mutt-send-email-mst@kernel.org>
-References: <cover.1584134074.git.balaton@eik.bme.hu>
- <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
+ k5sm13086142pgl.3.2020.03.14.22.44.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 14 Mar 2020 22:44:07 -0700 (PDT)
+Subject: Re: [PATCH v5 58/60] target/riscv: vector register gather instruction
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-59-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f9bebb0b-324f-c1fa-8bc1-e30a633285db@linaro.org>
+Date: Sat, 14 Mar 2020 22:44:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <20200312145900.2054-59-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,108 +99,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- John Snow <jsnow@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Mar 13, 2020 at 10:14:34PM +0100, BALATON Zoltan wrote:
-> This removes pci_piix4_ide_init() function similar to clean up done to
-> other ide devices.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/ide/piix.c    | 12 +-----------
->  hw/isa/piix4.c   |  5 ++++-
->  include/hw/ide.h |  1 -
->  3 files changed, 5 insertions(+), 13 deletions(-)
->=20
-> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-> index 8bcd6b72c2..3b2de4c312 100644
-> --- a/hw/ide/piix.c
-> +++ b/hw/ide/piix.c
-> @@ -208,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
->      }
->  }
-> =20
-> -/* hd_table must contain 4 block drivers */
-> -/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
-> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
-fn)
-> -{
-> -    PCIDevice *dev;
-> -
-> -    dev =3D pci_create_simple(bus, devfn, "piix4-ide");
-> -    pci_ide_create_devs(dev, hd_table);
-> -    return dev;
-> -}
-> -
->  /* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
->  static void piix3_ide_class_init(ObjectClass *klass, void *data)
->  {
-> @@ -247,6 +236,7 @@ static const TypeInfo piix3_ide_xen_info =3D {
->      .class_init    =3D piix3_ide_class_init,
->  };
-> =20
-> +/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
->  static void piix4_ide_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 7edec5e149..0ab4787658 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -35,6 +35,7 @@
->  #include "hw/timer/i8254.h"
->  #include "hw/rtc/mc146818rtc.h"
->  #include "hw/ide.h"
-> +#include "hw/ide/pci.h"
->  #include "migration/vmstate.h"
->  #include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
-> @@ -255,10 +256,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus *=
-*isa_bus,
->          *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
->      }
-> =20
-> +    pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
->      hd =3D g_new(DriveInfo *, ide_drives);
->      ide_drive_get(hd, ide_drives);
-> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-> +    pci_ide_create_devs(pci, hd);
->      g_free(hd);
+On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+> +static bool vrgather_vx_check(DisasContext *s, arg_rmrr *a)
+> +{
+> +    return (vext_check_isa_ill(s, RVV) &&
+> +            vext_check_overlap_mask(s, a->rd, a->vm, true) &&
+> +            vext_check_reg(s, a->rd, false) &&
+> +            vext_check_reg(s, a->rs2, false) &&
+> +            (a->rd != a->rs2));
+> +}
+> +GEN_OPIVX_TRANS(vrgather_vx, vrgather_vx_check)
+> +GEN_OPIVI_TRANS(vrgather_vi, 1, vrgather_vx, vrgather_vx_check)
+
+The unmasked versions of these should use gvec_dup.
+
+For the immediate version, where we can validate the index at translation time,
+we can use tcg_gen_gvec_dup_mem, so that the host vector dup-from-memory
+instruction can be used.
+
+For the register version, we should re-use the code from vext.x.s where we load
+the element, bound the index and squash the value to zero for index >= VLMAX.
+Then use tcg_gen_gvec_dup_i64.
+
+For the masked versions, we should load the value, as above, and then re-use
+the vmerge helper with vs2 = vd, so that we get
+
+    vd[i] = v0[i].lsb ? val : vd[i]
+
+
+> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+> index 2219fdd6c5..5788e46dcf 100644
+> --- a/target/riscv/vector_helper.c
+> +++ b/target/riscv/vector_helper.c
+> @@ -4647,3 +4647,71 @@ GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_b, uint8_t, H1, clearb)
+>  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_h, uint16_t, H2, clearh)
+>  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_w, uint32_t, H4, clearl)
+>  GEN_VEXT_VSLIDE1DOWN_VX(vslide1down_vx_d, uint64_t, H8, clearq)
 > +
+> +/* Vector Register Gather Instruction */
+> +#define GEN_VEXT_VRGATHER_VV(NAME, ETYPE, H, CLEAR_FN)                    \
+> +void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,               \
+> +        CPURISCVState *env, uint32_t desc)                                \
+> +{                                                                         \
+> +    uint32_t mlen = vext_mlen(desc);                                      \
+> +    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;                   \
+> +    uint32_t vm = vext_vm(desc);                                          \
+> +    uint32_t vl = env->vl;                                                \
+> +    uint32_t index, i;                                                    \
+> +                                                                          \
+> +    for (i = 0; i < vl; i++) {                                            \
+> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {                        \
+> +            continue;                                                     \
+> +        }                                                                 \
+> +        index = *((ETYPE *)vs1 + H(i));                                   \
+> +        if (index >= vlmax) {
 
-Why not move pci_create_simple down, and declare a new variable?
--    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-+    pci_dev =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
-+    pci_ide_create_devs(pci_dev, hd);
+The type of index should be ETYPE or uint64_t, and similar for vlmax just so
+they match.
 
-makes it clearer what's going on imho.
 
->      pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
->      if (smbus) {
->          *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
-> diff --git a/include/hw/ide.h b/include/hw/ide.h
-> index 883bbaeb9b..21bd8f23f1 100644
-> --- a/include/hw/ide.h
-> +++ b/include/hw/ide.h
-> @@ -12,7 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int io=
-base2, int isairq,
->                          DriveInfo *hd0, DriveInfo *hd1);
-> =20
->  /* ide-pci.c */
-> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int dev=
-fn);
->  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
-> =20
->  /* ide-mmio.c */
-> --=20
-> 2.21.1
-
+r~
 
