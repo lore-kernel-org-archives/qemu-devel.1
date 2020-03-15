@@ -6,77 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB213C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A8C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACCDD206B1
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71F9A206B1
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTsJWg1d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACCDD206B1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UofLmJ9z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F9A206B1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDUdp-0002Rx-ON
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 10:53:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40237)
+	id 1jDUdq-0002TZ-FW
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 10:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40277)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDUXd-0005Wf-DB
+ (envelope-from <armbru@redhat.com>) id 1jDUXd-0005Wk-LG
  for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDUXc-0002AB-1A
+ (envelope-from <armbru@redhat.com>) id 1jDUXc-0002BN-7w
  for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23455
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58267
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXb-00028i-Sa
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:46:59 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXc-00029B-01
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1584283619;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a/UYmOCxGxuVgibBYUMX0KvNJvGmm4H8hzsqVMEI/UA=;
- b=VTsJWg1dyhndfmr2lEQz42XnArotOSo8YKWp30x2E9AlmeMxwRIWMLYD8KYxTdDtwTSkoh
- hMY3Mz5bUcO+YK94em2puGuVfudcEcxJjvLKLCx5hERd3g5rAZaE2WTACaVR68MCHwCjOk
- WJBn34imL4gMuD0OBEgB2cYZrXjhmAQ=
+ bh=sW04fih2YXTfS8CLtTbDLCV2JzUFAWR4o8w8PMjp12g=;
+ b=UofLmJ9zw5DAEBx8DT+zyVSVYuRGMTUMhBXFeR+KgaekWKSWVqMSzlAf6AJ2rRPCM1zoKS
+ ngXM+0GkUkJTClMsnnng86eISWMZkM6RnmJBx3MSBjn/NKz5HwNs5PHqIQZwQOHgUSA+zM
+ 8f4ymv+KOMoqJnEcuNOdKRbNzM+665M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-ga9ke_2LPhmmu0d5sJKbhw-1; Sun, 15 Mar 2020 10:46:56 -0400
-X-MC-Unique: ga9ke_2LPhmmu0d5sJKbhw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-306-Q6eTv26JNxuHx-aOOG0rbA-1; Sun, 15 Mar 2020 10:46:57 -0400
+X-MC-Unique: Q6eTv26JNxuHx-aOOG0rbA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E3CB477;
- Sun, 15 Mar 2020 14:46:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9F4B100550D;
+ Sun, 15 Mar 2020 14:46:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
  [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F030060BFB;
- Sun, 15 Mar 2020 14:46:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78DDD91D88;
+ Sun, 15 Mar 2020 14:46:56 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7EB3211366CF; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
+ id 87E1D11366DB; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 03/34] docs/devel/qapi-code-gen: Clarify allow-oob
- introspection
-Date: Sun, 15 Mar 2020 15:46:22 +0100
-Message-Id: <20200315144653.22660-4-armbru@redhat.com>
+Subject: [PATCH v3 06/34] tests/test-qmp-cmds: Check responses more thoroughly
+Date: Sun, 15 Mar 2020 15:46:25 +0100
+Message-Id: <20200315144653.22660-7-armbru@redhat.com>
 In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
 References: <20200315144653.22660-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,31 +92,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mention SchemaInfo variant member "allow-oob" defaults to false.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/test-qmp-cmds.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 59d6973e1e..5906602504 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -988,9 +988,9 @@ The SchemaInfo for a command has meta-type "command", a=
-nd variant
- members "arg-type", "ret-type" and "allow-oob".  On the wire, the
- "arguments" member of a client's "execute" command must conform to the
- object type named by "arg-type".  The "return" member that the server
--passes in a success response conforms to the type named by
--"ret-type".  When "allow-oob" is set, it means the command supports
--out-of-band execution.
-+passes in a success response conforms to the type named by "ret-type".
-+When "allow-oob" is true, it means the command supports out-of-band
-+execution.  It defaults to false.
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index b31064b064..464b370189 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -151,9 +151,10 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
+_oob)
+     QObject *ret;
 =20
- If the command takes no arguments, "arg-type" names an object type
- without members.  Likewise, if the command returns nothing, "ret-type"
+     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
+-    g_assert(resp && !qdict_haskey(resp, "error"));
++    g_assert(resp);
+     ret =3D qdict_get(resp, "return");
+     g_assert(ret);
++    g_assert(qdict_size(resp) =3D=3D 1);
+=20
+     qobject_ref(ret);
+     qobject_unref(resp);
+@@ -163,9 +164,17 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
+_oob)
+ static void do_qmp_dispatch_error(QDict *req, bool allow_oob, ErrorClass c=
+ls)
+ {
+     QDict *resp;
++    QDict *error;
+=20
+     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
+-    g_assert(resp && qdict_haskey(resp, "error"));
++    g_assert(resp);
++    error =3D qdict_get_qdict(resp, "error");
++    g_assert(error);
++    g_assert_cmpstr(qdict_get_try_str(error, "class"),
++                    =3D=3D, QapiErrorClass_str(cls));
++    g_assert(qdict_get_try_str(error, "desc"));
++    g_assert(qdict_size(error) =3D=3D 2);
++    g_assert(qdict_size(resp) =3D=3D 1);
+=20
+     qobject_unref(resp);
+ }
+@@ -174,11 +183,12 @@ static void do_qmp_dispatch_error(QDict *req, bool al=
+low_oob, ErrorClass cls)
+ static void test_dispatch_cmd(void)
+ {
+     QDict *req =3D qdict_new();
+-    QObject *ret;
++    QDict *ret;
+=20
+     qdict_put_str(req, "execute", "user_def_cmd");
+=20
+-    ret =3D do_qmp_dispatch(req, false);
++    ret =3D qobject_to(QDict, do_qmp_dispatch(req, false));
++    assert(ret && qdict_size(ret) =3D=3D 0);
+=20
+     qobject_unref(ret);
+     qobject_unref(req);
+@@ -187,11 +197,12 @@ static void test_dispatch_cmd(void)
+ static void test_dispatch_cmd_oob(void)
+ {
+     QDict *req =3D qdict_new();
+-    QObject *ret;
++    QDict *ret;
+=20
+     qdict_put_str(req, "exec-oob", "test-flags-command");
+=20
+-    ret =3D do_qmp_dispatch(req, true);
++    ret =3D qobject_to(QDict, do_qmp_dispatch(req, true));
++    assert(ret && qdict_size(ret) =3D=3D 0);
+=20
+     qobject_unref(ret);
+     qobject_unref(req);
 --=20
 2.21.1
 
