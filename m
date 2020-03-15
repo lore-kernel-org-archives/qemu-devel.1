@@ -2,68 +2,88 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F9CC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0C4C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2A5A20637
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A5A20637
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9A36420637
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:51:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAV47tzk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A36420637
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDTei-0006oL-PQ
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 09:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53512)
+	id 1jDTfX-0007Bc-Ny
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 09:51:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jDTd1-0005ov-3e
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:48:32 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jDTda-00069o-7W
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jDTcz-0006HH-7K
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:48:30 -0400
-Resent-Date: Sun, 15 Mar 2020 09:48:30 -0400
-Resent-Message-Id: <E1jDTcz-0006HH-7K@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21195)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jDTcy-00062Y-Vn
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:48:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584280085; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BquPqY0Zn4iTKBmiWfBZCCjAUUzh/Orbqub5tBHFho4lV11VcMRZM1b9aoCYXREtj22Q07D5JFTQHYmUq+jjk2DuT3u63oR+eY2qqLCyPmf+l89w6wrII6h8wD6+qRC1Crc1B8LHVh94O3lAa+egs7RZOnwt6umott/7fiNr+jk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584280085;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=RRAJDfVZDjw+5G+JpXh8BX5xKa6v0HCw4ybWk+lOnyE=; 
- b=lrSNZpEPu/EDVmpQ7RjR4OjhIfj1KaNYWAW/E7A8pwXgWab4LeuUsPHCfSc/3xG5PF+qWamHykjBTW896jOSnQH75jPtjWDqM/YKsA7e282WwxCKwLi7EuF1GIEYYekA6jmtA/AeIjOHk5r+Z+2Fyca/MTU1ZN/rDHvnAb2rY8A=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584280083810903.8535066485549;
- Sun, 15 Mar 2020 06:48:03 -0700 (PDT)
-In-Reply-To: <20200315132447.113131-1-liran.alon@oracle.com>
-Subject: Re: [PATCH] hw/scsi/vmw_pvscsi: Remove assertion for kick after reset
-Message-ID: <158428008248.6054.7878741749637968511@39012742ff91>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jDTdZ-0000IO-0b
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:49:06 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39759)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jDTdY-0000CK-QC; Sun, 15 Mar 2020 09:49:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id f7so15126492wml.4;
+ Sun, 15 Mar 2020 06:49:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=r2HeUlgZPGznn3qDRP6dKLB5LdEIIfNvBnBheGi+K3c=;
+ b=fAV47tzkDfTrTn8i6wXvasDjUhX62cHIl2Ge6SIhny/HsP+ohpVKzgUi4jnOdSx9UT
+ xTfUj1AAj5ApdBAEAlr5FVH00j5z25s/hYdfGpSuJMOjBroAll9dMGiltKqOpw7yC7aC
+ eqIWxMLWSKW/hdtckGVJBaNTp92OxJPRtZo6OyyWKqvvKGEI0DB+53iWousFdVIrcYk7
+ FOAg31FK7d2nkcybOxFa+vYbn6g3l6ySAWzwi54iTO819sdrp/+TmTwUT/QI/0h7zfmh
+ POxMQBbtZw6ZnlTM54aKMI4car3gRa1fYQHV99T3w2cX1VJzGRu+ARm2AriIj369tsgf
+ Ruow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=r2HeUlgZPGznn3qDRP6dKLB5LdEIIfNvBnBheGi+K3c=;
+ b=aeIlXDr+ut9Ny9LJ3Rsp2pB4rx6JMM45DIDBFX1Fnph8gB4QNV+yKC4Xsk8ZZ42YXL
+ HO6A7cKYi57PC7r/rQARo+HlFpA3Tlyeuyt3Kvybk/o+EuA562uxlPpvI7UCiU/py3eT
+ 7uv0mRGRgiltnu2nhkWZ5TTcegn4Zclj84VA+ZbPnvwGcT+LUAIyaV/XRl0YZLahzopO
+ yYnSwjzem8quxDCVwIr6bUlapzkfwkGY9Y4kPp55bw0oUs6ce9YryBFiClvX/pIKnvbx
+ 8niWb/b794aKQ+fYxN9yvs+YnF5BE9X799tSzyu8vXbDHPdDYPE3XkC+TBqiS7w3WxJd
+ PAFw==
+X-Gm-Message-State: ANhLgQ0+RioD7Igzd6wMrIWjzHbs5wx1Q8qRXQXQlbRSHQHawE4B8/YN
+ KdWenQa4Mc/FpWogdSmm0ybpz7Dz
+X-Google-Smtp-Source: ADFU+vsRvWboPVFkW7c7iwn4qG220KPPK8VTnUzdU2yOZ4lvi1Q6N04hnAWaqBZBosO24n6B+UYrQg==
+X-Received: by 2002:a1c:9815:: with SMTP id a21mr22086396wme.11.1584280142934; 
+ Sun, 15 Mar 2020 06:49:02 -0700 (PDT)
+Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.191])
+ by smtp.gmail.com with ESMTPSA id c13sm29234085wro.96.2020.03.15.06.49.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 15 Mar 2020 06:49:02 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target/rx/cpu: Use address_space_ldl() to read reset vector
+ address
+Date: Sun, 15 Mar 2020 14:48:59 +0100
+Message-Id: <20200315134859.9547-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: liran.alon@oracle.com
-Date: Sun, 15 Mar 2020 06:48:03 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,54 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-block@nongnu.org,
+ Alistair Francis <alistair@alistair23.me>,
+ Stephanos Ioannidis <root@stephanos.io>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNTEzMjQ0Ny4xMTMx
-MzEtMS1saXJhbi5hbG9uQG9yYWNsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
-ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBBUyAgICAg
-IHBjLWJpb3Mvb3B0aW9ucm9tL3B2aC5vCiAgQ0MgICAgICBwYy1iaW9zL29wdGlvbnJvbS9wdmhf
-bWFpbi5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9zY3NpL3Ztd19wdnNjc2kuYzogSW4gZnVuY3Rp
-b24gJ3B2c2NzaV9wcm9jZXNzX2lvJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3Njc2kvdm13X3B2
-c2NzaS5jOjcyMzo5OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ3Fl
-bXVfbG9nJzsgZGlkIHlvdSBtZWFuICdxZW11X2ZvcmsnPyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5j
-dGlvbi1kZWNsYXJhdGlvbl0KICAgICAgICAgcWVtdV9sb2coIldBUk5JTkc6IFBWU0NTSTogQ2Fu
-bm90IHByb2Nlc3MgSS9PIHdoZW4gIgogICAgICAgICBefn5+fn5+fgogICAgICAgICBxZW11X2Zv
-cmsKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3Njc2kvdm13X3B2c2NzaS5jOjcyMzo5OiBlcnJvcjog
-bmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAncWVtdV9sb2cnIFstV2Vycm9yPW5lc3RlZC1l
-eHRlcm5zXQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAq
-KiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L3Njc2kvdm13X3B2c2NzaS5v
-XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgQlVJ
-TEQgICBwYy1iaW9zL29wdGlvbnJvbS9tdWx0aWJvb3QuaW1nCiAgQlVJTEQgICBwYy1iaW9zL29w
-dGlvbnJvbS9saW51eGJvb3QuaW1nCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJl
-dGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vk
-bycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2Uu
-dXVpZD0wMGM1NTRlNjgxM2Y0MWE3YmQ2ODgwMDgxNDEyOWMyOCcsICctdScsICcxMDAzJywgJy0t
-c2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdF
-VF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
-LCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNI
-RV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11
-LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hl
-dy10ZXN0ZXItdG1wLWh1dW9mX2M5L3NyYy9kb2NrZXItc3JjLjIwMjAtMDMtMTUtMDkuNDYuMDgu
-MTI5MDc6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUv
-cnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmls
-dGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MDBjNTU0ZTY4MTNmNDFh
-N2JkNjg4MDA4MTQxMjljMjgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2Vb
-MV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHV1b2Zf
-Yzkvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIK
-CnJlYWwgICAgMW01My41MDlzCnVzZXIgICAgMG03LjcyMHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzE1MTMyNDQ3LjExMzEzMS0x
-LWxpcmFuLmFsb25Ab3JhY2xlLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+The RX code flash is not a Masked ROM but a EEPROM (electrically
+erasable programmable flash memory).
+When implementing the flash hardware, the rom_ptr() returns NULL
+and the reset vector is not set.
+Instead, use the address_space ld/st API to fetch the reset vector
+address from the code flash.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+Based-on: <20200315132810.7022-1-f4bug@amsat.org>
+
+Same issue might occurs in Cortex-M arm_cpu_reset()
+---
+ target/rx/cpu.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+index 9c224a273c..d3bd09e753 100644
+--- a/target/rx/cpu.c
++++ b/target/rx/cpu.c
+@@ -26,6 +26,8 @@
+ #include "hw/loader.h"
+ #include "fpu/softfloat.h"
+ 
++#define CPU_RESET_VECTOR 0xfffffffc
++
+ static void rx_cpu_set_pc(CPUState *cs, vaddr value)
+ {
+     RXCPU *cpu = RXCPU(cs);
+@@ -51,17 +53,13 @@ static void rx_cpu_reset(CPUState *s)
+     RXCPU *cpu = RXCPU(s);
+     RXCPUClass *rcc = RXCPU_GET_CLASS(cpu);
+     CPURXState *env = &cpu->env;
+-    uint32_t *resetvec;
+ 
+     rcc->parent_reset(s);
+ 
+     memset(env, 0, offsetof(CPURXState, end_reset_fields));
+ 
+-    resetvec = rom_ptr(0xfffffffc, 4);
+-    if (resetvec) {
+-        /* In the case of kernel, it is ignored because it is not set. */
+-        env->pc = ldl_p(resetvec);
+-    }
++    env->pc = address_space_ldl(cpu_get_address_space(s, 0),
++                                CPU_RESET_VECTOR, MEMTXATTRS_UNSPECIFIED, NULL);
+     rx_cpu_unpack_psw(env, 0, 1);
+     env->regs[0] = env->isp = env->usp = 0;
+     env->fpsw = 0;
+-- 
+2.21.1
+
 
