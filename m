@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97655C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C7AC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EB1620637
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC1AF20637
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="If6XkH5l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EB1620637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKew/6Lh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC1AF20637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55181 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDVE1-00047m-Cb
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40533)
+	id 1jDVJ2-0007JG-Ky
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDUXk-0005Zu-RW
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:11 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDUXl-0005cA-V3
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDUXi-0002VY-SW
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:08 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52223
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1jDUXj-0002W1-CM
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58978
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXh-0002Lh-9I
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXh-0002OG-Di
  for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584283622;
+ s=mimecast20190719; t=1584283624;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=c7ZSBZCNo/ZgAY5gyqS52uAcS239rFzvOxIBhE8+2aY=;
- b=If6XkH5ldXjnJZd5+HuPss49O/LjdQIv8oA2RoVPiej8DH8aYZyzMo2dPM9qctTVgdm4nC
- YEslD0rx+R+wV+O7natKyKy5b4LIm7SM5M8SEDCulYDKJ3Z2oDSVg8coXUul78MWLsuasW
- 5B5KVziugUS2H6lyIhH9xCPMp4NGaXs=
+ bh=60n4UvY4nJ9qhhi+o1KATEXmoVRpzmup+ji/INf9+7E=;
+ b=aKew/6Lh2kIC0voDNwv78XCoCEutD6eebCl4mDOzqDTdML+ch4rmSzGhEf9hYifBUP3jT2
+ dEOBh5xlh6zegkpJQLb47v2Rp6s8APorA8Hjjb/S/FHd880NVXkqEZ3vHuZOAgvmgGv28u
+ ClLemBvw6D2EMxzluxniIvkjNa6sqiE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-VgFFqBkANIGBufjdKzPY3A-1; Sun, 15 Mar 2020 10:46:59 -0400
-X-MC-Unique: VgFFqBkANIGBufjdKzPY3A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-142-9RSYb8fuNompD-obSv57Hw-1; Sun, 15 Mar 2020 10:47:00 -0400
+X-MC-Unique: 9RSYb8fuNompD-obSv57Hw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83E53189D6C5;
- Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D55DF107ACC7;
+ Sun, 15 Mar 2020 14:46:59 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
  [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D4A12708B;
- Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80B419CA3;
+ Sun, 15 Mar 2020 14:46:59 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C5A00113523D; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
+ id DF11211336AF; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 25/34] qapi: New special feature flag "deprecated"
-Date: Sun, 15 Mar 2020 15:46:44 +0100
-Message-Id: <20200315144653.22660-26-armbru@redhat.com>
+Subject: [PATCH v3 33/34] qapi: Implement deprecated-input=reject for QMP
+ command arguments
+Date: Sun, 15 Mar 2020 15:46:52 +0100
+Message-Id: <20200315144653.22660-34-armbru@redhat.com>
 In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
 References: <20200315144653.22660-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,163 +94,278 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unlike regular feature flags, the new special feature flag
-"deprecated" is recognized by the QAPI generator.  For now, it's only
-permitted with commands, events, and struct members.  It will be put
-to use shortly.
+This policy rejects deprecated input, and thus permits "testing the
+future".  Implement it for QMP command arguments: reject commands with
+deprecated ones.  Example: when QEMU is run with -compat
+deprecated-input=3Dreject, then
+
+    {"execute": "eject", "arguments": {"device": "cd"}}
+
+fails like this
+
+    {"error": {"class": "GenericError", "desc": "Deprecated parameter 'devi=
+ce' disabled by policy"}}
+
+When the argument is removed, the error will change to
+
+    {"error": {"class": "GenericError", "desc": "Parameter 'device' is unex=
+pected"}}
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt                    | 6 ++++++
- scripts/qapi/schema.py                          | 6 ++++++
- tests/Makefile.include                          | 1 +
- tests/qapi-schema/features-deprecated-type.err  | 2 ++
- tests/qapi-schema/features-deprecated-type.json | 3 +++
- tests/qapi-schema/features-deprecated-type.out  | 0
- tests/qapi-schema/qapi-schema-test.json         | 6 +++---
- tests/qapi-schema/qapi-schema-test.out          | 6 +++---
- 8 files changed, 24 insertions(+), 6 deletions(-)
- create mode 100644 tests/qapi-schema/features-deprecated-type.err
- create mode 100644 tests/qapi-schema/features-deprecated-type.json
- create mode 100644 tests/qapi-schema/features-deprecated-type.out
+ include/qapi/qobject-input-visitor.h |  9 +++++++++
+ include/qapi/visitor-impl.h          |  2 +-
+ include/qapi/visitor.h               |  2 +-
+ qapi/qapi-visit-core.c               |  4 ++--
+ qapi/qobject-input-visitor.c         | 28 ++++++++++++++++++++++++++++
+ qapi/qobject-output-visitor.c        |  3 ++-
+ tests/test-qmp-cmds.c                | 25 +++++++++++++++++++++++++
+ scripts/qapi/commands.py             |  2 +-
+ scripts/qapi/visit.py                | 10 ++++++----
+ 9 files changed, 75 insertions(+), 10 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index a1ef1cfd61..823adbabda 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -683,6 +683,12 @@ Intended use is to have each feature string signal tha=
-t this build of
- QEMU shows a certain behaviour.
+diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-in=
+put-visitor.h
+index 95985e25e5..cbc54de4ac 100644
+--- a/include/qapi/qobject-input-visitor.h
++++ b/include/qapi/qobject-input-visitor.h
+@@ -58,6 +58,15 @@ typedef struct QObjectInputVisitor QObjectInputVisitor;
+  */
+ Visitor *qobject_input_visitor_new(QObject *obj);
 =20
-=20
-+=3D=3D=3D=3D Special features =3D=3D=3D=3D
++/*
++ * Create a QObject input visitor for @obj for use with QMP
++ *
++ * This is like qobject_input_visitor_new(), except it obeys the
++ * policy for handling deprecated management interfaces set with
++ * -compat.
++ */
++Visitor *qobject_input_visitor_new_qmp(QObject *obj);
 +
-+Feature "deprecated" makes a command, event, or struct member as
-+deprecated.  It is not supported elsewhere so far.
+ /*
+  * Create a QObject input visitor for @obj for use with keyval_parse()
+  *
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index a6b26b7a5b..ccc159a0d2 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -111,7 +111,7 @@ struct Visitor
+     void (*optional)(Visitor *v, const char *name, bool *present);
+=20
+     /* Optional */
+-    bool (*deprecated)(Visitor *v, const char *name);
++    bool (*deprecated)(Visitor *v, const char *name, Error **errp);
+=20
+     /* Must be set */
+     VisitorType type;
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index c89d51b2a4..2a3c4d0407 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -456,7 +456,7 @@ bool visit_optional(Visitor *v, const char *name, bool =
+*present);
+  * visit_start_struct() and visit_end_struct(), since only objects
+  * have deprecated members.
+  */
+-bool visit_deprecated(Visitor *v, const char *name);
++bool visit_deprecated(Visitor *v, const char *name, Error **errp);
+=20
+ /*
+  * Visit an enum value.
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 501b3ccdef..71e4978a6f 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -137,11 +137,11 @@ bool visit_optional(Visitor *v, const char *name, boo=
+l *present)
+     return *present;
+ }
+=20
+-bool visit_deprecated(Visitor *v, const char *name)
++bool visit_deprecated(Visitor *v, const char *name, Error **errp)
+ {
+     trace_visit_deprecated(v, name);
+     if (v->deprecated) {
+-        return v->deprecated(v, name);
++        return v->deprecated(v, name, errp);
+     }
+     return true;
+ }
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 32236cbcb1..6ea93f5a7a 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -14,6 +14,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include <math.h>
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/visitor-impl.h"
+@@ -43,6 +44,7 @@ typedef struct StackObject {
+=20
+ struct QObjectInputVisitor {
+     Visitor visitor;
++    CompatPolicyInput deprecated_policy;
+=20
+     /* Root of visit at visitor creation. */
+     QObject *root;
+@@ -640,6 +642,23 @@ static void qobject_input_optional(Visitor *v, const c=
+har *name, bool *present)
+     *present =3D true;
+ }
+=20
++static bool qobject_input_deprecated(Visitor *v, const char *name,
++                                     Error **errp)
++{
++    QObjectInputVisitor *qiv =3D to_qiv(v);
 +
++    switch (qiv->deprecated_policy) {
++    case COMPAT_POLICY_INPUT_ACCEPT:
++        return true;
++    case COMPAT_POLICY_INPUT_REJECT:
++        error_setg(errp, "Deprecated parameter '%s' disabled by policy",
++                   name);
++        return false;
++    default:
++        abort();
++    }
++}
 +
- =3D=3D=3D Naming rules and reserved names =3D=3D=3D
+ static void qobject_input_free(Visitor *v)
+ {
+     QObjectInputVisitor *qiv =3D to_qiv(v);
+@@ -674,6 +693,7 @@ static QObjectInputVisitor *qobject_input_visitor_base_=
+new(QObject *obj)
+     v->visitor.end_list =3D qobject_input_end_list;
+     v->visitor.start_alternate =3D qobject_input_start_alternate;
+     v->visitor.optional =3D qobject_input_optional;
++    v->visitor.deprecated =3D qobject_input_deprecated;
+     v->visitor.free =3D qobject_input_free;
 =20
- All names must begin with a letter, and contain only ASCII letters,
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 6ee3677215..78309a00f0 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -193,6 +193,12 @@ class QAPISchemaType(QAPISchemaEntity):
-             return None
-         return self.name
+     v->root =3D qobject_ref(obj);
+@@ -696,6 +716,14 @@ Visitor *qobject_input_visitor_new(QObject *obj)
+     return &v->visitor;
+ }
 =20
-+    def check(self, schema):
-+        QAPISchemaEntity.check(self, schema)
-+        if 'deprecated' in [f.name for f in self.features]:
-+            raise QAPISemError(
-+                self.info, "feature 'deprecated' is not supported for type=
-s")
++Visitor *qobject_input_visitor_new_qmp(QObject *obj)
++{
++    QObjectInputVisitor *v =3D to_qiv(qobject_input_visitor_new(obj));
 +
-     def describe(self):
-         assert self.meta
-         return "%s type '%s'" % (self.meta, self.name)
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 67e8fcddda..d1340301b2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -242,6 +242,7 @@ qapi-schema +=3D event-case.json
- qapi-schema +=3D event-member-invalid-dict.json
- qapi-schema +=3D event-nest-struct.json
- qapi-schema +=3D features-bad-type.json
-+qapi-schema +=3D features-deprecated-type.json
- qapi-schema +=3D features-duplicate-name.json
- qapi-schema +=3D features-if-invalid.json
- qapi-schema +=3D features-missing-name.json
-diff --git a/tests/qapi-schema/features-deprecated-type.err b/tests/qapi-sc=
-hema/features-deprecated-type.err
-new file mode 100644
-index 0000000000..af4ffe20aa
---- /dev/null
-+++ b/tests/qapi-schema/features-deprecated-type.err
-@@ -0,0 +1,2 @@
-+features-deprecated-type.json: In struct 'S':
-+features-deprecated-type.json:2: feature 'deprecated' is not supported for=
- types
-diff --git a/tests/qapi-schema/features-deprecated-type.json b/tests/qapi-s=
-chema/features-deprecated-type.json
-new file mode 100644
-index 0000000000..4b5bf5b86e
---- /dev/null
-+++ b/tests/qapi-schema/features-deprecated-type.json
-@@ -0,0 +1,3 @@
-+# Feature 'deprecated' is not supported for types
-+{ 'struct': 'S', 'data': {},
-+  'features': [ 'deprecated' ] }
-diff --git a/tests/qapi-schema/features-deprecated-type.out b/tests/qapi-sc=
-hema/features-deprecated-type.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
-pi-schema-test.json
-index f576c337af..6b1f05afa7 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -258,7 +258,7 @@
-   'data': { 'foo': 'int' },
-   'features': [] }
- { 'struct': 'FeatureStruct1',
--  'data': { 'foo': { 'type': 'int', 'features': [ 'member-feature1' ] } },
-+  'data': { 'foo': { 'type': 'int', 'features': [ 'deprecated' ] } },
-   'features': [ 'feature1' ] }
- { 'struct': 'FeatureStruct2',
-   'data': { 'foo': 'int' },
-@@ -308,7 +308,7 @@
-   'features': [] }
++    v->deprecated_policy =3D compat_policy.deprecated_input;
++    return &v->visitor;
++}
++
+ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
+ {
+     QObjectInputVisitor *v =3D qobject_input_visitor_base_new(obj);
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index 84cee17596..73983ca5cc 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -201,7 +201,8 @@ static void qobject_output_type_null(Visitor *v, const =
+char *name,
+     qobject_output_add(qov, name, qnull());
+ }
 =20
- { 'command': 'test-command-features1',
--  'features': [ 'feature1' ] }
-+  'features': [ 'deprecated' ] }
- { 'command': 'test-command-features3',
-   'features': [ 'feature1', 'feature2' ] }
+-static bool qobject_output_deprecated(Visitor *v, const char *name)
++static bool qobject_output_deprecated(Visitor *v, const char *name,
++                                      Error **errp)
+ {
+     QObjectOutputVisitor *qov =3D to_qov(v);
 =20
-@@ -322,4 +322,4 @@
-                                               'defined(TEST_IF_COND_2)'] }=
- ] }
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index a2099fee7d..4ca658acf9 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -299,6 +299,29 @@ static void test_dispatch_cmd_deprecated(void)
+     do_qmp_dispatch_error(false, ERROR_CLASS_COMMAND_NOT_FOUND, cmd);
+ }
 =20
- { 'event': 'TEST-EVENT-FEATURES1',
--  'features': [ 'feature1' ] }
-+  'features': [ 'deprecated' ] }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
-i-schema-test.out
-index cd863ae966..891b4101e0 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -359,7 +359,7 @@ object FeatureStruct0
-     member foo: int optional=3DFalse
- object FeatureStruct1
-     member foo: int optional=3DFalse
--        feature member-feature1
-+        feature deprecated
-     feature feature1
- object FeatureStruct2
-     member foo: int optional=3DFalse
-@@ -419,7 +419,7 @@ command test-features0 q_obj_test-features0-arg -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
- command test-command-features1 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
--    feature feature1
-+    feature deprecated
- command test-command-features3 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
-     feature feature1
-@@ -440,7 +440,7 @@ command test-command-cond-features3 None -> None
-         if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
- event TEST-EVENT-FEATURES1 None
-     boxed=3DFalse
--    feature feature1
-+    feature deprecated
- module include/sub-module.json
- include sub-sub-module.json
- object SecondArrayRef
++static void test_dispatch_cmd_arg_deprecated(void)
++{
++    const char *cmd =3D "{ 'execute': 'test-features0',"
++        " 'arguments': { 'fs1': { 'foo': 42 } } }";
++    QDict *ret;
++
++    memset(&compat_policy, 0, sizeof(compat_policy));
++
++    /* accept */
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 1);
++    qobject_unref(ret);
++
++    compat_policy.has_deprecated_input =3D true;
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_ACCEPT;
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 1);
++    qobject_unref(ret);
++
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_REJECT;
++    do_qmp_dispatch_error(false, ERROR_CLASS_GENERIC_ERROR, cmd);
++}
++
+ static void test_dispatch_cmd_ret_deprecated(void)
+ {
+     const char *cmd =3D "{ 'execute': 'test-features0' }";
+@@ -399,6 +422,8 @@ int main(int argc, char **argv)
+                     test_dispatch_cmd_success_response);
+     g_test_add_func("/qmp/dispatch_cmd_deprecated",
+                     test_dispatch_cmd_deprecated);
++    g_test_add_func("/qmp/dispatch_cmd_arg_deprecated",
++                    test_dispatch_cmd_arg_deprecated);
+     g_test_add_func("/qmp/dispatch_cmd_ret_deprecated",
+                     test_dispatch_cmd_ret_deprecated);
+     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index f628bbf144..3fb4ed42ed 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -132,7 +132,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+         push_indent()
+=20
+     ret +=3D mcgen('''
+-    v =3D qobject_input_visitor_new(QOBJECT(args));
++    v =3D qobject_input_visitor_new_qmp(QOBJECT(args));
+     visit_start_struct(v, NULL, NULL, 0, &err);
+     if (err) {
+         goto out;
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 21df3abed2..9119eb015b 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -66,15 +66,12 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             push_indent()
+         if deprecated:
+             ret +=3D mcgen('''
+-    if (visit_deprecated(v, "%(name)s")) {
++    if (visit_deprecated(v, "%(name)s", &err)) {
+ ''',
+                          name=3Dmemb.name)
+             push_indent()
+         ret +=3D mcgen('''
+     visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, &err);
+-    if (err) {
+-        goto out;
+-    }
+ ''',
+                      c_type=3Dmemb.type.c_name(), name=3Dmemb.name,
+                      c_name=3Dc_name(memb.name))
+@@ -82,6 +79,11 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)=
+s *obj, Error **errp)
+             pop_indent()
+             ret +=3D mcgen('''
+     }
++''')
++        ret +=3D mcgen('''
++    if (err) {
++        goto out;
++    }
+ ''')
+         if memb.optional:
+             pop_indent()
 --=20
 2.21.1
 
