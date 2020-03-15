@@ -2,70 +2,94 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA26FC10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBFCC10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B913B20578
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 12:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B913B20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id C7916205ED
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 13:24:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="G8/Gw86y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7916205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDSJc-0007kD-SL
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 08:24:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44795)
+	id 1jDTFp-0006CO-UV
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 09:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chengang@emindsoft.com.cn>) id 1jDSHh-0007Fd-O9
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:27 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jDTEF-0005mN-Gn
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chengang@emindsoft.com.cn>) id 1jDSHg-0004OU-0f
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:25 -0400
-Received: from lucky1.263xmail.com ([211.157.147.132]:43908)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chengang@emindsoft.com.cn>)
- id 1jDSHf-0003t5-6L
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 08:22:23 -0400
-Received: from localhost (unknown [192.168.167.69])
- by lucky1.263xmail.com (Postfix) with ESMTP id 61284B446B;
- Sun, 15 Mar 2020 20:22:12 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [223.72.82.233])
- by smtp.263.net (postfix) whith ESMTP id
- P20071T140595485996800S1584274925344411_; 
- Sun, 15 Mar 2020 20:22:11 +0800 (CST)
-X-UNIQUE-TAG: <74b4f6eec1cae0d7cd0169a97dbe721d>
-X-RL-SENDER: chengang@emindsoft.com.cn
-X-SENDER: chengang@emindsoft.com.cn
-X-LOGIN-NAME: chengang@emindsoft.com.cn
-X-FST-TO: riku.voipio@iki.fi
-X-SENDER-IP: 223.72.82.233
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: chengang@emindsoft.com.cn
-To: riku.voipio@iki.fi,
-	laurent@vivier.eu
-Subject: [PATCH v2] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Date: Sun, 15 Mar 2020 20:20:51 +0800
-Message-Id: <20200315122051.9360-1-chengang@emindsoft.com.cn>
-X-Mailer: git-send-email 2.24.0.308.g228f53135a
+ (envelope-from <liran.alon@oracle.com>) id 1jDTEE-0008Ne-6l
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:55 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:60478)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jDTED-0008Dg-TJ
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 09:22:54 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDMfcx039179;
+ Sun, 15 Mar 2020 13:22:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=J6ZiGQ4x1tHeR62jp28UqNAh6TGJQMKqqCyEp5Ljjbk=;
+ b=G8/Gw86yNA/M4mCbuhuFa7F0NDORdgnuLjkm2y7uxdPzSN/d1STqRy+thCV4qq2ZdJ2B
+ l8hqeUls8+nLbqK3TN0V3pR/pk5gSkK4AXQ626L0tyRcdMv6c04iPv9VBij/Y2M+uSEs
+ LHycgxOhqvWc+t/e4z5awvq+inTSKhfwSSoLaq90XTPshGWWHkD4eRsRqS2nfyQgehMy
+ uVzzxzU+EKP2mA1+E8KhggYdvKNh34rh/7LrWFNea+thXQdd4hvsD4mo3ukvplSkKD35
+ n1sEr3dGn4vm2YgdTNqmfHCfX5xu85Fy8qLV5ktboZ5n2TEChebCDfsHBDKTzxXzgxsU nQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2yrppqub28-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 15 Mar 2020 13:22:41 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02FDMcgJ190368;
+ Sun, 15 Mar 2020 13:22:38 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 2ys8tn3pd8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 15 Mar 2020 13:22:38 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02FDMbev011865;
+ Sun, 15 Mar 2020 13:22:37 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sun, 15 Mar 2020 06:22:37 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/scsi/vmw_pvscsi: Remove assertion for kick after reset
+Date: Sun, 15 Mar 2020 15:24:47 +0200
+Message-Id: <20200315132447.113131-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 211.157.147.132
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ phishscore=0 mlxscore=0
+ malwarescore=0 suspectscore=1 mlxlogscore=999 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003150074
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ bulkscore=0
+ suspectscore=1 lowpriorityscore=0 phishscore=0 adultscore=0 clxscore=1011
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003150074
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,181 +101,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Gang <chengang@emindsoft.com.cn>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
+From: Elazar Leibovich <elazar.leibovich@oracle.com>
 
-Another DRM_IOCTL_* commands will be done later.
+When running Ubuntu 3.13.0-65-generic guest, QEMU sometimes crashes
+during guest ACPI reset. It crashes on assert(s->rings_info_valid)
+in pvscsi_process_io().
 
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+Analyzing the crash revealed that it happens when userspace issues
+a sync during a reboot syscall.
+
+Below are backtraces we gathered from the guests.
+
+Guest backtrace when issuing PVSCSI_CMD_ADAPTER_RESET:
+    pci_device_shutdown
+    device_shutdown
+    init_pid_ns
+    init_pid_ns
+    kernel_power_off
+    SYSC_reboot
+
+Guest backtrace when issuing PVSCSI_REG_OFFSET_KICK_RW_IO:
+    scsi_done
+    scsi_dispatch_cmd
+    blk_add_timer
+    scsi_request_fn
+    elv_rb_add
+    __blk_run_queue
+    queue_unplugged
+    blk_flush_plug_list
+    blk_finish_plug
+    ext4_writepages
+    set_next_entity
+    do_writepages
+    __filemap_fdatawrite_range
+    filemap_write_and_wait_range
+    ext4_sync_file
+    ext4_sync_file
+    do_fsync
+    sys_fsync
+
+Since QEMU pvscsi should imitate VMware pvscsi device emulation,
+we decided to imitate VMware's behavior in this case.
+
+To check VMware behavior, we wrote a kernel module that issues
+a reset to the pvscsi device and then issues a kick. We ran it on
+VMware ESXi 6.5 and it seems that it simply ignores the kick.
+Hence, we decided to ignore the kick as well.
+
+Signed-off-by: Elazar Leibovich <elazar.leibovich@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
 ---
- linux-user/ioctls.h        |  2 ++
- linux-user/syscall.c       | 62 ++++++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  | 15 +++++++++
- linux-user/syscall_types.h | 11 +++++++
- 4 files changed, 90 insertions(+)
+ hw/scsi/vmw_pvscsi.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0defa1d8c1..3ae32cbfb1 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -574,6 +574,8 @@
-   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
-                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
-=20
-+  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
- #ifdef TARGET_TIOCSTART
-   IOCTL_IGNORE(TIOCSTART)
-   IOCTL_IGNORE(TIOCSTOP)
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8d27d10807..2eb7c91ab4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -112,6 +112,7 @@
- #include <linux/if_alg.h>
- #include <linux/rtc.h>
- #include <sound/asound.h>
-+#include <libdrm/drm.h>
- #include "linux_loop.h"
- #include "uname.h"
-=20
-@@ -5196,6 +5197,67 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLEn=
-try *ie, uint8_t *buf_temp,
- }
- #endif
-=20
-+static inline abi_long target_to_host_drmversion(struct drm_version *hos=
-t_ver,
-+                                                abi_long target_addr)
-+{
-+    struct target_drm_version *target_ver;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_ver, target_addr, 0)) {
-+        return -TARGET_EFAULT;
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index c91352cf46de..b2bb80449bba 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -719,7 +719,12 @@ pvscsi_process_io(PVSCSIState *s)
+     PVSCSIRingReqDesc descr;
+     hwaddr next_descr_pa;
+ 
+-    assert(s->rings_info_valid);
++    if (!s->rings_info_valid) {
++        qemu_log("WARNING: PVSCSI: Cannot process I/O when "
++                 "rings are not valid.\n");
++        return;
 +    }
-+    __get_user(host_ver->name_len, &target_ver->name_len);
-+    host_ver->name =3D host_ver->name_len ? g2h(target_ver->name) : NULL=
-;
-+    __get_user(host_ver->date_len, &target_ver->date_len);
-+    host_ver->date =3D host_ver->date_len ? g2h(target_ver->date) : NULL=
-;
-+    __get_user(host_ver->desc_len, &target_ver->desc_len);
-+    host_ver->desc =3D host_ver->desc_len ? g2h(target_ver->desc) : NULL=
-;
-+    unlock_user_struct(target_ver, target_addr, 0);
-+    return 0;
-+}
 +
-+static inline abi_long host_to_target_drmversion(abi_ulong target_addr,
-+                                                 struct drm_version *hos=
-t_ver)
-+{
-+    struct target_drm_version *target_ver;
-+
-+    if (!lock_user_struct(VERIFY_WRITE, target_ver, target_addr, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+    __put_user(host_ver->version_major, &target_ver->version_major);
-+    __put_user(host_ver->version_minor, &target_ver->version_minor);
-+    __put_user(host_ver->version_patchlevel, &target_ver->version_patchl=
-evel);
-+    __put_user(host_ver->name_len, &target_ver->name_len);
-+    __put_user(host_ver->date_len, &target_ver->date_len);
-+    __put_user(host_ver->desc_len, &target_ver->desc_len);
-+    unlock_user_struct(target_ver, target_addr, 0);
-+    return 0;
-+}
-+
-+static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                             int fd, int cmd, abi_long arg)
-+{
-+    struct drm_version *ver;
-+    abi_long ret;
-+
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_VERSION:
-+        ver =3D (struct drm_version *)buf_temp;
-+        memset(ver, 0, sizeof(*ver));
-+        ret =3D target_to_host_drmversion(ver, arg);
-+        if (is_error(ret)) {
-+            return ret;
-+        }
-+        ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-+        if (is_error(ret)) {
-+            return ret;
-+        }
-+        ret =3D host_to_target_drmversion(arg, ver);
-+        return ret;
-+    }
-+    return -TARGET_EFAULT;
-+}
-+
-+
- static IOCTLEntry ioctl_entries[] =3D {
- #define IOCTL(cmd, access, ...) \
-     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 152ec637cb..3c261cff0e 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
- #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
- #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
-=20
-+/* drm ioctls */
-+#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-+
- /* from asm/termbits.h */
-=20
- #define TARGET_NCC 8
-@@ -2598,6 +2601,18 @@ struct target_mq_attr {
-     abi_long mq_curmsgs;
- };
-=20
-+struct target_drm_version {
-+    int version_major;
-+    int version_minor;
-+    int version_patchlevel;
-+    abi_ulong name_len;
-+    abi_ulong name;
-+    abi_ulong date_len;
-+    abi_ulong date;
-+    abi_ulong desc_len;
-+    abi_ulong desc;
-+};
-+
- #include "socket.h"
-=20
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e12c1661e..e2b0484f50 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -292,6 +292,17 @@ STRUCT(dm_target_versions,
- STRUCT(dm_target_msg,
-        TYPE_ULONGLONG) /* sector */
-=20
-+STRUCT(drm_version,
-+       TYPE_INT, /* version_major */
-+       TYPE_INT, /* version_minor */
-+       TYPE_INT, /* version_patchlevel */
-+       TYPE_ULONG, /* name_len */
-+       TYPE_PTRVOID, /* name */
-+       TYPE_ULONG, /* date_len */
-+       TYPE_PTRVOID, /* date */
-+       TYPE_ULONG, /* desc_len */
-+       TYPE_PTRVOID) /* desc */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
---=20
-2.24.0.308.g228f53135a
-
-
+     while ((next_descr_pa = pvscsi_ring_pop_req_descr(&s->rings)) != 0) {
+ 
+         /* Only read after production index verification */
+-- 
+2.20.1
 
 
