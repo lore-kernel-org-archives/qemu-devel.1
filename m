@@ -2,97 +2,102 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B50C10F29
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 23:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8B2C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 23:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87187205ED
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 23:36:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61AE2205ED
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 23:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IxNeug0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87187205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEKk4obO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AE2205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDcnn-0006p6-9b
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 19:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33470)
+	id 1jDcuH-00087t-9l
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 19:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDcfS-0005ZW-6x
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:27:40 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDchA-0005sX-GV
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:29:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDcfR-0002EN-37
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:27:38 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44454)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDcfQ-0002Ar-RG
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:27:37 -0400
-Received: by mail-pg1-x541.google.com with SMTP id 37so8614358pgm.11
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 16:27:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=7kzRqUlLpkGjDOydIsoDKwsazMahQVbzT0T2HoBLlxQ=;
- b=IxNeug0L1ffIqU2BO8WEllFNhMJbqy54y+4HisD1mrqZu7ZvnG7H97sfceyU1W2F5U
- UsNSfc2aUJYuXLel+Ph8PjasFV8F1y1HrwepQKGK2wIhaAgiLJ10r4QdxNNpllFnq5d6
- I/u+YGy+XhD0Ukr39LYwhuWFez8OnKvrosW8kkZ8iXHwXch5XDMVbBjZ88opAZhJoOpN
- Rl/W9f/u9/k0A3Q6JHgmNe+0S5wSRLKF3SdW9pi4FaUZhrHYogAQPIqO/NFxj1EClQ26
- 0Z7X5siiM+CZdcODlC+NDOYc23Aqz8rkHD0PM43QzYkscRCVg2zi+ykQlvFOg+ArPN/y
- rnOw==
+ (envelope-from <philmd@redhat.com>) id 1jDch8-0007mA-9X
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:29:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51393
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDch8-0007hu-3M
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 19:29:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584314961;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4WumEjFpLdGXtIVB+lKkCaTKMvo703FUA4qb/lVmZ4U=;
+ b=bEKk4obOw+fTf9kwg2bEqJbvdkUmWn9UOPi1ALo9kjdD9itCC8qnDlWgHQKKEFhGecqEGO
+ uF12Axk8uy1KMsGxkza/6ce6/st82vD1Uk0w9Edp7RYZj551VS/XjQBXHnLd9hmXiULyd8
+ /J33AoYR5Qm+bDbLj+fHKhqtwMmLAtM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-Xmdyg5s4N5uhswyEVCGM8Q-1; Sun, 15 Mar 2020 19:29:18 -0400
+X-MC-Unique: Xmdyg5s4N5uhswyEVCGM8Q-1
+Received: by mail-wr1-f71.google.com with SMTP id c16so8155928wrt.2
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 16:29:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=7kzRqUlLpkGjDOydIsoDKwsazMahQVbzT0T2HoBLlxQ=;
- b=TrLTMOXn0InpsU0Rt7IeRRd3GLMPAt1Q0tZyZ5Quf1FDOESAVTg0Jb2gRAGOk78Ydh
- +r8p+0XbAss+g7qDIJErwmtZJJVwRz6GTHTGwSuXObfnMc4lVjGlLhoCfWvo+WgkoQbR
- 0WQCm88GC5bHkRMknDRNwKryvpI4R9urs07JmjwGVu9VUpfm+argbSGL2pjvWojEEcJA
- +ThHbOope9qoZ3ZSARHR1POIYKEcQ1mQGLkLQVDocCRJV4NzHsdNsLn6U1M3HL7cOGAj
- tqfTzNnnQKrz0uGmJFR3XlHLPlj3dPQjIjaBkPe7PSz1SznWSRkybq80SzF1KZM7NOhS
- j4DQ==
-X-Gm-Message-State: ANhLgQ2zCedCA6RkPem73s0aVsvHCob1KElpoXwaPlTN/F2Z7OZ0Gt0y
- tHKBX+7FduSNtc/QBgvaMIGBKg==
-X-Google-Smtp-Source: ADFU+vuExsYpZ3cHVZw6YERRgXKeYQAvx9SsZxCJrBulDM9ZhXR+zJhpimV6dFUbkprPjUGzfsDsIg==
-X-Received: by 2002:aa7:9790:: with SMTP id o16mr23754567pfp.322.1584314855272; 
- Sun, 15 Mar 2020 16:27:35 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- c11sm14574147pfc.216.2020.03.15.16.27.34
+ bh=GcXHnaqHRCexDMQKxXRREMxgznnfbEwtSJrVCXJw9kE=;
+ b=g5cBzEMN+vqj+se6/sNOMyVk3udvZXDcfavqhzKuwrPUG9d9e9XylnNaByhRfHY+6V
+ +t1iEthf4kiGLqrkcptwWv8rKLfpPtdcVa0yVZHrHPO1vqnkRwVfD/gHC+jugEWVWomP
+ PRPupAgssiwx3peu/awVpDfvZCnp1T2Yvo5xOfVSw39sjOPK6GbUVsfih3iTqd7Fzsno
+ ykwFF8YkR4VZFR1ZR13hPMgO9wvdTZGyeAlnjn8/W3KkLGSMepQ53bRWM3D3tleNBdc1
+ FNgKtxQq1nJNpGsTFNzebBQrfNMNT4YhiCnCLtmGX9K/z7UJ3e449V4D7EZPDMnX1GNK
+ x3EQ==
+X-Gm-Message-State: ANhLgQ34lUmXP2Oh1I9ALd2ywP/gCIPp7Cex5Xyn5o/TDciWJ9BftyZM
+ fJ2A4FT8Mn4M3HXrIY3cPLJXYWDVTRzxNpSUPoxy3R6I04vbm/6rIBqLIL1utkZWbwrin3ELtDL
+ lPBYxvA5vMrgxeIc=
+X-Received: by 2002:adf:8023:: with SMTP id 32mr21691296wrk.189.1584314957879; 
+ Sun, 15 Mar 2020 16:29:17 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtbkXp6lrfy8keAFwi9Nk+31/DC50pnjme/fFfdMlfjyt2SkbWgxcCkk5l/ETfYkj7nFz0Z2Q==
+X-Received: by 2002:adf:8023:: with SMTP id 32mr21691278wrk.189.1584314957689; 
+ Sun, 15 Mar 2020 16:29:17 -0700 (PDT)
+Received: from [192.168.1.40] (191.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.191])
+ by smtp.gmail.com with ESMTPSA id b202sm2308921wmd.15.2020.03.15.16.29.16
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 16:27:34 -0700 (PDT)
-Subject: Re: [PATCH v5 24/60] target/riscv: vector single-width averaging add
- and subtract
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
- <20200312145900.2054-25-zhiwei_liu@c-sky.com>
- <834922de-5107-0d00-6d4d-47bd830129a5@linaro.org>
- <2db448ea-f17f-e627-055d-fb3cdf6cfddc@linaro.org>
- <d48f77ee-ad99-26fa-a597-6cdcd2d55508@c-sky.com>
- <426e31f8-1b54-7b5a-b2a9-a2742f9c74af@linaro.org>
- <e40db19f-0bf6-9ccd-3f41-855f67cf88f2@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <af9227f2-eba9-eb27-d409-c95556b046e7@linaro.org>
-Date: Sun, 15 Mar 2020 16:27:32 -0700
+ Sun, 15 Mar 2020 16:29:17 -0700 (PDT)
+Subject: Re: [PATCH 8/9] hw/core: Add qdev stub for user-mode
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200313184607.11792-1-philmd@redhat.com>
+ <20200313184607.11792-9-philmd@redhat.com>
+ <7775dd60-7c5d-e973-162d-5eb742b41c07@redhat.com>
+ <9118c5b3-196b-9002-dcb8-1d3b91b59fc3@redhat.com>
+ <3e06976a-b58d-a66e-8a13-5e3d7a325dc1@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4564cb14-2fdb-2ea1-aef4-558160ea99cd@redhat.com>
+Date: Mon, 16 Mar 2020 00:29:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <e40db19f-0bf6-9ccd-3f41-855f67cf88f2@c-sky.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <3e06976a-b58d-a66e-8a13-5e3d7a325dc1@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,50 +109,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
+Cc: Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/15/20 4:23 PM, LIU Zhiwei wrote:
-> Many other fixed point instructions also need vxsat besides vxsrm.
+On 3/14/20 11:57 AM, Paolo Bonzini wrote:
+> On 14/03/20 11:49, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>
+>>>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+>>>> index 6215e7c208..89bf247173 100644
+>>>> --- a/hw/core/Makefile.objs
+>>>> +++ b/hw/core/Makefile.objs
+>>>> @@ -8,6 +8,7 @@ common-obj-y +=3D vmstate-if.o
+>>>>  =C2=A0 # irq.o needed for qdev GPIO handling:
+>>>>  =C2=A0 common-obj-y +=3D irq.o
+>>>> +common-obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D qdev-stubs.o
+>>>
+>>> This should be:
+>>>
+>>>  =C2=A0=C2=A0=C2=A0 obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D qdev-stubs.=
+o
+>>
+>> Actually I moved it to stub-obj-y which makes things easier.
+>=20
+> No, common-obj- is the right thing, followed by
+>=20
+> common-obj-$(CONFIG_ALL) +=3D qdev-stubs.o
 
-Ah yes.
+I don't understand CONFIG_ALL magic, why is that different to common-obj-y?
 
-> In that cases, can I just define OPIVV2_RM like this:
-> 
-> #define OPIVV2_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)     \
-> static inline void                                                  \
-> do_##NAME(void *vd, void *vs1, void *vs2, int i,                    \
->           CPURISCVState *env, int vxrm)                             \
-> {                                                                   \
->     TX1 s1 = *((T1 *)vs1 + HS1(i));                                 \
->     TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
->     *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1);                    \
-> }
-> 
-> static inline int32_t aadd32(|__attribute__((unused)) |CPURISCVState *env, 
-> 			     int vxrm, int32_t a, int32_t b)
+Anyway your suggestion works, so I'll blindly use it, thanks.
 
-You can drop the unused.  We don't turn on warnings for unused arguments, as we
-have a *lot* of them for exactly this reason -- keeping a common functional
-interface.
+>=20
+> Paolo
+>=20
 
-
-> {
->     int64_t res = (int64_t)a + b;
->     uint8_t round = get_round(vxrm, res, 1);
-> 
->     return (res >> 1) + round;
-> }
-> 
-> 
-> In this way， I can write just one OPIVV2_RM instead of (OPIVV2_RM,
-> OPIVV2_RM_ENV, OPIVV2_ENV).
-
-Yes, that's fine.
-
-
-r~
 
