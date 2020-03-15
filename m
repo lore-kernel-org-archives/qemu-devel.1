@@ -2,92 +2,82 @@ Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB33C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CD1C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7621220575
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:44:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE68F20575
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 15:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFVAof5G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7621220575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DZwfVMx8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE68F20575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDVRW-0003b8-H0
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:44:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60156)
+	id 1jDVVb-0005rE-Uq
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 11:49:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDV0J-0004fO-BH
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:41 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDUXl-0005c8-Tt
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDV0G-00009j-Mb
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60858
+ (envelope-from <armbru@redhat.com>) id 1jDUXj-0002WE-Cb
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44812
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDV02-0007s2-Hy
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 11:16:36 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXh-0002K4-Dh
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584285381;
+ s=mimecast20190719; t=1584283621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xp0mNxx8vSLElIjzPs/XjkhTJqhGk6ULRRwbhaYwxfM=;
- b=AFVAof5GtsQ0EVJJKMyAHDJvyazo12mbFdbUeUCK/OwwhQHbos8SpedMesh2CMSWgX9N2E
- B1PsOQTEDgNZIrA9pIPkfYWIvE00O9Qi17GjVOA7tdsFAvJQA8nfstlF8EcURfpOPBcGZQ
- beYbtsZ5OYvhNncD46/MTYpmEzhEhTY=
+ bh=RiUu3Ec8VkyOY/9bwmYyEGwnOSMLaPO2veBJP5kK8FY=;
+ b=DZwfVMx8BDOmT9tnGbHf+HLdihHDkzK90vEfptj7xm4fbGjwCQRVyWaIpebmRGL/4V96HC
+ 4OJRFIE4G3YpEjd0bmA1eyUHN0Nv8AOr7X4Jn6IoQp0yxDgqV6p0tpPFrQexGbDsGHkck0
+ XU08k5D3J2y/NqxzulMs4imy2OV3ef0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-CrKpmww-M_-ZWq7Gh94jlQ-1; Sun, 15 Mar 2020 11:16:12 -0400
-X-MC-Unique: CrKpmww-M_-ZWq7Gh94jlQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-227-pZwCmcvOOO2qIJwWKa7Mdg-1; Sun, 15 Mar 2020 10:47:00 -0400
+X-MC-Unique: pZwCmcvOOO2qIJwWKa7Mdg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87F40800D4E;
- Sun, 15 Mar 2020 15:16:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F23008017DF;
+ Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
  [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EE7F48AC36;
- Sun, 15 Mar 2020 15:16:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C5395DA2C;
+ Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 20BF61138404; Sun, 15 Mar 2020 16:16:08 +0100 (CET)
+ id CC1B11135243; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v4 2/3] mac_via: fix incorrect creation of mos6522 device
- in mac_via
-References: <20200305065422.12707-1-pannengyuan@huawei.com>
- <20200305065422.12707-3-pannengyuan@huawei.com>
- <CAFEAcA_twjUHpvf5ZpzA_bKyf8MZ4BuSY0MvNTgSEyVTYf9mXQ@mail.gmail.com>
- <0b2d3222-d122-e0db-db04-1c4e3028f8f8@huawei.com>
- <CAFEAcA9PQd=PwuF+j=3kOA_eCiRd_8TLEwPx8qB-jWvV_9CcMQ@mail.gmail.com>
- <0c3ae5aa-36c3-a809-4a42-159348f44780@huawei.com>
- <CAFEAcA8_RkECOT=YJ3ML0wxBrKiqVw=CssORU=jyryfcNueB0w@mail.gmail.com>
- <871rq08tn9.fsf@dusky.pond.sub.org>
- <eca27715-554d-2c2e-5e58-ffd01abb654c@ilande.co.uk>
-Date: Sun, 15 Mar 2020 16:16:08 +0100
-In-Reply-To: <eca27715-554d-2c2e-5e58-ffd01abb654c@ilande.co.uk> (Mark
- Cave-Ayland's message of "Sat, 14 Mar 2020 13:19:37 +0000")
-Message-ID: <87fte98x8n.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 27/34] qemu-options: New -compat to set policy for
+ deprecated interfaces
+Date: Sun, 15 Mar 2020 15:46:46 +0100
+Message-Id: <20200315144653.22660-28-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
+References: <20200315144653.22660-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,298 +89,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Pan Nengyuan <pannengyuan@huawei.com>,
- Laurent Vivier <laurent@vivier.eu>, Markus Armbruster <armbru@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+Policy is separate for input and output.
 
-> On 10/03/2020 09:07, Markus Armbruster wrote:
->
->> Widespread QOM usage anti-pattern ahead; cc: QOM maintainers.
->>=20
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>=20
->>> On Mon, 9 Mar 2020 at 10:02, Pan Nengyuan <pannengyuan@huawei.com> wrot=
-e:
->>>> On 3/9/2020 5:21 PM, Peter Maydell wrote:
->>>>> Could you explain more? My thought is that we should be using
->>>>> sysbus_init_child_obj() and we should be doing it in the init method.
->>>>> Why does that break the tests ? It's the same thing various other
->>>>> devices do.
->>>>
->>>> device-introspect-test do the follow check for each device type:
->>>>
->>>>     qtree_start =3D qtest_hmp(qts, "info qtree");
->>>>     ...
->>>>     qtest_qmp(qts, "{'execute': 'device-list-properties','arguments': =
-{'typename': %s}}", type);
->>>>     ...
->>>>     qtree_end =3D qtest_hmp(qts, "info qtree");
->>>>     g_assert_cmpstr(qtree_start, =3D=3D, qtree_end);
->>>>
->>>> If we do qdev_set_parent_bus in init, it will check fail when type =3D=
- 'mac_via'.
->>>> mac_via_init() is called by q800_init(). But it will not be called in =
-qtest(-machine none) in the step qtree_start.
->>>> And after we call 'device-list-properties', mac_via_init() was called =
-and set dev parent bus. We can find these
->>>> devices in the qtree_end. So it break the test on the assert.
->>>
->>> Markus, do you know what's happening here? Why is
->>> trying to use sysbus_init_child_obj() breaking the
->>> device-introspect-test for this particular device,
->>> but fine for the other places where we use it?
->>> (Maybe we're accidentally leaking a reference to
->>> something so the sub-device stays on the sysbus
->>> when it should have removed itself when the
->>> device was deinited ?)
->>=20
->> Two questions: (1) why does it break here, and (2) why doesn't it break
->> elsewhere.
->>=20
->> First question: why does it break here?
->>=20
->> It breaks here because asking for help with "device_add mac_via,help"
->> has a side effect visible in "info qtree".
->>=20
->>>> Here is the output:
->>>>
->>>> # Testing device 'mac_via'
->> [Uninteresting stuff snipped...]
->>=20
->> "info qtree" before asking for help:
->>=20
->>>> qtree_start: bus: main-system-bus
->>>>   type System
->>=20
->> "info qtree" after asking for help:
->>=20
->>>> qtree_end: bus: main-system-bus
->>>>   type System
->>>>   dev: mos6522-q800-via2, id ""
->>>>     gpio-in "via2-irq" 8
->>>>     gpio-out "sysbus-irq" 1
->>>>     frequency =3D 0 (0x0)
->>>>     mmio ffffffffffffffff/0000000000000010
->>>>   dev: mos6522-q800-via1, id ""
->>>>     gpio-in "via1-irq" 8
->>>>     gpio-out "sysbus-irq" 1
->>>>     frequency =3D 0 (0x0)
->>>>     mmio ffffffffffffffff/0000000000000010
->>=20
->> How come?
->>=20
->> "device_add mac_via,help" shows properties of device "mac_via".  It does
->> so even though "mac_via" is not available with device_add.  Useful
->> because "info qtree" shows properties for such devices.
->>=20
->> These properties are defined dynamically, either for the instance
->> (traditional) or the class.  The former typically happens in QOM
->> TypeInfo method .instance_init(), the latter in .class_init().
->>=20
->> "Typically", because properties can be added elsewhere, too.  In
->> particular, QOM properties not meant for device_add are often created in
->> DeviceClass method .realize().  More on that below.
->>=20
->> To make properties created in .instance_init() visible in help, we need
->> to create and destroy an instance.  This must be free of observable side
->> effects.
->>=20
->> This has been such a fertile source of crashes that I added
->> device-introspect-test:
->>=20
->> commit 2d1abb850fd15fd6eb75a92290be5f93b2772ec5
->> Author: Markus Armbruster <armbru@redhat.com>
->> Date:   Thu Oct 1 10:59:56 2015 +0200
->>=20
->>     device-introspect-test: New, covering device introspection
->>    =20
->>     The test doesn't check that the output makes any sense, only that QE=
-MU
->>     survives.  Useful since we've had an astounding number of crash bugs
->>     around there.
->>    =20
->>     In fact, we have a bunch of them right now: a few devices crash or
->>     hang, and some leave dangling pointers behind.  The test skips testi=
-ng
->>     the broken parts.  The next commits will fix them up, and drop the
->>     skipping.
->>    =20
->>     Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>     Reviewed-by: Eric Blake <eblake@redhat.com>
->>     Message-Id: <1443689999-12182-8-git-send-email-armbru@redhat.com>
->>=20
->> Now let's examine device "mac_via".  It defines properties both in its
->> .class_init() and its .instance_init().
->>=20
->>     static void mac_via_class_init(ObjectClass *oc, void *data)
->>     {
->>         DeviceClass *dc =3D DEVICE_CLASS(oc);
->>=20
->>         dc->realize =3D mac_via_realize;
->>         dc->reset =3D mac_via_reset;
->>         dc->vmsd =3D &vmstate_mac_via;
->> --->    device_class_set_props(dc, mac_via_properties);
->>     }
->>=20
->> where
->>=20
->>     static Property mac_via_properties[] =3D {
->>         DEFINE_PROP_DRIVE("drive", MacVIAState, blk),
->>         DEFINE_PROP_END_OF_LIST(),
->>     };
->>=20
->> And
->>=20
->>     static void mac_via_init(Object *obj)
->>     {
->>         SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->>         MacVIAState *m =3D MAC_VIA(obj);
->>         MOS6522State *ms;
->>=20
->>         /* MMIO */
->>         memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
->>         sysbus_init_mmio(sbd, &m->mmio);
->>=20
->>         memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
->>                               &m->mos6522_via1, "via1", VIA_SIZE);
->>         memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
->>=20
->>         memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
->>                               &m->mos6522_via2, "via2", VIA_SIZE);
->>         memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
->>=20
->>         /* ADB */
->>         qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
->>                             TYPE_ADB_BUS, DEVICE(obj), "adb.0");
->>=20
->>         /* Init VIAs 1 and 2 */
->>         sysbus_init_child_obj(OBJECT(m), "via1", &m->mos6522_via1,
->>                               sizeof(m->mos6522_via1), TYPE_MOS6522_Q800=
-_VIA1);
->>         sysbus_init_child_obj(OBJECT(m), "via2", &m->mos6522_via2,
->>                               sizeof(m->mos6522_via2), TYPE_MOS6522_Q800=
-_VIA2);
->>=20
->>         /* Pass through mos6522 output IRQs */
->>         ms =3D MOS6522(&m->mos6522_via1);
->>         object_property_add_alias(OBJECT(m), "irq[0]", OBJECT(ms),
->>                                   SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>         ms =3D MOS6522(&m->mos6522_via2);
->>         object_property_add_alias(OBJECT(m), "irq[1]", OBJECT(ms),
->>                                   SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_a=
-bort);
->>     }
->>=20
->> Resulting help:
->>=20
->>   adb.0=3D<child<apple-desktop-bus>>
->>   drive=3D<str>            - Node name or ID of a block device to use as=
- a backend
->>   irq[0]=3D<link<irq>>
->>   irq[1]=3D<link<irq>>
->>   mac-via[0]=3D<child<qemu:memory-region>>
->>   via1=3D<child<mos6522-q800-via1>>
->>   via1[0]=3D<child<qemu:memory-region>>
->>   via2=3D<child<mos6522-q800-via2>>
->>   via2[0]=3D<child<qemu:memory-region>>
->>=20
->> Observe that mac_via_init() has obvious side effects.  In particular, it
->> creates two devices that are then visible in "info qtree", and that's
->> caught by device-introspect-test.
->>=20
->> I believe these things need to be done in .realize().
->
-> Thanks for the detailed explanation, Markus. I had to re-read this severa=
-l times to
-> think about the different scenerios that could occur here.
->
-> From what you are saying above, my understanding is that the only thing t=
-hat
-> .instance_init() should do is add properties, so I can see that this work=
-s fine for
-> value properties and MemoryRegions. How would this would for reference pr=
-operties
-> such as gpios and links? Presumably these should be defined in .instance_=
-init() but
-> not connected until .realize()?
+Input policy can be "accept" (accept silently), or "reject" (reject
+the request with an error).
 
-Please understand that I'm operating at the limit of my expertise.  I
-might be talking nonsense.  Paolo seems to have a different opinion.  We
-need to reach some kind of common understanding of how QOM is supposed
-to be used.  Without that, we'll continue to fail at teaching it to its
-"mere" users.  Hopefully, this thread can get us a bit closer.
+Output policy can be "accept" (pass on unchanged), or "hide" (filter
+out the deprecated parts).
 
-Back to your question.  I think .instance_init() may do quite a bit more
-than adding properties.  What it must avoid is visible side effects, in
-particular guest-visible ones.
+Default is "accept".  Policies other than "accept" are implemented
+later in this series.
 
-With the right tools, you should be able to wire together components
-into a device in .instance_init(), exposing the complex device's
-properties.  Then make the complex device "visible" in .realize().
+For now, -compat covers only syntactic aspects of QMP, i.e. stuff
+tagged with feature 'deprecated'.  We may want to extend it to cover
+semantic aspects, CLI, and experimental features.
 
-Making "visible" is what .realize() is meant to do.  In unrealized
-state, devices have a ghost-like, "unreal" nature.  They must not affect
-the "real" stuff, like the machine and its (realized) devices.  Only
-.realize() makes them "real".
+The option is experimental.
 
-One of the reasons for having this unrealized state is letting you build
-complex devices without having to worry about exposing it to "real"
-stuff in incomplete states.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/compat.json             | 51 ++++++++++++++++++++++++++++++++++++
+ qapi/qapi-schema.json        |  1 +
+ include/qapi/compat-policy.h | 20 ++++++++++++++
+ qapi/qmp-dispatch.c          |  3 +++
+ softmmu/vl.c                 | 17 ++++++++++++
+ qapi/Makefile.objs           |  8 +++---
+ qemu-options.hx              | 20 ++++++++++++++
+ 7 files changed, 116 insertions(+), 4 deletions(-)
+ create mode 100644 qapi/compat.json
+ create mode 100644 include/qapi/compat-policy.h
 
-> If this is the case then how should object_property_add_alias() work sinc=
-e that not
-> only defines the property but also links to another object? qdev has a se=
-parate
-> concept of defining connectors vs. connecting them which feels like it wo=
-uld fit this
-> pattern.
-
-Clearer now?
-
->> Second question: why doesn't it break elsewhere?
->>=20
->> We have >200 calls of sysbus_init_child_obj() in some 40 files.  I'm
->> arbitrarily picking hw/arm/allwinner-a10.c for a closer look.
->>=20
->> It calls it from device allwinner-a10's .instance_init() method
->> aw_a10_init().  Side effect, clearly wrong.
->>=20
->> But why doesn't it break device-introspect-test?  allwinner-a10 is a
->> direct sub-type of TYPE_DEVICE.  Neither "info qtree" nor "info
->> qom-tree" know how to show these.
->>=20
->> Perhaps the side effect is visible if I peek into QOM with just the
->> right qom-list command.  Tell me, and I'll try to tighten
->> device-introspect-test accordingly.
->>=20
->>=20
->> Root cause of this issue: nobody knows how to use QOM correctly (first
->> order approximation).  In particular, people are perenially confused on
->> how to split work between .instance_init() and .realize().  We really,
->> really, really need to provide some guidance there!  Right now, all we
->> provide are hundreds of examples, many of them bad.
->
-> I certainly understand now why sysbus_init_child_obj() is wrong. Is there=
- any way to
-> detect this around object_new()/realize()? Perhaps take a snapshot of pro=
-perties
-> after object_new(), the same again after realize() and then write a warni=
-ng to stderr
-> if there are any differences? It would make issues like this more visible=
- than they
-> would be in device-introspect-test.
-
-First we have to figure out what the actual rules are.  Then we can look
-for better ways to prevent and catch mistakes.
+diff --git a/qapi/compat.json b/qapi/compat.json
+new file mode 100644
+index 0000000000..fd6f8e932c
+--- /dev/null
++++ b/qapi/compat.json
+@@ -0,0 +1,51 @@
++# -*- Mode: Python -*-
++
++##
++# =3D Compatibility policy
++##
++
++##
++# @CompatPolicyInput:
++#
++# Policy for handling "funny" input.
++#
++# @accept: Accept silently
++# @reject: Reject with an error
++#
++# Since: 5.0
++##
++{ 'enum': 'CompatPolicyInput',
++  'data': [ 'accept', 'reject' ] }
++
++##
++# @CompatPolicyOutput:
++#
++# Policy for handling "funny" output.
++#
++# @accept: Pass on unchanged
++# @hide: Filter out
++#
++# Since: 5.0
++##
++{ 'enum': 'CompatPolicyOutput',
++  'data': [ 'accept', 'hide' ] }
++
++##
++# @CompatPolicy:
++#
++# Policy for handling deprecated management interfaces.
++#
++# This is intended for testing users of the management interfaces.
++#
++# Limitation: covers only syntactic aspects of QMP, i.e. stuff tagged
++# with feature 'deprecated'.  We may want to extend it to cover
++# semantic aspects, CLI, and experimental features.
++#
++# @deprecated-input: how to handle deprecated input (default 'accept')
++# @deprecated-output: how to handle deprecated output (default 'accept')
++#
++# Since: 5.0
++##
++{ 'struct': 'CompatPolicy',
++  'data': { '*deprecated-input': 'CompatPolicyInput',
++            '*deprecated-output': 'CompatPolicyOutput' } }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 43b0ba0dea..f575b76d81 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -75,6 +75,7 @@
+ { 'include': 'migration.json' }
+ { 'include': 'transaction.json' }
+ { 'include': 'trace.json' }
++{ 'include': 'compat.json' }
+ { 'include': 'control.json' }
+ { 'include': 'introspect.json' }
+ { 'include': 'qom.json' }
+diff --git a/include/qapi/compat-policy.h b/include/qapi/compat-policy.h
+new file mode 100644
+index 0000000000..8efb2c58aa
+--- /dev/null
++++ b/include/qapi/compat-policy.h
+@@ -0,0 +1,20 @@
++/*
++ * Policy for handling "funny" management interfaces
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#ifndef QAPI_COMPAT_POLICY_H
++#define QAPI_COMPAT_POLICY_H
++
++#include "qapi/qapi-types-compat.h"
++
++extern CompatPolicy compat_policy;
++
++#endif
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index fb53687ce9..80beab517f 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -12,6 +12,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/dispatch.h"
+ #include "qapi/qmp/qdict.h"
+@@ -19,6 +20,8 @@
+ #include "sysemu/runstate.h"
+ #include "qapi/qmp/qbool.h"
+=20
++CompatPolicy compat_policy;
++
+ static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oo=
+b,
+                                      QObject **id, Error **errp)
+ {
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index ff2685dff8..74eb43d114 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -27,6 +27,7 @@
+ #include "qemu/units.h"
+ #include "hw/boards.h"
+ #include "hw/qdev-properties.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qemu-version.h"
+ #include "qemu/cutils.h"
+@@ -105,6 +106,7 @@
+ #include "sysemu/replay.h"
+ #include "qapi/qapi-events-run-state.h"
+ #include "qapi/qapi-visit-block-core.h"
++#include "qapi/qapi-visit-compat.h"
+ #include "qapi/qapi-visit-ui.h"
+ #include "qapi/qapi-commands-block-core.h"
+ #include "qapi/qapi-commands-run-state.h"
+@@ -3749,6 +3751,21 @@ void qemu_init(int argc, char **argv, char **envp)
+                     qemu_opt_get_bool(opts, "mem-lock", false);
+                 enable_cpu_pm =3D qemu_opt_get_bool(opts, "cpu-pm", false)=
+;
+                 break;
++            case QEMU_OPTION_compat:
++                {
++                    CompatPolicy *opts;
++                    Visitor *v;
++
++                    v =3D qobject_input_visitor_new_str(optarg, NULL,
++                                                      &error_fatal);
++
++                    visit_type_CompatPolicy(v, NULL, &opts, &error_fatal);
++                    QAPI_CLONE_MEMBERS(CompatPolicy, &compat_policy, opts)=
+;
++
++                    qapi_free_CompatPolicy(opts);
++                    visit_free(v);
++                    break;
++                }
+             case QEMU_OPTION_msg:
+                 opts =3D qemu_opts_parse_noisily(qemu_find_opts("msg"), op=
+targ,
+                                                false);
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index 4673ab7490..a3de2e2756 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -5,10 +5,10 @@ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
+ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
+=20
+-QAPI_COMMON_MODULES =3D audio authz block-core block char common control c=
+rypto
+-QAPI_COMMON_MODULES +=3D dump error introspect job machine migration misc
+-QAPI_COMMON_MODULES +=3D net pragma qdev qom rdma rocker run-state sockets=
+ tpm
+-QAPI_COMMON_MODULES +=3D trace transaction ui
++QAPI_COMMON_MODULES =3D audio authz block-core block char common compat
++QAPI_COMMON_MODULES +=3D control crypto dump error introspect job
++QAPI_COMMON_MODULES +=3D machine migration misc net pragma qdev qom rdma
++QAPI_COMMON_MODULES +=3D rocker run-state sockets tpm trace transaction ui
+ QAPI_TARGET_MODULES =3D machine-target misc-target
+ QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 1d8f852d89..5459e6c94c 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3357,6 +3357,26 @@ DEFHEADING()
+=20
+ DEFHEADING(Debug/Expert options:)
+=20
++DEF("compat", HAS_ARG, QEMU_OPTION_compat,
++    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
+t|hide]\n"
++    "                Policy for handling deprecated management interfaces\=
+n",
++    QEMU_ARCH_ALL)
++SRST
++``-compat [deprecated-input=3D@var{input-policy}][,deprecated-output=3D@va=
+r{output-policy}]``
++    Set policy for handling deprecated management interfaces (experimental=
+):
++
++    ``deprecated-input=3Daccept`` (default)
++        Accept deprecated commands and arguments
++    ``deprecated-input=3Dreject``
++        Reject deprecated commands and arguments
++    ``deprecated-output=3Daccept`` (default)
++        Emit deprecated command results and events
++    ``deprecated-output=3Dhide``
++        Suppress deprecated command results and events
++
++    Limitation: covers only syntactic aspects of QMP.
++ERST
++
+ DEF("fw_cfg", HAS_ARG, QEMU_OPTION_fwcfg,
+     "-fw_cfg [name=3D]<name>,file=3D<file>\n"
+     "                add named fw_cfg entry with contents from file\n"
+--=20
+2.21.1
 
 
