@@ -1,60 +1,106 @@
-Return-Path: <SRS0=i8Yf=47=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=WIOf=5A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A760DC0044D
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 23:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6AAC0044D
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 00:13:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62C6C221EB
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Mar 2020 23:53:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62C6C221EB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 1806020848
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 00:13:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DjOBiWdu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1806020848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDGbK-0004Pf-Il
-	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 19:53:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44537)
+	id 1jDGud-0008JT-8F
+	for qemu-devel@archiver.kernel.org; Sat, 14 Mar 2020 20:13:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jDGab-0003vH-6j
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 19:53:10 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jDGtk-0007ux-7z
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 20:12:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jDGaZ-0002Fn-SS
- for qemu-devel@nongnu.org; Sat, 14 Mar 2020 19:53:09 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:35498)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jDGaT-0001s7-2S; Sat, 14 Mar 2020 19:53:04 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 1C574747E0F;
- Sun, 15 Mar 2020 00:52:51 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D9545747E04; Sun, 15 Mar 2020 00:52:49 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id D74E9747DF8;
- Sun, 15 Mar 2020 00:52:49 +0100 (CET)
-Date: Sun, 15 Mar 2020 00:52:49 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 2/8] hw/ide: Get rid of piix4_init function
-In-Reply-To: <15adeb31-4bbc-0c98-4707-4f6b6c13498a@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003150038340.41905@zero.eik.bme.hu>
-References: <cover.1584134074.git.balaton@eik.bme.hu>
- <3240656814c804513de08bdbbf318f2f590df241.1584134074.git.balaton@eik.bme.hu>
- <15adeb31-4bbc-0c98-4707-4f6b6c13498a@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <liran.alon@oracle.com>) id 1jDGti-0006Kb-Lf
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 20:12:55 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:33530)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jDGti-0006DV-Bv
+ for qemu-devel@nongnu.org; Sat, 14 Mar 2020 20:12:54 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02F09qY6032180;
+ Sun, 15 Mar 2020 00:12:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=S6jEfHrVvbO5I6HY/l0fxoISiIgNbxknc9y32dqtf1s=;
+ b=DjOBiWduxH+4rCBEfQUu81nyJ5xyiN152zS9TvfWgKMwTdPx6Rwaj8vXc4UNBlMSekjB
+ cUVAsb64R4XDrkZsxFRpNGFcMgyMQnkr9lWRfkhplE0dwT+qr04aItwRHQ5tc9iBlJgx
+ iRHq2T16lOTFG2n8cl8n3FU1Y4U3ZArrq5nJAKkwV2F9K805fNaOmvWPXG/Y7OiOm9sl
+ Ih1OPBhMyeYiJx+buC8lnBI9bu2pQrJ9X+BPVbiUECyyDb1DtI9Vw1slFg4xE6m+ULp8
+ LA7pMccsGidi+gxUkOLWzKnDQxZTnqrJJFALXcn13XAq7anhyhc6CtWnvDjSyWZrSjQd vw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2yrqwmss6q-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 15 Mar 2020 00:12:47 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02F02HsK117547;
+ Sun, 15 Mar 2020 00:10:47 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 2ys8r9a9sj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 15 Mar 2020 00:10:47 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02F0AkXU020552;
+ Sun, 15 Mar 2020 00:10:46 GMT
+Received: from [192.168.14.112] (/79.179.237.174)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Sat, 14 Mar 2020 17:10:45 -0700
+Subject: Re: [PATCH v3 15/16] hw/i386/vmport: Add support for CMD_GETHZ
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200312165431.82118-1-liran.alon@oracle.com>
+ <20200312165431.82118-16-liran.alon@oracle.com>
+ <97784452-8270-e0ab-1164-d3a9fe567006@redhat.com>
+ <5a1a347a-102d-2c1e-bb27-e5b05408eb4a@oracle.com>
+ <20200314174536-mutt-send-email-mst@kernel.org>
+From: Liran Alon <liran.alon@oracle.com>
+Message-ID: <3bbb8216-41f5-c9dd-1c29-1b9409305417@oracle.com>
+Date: Sun, 15 Mar 2020 02:10:41 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-2131226626-1584229969=:41905"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20200314174536-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ bulkscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003140131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9560
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 mlxlogscore=999
+ mlxscore=0 bulkscore=0 phishscore=0 spamscore=0 suspectscore=0
+ malwarescore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003140131
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
+ 02F09qY6032180
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,138 +112,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Nikita Leshenko <nikita.leshchenko@oracle.com>, pbonzini@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---3866299591-2131226626-1584229969=:41905
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, 14 Mar 2020, Philippe Mathieu-Daud=E9 wrote:
-> On 3/13/20 10:14 PM, BALATON Zoltan wrote:
->> This removes pci_piix4_ide_init() function similar to clean up done to
->> other ide devices.
->>=20
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>   hw/ide/piix.c    | 12 +-----------
->>   hw/isa/piix4.c   |  5 ++++-
->>   include/hw/ide.h |  1 -
->>   3 files changed, 5 insertions(+), 13 deletions(-)
->>=20
->> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
->> index 8bcd6b72c2..3b2de4c312 100644
->> --- a/hw/ide/piix.c
->> +++ b/hw/ide/piix.c
->> @@ -208,17 +208,6 @@ static void pci_piix_ide_exitfn(PCIDevice *dev)
->>       }
->>   }
->>   -/* hd_table must contain 4 block drivers */
->> -/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
->> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int=20
->> devfn)
->> -{
->> -    PCIDevice *dev;
->> -
->> -    dev =3D pci_create_simple(bus, devfn, "piix4-ide");
->> -    pci_ide_create_devs(dev, hd_table);
->> -    return dev;
->> -}
->> -
->>   /* NOTE: for the PIIX3, the IRQs and IOports are hardcoded */
->>   static void piix3_ide_class_init(ObjectClass *klass, void *data)
->>   {
->> @@ -247,6 +236,7 @@ static const TypeInfo piix3_ide_xen_info =3D {
->>       .class_init    =3D piix3_ide_class_init,
->>   };
->>   +/* NOTE: for the PIIX4, the IRQs and IOports are hardcoded */
->>   static void piix4_ide_class_init(ObjectClass *klass, void *data)
->>   {
->>       DeviceClass *dc =3D DEVICE_CLASS(klass);
->> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
->> index 7edec5e149..0ab4787658 100644
->> --- a/hw/isa/piix4.c
->> +++ b/hw/isa/piix4.c
->> @@ -35,6 +35,7 @@
->>   #include "hw/timer/i8254.h"
->>   #include "hw/rtc/mc146818rtc.h"
->>   #include "hw/ide.h"
->> +#include "hw/ide/pci.h"
->>   #include "migration/vmstate.h"
->>   #include "sysemu/reset.h"
->>   #include "sysemu/runstate.h"
->> @@ -255,10 +256,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABu=
-s=20
->> **isa_bus,
->>           *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
->>       }
->>   +    pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide")=
-;
+On 14/03/2020 23:52, Michael S. Tsirkin wrote:
+> On Sat, Mar 14, 2020 at 12:44:55AM +0200, Liran Alon wrote:
+>> On 13/03/2020 22:07, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 3/12/20 5:54 PM, Liran Alon wrote:
+>>>> diff --git a/include/hw/i386/vmport.h b/include/hw/i386/vmport.h
+>>>> index 34cc050b1ffa..aee809521aa0 100644
+>>>> --- a/include/hw/i386/vmport.h
+>>>> +++ b/include/hw/i386/vmport.h
+>>>> @@ -12,6 +12,7 @@ typedef enum {
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_DATA=C2=A0=C2=A0=C2=
+=A0=C2=A0 =3D 39,
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_STATUS=C2=A0=C2=A0=
+ =3D 40,
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMPORT_CMD_VMMOUSE_COMMAND=C2=A0 =3D=
+ 41,
+>>>> +=C2=A0=C2=A0=C2=A0 VMPORT_CMD_GETHZ=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 45,
+>>> Can you rename to something easier to read, such _GET_FREQS_HZ or nic=
+er?
+>>>
+>> I actually prefer to stick with names similar to open-vm-tools. i.e. S=
+imilar
+>> to the definitions in lib/include/backdoor_def.h.
+> Please, do not copy without attribution. It really applies everywhere,
+> I commented on another enum and you fixed it there, but please
+> go over your code and try to generally apply the same rules.
+This is not a copy of the enum as the other case you replied on.
+It's just names "inspired" or "similar" to original names. They are not=20
+even the same.
 >
-> Why are you re-assigning 'pci'?
-
-Need a place to store it to pass to pci_ide_create_devs below and pci is=20
-unused at this point so it can be reused for this.  (The variable pci=20
-pointing to a PCIDevice was only used at the beginning of the function to=
-=20
-cast to dev then it's not needed any more.) Since this is very short func=
-=20
-and the reassign is right after its previous usage this should not be too=
-=20
-confusing and avoids needing to define another only once used variable fo=
-t=20
-this. See also patch 6 (http://patchwork.ozlabs.org/patch/1254687/) that=20
-simplifies it further.
-
-We could also do without this variable and write:
-
-dev =3D DEVICE(pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
-              true, TYPE_PIIX4_PCI_DEVICE));
-
-or after patch 6 even
-
-pci_ide_create_devs(pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide=
-"));
-
-but I think those are less readable than reusing variable pci here.
-
-Regards,
-BALATON Zoltan
-
->>       hd =3D g_new(DriveInfo *, ide_drives);
->>       ide_drive_get(hd, ide_drives);
->> -    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
->> +    pci_ide_create_devs(pci, hd);
->>       g_free(hd);
->> +
->>       pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
->>       if (smbus) {
->>           *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
->> diff --git a/include/hw/ide.h b/include/hw/ide.h
->> index 883bbaeb9b..21bd8f23f1 100644
->> --- a/include/hw/ide.h
->> +++ b/include/hw/ide.h
->> @@ -12,7 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int=
-=20
->> iobase2, int isairq,
->>                           DriveInfo *hd0, DriveInfo *hd1);
->>     /* ide-pci.c */
->> -PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int=20
->> devfn);
->>   int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
->>     /* ide-mmio.c */
->>=20
+>> This helps correlates a command in QEMU code to guest code (in
+>> open-vm-tools) that interacts with it.
+>> I can rename to just VMPORT_CMD_GET_HZ (Similar to what you suggested =
+for
+>> previous commands).
+>> But I don't have a strong opinion on this. If you still think _GET_FRE=
+Q_HZ
+>> is preferred, I will rename to that.
+>>
+>> -Liran
 >
+> Generally I don't think a hard to read code somewhere is a good reason
+> to have hard to read code in QEMU, especially since it tends to
+> proliferate.  It seems unlikely that VMPORT_CMD_GETHZ appears verbatim
+> anywhere, and applying transformation rules is just too tricky. The bes=
+t
+> way to map host code to guest code in light of coding style differences
+> etc is using comments. You did it in case of the type values, it
+> applies equally here.
 >
---3866299591-2131226626-1584229969=:41905--
+Honestly, even though I used slightly different names than original=20
+open-vm-tools code, I think it's quite trivial to coorelate.
+Both by similar name (not same), by value and by function. That's why I=20
+don't have a strong opinion about the name.
+I think VMPORT_CMD_GET_HZ is sufficient, but honestly I would name it=20
+however you want. I really don't care.
+
+I don't think any special comment is necessary here for correlation. But=20
+I don't mind putting above enum a general comment such as:
+/* See open-vm-tools lib/include/backdoor_def.h to match these to guest=20
+commands */
+
+-Liran
+
+
 
