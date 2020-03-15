@@ -6,76 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A22A8C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C74BC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71F9A206B1
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A5FF206B1
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 14:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UofLmJ9z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F9A206B1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BbDULXQd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A5FF206B1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDUdq-0002TZ-FW
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 10:53:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40277)
+	id 1jDUdt-0002V6-2R
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 10:53:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDUXd-0005Wk-LG
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDUXg-0005X1-Be
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDUXc-0002BN-7w
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58267
+ (envelope-from <armbru@redhat.com>) id 1jDUXd-0002IY-FM
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44454
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXc-00029B-01
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:00 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDUXd-0002GJ-6c
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 10:47:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584283619;
+ s=mimecast20190719; t=1584283620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sW04fih2YXTfS8CLtTbDLCV2JzUFAWR4o8w8PMjp12g=;
- b=UofLmJ9zw5DAEBx8DT+zyVSVYuRGMTUMhBXFeR+KgaekWKSWVqMSzlAf6AJ2rRPCM1zoKS
- ngXM+0GkUkJTClMsnnng86eISWMZkM6RnmJBx3MSBjn/NKz5HwNs5PHqIQZwQOHgUSA+zM
- 8f4ymv+KOMoqJnEcuNOdKRbNzM+665M=
+ bh=rbSWSFCqRg7Dyhwyu1gGZIgG7CVGvmA7JcPtABc7N4A=;
+ b=BbDULXQdcAQ0yCGYhXVlxr2NPSUkpe6eAh4Xtq3plH2LyeBlvn86kni0Yj4hF8PbzD4qbV
+ tKWpIGDwpGNc5KHEj1NMocZihy+/sVM4bX4RCoE8KzCljxtRs19SurqCN33NyQZ5m6Mir1
+ 43TLK3MiTP9D/xMKIcIKgHJ4XhHkKfY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-Q6eTv26JNxuHx-aOOG0rbA-1; Sun, 15 Mar 2020 10:46:57 -0400
-X-MC-Unique: Q6eTv26JNxuHx-aOOG0rbA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-123-QJ-6pjz_MqevZCib13yufA-1; Sun, 15 Mar 2020 10:46:59 -0400
+X-MC-Unique: QJ-6pjz_MqevZCib13yufA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9F4B100550D;
- Sun, 15 Mar 2020 14:46:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F9E813F5;
+ Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
  [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 78DDD91D88;
- Sun, 15 Mar 2020 14:46:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FD7960C81;
+ Sun, 15 Mar 2020 14:46:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 87E1D11366DB; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
+ id BC12411358C9; Sun, 15 Mar 2020 15:46:53 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/34] tests/test-qmp-cmds: Check responses more thoroughly
-Date: Sun, 15 Mar 2020 15:46:25 +0100
-Message-Id: <20200315144653.22660-7-armbru@redhat.com>
+Subject: [PATCH v3 22/34] qapi: Simplify how qmp_dispatch() deals with
+ QCO_NO_SUCCESS_RESP
+Date: Sun, 15 Mar 2020 15:46:41 +0100
+Message-Id: <20200315144653.22660-23-armbru@redhat.com>
 In-Reply-To: <20200315144653.22660-1-armbru@redhat.com>
 References: <20200315144653.22660-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,78 +96,68 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-qmp-cmds.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ qapi/qmp-dispatch.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index b31064b064..464b370189 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -151,9 +151,10 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
-_oob)
-     QObject *ret;
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index a588072523..550d1fe8d2 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -106,7 +106,7 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *requ=
+est,
+     QDict *dict =3D qobject_to(QDict, request);
+     QObject *id =3D dict ? qdict_get(dict, "id") : NULL;
+     QObject *ret =3D NULL;
+-    QDict *rsp;
++    QDict *rsp =3D NULL;
 =20
-     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
--    g_assert(resp && !qdict_haskey(resp, "error"));
-+    g_assert(resp);
-     ret =3D qdict_get(resp, "return");
-     g_assert(ret);
-+    g_assert(qdict_size(resp) =3D=3D 1);
+     dict =3D qmp_dispatch_check_obj(request, allow_oob, &err);
+     if (!dict) {
+@@ -151,31 +151,32 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *re=
+quest,
+         args =3D qdict_get_qdict(dict, "arguments");
+         qobject_ref(args);
+     }
+-
+     cmd->fn(args, &ret, &err);
++    qobject_unref(args);
+     if (err) {
+-        ;
+-    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
++        goto out;
++    }
++
++    if (cmd->options & QCO_NO_SUCCESS_RESP) {
+         g_assert(!ret);
++        return NULL;
+     } else if (!ret) {
+         /* TODO turn into assertion */
+         ret =3D QOBJECT(qdict_new());
+     }
 =20
-     qobject_ref(ret);
-     qobject_unref(resp);
-@@ -163,9 +164,17 @@ static QObject *do_qmp_dispatch(QDict *req, bool allow=
-_oob)
- static void do_qmp_dispatch_error(QDict *req, bool allow_oob, ErrorClass c=
-ls)
- {
-     QDict *resp;
-+    QDict *error;
+-    qobject_unref(args);
++    rsp =3D qdict_new();
++    qdict_put_obj(rsp, "return", ret);
 =20
-     resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
--    g_assert(resp && qdict_haskey(resp, "error"));
-+    g_assert(resp);
-+    error =3D qdict_get_qdict(resp, "error");
-+    g_assert(error);
-+    g_assert_cmpstr(qdict_get_try_str(error, "class"),
-+                    =3D=3D, QapiErrorClass_str(cls));
-+    g_assert(qdict_get_try_str(error, "desc"));
-+    g_assert(qdict_size(error) =3D=3D 2);
-+    g_assert(qdict_size(resp) =3D=3D 1);
+ out:
+     if (err) {
++        assert(!rsp);
+         rsp =3D qmp_error_response(err);
+-    } else if (ret) {
+-        rsp =3D qdict_new();
+-        qdict_put_obj(rsp, "return", ret);
+-    } else {
+-        /* Can only happen for commands with QCO_NO_SUCCESS_RESP */
+-        rsp =3D NULL;
+     }
 =20
-     qobject_unref(resp);
- }
-@@ -174,11 +183,12 @@ static void do_qmp_dispatch_error(QDict *req, bool al=
-low_oob, ErrorClass cls)
- static void test_dispatch_cmd(void)
- {
-     QDict *req =3D qdict_new();
--    QObject *ret;
-+    QDict *ret;
+-    if (rsp && id) {
++    assert(rsp);
++
++    if (id) {
+         qdict_put_obj(rsp, "id", qobject_ref(id));
+     }
 =20
-     qdict_put_str(req, "execute", "user_def_cmd");
-=20
--    ret =3D do_qmp_dispatch(req, false);
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(req, false));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-=20
-     qobject_unref(ret);
-     qobject_unref(req);
-@@ -187,11 +197,12 @@ static void test_dispatch_cmd(void)
- static void test_dispatch_cmd_oob(void)
- {
-     QDict *req =3D qdict_new();
--    QObject *ret;
-+    QDict *ret;
-=20
-     qdict_put_str(req, "exec-oob", "test-flags-command");
-=20
--    ret =3D do_qmp_dispatch(req, true);
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(req, true));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-=20
-     qobject_unref(ret);
-     qobject_unref(req);
 --=20
 2.21.1
 
