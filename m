@@ -7,88 +7,89 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D60C9C10DCE
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 20:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A542C10DCE
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 20:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51D1020578
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 20:29:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03A6220658
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Mar 2020 20:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RucN+341"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51D1020578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EnV4etuk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A6220658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDZtN-0001Wz-04
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 16:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45238)
+	id 1jDa0V-0003Qb-Vn
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 16:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDZiK-0006T9-Ff
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:25 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDZie-0006ec-UD
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDZiJ-0001lc-FT
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:24 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:52648)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDZid-0003Uh-VN
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:44 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38835)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDZiJ-0001h4-7k
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:23 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id ng8so29660pjb.2
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 13:18:23 -0700 (PDT)
+ id 1jDZid-0003Pv-Oj
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 16:18:43 -0400
+Received: by mail-pl1-x642.google.com with SMTP id w3so6950343plz.5
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 13:18:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=hUbgdJ8axJNBUNavUWRYwmcrmlXlzsQv8v+AhElMzek=;
- b=RucN+341Pl+98/KvSN2eY+qezA3vEcRqE3AjB/4Rf63S2hr0bM1rExlB/XwbFI90Me
- PLuAgBlYSqSlG+txsaNPVK3kQ2llL7+IN5V4DZmAaK+zMxftjvQnJW4pp0rHOingxnrg
- xMkbNgie2vhRQz5iSBV7JWSnzmifnS2fK5fV9olR3ZFWtsd+4ROSnoA6jAIiBaas7gUN
- PcNI3b9bk02PC94xkf35OjROnsQfuy8lVvjn3IRml69T3pk+ROUV7G67+4leH/IEnfHY
- wlKay4tNAuAXWtw0EcI/0jkPhih2eba287kF6byYGHOPcwqPT8V/51q6/O4mb5ZZmvlu
- pB7A==
+ bh=tPwZ4NakikcOwfVAMZAy1h09eFvA6fIiEKchL4XH/+c=;
+ b=EnV4etukqVd7OmLP+BhkKk8weN8D0vlQZVmEMHx2UrDW+rZucpSJSrh/XBSneukxxn
+ ir1riOfWIyVKivQ5ia64PwezK8pVNUAOOJl0Ab1j3JfmoQPCZ/QlwV1YF/mbKh+AmXQy
+ QIw4e49PD/gktjD1GyL35NWim+pYdKnFYkeG5CxPUJi7scrnCgsm63oIxM6SoHkKaAD9
+ Wkjh/bu8C4kfTTbl99s/kRehq2dhw6EYlJhuiL2luKb3Vi8GOeVuwKkgA68kjJAiMyD1
+ gIaMReDynxRKdvNGF6jGWa0Tnt43WiO4yFRKckt6XOeg1ENqOifVdbuU+gasgRZzlpOI
+ waag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hUbgdJ8axJNBUNavUWRYwmcrmlXlzsQv8v+AhElMzek=;
- b=ozHYjcgXW65q3ldXZjWKslc9UyE/HxsrnQIjMbqyj1RuzSvcLgyktHkO17/MOD8IYz
- ZRyyOly3YAay5FI2DhUC6Cfp2Mt3Ha12NdzlkLjfRsOtX1jEG4CNXkfjml+0utqNOEdh
- zlNujdDHPB9lZwzOCy7ql2msaFABjDzPU8KjXGWpjB00oVwIfQgvkvra26W0DOI3tGzT
- z0GEbHejQwjxhDOoe33eiGT0xU//vdGcm3loYlDCYiyxM0OposPchoSfEOWVi/W9POrT
- dlvkqg9if6ZTXNqrKAI+l+zW2kXyernRa495H2CQQ3AcM9FXaJ7MSmVQ6kNGlbQUZhkZ
- iVlg==
-X-Gm-Message-State: ANhLgQ1PtMpdV0CfefB8z/mUdCzzqrutQNZvu4pS15V4MgpFSW+R10nt
- ZxnrmB+2kzjEsCucX5tsdqUVrg==
-X-Google-Smtp-Source: ADFU+vs/addkmQN34sUVbe/KT4pAtgwLGl2LIxE4JatwXayNepsIoE1ea57z4d0zFfseanAvIUJJ8A==
-X-Received: by 2002:a17:90a:e2c4:: with SMTP id
- fr4mr21482382pjb.91.1584303502400; 
- Sun, 15 Mar 2020 13:18:22 -0700 (PDT)
+ bh=tPwZ4NakikcOwfVAMZAy1h09eFvA6fIiEKchL4XH/+c=;
+ b=Fr16NYV5zha14FXqYZoIsmlwndeFMU4mpaA3HW8RO9xMIMGWM1TUjGpDOB0NVEGwVF
+ dJbWVHx/28g9PboAgjarSEgmE9u908CiVV1yH/wo8T7c3LyJM9GqC3NplSTOWRcb1g7K
+ AqY+5K+Tab0Za9Q3uTbPC2SAS+Imd00BCvFaqb0CCMv1x/tTIewd9nvh9lOikRxSMAnb
+ 0BxNrxc6usOa7JL9fuw1EBAkbb6fx4LYwTdO97baOO8rROsLTQ3vFGUK6iF6p1rwAWR2
+ 0lftYVDFAZ3ZEjU/k1zAunWF2aFl5y2OYcmd4naw/f7Qi6UZBo6dT8DGwm7EQXueW0E1
+ RUSQ==
+X-Gm-Message-State: ANhLgQ091ZYjjpojWGNm3zKNtXfpJqBLr1u1c/cXGnxw00egY+cvWkW+
+ EYj/PCXiV3UVBM92DAumfUdy5A==
+X-Google-Smtp-Source: ADFU+vvoMqGceWF21tpQ/ru1JYPityst91oYzA5zXFpXLbhVxqkhKFjGKFGAdvC8Uj0oaFXbnNX6eg==
+X-Received: by 2002:a17:902:6bc3:: with SMTP id
+ m3mr23984325plt.27.1584303522679; 
+ Sun, 15 Mar 2020 13:18:42 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- f17sm51074460pge.48.2020.03.15.13.18.21
+ k5sm17444826pju.29.2020.03.15.13.18.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 15 Mar 2020 13:18:21 -0700 (PDT)
-Subject: Re: [PATCH 06/14] util/Makefile: Reduce the user-mode object list
+ Sun, 15 Mar 2020 13:18:42 -0700 (PDT)
+Subject: Re: [PATCH 07/14] target/riscv/cpu: Restrict CPU migration to
+ system-mode
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200313183652.10258-1-philmd@redhat.com>
- <20200313183652.10258-7-philmd@redhat.com>
+ <20200313183652.10258-8-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d20dc940-1d2d-eed8-3240-9cf28b55d6a7@linaro.org>
-Date: Sun, 15 Mar 2020 13:18:19 -0700
+Message-ID: <ffd75cb7-4b80-f098-59e2-7c24f0e03288@linaro.org>
+Date: Sun, 15 Mar 2020 13:18:39 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200313183652.10258-7-philmd@redhat.com>
+In-Reply-To: <20200313183652.10258-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,12 +118,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/13/20 11:36 AM, Philippe Mathieu-Daudé wrote:
-> These stubs are not required when configured with --disable-system.
-> 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  util/Makefile.objs | 59 +++++++++++++++++++++++++++++-----------------
->  1 file changed, 38 insertions(+), 21 deletions(-)
+>  target/riscv/cpu.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
