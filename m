@@ -2,63 +2,86 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 186E1C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F832C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFD9020663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:01:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD9020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4741820663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:02:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZheKvw6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4741820663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuz5-0001uh-42
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:01:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58805)
+	id 1jDv0B-0003l2-FB
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:02:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jDu2w-0004HJ-UZ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:03 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDuZZ-0004B6-Sk
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jDu2v-00077p-P4
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:02 -0400
-Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:58864)
+ (envelope-from <armbru@redhat.com>) id 1jDuZX-00062E-Ti
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46340)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jDu2v-0006zV-H4
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:01 -0400
-Received: from player716.ha.ovh.net (unknown [10.110.208.183])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id BB8CD1B564F
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 19:00:59 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player716.ha.ovh.net (Postfix) with ESMTPSA id 2C48B1069AEFC;
- Mon, 16 Mar 2020 18:00:47 +0000 (UTC)
-Subject: Re: [PATCH v2 5/8] ppc/spapr: Allow FWNMI on TCG
-To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
-References: <20200316142613.121089-1-npiggin@gmail.com>
- <20200316142613.121089-6-npiggin@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <531bdcf7-e54a-4fe4-ff78-7d8bc5ef1e7c@kaod.org>
-Date: Mon, 16 Mar 2020 19:00:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDuZX-0005rG-P7
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584383682;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HEcY6cL30ap/GlNtA0PLagV8dLpDs0nxmXzFdVBA4OM=;
+ b=JZheKvw60bboBwlwOn+5f+vk5v189Edz/C4j7GIng9MTAcM7fTj8zdA/iAMk6bfFDk42EP
+ +PcGYZCEeWGlL2TScodZn/TAjhUQ2jVp1aR2dAPVzXQZSQWMjPfMPNK1fLyuNCMatV3UIY
+ 8qeSX6g665S759cxwZ0L/ZGDHENqkoQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-B0-X1-wPP8a17_TbYF3Zew-1; Mon, 16 Mar 2020 14:34:40 -0400
+X-MC-Unique: B0-X1-wPP8a17_TbYF3Zew-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6962C8E91A3;
+ Mon, 16 Mar 2020 18:34:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
+ [10.36.116.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BC328AC30;
+ Mon, 16 Mar 2020 18:34:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BF5071138404; Mon, 16 Mar 2020 19:34:37 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v3 01/34] qemu-doc: Belatedly document QMP command arg &
+ result deprecation
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-2-armbru@redhat.com>
+ <25da4d26-094d-e74c-d0d6-8e159c96191f@redhat.com>
+Date: Mon, 16 Mar 2020 19:34:37 +0100
+In-Reply-To: <25da4d26-094d-e74c-d0d6-8e159c96191f@redhat.com> (Eric Blake's
+ message of "Mon, 16 Mar 2020 10:10:09 -0500")
+Message-ID: <87v9n4w3lu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200316142613.121089-6-npiggin@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 13752585887778507750
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.45.107
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,48 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 3:26 PM, Nicholas Piggin wrote:
-> There should no longer be a reason to prevent TCG providing FWNMI.
-> System Reset interrupts are generated to the guest with nmi monitor
-> command and H_SIGNAL_SYS_RESET. Machine Checks can not be injected
-> currently, but this could be implemented with the mce monitor cmd
-> similarly to i386.
->=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> On 3/15/20 9:46 AM, Markus Armbruster wrote:
+>> A number of deprecated QMP arguments and results were missed in commit
+>> eb22aeca65 "docs: document deprecation policy & deprecated features in
+>> appendix" (v2.10.0):
+>>
+>
+>>
+>> Since then, we missed a few more:
+>>
+>> * Commit 3c605f4074 "commit: Add top-node/base-node options" (v3.1.0)
+>>    deprecated block-commit arguments @base and @top.
+>>
+>> * Commit 4db6ceb0b5 "block/dirty-bitmap: add recording and busy
+>>    properties" (v4.0.0) deprecated query-named-block-nodes result
+>>    @dirty-bitmaps member @status, not just query-block.
+>>
+>> Make up for all that.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>   docs/system/deprecated.rst | 48 ++++++++++++++++++++++++++++++++++----
+>>   1 file changed, 44 insertions(+), 4 deletions(-)
+>
+> Should we remove any of these features that have been deprecated long
+> enough?  But that can be separate, having this patch just add mention
+> that was previously forgotten is fine.
 
-> ---
->  hw/ppc/spapr_caps.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index f626d769a0..679ae7959f 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -516,10 +516,7 @@ static void cap_fwnmi_apply(SpaprMachineState *spa=
-pr, uint8_t val,
->          return; /* Disabled by default */
->      }
-> =20
-> -    if (tcg_enabled()) {
-> -        warn_report("Firmware Assisted Non-Maskable Interrupts(FWNMI) =
-not "
-> -                    "supported in TCG");
-> -    } else if (kvm_enabled()) {
-> +    if (kvm_enabled()) {
->          if (kvmppc_set_fwnmi() < 0) {
->              error_setg(errp, "Firmware Assisted Non-Maskable Interrupt=
-s(FWNMI) "
->                               "not supported by KVM");
->=20
+Up to the subsystem maintainers, I'd say.
+
+I think we should sweep deprecated.rst on every release.  Early in the
+development cycle seems best.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
 
 
