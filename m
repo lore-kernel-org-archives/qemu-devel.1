@@ -2,83 +2,77 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D5CBC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EEF9C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C9A320663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:13:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 094E420658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:13:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fbO/ja+/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C9A320663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4ys7Qs3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 094E420658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDocS-00006o-1T
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:13:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59993)
+	id 1jDock-0000FF-Me
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:13:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jDnn2-0006QS-I7
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:20:14 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jDnl3-0005YZ-TA
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jDnn1-0002gF-5H
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:20:12 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:43466)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jDnn0-0002NY-Nx
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:20:10 -0400
-Received: by mail-wr1-x434.google.com with SMTP id b2so14445765wrj.10
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 04:20:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=e90s5GDKqF71kjDAM6KX7htm2byTtpgfT/7m3PaplCY=;
- b=fbO/ja+/0dTZk/p1OPkanWOwknUvvPsB8ZvfTdth3VJzomGE5GOC5OL5XvtvAeWm7C
- 9VP4C8ofRqF/rObX0xH2cM8Vg3/S6m4QuTxCeG6Kow5tr+Zrm3Lc9x8Xf00Boh78dyJa
- VqF+WNiwQgi2tpjtjZ6dVe+kjR7/91m5OsgHR+0wFTPV8/3BwaM2p591d9PGfYoSSewS
- MaMhQq0snnOv0ta48DPVHLxUPn3TvhpJKqWpfkNUqpjvq4LvdSnJczSjf0TkwptMqjOK
- Dd5y95iq3+34ICpv6+a3s59psj3coSEXAceXL9MyJgTpCXCF7dL53c2JkGdaMKn/jzff
- +NUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=e90s5GDKqF71kjDAM6KX7htm2byTtpgfT/7m3PaplCY=;
- b=oRzV1IXi9C6egyr1o819DATpJpztDeX3VzPoEaMJBg3a+9mJ3w2qVzrrqsc3NRyEYs
- ivcdQ80y2GMOpND+YHj9wNgrWp/tdCJFfoHj8hQYAgT5bej+Jn1FY7UQSZEYychvbR+C
- OsqgEYlXtbI9zMdfUzz9OFBejolHAQo9RvJNl+lQwn6U6xEOC5sSlP3n75x89j6XiemJ
- nPLZZD/mQ8hOVRUJsPJRaxflMKWKsbt4OekdtHGMeT2vQ6EWvlhgyI/O8Q2pQhmtXz91
- BeGKaBhZEJJur9yqceaEq18T33vUv/BfKRGn4fDTkr1usIUBqQYWBAydj2sSAx4s8zFr
- KOBQ==
-X-Gm-Message-State: ANhLgQ0Is6uDGkVDHo+8cK8IeICbiksXhVzcyecog9sIIuYmr0JfQwK6
- 3mzz3u5N1jWvm49wlaO0YnXQiZQQ4OgzBQ==
-X-Google-Smtp-Source: ADFU+vtaaloOppJKIJRdFnj530OT9zBbONplkXFi8WZmA16hGZaM/grqL9Kd93FyGsjmchogrJS5zQ==
-X-Received: by 2002:adf:df07:: with SMTP id y7mr1665646wrl.355.1584357608819; 
- Mon, 16 Mar 2020 04:20:08 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r9sm23178099wma.47.2020.03.16.04.20.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 04:20:08 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] Update copyright date for user-facing copyright strings
-Date: Mon, 16 Mar 2020 11:20:06 +0000
-Message-Id: <20200316112006.19107-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <imammedo@redhat.com>) id 1jDnl2-0003Uc-C5
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:18:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49564
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDnl2-0003MX-4l
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:18:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584357487;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tYV2Z1yIfUHJKAR4weRJObEb0tvA/Yg/Xc3+A8vyxpo=;
+ b=g4ys7Qs3n1yQ/0tDFI4hMR9/EuF927JMjqIJDSsKsGQACKORBAbB8qtFEvXJmGCcQgHd9b
+ 9ht9lmheWJpEktJGf6pyKD2j9212Yc+FWeJPo1Bdlc/3ynGrZrYmtbLK2qbzP6eDY+zUTG
+ aotVkluo0JnlyXNPxpZqygb9WTsLh18=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-T-qHoOalOFe5ekCT1R9ipA-1; Mon, 16 Mar 2020 07:18:06 -0400
+X-MC-Unique: T-qHoOalOFe5ekCT1R9ipA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9314DB20;
+ Mon, 16 Mar 2020 11:18:04 +0000 (UTC)
+Received: from localhost (ovpn-200-42.brq.redhat.com [10.40.200.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A2FD60BF3;
+ Mon, 16 Mar 2020 11:17:56 +0000 (UTC)
+Date: Mon, 16 Mar 2020 12:17:55 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] checkpatch: enforce process for expected files
+Message-ID: <20200316121755.45fa97c2@redhat.com>
+In-Reply-To: <20200315113323.526984-1-mst@redhat.com>
+References: <20200315113323.526984-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,48 +84,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Arbuckle <programmingkidx@gmail.com>
+Cc: peter.maydell@linaro.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the copyright date to 2020 for the copyright strings which are
-user-facing and represent overall copyright info for all of QEMU.
+On Sun, 15 Mar 2020 07:35:46 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Reported-by: John Arbuckle <programmingkidx@gmail.com>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/qemu-common.h | 2 +-
- docs/conf.py          | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> If the process documented in tests/qtest/bios-tables-test.c
+> is followed, then same patch never touches both expected
+> files and code. Teach checkpatch to enforce this rule.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 082da59e852..d0142f29ac1 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -13,7 +13,7 @@
- #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
- 
- /* Copyright string for -version arguments, About dialogs, etc */
--#define QEMU_COPYRIGHT "Copyright (c) 2003-2019 " \
-+#define QEMU_COPYRIGHT "Copyright (c) 2003-2020 " \
-     "Fabrice Bellard and the QEMU Project developers"
- 
- /* Bug reporting information for --help arguments, About dialogs, etc */
-diff --git a/docs/conf.py b/docs/conf.py
-index 960043cb860..af55f506d5d 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -80,7 +80,7 @@ master_doc = 'index'
- 
- # General information about the project.
- project = u'QEMU'
--copyright = u'2019, The QEMU Project Developers'
-+copyright = u'2020, The QEMU Project Developers'
- author = u'The QEMU Project Developers'
- 
- # The version info for the project you're documenting, acts as replacement for
--- 
-2.20.1
+Tested-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+> 
+> Peter, Igor what do you think?
+> 
+>  scripts/checkpatch.pl | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index b27e4ff5e9..96583e3fff 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -35,6 +35,8 @@ my $summary_file = 0;
+>  my $root;
+>  my %debug;
+>  my $help = 0;
+> +my $testexpected;
+> +my $nontestexpected;
+>  
+>  sub help {
+>  	my ($exitcode) = @_;
+> @@ -1256,6 +1258,26 @@ sub WARN {
+>  	}
+>  }
+>  
+> +# According to tests/qtest/bios-tables-test.c: do not
+> +# change expected file in the same commit with adding test
+> +sub checkfilename {
+> +	my ($name) = @_;
+> +        if ($name =~ m#^tests/data/acpi/# and
+> +            # make exception for a shell script that rebuilds the files
+> +            not $name =~ m#^\.sh$# or
+> +            $name =~ m#^tests/qtest/bios-tables-test-allowed-diff.h$#) {
+> +            $testexpected = $name;
+> +        } else {
+> +            $nontestexpected = $name;
+> +        }
+> +        if (defined $testexpected and defined $nontestexpected) {
+> +            ERROR("Do not add expected files together with tests, " .
+> +                  "follow instructions in " .
+> +                  "tests/qtest/bios-tables-test.c: both " .
+> +                  $testexpected . " and " . $nontestexpected . " found\n");
+> +        }
+> +}
+> +
+>  sub process {
+>  	my $filename = shift;
+>  
+> @@ -1431,9 +1453,11 @@ sub process {
+>  		if ($line =~ /^diff --git.*?(\S+)$/) {
+>  			$realfile = $1;
+>  			$realfile =~ s@^([^/]*)/@@ if (!$file);
+> +                        checkfilename($realfile);
+>  		} elsif ($line =~ /^\+\+\+\s+(\S+)/) {
+>  			$realfile = $1;
+>  			$realfile =~ s@^([^/]*)/@@ if (!$file);
+> +                        checkfilename($realfile);
+>  
+>  			$p1_prefix = $1;
+>  			if (!$file && $tree && $p1_prefix ne '' &&
 
 
