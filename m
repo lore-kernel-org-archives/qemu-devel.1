@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0796BC10DCE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 868E4C10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCBF720663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A4A720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:40:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KboQaqPK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCBF720663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPF9dq0D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4A720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDeev-0006ST-Hl
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 21:35:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57273)
+	id 1jDekO-0008UE-6P
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 21:40:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDdLw-0008FJ-Km
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:34 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDdMA-0008Lx-8P
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDdLu-0004SK-Is
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54767
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jDdM9-0005Ij-89
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51420
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDdLu-0004OK-EA
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:30 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDdM9-0005HA-46
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584317489;
+ s=mimecast20190719; t=1584317504;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PL9v4CeGO/2oc9s92a/R9E/v/MDOYA5KsXid6uFaEzU=;
- b=KboQaqPKwqrDJMghpJFVZjRTiQYxnt3GEaXcWJort8dZzYNBJb6xeT/ovFopXL1e17P856
- oxXZdcrn+LS4AxtJ0iSrW9sqGmgPLk6/qjjwUTjqka1Cq3sqX3dDg+jwHQEvgPYk5LGw3l
- sz2zREJusMAARoOsH/uzqwXV++7fzg0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-12iizrilNICfVH_XfYAsBA-1; Sun, 15 Mar 2020 20:11:27 -0400
-X-MC-Unique: 12iizrilNICfVH_XfYAsBA-1
-Received: by mail-wr1-f70.google.com with SMTP id b12so8207499wro.4
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 17:11:27 -0700 (PDT)
+ bh=R5oHwdalGSUh9fUiAtO6F1i/o9Ne148Jqojt7pJjorc=;
+ b=hPF9dq0DgvpqMxhM0etEDsbrgevM0kLoIrgdfJwvM0ievPd/9ciDEjPNN3dYehu4vQmYFC
+ l9bBdbuNaKtTMYDlG9BY8/dyYRmTJogmUXg6RSXBwNx3SmXmhbbNXj6sbSghZzmpwzhKUG
+ Circ8SIQEDGP5NInUi/5GjZwRDg0YMc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-w3CibJ0pMbqC4Prwj8VfiA-1; Sun, 15 Mar 2020 20:11:43 -0400
+X-MC-Unique: w3CibJ0pMbqC4Prwj8VfiA-1
+Received: by mail-wr1-f71.google.com with SMTP id v6so8067762wrg.22
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 17:11:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Z/zbte99k4d/M7DBGyDBjG9o4G746mqNhzLp9Pz4m/w=;
- b=e7cL6xsFbojZIywZ3p2aE9A7QcsLYG4QLbeplkgV/4DuccdoqMoaq/cGUP7n80hsc3
- BcL6xyElZ2U8MTcoTztgIXMyrga5xkeH7T6B3XGe6bFAy6sLmlR7pVmzKWfkD4I/D03e
- 61Z2/udQ32lqg6+6sq38/EF6jg4BDxtRpADXjj6QS/M4+PTFgzU/lh9zqB2txMO+XgF/
- uozVqyr8H+26MrtOrL6JtejPIGhF8MyWUZg9bsJlboO9GhewGpyNJDk07uS99a9t/qy4
- p87gE3qBx76AhIFmnemVv0VvfLWfXucllj91S/7FV1a4l2qAWmH2PEfOOZxRRqeUTR5v
- FqnQ==
-X-Gm-Message-State: ANhLgQ0VfK8FrEt3Q6IOFg8Qc+ebX2XlIKYQnVuKKrukQ8nQ0s9YxnZC
- zLWcGENQgTyx/OlhpT8GGjmSTumQqKQSVhuefIBwIqFzyKdylyUhZF/U5RhkEIyR7VQ9xp8eqje
- lmJ1LOQAt3CGpGZs=
-X-Received: by 2002:a1c:2358:: with SMTP id j85mr25807428wmj.137.1584317485187; 
- Sun, 15 Mar 2020 17:11:25 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtymsgRj0mrAJNPsEgdU5AEA8Svcc7shBBY9ByFbMcPebmUKjEk2yAZlPPkxZkTU9TPcTsfpw==
-X-Received: by 2002:a1c:2358:: with SMTP id j85mr25807406wmj.137.1584317484960; 
- Sun, 15 Mar 2020 17:11:24 -0700 (PDT)
+ bh=D3R81IpDiBCPcJm6v/qjLXKSHFAs8r3O5+h73S1rpfw=;
+ b=OhR+Q+TxSjOt0gEn0ci3gWKfRWSvoyXHdNiZT7fa/jyoFaaro7EtljaN4ssQ4SlyPY
+ UHkIHG6kWspDIDtxgzYYzei+i14X9gCVSgGXn+n3LC1QPDqp/FAbAipNtwPBTg0/XN3y
+ eRN/p3pEEPUAqRlMYZXcSF9mM/V4nF9t7KSRh8JBQIMRxyxGhloWMus//YV2Ph/ICufY
+ dWDobdY9rnros3Jt1f5oze7Gkxi+eUQpNC4J9yIZywGlyQFht6naGiFxuLcUia1zQeeM
+ Y5P0YQbyn/fbJRK899RB01H5ngM5G0zX3P43suQVFlTQ5G8o89LAjhG7Hm7NYi6Zl0Ay
+ Ttww==
+X-Gm-Message-State: ANhLgQ1AITJR9eR+3iq+PvoMdvJ5Wf1DTMJ6Z0eQnJ4NMitv06290O99
+ 0rC2aLCRCee2tusiaVx7fQ8WIjcqu8FoDhdzqzuCI+vjR+CBm+PU/c/Fd1UDHskse5mEeYIe0+D
+ 0q1oyGDarcyYgTYE=
+X-Received: by 2002:a7b:c381:: with SMTP id s1mr22723453wmj.0.1584317501203;
+ Sun, 15 Mar 2020 17:11:41 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vssZmjyburU8BaWOP+arhyyQ9r5jXISw+aZfNKA/6GUbNbJR6vj5QZ/sLeZybJnLmz9saXbXA==
+X-Received: by 2002:a7b:c381:: with SMTP id s1mr22723434wmj.0.1584317500998;
+ Sun, 15 Mar 2020 17:11:40 -0700 (PDT)
 Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id m10sm713458wmc.24.2020.03.15.17.11.23
+ by smtp.gmail.com with ESMTPSA id t124sm28387358wmg.13.2020.03.15.17.11.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Mar 2020 17:11:24 -0700 (PDT)
+ Sun, 15 Mar 2020 17:11:40 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/9] hw/core/qdev-properties: Use qemu_strtoul() in
- set_pci_host_devaddr()
-Date: Mon, 16 Mar 2020 01:11:04 +0100
-Message-Id: <20200316001111.31004-3-philmd@redhat.com>
+Subject: [PATCH v2 5/9] hw/core/qdev-properties: Export qdev_prop_enum
+Date: Mon, 16 Mar 2020 01:11:07 +0100
+Message-Id: <20200316001111.31004-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200316001111.31004-1-philmd@redhat.com>
 References: <20200316001111.31004-1-philmd@redhat.com>
@@ -92,7 +91,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,6 +105,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Michael Roth <mdroth@linux.vnet.ibm.com>,
  Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
@@ -113,83 +113,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace strtoul() by qemu_strtoul() so checkpatch.pl won't
-complain if we move this code later. Increase the slot and
-func local variables to unsigned long so that the range check
-isn't truncated. Remove the 'e =3D=3D p' test which is done in
-check_strtox_error(), called by qemu_strtoul().
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: drop the e =3D=3D p test, do not do modify range check (rth)
----
- hw/core/qdev-properties.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+ include/hw/qdev-properties.h | 1 +
+ hw/core/qdev-properties.c    | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index f161604fb6..134753d595 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -8,6 +8,7 @@
+ extern const PropertyInfo qdev_prop_bit;
+ extern const PropertyInfo qdev_prop_bit64;
+ extern const PropertyInfo qdev_prop_bool;
++extern const PropertyInfo qdev_prop_enum;
+ extern const PropertyInfo qdev_prop_uint8;
+ extern const PropertyInfo qdev_prop_uint16;
+ extern const PropertyInfo qdev_prop_uint32;
 diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 48e4c98cf0..0e4da655c1 100644
+index 3f3a008938..7e89c11dfd 100644
 --- a/hw/core/qdev-properties.c
 +++ b/hw/core/qdev-properties.c
-@@ -820,10 +820,10 @@ static void set_pci_host_devaddr(Object *obj, Visitor=
- *v, const char *name,
-     PCIHostDeviceAddress *addr =3D qdev_get_prop_ptr(dev, prop);
-     Error *local_err =3D NULL;
-     char *str, *p;
--    char *e;
-+    const char *e;
-     unsigned long val;
-     unsigned long dom =3D 0, bus =3D 0;
--    unsigned int slot =3D 0, func =3D 0;
-+    unsigned long slot =3D 0, func =3D 0;
+@@ -84,6 +84,13 @@ void qdev_propinfo_set_default_value_enum(ObjectProperty=
+ *op,
+         qapi_enum_lookup(prop->info->enum_table, prop->defval.i));
+ }
 =20
-     if (dev->realized) {
-         qdev_prop_set_after_realize(dev, name, errp);
-@@ -837,23 +837,23 @@ static void set_pci_host_devaddr(Object *obj, Visitor=
- *v, const char *name,
-     }
++const PropertyInfo qdev_prop_enum =3D {
++    .name  =3D "enum",
++    .get   =3D qdev_propinfo_get_enum,
++    .set   =3D qdev_propinfo_set_enum,
++    .set_default_value =3D qdev_propinfo_set_default_value_enum,
++};
++
+ /* Bit */
 =20
-     p =3D str;
--    val =3D strtoul(p, &e, 16);
--    if (e =3D=3D p || *e !=3D ':') {
-+    if (qemu_strtoul(p, &e, 16, &val) < 0) {
-+        goto inval;
-+    }
-+    if (*e !=3D ':') {
-         goto inval;
-     }
-     bus =3D val;
-=20
--    p =3D e + 1;
--    val =3D strtoul(p, &e, 16);
--    if (e =3D=3D p) {
-+    p =3D (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 16, &val) < 0) {
-         goto inval;
-     }
-     if (*e =3D=3D ':') {
-         dom =3D bus;
-         bus =3D val;
--        p =3D e + 1;
--        val =3D strtoul(p, &e, 16);
--        if (e =3D=3D p) {
-+        p =3D (char *)e + 1;
-+        if (qemu_strtoul(p, &e, 16, &val) < 0) {
-             goto inval;
-         }
-     }
-@@ -862,9 +862,8 @@ static void set_pci_host_devaddr(Object *obj, Visitor *=
-v, const char *name,
-     if (*e !=3D '.') {
-         goto inval;
-     }
--    p =3D e + 1;
--    val =3D strtoul(p, &e, 10);
--    if (e =3D=3D p) {
-+    p =3D (char *)e + 1;
-+    if (qemu_strtoul(p, &e, 10, &val) < 0) {
-         goto inval;
-     }
-     func =3D val;
+ static uint32_t qdev_get_prop_mask(Property *prop)
 --=20
 2.21.1
 
