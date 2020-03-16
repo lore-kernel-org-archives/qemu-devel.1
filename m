@@ -2,97 +2,94 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C824C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AA7C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D50520658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:51:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC9CB2073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:52:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GP7SnVfI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D50520658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/o9Q9gH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9CB2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuq1-00017c-4e
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
+	id 1jDuqK-0001ig-2P
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDuoy-0007N3-5r
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:41 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDtlY-0004eM-5I
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDuow-0008V6-Ki
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:40 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34895)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDuow-0008Qt-G7
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584384638;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hXIJL668freBf14eTVXascLoIFucgmXgkcGWSAplUNA=;
- b=GP7SnVfIflN2MzHSxiiG2dXJDZcbuw+Lvs/1b0GBjE5KbpHnuu8kEPnSL6iXNPk/0706If
- /hMBsOIoLsxiDOTFA2zM/WxIbO9d/XsMjWOHFlraDTJN41ad0EOsbQsQYnysLVYDFW3FOH
- M/qO9CQnF+9SbJ62EJvIeowYVej1oaQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-QciJYGRAPWC3ASAcCeZqiQ-1; Mon, 16 Mar 2020 14:50:35 -0400
-X-MC-Unique: QciJYGRAPWC3ASAcCeZqiQ-1
-Received: by mail-wm1-f72.google.com with SMTP id a23so6173765wmm.8
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:50:35 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDtlV-0000Qo-Nz
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:43:03 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:40232)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDtlV-0000Ha-IL
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:43:01 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id bo3so7667981pjb.5
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:43:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zOs/8OdiftpJmPSmUYbE0no0V2XkwWZ2rsSlJaTudvc=;
+ b=B/o9Q9gHb9IdGkpjrF6nKILWlYTgxw9+h1aKok8qMXNQANl5bSNYFoR9SEyLmPEy+S
+ sSs+r+crKpyrkH/CFIpxvuc2Oc5L3PxFG1voyfOjhYXcJZvPMop7LCoTQtrH9zd/eMWF
+ R19EOoeTNHlEp0S6cXmLWx+wbnJyIWaNyZoqvpb2z1oQ3MJufWBe09rtAI2dLh7rnvgx
+ yoNK0ihBt+BPtV+JmNYU1gDGHpoSo8bQDpTLGPBVtcXZcKzBdgCR0j719s6Z/sTGrnfV
+ rmJsmDR26x8r8oK9xROFZNcHgUECzb5KeG6b8cm8pE4b/liVop8ebsZX6dwmtzsBNZJa
+ EghA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=4QL+8S8VSX/i0yA2bSlkIiSqdqBMljhwg+YkcURAAts=;
- b=Q4mVKFy67csWbqNxS75yF/YOby93w4z2umx3/jGMRA4MGCIheh/dhJ4DjyYB/vUL2A
- XYjyJ4VrU++cut9+dHHhlv50e2OBsw6PdPMCbWeJXy9B12tfzfIuGxWvGJtdICKzP379
- aguYN5BnJgPp4aOcKWNZcDRrZ/ExcZp2q9DLBEzVDwzLToxbtEahoQG1E7kPJbdfxsQK
- h9aWvWGijayVdeVzR8YL9AeEiNVrcC/XcAbqJRhpJfjqpHbvRB8lkBvBIj2n67gZOQlD
- 6Iz1IdsGTVEDqeGVAc5LfOWt1ejcIcUgkVnYs/HUXhQTfJbPbAP1/8pbPLYjFLSB9y2G
- GaEQ==
-X-Gm-Message-State: ANhLgQ3ebNVnfcaMrUL767aaCGOWUVbmImtSRj4upXWBU51sbGIR4UQr
- fEbQLxKXKyoBszfL0l8WijsdWsgD4jix6C9YWL80ZglGWgeLheHpzvfIvIcTdM0e4vs2khaRNhD
- +5WUU64RHdSnxbxA=
-X-Received: by 2002:a1c:156:: with SMTP id 83mr484821wmb.151.1584384634595;
- Mon, 16 Mar 2020 11:50:34 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvYSH5bQVhe7l3Eyrisd/fUWufhe9CCEW/brEle1wnTEqiYlpfJLLcCr6DkPXeks+UsP6XzXA==
-X-Received: by 2002:a1c:156:: with SMTP id 83mr484810wmb.151.1584384634350;
- Mon, 16 Mar 2020 11:50:34 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id b5sm1036436wrw.86.2020.03.16.11.50.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 11:50:33 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 05/25] hw/arm: Use memory_region_init_rom() with read-only
- regions
-Date: Mon, 16 Mar 2020 19:49:46 +0100
-Message-Id: <20200316185006.576-6-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
-References: <20200316185006.576-1-philmd@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zOs/8OdiftpJmPSmUYbE0no0V2XkwWZ2rsSlJaTudvc=;
+ b=M4PiJGbg8p4D1bm16AWWHk0RDigO1vAp/IabLjx6Mk7QAR2sQITGavU9kWyzTybWdt
+ yadfWjTSxo8dPvMLsxNMp9lsZPdekcvTn1cBKB1Wfyx32ErakOzGBswJvpbYkYgF4cRX
+ W9iq0PUsU4AX0I+qW4T6J6/r3RFR8GQ4W92Xo+zUdm3xsSN+DpbCdqGs5HQqyFDLQ/zE
+ f40foGdlItT5Z5p4UJ0gWqz2NQZx974EycFJLLkeB6C0ykkg8sP9ZPkPCxyYkFHKXuBB
+ HxM05OH9xNXFwkxabvZWwZWMKY3pyeIg/VTkqJoAISHBP88whJT2KMr4LpF+7uolDRzp
+ jT0w==
+X-Gm-Message-State: ANhLgQ2fwFrJWbXTmddSLSV1Ed1jlSL/hvJsrotdVOh3iYANsErFkerC
+ 2IhEc4Jtthlz++G8duDoaSS1fg==
+X-Google-Smtp-Source: ADFU+vsoDPXOmPxhMQrd/cq9DEqHnR1g0lwaoFdNv0ACrg+cfg4uMaElreXINYoU+qCv/rsfNmmwWA==
+X-Received: by 2002:a17:90a:fb49:: with SMTP id
+ iq9mr637995pjb.143.1584380579244; 
+ Mon, 16 Mar 2020 10:42:59 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ jz19sm394711pjb.48.2020.03.16.10.42.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 10:42:58 -0700 (PDT)
+Subject: Re: [PATCH v5 57/60] target/riscv: vector slide instructions
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-58-zhiwei_liu@c-sky.com>
+ <28063df7-bf38-d136-2d32-39651692c4c6@linaro.org>
+ <88b87d58-5387-9d0d-b1a0-5705171f2e83@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <76b6c079-15b2-08f1-f8e2-570efb6cfae5@linaro.org>
+Date: Mon, 16 Mar 2020 10:42:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+In-Reply-To: <88b87d58-5387-9d0d-b1a0-5705171f2e83@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,153 +101,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "open list:Exynos" <qemu-arm@nongnu.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+On 3/16/20 1:04 AM, LIU Zhiwei wrote:
+>> As a preference, I think you can do away with this helper.
+>> Simply use the slideup helper with argument 1, and then
+>> afterwards store the integer register into element 0.  You should be able to
+>> re-use code from vmv.s.x for that.
+> When I try it, I find it is some difficult, because  vmv.s.x will clean
+> the elements (0 < index < VLEN/SEW).
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/arm/exynos4210.c | 3 +--
- hw/arm/mainstone.c  | 3 +--
- hw/arm/omap_sx1.c   | 6 ++----
- hw/arm/palm.c       | 3 +--
- hw/arm/spitz.c      | 3 +--
- hw/arm/stellaris.c  | 3 +--
- hw/arm/tosa.c       | 3 +--
- 7 files changed, 8 insertions(+), 16 deletions(-)
+Well, two things about that:
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 59a27bdd68..3af6502a5e 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -311,9 +311,8 @@ static void exynos4210_realize(DeviceState *socdev, Err=
-or **errp)
-                                 &s->chipid_mem);
-=20
-     /* Internal ROM */
--    memory_region_init_ram(&s->irom_mem, NULL, "exynos4210.irom",
-+    memory_region_init_rom(&s->irom_mem, NULL, "exynos4210.irom",
-                            EXYNOS4210_IROM_SIZE, &error_fatal);
--    memory_region_set_readonly(&s->irom_mem, true);
-     memory_region_add_subregion(system_mem, EXYNOS4210_IROM_BASE_ADDR,
-                                 &s->irom_mem);
-     /* mirror of iROM */
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index 1042017086..6bc643651b 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -124,9 +124,8 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-     /* Setup CPU & memory */
-     mpu =3D pxa270_init(address_space_mem, mainstone_binfo.ram_size,
-                       machine->cpu_type);
--    memory_region_init_ram(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-+    memory_region_init_rom(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-                            &error_fatal);
--    memory_region_set_readonly(rom, true);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
-     /* There are two 32MiB flash devices on the board */
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index de5ff447dc..57829b3744 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -131,9 +131,8 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-     mpu =3D omap310_mpu_init(machine->ram, machine->cpu_type);
-=20
-     /* External Flash (EMIFS) */
--    memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
-+    memory_region_init_rom(flash, NULL, "omap_sx1.flash0-0", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(address_space, OMAP_CS0_BASE, flash);
-=20
-     memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val,
-@@ -167,9 +166,8 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-     if ((version =3D=3D 1) &&
-             (dinfo =3D drive_get(IF_PFLASH, 0, fl_idx)) !=3D NULL) {
-         MemoryRegion *flash_1 =3D g_new(MemoryRegion, 1);
--        memory_region_init_ram(flash_1, NULL, "omap_sx1.flash1-0",
-+        memory_region_init_rom(flash_1, NULL, "omap_sx1.flash1-0",
-                                flash1_size, &error_fatal);
--        memory_region_set_readonly(flash_1, true);
-         memory_region_add_subregion(address_space, OMAP_CS1_BASE, flash_1)=
-;
-=20
-         memory_region_init_io(&cs[1], NULL, &static_ops, &cs1val,
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 99554bda19..97ca105d29 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -213,9 +213,8 @@ static void palmte_init(MachineState *machine)
-     mpu =3D omap310_mpu_init(machine->ram, machine->cpu_type);
-=20
-     /* External Flash (EMIFS) */
--    memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
-+    memory_region_init_rom(flash, NULL, "palmte.flash", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(address_space_mem, OMAP_CS0_BASE, flash);
-=20
-     memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val, "palmte-cs0"=
-,
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index cbfa6934cf..c28d9b5ed7 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -929,8 +929,7 @@ static void spitz_common_init(MachineState *machine,
-=20
-     sl_flash_register(mpu, (model =3D=3D spitz) ? FLASH_128M : FLASH_1024M=
-);
-=20
--    memory_region_init_ram(rom, NULL, "spitz.rom", SPITZ_ROM, &error_fatal=
-);
--    memory_region_set_readonly(rom, true);
-+    memory_region_init_rom(rom, NULL, "spitz.rom", SPITZ_ROM, &error_fatal=
-);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
-     /* Setup peripherals */
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 221a78674e..d136ba1a92 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -1300,9 +1300,8 @@ static void stellaris_init(MachineState *ms, stellari=
-s_board_info *board)
-     sram_size =3D ((board->dc0 >> 18) + 1) * 1024;
-=20
-     /* Flash programming is done via the SCU, so pretend it is ROM.  */
--    memory_region_init_ram(flash, NULL, "stellaris.flash", flash_size,
-+    memory_region_init_rom(flash, NULL, "stellaris.flash", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(system_memory, 0, flash);
-=20
-     memory_region_init_ram(sram, NULL, "stellaris.sram", sram_size,
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 4d95a1f3e2..5dee2d76c6 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -226,8 +226,7 @@ static void tosa_init(MachineState *machine)
-=20
-     mpu =3D pxa255_init(address_space_mem, tosa_binfo.ram_size);
-=20
--    memory_region_init_ram(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
--    memory_region_set_readonly(rom, true);
-+    memory_region_init_rom(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
-     tmio =3D tc6393xb_init(address_space_mem, 0x10000000,
---=20
-2.21.1
+(1) The 0.8 version of vmv.s.x does *not* zero the other elements, so we'll
+want to be prepared for that.
 
+(2) We have 8 insns that, in the end come down to a direct element access,
+possibly with some other processing.
+
+So we'll want basic helper functions that can locate an element by immediate
+offset and by variable offset:
+
+/* Compute the offset of vreg[idx] relative to cpu_env.
+   The index must be in range of VLMAX. */
+int vec_element_ofsi(int vreg, int idx, int sew);
+
+/* Compute a pointer to vreg[idx].
+   If need_bound is true, mask idx into VLMAX,
+   Otherwise we know a-priori that idx is already in bounds. */
+void vec_element_ofsx(DisasContext *s, TCGv_ptr base,
+                      TCGv idx, int sew, bool need_bound);
+
+/* Load idx >= VLMAX ? 0 : vreg[idx] */
+void vec_element_loadi(DisasContext *s, TCGv_i64 val,
+                       int vreg, int idx, int sew);
+void vec_element_loadx(DisasContext *s, TCGv_i64 val,
+                       int vreg, TCGv idx, int sew);
+
+/* Store vreg[imm] = val.
+   The index must be in range of VLMAX.  */
+void vec_element_storei(DisasContext *s, int vreg, int imm,
+                        TCGv_i64 val);
+void vec_element_storex(DisasContext *s, int vreg,
+                        TCGv idx, TCGv_i64 val);
+
+(3) It would be handy to have TCGv cpu_vl.
+
+Then:
+
+vext.x.v:
+    If rs1 == 0,
+        Use vec_element_loadi(s, x[rd], vs2, 0, s->sew).
+    else
+        Use vec_element_loadx(s, x[rd], vs2, x[rs1], true).
+
+vmv.s.x:
+    over = gen_new_label();
+    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+    For 0.7.1:
+        Use tcg_gen_dup8i to zero all VLMAX elements of vd.
+        If rs1 == 0, goto done.
+    Use vec_element_storei(s, vs2, 0, x[rs1]).
+ done:
+    gen_set_label(over);
+
+vfmv.f.s:
+    Use vec_element_loadi(x, f[rd], vs2, 0).
+    NaN-box f[rd] as necessary for SEW.
+
+vfmv.s.f:
+    tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);
+    For 0.7.1:
+        Use tcg_gen_dup8i to zero all VLMAX elements of vd.
+    Let tmp = f[rs1], nan-boxed as necessary for SEW.
+    Use vec_element_storei(s, vs2, 0, tmp).
+    gen_set_label(over);
+
+vslide1up.vx:
+    Ho hum, I forgot about masking.  Some options:
+    (1) Call a helper just as you did in your original patch.
+    (2) Call a helper only for !vm, for vm as below.
+    (3) Call vslideup w/1.
+        tcg_gen_brcondi(TCG_COND_EQ, cpu_vl, 0, over);
+        If !vm,
+            // inline test for v0[0]
+            vec_element_loadi(s, tmp, 0, 0, MO_8);
+            tcg_gen_andi_i64(tmp, tmp, 1);
+            tcg_gen_brcondi(TCG_COND_EQ, tmp, 0, over);
+        Use vec_element_store(s, vd, 0, x[rs1]).
+        gen_set_label(over);
+
+vslide1down.vx:
+    For !vm, this is complicated enough for a helper.
+    If using option 3 for vslide1up, then the store becomes:
+    tcg_gen_subi_tl(tmp, cpu_vl, 1);
+    vec_element_storex(s, base, tmp, x[rs1]);
+
+vrgather.vx:
+    If !vm or !vl_eq_vlmax, use helper.
+    vec_element_loadx(s, tmp, vs2, x[rs1]);
+    Use tcg_gen_gvec_dup_i64 to store to tmp to vd.
+
+vrgather.vi:
+    If !vm or !vl_eq_vlmax, use helper.
+    If imm >= vlmax,
+        Use tcg_gen_dup8i to zero vd;
+    else,
+        ofs = vec_element_ofsi(s, vs2, imm, s->sew);
+        tcg_gen_gvec_dup_mem(sew, vreg_ofs(vd),
+                             ofs, vlmax, vlmax);
+
+
+r~
 
