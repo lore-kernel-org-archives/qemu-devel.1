@@ -2,83 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72937C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4382C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D29720663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A16BD20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5OeceMG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D29720663
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5Z8fGav"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A16BD20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDshx-0001Dc-2S
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:35:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48470)
+	id 1jDsi0-0001Ig-LI
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:35:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jDqhm-0007Nw-9H
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:26:59 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDr5L-00007w-Aa
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jDqhl-00005A-AR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:26:58 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36326)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDr5K-00085O-9E
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:51:19 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33088)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jDqhh-00082R-SZ; Mon, 16 Mar 2020 10:26:54 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id nu11so5546603pjb.1;
- Mon, 16 Mar 2020 07:26:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jDr5K-0007tp-1Q
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:51:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a25so21606977wrd.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 07:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i5D0yWQL9Fea9nHxAcnwd4Pw7HLyVMj68QCZAf63FYA=;
- b=e5OeceMGPC6F5sYOBXp2yqPDd8sVtEEkb0D/70PQx0/AxzH6t7k0FkvRBfLIAdXxv5
- 974S6/eUm25qFMExIWf3uW9HGAZa9a28+C9RyCoXE+tJE3pbuIBSZ/Ndwft3ICWG4iaT
- CrtUwnP6ZCbtA8bJ47tZBsLjXNfzhkZ6UxJ2qoXnUxW8JWebsd7gImiDvmLp0L8yxeQM
- M9SxVqABIomzRP4hx1L4JL18VEblfkDjdRmKAc56LWzOblCl+KhhT0iYeuZfnH/aZ0MC
- rcz2vZwybU5O5mp3rz9bAObtGQ/9AeYFegXf1L6PvVcszl/xIJV8D1lFtkVO5HUR5drJ
- Wh+g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=EBA2kBnuWIbZxYq1IozPBlavq7ho+4yFZxgtcTzlqMM=;
+ b=m5Z8fGavUhGGyLfX0PzBZDYHeEfUf5hzVkFzioL5oE8Js7fNG7xg1HAM64OeYx6Xlu
+ avw9mCH6HZPOQWoVtlV+S3rFIZ2LvmkhxJ2k6a7wtP3XquLnMnz1g4zrPlnheJX4waGG
+ m5Q0IrBEwkn6NTC/+Io8A81VvOEStNFjFKqzVa5BpLLLGHrHTKA6zeVeA+0thSe1td+I
+ imhaPfZgxkXVNGZ22hhEFmGjWrY/kSF1O2DGd87KxyeTWjoCF21dsb3LjCr3RiU7gFUC
+ zCUIqWZwCK3rQJd2fQtF9728wJCKRAdZgpfKaU8a27HoqNl6rc9l3adsLakfd7KTx6kG
+ xIcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i5D0yWQL9Fea9nHxAcnwd4Pw7HLyVMj68QCZAf63FYA=;
- b=O/WttuuqdTjGJIeL/IBnu/0cHbwAHvG5bHob5u9ly+sicMcP799ScL/dOQKVTP6Kfb
- YYWRZ1MINursJnCkXzJb3YCy5zlAxGDhzdbUZeoCeZsvnPV8h7QryDrlZzGWSSFIp/ab
- wcHoBCZ5R243170HpLZ5uKlT//zXzmD9BYQPsjL/Mr+6QRYOtjHvvAeYC+RbwO6IlESl
- cKet+/BrEv11S77+5RWvzMljKxJKX6Eval6XcaPxbs35cNkLQ+jy/2BURh5bd1+Nd7Xi
- PQeU4zbsK0befAoEKoW1ft2Xh+mYQZPuzpoUW9gM84fBR3hi9Br3pyym5VIw/66CRXUs
- B24A==
-X-Gm-Message-State: ANhLgQ2ZAwGcokbgi0GlukJW5yUVa8eEEWhKWXvv/k/HEHAuzv6vBHAX
- L6TvslFWpfN3P/yCbQdBQkSl7fLr
-X-Google-Smtp-Source: ADFU+vvF8PBfhOCqdJxtRSDuQsLB4LMWKdtsU0WLMN27Q3lMNCmYWUFgGVNyy6yrIew/R9AlL/rDMQ==
-X-Received: by 2002:a17:902:b582:: with SMTP id
- a2mr6018199pls.176.1584368811804; 
- Mon, 16 Mar 2020 07:26:51 -0700 (PDT)
-Received: from bobo.ozlabs.ibm.com ([203.63.160.49])
- by smtp.gmail.com with ESMTPSA id v1sm45564pjy.35.2020.03.16.07.26.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 07:26:51 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v2 0/8] FWNMI fixes / changes
-Date: Tue, 17 Mar 2020 00:26:05 +1000
-Message-Id: <20200316142613.121089-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.23.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=EBA2kBnuWIbZxYq1IozPBlavq7ho+4yFZxgtcTzlqMM=;
+ b=dnxnn4+RinMuYTISUx4EpEMQmif6Nlxl5DKtBD0B89evgLmKE3ywAzEVK+SFgWByiz
+ +T8Z68+kwDcYh6wpThoCwaQccvtG55qjmfniRtw3MwzPIucVyq8fM6q46yrw6kdDcLLK
+ GMa4B91Vv1eGfWMWA/AEZq26e5srdDW3DXWdvEV75476QPaHxFT8kSQjuWk2JiZmqXLJ
+ iTT8Id7GsqrndQnVnpts0h6d/GmFbD2oaXtU0SlTmqUphaOmOu1hhrPW0cGgCPriPjy2
+ KGoYlCx5Xd9jgh6rFzrftdztXhO167W5+rju4lNsUMT7xtpbyEPIGSU/Zg341M2Rz8LG
+ wNBQ==
+X-Gm-Message-State: ANhLgQ1O3iKrVEFmSMJQsCoftpkfnC0Pe7sBIl+RRl+qWQ9CyN14wCZN
+ 7lYjRsWBeqU+Kn/KZ/64HSKfrLk2w7PE0R0rPvM=
+X-Google-Smtp-Source: ADFU+vsmPUmAFZNXCupcgzplpXJcX1MCYgHXmUmwVhROtqxZjkAav4Td7dQ6QNhwwaYVJX6UjAV6aweJM/iCTJviI3E=
+X-Received: by 2002:adf:cc85:: with SMTP id p5mr35908613wrj.196.1584370275751; 
+ Mon, 16 Mar 2020 07:51:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-3-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-3-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 16 Mar 2020 15:51:03 +0100
+Message-ID: <CAJ+F1CJ_wUSvv4ZmybaeQxJnUe3RyFHgTnLo=EzYzOJqVq6emA@mail.gmail.com>
+Subject: Re: [PATCH v3 02/34] qapi: Belatedly update doc comment for @wait
+ deprecation
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,54 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- Nicholas Piggin <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Hi
 
-Since v1, I fixed the intermediate compile error spotted by Greg, and
-rediffed the series on top of ppc-for-5.0, plus Alexey's patch
-("spapr/rtas: Reserve space for RTAS blob and log").
+On Sun, Mar 15, 2020 at 3:48 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Commit a9b305ba29 "socket: allow wait=3Dfalse for client socket"
+> deprecated use of @wait for client socket chardevs, but neglected to
+> update char.json's doc comment.  Make up for that.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-The first 6 patches are otherwise unchanged since last posting.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Patch 7 implements fwnim sreset interrupts now in a way that's
-compatible with existing Linux guests (which doesn't necessarily quite
-match PAPR, but does match PowerVM behaviour).
 
-Patch 8 isn't required but it papers over Linux warning messages caused
-by another quirk.
+> ---
+>  qapi/char.json | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/qapi/char.json b/qapi/char.json
+> index 6907b2bfdb..daceb20f84 100644
+> --- a/qapi/char.json
+> +++ b/qapi/char.json
+> @@ -258,6 +258,7 @@
+>  # @server: create server socket (default: true)
+>  # @wait: wait for incoming connection on server
+>  #        sockets (default: false).
+> +#        Silently ignored with server: false.  This use is deprecated.
+>  # @nodelay: set TCP_NODELAY socket option (default: false)
+>  # @telnet: enable telnet protocol on server
+>  #          sockets (default: false)
+> --
+> 2.21.1
+>
+>
 
-Thanks,
-Nick
 
-Nicholas Piggin (8):
-  ppc/spapr: Fix FWNMI machine check failure handling
-  ppc/spapr: Change FWNMI names
-  ppc/spapr: Add FWNMI System Reset state
-  ppc/spapr: Fix FWNMI machine check interrupt delivery
-  ppc/spapr: Allow FWNMI on TCG
-  target/ppc: Allow ppc_cpu_do_system_reset to take an alternate vector
-  ppc/spapr: Implement FWNMI System Reset delivery
-  ppc/spapr: Ignore common "ibm,nmi-interlock" Linux bug
-
- hw/ppc/spapr.c                    | 76 ++++++++++++++++++++++-------
- hw/ppc/spapr_caps.c               | 19 ++++----
- hw/ppc/spapr_events.c             | 38 ++++-----------
- hw/ppc/spapr_rtas.c               | 43 +++++++++++++----
- include/hw/ppc/spapr.h            | 28 +++++++----
- target/ppc/cpu.h                  |  3 +-
- target/ppc/excp_helper.c          | 79 ++++++++++++++++++++++---------
- tests/qtest/libqos/libqos-spapr.h |  2 +-
- 8 files changed, 188 insertions(+), 100 deletions(-)
-
--- 
-2.23.0
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
