@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEB6C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2469BC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F9D720674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFE7820674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:18:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ml3q88ml"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F9D720674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dswHuwkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE7820674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvFB-0004uB-DJ
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:17:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39355)
+	id 1jDvFT-0005T7-17
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDups-0001JF-FT
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:37 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDuod-0006jx-BS
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDupr-0008OJ-9I
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39251)
+ (envelope-from <philmd@redhat.com>) id 1jDuoc-0005Ld-97
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDupr-0008Mh-4r
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:35 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDuoc-0005JT-3z
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584384694;
+ s=mimecast20190719; t=1584384617;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PnTiznQbcjSITmlrC8f0MwivspPIOZv0h5wAVkTgkTc=;
- b=Ml3q88mlKS3Df5R1wT1AsPJL+LVBkjN3Ihfdc8dKXk514k7PDhIMJrUmoGcTN/U2FgMXtq
- 3q1iAQp/AwpWNh0bl+ADLMEo1EwmJXUZyW44A1uUsD8reEpmU/Ml5CR9oOOSA9V1QNnfo1
- UFP+xhlR/sUDf1wRNLKl52aDByk2Yiw=
+ bh=ToHM1bRcSu3o42IHguqQBrZI8fvHPvcqixZhQVzTz6E=;
+ b=dswHuwkp/soGaKzAvCFQs0qfpLSSrFvINcLEV2QgeIePdCV79VzUzSJdFZJEFGPVpwirdP
+ bm0nf2FCv7iqPPfD08swIiY0k6qfE895vQ2vzj+AMpXZxpkp+fVHW66fP0a+/xyG+JynR2
+ Uy0Mt1fNRhl3CoPlegEZZq5LAyl4+ac=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-mpECr7nXNgK8D7A29tNcCA-1; Mon, 16 Mar 2020 14:51:33 -0400
-X-MC-Unique: mpECr7nXNgK8D7A29tNcCA-1
-Received: by mail-wr1-f72.google.com with SMTP id w11so9465380wrp.20
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:51:32 -0700 (PDT)
+ us-mta-11-1eibFGHpPlGov-kvsdwdCw-1; Mon, 16 Mar 2020 14:50:15 -0400
+X-MC-Unique: 1eibFGHpPlGov-kvsdwdCw-1
+Received: by mail-wr1-f72.google.com with SMTP id v7so8264wrp.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:50:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=04xeP5EixbpWsJm6lJ8qB4mcyVbq8ONy8Rtl0nbrdFA=;
- b=eMyw0lYrE+rb87OccotAxpkC2bFhd1PffR3lf4PhDnjjN8aNOd8vkrCPg74/c3kqPZ
- gZvff+2gPk3YyaWRHfqqmgkJvrrwU+fC9M7ic3ehNhZWACa7xMyIOTmlOFUGQ+d4heOj
- zWQ+M3+2SNtEXRAFwM5x16Zt4aekG1RZk0oLb3Inw9EGYx+Fkf1tH8Ka0ZFYOooWNVwX
- x6PTAd6GlKVaDYf04roMkrs3G5gITqgEbeupY8dg+T2RRq+Fzj9F/UMDPiLApxhZdE/l
- sHeKZ1l9p324tMNbzE4IVq1ogkzNfgTiZ5LmVYesBGUkmMDCuXlzq1D6PQOEZKXpOxTG
- grLA==
-X-Gm-Message-State: ANhLgQ2xPFcIhUYNYVEQE7jZdA4R3BvJgoYGZ8H+YV7byb31kpGs7Bty
- X7KzE6rguU546IKVN0AFw2YF0ryCLXRKL8VKYGsvXEpmsDEhqjABiEFZLkS0oLjtopPiKLLZMij
- kFLtKAFoZ4EVXuGw=
-X-Received: by 2002:a1c:4d14:: with SMTP id o20mr525852wmh.17.1584384691714;
- Mon, 16 Mar 2020 11:51:31 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vs5XMd9dWXI5/5mbyYuh2ZFc0lUCEk7bLwWAUlQSiKmR6i7d0sJHuxSLYEAXyyiuMXUqIb20g==
-X-Received: by 2002:a1c:4d14:: with SMTP id o20mr525833wmh.17.1584384691447;
- Mon, 16 Mar 2020 11:51:31 -0700 (PDT)
+ bh=dnVDi3pCdMDNavjfPIsCqusO2Yp3WpdN6v4oPIcWzd4=;
+ b=ZVl5RtbGMoUKrD+ozn0yHPDhRr0MPpV3T/BIejJpUnHleevWvnKmeg041po4I0ZA+2
+ 2/riSQu+Q2is7qneVKjzLe2hFH+8RmH2Wl+YwNmgeIqVIxtS9u1ZNyIq7kzeIsVSTcV3
+ /evKjjhLh1CtcxRIbeMxX0xhC9ONDqHOERRqLf8TvW0rwpONcbDsvevD0TgTutGiuIvK
+ qpt1260rn/2nhV929Vv/of+XXrNp0TEO1J0INwc9wg9ga9OI15hywqd5O7wHxypgkUPs
+ vYJa/Bs0uVJzKcAj+HGsFqmP38cMBPT/2oHimXMWkMG6EpKSZ6KwcjxZoymc05RmBRXK
+ OvLA==
+X-Gm-Message-State: ANhLgQ29kCD16T+SFE88ghQLYV6w65Se8XQpK8MpOw4uCIXnDxhxIPhz
+ M1tbx/zB94Ke/ZUbof7IsOqtPef9v2+JJm70iI73dqIIW2/wtMGc/X/ek9oA9ik3qDkgnFxofvV
+ v+NqX+NnpJX4Sbm0=
+X-Received: by 2002:a5d:694e:: with SMTP id r14mr761147wrw.312.1584384614279; 
+ Mon, 16 Mar 2020 11:50:14 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vumt0/zyQegs7BCttH3meap4BjY3y8njKNdvv230mwaaJmL4cZHHdg7RC6AUxKvB+enCsS0Uw==
+X-Received: by 2002:a5d:694e:: with SMTP id r14mr761126wrw.312.1584384614058; 
+ Mon, 16 Mar 2020 11:50:14 -0700 (PDT)
 Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
  [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id b4sm747590wmj.12.2020.03.16.11.51.30
+ by smtp.gmail.com with ESMTPSA id v10sm763990wmh.17.2020.03.16.11.50.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 11:51:30 -0700 (PDT)
+ Mon, 16 Mar 2020 11:50:13 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 16/25] scripts/cocci: Patch to let devices own their
- MemoryRegions
-Date: Mon, 16 Mar 2020 19:49:57 +0100
-Message-Id: <20200316185006.576-17-philmd@redhat.com>
+Subject: [PATCH v3 01/25] memory: Correctly return alias region type
+Date: Mon, 16 Mar 2020 19:49:42 +0100
+Message-Id: <20200316185006.576-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
 References: <20200316185006.576-1-philmd@redhat.com>
@@ -92,7 +91,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,103 +110,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When a device creates a MemoryRegion without setting its ownership,
-the MemoryRegion is added to the machine "/unattached" container in
-the QOM tree.
-
-Example with the Samsung SMDKC210 board:
-
-  $ arm-softmmu/qemu-system-arm -M smdkc210 -S -monitor stdio
-  (qemu) info qom-tree
-  /machine (smdkc210-machine)
-    /unattached (container)
-      /io[0] (qemu:memory-region)
-      /exynos4210.dram0[0] (qemu:memory-region)
-      /exynos4210.irom[0] (qemu:memory-region)
-      /exynos4210.iram[0] (qemu:memory-region)
-      /exynos4210.chipid[0] (qemu:memory-region)
-      ...
-      /device[26] (exynos4210.uart)
-        /exynos4210.uart[0] (qemu:memory-region)
-    /soc (exynos4210)
-      ^
-       \__ [*]
-
-The irom/iram/chipid regions should go under 'soc' at [*].
-
-Add a semantic patch to let the device own the memory region.
+Since memory region aliases are neither rom nor ram, they are
+described as i/o, which is often incorrect. Return instead the
+type of the original region we are aliasing.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- .../memory-region-housekeeping.cocci          | 56 +++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ memory.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/coccinelle/memory-region-housekeeping.cocci b/scripts/=
-coccinelle/memory-region-housekeeping.cocci
-index 5e6b31d8ba..c768d8140a 100644
---- a/scripts/coccinelle/memory-region-housekeeping.cocci
-+++ b/scripts/coccinelle/memory-region-housekeeping.cocci
-@@ -101,3 +101,59 @@ expression ERRP;
- +memory_region_init_rom_device(MR, NULL, OPS, OPAQUE, NAME, SIZE, ERRP);
-  ...
- -vmstate_register_ram_global(MR);
-+
-+
-+// Device is owner
-+@@
-+typedef DeviceState;
-+identifier device_fn, dev, obj;
-+expression E1, E2, E3, E4, E5;
-+@@
-+static void device_fn(DeviceState *dev, ...)
-+{
-+  ...
-+  Object *obj =3D OBJECT(dev);
-+  <+...
-+(
-+- memory_region_init(E1, NULL, E2, E3);
-++ memory_region_init(E1, obj, E2, E3);
-+|
-+- memory_region_init_io(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_io(E1, obj, E2, E3, E4, E5);
-+|
-+- memory_region_init_alias(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_alias(E1, obj, E2, E3, E4, E5);
-+|
-+- memory_region_init_rom(E1, NULL, E2, E3, E4);
-++ memory_region_init_rom(E1, obj, E2, E3, E4);
-+|
-+- memory_region_init_ram_shared_nomigrate(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_ram_shared_nomigrate(E1, obj, E2, E3, E4, E5);
-+)
-+  ...+>
-+}
-+@@
-+identifier device_fn, dev;
-+expression E1, E2, E3, E4, E5;
-+@@
-+static void device_fn(DeviceState *dev, ...)
-+{
-+  <+...
-+(
-+- memory_region_init(E1, NULL, E2, E3);
-++ memory_region_init(E1, OBJECT(dev), E2, E3);
-+|
-+- memory_region_init_io(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_io(E1, OBJECT(dev), E2, E3, E4, E5);
-+|
-+- memory_region_init_alias(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_alias(E1, OBJECT(dev), E2, E3, E4, E5);
-+|
-+- memory_region_init_rom(E1, NULL, E2, E3, E4);
-++ memory_region_init_rom(E1, OBJECT(dev), E2, E3, E4);
-+|
-+- memory_region_init_ram_shared_nomigrate(E1, NULL, E2, E3, E4, E5);
-++ memory_region_init_ram_shared_nomigrate(E1, OBJECT(dev), E2, E3, E4, E5)=
-;
-+)
-+  ...+>
-+}
+diff --git a/memory.c b/memory.c
+index 09be40edd2..3ea0afada9 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2830,6 +2830,9 @@ void address_space_destroy(AddressSpace *as)
+=20
+ static const char *memory_region_type(MemoryRegion *mr)
+ {
++    if (mr->alias) {
++        return memory_region_type(mr->alias);
++    }
+     if (memory_region_is_ram_device(mr)) {
+         return "ramd";
+     } else if (memory_region_is_romd(mr)) {
 --=20
 2.21.1
 
