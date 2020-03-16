@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CC0C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A81B1C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE8E320679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE8E320679
+	by mail.kernel.org (Postfix) with ESMTPS id 7CCED20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CCED20679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDt17-0001we-1S
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:55:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52845)
+	id 1jDt1F-0002FF-KY
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:55:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDqkU-0008PP-6I
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:29:48 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jDqlK-0000TX-Lr
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDqkR-0007gb-0p
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:29:45 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48460)
+ (envelope-from <its@irrelevant.dk>) id 1jDqlD-0004dk-3e
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:38 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48814)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDqkM-0006uW-2b; Mon, 16 Mar 2020 10:29:38 -0400
+ id 1jDql6-0001yU-VN; Mon, 16 Mar 2020 10:30:25 -0400
 Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
  [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id A351EBF7B4;
- Mon, 16 Mar 2020 14:29:36 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 344A7BF967;
+ Mon, 16 Mar 2020 14:29:47 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 03/42] nvme: move device parameters to separate struct
-Date: Mon, 16 Mar 2020 07:28:49 -0700
-Message-Id: <20200316142928.153431-4-its@irrelevant.dk>
+Subject: [PATCH v6 23/42] nvme: add mapping helpers
+Date: Mon, 16 Mar 2020 07:29:09 -0700
+Message-Id: <20200316142928.153431-24-its@irrelevant.dk>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
@@ -71,240 +71,234 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Move device configuration parameters to separate struct to make it
-explicit what is configurable and what is set internally.
+Add nvme_map_addr, nvme_map_addr_cmb and nvme_addr_to_cmb helpers and
+use them in nvme_map_prp.
 
-Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+This fixes a bug where in the case of a CMB transfer, the device would
+map to the buffer with a wrong length.
+
+Fixes: b2b2b67a00574 ("nvme: Add support for Read Data and Write Data in =
+CMBs.")
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c | 44 ++++++++++++++++++++++----------------------
- hw/block/nvme.h | 16 +++++++++++++---
- 2 files changed, 35 insertions(+), 25 deletions(-)
+ hw/block/nvme.c       | 97 +++++++++++++++++++++++++++++++++++--------
+ hw/block/trace-events |  1 +
+ 2 files changed, 81 insertions(+), 17 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 9740948b354a..b532818b4b76 100644
+index 08267e847671..187c816eb6ad 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -64,12 +64,12 @@ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, =
-void *buf, int size)
+@@ -59,6 +59,11 @@
 =20
- static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+ static void nvme_process_sq(void *opaque);
+=20
++static inline void *nvme_addr_to_cmb(NvmeCtrl *n, hwaddr addr)
++{
++    return &n->cmbuf[addr - n->ctrl_mem.addr];
++}
++
+ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
  {
--    return sqid < n->num_queues && n->sq[sqid] !=3D NULL ? 0 : -1;
-+    return sqid < n->params.num_queues && n->sq[sqid] !=3D NULL ? 0 : -1=
-;
+     hwaddr low =3D n->ctrl_mem.addr;
+@@ -70,7 +75,7 @@ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr=
+ addr)
+ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size=
+)
+ {
+     if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
+-        memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
++        memcpy(buf, nvme_addr_to_cmb(n, addr), size);
+         return;
+     }
+=20
+@@ -153,29 +158,79 @@ static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQue=
+ue *cq)
+     }
  }
 =20
- static int nvme_check_cqid(NvmeCtrl *n, uint16_t cqid)
++static uint16_t nvme_map_addr_cmb(NvmeCtrl *n, QEMUIOVector *iov, hwaddr=
+ addr,
++                                  size_t len)
++{
++    if (!nvme_addr_is_cmb(n, addr) || !nvme_addr_is_cmb(n, addr + len)) =
+{
++        return NVME_DATA_TRAS_ERROR;
++    }
++
++    qemu_iovec_add(iov, nvme_addr_to_cmb(n, addr), len);
++
++    return NVME_SUCCESS;
++}
++
++static uint16_t nvme_map_addr(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector=
+ *iov,
++                              hwaddr addr, size_t len)
++{
++    if (nvme_addr_is_cmb(n, addr)) {
++        if (qsg && qsg->sg) {
++            return NVME_INVALID_USE_OF_CMB | NVME_DNR;
++        }
++
++        assert(iov);
++
++        if (!iov->iov) {
++            qemu_iovec_init(iov, 1);
++        }
++
++        return nvme_map_addr_cmb(n, iov, addr, len);
++    }
++
++    if (iov && iov->iov) {
++        return NVME_INVALID_USE_OF_CMB | NVME_DNR;
++    }
++
++    assert(qsg);
++
++    if (!qsg->sg) {
++        pci_dma_sglist_init(qsg, &n->parent_obj, 1);
++    }
++
++    qemu_sglist_add(qsg, addr, len);
++
++    return NVME_SUCCESS;
++}
++
+ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_=
+t prp1,
+                              uint64_t prp2, uint32_t len, NvmeCtrl *n)
  {
--    return cqid < n->num_queues && n->cq[cqid] !=3D NULL ? 0 : -1;
-+    return cqid < n->params.num_queues && n->cq[cqid] !=3D NULL ? 0 : -1=
-;
- }
+     hwaddr trans_len =3D n->page_size - (prp1 % n->page_size);
+     trans_len =3D MIN(len, trans_len);
+     int num_prps =3D (len >> n->page_bits) + 1;
++    uint16_t status;
 =20
- static void nvme_inc_cq_tail(NvmeCQueue *cq)
-@@ -631,7 +631,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *=
-cmd)
-         trace_nvme_dev_err_invalid_create_cq_addr(prp1);
+     if (unlikely(!prp1)) {
+         trace_nvme_dev_err_invalid_prp();
          return NVME_INVALID_FIELD | NVME_DNR;
+-    } else if (n->bar.cmbsz && prp1 >=3D n->ctrl_mem.addr &&
+-               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size))=
+ {
+-        qsg->nsg =3D 0;
++    }
++
++    if (nvme_addr_is_cmb(n, prp1)) {
+         qemu_iovec_init(iov, num_prps);
+-        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], =
+trans_len);
+     } else {
+         pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
+-        qemu_sglist_add(qsg, prp1, trans_len);
      }
--    if (unlikely(vector > n->num_queues)) {
-+    if (unlikely(vector > n->params.num_queues)) {
-         trace_nvme_dev_err_invalid_create_cq_vector(vector);
-         return NVME_INVALID_IRQ_VECTOR | NVME_DNR;
-     }
-@@ -783,7 +783,8 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd=
- *cmd, NvmeRequest *req)
-         trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-         break;
-     case NVME_NUMBER_OF_QUEUES:
--        result =3D cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2=
-) << 16));
-+        result =3D cpu_to_le32((n->params.num_queues - 2) |
-+                             ((n->params.num_queues - 2) << 16));
-         trace_nvme_dev_getfeat_numq(result);
-         break;
-     case NVME_TIMESTAMP:
-@@ -827,9 +828,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCm=
-d *cmd, NvmeRequest *req)
-     case NVME_NUMBER_OF_QUEUES:
-         trace_nvme_dev_setfeat_numq((dw11 & 0xFFFF) + 1,
-                                     ((dw11 >> 16) & 0xFFFF) + 1,
--                                    n->num_queues - 1, n->num_queues - 1=
-);
--        req->cqe.result =3D
--            cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16=
-));
-+                                    n->params.num_queues - 1,
-+                                    n->params.num_queues - 1);
-+        req->cqe.result =3D cpu_to_le32((n->params.num_queues - 2) |
-+                                      ((n->params.num_queues - 2) << 16)=
-);
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_set_feature_timestamp(n, cmd);
-@@ -900,12 +902,12 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
++
++    status =3D nvme_map_addr(n, qsg, iov, prp1, trans_len);
++    if (status) {
++        goto unmap;
++    }
++
+     len -=3D trans_len;
+     if (len) {
+         if (unlikely(!prp2)) {
+             trace_nvme_dev_err_invalid_prp2_missing();
++            status =3D NVME_INVALID_FIELD | NVME_DNR;
+             goto unmap;
+         }
+         if (len > n->page_size) {
+@@ -192,6 +247,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOV=
+ector *iov, uint64_t prp1,
+                 if (i =3D=3D n->max_prp_ents - 1 && len > n->page_size) =
+{
+                     if (unlikely(!prp_ent || prp_ent & (n->page_size - 1=
+))) {
+                         trace_nvme_dev_err_invalid_prplist_ent(prp_ent);
++                        status =3D NVME_INVALID_FIELD | NVME_DNR;
+                         goto unmap;
+                     }
 =20
-     blk_drain(n->conf.blk);
+@@ -205,14 +261,14 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUI=
+OVector *iov, uint64_t prp1,
 =20
--    for (i =3D 0; i < n->num_queues; i++) {
-+    for (i =3D 0; i < n->params.num_queues; i++) {
-         if (n->sq[i] !=3D NULL) {
-             nvme_free_sq(n->sq[i], n);
+                 if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) =
+{
+                     trace_nvme_dev_err_invalid_prplist_ent(prp_ent);
++                    status =3D NVME_INVALID_FIELD | NVME_DNR;
+                     goto unmap;
+                 }
+=20
+                 trans_len =3D MIN(len, n->page_size);
+-                if (qsg->nsg){
+-                    qemu_sglist_add(qsg, prp_ent, trans_len);
+-                } else {
+-                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->c=
+trl_mem.addr], trans_len);
++                status =3D nvme_map_addr(n, qsg, iov, prp_ent, trans_len=
+);
++                if (status) {
++                    goto unmap;
+                 }
+                 len -=3D trans_len;
+                 i++;
+@@ -220,20 +276,27 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUI=
+OVector *iov, uint64_t prp1,
+         } else {
+             if (unlikely(prp2 & (n->page_size - 1))) {
+                 trace_nvme_dev_err_invalid_prp2_align(prp2);
++                status =3D NVME_INVALID_FIELD | NVME_DNR;
+                 goto unmap;
+             }
+-            if (qsg->nsg) {
+-                qemu_sglist_add(qsg, prp2, len);
+-            } else {
+-                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem=
+.addr], trans_len);
++            status =3D nvme_map_addr(n, qsg, iov, prp2, len);
++            if (status) {
++                goto unmap;
+             }
          }
      }
--    for (i =3D 0; i < n->num_queues; i++) {
-+    for (i =3D 0; i < n->params.num_queues; i++) {
-         if (n->cq[i] !=3D NULL) {
-             nvme_free_cq(n->cq[i], n);
-         }
-@@ -1308,7 +1310,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-     int64_t bs_size;
-     uint8_t *pci_conf;
+     return NVME_SUCCESS;
 =20
--    if (!n->num_queues) {
-+    if (!n->params.num_queues) {
-         error_setg(errp, "num_queues can't be zero");
-         return;
-     }
-@@ -1324,7 +1326,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-         return;
-     }
-=20
--    if (!n->serial) {
-+    if (!n->params.serial) {
-         error_setg(errp, "serial property not set");
-         return;
-     }
-@@ -1341,25 +1343,25 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
-r **errp)
-     pcie_endpoint_cap_init(pci_dev, 0x80);
-=20
-     n->num_namespaces =3D 1;
--    n->reg_size =3D pow2ceil(0x1004 + 2 * (n->num_queues + 1) * 4);
-+    n->reg_size =3D pow2ceil(0x1004 + 2 * (n->params.num_queues + 1) * 4=
-);
-     n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
-=20
-     n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
--    n->sq =3D g_new0(NvmeSQueue *, n->num_queues);
--    n->cq =3D g_new0(NvmeCQueue *, n->num_queues);
-+    n->sq =3D g_new0(NvmeSQueue *, n->params.num_queues);
-+    n->cq =3D g_new0(NvmeCQueue *, n->params.num_queues);
-=20
-     memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-                           "nvme", n->reg_size);
-     pci_register_bar(pci_dev, 0,
-         PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-         &n->iomem);
--    msix_init_exclusive_bar(pci_dev, n->num_queues, 4, NULL);
-+    msix_init_exclusive_bar(pci_dev, n->params.num_queues, 4, NULL);
-=20
-     id->vid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-     id->ssvid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VEND=
-OR_ID));
-     strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
-     strpadcpy((char *)id->fr, sizeof(id->fr), "1.0", ' ');
--    strpadcpy((char *)id->sn, sizeof(id->sn), n->serial, ' ');
-+    strpadcpy((char *)id->sn, sizeof(id->sn), n->params.serial, ' ');
-     id->rab =3D 6;
-     id->ieee[0] =3D 0x00;
-     id->ieee[1] =3D 0x02;
-@@ -1388,7 +1390,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-     n->bar.vs =3D 0x00010200;
-     n->bar.intmc =3D n->bar.intms =3D 0;
-=20
--    if (n->cmb_size_mb) {
-+    if (n->params.cmb_size_mb) {
-=20
-         NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
-         NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
-@@ -1399,7 +1401,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error =
-**errp)
-         NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-         NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-         NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
--        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->cmb_size_mb);
-+        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
-=20
-         n->cmbloc =3D n->bar.cmbloc;
-         n->cmbsz =3D n->bar.cmbsz;
-@@ -1438,7 +1440,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->cq);
-     g_free(n->sq);
-=20
--    if (n->cmb_size_mb) {
-+    if (n->params.cmb_size_mb) {
-         g_free(n->cmbuf);
-     }
-     msix_uninit_exclusive_bar(pci_dev);
-@@ -1446,9 +1448,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-=20
- static Property nvme_props[] =3D {
-     DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
--    DEFINE_PROP_STRING("serial", NvmeCtrl, serial),
--    DEFINE_PROP_UINT32("cmb_size_mb", NvmeCtrl, cmb_size_mb, 0),
--    DEFINE_PROP_UINT32("num_queues", NvmeCtrl, num_queues, 64),
-+    DEFINE_NVME_PROPERTIES(NvmeCtrl, params),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 557194ee1954..9957c4a200e2 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -1,7 +1,19 @@
- #ifndef HW_NVME_H
- #define HW_NVME_H
+- unmap:
+-    qemu_sglist_destroy(qsg);
+-    return NVME_INVALID_FIELD | NVME_DNR;
++unmap:
++    if (iov && iov->iov) {
++        qemu_iovec_destroy(iov);
++    }
 +
- #include "block/nvme.h"
-=20
-+#define DEFINE_NVME_PROPERTIES(_state, _props) \
-+    DEFINE_PROP_STRING("serial", _state, _props.serial), \
-+    DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
-+    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64)
++    if (qsg && qsg->sg) {
++        qemu_sglist_destroy(qsg);
++    }
 +
-+typedef struct NvmeParams {
-+    char     *serial;
-+    uint32_t num_queues;
-+    uint32_t cmb_size_mb;
-+} NvmeParams;
-+
- typedef struct NvmeAsyncEvent {
-     QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
-     NvmeAerResult result;
-@@ -63,6 +75,7 @@ typedef struct NvmeCtrl {
-     MemoryRegion ctrl_mem;
-     NvmeBar      bar;
-     BlockConf    conf;
-+    NvmeParams   params;
++    return status;
+ }
 =20
-     uint32_t    page_size;
-     uint16_t    page_bits;
-@@ -71,10 +84,8 @@ typedef struct NvmeCtrl {
-     uint16_t    sqe_size;
-     uint32_t    reg_size;
-     uint32_t    num_namespaces;
--    uint32_t    num_queues;
-     uint32_t    max_q_ents;
-     uint64_t    ns_size;
--    uint32_t    cmb_size_mb;
-     uint32_t    cmbsz;
-     uint32_t    cmbloc;
-     uint8_t     *cmbuf;
-@@ -82,7 +93,6 @@ typedef struct NvmeCtrl {
-     uint64_t    host_timestamp;                 /* Timestamp sent by the=
- host */
-     uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-=20
--    char            *serial;
-     NvmeNamespace   *namespaces;
-     NvmeSQueue      **sq;
-     NvmeCQueue      **cq;
+ static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t l=
+en,
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 4cde0844ef64..adf11313f956 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -33,6 +33,7 @@ nvme_dev_irq_msix(uint32_t vector) "raising MSI-X IRQ v=
+ector %u"
+ nvme_dev_irq_pin(void) "pulsing IRQ pin"
+ nvme_dev_irq_masked(void) "IRQ is masked"
+ nvme_dev_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=3D0x%"PR=
+Ix64" prp2=3D0x%"PRIx64""
++nvme_dev_map_prp(uint16_t cid, uint8_t opc, uint64_t trans_len, uint32_t=
+ len, uint64_t prp1, uint64_t prp2, int num_prps) "cid %"PRIu16" opc 0x%"=
+PRIx8" trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64=
+" num_prps %d"
+ nvme_dev_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, u=
+int64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
+ nvme_dev_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t=
+ qsize, uint16_t qflags) "create submission queue, addr=3D0x%"PRIx64", sq=
+id=3D%"PRIu16", cqid=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D%"PRIu16""
+ nvme_dev_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16=
+_t size, uint16_t qflags, int ien) "create completion queue, addr=3D0x%"P=
+RIx64", cqid=3D%"PRIu16", vector=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D=
+%"PRIu16", ien=3D%d"
 --=20
 2.25.1
 
