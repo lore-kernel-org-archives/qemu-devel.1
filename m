@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB471C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69330C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 955DD205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F49B205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LopQyfnf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955DD205ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahlQWJeJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F49B205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxbb-00083h-PJ
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:49:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42764)
+	id 1jDxbn-0008Nu-DM
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:49:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHs-00044I-2C
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:41 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHT-0003QR-D0
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHo-0006CQ-M6
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:38549)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHS-0003tw-1g
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39623)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHo-00068b-GG
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:36 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHR-0003r9-RU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394116;
+ s=mimecast20190719; t=1584394093;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HxC1eILjyyD4vXLg01tF8j7MmRukmacLFrXLAYZM6r4=;
- b=LopQyfnfFRMwh55F3fxmeLAgjmyAFye3GLLHkQLFUszkq0SzjPgCYPHnjqeuTndrJ6aeO+
- czPtQ7Fu7ROj/aDth0I8CUclW8tAXKwycH4eJV1n2wjTcxoswCR2HNbQTOLrDYTThf8RvD
- mbLLvDhuQQSuRa7MNoVmmoYEmkrN3u8=
+ bh=PpGvtNCDlQfH6rOIsiKSImKl8aq6C5B4SOcZrIHugE4=;
+ b=ahlQWJeJebsiF1T/zxI5U1+D7s7hUaTC7/UPmzhHeSG/iuKrKif4HvSVFIWc8jaIEa/XVZ
+ 2nLxUZJ8SH6grh7nhERcAr4f+4+XRvJHc78zYv/AjIFYZ3B+tkmDH4U5Z0vQrkDm3ai4E2
+ ZdEIQTYL+9uwxTqxjSbJ1GhHAOQp01s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-iAUgFsVKNAiTFCetGgpXDA-1; Mon, 16 Mar 2020 17:28:32 -0400
-X-MC-Unique: iAUgFsVKNAiTFCetGgpXDA-1
+ us-mta-33-cdlhqBcxMbCwnDWozQgwlA-1; Mon, 16 Mar 2020 17:28:11 -0400
+X-MC-Unique: cdlhqBcxMbCwnDWozQgwlA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E023149CF;
- Mon, 16 Mar 2020 21:28:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1248B180454D;
+ Mon, 16 Mar 2020 21:28:10 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46AD319C4F;
- Mon, 16 Mar 2020 21:28:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D25719C4F;
+ Mon, 16 Mar 2020 21:28:08 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/61] softmmu/vl.c: Handle '-cpu help' and '-device help'
- before 'no default machine'
-Date: Mon, 16 Mar 2020 22:26:58 +0100
-Message-Id: <1584394048-44994-32-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 22/61] WHPX: Use proper synchronization primitives while
+ processing
+Date: Mon, 16 Mar 2020 22:26:49 +0100
+Message-Id: <1584394048-44994-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
@@ -85,88 +85,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Sunil Muthuswamy <sunilmut@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
 
-Currently if you try to ask for the list of CPUs for a target
-architecture which does not specify a default machine type
-you just get an error:
+WHPX wasn't using the proper synchronization primitives while
+processing async events, which can cause issues with SMP.
 
-  $ qemu-system-arm -cpu help
-  qemu-system-arm: No machine specified, and there is no default
-  Use -machine help to list supported machines
-
-Since the list of CPUs doesn't depend on the machine, this is
-unnecessarily unhelpful. "-device help" has a similar problem.
-
-Move the checks for "did the user ask for -cpu help or -device help"
-up so they precede the select_machine() call which checks that the
-user specified a valid machine type.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ target/i386/whpx-all.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index ff2685d..6a28592 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -3789,6 +3789,22 @@ void qemu_init(int argc, char **argv, char **envp)
-      */
-     loc_set_none();
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index cb863b7..c78baac 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -905,9 +905,8 @@ static void whpx_vcpu_process_async_events(CPUState *cp=
+u)
 =20
-+    /*
-+     * Check for -cpu help and -device help before we call select_machine(=
-),
-+     * which will return an error if the architecture has no default machi=
-ne
-+     * type and the user did not specify one, so that the user doesn't nee=
-d
-+     * to say '-cpu help -machine something'.
-+     */
-+    if (cpu_option && is_help_option(cpu_option)) {
-+        list_cpus(cpu_option);
-+        exit(0);
-+    }
-+
-+    if (qemu_opts_foreach(qemu_find_opts("device"),
-+                          device_help_func, NULL, NULL)) {
-+        exit(0);
-+    }
-+
-     user_register_global_props();
-=20
-     replay_configure(icount_opts);
-@@ -3877,11 +3893,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         qemu_set_hw_version(machine_class->hw_version);
+     if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
+         !(env->hflags & HF_SMM_MASK)) {
+-
++        whpx_cpu_synchronize_state(cpu);
+         do_cpu_init(x86_cpu);
+-        cpu->vcpu_dirty =3D true;
+         vcpu->interruptable =3D true;
      }
 =20
--    if (cpu_option && is_help_option(cpu_option)) {
--        list_cpus(cpu_option);
--        exit(0);
--    }
--
-     if (!trace_init_backends()) {
-         exit(1);
+@@ -923,17 +922,13 @@ static void whpx_vcpu_process_async_events(CPUState *=
+cpu)
      }
-@@ -4112,11 +4123,6 @@ void qemu_init(int argc, char **argv, char **envp)
-                       fsdev_init_func, NULL, &error_fatal);
- #endif
 =20
--    if (qemu_opts_foreach(qemu_find_opts("device"),
--                          device_help_func, NULL, NULL)) {
--        exit(0);
--    }
--
-     /*
-      * Note: we need to create block backends before
-      * machine_set_property(), so machine properties can refer to
+     if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
+-        if (!cpu->vcpu_dirty) {
+-            whpx_get_registers(cpu);
+-        }
++        whpx_cpu_synchronize_state(cpu);
+         do_cpu_sipi(x86_cpu);
+     }
+=20
+     if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
+         cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
+-        if (!cpu->vcpu_dirty) {
+-            whpx_get_registers(cpu);
+-        }
++        whpx_cpu_synchronize_state(cpu);
+         apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
+                                       env->tpr_access_type);
+     }
+@@ -1125,8 +1120,10 @@ static int whpx_vcpu_run(CPUState *cpu)
+=20
+ static void do_whpx_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data a=
+rg)
+ {
+-    whpx_get_registers(cpu);
+-    cpu->vcpu_dirty =3D true;
++    if (!cpu->vcpu_dirty) {
++        whpx_get_registers(cpu);
++        cpu->vcpu_dirty =3D true;
++    }
+ }
+=20
+ static void do_whpx_cpu_synchronize_post_reset(CPUState *cpu,
 --=20
 1.8.3.1
 
