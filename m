@@ -2,98 +2,94 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D59C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C626C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66C1720753
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:22:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 560A720753
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:23:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g0X82ww1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66C1720753
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rzr1XnXj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 560A720753
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvK3-0006Mq-Ds
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38934)
+	id 1jDvKe-00081e-F3
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:23:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDuph-0000t0-By
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDuvE-000474-Jj
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:57:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDupg-000754-5C
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52157)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDupg-0006mS-0o
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:51:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584384681;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bTuM1yhPSP5ySruBCJxSW6noud9pHrZGrwBgDgMq278=;
- b=g0X82ww1NkuMK1gwyeWGJvkDulhLayCd/Ya3lfHseNfGSuUEcKW0+goMxKtq/k7H3qJooU
- cq+j4qBWt9cmSbnoAe1yvQy02Y5dqmWgqxvnde/qsbO+H+JyHdNcCgPfa7QWeMUsv35B+w
- H05DJAeUsoSw4Rza4FIbtBGvSQgVH4M=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-8RY_omIMNRavhwS1PD0myg-1; Mon, 16 Mar 2020 14:51:17 -0400
-X-MC-Unique: 8RY_omIMNRavhwS1PD0myg-1
-Received: by mail-wr1-f69.google.com with SMTP id f13so3265862wro.23
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:51:17 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDuvD-0003my-HL
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:57:08 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44823)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDuvC-0003d1-SZ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:57:07 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d9so8406600plo.11
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:57:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=j1sC+lNIFsKn3Cq5U7jHOz8e7n9eiTLX59JudzPIyOU=;
+ b=Rzr1XnXjKQlpR0mhkTwKRrurdw5NhB/KiMC8gFr3f6OPwo4trkT978nXKP0rmHUvWv
+ euFJv1AfdTFr5vOvg5g7bX6jX9/ZuFPCBhfuBa/9vdhQQ9D9JaeuuoY3FWFmp0QgT/qj
+ SOxQxlIFptIGwSXaoc2zWxFJUCk3MKV8wYjgbT5O9CPNihs8H1Z/LhsNlGlcMKnXh3AZ
+ OKybcIRTtOVTzRUX2C8BjvtLhdgsG6esDECqpy/zGAW4UiemIThOHzA0YBmtW48mWSvg
+ +URARYkLH4nNITZCxlspTLQOZ03I+XvVsOM+jM6NMn8g4ITeYB3s/a6r94K0qfOeAEe0
+ uv4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=2B/8CWN/FyAeBStmkGrCPLIrt/TAmqFu9+C8I7tRrxA=;
- b=Y97GA7bZkpAkOi17iHGXKugqkuYY8BkzGfB8ACtlcIPAlBqHV0DuBlFSuKY+Cy+6eh
- YrgosB7oghaipF1EgTbmhsHu1tp7slT6+cDZs7duafRuIgI4v8P0dM9c+YepuVNWF1K9
- kboW4inTBDWyaQJMP4+Tfd11o6LzGBco6kIkiVV1ZID00Q/oPCf2Pm5WiGM+M2OsU4Kd
- wo8xh7LiNmUO8KTvuXZFXaLxo3zfYJG56LxnK7xY75AFUH1mRt/aDkCQz1gRJet4x5V7
- WunCtwr7gFtSaEDlV0Bf+PS6dbQ/FnluXQK/I1TrojW+2ZdsvSuJRetzvSde2L45moGR
- vpgw==
-X-Gm-Message-State: ANhLgQ1Ww2vhB2ld1uLfME4iVAqsi44+tFTT7qWmYMBNYCx40336G2TK
- lDYkoK4IcW22ocw3+d+xlKAAth7nBdEzzmHibfPZStsKJjsECqA29qhlrKyeQO7hRsyiKeYUTEp
- aV5k1MVbSsrzsgbI=
-X-Received: by 2002:a5d:6910:: with SMTP id t16mr722548wru.209.1584384676472; 
- Mon, 16 Mar 2020 11:51:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvBnXDAus51I8a8xSHRFv5byerQBu4zdjvJtF9Gjgy7GzQkS7v5UpU5DfU2gyAprWpZI+Juwg==
-X-Received: by 2002:a5d:6910:: with SMTP id t16mr722533wru.209.1584384676298; 
- Mon, 16 Mar 2020 11:51:16 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id g127sm781950wmf.10.2020.03.16.11.51.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 11:51:15 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 13/25] hw/sparc: Use memory_region_init_rom() with
- read-only regions
-Date: Mon, 16 Mar 2020 19:49:54 +0100
-Message-Id: <20200316185006.576-14-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
-References: <20200316185006.576-1-philmd@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j1sC+lNIFsKn3Cq5U7jHOz8e7n9eiTLX59JudzPIyOU=;
+ b=tg1Us4rRRvpDXxeHjW02Z4sjXk+CjdvQGLWKcbAlPiQKclwB+zdHehdsqWNZrqP3XM
+ 7h/mPI6fk9Yijgy6Gq8C1va5k74m631EujCwuSK9yp/QtZUXn2RzTZNvGDPY8JP76Rr3
+ f1FOlPrpN2EaaQ7HT7I3g3bsU9oIrWb8+BxYfau/2oy3wfXkRbQ7JhOz6k1VTFpB+2kZ
+ XDsFzLddzTiDne6Dy/W5k5TlRt7Ve59UlUcLBJUGCr73xgjwcJjViC5+SJ/DR7pqePad
+ vrzmEkO/4YfNZf3TbURsV6iiBQkIqzl65Eel1mboNGe1epJ+sZWo4Bftc6RqlzWXphlv
+ 7Ofg==
+X-Gm-Message-State: ANhLgQ1liWJ58PKzfscLEK6VhplPFpgrKeU367Y9julmXuiBA1xhDbVw
+ toc6y/gH7pc49sVvu0u9/OaJzA==
+X-Google-Smtp-Source: ADFU+vscxB5GwRBCLCk4FIKwjmo3R2TCFIKQXTPhGuFiqt0FRxLIb8FuexYRa6oaJupiOW6gdiw9xA==
+X-Received: by 2002:a17:902:7886:: with SMTP id
+ q6mr536847pll.237.1584385025843; 
+ Mon, 16 Mar 2020 11:57:05 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ i21sm274755pgn.5.2020.03.16.11.57.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 11:57:05 -0700 (PDT)
+Subject: Re: [PATCH v2 01/12] Makefile: Only build virtiofsd if system-mode is
+ enabled
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200315235716.28448-1-philmd@redhat.com>
+ <20200315235716.28448-2-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b999f172-b616-5bec-e88f-725983057bf1@linaro.org>
+Date: Mon, 16 Mar 2020 11:57:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+In-Reply-To: <20200315235716.28448-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,44 +101,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+On 3/15/20 4:57 PM, Philippe Mathieu-Daudé wrote:
+> Do not build the virtiofsd helper when configured with
+> --disable-system.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> v2: Use single line with ifeq='yyyy' (lvivier, rth)
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/sparc/leon3.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 5fa58aa55f..8f024dab7b 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -255,8 +255,7 @@ static void leon3_generic_hw_init(MachineState *machine=
-)
-=20
-     /* Allocate BIOS */
-     prom_size =3D 8 * MiB;
--    memory_region_init_ram(prom, NULL, "Leon3.bios", prom_size, &error_fat=
-al);
--    memory_region_set_readonly(prom, true);
-+    memory_region_init_rom(prom, NULL, "Leon3.bios", prom_size, &error_fat=
-al);
-     memory_region_add_subregion(address_space_mem, LEON3_PROM_OFFSET, prom=
-);
-=20
-     /* Load boot prom */
---=20
-2.21.1
+r~
 
 
