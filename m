@@ -2,97 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB17C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA49C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:07:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 026D020658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:07:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4316D20658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:07:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E66aKtU3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 026D020658
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XQHG4iLb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4316D20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDv5D-0004fK-61
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37657)
+	id 1jDv5I-0004qJ-E3
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:07:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49546)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDuou-0007Fn-8n
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:37 -0400
+ (envelope-from <eblake@redhat.com>) id 1jDuIK-0005dj-Pn
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDuot-0007nQ-3P
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:46278)
+ (envelope-from <eblake@redhat.com>) id 1jDuII-0003b6-3Y
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:16:55 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:43826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDuos-0007h1-UB
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:50:35 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jDuIF-0003WG-6M
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:16:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584384634;
+ s=mimecast20190719; t=1584382608;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KKIXWkZQ88WTduFFFkbsC3MYjrqzYmU5aP3tKw4s+ro=;
- b=E66aKtU3AjXGs96/bUQH5A5g1RpwU4zb9JoioA0MEJeromP0IK234O6Fu6fA6pI8qaiBe/
- ibe34NoCPlL2Kp1XoSoAfeHP7LItf741XFW0IqUhBe8FhzjvNGbIa0JLiImhlg9c/TLbrs
- QBNTvZ4y/LRZGHv9qDfvIUw6wHalDII=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-XaWtLWjxN6-k15RYNXvfdw-1; Mon, 16 Mar 2020 14:50:30 -0400
-X-MC-Unique: XaWtLWjxN6-k15RYNXvfdw-1
-Received: by mail-wr1-f69.google.com with SMTP id l16so8749103wrr.6
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:50:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pKNOtl8y4WJnqPTmGJ+A9Z44KVpFXaN4HJISuiqMTmo=;
- b=aAsjxYQmttJ6SMNIVZOqhrlRS+XpDiMFpNf9n8kH49UfGfQwOAc+kt+ZddDeqWImeF
- vYxy19TzrV87wHkMiFujlwX5NDTr8IL86gwVhebwOU7eqeDekzKRi+TqUQg00Ckf880E
- uPZaom5kbm9qNO/GEiGWP6r+O1Ya6/PdbDiC7G4+CAHFAUR8zk75HCfMvKIqlxEbdOwW
- ekn4gc9mTSnIm1AIwTinK9DM7kPgQW5XDy+vkoBougv6MTYZVovV+g6Q2ETwxlBRslKO
- K/3RQAWeI2LyrV+pxmzijDbXBU+zbAPROnok4KYp3Y+aNaK/H/wabVNzUPhR8CS7ZaJV
- 2Z8A==
-X-Gm-Message-State: ANhLgQ3wCVOkgTRiZlVxp3zDN4H3UnifrO3PuuaJvFQXXLGiBweFEUhx
- y7L4CVVseovHsCHuQdEU6xalyDGK/0FjoHRpxD/C55nfUXvzCV3yi6m+DhBj+uodmYd9i6Iud/G
- YF3l8nLikhkHnq8c=
-X-Received: by 2002:a5d:4283:: with SMTP id k3mr772415wrq.304.1584384629244;
- Mon, 16 Mar 2020 11:50:29 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvLYYS1hcFWDjX+81ipfXjuKriBFgByjOnnLP1rmg7qpolVldr1N15Iz2a7I4cYqnmMXQAUgA==
-X-Received: by 2002:a5d:4283:: with SMTP id k3mr772390wrq.304.1584384628962;
- Mon, 16 Mar 2020 11:50:28 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id h10sm1079644wrb.24.2020.03.16.11.50.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 11:50:28 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 04/25] scripts/cocci: Patch to replace
- memory_region_init_{ram, readonly -> rom}
-Date: Mon, 16 Mar 2020 19:49:45 +0100
-Message-Id: <20200316185006.576-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
-References: <20200316185006.576-1-philmd@redhat.com>
+ bh=qYHp8rynnbtG8wxxghAk7dzacjYoNL1Xio3DDGG3ujY=;
+ b=XQHG4iLbEjkR2bzKJfMdBCZzHTuwaAPqSjxM6RVnn5z9JF4/QoWeelzYFypEYL3YVhR8be
+ Mf5B4e8vVDhq5c5VONELfVYFH8VC0OeJGF1dTbkR4a/rOVzFF4+XTcxf6X/T5EhV0XmOHy
+ A85ZFKfnihxyihFYfhKBrz8B8w4qKvE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-1ueIRDpVPRCrssMs6zqA_g-1; Mon, 16 Mar 2020 14:16:44 -0400
+X-MC-Unique: 1ueIRDpVPRCrssMs6zqA_g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10EEB116AF69;
+ Mon, 16 Mar 2020 17:55:39 +0000 (UTC)
+Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7DEB5C1B2;
+ Mon, 16 Mar 2020 17:55:38 +0000 (UTC)
+Subject: Re: [PATCH v3 12/34] qapi: Add feature flags to remaining definitions
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-13-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <a6b5dcd4-6ac7-adef-d3c0-20a6a9748bd3@redhat.com>
+Date: Mon, 16 Mar 2020 12:55:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200315144653.22660-13-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,51 +90,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a semantic patch to replace memory_region_init_ram(readonly)
-by memory_region_init_rom().
+On 3/15/20 9:46 AM, Markus Armbruster wrote:
+> In v4.1.0, we added feature flags just to struct types (commit
+> 6a8c0b5102^..f3ed93d545), to satisfy an immediate need (commit
+> c9d4070991 "file-posix: Add dynamic-auto-read-only QAPI feature").  In
+> v4.2.0, we added them to commands (commit 23394b4c39 "qapi: Add
+> feature flags to commands") to satisfy another immediate need (commit
+> d76744e65e "qapi: Allow introspecting fix for savevm's cooperation
+> with blockdev").
+> 
+> Add them to the remaining definitions: enumeration types, union types,
+> alternate types, and events.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- .../memory-region-housekeeping.cocci           | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/scripts/coccinelle/memory-region-housekeeping.cocci b/scripts/=
-coccinelle/memory-region-housekeeping.cocci
-index 3699c1017e..ee3923d369 100644
---- a/scripts/coccinelle/memory-region-housekeeping.cocci
-+++ b/scripts/coccinelle/memory-region-housekeeping.cocci
-@@ -11,6 +11,24 @@
- */
-=20
-=20
-+// Replace memory_region_init_ram(readonly) by memory_region_init_rom()
-+@@
-+expression E1, E2, E3, E4, E5;
-+symbol true;
-+@@
-+(
-+- memory_region_init_ram(E1, E2, E3, E4, E5);
-++ memory_region_init_rom(E1, E2, E3, E4, E5);
-+  ... WHEN !=3D E1
-+- memory_region_set_readonly(E1, true);
-+|
-+- memory_region_init_ram_nomigrate(E1, E2, E3, E4, E5);
-++ memory_region_init_rom_nomigrate(E1, E2, E3, E4, E5);
-+  ... WHEN !=3D E1
-+- memory_region_set_readonly(E1, true);
-+)
-+
-+
- // Replace by-hand memory_region_init_ram_nomigrate/vmstate_register_ram
- // code sequences with use of the new memory_region_init_ram function.
- // Similarly for the _rom and _rom_device functions.
---=20
-2.21.1
+> +++ b/qapi/introspect.json
+> @@ -89,12 +89,18 @@
+>   #
+>   # @meta-type: the entity's meta type, inherited from @base.
+>   #
+> +# @features: names of features associated with the entity, in no
+> +#            particular order.
+> +#            (since 4.1 for object types, 4.2 for commands, 5.0 for
+> +#            the rest)
+
+Odd versioning hint, but accurate, and I don't see any way to improve it.
+
+> +#
+>   # Additional members depend on the value of @meta-type.
+>   #
+>   # Since: 2.5
+>   ##
+>   { 'union': 'SchemaInfo',
+> -  'base': { 'name': 'str', 'meta-type': 'SchemaMetaType' },
+> +  'base': { 'name': 'str', 'meta-type': 'SchemaMetaType',
+> +            '*features': [ 'str' ] },
+>     'discriminator': 'meta-type',
+>     'data': {
+>         'builtin': 'SchemaInfoBuiltin',
+> @@ -174,9 +180,6 @@
+>   #            and may even differ from the order of the values of the
+>   #            enum type of the @tag.
+>   #
+> -# @features: names of features associated with the type, in no particular
+> -#            order. (since: 4.1)
+> -#
+>   # Values of this type are JSON object on the wire.
+>   #
+>   # Since: 2.5
+> @@ -184,8 +187,7 @@
+>   { 'struct': 'SchemaInfoObject',
+>     'data': { 'members': [ 'SchemaInfoObjectMember' ],
+>               '*tag': 'str',
+> -            '*variants': [ 'SchemaInfoObjectVariant' ],
+> -            '*features': [ 'str' ] } }
+> +            '*variants': [ 'SchemaInfoObjectVariant' ] } }
+
+The code motion from use in some of the union branches to now being 
+present in the base class of all of the branches is backwards-compatible.
+
+The generator changes also look correct, and have enough testsuite 
+coverage to make it easier to be confident about the patch.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+> +++ b/tests/qapi-schema/doc-good.json
+> @@ -53,10 +53,14 @@
+>   # @Enum:
+>   # @one: The _one_ {and only}
+>   #
+> +# Features:
+> +# @enum-feat: Also _one_ {and only}
+
+All our existing public features are a single word (matching naming 
+conventions elsewhere in QAPI).  Are we sure we want to allow feature 
+names that include whitespace?  Of course, the fact that our testsuite 
+covers it (even if we don't use it publically) means that we are sure 
+that our generator can handle it, regardless of whether we decide that a 
+separate patch should restrict feature names.  But I don't see it 
+holding up this patch.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
