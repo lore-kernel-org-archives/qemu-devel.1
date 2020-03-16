@@ -2,92 +2,82 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5751C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54C4C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:00:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DE9320663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:59:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2A5920663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:00:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aw6b4Wf+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DE9320663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/XRHFTn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A5920663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuxy-0000mE-Jp
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:59:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46112)
+	id 1jDuya-0001XX-QK
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:00:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDuuR-0002j7-2h
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:56:20 -0400
+ (envelope-from <cohuck@redhat.com>) id 1jDuCd-0005gF-BF
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDuuP-0007MM-Rm
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:56:18 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:34975)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDuuP-0007HJ-KV
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:56:17 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id mq3so9186941pjb.0
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Z0Mfj9/7R94RJlMQNj7AyIsYbkmBW+29a4buXrrjXRQ=;
- b=aw6b4Wf+WOuyRybaz8Hbq2MR422NhF1FqI2l4OrqRWVOgfbTgeWZntjk5QX5g8XFCx
- avkZ+87xHV/KtazV9ciWYgx2/9nmk23sbjojb4GhO2v6OYOcv6XUDhLmHenTBf1HJrY1
- HRu+vCwmkl0biMDlztTplbAJuxymqA+j+84OQ1CpkZ79OM1LxIzUHKKjawpZ2yAW7pvb
- Yna6NPKDgim64Ww39IHx8w0F/uGswM9KeOZyel8eZYowanXbzjn3MkEtFL3yhAIVCmmh
- WNpSeH8tOQ8zGj/tsc3vmjJTFdF2S3GP8N6ViSHWIhbvDBj3Q2De3Mr/tblg6IIbiXSr
- 6i7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Z0Mfj9/7R94RJlMQNj7AyIsYbkmBW+29a4buXrrjXRQ=;
- b=ij9+oy3krdZqTdO5smCWsUI5vJG8qe3bH9TALdD9kP/byJE04WRW61mVSf7Cf7VkMk
- CrTeIWSEhfATi8/xvAV0zLIaPGj/iEeayLd5yPZN0jXOgDjqbq03YgtmqChlYjGHlCis
- GfXCN4WKE/hBjW1KmcyZ6ziB0wa4r80iruo1HYxceidx4l/tAC2SrGdsFuwXCIY5O/xA
- 3jy0WysYq1+QwJiY62G/KTY0L4hIM925rGIQZqYA6Rw6aB860pgUfkXZLq8u2fhk0xxB
- yDkvUYnTa7pbCFWesz8i18B0gh1Lv6OlyKFLLDLx6SHWKZu6LmNMFlCBrH1c7mnd6jOV
- YR/A==
-X-Gm-Message-State: ANhLgQ0QSUk7+/HrZPuFpIwAgqFPBDrLXLclMdJXjQJizZ/Iti4mJXCy
- ulAB8OuSDQLdcQCHrdy8CkIrdQ==
-X-Google-Smtp-Source: ADFU+vvjaXKa/eXbYjRAvM+YMD6OhcaaxIUCBTuFZf9ybv6H0sMV6f2YVMMQkboS24hx2B7i5lUKOw==
-X-Received: by 2002:a17:902:d909:: with SMTP id
- c9mr534859plz.228.1584384976278; 
- Mon, 16 Mar 2020 11:56:16 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- gc16sm514163pjb.8.2020.03.16.11.56.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 11:56:15 -0700 (PDT)
-Subject: Re: [PATCH v2 8/9] hw/core: Add qdev stub for user-mode
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200316001111.31004-1-philmd@redhat.com>
- <20200316001111.31004-9-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fc93f85a-6f55-a793-a311-04e00afac65f@linaro.org>
-Date: Mon, 16 Mar 2020 11:56:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <cohuck@redhat.com>) id 1jDuCb-0004Iz-F0
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:02 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60557)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jDuCa-0004Ge-VV
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584382260;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=M3KjyDukERh1d5BPBXiKd9VP3IiPYhebJi6stTONZAA=;
+ b=A/XRHFTnUqYkiLf1pcFzsKKNZkDqXuUZzUZk6hOWecgLi8ZhyqHeOXY+lV4mrG5/yIKd9F
+ EDq+ja3VJejFL0e+Pg/pUOuAgo9qW04L9dEOmGDByXWOJREqLYK6Vbl0v6X7oT6fVWLA1P
+ pUPMnklyc9I/3hp/o3pJaK3cKVeorcU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-AoxoeXZtNa-js2AwAtH10g-1; Mon, 16 Mar 2020 14:10:56 -0400
+X-MC-Unique: AoxoeXZtNa-js2AwAtH10g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E31CF94C1CB;
+ Mon, 16 Mar 2020 17:58:39 +0000 (UTC)
+Received: from gondolin (ovpn-117-70.ams2.redhat.com [10.36.117.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D3FD5C1B2;
+ Mon, 16 Mar 2020 17:58:35 +0000 (UTC)
+Date: Mon, 16 Mar 2020 18:58:25 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v9] fixup! Fix subcode/pbt
+Message-ID: <20200316185825.5129e15c.cohuck@redhat.com>
+In-Reply-To: <344cf3c0-64dd-22be-e62b-448ef70dcc18@linux.ibm.com>
+References: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
+ <20200313095232.2392-1-frankja@linux.ibm.com>
+ <20200316152738.4c1c65ee.cohuck@redhat.com>
+ <bbbabbb0-2325-406d-a619-f2d03f447c8c@linux.ibm.com>
+ <20200316155457.73e97d9c.cohuck@redhat.com>
+ <344cf3c0-64dd-22be-e62b-448ef70dcc18@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200316001111.31004-9-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; boundary="Sig_/78OVCEWBtgBbjRizafzIhHj";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +89,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/15/20 5:11 PM, Philippe Mathieu-Daudé wrote:
-> While user-mode does not use peripherals (devices), it uses a
-> CPU which is a device.
-> In the next commit we will reduce the QAPI generated code for
-> user-mode. Since qdev.c calls qapi_event_send_device_deleted(),
-> let's add a stub for it.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> v2: use common-obj-$(CONFIG_ALL) (Paolo)
-> ---
->  hw/core/qdev-stubs.c  | 20 ++++++++++++++++++++
->  hw/core/Makefile.objs |  3 +++
->  2 files changed, 23 insertions(+)
->  create mode 100644 hw/core/qdev-stubs.c
+--Sig_/78OVCEWBtgBbjRizafzIhHj
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, 16 Mar 2020 16:05:03 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-r~
+> On 3/16/20 3:54 PM, Cornelia Huck wrote:
+> > On Mon, 16 Mar 2020 15:47:41 +0100
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >  =20
+> >> On 3/16/20 3:27 PM, Cornelia Huck wrote: =20
+> >>> On Fri, 13 Mar 2020 05:52:32 -0400
+> >>> Janosch Frank <frankja@linux.ibm.com> wrote:
+> >>>    =20
+> >>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >>>> ---
+> >>>>  hw/s390x/ipl.h      | 11 +++++++----
+> >>>>  target/s390x/diag.c |  2 +-
+> >>>>  2 files changed, 8 insertions(+), 5 deletions(-) =20
+> >=20
+> >  =20
+> >>>> @@ -118,7 +118,7 @@ void handle_diag_308(CPUS390XState *env, uint64_=
+t r1, uint64_t r3, uintptr_t ra)
+> >>>> =20
+> >>>>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len)=
+);
+> >>>> =20
+> >>>> -        if (!iplb_valid(iplb)) {
+> >>>> +        if (!iplb_valid(iplb, subcode)) {
+> >>>>              env->regs[r1 + 1] =3D DIAG_308_RC_INVALID;
+> >>>>              goto out;
+> >>>>          }   =20
+> >>>
+> >>> ...because you're basically checking whether you either have a valid
+> >>> normal iplb, or a valid pv iplb, with the two being mutually exclusiv=
+e,
+> >>> IIUC. So what about introducing iplb_valid_pv and calling that for th=
+e
+> >>> pv case? Would be a bit nicer to read, I think, and also matches what
+> >>> you do for the STORE case.
+> >>>    =20
+> >>S390_IPL_TYPE_CCW
+> >> The idea was to get rid of all of these ifs and elses and only have on=
+e
+> >> iplb_valid function. Your suggestion would defeat hiding that complexi=
+ty
+> >> behind this function. =20
+> >=20
+> > I'd argue that this is a complexity we should not hide; for non-pv, we
+> > can have several formats, for pv, only one, and we cannot use a pv iplb
+> > in a non-pv context and vice versa.
+> >  =20
+>=20
+> Ok, then please let me split this out into a new function within diag.c.
+> Something like:
+>=20
+> static bool diag308_pbt_subcode_validity(uint8_t pbt, uint64_t subcode)
+> {
+> =09if (subcode =3D=3D DIAG308_SET) {
+> =09=09return (pbt =3D=3D S390_IPL_TYPE_FCP || pbt =3D=3D S390_IPL_TYPE_CC=
+W)
+> =09} else if (subcode =3D=3D DIAG308_PV_SET && pbt =3D=3D S390_IPL_TYPE_P=
+V) {
+> =09return true;
+> }
+>=20
+> =09return false;
+> }
+>=20
+
+Sorry, you now managed to confuse me... where is that supposed to be
+called?
+
+--Sig_/78OVCEWBtgBbjRizafzIhHj
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5vvkEACgkQ3s9rk8bw
+L6/aWQ//SFdhw8E4QQhOVawRkRadV5oliTKKyV+iR2ITa2UZs9aUR/w5z3mSjOul
+ijmz6uSsnI9IAF5wK49VqeTgY3P6xH1dWWiU/Zm/g3Ssq1ZX1R9oOm5Xjb+2f30Z
+JJx/wZXYNLhstZmKdattYqNP7kSqAIS5iqr6foLtt4XZx3My76IF6/fJnfBNxyKT
+IE5jIC9BaFQGg8qlySBLwMl67HtHTGrnAnJsdZQkoGhsrPXyQ2ZvXdTM2PwuMjwL
+kaPCN0AtGpb5wNnxy6V7wSP2DygS4EmTYeizKD/DTcKjnaoAKtUhxHhNSZ30YryY
+gsJ5hn21vvODL9dJaBeD/X40OZJLFx0eQ82Nu4jMKm07NrtvUJWH/YFYlk+ZKA+y
+rTxdHPvcqTOnkHLH1GW/PmzkVPhI3zju/2hXIpO4Du3Fi8t/r20R/QF2CF/n93aH
+MoNjB0EStK5TMVF3LXzXpYWOxl+UPV0VymgvSjKyfLyaVAsxmQ4+955cloXoXkCm
+a/4C82oo8SKcEmarK45WniUNjj6Sxd0sdHJZBJcvv5Rz0I+3TWOq+djOhmVRH+mD
+iJVh/wtZOx7sx+6UlV6EB8yFUlnuBJfJg0p8ylhIrPDRBYAKukOszWZrV7Osgbhw
+DZ++N07xOeNgrVoiNoL2e9DWhpudiHA+HimeqHLA2QCIo/r3+MM=
+=zbxO
+-----END PGP SIGNATURE-----
+
+--Sig_/78OVCEWBtgBbjRizafzIhHj--
 
 
