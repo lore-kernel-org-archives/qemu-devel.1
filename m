@@ -2,78 +2,85 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2A6C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 22:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D71C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 22:07:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8C3E205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 22:06:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2972205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 22:07:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbIik6Pp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8C3E205ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TS0+WqQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2972205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxsv-0001yn-4L
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 18:06:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44019)
+	id 1jDxtL-000391-Ry
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 18:07:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxIa-0005Aq-TS
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:29:27 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1jDxsM-0001Tk-2B
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 18:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxIY-0000zb-IR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:29:24 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:45395)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxIY-0000wW-CM
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:29:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394162;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oYHjZDpcNN2ePqEz9llI3P58uy6rKg4XVNTobQcwV+E=;
- b=gbIik6Pp8k11q2NWf+agqOZ51oRvrL0vCbTZRaG+nYPhuRlsixuADyFd7ILs4S0NN0TdcX
- 50IDshZKV02oGg5UYiNQooBctz1yJHJ8LrhGXutsT6o2OLjP4Yp0cztx7+KONQm1ePSreX
- 2EDiilNpwUa9HCXbQhuBHIlQwgZRoqM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-RZ5djjSPPnO1f51ERfCYyg-1; Mon, 16 Mar 2020 17:29:19 -0400
-X-MC-Unique: RZ5djjSPPnO1f51ERfCYyg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEAB78017CC
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:29:18 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E221B19C4F;
- Mon, 16 Mar 2020 21:29:17 +0000 (UTC)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1jDxsJ-0001mD-6o
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 18:06:21 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42824)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1jDxsI-0001Y9-SH
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 18:06:19 -0400
+Received: by mail-wr1-x433.google.com with SMTP id v11so23241234wrm.9
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 15:06:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/Ac0BpTDPqryII/1mSbC6OFEqbPybLVEM8m8/BY/Qgg=;
+ b=TS0+WqQApHnQ/SpSmR6cHe/P2mj65zzD+0FcsrpxUcqL+mlNLbEEyDBn1YtNHDQXx5
+ ZaCQqGKzHUFiNFLBZcOyKikLHN3YCAeQoRjRHt7+k5w/T9M5P0nGkE9A5z4E0zVrhJEu
+ cGuoGxhp/TwBNXURxH0Lycy8avOHBMv4qpBwVCxtVSpJbz1gP85XmfEmwyCh+2vKNECX
+ ha+upL47ko8WQNPKB5GbE1ZTWNcJQvUcx7FVD0ayNn4R2U60bbruVAqBOVWSpu//KryA
+ vyLg4XUW9pBUzLEUa8jT77qqlOhe5LRxl4NgtTpkQoryMULmbQxuMn8As9N8LPG8PZXB
+ ky8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=/Ac0BpTDPqryII/1mSbC6OFEqbPybLVEM8m8/BY/Qgg=;
+ b=OGbhP2ftr4kyzcQMajdgCh01XMwzhryWXf9ohhP+bnlUt3/aa+qedtqJdWV7xjKPY+
+ W45iuFsny2lkDE+MTEIIeV1S9e8BYzPM15Ej1AegKepoYtRFOTe6UmbrmT9ESx/WVy2P
+ 0XsvkfNw0NQ+3uLPUCJyaPXAzkyfk5IUIPmKkirAFOh+vc3fS27kdrFhAkaphljGI+MK
+ cumnrZa7jb4IyFCPxIE4z7SsFscbVmeNYrVnsG9IVbfVztoWW2BKil/bkpgoDey+6eZA
+ snq08fnFRtmVffyJwpR1E9WDb3OEUc2FomrZo46Qmd7gZrMLJd2iyBCJTibd5Jjq+iK4
+ ruyw==
+X-Gm-Message-State: ANhLgQ132kubirR/EqQw8d8z7/ry/lx9jleIEss/y60Dcz8ASRWsLjlK
+ DKJR0iN5e63oHF0cKuCmjWFVAr9T
+X-Google-Smtp-Source: ADFU+vv5hg/z3zkWB2FKMaKysWUponx75vo9p60jl9SEesliUWVIP2bnoCD1A5bBX0rSXb7d5AYRqg==
+X-Received: by 2002:adf:ab54:: with SMTP id r20mr1477473wrc.197.1584396377253; 
+ Mon, 16 Mar 2020 15:06:17 -0700 (PDT)
+Received: from 640k.lan ([93.56.174.5])
+ by smtp.gmail.com with ESMTPSA id v10sm1369392wmh.17.2020.03.16.15.06.16
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 16 Mar 2020 15:06:16 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 61/61] hw/arm: Let devices own the MemoryRegion they create
-Date: Mon, 16 Mar 2020 22:27:28 +0100
-Message-Id: <1584394048-44994-62-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
-References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL v2 00/61] Misc patches for soft freeze
+Date: Mon, 16 Mar 2020 23:06:14 +0100
+Message-Id: <1584396375-31278-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,341 +92,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The following changes since commit a98135f727595382e200d04c2996e868b7925a01:
 
-Avoid orphan memory regions being added in the /unattached QOM
-container.
+  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200316-pull-request' into staging (2020-03-16 14:55:59 +0000)
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+are available in the git repository at:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/arm/exynos4210.c    | 12 ++++++------
- hw/arm/fsl-imx25.c     | 10 +++++-----
- hw/arm/fsl-imx31.c     |  6 +++---
- hw/arm/fsl-imx6.c      |  6 +++---
- hw/arm/fsl-imx6ul.c    |  9 +++++----
- hw/arm/msf2-soc.c      |  6 +++---
- hw/arm/nrf51_soc.c     |  2 +-
- hw/arm/stm32f205_soc.c |  8 ++++----
- hw/arm/stm32f405_soc.c |  9 +++++----
- hw/arm/xlnx-zynqmp.c   | 11 +++++------
- 10 files changed, 40 insertions(+), 39 deletions(-)
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 4e1fd7e..1f7253e 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -305,20 +305,20 @@ static void exynos4210_realize(DeviceState *socdev, E=
-rror **errp)
-     /*** Memory ***/
-=20
-     /* Chip-ID and OMR */
--    memory_region_init_io(&s->chipid_mem, NULL, &exynos4210_chipid_and_omr=
-_ops,
--        NULL, "exynos4210.chipid", sizeof(chipid_and_omr));
-+    memory_region_init_io(&s->chipid_mem, OBJECT(socdev),
-+                          &exynos4210_chipid_and_omr_ops, NULL,
-+                          "exynos4210.chipid", sizeof(chipid_and_omr));
-     memory_region_add_subregion(system_mem, EXYNOS4210_CHIPID_ADDR,
-                                 &s->chipid_mem);
-=20
-     /* Internal ROM */
--    memory_region_init_rom(&s->irom_mem, NULL, "exynos4210.irom",
-+    memory_region_init_rom(&s->irom_mem, OBJECT(socdev), "exynos4210.irom"=
-,
-                            EXYNOS4210_IROM_SIZE, &error_fatal);
-     memory_region_add_subregion(system_mem, EXYNOS4210_IROM_BASE_ADDR,
-                                 &s->irom_mem);
-     /* mirror of iROM */
--    memory_region_init_alias(&s->irom_alias_mem, NULL, "exynos4210.irom_al=
-ias",
--                             &s->irom_mem,
--                             0,
-+    memory_region_init_alias(&s->irom_alias_mem, OBJECT(socdev),
-+                             "exynos4210.irom_alias", &s->irom_mem, 0,
-                              EXYNOS4210_IROM_SIZE);
-     memory_region_add_subregion(system_mem, EXYNOS4210_IROM_MIRROR_BASE_AD=
-DR,
-                                 &s->irom_alias_mem);
-diff --git a/hw/arm/fsl-imx25.c b/hw/arm/fsl-imx25.c
-index a3f829f..6f1a82c 100644
---- a/hw/arm/fsl-imx25.c
-+++ b/hw/arm/fsl-imx25.c
-@@ -303,16 +303,16 @@ static void fsl_imx25_realize(DeviceState *dev, Error=
- **errp)
-     }
-=20
-     /* initialize 2 x 16 KB ROM */
--    memory_region_init_rom(&s->rom[0], NULL,
--                           "imx25.rom0", FSL_IMX25_ROM0_SIZE, &err);
-+    memory_region_init_rom(&s->rom[0], OBJECT(dev), "imx25.rom0",
-+                           FSL_IMX25_ROM0_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_ROM0_ADDR,
-                                 &s->rom[0]);
--    memory_region_init_rom(&s->rom[1], NULL,
--                           "imx25.rom1", FSL_IMX25_ROM1_SIZE, &err);
-+    memory_region_init_rom(&s->rom[1], OBJECT(dev), "imx25.rom1",
-+                           FSL_IMX25_ROM1_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -331,7 +331,7 @@ static void fsl_imx25_realize(DeviceState *dev, Error *=
-*errp)
-                                 &s->iram);
-=20
-     /* internal RAM (128 KB) is aliased over 128 MB - 128 KB */
--    memory_region_init_alias(&s->iram_alias, NULL, "imx25.iram_alias",
-+    memory_region_init_alias(&s->iram_alias, OBJECT(dev), "imx25.iram_alia=
-s",
-                              &s->iram, 0, FSL_IMX25_IRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX25_IRAM_ALIAS_=
-ADDR,
-                                 &s->iram_alias);
-diff --git a/hw/arm/fsl-imx31.c b/hw/arm/fsl-imx31.c
-index 55e90d1..8472d2e 100644
---- a/hw/arm/fsl-imx31.c
-+++ b/hw/arm/fsl-imx31.c
-@@ -206,7 +206,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error *=
-*errp)
-     }
-=20
-     /* On a real system, the first 16k is a `secure boot rom' */
--    memory_region_init_rom(&s->secure_rom, NULL, "imx31.secure_rom",
-+    memory_region_init_rom(&s->secure_rom, OBJECT(dev), "imx31.secure_rom"=
-,
-                            FSL_IMX31_SECURE_ROM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -216,7 +216,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error *=
-*errp)
-                                 &s->secure_rom);
-=20
-     /* There is also a 16k ROM */
--    memory_region_init_rom(&s->rom, NULL, "imx31.rom",
-+    memory_region_init_rom(&s->rom, OBJECT(dev), "imx31.rom",
-                            FSL_IMX31_ROM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -236,7 +236,7 @@ static void fsl_imx31_realize(DeviceState *dev, Error *=
-*errp)
-                                 &s->iram);
-=20
-     /* internal RAM (16 KB) is aliased over 256 MB - 16 KB */
--    memory_region_init_alias(&s->iram_alias, NULL, "imx31.iram_alias",
-+    memory_region_init_alias(&s->iram_alias, OBJECT(dev), "imx31.iram_alia=
-s",
-                              &s->iram, 0, FSL_IMX31_IRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX31_IRAM_ALIAS_=
-ADDR,
-                                 &s->iram_alias);
-diff --git a/hw/arm/fsl-imx6.c b/hw/arm/fsl-imx6.c
-index ecc6285..9c09f71 100644
---- a/hw/arm/fsl-imx6.c
-+++ b/hw/arm/fsl-imx6.c
-@@ -405,7 +405,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **=
-errp)
-     }
-=20
-     /* ROM memory */
--    memory_region_init_rom(&s->rom, NULL, "imx6.rom",
-+    memory_region_init_rom(&s->rom, OBJECT(dev), "imx6.rom",
-                            FSL_IMX6_ROM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -415,7 +415,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **=
-errp)
-                                 &s->rom);
-=20
-     /* CAAM memory */
--    memory_region_init_rom(&s->caam, NULL, "imx6.caam",
-+    memory_region_init_rom(&s->caam, OBJECT(dev), "imx6.caam",
-                            FSL_IMX6_CAAM_MEM_SIZE, &err);
-     if (err) {
-         error_propagate(errp, err);
-@@ -435,7 +435,7 @@ static void fsl_imx6_realize(DeviceState *dev, Error **=
-errp)
-                                 &s->ocram);
-=20
-     /* internal OCRAM (256 KB) is aliased over 1 MB */
--    memory_region_init_alias(&s->ocram_alias, NULL, "imx6.ocram_alias",
-+    memory_region_init_alias(&s->ocram_alias, OBJECT(dev), "imx6.ocram_ali=
-as",
-                              &s->ocram, 0, FSL_IMX6_OCRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6_OCRAM_ALIAS_=
-ADDR,
-                                 &s->ocram_alias);
-diff --git a/hw/arm/fsl-imx6ul.c b/hw/arm/fsl-imx6ul.c
-index c405b68..f4a9ed6 100644
---- a/hw/arm/fsl-imx6ul.c
-+++ b/hw/arm/fsl-imx6ul.c
-@@ -543,7 +543,7 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error =
-**errp)
-     /*
-      * ROM memory
-      */
--    memory_region_init_rom(&s->rom, NULL, "imx6ul.rom",
-+    memory_region_init_rom(&s->rom, OBJECT(dev), "imx6ul.rom",
-                            FSL_IMX6UL_ROM_SIZE, &error_abort);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_ROM_ADDR,
-                                 &s->rom);
-@@ -551,7 +551,7 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error =
-**errp)
-     /*
-      * CAAM memory
-      */
--    memory_region_init_rom(&s->caam, NULL, "imx6ul.caam",
-+    memory_region_init_rom(&s->caam, OBJECT(dev), "imx6ul.caam",
-                            FSL_IMX6UL_CAAM_MEM_SIZE, &error_abort);
-     memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_CAAM_MEM_A=
-DDR,
-                                 &s->caam);
-@@ -568,8 +568,9 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error =
-**errp)
-     /*
-      * internal OCRAM (128 KB) is aliased over 512 KB
-      */
--    memory_region_init_alias(&s->ocram_alias, NULL, "imx6ul.ocram_alias",
--                             &s->ocram, 0, FSL_IMX6UL_OCRAM_ALIAS_SIZE);
-+    memory_region_init_alias(&s->ocram_alias, OBJECT(dev),
-+                             "imx6ul.ocram_alias", &s->ocram, 0,
-+                             FSL_IMX6UL_OCRAM_ALIAS_SIZE);
-     memory_region_add_subregion(get_system_memory(),
-                                 FSL_IMX6UL_OCRAM_ALIAS_ADDR, &s->ocram_ali=
-as);
- }
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index 8f84692..588d643 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -96,7 +96,7 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Erro=
-r **errp)
-     MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
-     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
-=20
--    memory_region_init_rom(nvm, NULL, "MSF2.eNVM", s->envm_size,
-+    memory_region_init_rom(nvm, OBJECT(dev_soc), "MSF2.eNVM", s->envm_size=
-,
-                            &error_fatal);
-     /*
-      * On power-on, the eNVM region 0x60000000 is automatically
-@@ -104,8 +104,8 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Er=
-ror **errp)
-      * start address (0x0). We do not support remapping other eNVM,
-      * eSRAM and DDR regions by guest(via Sysreg) currently.
-      */
--    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM",
--                             nvm, 0, s->envm_size);
-+    memory_region_init_alias(nvm_alias, OBJECT(dev_soc), "MSF2.eNVM", nvm,=
- 0,
-+                             s->envm_size);
-=20
-     memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
-     memory_region_add_subregion(system_memory, 0, nvm_alias);
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 4817a76..57eff63 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -165,7 +165,7 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Err=
-or **errp)
-     }
-=20
-     /* STUB Peripherals */
--    memory_region_init_io(&s->clock, NULL, &clock_ops, NULL,
-+    memory_region_init_io(&s->clock, OBJECT(dev_soc), &clock_ops, NULL,
-                           "nrf51_soc.clock", 0x1000);
-     memory_region_add_subregion_overlap(&s->container,
-                                         NRF51_IOMEM_BASE, &s->clock, -1);
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 6e93726..118c342 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -93,10 +93,10 @@ static void stm32f205_soc_realize(DeviceState *dev_soc,=
- Error **errp)
-     MemoryRegion *flash =3D g_new(MemoryRegion, 1);
-     MemoryRegion *flash_alias =3D g_new(MemoryRegion, 1);
-=20
--    memory_region_init_rom(flash, NULL, "STM32F205.flash", FLASH_SIZE,
--                           &error_fatal);
--    memory_region_init_alias(flash_alias, NULL, "STM32F205.flash.alias",
--                             flash, 0, FLASH_SIZE);
-+    memory_region_init_rom(flash, OBJECT(dev_soc), "STM32F205.flash",
-+                           FLASH_SIZE, &error_fatal);
-+    memory_region_init_alias(flash_alias, OBJECT(dev_soc),
-+                             "STM32F205.flash.alias", flash, 0, FLASH_SIZE=
-);
-=20
-     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
-     memory_region_add_subregion(system_memory, 0, flash_alias);
-diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
-index d590cd0..4f10ce6 100644
---- a/hw/arm/stm32f405_soc.c
-+++ b/hw/arm/stm32f405_soc.c
-@@ -95,14 +95,15 @@ static void stm32f405_soc_realize(DeviceState *dev_soc,=
- Error **errp)
-     Error *err =3D NULL;
-     int i;
-=20
--    memory_region_init_rom(&s->flash, NULL, "STM32F405.flash", FLASH_SIZE,
--                           &err);
-+    memory_region_init_rom(&s->flash, OBJECT(dev_soc), "STM32F405.flash",
-+                           FLASH_SIZE, &err);
-     if (err !=3D NULL) {
-         error_propagate(errp, err);
-         return;
-     }
--    memory_region_init_alias(&s->flash_alias, NULL, "STM32F405.flash.alias=
-",
--                             &s->flash, 0, FLASH_SIZE);
-+    memory_region_init_alias(&s->flash_alias, OBJECT(dev_soc),
-+                             "STM32F405.flash.alias", &s->flash, 0,
-+                             FLASH_SIZE);
-=20
-     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->fla=
-sh);
-     memory_region_add_subregion(system_memory, 0, &s->flash_alias);
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index cab0160..49f1c8d 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -318,9 +318,9 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error=
- **errp)
-         ddr_low_size =3D XLNX_ZYNQMP_MAX_LOW_RAM_SIZE;
-         ddr_high_size =3D ram_size - XLNX_ZYNQMP_MAX_LOW_RAM_SIZE;
-=20
--        memory_region_init_alias(&s->ddr_ram_high, NULL,
--                                 "ddr-ram-high", s->ddr_ram,
--                                  ddr_low_size, ddr_high_size);
-+        memory_region_init_alias(&s->ddr_ram_high, OBJECT(dev),
-+                                 "ddr-ram-high", s->ddr_ram, ddr_low_size,
-+                                 ddr_high_size);
-         memory_region_add_subregion(get_system_memory(),
-                                     XLNX_ZYNQMP_HIGH_RAM_START,
-                                     &s->ddr_ram_high);
-@@ -330,9 +330,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error=
- **errp)
-         ddr_low_size =3D ram_size;
-     }
-=20
--    memory_region_init_alias(&s->ddr_ram_low, NULL,
--                             "ddr-ram-low", s->ddr_ram,
--                              0, ddr_low_size);
-+    memory_region_init_alias(&s->ddr_ram_low, OBJECT(dev), "ddr-ram-low",
-+                             s->ddr_ram, 0, ddr_low_size);
-     memory_region_add_subregion(get_system_memory(), 0, &s->ddr_ram_low);
-=20
-     /* Create the four OCM banks */
---=20
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 9d04fea181318684a899fadd99cef7e04097456b:
+
+  hw/arm: Let devices own the MemoryRegion they create (2020-03-16 23:02:30 +0100)
+
+----------------------------------------------------------------
+* Bugfixes all over the place
+* get/set_uint cleanups (Felipe)
+* Lock guard support (Stefan)
+* MemoryRegion ownership cleanup (Philippe)
+* AVX512 optimization for buffer_is_zero (Robert)
+
+----------------------------------------------------------------
+v1->v2: fix for clang build
+
+Christian Ehrhardt (1):
+      modules: load modules from versioned /var/run dir
+
+Christophe de Dinechin (1):
+      scsi/qemu-pr-helper: Fix out-of-bounds access to trnptid_list[]
+
+Colin Xu (1):
+      MAINTAINERS: Add entry for Guest X86 HAXM CPUs
+
+Dr. David Alan Gilbert (1):
+      exec/rom_reset: Free rom data during inmigrate skip
+
+Eduardo Habkost (1):
+      Use -isystem for linux-headers dir
+
+Felipe Franciosi (4):
+      qom/object: enable setter for uint types
+      ich9: fix getter type for sci_int property
+      ich9: Simplify ich9_lpc_initfn
+      qom/object: Use common get/set uint helpers
+
+Jan Kiszka (1):
+      hw/i386/intel_iommu: Fix out-of-bounds access on guest IRT
+
+Joe Richey (1):
+      optionrom/pvh: scan entire RSDP Area
+
+Julio Faracco (1):
+      i386: Fix GCC warning with snprintf when HAX is enabled
+
+Kashyap Chamarthy (1):
+      qemu-cpu-models.rst: Document -noTSX, mds-no, taa-no, and tsx-ctrl
+
+Longpeng (Mike) (1):
+      cpus: avoid pause_all_vcpus getting stuck due to race
+
+Marc-André Lureau (1):
+      build-sys: do not make qemu-ga link with pixman
+
+Matt Borgerson (1):
+      memory: Fix start offset for bitmap log_clear hook
+
+Paolo Bonzini (1):
+      oslib-posix: initialize mutex and condition variable
+
+Peter Maydell (1):
+      softmmu/vl.c: Handle '-cpu help' and '-device help' before 'no default machine'
+
+Philippe Mathieu-Daudé (36):
+      misc: Replace zero-length arrays with flexible array member (automatic)
+      misc: Replace zero-length arrays with flexible array member (manual)
+      configure: Fix building with SASL on Windows
+      tests/docker: Install SASL library to extend code coverage on amd64
+      Makefile: Align 'help' target output
+      Makefile: Let the 'help' target list the tools targets
+      hw/audio/fmopl: Move ENV_CURVE to .heap to save 32KiB of .bss
+      hw/audio/intel-hda: Use memory region alias to reduce .rodata by 4.34MB
+      hw/usb/quirks: Use smaller types to reduce .rodata by 10KiB
+      ui/curses: Make control_characters[] array const
+      ui/curses: Move arrays to .heap to save 74KiB of .bss
+      memory: Correctly return alias region type
+      memory: Simplify memory_region_init_rom_nomigrate() to ease review
+      scripts/cocci: Rename memory-region-{init-ram -> housekeeping}
+      scripts/cocci: Patch to replace memory_region_init_{ram,readonly -> rom}
+      hw/arm: Use memory_region_init_rom() with read-only regions
+      hw/display: Use memory_region_init_rom() with read-only regions
+      hw/m68k: Use memory_region_init_rom() with read-only regions
+      hw/net: Use memory_region_init_rom() with read-only regions
+      hw/pci-host: Use memory_region_init_rom() with read-only regions
+      hw/ppc: Use memory_region_init_rom() with read-only regions
+      hw/riscv: Use memory_region_init_rom() with read-only regions
+      hw/sh4: Use memory_region_init_rom() with read-only regions
+      hw/sparc: Use memory_region_init_rom() with read-only regions
+      scripts/cocci: Patch to detect potential use of memory_region_init_rom
+      scripts/cocci: Patch to remove unnecessary memory_region_set_readonly()
+      scripts/cocci: Patch to let devices own their MemoryRegions
+      hw/core: Let devices own the MemoryRegion they create
+      hw/display: Let devices own the MemoryRegion they create
+      hw/dma: Let devices own the MemoryRegion they create
+      hw/riscv: Let devices own the MemoryRegion they create
+      hw/char: Let devices own the MemoryRegion they create
+      hw/arm/stm32: Use memory_region_init_rom() with read-only regions
+      hw/ppc/ppc405: Use memory_region_init_rom() with read-only regions
+      hw/arm: Remove unnecessary memory_region_set_readonly() on ROM alias
+      hw/arm: Let devices own the MemoryRegion they create
+
+Robert Hoo (2):
+      configure: add configure option avx512f_opt
+      util: add util function buffer_zero_avx512()
+
+Stefan Hajnoczi (2):
+      lockable: add lock guards
+      lockable: add QemuRecMutex support
+
+Sunil Muthuswamy (3):
+      WHPX: TSC get and set should be dependent on VM state
+      WHPX: Use QEMU values for trapped CPUID
+      WHPX: Use proper synchronization primitives while processing
+
+ MAINTAINERS                                        |  12 ++
+ Makefile                                           |  49 +++--
+ Makefile.target                                    |   2 +-
+ block/linux-aio.c                                  |   2 +-
+ block/vmdk.c                                       |   2 +-
+ bsd-user/qemu.h                                    |   2 +-
+ configure                                          |  62 +++++-
+ contrib/libvhost-user/libvhost-user.h              |   2 +-
+ contrib/vhost-user-gpu/Makefile.objs               |   6 +-
+ .../vhost-user-gpu/{main.c => vhost-user-gpu.c}    |   0
+ cpus.c                                             |   6 +-
+ docs/interop/vhost-user.rst                        |   4 +-
+ docs/system/cpu-models-x86.rst.inc                 |  57 +++++-
+ exec.c                                             |   9 +-
+ hw/acpi/ich9.c                                     |  99 +---------
+ hw/acpi/nvdimm.c                                   |   6 +-
+ hw/acpi/pcihp.c                                    |   7 +-
+ hw/acpi/piix4.c                                    |  12 +-
+ hw/arm/exynos4210.c                                |  14 +-
+ hw/arm/fsl-imx25.c                                 |  10 +-
+ hw/arm/fsl-imx31.c                                 |   6 +-
+ hw/arm/fsl-imx6.c                                  |   6 +-
+ hw/arm/fsl-imx6ul.c                                |   9 +-
+ hw/arm/mainstone.c                                 |   3 +-
+ hw/arm/msf2-soc.c                                  |   6 +-
+ hw/arm/nrf51_soc.c                                 |   2 +-
+ hw/arm/omap_sx1.c                                  |   6 +-
+ hw/arm/palm.c                                      |   3 +-
+ hw/arm/spitz.c                                     |   3 +-
+ hw/arm/stellaris.c                                 |   3 +-
+ hw/arm/stm32f205_soc.c                             |  11 +-
+ hw/arm/stm32f405_soc.c                             |  12 +-
+ hw/arm/tosa.c                                      |   3 +-
+ hw/arm/xlnx-zynqmp.c                               |  11 +-
+ hw/audio/fmopl.c                                   |   4 +-
+ hw/audio/intel-hda.c                               |  24 +--
+ hw/char/sclpconsole-lm.c                           |   2 +-
+ hw/char/sclpconsole.c                              |   2 +-
+ hw/char/serial.c                                   |   7 +-
+ hw/core/loader.c                                   |  25 ++-
+ hw/core/platform-bus.c                             |   3 +-
+ hw/display/cg3.c                                   |   5 +-
+ hw/display/g364fb.c                                |   3 +-
+ hw/display/macfb.c                                 |   4 +-
+ hw/display/tcx.c                                   |   5 +-
+ hw/dma/i8257.c                                     |   2 +-
+ hw/dma/rc4030.c                                    |   4 +-
+ hw/dma/soc_dma.c                                   |   2 +-
+ hw/i386/intel_iommu.c                              |   6 +
+ hw/i386/x86.c                                      |   2 +-
+ hw/isa/lpc_ich9.c                                  |  27 +--
+ hw/m68k/bootinfo.h                                 |   2 +-
+ hw/m68k/q800.c                                     |   3 +-
+ hw/misc/edu.c                                      |  13 +-
+ hw/misc/omap_l4.c                                  |   2 +-
+ hw/net/dp8393x.c                                   |   5 +-
+ hw/nvram/eeprom93xx.c                              |   2 +-
+ hw/pci-host/prep.c                                 |   5 +-
+ hw/pci-host/q35.c                                  |  14 +-
+ hw/ppc/mac_newworld.c                              |   3 +-
+ hw/ppc/mac_oldworld.c                              |   3 +-
+ hw/ppc/ppc405_boards.c                             |   6 +-
+ hw/ppc/spapr.c                                     |  36 +---
+ hw/ppc/spapr_drc.c                                 |   3 +-
+ hw/rdma/vmw/pvrdma_qp_ops.c                        |   4 +-
+ hw/riscv/sifive_e.c                                |   9 +-
+ hw/riscv/sifive_u.c                                |   2 +-
+ hw/s390x/virtio-ccw.c                              |   2 +-
+ hw/sh4/shix.c                                      |   3 +-
+ hw/sparc/leon3.c                                   |   3 +-
+ hw/usb/dev-network.c                               |   2 +-
+ hw/usb/dev-smartcard-reader.c                      |   4 +-
+ hw/usb/quirks.c                                    |   4 +-
+ hw/usb/quirks.h                                    |  22 ++-
+ hw/virtio/virtio.c                                 |   4 +-
+ hw/xen/xen_pt.h                                    |   2 +-
+ include/hw/acpi/acpi-defs.h                        |  16 +-
+ include/hw/arm/smmu-common.h                       |   2 +-
+ include/hw/boards.h                                |   2 +-
+ include/hw/i386/intel_iommu.h                      |   3 +-
+ include/hw/s390x/event-facility.h                  |   2 +-
+ include/hw/s390x/sclp.h                            |   8 +-
+ include/hw/virtio/virtio-iommu.h                   |   2 +-
+ include/qemu/cpuid.h                               |   3 +
+ include/qemu/lockable.h                            |  67 +++++++
+ include/qom/object.h                               |  48 ++++-
+ include/sysemu/cryptodev.h                         |   2 +-
+ include/sysemu/whpx.h                              |   7 +
+ include/tcg/tcg.h                                  |   2 +-
+ memory.c                                           |  31 +--
+ net/queue.c                                        |   2 +-
+ pc-bios/optionrom/pvh_main.c                       |   2 +-
+ pc-bios/s390-ccw/bootmap.h                         |   2 +-
+ pc-bios/s390-ccw/sclp.h                            |   2 +-
+ plugins/core.c                                     |   7 +-
+ plugins/loader.c                                   |  16 +-
+ qom/object.c                                       | 212 ++++++++++++++++++---
+ .../coccinelle/memory-region-housekeeping.cocci    | 159 ++++++++++++++++
+ scripts/coccinelle/memory-region-init-ram.cocci    |  38 ----
+ scsi/qemu-pr-helper.c                              |  17 +-
+ softmmu/vl.c                                       |  26 ++-
+ target/arm/cpu.c                                   |  22 +--
+ target/i386/hax-posix.c                            |  33 +---
+ target/i386/hax-windows.c                          |  33 +---
+ target/i386/sev.c                                  | 106 +----------
+ target/i386/whp-dispatch.h                         |   9 +
+ target/i386/whpx-all.c                             | 162 +++++++++++-----
+ target/s390x/ioinst.c                              |   2 +-
+ tests/docker/dockerfiles/debian-amd64.docker       |   1 +
+ tests/qtest/libqos/ahci.h                          |   2 +-
+ ui/console.c                                       |   4 +-
+ ui/curses.c                                        |  10 +-
+ util/bufferiszero.c                                |  71 ++++++-
+ util/module.c                                      |  14 ++
+ util/oslib-posix.c                                 |   7 +
+ util/qemu-timer.c                                  |  23 ++-
+ 116 files changed, 1145 insertions(+), 764 deletions(-)
+ rename contrib/vhost-user-gpu/{main.c => vhost-user-gpu.c} (100%)
+ create mode 100644 scripts/coccinelle/memory-region-housekeeping.cocci
+ delete mode 100644 scripts/coccinelle/memory-region-init-ram.cocci
+-- 
 1.8.3.1
 
 
