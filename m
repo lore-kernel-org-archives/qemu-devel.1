@@ -2,89 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D04BFC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D683BC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B26A20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E1A520674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OzCWNNwB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B26A20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoXh0etP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E1A520674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuRO-0006Db-PU
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52836)
+	id 1jDuRb-0006VF-QU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXn-0003id-9Y
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:54 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtCT-0006IF-Qe
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXl-0002FC-Vz
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:51 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43158)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtCS-0000ac-CU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:49 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44371)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtXk-00022H-Bp
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:48 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id b2so16053190wrj.10
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=r0mbXI1FyMLDM5RVM9EU8oKyEvhKwmvfb7Yp7qK5ioM=;
- b=OzCWNNwBak8yE/Fcxhd/ZyQc84pbSqzsgLqCwWEyoTaPSF/6PBsb4TQzTODE9OzSY7
- V0suokH+dKOpBm0HqUyCDx2NtxaTub0xdwffooACl44ZRmYiIr5m23/lbER5HBHsA4Lz
- o9uHtH6Duc/UhaZqYmMO1X2PbaFCVYA8yqMH64eJSS/20b3YrODRLCA8FZU/jHLferkY
- haFwMBHJnjPbdGpdmrNiJxnyj5S52hm0qgGslBnmtfdxPzYA8HAC1ndvCmI0CuTelxBw
- hl4A9AByXeOsugr9EPpGsVl0WLujJuiVdLl0b8xrUYx8k71soKPEuTPawsha1xysJYZN
- O+Wg==
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jDtCS-0000LV-1q
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:48 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y2so6718715wrn.11
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:06:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+aehvrjy0SyV5NB78ZWbob8FS5DKF0bgZJt6g171eSY=;
+ b=UoXh0etP7PAhMzIHl5pGI12K7jPec9AFOjNdemwBIYYDMhfgQ6322Se/kQyWJyvxj5
+ nmwdatoehAxcBreu45kyRdtBAvSZe4o/YlgLVX5vtZANSJXl84gQ9Nc4QhyvhaaISy6/
+ 6NroTy5P0bjUAMwT8EQUHzZqJXq3hW7VkPjUHC3G+bkzhxtNBmN//5TnSxdvD4ey1ndW
+ zadb16vz5T+nrsgKETGShINAkzqmS1GiCaAqRXSOieH6hB3BlcRixqmPEmU4gmn+bNvV
+ TsnaZZmwpYB7jQi8ja8q1uE56NNdC6xiXQ822/+uqPmNswfeb5eib12Zxl/NSXHL376N
+ NWEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=r0mbXI1FyMLDM5RVM9EU8oKyEvhKwmvfb7Yp7qK5ioM=;
- b=Ohcg4y7K4RHmQtB5n1MEIsYEY1nH3xJwhuQuaoQc2K2T6D6XbUURFBsDsEhfWuuVXY
- VRv70VIhE8v/4QuFUza3lv4lR2O/vW54xHnfkNedf6Zz6GzYZ57MmrrLzErIickA1/EP
- fuwDjHfeI+BVLy+RV5u83r4vjk65kljga6uWm2mxkJToVvUlLD1gN8JFzv3y0ZLdbdEZ
- Vpy9kSI30cjRjOWq0bEx/gLhKW5aYD7bhqIuH0zUe1kO2bGknDoYNPbdnn++xLiefgRp
- uiWwSspO/cSWx6OSIovLtJtmsQfUW3XHHx63mLFsOpUjFV6hdMn/xoxfIi8DEl3aRT9u
- 3jAg==
-X-Gm-Message-State: ANhLgQ2KF8G+vqbBucDxHL5hhBKlrjAg073zYL7ln2obOhd1w9d0SlUY
- kemDDWtEwQbWqBRI3xwnMYC3Ow==
-X-Google-Smtp-Source: ADFU+vsedf7pCBxcX3pKcwKlrigpbFkclCGcCE2ZHjXoceF+3e0pByy6V08kj2Aw81yfb4PutD1kfg==
-X-Received: by 2002:adf:f40f:: with SMTP id g15mr431292wro.213.1584379724372; 
- Mon, 16 Mar 2020 10:28:44 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b10sm818520wrm.30.2020.03.16.10.28.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:28:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 557E01FFAB;
- Mon, 16 Mar 2020 17:21:57 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 21/28] configure: allow user to specify what gdb to use
-Date: Mon, 16 Mar 2020 17:21:48 +0000
-Message-Id: <20200316172155.971-22-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+aehvrjy0SyV5NB78ZWbob8FS5DKF0bgZJt6g171eSY=;
+ b=mFg2N1a9w2cuTXjrlFFFuT0WrJAxBrFDkC4scUFXahZ8UUCbaTCsn7ovDF7cgbkq56
+ UXV0MjnjiSqfadfKceiA5eVFKwf/NWPzxXo4mssNvOGc6Nox4nVNc7kPSgU64aBkg0Wm
+ 2qm1NRXlvJD7Pja0IiVeaqftUXNddvPGadXaTDX29NLyfWQokiXEyq9Lgwzv5LZpKdvB
+ 4wW5TLXCYtJBiVwiix/G/IsXXRm2NRwvN8RP2lD1tAGG3RDH+v59/FPz6BKcU+3B5SoZ
+ TzsDcOfY/pmDbQYaEIKXM8CJ1EtY4fONBoDiJOuGdvskuMdSxHELSqAxgVOHoOafTBV+
+ DH8g==
+X-Gm-Message-State: ANhLgQ2LtY6Hm/tblXHFU9thHU6wHT9nk2U2bmOrLVfM9UblDOuayBky
+ NHdPmSQZUGkrESFi/ah/XDu/m5+YuCNyEcHS+JU=
+X-Google-Smtp-Source: ADFU+vu5P19/Qf7O1XND33l2+njh/AxqlvTEcl203lEmHVkSMeTVUkipcIrrAlntJIL8pCs09kQMPgvgC3F08ka5v1M=
+X-Received: by 2002:a5d:62c9:: with SMTP id o9mr384774wrv.2.1584378406871;
+ Mon, 16 Mar 2020 10:06:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-19-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-19-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 16 Mar 2020 18:06:35 +0100
+Message-ID: <CAJ+F1C+NaANkyF7NVs5_XW=Gy0wR7Js_dwhsw8gSFi3kGqZ_aA@mail.gmail.com>
+Subject: Re: [PATCH v3 18/34] qapi/schema: Rename QAPISchemaObjectType{Variant, 
+ Variants}
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,70 +90,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is useful, especially when testing relatively new gdbstub
-features that might not be in distro packages yet.
+On Sun, Mar 15, 2020 at 4:19 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> QAPISchemaObjectTypeVariants represents both object type and alternate
+> type variants.  Rename to QAPISchemaVariants.
+>
+> Rename QAPISchemaObjectTypeVariant the same way.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- configure | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/configure b/configure
-index eb49bb6680c..6724158fde1 100755
---- a/configure
-+++ b/configure
-@@ -303,6 +303,7 @@ libs_qga=""
- debug_info="yes"
- stack_protector=""
- use_containers="yes"
-+gdb_bin=$(command -v "gdb")
- 
- if test -e "$source_path/.git"
- then
-@@ -1588,6 +1589,8 @@ for opt do
-   ;;
-   --disable-fuzzing) fuzzing=no
-   ;;
-+  --with-gdb=*) gdb_bin="$optarg"
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1773,6 +1776,7 @@ Advanced options (experts only):
-   --enable-plugins
-                            enable plugins via shared library loading
-   --disable-containers     don't use containers for cross-building
-+  --with-gdb=GBB-path      gdb to use for gdbstub tests [$gdb_bin]
- 
- Optional features, enabled with --enable-FEATURE and
- disabled with --disable-FEATURE, default is enabled if available:
-@@ -6734,6 +6738,7 @@ echo "libudev           $libudev"
- echo "default devices   $default_devices"
- echo "plugin support    $plugins"
- echo "fuzzing support   $fuzzing"
-+echo "gdb               $gdb_bin"
- 
- if test "$supported_cpu" = "no"; then
-     echo
-@@ -7608,6 +7613,10 @@ if test "$plugins" = "yes" ; then
-     fi
- fi
- 
-+if test -n "$gdb_bin" ; then
-+    echo "HAVE_GDB_BIN=$gdb_bin" >> $config_host_mak
-+fi
-+
- if test "$tcg_interpreter" = "yes"; then
-   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
- elif test "$ARCH" = "sparc64" ; then
--- 
-2.20.1
 
+> ---
+>  scripts/qapi/schema.py | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+> index 0acf8b466f..033c84c4a0 100644
+> --- a/scripts/qapi/schema.py
+> +++ b/scripts/qapi/schema.py
+> @@ -338,7 +338,7 @@ class QAPISchemaObjectType(QAPISchemaType):
+>              assert isinstance(m, QAPISchemaObjectTypeMember)
+>              m.set_defined_in(name)
+>          if variants is not None:
+> -            assert isinstance(variants, QAPISchemaObjectTypeVariants)
+> +            assert isinstance(variants, QAPISchemaVariants)
+>              variants.set_defined_in(name)
+>          self._base_name =3D base
+>          self.base =3D None
+> @@ -449,7 +449,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>
+>      def __init__(self, name, info, doc, ifcond, features, variants):
+>          super().__init__(name, info, doc, ifcond, features)
+> -        assert isinstance(variants, QAPISchemaObjectTypeVariants)
+> +        assert isinstance(variants, QAPISchemaVariants)
+>          assert variants.tag_member
+>          variants.set_defined_in(name)
+>          variants.tag_member.set_defined_in(self.name)
+> @@ -512,7 +512,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>              self.name, self.info, self.ifcond, self.features, self.varia=
+nts)
+>
+>
+> -class QAPISchemaObjectTypeVariants:
+> +class QAPISchemaVariants:
+>      def __init__(self, tag_name, info, tag_member, variants):
+>          # Flat unions pass tag_name but not tag_member.
+>          # Simple unions and alternates pass tag_member but not tag_name.
+> @@ -522,7 +522,7 @@ class QAPISchemaObjectTypeVariants:
+>          assert (isinstance(tag_name, str) or
+>                  isinstance(tag_member, QAPISchemaObjectTypeMember))
+>          for v in variants:
+> -            assert isinstance(v, QAPISchemaObjectTypeVariant)
+> +            assert isinstance(v, QAPISchemaVariant)
+>          self._tag_name =3D tag_name
+>          self.info =3D info
+>          self.tag_member =3D tag_member
+> @@ -572,8 +572,8 @@ class QAPISchemaObjectTypeVariants:
+>              cases =3D {v.name for v in self.variants}
+>              for m in self.tag_member.type.members:
+>                  if m.name not in cases:
+> -                    v =3D QAPISchemaObjectTypeVariant(m.name, self.info,
+> -                                                    'q_empty', m.ifcond)
+> +                    v =3D QAPISchemaVariant(m.name, self.info,
+> +                                          'q_empty', m.ifcond)
+>                      v.set_defined_in(self.tag_member.defined_in)
+>                      self.variants.append(v)
+>          if not self.variants:
+> @@ -681,7 +681,7 @@ class QAPISchemaObjectTypeMember(QAPISchemaMember):
+>                                          self.describe)
+>
+>
+> -class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
+> +class QAPISchemaVariant(QAPISchemaObjectTypeMember):
+>      role =3D 'branch'
+>
+>      def __init__(self, name, info, typ, ifcond=3DNone):
+> @@ -987,7 +987,7 @@ class QAPISchema:
+>              None))
+>
+>      def _make_variant(self, case, typ, ifcond, info):
+> -        return QAPISchemaObjectTypeVariant(case, info, typ, ifcond)
+> +        return QAPISchemaVariant(case, info, typ, ifcond)
+>
+>      def _make_simple_variant(self, case, typ, ifcond, info):
+>          if isinstance(typ, list):
+> @@ -996,7 +996,7 @@ class QAPISchema:
+>          typ =3D self._make_implicit_object_type(
+>              typ, info, self.lookup_type(typ),
+>              'wrapper', [self._make_member('data', typ, None, info)])
+> -        return QAPISchemaObjectTypeVariant(case, info, typ, ifcond)
+> +        return QAPISchemaVariant(case, info, typ, ifcond)
+>
+>      def _def_union_type(self, expr, info, doc):
+>          name =3D expr['union']
+> @@ -1026,7 +1026,7 @@ class QAPISchema:
+>          self._def_entity(
+>              QAPISchemaObjectType(name, info, doc, ifcond, features,
+>                                   base, members,
+> -                                 QAPISchemaObjectTypeVariants(
+> +                                 QAPISchemaVariants(
+>                                       tag_name, info, tag_member, variant=
+s)))
+>
+>      def _def_alternate_type(self, expr, info, doc):
+> @@ -1040,7 +1040,7 @@ class QAPISchema:
+>          tag_member =3D QAPISchemaObjectTypeMember('type', info, 'QType',=
+ False)
+>          self._def_entity(
+>              QAPISchemaAlternateType(name, info, doc, ifcond, features,
+> -                                    QAPISchemaObjectTypeVariants(
+> +                                    QAPISchemaVariants(
+>                                          None, info, tag_member, variants=
+)))
+>
+>      def _def_command(self, expr, info, doc):
+> --
+> 2.21.1
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
