@@ -2,86 +2,68 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D29FC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB537C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:45:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 186AC20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:45:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K+7nCIcC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186AC20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8F2362051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:45:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F2362051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtnf-0007xY-6N
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:45:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44986)
+	id 1jDto5-0000DC-O9
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:45:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRI-0000Xa-Rs
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:12 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsPU-0007r1-Sh
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRF-0007tf-KA
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:08 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43653)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtRF-0007io-6K
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:05 -0400
-Received: by mail-wr1-x444.google.com with SMTP id b2so16025929wrj.10
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Q+OUDDPHwOQka6zNvKnp9HDN8/R0WLXE1LB7BAeLwnM=;
- b=K+7nCIcCzrCrSwm6IZZU7SvkILfnyetgFiwhaMjIs2VjB1zU3szHuzlpvFnQQwDxks
- Vol5alyK5jBtsFnSbLS79m4a9TrdlMsgfkjmuYRIreK+opXrLiKRCd6rYYCyY5RkS0bQ
- z/OaBM5X0hr/Zs67vjfkyGs0s6wlQgz1kD8lOQmqeqJn6GrJZ7N2YuVQRVCKlf2scStI
- cva1tSgz/jU36IhS/wwAj5rYTyfSlFPAKmpDMLPWPKKPgL7EY5lxA2aHcNT6sCGXEryC
- GIL5wCNeOw7bJXCh1V5QqBnRI5emYz6r7dT0SE6Akg4nBIhhOYAGJObrABIJsJHx0E07
- 8HqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Q+OUDDPHwOQka6zNvKnp9HDN8/R0WLXE1LB7BAeLwnM=;
- b=nPqZY11IFqZBkrL86FKi4YWECzziS9+9YwMZtrHc++BmyqAAyePLl0pifyx4jBjESd
- jvnsHFvr5vLnPHlBEPdSR6xusj1kKMWd3XJM6zpRvWJjgFFXnsVdFThYWLhHevLjh3Vd
- +UylaZRpNqisLxSzWfLxAg065T6zrifhf1t9yqSoopQAvRXRy1IVE6O3bHnbjKQ8r/hX
- Z4FN+NnqJo5N1pbKrC6NLyJGjbcLFemJxy1EVCgg7CVr380zXdAEA/UGMQdeM4ICTaEZ
- 63fEQC0AsxR0ZfGhQNklH6nzrGqM0M1zgcTPuPkSVVUVpievF5wnHKWTPXFsMD3UsoHI
- o8KA==
-X-Gm-Message-State: ANhLgQ0VY86QfoiXGwxzkPVeug2PB+WoCUyALJk5ANNrP/dJ/TGGSvYk
- ZoC8A1uH6Fj552qA6H0L0biaOA==
-X-Google-Smtp-Source: ADFU+vuPtgVn1/6GjVtt85EO/iugNIzpyS2SyY4hCM65cOA6kkrRp+LvAtTsAN9Sq/FuWK6MaJUfTw==
-X-Received: by 2002:adf:ea42:: with SMTP id j2mr384959wrn.3.1584379320483;
- Mon, 16 Mar 2020 10:22:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z11sm446523wmc.30.2020.03.16.10.21.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:21:57 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 271861FF7E;
- Mon, 16 Mar 2020 17:21:55 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1jDsPT-0006pI-BQ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:49327)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsPT-0006eG-1P
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:11 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1M7ehh-1jEixU270H-007yRG; Mon, 16 Mar 2020 17:16:05 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 00/28 for 5.0] testing and gdbstub
-Date: Mon, 16 Mar 2020 17:21:27 +0000
-Message-Id: <20200316172155.971-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Subject: [PULL 03/38] linux-user/i386: Emulate x86_64 vsyscalls
+Date: Mon, 16 Mar 2020 17:15:15 +0100
+Message-Id: <20200316161550.336150-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Provags-ID: V03:K1:lZvFEJ9o9G68c+XASEUpLXin5vmNZDMT1y+F84scUvakLyBelX9
+ PNSqCPntBUuGnEvlT19tvz9rpFcgNFe++YuVZzItp8OsJEm53cb+HqVh1bI9NdVeJ4+A19V
+ 8Y4306bYtYU7fs1SmTmr8EjBBvb+xh7f1nmMoitU1kw2M/Bqe5CVkISJwhSLHdormGUkKSb
+ jXHEnwWuwHVAmNDLJj4RQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wFXAT8xnGt0=:Pofy35ZdiFalCR8u0um57I
+ qnocvwCpIKo4FypFLDoML5diRwuXQ19R4UynuqbwOcdwJFlqV0+iouO7jgOpUdDib60fnMlnw
+ vRepkWT8V1sClLCL5iTP4R2gb7lC+4G2Cz02yYQAoL7N2C5DxGV+oMx4JC1PxG+ZCazPEDK59
+ g6m8PVFmmVdkcqRNKTG2+3qDrZPLWCnnAuLatBrYbqcghX1JwMlChPYX9HqreF4Atd/Ez2rgP
+ bkplbUEK0ybR41jH71/O/1pisey8iDfUjlhYKw91UCqO3A9psrfo5Y/v+IsJRtlIFTWiVpHq8
+ uOFinNohgw0z1OArti++JzDUuhb4ISb+tPGjv3aDVcHJEFbhIp3UVf7+zr4ozU0B0UVYtKdnb
+ ygGOIVeaL+tQQ/iCdVYl2gGTMGHti7rN38ZjQeHSolaaDIcKdajQKNVWh+6EuDWwd/pVhMqmY
+ B3bDwFctqqE0QaxyEr5KFxhL3oLzbzbs4MIFnuosLgdj8MtmQ176x0oozJ9l9jSspdJGvMJWG
+ c3aL3cyW1NRgrFWph4NuYkQtyj3QfLhiVWXs/NrOcr6gL2/x9FAv/sricC+OiV6Mn/9BAyORD
+ 4jYLzdSFLrxuGcK5DdXF9S7JOIJgxzEx8MyTpo51ywljPxuP8wfZGkjlX7qD8BUSSsShXcQG9
+ FAuiRXEej80n4iCOLvtuFgJbO1yyp0Sxj/r9Cspe7mYQsusudfw7PwmnVlNfKMzJn54bVLZsA
+ T+eunW6DA2pV/CKRAeFR8MpuX6U+4hq0sAh3NshjjbVJlUS07TxzsZdzcDeu+ruYs7/ilcyo2
+ 10aZSOhS7e/UCLQDOffSjnp/iU1CqgtdTkqFXC+Ll+s0rtukdFi9WLOCIEHM9Jm7cOpZWvj
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,126 +75,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+From: Richard Henderson <richard.henderson@linaro.org>
 
-This is the last chance to get any reviews in before I send a pull
-request later today. To avoid having multiple PRs I've combined both
-the testing changes and the gdbstub updates. In the end I had to drop
-Gerd's vm updates as it cause problems with the acceptance testing.
+Notice the magic page during translate, much like we already
+do for the arm32 commpage.  At runtime, raise an exception to
+return cpu_loop for emulation.
 
-The following patches still need review:
- - tests/tcg/aarch64: add test-sve-ioctl guest-debug test
- - tests/tcg/aarch64: add SVE iotcl test
- - tests/tcg/aarch64: add a gdbstub testcase for SVE registers
- - target/arm: generate xml description of our SVE registers
- - target/arm: prepare for multiple dynamic XMLs
- - target/i386: use gdb_get_reg helpers
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-4-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/i386/cpu_loop.c | 108 +++++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h          |   7 +++
+ target/i386/translate.c    |  14 ++++-
+ 3 files changed, 128 insertions(+), 1 deletion(-)
 
-Alex Bennée (20):
-  gdbstub: make GDBState static and have common init function
-  gdbstub: stop passing GDBState * around and use global
-  gdbstub: move str_buf to GDBState and use GString
-  gdbstub: move mem_buf to GDBState and use GByteArray
-  gdbstub: add helper for 128 bit registers
-  target/arm: use gdb_get_reg helpers
-  target/m68k: use gdb_get_reg helpers
-  target/i386: use gdb_get_reg helpers
-  gdbstub: extend GByteArray to read register helpers
-  target/arm: prepare for multiple dynamic XMLs
-  target/arm: explicitly encode regnum in our XML
-  target/arm: default SVE length to 64 bytes for linux-user
-  target/arm: generate xml description of our SVE registers
-  target/arm: don't bother with id_aa64pfr0_read for USER_ONLY
-  tests/tcg/aarch64: userspace system register test
-  configure: allow user to specify what gdb to use
-  tests/guest-debug: add a simple test runner
-  tests/tcg/aarch64: add a gdbstub testcase for SVE registers
-  tests/tcg/aarch64: add SVE iotcl test
-  tests/tcg/aarch64: add test-sve-ioctl guest-debug test
-
-Changbin Du (1):
-  gdbstub: Fix single-step issue by confirming 'vContSupported+' feature
-    to gdb
-
-Damien Hedde (2):
-  gdbstub: change GDBState.last_packet to GByteArray
-  gdbstub: do not split gdb_monitor_write payload
-
-Philippe Mathieu-Daudé (5):
-  tests/docker: Install tools to cross-debug and build Linux kernels
-  tests/docker: Update VirGL git repository URL
-  tests/docker: Remove obsolete VirGL --with-glx configure option
-  tests/docker: Update VirGL to v0.8.0
-  travis.yml: Set G_MESSAGES_DEBUG do report GLib errors
-
- configure                                    |   9 +
- include/exec/gdbstub.h                       |  62 +-
- include/hw/core/cpu.h                        |   2 +-
- target/alpha/cpu.h                           |   2 +-
- target/arm/cpu.h                             |  31 +-
- target/cris/cpu.h                            |   4 +-
- target/hppa/cpu.h                            |   2 +-
- target/i386/cpu.h                            |   2 +-
- target/lm32/cpu.h                            |   2 +-
- target/m68k/cpu.h                            |   2 +-
- target/microblaze/cpu.h                      |   2 +-
- target/mips/internal.h                       |   2 +-
- target/openrisc/cpu.h                        |   2 +-
- target/ppc/cpu.h                             |   4 +-
- target/riscv/cpu.h                           |   2 +-
- target/s390x/internal.h                      |   2 +-
- target/sh4/cpu.h                             |   2 +-
- target/sparc/cpu.h                           |   2 +-
- target/xtensa/cpu.h                          |   2 +-
- gdbstub.c                                    | 936 +++++++++----------
- hw/core/cpu.c                                |   2 +-
- target/alpha/gdbstub.c                       |   2 +-
- target/arm/cpu.c                             |   7 +-
- target/arm/gdbstub.c                         | 173 +++-
- target/arm/gdbstub64.c                       |   2 +-
- target/arm/helper.c                          | 186 +++-
- target/cris/gdbstub.c                        |   4 +-
- target/hppa/gdbstub.c                        |   2 +-
- target/i386/gdbstub.c                        |  29 +-
- target/lm32/gdbstub.c                        |   2 +-
- target/m68k/gdbstub.c                        |   2 +-
- target/m68k/helper.c                         |  33 +-
- target/microblaze/gdbstub.c                  |   2 +-
- target/mips/gdbstub.c                        |   2 +-
- target/nios2/cpu.c                           |   2 +-
- target/openrisc/gdbstub.c                    |   2 +-
- target/ppc/gdbstub.c                         |  48 +-
- target/ppc/translate_init.inc.c              |  54 +-
- target/riscv/gdbstub.c                       |  20 +-
- target/s390x/gdbstub.c                       |  30 +-
- target/sh4/gdbstub.c                         |   2 +-
- target/sparc/gdbstub.c                       |   2 +-
- target/xtensa/gdbstub.c                      |   2 +-
- tests/tcg/aarch64/sve-ioctls.c               |  70 ++
- tests/tcg/aarch64/sysregs.c                  | 172 ++++
- .travis.yml                                  |   1 +
- tests/.gitignore                             |   1 +
- tests/docker/dockerfiles/debian-amd64.docker |   6 +-
- tests/docker/dockerfiles/debian10.docker     |   3 +
- tests/docker/dockerfiles/debian9.docker      |   3 +
- tests/guest-debug/run-test.py                |  57 ++
- tests/tcg/aarch64/Makefile.target            |  32 +
- tests/tcg/aarch64/gdbstub/test-sve-ioctl.py  |  82 ++
- tests/tcg/aarch64/gdbstub/test-sve.py        |  81 ++
- 54 files changed, 1491 insertions(+), 701 deletions(-)
- create mode 100644 tests/tcg/aarch64/sve-ioctls.c
- create mode 100644 tests/tcg/aarch64/sysregs.c
- create mode 100755 tests/guest-debug/run-test.py
- create mode 100644 tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
- create mode 100644 tests/tcg/aarch64/gdbstub/test-sve.py
-
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+index e217cca5ee1e..70cde417e605 100644
+--- a/linux-user/i386/cpu_loop.c
++++ b/linux-user/i386/cpu_loop.c
+@@ -92,6 +92,109 @@ static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
+     queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+ }
+ 
++#ifdef TARGET_X86_64
++static bool write_ok_or_segv(CPUX86State *env, abi_ptr addr, size_t len)
++{
++    /*
++     * For all the vsyscalls, NULL means "don't write anything" not
++     * "write it at address 0".
++     */
++    if (addr == 0 || access_ok(VERIFY_WRITE, addr, len)) {
++        return true;
++    }
++
++    env->error_code = PG_ERROR_W_MASK | PG_ERROR_U_MASK;
++    gen_signal(env, TARGET_SIGSEGV, TARGET_SEGV_MAPERR, addr);
++    return false;
++}
++
++/*
++ * Since v3.1, the kernel traps and emulates the vsyscall page.
++ * Entry points other than the official generate SIGSEGV.
++ */
++static void emulate_vsyscall(CPUX86State *env)
++{
++    int syscall;
++    abi_ulong ret;
++    uint64_t caller;
++
++    /*
++     * Validate the entry point.  We have already validated the page
++     * during translation to get here; now verify the offset.
++     */
++    switch (env->eip & ~TARGET_PAGE_MASK) {
++    case 0x000:
++        syscall = TARGET_NR_gettimeofday;
++        break;
++    case 0x400:
++        syscall = TARGET_NR_time;
++        break;
++    case 0x800:
++        syscall = TARGET_NR_getcpu;
++        break;
++    default:
++        goto sigsegv;
++    }
++
++    /*
++     * Validate the return address.
++     * Note that the kernel treats this the same as an invalid entry point.
++     */
++    if (get_user_u64(caller, env->regs[R_ESP])) {
++        goto sigsegv;
++    }
++
++    /*
++     * Validate the the pointer arguments.
++     */
++    switch (syscall) {
++    case TARGET_NR_gettimeofday:
++        if (!write_ok_or_segv(env, env->regs[R_EDI],
++                              sizeof(struct target_timeval)) ||
++            !write_ok_or_segv(env, env->regs[R_ESI],
++                              sizeof(struct target_timezone))) {
++            return;
++        }
++        break;
++    case TARGET_NR_time:
++        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(abi_long))) {
++            return;
++        }
++        break;
++    case TARGET_NR_getcpu:
++        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(uint32_t)) ||
++            !write_ok_or_segv(env, env->regs[R_ESI], sizeof(uint32_t))) {
++            return;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    /*
++     * Perform the syscall.  None of the vsyscalls should need restarting.
++     */
++    ret = do_syscall(env, syscall, env->regs[R_EDI], env->regs[R_ESI],
++                     env->regs[R_EDX], env->regs[10], env->regs[8],
++                     env->regs[9], 0, 0);
++    g_assert(ret != -TARGET_ERESTARTSYS);
++    g_assert(ret != -TARGET_QEMU_ESIGRETURN);
++    if (ret == -TARGET_EFAULT) {
++        goto sigsegv;
++    }
++    env->regs[R_EAX] = ret;
++
++    /* Emulate a ret instruction to leave the vsyscall page.  */
++    env->eip = caller;
++    env->regs[R_ESP] += 8;
++    return;
++
++ sigsegv:
++    /* Like force_sig(SIGSEGV).  */
++    gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
++}
++#endif
++
+ void cpu_loop(CPUX86State *env)
+ {
+     CPUState *cs = env_cpu(env);
+@@ -141,6 +244,11 @@ void cpu_loop(CPUX86State *env)
+                 env->regs[R_EAX] = ret;
+             }
+             break;
++#endif
++#ifdef TARGET_X86_64
++        case EXCP_VSYSCALL:
++            emulate_vsyscall(env);
++            break;
+ #endif
+         case EXCP0B_NOSEG:
+         case EXCP0C_STACK:
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 08b4422f36bd..39be555db3da 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1001,6 +1001,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ 
+ #define EXCP_VMEXIT     0x100 /* only for system emulation */
+ #define EXCP_SYSCALL    0x101 /* only for user emulation */
++#define EXCP_VSYSCALL   0x102 /* only for user emulation */
+ 
+ /* i386-specific interrupt pending bits.  */
+ #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+@@ -2215,4 +2216,10 @@ static inline bool hyperv_feat_enabled(X86CPU *cpu, int feat)
+     return !!(cpu->hyperv_features & BIT(feat));
+ }
+ 
++#if defined(TARGET_X86_64) && \
++    defined(CONFIG_USER_ONLY) && \
++    defined(CONFIG_LINUX)
++# define TARGET_VSYSCALL_PAGE  (UINT64_C(-10) << 20)
++#endif
++
+ #endif /* I386_CPU_H */
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index d9af8f4078b3..5e5dbb41b0ce 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8555,7 +8555,19 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+ static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+-    target_ulong pc_next = disas_insn(dc, cpu);
++    target_ulong pc_next;
++
++#ifdef TARGET_VSYSCALL_PAGE
++    /*
++     * Detect entry into the vsyscall page and invoke the syscall.
++     */
++    if ((dc->base.pc_next & TARGET_PAGE_MASK) == TARGET_VSYSCALL_PAGE) {
++        gen_exception(dc, EXCP_VSYSCALL, dc->base.pc_next);
++        return;
++    }
++#endif
++
++    pc_next = disas_insn(dc, cpu);
+ 
+     if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+         /* if single step mode, we generate only one instruction and
 -- 
-2.20.1
+2.24.1
 
 
