@@ -2,78 +2,66 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168C2C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EF2C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:23:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C28BB20736
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:18:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/1Jd/Sr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28BB20736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CEB132071C
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:23:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB132071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDmpN-0000NV-GJ
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 06:18:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39118)
+	id 1jDmuR-0002Dc-Gd
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 06:23:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jDmSG-0001Xu-MS
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 05:54:42 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDlY2-0005lB-T7
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jDmSE-0000DS-E7
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 05:54:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52843
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jDmSD-0008IL-8Z
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 05:54:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584352474;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=EjG8CvKoeUPFuZmxhgWZvsc7yDDr/GMkjBJsuMwsZNQ=;
- b=e/1Jd/SrWFHfxwQ7veTSxgkXQ4/sjKc4SNPAH7eFLeSQrxY7XI8+IH8OCdTJTVZ3XbpULU
- ev6pwuvg+X8ZZ9KVDk4esV3N4PCrK9rfe/LnEzZSuy3cSy74ykLErG2ZRHfYlj8mo9Rtfy
- 9kPAzqk3napA3Maip9nu7TGK4PJYcas=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-heA0sUrNNjGvnMzCGK4NdA-1; Mon, 16 Mar 2020 05:54:32 -0400
-X-MC-Unique: heA0sUrNNjGvnMzCGK4NdA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B82C1137843;
- Mon, 16 Mar 2020 09:54:31 +0000 (UTC)
-Received: from localhost (unknown [10.36.119.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1272A907F7;
- Mon, 16 Mar 2020 09:54:28 +0000 (UTC)
-Date: Mon, 16 Mar 2020 09:54:27 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] checkpatch: enforce process for expected files
-Message-ID: <20200316095427.GA340615@stefanha-x1.localdomain>
-References: <20200315113323.526984-1-mst@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1jDlY1-0003fX-Ke
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:34 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:42327)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDlY1-0003IV-9u
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:33 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1M730b-1jE0Wd1nMF-008YVF; Mon, 16 Mar 2020 09:56:24 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/4] linux-user: generate syscall_nr.h from linux unistd.h
+Date: Mon, 16 Mar 2020 09:56:16 +0100
+Message-Id: <20200316085620.309769-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <20200315113323.526984-1-mst@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:GOZ4C5AVBeyNueFbXnRc+0t8mumemR/aijjymyYfYLXqd7RnupJ
+ AWctDb28LchxFjTYFGQiU6TU8rLZRkpGODBm65l/td8uBHo6ECtuaOkXTO2AckQoXnZNnVm
+ fSBSRapS2FqN9eeZzm21391Z8CZE0D8FizjWY6xSWHq3NOzvU/AU0LUZpj1tTadBj7AGwie
+ g95P4WSwdtmKGl8Mti9vQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:dJY4cKYwXTQ=:RiIbKqFJlVMnXrJYEKwG6H
+ fWpEAnAUvYZO1u5oJ7Hd7p6m8ibLR8CMIYRMMw9YMaueKsAdFDw5iRiseuyh4gs9i2XqnZZsD
+ AQNiTKqkWKcm16J++LAqmACWlcnFbd04RaF0ncaXsyrHUjfc1fGffSlk/z1n7i8K6u/8HfrRs
+ 59lP+MQYryEG/g3Da33i/AlXbBKgyrlj4TkZy1mqrXHYUa/y+jrRJIJsAidqDfqDAsSPwPtgP
+ 7mqROuj/xJRiPAlitOlFCA5XCpCVERqFQCD6cEcsd3NTNG9bml8xHulYFQtL09gIvfVZ6MM8p
+ tO8LtubOLEpkDJFKLgxSB4nrr+V+5fWsnnEZitp3tjeE4t7XSRKjXCZHGsvNkgwyCP/qCz7Pl
+ LdrALX5kRcwafeTZfLJp6oLGheP/qa+w76NqHcG7vrb7Yv2GW5Jc5nm48wFjPyI6zQLpxB76f
+ EqwbrVSba1GtFZcrtfCeyVsHfKeVgjSb5T8WDi6KzHKdHDjAtF3eRu0/T8BSkeOPif8XO/+1p
+ diIFRv9vzUq1LVxRkPKZJKenc8m2R2aweWNWTsJGVCatQrNoiCEQK3LK5Ichm/Uhy20IJ3NKD
+ 30UM/q2VViBukFnZQVjWD6vo3D3RkE5rgwgbJJPXuPb+s4WK5oeFB5Hd6YEddVihqnqq06H+I
+ OWFIxcDwM/7LyfJFoYQ2uTvf1T+QC5sXHHuZ4Qd4YvtwIIZvTkV/L7A+Q/69BzKoHdoCzpubD
+ MxY1QiXmnKhmUz2kl0AIDA14mwVCoLlRTKDYWP0rtB4DVpI2tX5t8USMj3nGFpZkN9HlD79SP
+ 5TUImQTrJ+zrVrGjHx2r+QFmV+UG3z5qY6I0j5RHyrGKwneR6G2VASe5pqBl9d3BfOlmBQV
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,115 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- imammedo@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series adds a script to generate syscall_nr.h for
+architectures that don't use syscall.tbl but asm-generic/unistd.h
 
-On Sun, Mar 15, 2020 at 07:35:46AM -0400, Michael S. Tsirkin wrote:
-> If the process documented in tests/qtest/bios-tables-test.c
-> is followed, then same patch never touches both expected
-> files and code. Teach checkpatch to enforce this rule.
->=20
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->=20
-> Peter, Igor what do you think?
+The script uses several cpp passes and filters result with a grep/sed/tr sequence.
+The result must be checked before being used, so it's why the script is not
+automatically run.
 
-Minor comments below:
+I have run the script, checked and added new files for arm64, nios2, openrisc.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I don't include result for riscv as Alistair is already working on a series
+for this architecture and it needs some changes in syscall.c as some
+syscalls are not defined.
 
->=20
->  scripts/checkpatch.pl | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->=20
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index b27e4ff5e9..96583e3fff 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -35,6 +35,8 @@ my $summary_file =3D 0;
->  my $root;
->  my %debug;
->  my $help =3D 0;
-> +my $testexpected;
-> +my $nontestexpected;
+We also need to add the _time64 variant of syscalls added by the update of the
+syscall_nr.h.
 
-If you respin, please add acpi to these variable names since they are
-specific to acpi.
+Based-on: <20200310103403.3284090-1-laurent@vivier.eu>
 
-> =20
->  sub help {
->  =09my ($exitcode) =3D @_;
-> @@ -1256,6 +1258,26 @@ sub WARN {
->  =09}
->  }
-> =20
-> +# According to tests/qtest/bios-tables-test.c: do not
-> +# change expected file in the same commit with adding test
-> +sub checkfilename {
-> +=09my ($name) =3D @_;
+v3: remove useless upper command
+v2: add comments suggested by Taylor
 
-There is a tab instead of spaces here that could be fixed if you decide
-to respin.
+Laurent Vivier (4):
+  scripts: add a script to generate syscall_nr.h
+  linux-user, aarch64: sync syscall numbers with kernel v5.5
+  linux-user,nios2: sync syscall numbers with kernel v5.5
+  linux-user, openrisc: sync syscall numbers with kernel v5.5
 
-> +        if ($name =3D~ m#^tests/data/acpi/# and
-> +            # make exception for a shell script that rebuilds the files
-> +            not $name =3D~ m#^\.sh$# or
-> +            $name =3D~ m#^tests/qtest/bios-tables-test-allowed-diff.h$#)=
- {
-> +            $testexpected =3D $name;
-> +        } else {
-> +            $nontestexpected =3D $name;
-> +        }
-> +        if (defined $testexpected and defined $nontestexpected) {
-> +            ERROR("Do not add expected files together with tests, " .
-> +                  "follow instructions in " .
-> +                  "tests/qtest/bios-tables-test.c: both " .
-> +                  $testexpected . " and " . $nontestexpected . " found\n=
-");
-> +        }
-> +}
-> +
->  sub process {
->  =09my $filename =3D shift;
-> =20
-> @@ -1431,9 +1453,11 @@ sub process {
->  =09=09if ($line =3D~ /^diff --git.*?(\S+)$/) {
->  =09=09=09$realfile =3D $1;
->  =09=09=09$realfile =3D~ s@^([^/]*)/@@ if (!$file);
-> +                        checkfilename($realfile);
->  =09=09} elsif ($line =3D~ /^\+\+\+\s+(\S+)/) {
->  =09=09=09$realfile =3D $1;
->  =09=09=09$realfile =3D~ s@^([^/]*)/@@ if (!$file);
-> +                        checkfilename($realfile);
+ linux-user/aarch64/syscall_nr.h  |  34 +-
+ linux-user/nios2/syscall_nr.h    | 650 +++++++++++++++----------------
+ linux-user/openrisc/syscall_nr.h | 309 +++------------
+ scripts/gensyscalls.sh           | 102 +++++
+ 4 files changed, 513 insertions(+), 582 deletions(-)
+ create mode 100755 scripts/gensyscalls.sh
 
-The surrounding lines in this hunk use tab indentation, not spaces.
-
---bp/iNruPH9dso1Pn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5vTNMACgkQnKSrs4Gr
-c8ivTggAlcNrLuL0ddPvu/uWpx5eVTT6heqqZQm3ZsCYByZwXDSHx2zzy/h6xfiW
-SpE6DmY/QxNnza1CfT4JTTEq3yNwsEqyeGPITdF9sDrdxxC+hWrdJf3kdKjuY0hG
-NRd1pVc5oR3U5k33pFLpD4qaiTjTfhBienztelFDRCt6kSnxqcCd/7Qu3oKc9Gc8
-jeiswRLfMpU74HJAeCyfBZdTEJgKXlQ5xyeaIZDyJC/fFfT4v7CyBklPcpgm5Ymg
-0njq3uMUuxAe/XHPyzu1Poob45LZCd44T/EFjir5ZRjHTdHKoVneX/I/LQwLT9hF
-AJwrQD7tVn2YZH7KK0EdA1UiCzkwjQ==
-=lze3
------END PGP SIGNATURE-----
-
---bp/iNruPH9dso1Pn--
+-- 
+2.24.1
 
 
