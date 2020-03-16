@@ -2,91 +2,81 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE21C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ABDC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69F432051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DA722071C
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:57:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vafpjUZp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69F432051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVfIpJiI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA722071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDs4X-0007SO-QL
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 11:54:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53728)
+	id 1jDs73-0008Cu-OA
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 11:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jDppe-0003MX-2X
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:31:04 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jDpl7-0001UE-UE
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcel.apfelbaum@gmail.com>) id 1jDppc-0004aG-LE
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:31:01 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43114)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
- id 1jDppc-0004Rj-CM
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:31:00 -0400
-Received: by mail-wr1-x443.google.com with SMTP id b2so14995566wrj.10
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 06:31:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-transfer-encoding:content-language;
- bh=UbbPerI1ViIZ/ZFKWkhwLiubBQVNFB7qXCfElKgnVe4=;
- b=vafpjUZpQMNKzS476VbBN1TOnUrBUi3KUmXLhM/FHFYTwIkduwSrfU/CvXmNy+1CYX
- cwYYC/grM6B8emmhRMIczE2D/ToxvsDMgtjxs5Nv2gkr8GOjlZF6pGodLWHWo6jXBz28
- fF9Eafa16QmxsimCFtf8ssxMU/US7WhvyLBAC3o4Y6/RkUoTRTHR8wkPmhsJollh1djT
- oZ+NTn6sj1w5P+kijKPPcay1bkT+2Qr8RLFSIQL8AAPA/roYH6IzodpKDSbI71f+cF5B
- cQ3lXw7GsItPSlTVtx2edRVXitmbgsQJUenx7nAt+UYb3c7roU2dq2eVO1qZ55L+vkr/
- Ydrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=UbbPerI1ViIZ/ZFKWkhwLiubBQVNFB7qXCfElKgnVe4=;
- b=c173ZhojWJaZkxn5jcbEuVTO+Mg8KDMNBlgpbjtOPhozwbu+2aQPLUvqbBUlYqwbZ2
- hUOW7F2dITrB93+I9p9RYPP/Y75bF/MtGOyNc0NSSaMzL3aehgic3CPLvHPelWZ+bl2V
- U88MweMxQUHCCMXDlFtryoNKSiK4v2/TFjgtmIOBjT9PbRhIAznTPfLUyhOTiF2SpwHJ
- 3xjf0+VNMj9ZOcerzce3tdwPx69E9OnObYRj1+8rwkCYTuFm9Th/u1w+58iIP/PQdGPx
- b6dQZedFivrMOKpq9hJINjBtlAEZDPp5R1/jA1QszlePLZF9Zrm+z0MKMuB2bjafAi1j
- 8iKQ==
-X-Gm-Message-State: ANhLgQ0FL23ZsclC2wcIZVrp0q5lkDr651o/NBG431dsHW/rTaxHZCi7
- +5g6MM0HD8vlgp/uKOj8ZVa0ZBBH
-X-Google-Smtp-Source: ADFU+vtNMHIwTRSzW+jP0Hyk7HJC6921p7iYU6p/F8aQa1RM9s4W1XZmOhJEoytA8GR0VN1kH7h7fA==
-X-Received: by 2002:adf:ce8e:: with SMTP id r14mr5413080wrn.415.1584365458315; 
- Mon, 16 Mar 2020 06:30:58 -0700 (PDT)
-Received: from [192.168.86.224] ([37.142.144.12])
- by smtp.gmail.com with ESMTPSA id l7sm22869966wrw.33.2020.03.16.06.30.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 06:30:57 -0700 (PDT)
-Subject: Re: [PATCH 1/2] hw/rdma: Cosmetic change - no need for two sge arrays
-To: Yuval Shaia <yuval.shaia.ml@gmail.com>, qemu-devel@nongnu.org
-References: <20200307125608.2476-1-yuval.shaia.ml@gmail.com>
- <20200307125608.2476-2-yuval.shaia.ml@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <0f105874-c15f-406e-c4e9-fd752f95aa96@gmail.com>
-Date: Mon, 16 Mar 2020 15:32:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <imammedo@redhat.com>) id 1jDpl5-0000vE-Fq
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39876
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDpl5-0000qY-A3
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584365179;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=84FK/whIcqud6MQ9tDuDfoxHPB6HJs1Ch1gm48BLGw4=;
+ b=QVfIpJiIXiLuwLRKWnf5cLG2UbaaP3hJ6gN9DTcRSF1+4BxcnIZEa6BdXGa4W7QVabyUON
+ z64VCpPjUI0WCMA9+GcTDGF6Wdjky/8O4hfwvyrsctFkDMQ1z5NyQOLhrszycURYUS+YRD
+ zrj6J/JQP7giEu+GQLFBB1yrn7r79BM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-PjlUvtwVMXSFvu3ZBi3_dg-1; Mon, 16 Mar 2020 09:26:17 -0400
+X-MC-Unique: PjlUvtwVMXSFvu3ZBi3_dg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CD61189F768;
+ Mon, 16 Mar 2020 13:26:16 +0000 (UTC)
+Received: from localhost (ovpn-200-42.brq.redhat.com [10.40.200.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 63A8F5DA7B;
+ Mon, 16 Mar 2020 13:26:11 +0000 (UTC)
+Date: Mon, 16 Mar 2020 14:26:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
+Message-ID: <20200316142609.5b73a0ca@redhat.com>
+In-Reply-To: <20200313110940-mutt-send-email-mst@kernel.org>
+References: <20200311170826.79419-1-liran.alon@oracle.com>
+ <20200312172745.1b7b2222@redhat.com>
+ <20200312130854-mutt-send-email-mst@kernel.org>
+ <20200313103656.094ec89b@redhat.com>
+ <20200313110940-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200307125608.2476-2-yuval.shaia.ml@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,153 +88,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
+ Liran Alon <liran.alon@oracle.com>, Elad Gabay <elad.gabay@oracle.com>,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yuval,
+On Fri, 13 Mar 2020 11:26:45 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-On 3/7/20 2:56 PM, Yuval Shaia wrote:
-> The function build_host_sge_array uses two sge arrays, one for input and
-> one for output.
-> Since the size of the two arrays is the same, the function can write
-> directly to the given source array (i.e. input/output argument).
->
-> Signed-off-by: Yuval Shaia <yuval.shaia.ml@gmail.com>
-> ---
->   hw/rdma/rdma_backend.c | 40 +++++++++++++++++-----------------------
->   1 file changed, 17 insertions(+), 23 deletions(-)
->
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index c346407cd3..79b9cfb487 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -378,30 +378,27 @@ static void ah_cache_init(void)
->   }
->   
->   static int build_host_sge_array(RdmaDeviceResources *rdma_dev_res,
-> -                                struct ibv_sge *dsge, struct ibv_sge *ssge,
-> -                                uint8_t num_sge, uint64_t *total_length)
-> +                                struct ibv_sge *sge, uint8_t num_sge,
-> +                                uint64_t *total_length)
->   {
->       RdmaRmMR *mr;
-> -    int ssge_idx;
-> +    int idx;
->   
-> -    for (ssge_idx = 0; ssge_idx < num_sge; ssge_idx++) {
-> -        mr = rdma_rm_get_mr(rdma_dev_res, ssge[ssge_idx].lkey);
-> +    for (idx = 0; idx < num_sge; idx++) {
-> +        mr = rdma_rm_get_mr(rdma_dev_res, sge[idx].lkey);
->           if (unlikely(!mr)) {
-> -            rdma_error_report("Invalid lkey 0x%x", ssge[ssge_idx].lkey);
-> -            return VENDOR_ERR_INVLKEY | ssge[ssge_idx].lkey;
-> +            rdma_error_report("Invalid lkey 0x%x", sge[idx].lkey);
-> +            return VENDOR_ERR_INVLKEY | sge[idx].lkey;
->           }
->   
->   #ifdef LEGACY_RDMA_REG_MR
-> -        dsge->addr = (uintptr_t)mr->virt + ssge[ssge_idx].addr - mr->start;
-> +        sge[idx].addr = (uintptr_t)mr->virt + sge[idx].addr - mr->start;
->   #else
-> -        dsge->addr = ssge[ssge_idx].addr;
-> +        sge[idx].addr = sge[idx].addr;
+> On Fri, Mar 13, 2020 at 10:36:56AM +0100, Igor Mammedov wrote:
+> > On Thu, 12 Mar 2020 13:09:51 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Thu, Mar 12, 2020 at 05:27:45PM +0100, Igor Mammedov wrote:  
+> > > > On Wed, 11 Mar 2020 19:08:26 +0200
+> > > > Liran Alon <liran.alon@oracle.com> wrote:
+> > > >     
+> > > > > From: Elad Gabay <elad.gabay@oracle.com>
+> > > > > 
+> > > > > Microsoft introduced this ACPI table to avoid Windows guests performing
+> > > > > various workarounds for device erratas. As the virtual device emulated
+> > > > > by VMM may not have the errata.
+> > > > > 
+> > > > > Currently, WAET allows hypervisor to inform guest about two
+> > > > > specific behaviors: One for RTC and the other for ACPI PM Timer.
+> > > > > 
+> > > > > Support for WAET have been introduced since Windows Vista. This ACPI
+> > > > > table is also exposed by other hypervisors, such as VMware, by default.
+> > > > > 
+> > > > > This patch adds WAET ACPI Table to QEMU. It also makes sure to introduce
+> > > > > the new ACPI table only for new machine-types.    
+> > > > 
+> > > > in addition to comments made by Michael ...
+> > > >     
+> > > > > 
+> > > > > Signed-off-by: Elad Gabay <elad.gabay@oracle.com>
+> > > > > Co-developed-by: Liran Alon <liran.alon@oracle.com>
+> > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> > > > > ---
+> > > > >  hw/i386/acpi-build.c        | 18 ++++++++++++++++++
+> > > > >  hw/i386/pc_piix.c           |  2 ++
+> > > > >  hw/i386/pc_q35.c            |  2 ++
+> > > > >  include/hw/acpi/acpi-defs.h | 25 +++++++++++++++++++++++++
+> > > > >  include/hw/i386/pc.h        |  1 +
+> > > > >  5 files changed, 48 insertions(+)
+> > > > > 
+> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > > > > index 9c4e46fa7466..29f70741cd96 100644
+> > > > > --- a/hw/i386/acpi-build.c
+> > > > > +++ b/hw/i386/acpi-build.c
+> > > > > @@ -2512,6 +2512,19 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
+> > > > >      build_header(linker, table_data, (void *)(table_data->data + dmar_start),
+> > > > >                   "DMAR", table_data->len - dmar_start, 1, NULL, NULL);
+> > > > >  }
+> > > > > +
+> > > > > +static void
+> > > > > +build_waet(GArray *table_data, BIOSLinker *linker)    
+> > > > see build_hmat_lb() for example how to doc comment for such function
+> > > > should look like. Use earliest spec version where table was introduced.
+> > > >     
+> > > > > +{
+> > > > > +    AcpiTableWaet *waet;
+> > > > > +
+> > > > > +    waet = acpi_data_push(table_data, sizeof(*waet));
+> > > > > +    waet->emulated_device_flags = cpu_to_le32(ACPI_WAET_PM_TIMER_GOOD);    
+> > > > 
+> > > > we don't use packed structures for building ACPI tables anymore (there is
+> > > > old code that still does but that's being converted when we touch it)
+> > > > 
+> > > > pls use build_append_int_noprefix() api instead, see build_amd_iommu() as
+> > > > an example how to build binary tables using it and how to use comments
+> > > > to document fields.
+> > > > Basic idea is that api makes function building a table match table's
+> > > > description in spec (each call represents a row in spec) and comment
+> > > > belonging to a row should contain verbatim field name as used by spec
+> > > > so reader could copy/past and grep it easily.    
+> > > 
+> > > 
+> > > BTW how about a better name for this function?  
+> > 
+> > how about [aml|acpi]_int_raw 
+> > [...]  
+> 
+> I'm not sure how this helps.  I think the main problems are
+> 1- very long name
+> 2- only makes sense if you know that ACPI has a special integer prefix
+> 3- easy to confuse which is the value which is the length
+> 4- length is in bytes (typical documentation is in bits)
+in acpi spec, they use bytes mostly (with occasional bits deviation)
 
-It seems we don't need the above line.
-Other than that it looks good to me.
+> 
+> Your suggestion only fixes issue 1.
+that's what I don't like the most about current name, it's way too long.
 
-Thanks,
-Marcel
-
->   #endif
-> -        dsge->length = ssge[ssge_idx].length;
-> -        dsge->lkey = rdma_backend_mr_lkey(&mr->backend_mr);
-> +        sge[idx].lkey = rdma_backend_mr_lkey(&mr->backend_mr);
->   
-> -        *total_length += dsge->length;
-> -
-> -        dsge++;
-> +        *total_length += sge[idx].length;
->       }
->   
->       return 0;
-> @@ -484,7 +481,6 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->                               void *ctx)
->   {
->       BackendCtx *bctx;
-> -    struct ibv_sge new_sge[MAX_SGE];
->       uint32_t bctx_id;
->       int rc;
->       struct ibv_send_wr wr = {}, *bad_wr;
-> @@ -518,7 +514,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->   
->       rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
->   
-> -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
->                                 &backend_dev->rdma_dev_res->stats.tx_len);
->       if (rc) {
->           complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> @@ -538,7 +534,7 @@ void rdma_backend_post_send(RdmaBackendDev *backend_dev,
->       wr.num_sge = num_sge;
->       wr.opcode = IBV_WR_SEND;
->       wr.send_flags = IBV_SEND_SIGNALED;
-> -    wr.sg_list = new_sge;
-> +    wr.sg_list = sge;
->       wr.wr_id = bctx_id;
->   
->       rc = ibv_post_send(qp->ibqp, &wr, &bad_wr);
-> @@ -601,7 +597,6 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->                               struct ibv_sge *sge, uint32_t num_sge, void *ctx)
->   {
->       BackendCtx *bctx;
-> -    struct ibv_sge new_sge[MAX_SGE];
->       uint32_t bctx_id;
->       int rc;
->       struct ibv_recv_wr wr = {}, *bad_wr;
-> @@ -635,7 +630,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->   
->       rdma_protected_gslist_append_int32(&qp->cqe_ctx_list, bctx_id);
->   
-> -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
->                                 &backend_dev->rdma_dev_res->stats.rx_bufs_len);
->       if (rc) {
->           complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> @@ -643,7 +638,7 @@ void rdma_backend_post_recv(RdmaBackendDev *backend_dev,
->       }
->   
->       wr.num_sge = num_sge;
-> -    wr.sg_list = new_sge;
-> +    wr.sg_list = sge;
->       wr.wr_id = bctx_id;
->       rc = ibv_post_recv(qp->ibqp, &wr, &bad_wr);
->       if (rc) {
-> @@ -671,7 +666,6 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
->                                   uint32_t num_sge, void *ctx)
->   {
->       BackendCtx *bctx;
-> -    struct ibv_sge new_sge[MAX_SGE];
->       uint32_t bctx_id;
->       int rc;
->       struct ibv_recv_wr wr = {}, *bad_wr;
-> @@ -688,7 +682,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
->   
->       rdma_protected_gslist_append_int32(&srq->cqe_ctx_list, bctx_id);
->   
-> -    rc = build_host_sge_array(backend_dev->rdma_dev_res, new_sge, sge, num_sge,
-> +    rc = build_host_sge_array(backend_dev->rdma_dev_res, sge, num_sge,
->                                 &backend_dev->rdma_dev_res->stats.rx_bufs_len);
->       if (rc) {
->           complete_work(IBV_WC_GENERAL_ERR, rc, ctx);
-> @@ -696,7 +690,7 @@ void rdma_backend_post_srq_recv(RdmaBackendDev *backend_dev,
->       }
->   
->       wr.num_sge = num_sge;
-> -    wr.sg_list = new_sge;
-> +    wr.sg_list = sge;
->       wr.wr_id = bctx_id;
->       rc = ibv_post_srq_recv(srq->ibsrq, &wr, &bad_wr);
->       if (rc) {
+> Having listed it all out, I suggest the following for the purpose of
+> building structures:
+> 
+> 	acpi/aml/build_append_u8
+> 	acpi/aml/build_append_u16
+> 	acpi/aml/build_append_u32
+> 	acpi/aml/build_append_u64
+I prefer having length argument, so when I'm reviewing code, I'm basically
+comparing it with value in the table.
+The same applies to function name, having a bunch of different
+names would be distracting, at least where it comes to composing
+tables.
+So I prefer keeping current list of arguments.
+ 
+> and maybe
+> 	acpi/aml/build_append_pad( length)
+> 
+> I'm not sure what the best prefix is. I guess we can have them all
+> with the slightly different arguments.
 
 
