@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8F5C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9E5C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E9CD20658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:50:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9CD20658
+	by mail.kernel.org (Postfix) with ESMTPS id 124B920658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:51:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 124B920658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDkVm-0005ma-08
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:50:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52560)
+	id 1jDkWk-00062a-SQ
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:51:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54546)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDkPr-00047h-DB
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:44:05 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jDkQc-0004NM-BH
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDkPp-0000Bx-6I
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:44:03 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47650)
+ (envelope-from <its@irrelevant.dk>) id 1jDkQY-0001KY-Re
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:44:50 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDkPk-00074x-6C; Mon, 16 Mar 2020 03:43:56 -0400
+ id 1jDkQU-0000Ha-S9; Mon, 16 Mar 2020 03:44:43 -0400
 Received: from apples.localdomain (80-62-117-52-mobile.dk.customer.tdc.net
  [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id 15DFCBF5E1;
- Mon, 16 Mar 2020 07:43:52 +0000 (UTC)
-Date: Mon, 16 Mar 2020 00:43:48 -0700
+ by charlie.dont.surf (Postfix) with ESMTPSA id 569A0BF5E1;
+ Mon, 16 Mar 2020 07:44:41 +0000 (UTC)
+Date: Mon, 16 Mar 2020 00:44:37 -0700
 From: Klaus Birkelund Jensen <its@irrelevant.dk>
 To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v5 08/26] nvme: refactor device realization
-Message-ID: <20200316074348.wxmxsox6j42r6rw5@apples.localdomain>
+Subject: Re: [PATCH v5 09/26] nvme: add temperature threshold feature
+Message-ID: <20200316074437.uwrzruxpw7vfcwbt@apples.localdomain>
 References: <20200204095208.269131-1-k.jensen@samsung.com>
- <CGME20200204095220eucas1p186b0de598359750d49278e0226ae45fb@eucas1p1.samsung.com>
- <20200204095208.269131-9-k.jensen@samsung.com>
- <fbacd1f4623decc7f30b3e21b6095989311cecbc.camel@redhat.com>
+ <CGME20200204095221eucas1p1d5b1c9578d79e6bcc5714976bbe7dc11@eucas1p1.samsung.com>
+ <20200204095208.269131-10-k.jensen@samsung.com>
+ <9d2f45a97cce33a548ed98843e06b299b89b30e3.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fbacd1f4623decc7f30b3e21b6095989311cecbc.camel@redhat.com>
+In-Reply-To: <9d2f45a97cce33a548ed98843e06b299b89b30e3.camel@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 128.199.63.193
@@ -71,389 +71,185 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Feb 12 11:27, Maxim Levitsky wrote:
+On Feb 12 11:31, Maxim Levitsky wrote:
 > On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
-> > This patch splits up nvme_realize into multiple individual functions,
-> > each initializing a different subset of the device.
+> > It might seem wierd to implement this feature for an emulated device,
+> > but it is mandatory to support and the feature is useful for testing
+> > asynchronous event request support, which will be added in a later
+> > patch.
+> 
+> Absolutely but as the old saying is, rules are rules.
+> At least, to the defense of the spec, making this mandatory
+> forced the vendors to actually report some statistics about
+> the device in neutral format as opposed to yet another
+> vendor proprietary thing (I am talking about SMART log page).
+> 
 > > 
-> > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> 
+> I noticed that you sign off some patches with your @samsung.com email,
+> and some with @cnexlabs.com
+> Is there a reason for that?
+
+Yeah. Some of this code was made while I was at CNEX Labs. I've since
+moved to Samsung. But credit where credit's due.
+
+> 
+> 
 > > ---
-> >  hw/block/nvme.c | 175 +++++++++++++++++++++++++++++++-----------------
-> >  hw/block/nvme.h |  21 ++++++
-> >  2 files changed, 133 insertions(+), 63 deletions(-)
+> >  hw/block/nvme.c      | 50 ++++++++++++++++++++++++++++++++++++++++++++
+> >  hw/block/nvme.h      |  2 ++
+> >  include/block/nvme.h |  7 ++++++-
+> >  3 files changed, 58 insertions(+), 1 deletion(-)
 > > 
 > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index e1810260d40b..81514eaef63a 100644
+> > index 81514eaef63a..f72348344832 100644
 > > --- a/hw/block/nvme.c
 > > +++ b/hw/block/nvme.c
-> > @@ -44,6 +44,7 @@
-> >  #include "nvme.h"
+> > @@ -45,6 +45,9 @@
 > >  
 > >  #define NVME_SPEC_VER 0x00010201
-> > +#define NVME_MAX_QS PCI_MSIX_FLAGS_QSIZE
+> >  #define NVME_MAX_QS PCI_MSIX_FLAGS_QSIZE
+> > +#define NVME_TEMPERATURE 0x143
+> > +#define NVME_TEMPERATURE_WARNING 0x157
+> > +#define NVME_TEMPERATURE_CRITICAL 0x175
 > >  
 > >  #define NVME_GUEST_ERR(trace, fmt, ...) \
 > >      do { \
-> > @@ -1325,67 +1326,106 @@ static const MemoryRegionOps nvme_cmb_ops = {
-> >      },
-> >  };
-> >  
-> > -static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-> > +static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
+> > @@ -798,9 +801,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
+> >  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
 > >  {
-> > -    NvmeCtrl *n = NVME(pci_dev);
-> > -    NvmeIdCtrl *id = &n->id_ctrl;
-> > -
-> > -    int i;
-> > -    int64_t bs_size;
-> > -    uint8_t *pci_conf;
-> > -
-> > -    if (!n->params.num_queues) {
-> > -        error_setg(errp, "num_queues can't be zero");
-> > -        return;
-> > -    }
-> > +    NvmeParams *params = &n->params;
+> >      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> > +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> >      uint32_t result;
 > >  
-> >      if (!n->conf.blk) {
-> > -        error_setg(errp, "drive property not set");
-> > -        return;
-> > +        error_setg(errp, "nvme: block backend not configured");
-> > +        return 1;
-> As a matter of taste, negative values indicate error, and 0 is the success value.
-> In Linux kernel this is even an official rule.
-> >      }
-
-Fixed.
-
-> >  
-> > -    bs_size = blk_getlength(n->conf.blk);
-> > -    if (bs_size < 0) {
-> > -        error_setg(errp, "could not get backing file size");
-> > -        return;
-> > +    if (!params->serial) {
-> > +        error_setg(errp, "nvme: serial not configured");
-> > +        return 1;
-> >      }
-> >  
-> > -    if (!n->params.serial) {
-> > -        error_setg(errp, "serial property not set");
-> > -        return;
-> > +    if ((params->num_queues < 1 || params->num_queues > NVME_MAX_QS)) {
-> > +        error_setg(errp, "nvme: invalid queue configuration");
-> Maybe something like "nvme: invalid queue count specified, should be between 1 and ..."?
-> > +        return 1;
-> >      }
-
-Fixed.
-
+> >      switch (dw10) {
+> > +    case NVME_TEMPERATURE_THRESHOLD:
+> > +        result = 0;
 > > +
-> > +    return 0;
-> > +}
+> > +        /*
+> > +         * The controller only implements the Composite Temperature sensor, so
+> > +         * return 0 for all other sensors.
+> > +         */
+> > +        if (NVME_TEMP_TMPSEL(dw11)) {
+> > +            break;
+> > +        }
 > > +
-> > +static int nvme_init_blk(NvmeCtrl *n, Error **errp)
-> > +{
-> >      blkconf_blocksizes(&n->conf);
-> >      if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->conf.blk),
-> > -                                       false, errp)) {
-> > -        return;
-> > +        false, errp)) {
-> > +        return 1;
-> >      }
+> > +        switch (NVME_TEMP_THSEL(dw11)) {
+> > +        case 0x0:
+> > +            result = cpu_to_le16(n->features.temp_thresh_hi);
+> > +            break;
+> > +        case 0x1:
+> > +            result = cpu_to_le16(n->features.temp_thresh_low);
+> > +            break;
+> > +        }
+> > +
+> > +        break;
+> >      case NVME_VOLATILE_WRITE_CACHE:
+> >          result = blk_enable_write_cache(n->conf.blk);
+> >          trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
+> > @@ -845,6 +870,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
 > >  
-> > -    pci_conf = pci_dev->config;
-> > -    pci_conf[PCI_INTERRUPT_PIN] = 1;
-> > -    pci_config_set_prog_interface(pci_dev->config, 0x2);
-> > -    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
-> > -    pcie_endpoint_cap_init(pci_dev, 0x80);
-> > +    return 0;
-> > +}
-> >  
-> > +static void nvme_init_state(NvmeCtrl *n)
-> > +{
-> >      n->num_namespaces = 1;
-> >      n->reg_size = pow2ceil(0x1004 + 2 * (n->params.num_queues + 1) * 4);
-> 
-> Isn't that wrong?
-> First 4K of mmio (0x1000) is the registers, and that is followed by the doorbells,
-> and each doorbell takes 8 bytes (assuming regular doorbell stride).
-> so n->params.num_queues + 1 should be total number of queues, thus the 0x1004 should be 0x1000 IMHO.
-> I might miss some rounding magic here though.
-> 
-
-Yeah. I think you are right. It all becomes slightly more fishy due to
-the num_queues device parameter being 1's based and accounts for the
-admin queue pair.
-
-But in get/set features, the value has to be 0's based and only account
-for the I/O queues, so we need to subtract 2 from the value. It's
-confusing all around.
-
-Since the admin queue pair isn't really optional I think it would be
-better that we introduces a new max_ioqpairs parameter that is 1's
-based, counts number of pairs and obviously only accounts for the io
-queues.
-
-I guess we need to keep the num_queues parameter around for
-compatibility.
-
-The doorbells are only 4 bytes btw, but the calculation still looks
-wrong. With a max_ioqpairs parameter in place, the reg_size should be
-
-    pow2ceil(0x1008 + 2 * (n->params.max_ioqpairs) * 4)
-
-Right? Thats 0x1000 for the core registers, 8 bytes for the sq/cq
-doorbells for the admin queue pair, and then room for the i/o queue
-pairs.
-
-I added a patch for this in v6.
-
-> > -    n->ns_size = bs_size / (uint64_t)n->num_namespaces;
-> > -
+> >      switch (dw10) {
+> > +    case NVME_TEMPERATURE_THRESHOLD:
+> > +        if (NVME_TEMP_TMPSEL(dw11)) {
+> > +            break;
+> > +        }
+> > +
+> > +        switch (NVME_TEMP_THSEL(dw11)) {
+> > +        case 0x0:
+> > +            n->features.temp_thresh_hi = NVME_TEMP_TMPTH(dw11);
+> > +            break;
+> > +        case 0x1:
+> > +            n->features.temp_thresh_low = NVME_TEMP_TMPTH(dw11);
+> > +            break;
+> > +        default:
+> > +            return NVME_INVALID_FIELD | NVME_DNR;
+> > +        }
+> > +
+> > +        break;
+> >      case NVME_VOLATILE_WRITE_CACHE:
+> >          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+> >          break;
+> > @@ -1366,6 +1408,9 @@ static void nvme_init_state(NvmeCtrl *n)
 > >      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
 > >      n->sq = g_new0(NvmeSQueue *, n->params.num_queues);
 > >      n->cq = g_new0(NvmeCQueue *, n->params.num_queues);
-> > +}
-> >  
-> > -    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
-> > -                          "nvme", n->reg_size);
-> > +static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-> > +{
-> > +    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
-> It would be nice to have #define for CMB bar number
-
-Added.
-
-> > +    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
 > > +
-> > +    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-> > +    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
-> > +    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-> > +    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-> > +    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-> > +    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
-> > +    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
-> > +
-> > +    n->cmbloc = n->bar.cmbloc;
-> > +    n->cmbsz = n->bar.cmbsz;
-> > +
-> > +    n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-> > +    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-> > +                            "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-> > +    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
-> Same here although since you read it here from the controller register,
-> then maybe leave it as is. I prefer though for this kind of thing
-> to have a #define and use it everywhere. 
+> > +    n->temperature = NVME_TEMPERATURE;
+> 
+> This appears not to be used in the patch.
+> I think you should move that to the next patch that
+> adds the get log page support.
 > 
 
-Done.
+Fixed.
 
-> > +        PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-> > +        PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
-> > +}
-> > +
-> > +static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
-> > +{
-> > +    uint8_t *pci_conf = pci_dev->config;
-> > +
-> > +    pci_conf[PCI_INTERRUPT_PIN] = 1;
-> > +    pci_config_set_prog_interface(pci_conf, 0x2);
-> Nitpick: How about adding some #define for that as well?
-> (I know that this code is copied as is but still)
-
-Yeah. A PCI_PI_NVME or something would be nice. But this should probably
-go to some pci related header file? Any idea where that would fit?
-
-> > +    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
-> > +    pci_config_set_device_id(pci_conf, 0x5845);
-> > +    pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
-> > +    pcie_endpoint_cap_init(pci_dev, 0x80);
-> > +
-> > +    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n, "nvme",
-> > +        n->reg_size);
-> 
-> Code on split lines should start at column right after the '('
-> Now its my turn to notice this - our checkpatch.pl doesn't check this,
-> and I can't explain how often I am getting burnt on this myself.
-> 
-> There are *lot* of these issues, I pointed out some of them but you should
-> check all the patches for this.
-> 
-
-I fixed all that :)
-
-> 
-> >      pci_register_bar(pci_dev, 0,
-> >          PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
-> >          &n->iomem);
-> Split line alignment issue here as well.
-> >      msix_init_exclusive_bar(pci_dev, n->params.num_queues, 4, NULL);
-> >  
-> > +    if (n->params.cmb_size_mb) {
-> > +        nvme_init_cmb(n, pci_dev);
-> > +    }
-> > +}
-> > +
-> > +static void nvme_init_ctrl(NvmeCtrl *n)
-> > +{
-> > +    NvmeIdCtrl *id = &n->id_ctrl;
-> > +    NvmeParams *params = &n->params;
-> > +    uint8_t *pci_conf = n->parent_obj.config;
-> > +
-> >      id->vid = cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
-> >      id->ssvid = cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VENDOR_ID));
-> >      strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
-> >      strpadcpy((char *)id->fr, sizeof(id->fr), "1.0", ' ');
-> > -    strpadcpy((char *)id->sn, sizeof(id->sn), n->params.serial, ' ');
-> > +    strpadcpy((char *)id->sn, sizeof(id->sn), params->serial, ' ');
-> >      id->rab = 6;
-> >      id->ieee[0] = 0x00;
-> >      id->ieee[1] = 0x02;
-> > @@ -1431,46 +1471,55 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-> >  
-> >      n->bar.vs = NVME_SPEC_VER;
-> >      n->bar.intmc = n->bar.intms = 0;
-> > +}
-> >  
-> > -    if (n->params.cmb_size_mb) {
-> > +static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
-> > +{
-> > +    int64_t bs_size;
-> > +    NvmeIdNs *id_ns = &ns->id_ns;
-> >  
-> > -        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
-> > -        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
-> > +    bs_size = blk_getlength(n->conf.blk);
-> > +    if (bs_size < 0) {
-> > +        error_setg_errno(errp, -bs_size, "blk_getlength");
-> > +        return 1;
-> > +    }
-> >  
-> > -        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
-> > -        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
-> > -        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
-> > -        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
-> > -        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
-> > -        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
-> > -        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
-> > +    id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
-> > +    n->ns_size = bs_size;
-> >  
-> > -        n->cmbloc = n->bar.cmbloc;
-> > -        n->cmbsz = n->bar.cmbsz;
-> > +    id_ns->ncap = id_ns->nuse = id_ns->nsze =
-> > +        cpu_to_le64(nvme_ns_nlbas(n, ns));
-> I myself don't know how to align these splits to be honest.
-> I would just split this into multiple statements.
-> >  
-> > -        n->cmbuf = g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-> > -        memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
-> > -                              "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
-> > -        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
-> > -            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64 |
-> > -            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
-> > +    return 0;
-> > +}
-> >  
-> > +static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-> > +{
-> > +    NvmeCtrl *n = NVME(pci_dev);
-> > +    Error *local_err = NULL;
-> > +    int i;
-> > +
-> > +    if (nvme_check_constraints(n, &local_err)) {
-> > +        error_propagate_prepend(errp, local_err, "nvme_check_constraints: ");
-> Do we need that hint for the end user?
-
-Removed.
-
-> > +        return;
-> > +    }
-> > +
-> > +    nvme_init_state(n);
-> > +
-> > +    if (nvme_init_blk(n, &local_err)) {
-> > +        error_propagate_prepend(errp, local_err, "nvme_init_blk: ");
-> Same here
-
-Done.
-
-
-> > +        return;
-> >      }
-> >  
-> >      for (i = 0; i < n->num_namespaces; i++) {
-> > -        NvmeNamespace *ns = &n->namespaces[i];
-> > -        NvmeIdNs *id_ns = &ns->id_ns;
-> > -        id_ns->nsfeat = 0;
-> > -        id_ns->nlbaf = 0;
-> > -        id_ns->flbas = 0;
-> > -        id_ns->mc = 0;
-> > -        id_ns->dpc = 0;
-> > -        id_ns->dps = 0;
-> > -        id_ns->lbaf[0].ds = BDRV_SECTOR_BITS;
-> > -        id_ns->ncap  = id_ns->nuse = id_ns->nsze =
-> > -            cpu_to_le64(n->ns_size >>
-> > -                id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds);
-> > +        if (nvme_init_namespace(n, &n->namespaces[i], &local_err)) {
-> > +            error_propagate_prepend(errp, local_err, "nvme_init_namespace: ");
-> And here
-
-Done.
-
-
-> > +            return;
-> > +        }
-> >      }
-> > +
-> > +    nvme_init_pci(n, pci_dev);
-> > +    nvme_init_ctrl(n);
+> > +    n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
 > >  }
 > >  
-> >  static void nvme_exit(PCIDevice *pci_dev)
+> >  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+> > @@ -1447,6 +1492,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+> >      id->acl = 3;
+> >      id->frmw = 7 << 1;
+> >      id->lpa = 1 << 0;
+> > +
+> > +    /* recommended default value (~70 C) */
+> > +    id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
+> > +    id->cctemp = cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
+> > +
+> >      id->sqes = (0x6 << 4) | 0x6;
+> >      id->cqes = (0x4 << 4) | 0x4;
+> >      id->nn = cpu_to_le32(n->num_namespaces);
 > > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> > index 9957c4a200e2..a867bdfabafd 100644
+> > index a867bdfabafd..1518f32557a3 100644
 > > --- a/hw/block/nvme.h
 > > +++ b/hw/block/nvme.h
-> > @@ -65,6 +65,22 @@ typedef struct NvmeNamespace {
-> >      NvmeIdNs        id_ns;
-> >  } NvmeNamespace;
+> > @@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
+> >      uint64_t    irq_status;
+> >      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+> >      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
+> > +    uint16_t    temperature;
 > >  
-> > +static inline NvmeLBAF nvme_ns_lbaf(NvmeNamespace *ns)
-> > +{
-> Its not common to return a structure in C, usually pointer is returned to
-> avoid copying. In this case this doesn't matter that much though.
-
-It's actually gonna be used a lot. So swapped to pointer.
-
-> > +    NvmeIdNs *id_ns = &ns->id_ns;
-> > +    return id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
-> > +}
-> > +
-> > +static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
-> > +{
-> > +    return nvme_ns_lbaf(ns).ds;
-> > +}
-> > +
-> > +static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
-> > +{
-> > +    return 1 << nvme_ns_lbads(ns);
-> > +}
-> > +
-> >  #define TYPE_NVME "nvme"
-> >  #define NVME(obj) \
-> >          OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
-> > @@ -101,4 +117,9 @@ typedef struct NvmeCtrl {
+> >      NvmeNamespace   *namespaces;
+> >      NvmeSQueue      **sq;
+> > @@ -115,6 +116,7 @@ typedef struct NvmeCtrl {
+> >      NvmeSQueue      admin_sq;
+> >      NvmeCQueue      admin_cq;
 > >      NvmeIdCtrl      id_ctrl;
+> > +    NvmeFeatureVal  features;
 > >  } NvmeCtrl;
 > >  
-> > +static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
-> > +{
-> > +    return n->ns_size >> nvme_ns_lbads(ns);
-> > +}
-> Unless you need all these functions in the future, this feels like
-> it is a bit verbose.
+> >  static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+> > diff --git a/include/block/nvme.h b/include/block/nvme.h
+> > index d2f65e8fe496..ff31cb32117c 100644
+> > --- a/include/block/nvme.h
+> > +++ b/include/block/nvme.h
+> > @@ -616,7 +616,8 @@ enum NvmeIdCtrlOncs {
+> >  typedef struct NvmeFeatureVal {
+> >      uint32_t    arbitration;
+> >      uint32_t    power_mgmt;
+> > -    uint32_t    temp_thresh;
+> > +    uint16_t    temp_thresh_hi;
+> > +    uint16_t    temp_thresh_low;
+> >      uint32_t    err_rec;
+> >      uint32_t    volatile_wc;
+> >      uint32_t    num_queues;
+> > @@ -635,6 +636,10 @@ typedef struct NvmeFeatureVal {
+> >  #define NVME_INTC_THR(intc)     (intc & 0xff)
+> >  #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
+> >  
+> > +#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
+> > +#define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
+> > +#define NVME_TEMP_TMPTH(temp)  (temp & 0xffff)
+> > +
+> >  enum NvmeFeatureIds {
+> >      NVME_ARBITRATION                = 0x1,
+> >      NVME_POWER_MANAGEMENT           = 0x2,
 > 
-
-These will be used in various places later.
- 
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
 
