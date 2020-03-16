@@ -2,87 +2,86 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D74CC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:07:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5ACC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24EDF20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:07:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C756B20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:10:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mfW4NgO9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24EDF20679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CmE9Y6GI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C756B20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDw12-00011C-CO
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 16:07:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51359)
+	id 1jDw3n-0002MG-2R
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 16:10:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDw0M-0000OG-1F
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:06:30 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDw38-0001q5-3J
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:09:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDw0K-00087A-Tf
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:06:29 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34212)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDw35-0004kJ-JD
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:09:21 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40292)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDw0K-00082K-MA
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:06:28 -0400
-Received: by mail-pg1-x541.google.com with SMTP id t3so10350104pgn.1
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:06:28 -0700 (PDT)
+ id 1jDw34-0004Xo-Aw
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:09:19 -0400
+Received: by mail-pg1-x541.google.com with SMTP id t24so10347139pgj.7
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:09:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=oMoLpNdfwPj3BjJ9X6DM9wITDjEHBSTuqrQmlwfNSjU=;
- b=mfW4NgO9PmedbXOTkBJ2p4fnyqH+PaQYFFXkpEl0+hkas2oi5vm/Ucr8lrSCnzFctx
- 6wBrvoaeMeZBG2bQRqO6mw68s4MtCafwnw1Acq3IC/kOQ/oZvCX1QOkyT1nv8l5yR9f7
- nL8bzh5vOlxijwjQmhJX60n3loAmx6odX8iqdxxUKlOyqsvAUvJZGVcUty0Jq2YYVuHW
- ciMsmsWm/7We+5mY6F/srwuqqKqIvZJ3LWnx4LWa6xvmfGDrBi1V+BdAJm3E8Mi8khy7
- N49rccakpTBvzDNoqeIEZhtiDJQhZr1MR+mYhDE+Yea4FztXp6MFREA8EZUCaWd+HufS
- NvHA==
+ bh=iHWNGHwZg0b9gZmRRuZF0ElUxFU5qu0I08unHCAlUTo=;
+ b=CmE9Y6GIRrEIFvCBFwc3pmjmYPqQ/MY52zfMZfNZMTcbUXhyZGGYlCZi0eVCmBVCIP
+ UjA7lYlBipTKZTVo2Gs75p76wj/pRrheSrHYLUmItGJcc+gqetzboJpaJBUaGIrMSgAN
+ 0FTeLyZVjdPXRhJxsu6aNeWE1kO09Ftpzk+QceM+nx+SJOTKhUlrVD1tm8IBRwwNjTPn
+ h49QreqTPOmHVcyCcpZqMeAgcqRGf1qVvtY4LK0JhEN3VxFuXWoCY9XltQgKBGVzsLhg
+ yvm6EGvbW3L0mo22l2kWROnd/oYRhTsA4zusQ+fQfoCFE5QZys27szf2nvMqOxshtxjM
+ BWMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=oMoLpNdfwPj3BjJ9X6DM9wITDjEHBSTuqrQmlwfNSjU=;
- b=ZBkGyJz8Z2K8ljMlxvg4AjmfjIehlkh7PQ4OYoNSiSLAZCrCj4xQK3qTv82gPgFKJ0
- MGWe9iOFKQeKXiiMo+gxbfWKSNATpmYDwbkMgC8H9e3sa/f5X4Jv/OMPCem1LdZ7aSMG
- jh1uEnvKEsY2Tqc9lu6TkKncsxvaG18ymmU9T3oNAOCO+765nMYW8HzlGJT/vtDzFDSF
- t94QNmEVedh2K6Lno0CGAb/FUtP7QbMa6rCZv2HRzcdpp2TaJnWUNGnVWbPXpmLGqSin
- OZ2uGljT2bh1cvxwRUk5K/b6Jur9VzOccqTycoqPGqlboup12uGDuryILa2F5JN7kplv
- dDOQ==
-X-Gm-Message-State: ANhLgQ0xYOZ7oNHOe0NNVnlIKP6jNeDQH9ydfy4JQJTWYXZwDEyanmjj
- eKwSy/jjYZu4D5P/V5YVz54VuA==
-X-Google-Smtp-Source: ADFU+vvSFbuSg/ZfRlESkgsCOFoCSgmG5iPCyQlDq0W9IFjOrCmIyWHQSdbKHKIkdWBjoEo1wl9mPA==
-X-Received: by 2002:a63:790e:: with SMTP id u14mr1340697pgc.361.1584389187593; 
- Mon, 16 Mar 2020 13:06:27 -0700 (PDT)
+ bh=iHWNGHwZg0b9gZmRRuZF0ElUxFU5qu0I08unHCAlUTo=;
+ b=LYhMmcgpHpurPDjmYvTlBf56bnlgFbiv3uB1YqHV6zA/1UyCMOT9ztTev/VaqOAM7S
+ OtnJ6WRWJiQIiIHaslFQgEimzu4zg3CDTDH02tMf/QlwL7bQxgjLD2gcLa0fDGG9Igu2
+ QAgfLMa8a9schHbJZ5O4UHlsOJAo5zM5halTINX1Z52zDF4fy8wtSRWyJ7H5FcBMo0ue
+ SSRTa6CGy2kVHirq+bZFzpY175s/x5fnBcKbF2s7aOMP3G8RHop0ILeE1fupxbBxfe0a
+ 9fGQf76NOItlm6euknLfKSy7tcqi/hh9N3mmU9z2EKSII+5dukFnMKMHWibdyeN4YttO
+ BjNw==
+X-Gm-Message-State: ANhLgQ1jkc+C6uaO0kjrX1rOqjV1wFtcCiqZ+o0RN00ZfmjGpjJMyqho
+ Z0jhH5UC47FTWmtEVUsvQebNKw==
+X-Google-Smtp-Source: ADFU+vvwIq9UpPBuFyug8mpIP8LNVAnbLWqF2AkU3+pV85O/b7C5pVFS7sPIzV+bLSU23jKDsIvnSg==
+X-Received: by 2002:a62:4ec4:: with SMTP id c187mr1376639pfb.223.1584389356184; 
+ Mon, 16 Mar 2020 13:09:16 -0700 (PDT)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- a71sm687824pfa.162.2020.03.16.13.06.26
+ r186sm685696pfc.181.2020.03.16.13.09.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 13:06:26 -0700 (PDT)
-Subject: Re: [PATCH v3 17/19] hw/arm: Automatically select the 'virt' machine
- on KVM
+ Mon, 16 Mar 2020 13:09:15 -0700 (PDT)
+Subject: Re: [PATCH v3 09/19] target/arm: Move ARM_V7M Kconfig from hw/ to
+ target/
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-18-philmd@redhat.com>
+ <20200316160634.3386-10-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d0842e82-8640-5903-e59b-99963584b89a@linaro.org>
-Date: Mon, 16 Mar 2020 13:06:25 -0700
+Message-ID: <d09210dd-2837-1fb3-2dc5-c17c2f86d908@linaro.org>
+Date: Mon, 16 Mar 2020 13:09:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316160634.3386-18-philmd@redhat.com>
+In-Reply-To: <20200316160634.3386-10-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -109,29 +108,19 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
-> When building a KVM-only QEMU, the 'virt' machine is a good
-> default :)
+> ARM_V7M is a concept tied to the architecture. Move it to the
+> target/arm/ directory to keep the hardware/architecture separation
+> clearer.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/arm/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index d0903d8544..8e801cd15f 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -1,5 +1,6 @@
->  config ARM_VIRT
->      bool
-> +    default y if KVM
->      imply PCI_DEVICES
->      imply TEST_DEVICES
->      imply VFIO_AMD_XGBE
-> 
+>  hw/arm/Kconfig     | 3 ---
+>  target/Kconfig     | 2 +-
+>  target/arm/Kconfig | 2 ++
+>  3 files changed, 3 insertions(+), 4 deletions(-)
+>  create mode 100644 target/arm/Kconfig
 
-Likewise SBSA_REF?  Otherwise, what is this for?
-Did you remove ARM_VIRT from default-config/*?
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
