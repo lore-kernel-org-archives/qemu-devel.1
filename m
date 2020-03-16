@@ -2,99 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4D4C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FCBC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A435320674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F87420674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf0DNZHi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A435320674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbfT9kzg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F87420674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtVK-0007YP-RE
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53561)
+	id 1jDtVN-0007gm-BY
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDsGe-0004Ap-Ag
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:06 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDrRl-00012d-Bg
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:14:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDsGd-0008DL-1G
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:04 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39869)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDsGc-0008CR-T8
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584374822;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=j2NQUGK1oGWALaGzXfEtj8AM5490glkq1or09z6B8W8=;
- b=Zf0DNZHiVI4eFg98LAkhJz0J9cbICvHiZpIgeiQ5fXtSrrichYZ+Lcyzg1fRnNtlk7QRdS
- 8Dt9TK/Sn0RkecrD1tTwHNf/rLpZybQ4Q8RSOQCJncrGDnDjIJ2FkI6Zmn9EybnAcIky65
- uAPpaqoDm5uZvQGAv3vPJDY0AVn517I=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-iZVhGtFkMxiy6byJlrL-qg-1; Mon, 16 Mar 2020 12:07:01 -0400
-X-MC-Unique: iZVhGtFkMxiy6byJlrL-qg-1
-Received: by mail-wr1-f72.google.com with SMTP id v6so9173910wrg.22
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:07:00 -0700 (PDT)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDrRk-0006We-80
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:14:29 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35872)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jDrRk-0006O8-0L
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:14:28 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g62so18513293wme.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 08:14:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=vBOJRsRvVO3wJPXXvFhNbaVuIx9vh/F/w8uXer5AY28=;
+ b=kbfT9kzgLfzL9hsLEiG+SeRwqiNMU4iUmrCt61jWEGxCuFSQueQOdJB6G1Tegp7din
+ Et9+utysC1YQCtwwdrG5Cu4TUvbxp7JVhTfB2IvJ9llh9AqXrOHMQjlS5v2c/EcLx3PD
+ GCBer5FnTc/6IvSJ76zpocyDLJurE534ujVEukcMZ63kiY9yBppX93v06JlV5kB49Dy0
+ O94g0lTV3ixFvcJ3CqlqCPq6/TgvJut6K7XF3RXXzTSf/g9NRrgQVnJsXuUIHi83Hi6d
+ kCyjSvKsXXoRrDeapoHZfrUEk3KkMy9nnw+seHGM2M3145wAqEU8tZCU4NgB3wzIMQI7
+ KW6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=x1weIqYNF3Fo5tV0WZvC7V944GYiMwvqowZHCwqs/e8=;
- b=rXzFifaKD0RQWuCwEmemOHWYgq8aQOmn/tlatIwMzKTNYa4dqoDggH1OUdJJs3tquB
- 02g5kO1fX7E7Edid19wha/SK43PJE320k/qO/iborihh2az1yrpRccdC5orqGKqEWn8l
- 704/azvHKZAtTuSVnMT8jKWOwvif2+NrjCCBzsFMIHdIEkfdupF/PA578hBYDldErPIi
- 1Ef4VjT2ZjxnIDMi74JOfmBFr+2+YONI32hIbVFFBo3Rh0NoJ54+2Mt88W3VKdRgxCGQ
- zTiw1y5QMuZ2WRlS9em/HJOgw6pg7vv9qK4hkhaHEks2+ocGIeModriCaEpLBslMoyka
- Zjzg==
-X-Gm-Message-State: ANhLgQ129fPiIgcAFGnC9yat1db4yeoeLhHHCbgojgcMXaxGEFOeUxp4
- dfG8+JHZpgBUvvgwud56CJCL+rc++gJ8RgpjWoFtj1ymvLuC7YzumaKAeo2nTV1LSCG66CudeJQ
- j0dyaljUTthotmLk=
-X-Received: by 2002:a1c:6385:: with SMTP id
- x127mr28120927wmb.141.1584374819495; 
- Mon, 16 Mar 2020 09:06:59 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vsfX0n8OJNrHnrM7slMemare5ZJPKg4uT9S5KNvko7zVE1qXAD/IK5hEDswewh2HAjGFyl3Zg==
-X-Received: by 2002:a1c:6385:: with SMTP id
- x127mr28120897wmb.141.1584374819229; 
- Mon, 16 Mar 2020 09:06:59 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id y5sm166058wmi.34.2020.03.16.09.06.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 09:06:58 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/19] target/arm: Restric the Address Translate operations
- to TCG accel
-Date: Mon, 16 Mar 2020 17:06:19 +0100
-Message-Id: <20200316160634.3386-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
-References: <20200316160634.3386-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vBOJRsRvVO3wJPXXvFhNbaVuIx9vh/F/w8uXer5AY28=;
+ b=HjZzkd4qAywCP9eC/gekD1FOTTFZNbw6M3pW1WQEaAuzp64gb/R/kmyt+77UlFHbKr
+ x8NU6n8oZXpqb911C7l+8L2yAUFN44NLsdeq+OenyY95cvjfpqd1nxCQTvd85ia7GXJX
+ 0Gi3nqVgyI/iBkdIOvuO647Ax++R8Q+viPthsnvDUoknNrHoXwlVyjvC8D0ulQJXm1vj
+ 1Cq5CjFDdH8KRUB4uLb9VJk5ZTnLsg2zFKWQ+zbkLcKu2sSVcGXcGSLpo77gQ072pk6J
+ xnUOhLCJfjVXm6yBExCAQoq8Bwvft7NXsKah19sgZHsmVM3+DB9lZunLvqlmheSCZGWK
+ AGkw==
+X-Gm-Message-State: ANhLgQ1evzwcMf3HvqYmSd6g0eW5LawGLC2TIaKBKtaQvSG9onj4vpMP
+ 5t2kqcTfPto6nXYp3s/0q4NBEmjyAijJ1MkzokA=
+X-Google-Smtp-Source: ADFU+vsqSYCUglt3wxCDTVIkOI8Y2sO4fhlXZapg017PcBUdU37NVEVwK2h4U6DK7+pPruEGDi4y6FXIn56naqpPHto=
+X-Received: by 2002:a1c:1fc9:: with SMTP id f192mr29131782wmf.4.1584371667016; 
+ Mon, 16 Mar 2020 08:14:27 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-11-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-11-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 16 Mar 2020 16:14:14 +0100
+Message-ID: <CAJ+F1CK8+O_aN-OQUxJkS2+j+ALv6vCp7rRFMAkoBAD9keibBQ@mail.gmail.com>
+Subject: Re: [PATCH v3 10/34] tests/test-qmp-event: Check event is actually
+ emitted
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,117 +90,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Under KVM the ATS instruction will trap.
+On Sun, Mar 15, 2020 at 3:55 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- target/arm/helper.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 924deffd65..a5280c091b 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -3322,7 +3322,7 @@ static void par_write(CPUARMState *env, const ARMCPRe=
-gInfo *ri, uint64_t value)
-     }
- }
-=20
--#ifndef CONFIG_USER_ONLY
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- /* get_phys_addr() isn't present for user-mode-only targets */
-=20
- static CPAccessResult ats_access(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3631,7 +3631,7 @@ static void ats_write64(CPUARMState *env, const ARMCP=
-RegInfo *ri,
-=20
-     env->cp15.par_el[1] =3D do_ats_write(env, value, access_type, mmu_idx)=
-;
- }
--#endif
-+#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
-=20
- static const ARMCPRegInfo vapa_cp_reginfo[] =3D {
-     { .name =3D "PAR", .cp =3D 15, .crn =3D 7, .crm =3D 4, .opc1 =3D 0, .o=
-pc2 =3D 0,
-@@ -3639,7 +3639,7 @@ static const ARMCPRegInfo vapa_cp_reginfo[] =3D {
-       .bank_fieldoffsets =3D { offsetoflow32(CPUARMState, cp15.par_s),
-                              offsetoflow32(CPUARMState, cp15.par_ns) },
-       .writefn =3D par_write },
--#ifndef CONFIG_USER_ONLY
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-     /* This underdecoding is safe because the reginfo is NO_RAW. */
-     { .name =3D "ATS", .cp =3D 15, .crn =3D 7, .crm =3D 8, .opc1 =3D 0, .o=
-pc2 =3D CP_ANY,
-       .access =3D PL1_W, .accessfn =3D ats_access,
-@@ -4880,7 +4880,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] =3D {
-       .opc0 =3D 1, .opc1 =3D 4, .crn =3D 8, .crm =3D 7, .opc2 =3D 6,
-       .access =3D PL2_W, .type =3D ARM_CP_NO_RAW,
-       .writefn =3D tlbi_aa64_alle1is_write },
--#ifndef CONFIG_USER_ONLY
-+
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-     /* 64 bit address translation operations */
-     { .name =3D "AT_S1E1R", .state =3D ARM_CP_STATE_AA64,
-       .opc0 =3D 1, .opc1 =3D 0, .crn =3D 7, .crm =3D 8, .opc2 =3D 0,
-@@ -4929,7 +4930,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] =3D {
-       .access =3D PL1_RW, .resetvalue =3D 0,
-       .fieldoffset =3D offsetof(CPUARMState, cp15.par_el[1]),
-       .writefn =3D par_write },
--#endif
-+#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
-+
-     /* TLB invalidate last level of translation table walk */
-     { .name =3D "TLBIMVALIS", .cp =3D 15, .opc1 =3D 0, .crn =3D 8, .crm =
-=3D 3, .opc2 =3D 5,
-       .type =3D ARM_CP_NO_RAW, .access =3D PL1_W, .accessfn =3D access_ttl=
-b,
-@@ -5536,7 +5538,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
-       .opc0 =3D 1, .opc1 =3D 4, .crn =3D 8, .crm =3D 3, .opc2 =3D 5,
-       .access =3D PL2_W, .type =3D ARM_CP_NO_RAW,
-       .writefn =3D tlbi_aa64_vae2is_write },
--#ifndef CONFIG_USER_ONLY
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-     /* Unlike the other EL2-related AT operations, these must
-      * UNDEF from EL3 if EL2 is not implemented, which is why we
-      * define them here rather than with the rest of the AT ops.
-@@ -6992,7 +6994,7 @@ static const ARMCPRegInfo vhe_reginfo[] =3D {
-     REGINFO_SENTINEL
- };
-=20
--#ifndef CONFIG_USER_ONLY
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
- static const ARMCPRegInfo ats1e1_reginfo[] =3D {
-     { .name =3D "AT_S1E1R", .state =3D ARM_CP_STATE_AA64,
-       .opc0 =3D 1, .opc1 =3D 0, .crn =3D 7, .crm =3D 9, .opc2 =3D 0,
-@@ -7894,14 +7896,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-     if (cpu_isar_feature(aa64_pan, cpu)) {
-         define_one_arm_cp_reg(cpu, &pan_reginfo);
-     }
--#ifndef CONFIG_USER_ONLY
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
-     if (cpu_isar_feature(aa64_ats1e1, cpu)) {
-         define_arm_cp_regs(cpu, ats1e1_reginfo);
-     }
-     if (cpu_isar_feature(aa32_ats1e1, cpu)) {
-         define_arm_cp_regs(cpu, ats1cp_reginfo);
-     }
--#endif
-+#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
-     if (cpu_isar_feature(aa64_uao, cpu)) {
-         define_one_arm_cp_reg(cpu, &uao_reginfo);
-     }
+
+> ---
+>  tests/test-qmp-event.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+> index d64066139c..7dd0053190 100644
+> --- a/tests/test-qmp-event.c
+> +++ b/tests/test-qmp-event.c
+> @@ -26,6 +26,7 @@
+>
+>  typedef struct TestEventData {
+>      QDict *expect;
+> +    bool emitted;
+>  } TestEventData;
+>
+>  TestEventData *test_event_data;
+> @@ -52,7 +53,7 @@ void test_qapi_event_emit(test_QAPIEvent event, QDict *=
+d)
+>      qdict_del(d, "timestamp");
+>
+>      g_assert(qobject_is_equal(QOBJECT(d), QOBJECT(test_event_data->expec=
+t)));
+> -
+> +    test_event_data->emitted =3D true;
+>  }
+>
+>  static void event_prepare(TestEventData *data,
+> @@ -87,6 +88,7 @@ static void test_event_a(TestEventData *data,
+>  {
+>      data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_A' }");
+>      qapi_event_send_event_a();
+> +    g_assert(data->emitted);
+>      qobject_unref(data->expect);
+>  }
+>
+> @@ -95,6 +97,7 @@ static void test_event_b(TestEventData *data,
+>  {
+>      data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_B' }");
+>      qapi_event_send_event_b();
+> +    g_assert(data->emitted);
+>      qobject_unref(data->expect);
+>  }
+>
+> @@ -107,6 +110,7 @@ static void test_event_c(TestEventData *data,
+>          "{ 'event': 'EVENT_C', 'data': {"
+>          " 'a': 1, 'b': { 'integer': 2, 'string': 'test1' }, 'c': 'test2'=
+ } }");
+>      qapi_event_send_event_c(true, 1, true, &b, "test2");
+> +    g_assert(data->emitted);
+>      qobject_unref(data->expect);
+>  }
+>
+> @@ -132,6 +136,7 @@ static void test_event_d(TestEventData *data,
+>          "  'string': 'test2', 'enum2': 'value2' },"
+>          " 'b': 'test3', 'enum3': 'value3' } }");
+>      qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VAL=
+UE3);
+> +    g_assert(data->emitted);
+>      qobject_unref(data->expect);
+>  }
+>
+> --
+> 2.21.1
+>
+>
+
+
 --=20
-2.21.1
-
+Marc-Andr=C3=A9 Lureau
 
