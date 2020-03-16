@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FC0C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1E8C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 495A92073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5A7520663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:59:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iq8XZEE9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495A92073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XED/gtbk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A7520663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvtD-00031q-FA
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:59:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42597)
+	id 1jDvtM-0003Ke-43
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42771)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jDvsI-0001mX-NR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:11 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jDvsQ-00022H-TV
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jDvsH-0002XO-Ku
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:10 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24078)
+ (envelope-from <jsnow@redhat.com>) id 1jDvsP-0003V6-TR
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:18 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22764)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jDvsH-0002TU-G5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:09 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jDvsP-0003Pu-Nt
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:58:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584388689;
+ s=mimecast20190719; t=1584388697;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=puBSKPMhK1tbMdZhnIjRMV7B7BX3nUo3nYIO3rPUq7A=;
- b=iq8XZEE9hU/LRL/XwfR8Lkawqhry/+2Lh0QTDWQyJ9Q3Iv6RoIQkzDFQSoonftJGmSJ0xX
- 76lNbtAWxEwj4XBlYbqS0JiiP95GZrhN+hEppihkMRdwUr1YRf3ykkjPbe/8M6B0djJXPx
- iZVYQMW01S/FSUdoglq7R+CYGmYdyyc=
+ bh=Xc6OfWD9xEQApri2rks5HZKW0bKuBnyxPG4ldZL6ROE=;
+ b=XED/gtbkpGWVFuPxFmyMR4xvauUMg1h+CeQTiDe9QVB/oHFTmQutyapRBVlSDRXw5UBxo6
+ XFHGOcep77cQCrz4rh1HYI3KXW4BfIVczE84lVPmRJDVymefGXuxtuwzeOZzQBHUYcWVpy
+ Xh8qCI0FlQ7nXRv6k6P2PpYx5+bPCDY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-PXcxRyvUPt6IG_NsUH4nTQ-1; Mon, 16 Mar 2020 15:58:07 -0400
-X-MC-Unique: PXcxRyvUPt6IG_NsUH4nTQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-116-yHChiVLEP9qBvsW4TxojkQ-1; Mon, 16 Mar 2020 15:58:15 -0400
+X-MC-Unique: yHChiVLEP9qBvsW4TxojkQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7656A1052BA7;
- Mon, 16 Mar 2020 19:57:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E383D805B79;
+ Mon, 16 Mar 2020 19:58:12 +0000 (UTC)
 Received: from [10.10.125.118] (ovpn-125-118.rdu2.redhat.com [10.10.125.118])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9B7A19CA3;
- Mon, 16 Mar 2020 19:57:44 +0000 (UTC)
-Subject: Re: [PATCH 2/3] python/qemu: Kill QEMU process if 'quit' doesn't work
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D95F9353C;
+ Mon, 16 Mar 2020 19:58:11 +0000 (UTC)
+Subject: Re: [PATCH 3/3] iotests: Increase pause_wait() timeout
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200313083617.8326-1-kwolf@redhat.com>
- <20200313083617.8326-3-kwolf@redhat.com>
+ <20200313083617.8326-4-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -137,21 +137,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a50e86c2-97b5-d318-d061-016299b5c8dd@redhat.com>
-Date: Mon, 16 Mar 2020 15:57:43 -0400
+Message-ID: <b199db36-1d2f-c133-ad8a-cc1fbf5d39ee@redhat.com>
+Date: Mon, 16 Mar 2020 15:58:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200313083617.8326-3-kwolf@redhat.com>
+In-Reply-To: <20200313083617.8326-4-kwolf@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -171,40 +170,31 @@ Sender: "Qemu-devel"
 
 
 On 3/13/20 4:36 AM, Kevin Wolf wrote:
-> With a QEMU bug, it can happen that the QEMU process doesn't react to a
-> 'quit' QMP command. If we got an exception during previous QMP
-> communication (e.g. iotests Timeout expiring), we could also be in an
-> inconsistent state where after sending 'quit' we immediately read an old
-> response and close the socket even though the 'quit' command wasn't
-> processed yet. Both cases would lead to a hanging test.
->=20
-> Fix this by waiting for the QEMU process to exit after sending 'quit'
-> with a timeout, and if it doesn't happen within three seconds, send
-> SIGKILL.
->=20
+> Waiting for only 1 second proved to be too short on a loaded system,
+> resulting in false positives when testing pull requests. Increase the
+> timeout a bit to make this less likely.
+> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
 > ---
->  python/qemu/machine.py | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index 183d8f3d38..c837ee8723 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -358,6 +358,7 @@ class QEMUMachine(object):
->                      if not has_quit:
->                          self._qmp.cmd('quit')
->                      self._qmp.close()
-> +                    self._popen.wait(timeout=3D3)
->                  except:
->                      self._popen.kill()
->              self._popen.wait()
->=20
-
---=20
-=E2=80=94js
+>  tests/qemu-iotests/iotests.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index b859c303a2..7bc4934cd2 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -925,7 +925,7 @@ class QMPTestCase(unittest.TestCase):
+>          self.assert_qmp(event, 'data/type', 'mirror')
+>  
+>      def pause_wait(self, job_id='job0'):
+> -        with Timeout(1, "Timeout waiting for job to pause"):
+> +        with Timeout(3, "Timeout waiting for job to pause"):
+>              while True:
+>                  result = self.vm.qmp('query-block-jobs')
+>                  found = False
+> 
 
 
