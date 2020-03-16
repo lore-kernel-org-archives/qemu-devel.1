@@ -2,67 +2,89 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11244C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF00C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C01D720679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:14:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01D720679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EDF2F20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:21:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzbzQiq3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF2F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDyvx-00013X-13
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 19:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55990)
+	id 1jDz32-0003by-4H
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 19:21:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jDysm-0005dm-6o
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:53 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jDz2F-00036S-ST
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jDysk-0002Mp-Mu
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:51 -0400
-Resent-Date: Mon, 16 Mar 2020 19:10:51 -0400
-Resent-Message-Id: <E1jDysk-0002Mp-Mu@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21134)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jDysk-00028g-CL; Mon, 16 Mar 2020 19:10:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584400231; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=lTJo3Ft9H5/oJfM+tkL+eNvI0GBJEAdoSc+zlpAho5RpIkrVp7peED+4HzJ1hV6llj2x5IvILV8Y/ZcfCQ0D4VfHaUruILnwuKQnCRg+0g8yNBPgs5t9JFvEKAwbBG1eRfhznqoKSCxs6d+IuYSw3HbmwSS87YQZBFKhnbJMCo0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584400231;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ALw4DAB7Cs8zNB9H3tmmwtuvBjRFkW2rCw2X+VUNNy4=; 
- b=NXUYzKG5seVchkE4a6BjKWi63GFLSNY35n5m1MQTDrD04K4W34r6LKgSP4ZTh26I16rEH8FWG9svZGSJMFiT9mYwiFKBnOLRzCQuahTWLGFh6TH4327zP2uGVnSzG8Wcyd2kW8p5doNTAA1cUiC9EYEOVGBASLeZ4KML/QjYQqg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1584400229998294.08700547819376;
- Mon, 16 Mar 2020 16:10:29 -0700 (PDT)
-In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
-Subject: Re: [PATCH v3 00/19] Support disabling TCG on ARM (part 2)
-Message-ID: <158440022829.17104.10073980639396004207@39012742ff91>
+ (envelope-from <npiggin@gmail.com>) id 1jDz2D-0007sF-Tq
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:20:39 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:35370)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jDz2B-0007XF-AA; Mon, 16 Mar 2020 19:20:35 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id mq3so9503812pjb.0;
+ Mon, 16 Mar 2020 16:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:cc:references:in-reply-to:mime-version
+ :user-agent:message-id:content-transfer-encoding;
+ bh=RxitBX2wmDaqOJMkoLn0PDjoYn/6B9kD7YTS9J4vrDE=;
+ b=OzbzQiq3WeMgf4ywHdIYG2bNcEE3uD+0FQOu/RSNWQ9d9f/xCGcMzpHuOyznJ5UcPX
+ HrtF5nadvIkQI2m6JiI2qJG6owhayScls0QVU0k0SUuLXoE46hC4SG+qMzUorVqjt6LB
+ vQ9PYMNKWTEZ9hj2KQsJIZr2M1Y3vnxasarpI+VnV93cgPPfAvDD/smvblQuhkBo/Y/K
+ bgWIUbatLu5+aydnHaITs6mf6eT5v5zCjISfJzj25w5YcryoHogVoBboEh56ms8yG4aA
+ M/S2BQ7RW08bP6u/rR88cigEeGcGcFtvftrwrg1bs9VuX2dQV/JeXy2VDG3z3Wy4O1zq
+ UWXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+ :mime-version:user-agent:message-id:content-transfer-encoding;
+ bh=RxitBX2wmDaqOJMkoLn0PDjoYn/6B9kD7YTS9J4vrDE=;
+ b=dUKmdSrIohOyHCRX62oHU84y282GwBTarUxw4qmqP2iEymiYovep7SSuanCppCObTR
+ gUysjDQS+GSuRL7bk/9fsy/TRMOiVIaf/GfLOERRtHq/8MZEOZsKg/7ZCSeF5HY1EU40
+ CrmbITNokATYedmrfHIJ8YQCwyco+yHIVZQy+28/fckdKE/7FqJ6fsxR1XkKG0oaETWK
+ vMtkaH4deJIXBOj7bezH9h+5hsOi8ODR3dehBobLyqM46WEYEXWY23hWeCbfH85RaYqc
+ /vc8CLj+A6+dPZ4ThF99bDr01S/QDfiNkfWbRNIDRfK6tdkWm+VmDroQdd0EScbyVxvA
+ 0m6A==
+X-Gm-Message-State: ANhLgQ0ykaXbJmQTYL3X3UGsWC5T0lSc57GGZQ051Ygajbq/tJ+ZMTl8
+ 6iVgDMgygqiWLPgBH7AA830=
+X-Google-Smtp-Source: ADFU+vtYzU5Q7ItXP8WZghzrOjg4+or4ycrXP4SPAJ+t3wAQGcuzXSEMT+j57OpbhzQdp7D7E+zy9g==
+X-Received: by 2002:a17:90b:238e:: with SMTP id
+ mr14mr2024552pjb.146.1584400834105; 
+ Mon, 16 Mar 2020 16:20:34 -0700 (PDT)
+Received: from localhost (203-213-47-190.tpgi.com.au. [203.213.47.190])
+ by smtp.gmail.com with ESMTPSA id b9sm509385pgi.75.2020.03.16.16.20.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 16:20:33 -0700 (PDT)
+Date: Tue, 17 Mar 2020 09:19:57 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 4/8] ppc/spapr: Fix FWNMI machine check interrupt
+ delivery
+To: =?iso-8859-1?q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
+References: <20200316142613.121089-1-npiggin@gmail.com>
+ <20200316142613.121089-5-npiggin@gmail.com>
+ <2ff9bfbf-5a6a-2a79-e14e-4b7c76aff062@kaod.org>
+In-Reply-To: <2ff9bfbf-5a6a-2a79-e14e-4b7c76aff062@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Mon, 16 Mar 2020 16:10:29 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+User-Agent: astroid/0.15.0 (https://github.com/astroidmail/astroid)
+Message-Id: <1584400226.tr4pv2h852.astroid@bobo.none>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,50 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, peter.maydell@linaro.org, thuth@redhat.com,
- kvm@vger.kernel.org, philmd@redhat.com, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
- alex.bennee@linaro.org
+Cc: Aravinda Prasad <arawinda.p@gmail.com>, qemu-devel@nongnu.org,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNjE2MDYzNC4zMzg2
-LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbWlzc2luZyBvYmplY3QgdHlwZSAn
-b3ItaXJxJwpCcm9rZW4gcGlwZQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QvbGlicXRl
-c3QuYzoxNzU6IGtpbGxfcWVtdSgpIGRldGVjdGVkIFFFTVUgZGVhdGggZnJvbSBzaWduYWwgNiAo
-QWJvcnRlZCkgKGNvcmUgZHVtcGVkKQpFUlJPUiAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3Rl
-ZCA2LCBnb3QgNSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC1hYXJjaDY0XSBFcnJvciAxCm1ha2U6
-ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCkNvdWxkIG5vdCBhY2Nlc3MgS1ZN
-IGtlcm5lbCBtb2R1bGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKcWVtdS1zeXN0ZW0teDg2
-XzY0OiAtYWNjZWwga3ZtOiBmYWlsZWQgdG8gaW5pdGlhbGl6ZSBrdm06IE5vIHN1Y2ggZmlsZSBv
-ciBkaXJlY3RvcnkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21k
-KQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywg
-J2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWQ1MWZl
-NzMxNjA2NDRlMGJhNmEwZjNjZjFjMWQ2MjA4JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1v
-cHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9Jywg
-Jy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0Jywg
-Jy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zh
-ci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1j
-Y2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLXU4anU0c3NwL3NyYy9kb2NrZXItc3JjLjIwMjAtMDMtMTYtMTguNTcuMTMuMjEwMDc6L3Zh
-ci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0
-ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZp
-bHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWQ1MWZlNzMxNjA2NDRlMGJhNmEwZjNj
-ZjFjMWQ2MjA4Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2
-aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXU4anU0c3NwL3NyYycK
-bWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAg
-ICAxM20xNi4yMjhzCnVzZXIgICAgMG04Ljc2M3MKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
-IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzE2MTYwNjM0LjMzODYtMS1waGlsbWRA
-cmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+C=C3=A9dric Le Goater's on March 17, 2020 3:59 am:
+> On 3/16/20 3:26 PM, Nicholas Piggin wrote:
+>> FWNMI machine check delivery misses a few things that will make it fail
+>> with TCG at least (which we would like to allow in future to improve
+>> testing).
+>=20
+> I don't understand which issues are addressed in the patch.
+
+The existing code does not compute hflags, at least.
+
+There's a few possible other things, I didn't dig into qemu enough
+to know if they might be a problem (e.g., reservation and TLB). I
+figure it's better to keep these consistent.
+
+Keep in mind this is a bit academic right now, because we can't
+(AFAIKS) inject an MCE from TCG. It would be good to wire that up,
+but I didn't get to it.
+
+>> It's not nice to scatter interrupt delivery logic around the tree, so
+>> move it to excp_helper.c and share code where possible.
+>=20
+> It looks correct but this is touching the ugliest routine in the QEMU=20
+> PPC universe. I would split the patch in two to introduce the helper
+> powerpc_set_excp_state().
+>=20
+> It does not seem to need to be an inline also.
+
+Yeah it's all pretty ugly. I didn't yet find a nice way to do
+split things up that did not require a lot of code churn, but that
+can come later.
+
+Inline was just because powerpc_excp is inline, I didn't want to
+change behaviour too much there (it obviously wants to do a lot of
+constant propagation but maybe only on the case statement). Anyway
+I just wanted to be minimal for now, it could be changed.
+
+Thanks,
+Nick
+
+=
 
