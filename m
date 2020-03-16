@@ -7,70 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D114C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D3DC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37A6F20658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A02720658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:44:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMgGV3PU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37A6F20658
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEDCtUzS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A02720658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxWD-0007yR-Co
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42315)
+	id 1jDxWp-0000na-M0
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:44:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHa-0003Yx-6k
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:23 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHx-00047t-SU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHZ-0004dC-5o
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:22 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:51690)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHv-0006Rg-Rt
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:45 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:54083)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHZ-0004Wq-0O
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:21 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHt-0006NH-SA
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394100;
+ s=mimecast20190719; t=1584394120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=APH5QeUNY4+QdIZjt0jLIZOSs0GF5eMKvhg6Of9TREg=;
- b=HMgGV3PU/Z9NaRaSulg5sltz9qk45BtLDlJ1ZAGou0VC2dAmKbDRM9f5luipAV1MRPltmU
- 5Gu83SppZUkvuH2zZLi/PLiyqLYwq8umcqDFtlengsVufbegbKsHBMj5KrZjzH9mKxgNhD
- nqOpCP6MsS1MafjOiIJKydAuJNQffeA=
+ bh=MKUYLYyTOhXXs5Uuzx/QroEWqaITGSQKhJNLF3Ips9U=;
+ b=KEDCtUzS5ZUidBlkAoo0d6SomGztodjYJnjtsnPibv8LsuDISx+5qWu15p9sOOUL2uFLff
+ nTEAUMyX7yEdICml7cMBSOCLq6T0oiTOBgagD4g0CiNYDtj4j8ph6I4RASwR+33ihWFQkm
+ SydinnG5ZI+eg50A8mV4QKMtDSFcNPo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-GQnqhdomP5u6yrQGSzR4Og-1; Mon, 16 Mar 2020 17:28:19 -0400
-X-MC-Unique: GQnqhdomP5u6yrQGSzR4Og-1
+ us-mta-366-ttNj0ZWuMJi1nOUxPOGdIw-1; Mon, 16 Mar 2020 17:28:37 -0400
+X-MC-Unique: ttNj0ZWuMJi1nOUxPOGdIw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AA69800D53
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B16598017CC;
+ Mon, 16 Mar 2020 21:28:36 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46A3F19C4F;
- Mon, 16 Mar 2020 21:28:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6997119C4F;
+ Mon, 16 Mar 2020 21:28:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/61] hw/audio/fmopl: Move ENV_CURVE to .heap to save 32KiB of
- .bss
-Date: Mon, 16 Mar 2020 22:26:52 +0100
-Message-Id: <1584394048-44994-26-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 34/61] cpus: avoid pause_all_vcpus getting stuck due to race
+Date: Mon, 16 Mar 2020 22:27:01 +0100
+Message-Id: <1584394048-44994-35-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -85,52 +83,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Longpeng <longpeng2@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Longpeng <longpeng2@huawei.com>
 
-This buffer is only used by the adlib audio device. Move it to
-the .heap to release 32KiB of .bss (size reported on x86_64 host).
+We found an issue when repeat reboot in guest during migration, it cause th=
+e
+migration thread never be waken up again.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+<main loop>                        |<migration_thread>
+                                   |
+LOCK BQL                           |
+...                                |
+main_loop_should_exit              |
+ pause_all_vcpus                   |
+  1. set all cpus ->stop=3Dtrue      |
+     and then kick                 |
+  2. return if all cpus is paused  |
+     (by '->stopped =3D=3D true'), else|
+  3. qemu_cond_wait [BQL UNLOCK]   |
+                                   |LOCK BQL
+                                   |...
+                                   |do_vm_stop
+                                   | pause_all_vcpus
+                                   |  (A)set all cpus ->stop=3Dtrue
+                                   |     and then kick
+                                   |  (B)return if all cpus is paused
+                                   |     (by '->stopped =3D=3D true'), else
+                                   |  (C)qemu_cond_wait [BQL UNLOCK]
+  4. be waken up and LOCK BQL      |  (D)be waken up BUT wait for  BQL
+  5. goto 2.                       |
+ (BQL is still LOCKed)             |
+ resume_all_vcpus                  |
+  1. set all cpus ->stop=3Dfalse     |
+     and ->stopped=3Dfalse           |
+...                                |
+BQL UNLOCK                         |  (E)LOCK BQL
+                                   |  (F)goto B. [but stopped is false now!=
+]
+                                   |Finally, sleep at step 3 forever.
+
+resume_all_vcpus should notice this race, so we need to move the change
+of runstate before pause_all_vcpus in do_vm_stop() and ignore the resume
+request if runstate is not running.
+
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Longpeng <longpeng2@huawei.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20200316083732.2010-1-longpeng2@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/audio/fmopl.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ cpus.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/audio/fmopl.c b/hw/audio/fmopl.c
-index 173a752..356d4df 100644
---- a/hw/audio/fmopl.c
-+++ b/hw/audio/fmopl.c
-@@ -186,7 +186,7 @@ static int32_t *VIB_TABLE;
+diff --git a/cpus.c b/cpus.c
+index b4f8b84..ef441bd 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1026,9 +1026,9 @@ static int do_vm_stop(RunState state, bool send_stop)
+     int ret =3D 0;
 =20
- /* envelope output curve table */
- /* attack + decay + OFF */
--static int32_t ENV_CURVE[2*EG_ENT+1];
-+static int32_t *ENV_CURVE;
+     if (runstate_is_running()) {
++        runstate_set(state);
+         cpu_disable_ticks();
+         pause_all_vcpus();
+-        runstate_set(state);
+         vm_state_notify(0, state);
+         if (send_stop) {
+             qapi_event_send_stop();
+@@ -1899,6 +1899,10 @@ void resume_all_vcpus(void)
+ {
+     CPUState *cpu;
 =20
- /* multiple table */
- #define ML 2
-@@ -1090,6 +1090,7 @@ FM_OPL *OPLCreate(int clock, int rate)
- =09OPL->clock =3D clock;
- =09OPL->rate  =3D rate;
- =09OPL->max_ch =3D max_ch;
-+    ENV_CURVE =3D g_new(int32_t, 2 * EG_ENT + 1);
- =09/* init grobal tables */
- =09OPL_initialize(OPL);
- =09/* reset chip */
-@@ -1127,6 +1128,7 @@ void OPLDestroy(FM_OPL *OPL)
- #endif
- =09OPL_UnLockTable();
- =09free(OPL);
-+    g_free(ENV_CURVE);
- }
-=20
- /* ----------  Option handlers ----------       */
++    if (!runstate_is_running()) {
++        return;
++    }
++
+     qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+     CPU_FOREACH(cpu) {
+         cpu_resume(cpu);
 --=20
 1.8.3.1
 
