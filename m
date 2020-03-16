@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D683BC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A00C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:27:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E1A520674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:26:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E75420409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:27:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UoXh0etP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E1A520674
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ggxM5D/j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E75420409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuRb-0006VF-QU
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53930)
+	id 1jDuSY-0007wS-ES
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:27:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDtCT-0006IF-Qe
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:51 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDszG-0007SW-FC
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:53:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDtCS-0000ac-CU
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:49 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44371)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDszE-0000hU-Ab
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:53:10 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53471)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jDtCS-0000LV-1q
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:06:48 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y2so6718715wrn.11
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:06:47 -0700 (PDT)
+ id 1jDszE-0000VE-0l
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:53:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 25so18484539wmk.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:53:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=+aehvrjy0SyV5NB78ZWbob8FS5DKF0bgZJt6g171eSY=;
- b=UoXh0etP7PAhMzIHl5pGI12K7jPec9AFOjNdemwBIYYDMhfgQ6322Se/kQyWJyvxj5
- nmwdatoehAxcBreu45kyRdtBAvSZe4o/YlgLVX5vtZANSJXl84gQ9Nc4QhyvhaaISy6/
- 6NroTy5P0bjUAMwT8EQUHzZqJXq3hW7VkPjUHC3G+bkzhxtNBmN//5TnSxdvD4ey1ndW
- zadb16vz5T+nrsgKETGShINAkzqmS1GiCaAqRXSOieH6hB3BlcRixqmPEmU4gmn+bNvV
- TsnaZZmwpYB7jQi8ja8q1uE56NNdC6xiXQ822/+uqPmNswfeb5eib12Zxl/NSXHL376N
- NWEw==
+ bh=VI4mbd3B2oWxXYLAt8oWmbegrxmq0MeKs/7FeQkOLFk=;
+ b=ggxM5D/jQonjVvRf4hOhz1t+bjLab9L1sTPpAcdrjwNw1imJsM7G6up4114FB858JM
+ 0rREoVyXFjNkUnkHJtokxL0hpM4pM/rM2XMpCZqvFbeLzVjn/dpVhsrji4ylRbwr34Ou
+ Aywdjvz+kasA+LS86S3CiMlPshthAWoD7qvRLdHhKcZzHSLryxVczetoG4KbQgztlIQM
+ k3OdTceYh4g+/5QIq8/gUqIDrhwXEIls+rHNWLE56If++0ORgzuxTN9PQrgHzaVZyeIF
+ KaAIY/U6pLtSKeRD86cc8Clp7GH4cp6LfnE6mu1heMgDO/i9rzMh9F9OrQNiM6nAZCk0
+ 2Y8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=+aehvrjy0SyV5NB78ZWbob8FS5DKF0bgZJt6g171eSY=;
- b=mFg2N1a9w2cuTXjrlFFFuT0WrJAxBrFDkC4scUFXahZ8UUCbaTCsn7ovDF7cgbkq56
- UXV0MjnjiSqfadfKceiA5eVFKwf/NWPzxXo4mssNvOGc6Nox4nVNc7kPSgU64aBkg0Wm
- 2qm1NRXlvJD7Pja0IiVeaqftUXNddvPGadXaTDX29NLyfWQokiXEyq9Lgwzv5LZpKdvB
- 4wW5TLXCYtJBiVwiix/G/IsXXRm2NRwvN8RP2lD1tAGG3RDH+v59/FPz6BKcU+3B5SoZ
- TzsDcOfY/pmDbQYaEIKXM8CJ1EtY4fONBoDiJOuGdvskuMdSxHELSqAxgVOHoOafTBV+
- DH8g==
-X-Gm-Message-State: ANhLgQ2LtY6Hm/tblXHFU9thHU6wHT9nk2U2bmOrLVfM9UblDOuayBky
- NHdPmSQZUGkrESFi/ah/XDu/m5+YuCNyEcHS+JU=
-X-Google-Smtp-Source: ADFU+vu5P19/Qf7O1XND33l2+njh/AxqlvTEcl203lEmHVkSMeTVUkipcIrrAlntJIL8pCs09kQMPgvgC3F08ka5v1M=
-X-Received: by 2002:a5d:62c9:: with SMTP id o9mr384774wrv.2.1584378406871;
- Mon, 16 Mar 2020 10:06:46 -0700 (PDT)
+ bh=VI4mbd3B2oWxXYLAt8oWmbegrxmq0MeKs/7FeQkOLFk=;
+ b=L7osFfEchptNphD3imH+GauY/AEPf2qJNFVaqAqSY8wHf8vBQr2aPDG6dHzfzdPaxE
+ KBN8xuq1barZ1lQPvl3FxId15pDyHW1Vd8z2L0ckdDMdHvw0xgd1RmS/NWEekomYvxGt
+ TumupFlq8dHfNF/K82jm8V6qi9f7jcG5C7l7yTBrKnc7RWm1n1OPze5ozWtvhpzBqsCj
+ coFn0fYr2Xb4cJkhLlFcfgdFU6Vn06mz5XURtfmg4ZCP32u/HH4eISoTxBk3SQ2MQeTC
+ aPW2TLHp1Y1VHzllegTbIZjo/FHktXEca35sJ9pJ6LT5AgrdqUwLSZ2cMDrBItRXF688
+ bp8A==
+X-Gm-Message-State: ANhLgQ1ASt8UGPwcrNfAIexmvKXknQxGff43rqxrrD6hYsWU1UlXa/Qp
+ vZGmFOhPr5UW1zyVaXcqpt0aHnG0LEZJV5pny6MUrIr9bQ8=
+X-Google-Smtp-Source: ADFU+vtl98cITYu2RUnfTdVXSlelw5FeBg/yEc59bqCzwdVnL8zHqKB2lxRVgLonq18ONuVHly0lWqBfhGDHB8Y/2mY=
+X-Received: by 2002:a7b:cc8b:: with SMTP id p11mr88416wma.26.1584377586765;
+ Mon, 16 Mar 2020 09:53:06 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-19-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-19-armbru@redhat.com>
+ <20200315144653.22660-14-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-14-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 16 Mar 2020 18:06:35 +0100
-Message-ID: <CAJ+F1C+NaANkyF7NVs5_XW=Gy0wR7Js_dwhsw8gSFi3kGqZ_aA@mail.gmail.com>
-Subject: Re: [PATCH v3 18/34] qapi/schema: Rename QAPISchemaObjectType{Variant, 
- Variants}
+Date: Mon, 16 Mar 2020 17:52:53 +0100
+Message-ID: <CAJ+F1C+GQjA1do86sCroCu=gLB=m=VO2297i8Be2uA0oTu9p+A@mail.gmail.com>
+Subject: Re: [PATCH v3 13/34] qapi: Consistently put @features parameter right
+ after @ifcond
 To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,13 +95,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 15, 2020 at 4:19 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Sun, Mar 15, 2020 at 4:51 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
->
-> QAPISchemaObjectTypeVariants represents both object type and alternate
-> type variants.  Rename to QAPISchemaVariants.
->
-> Rename QAPISchemaObjectTypeVariant the same way.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
@@ -109,109 +104,238 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi/schema.py | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+>  scripts/qapi/commands.py       |  6 +++---
+>  scripts/qapi/doc.py            | 10 +++++-----
+>  scripts/qapi/introspect.py     | 10 +++++-----
+>  scripts/qapi/schema.py         | 36 ++++++++++++++++------------------
+>  scripts/qapi/types.py          |  4 ++--
+>  scripts/qapi/visit.py          |  4 ++--
+>  tests/qapi-schema/test-qapi.py | 10 +++++-----
+>  7 files changed, 39 insertions(+), 41 deletions(-)
 >
+> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+> index 0e13e82989..bc30876c88 100644
+> --- a/scripts/qapi/commands.py
+> +++ b/scripts/qapi/commands.py
+> @@ -283,9 +283,9 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmd=
+s);
+>                                        prefix=3Dself._prefix))
+>          self._genc.add(gen_registry(self._regy.get_content(), self._pref=
+ix))
+>
+> -    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+> -                      success_response, boxed, allow_oob, allow_preconfi=
+g,
+> -                      features):
+> +    def visit_command(self, name, info, ifcond, features,
+> +                      arg_type, ret_type, gen, success_response, boxed,
+> +                      allow_oob, allow_preconfig):
+>          if not gen:
+>              return
+>          # FIXME: If T is a user-defined type, the user is responsible
+> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+> index 36e823338b..92f584edcf 100644
+> --- a/scripts/qapi/doc.py
+> +++ b/scripts/qapi/doc.py
+> @@ -249,8 +249,8 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+>                                  texi_members(doc, 'Values',
+>                                               member_func=3Dtexi_enum_val=
+ue)))
+>
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts,
+> -                          features):
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+>          doc =3D self.cur_doc
+>          if base and base.is_implicit():
+>              base =3D None
+> @@ -262,9 +262,9 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+>          self._gen.add(texi_type('Alternate', doc, ifcond,
+>                                  texi_members(doc, 'Members')))
+>
+> -    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+> -                      success_response, boxed, allow_oob, allow_preconfi=
+g,
+> -                      features):
+> +    def visit_command(self, name, info, ifcond, features,
+> +                      arg_type, ret_type, gen, success_response, boxed,
+> +                      allow_oob, allow_preconfig):
+>          doc =3D self.cur_doc
+>          self._gen.add(texi_msg('Command', doc, ifcond,
+>                                 texi_arguments(doc,
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index 2e9e00aa1f..b54910510d 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -193,8 +193,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>          self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement},
+>                         ifcond, None)
+>
+> -    def visit_object_type_flat(self, name, info, ifcond, members, varian=
+ts,
+> -                               features):
+> +    def visit_object_type_flat(self, name, info, ifcond, features,
+> +                               members, variants):
+>          obj =3D {'members': [self._gen_member(m) for m in members]}
+>          if variants:
+>              obj.update(self._gen_variants(variants.tag_member.name,
+> @@ -209,9 +209,9 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>                             for m in variants.variants]},
+>                         ifcond, features)
+>
+> -    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+> -                      success_response, boxed, allow_oob, allow_preconfi=
+g,
+> -                      features):
+> +    def visit_command(self, name, info, ifcond, features,
+> +                      arg_type, ret_type, gen, success_response, boxed,
+> +                      allow_oob, allow_preconfig):
+>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>          ret_type =3D ret_type or self._schema.the_empty_object_type
+>          obj =3D {'arg-type': self._use_type(arg_type),
 > diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-> index 0acf8b466f..033c84c4a0 100644
+> index 22238005ff..958756ecd6 100644
 > --- a/scripts/qapi/schema.py
 > +++ b/scripts/qapi/schema.py
-> @@ -338,7 +338,7 @@ class QAPISchemaObjectType(QAPISchemaType):
->              assert isinstance(m, QAPISchemaObjectTypeMember)
->              m.set_defined_in(name)
->          if variants is not None:
-> -            assert isinstance(variants, QAPISchemaObjectTypeVariants)
-> +            assert isinstance(variants, QAPISchemaVariants)
->              variants.set_defined_in(name)
->          self._base_name =3D base
->          self.base =3D None
-> @@ -449,7 +449,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+> @@ -115,20 +115,20 @@ class QAPISchemaVisitor:
+>      def visit_array_type(self, name, info, ifcond, element_type):
+>          pass
 >
->      def __init__(self, name, info, doc, ifcond, features, variants):
->          super().__init__(name, info, doc, ifcond, features)
-> -        assert isinstance(variants, QAPISchemaObjectTypeVariants)
-> +        assert isinstance(variants, QAPISchemaVariants)
->          assert variants.tag_member
->          variants.set_defined_in(name)
->          variants.tag_member.set_defined_in(self.name)
-> @@ -512,7 +512,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
->              self.name, self.info, self.ifcond, self.features, self.varia=
-nts)
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts,
+> -                          features):
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+>          pass
+>
+> -    def visit_object_type_flat(self, name, info, ifcond, members, varian=
+ts,
+> -                               features):
+> +    def visit_object_type_flat(self, name, info, ifcond, features,
+> +                               members, variants):
+>          pass
+>
+>      def visit_alternate_type(self, name, info, ifcond, features, variant=
+s):
+>          pass
+>
+> -    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+> -                      success_response, boxed, allow_oob, allow_preconfi=
+g,
+> -                      features):
+> +    def visit_command(self, name, info, ifcond, features,
+> +                      arg_type, ret_type, gen, success_response, boxed,
+> +                      allow_oob, allow_preconfig):
+>          pass
+>
+>      def visit_event(self, name, info, ifcond, features, arg_type, boxed)=
+:
+> @@ -436,12 +436,12 @@ class QAPISchemaObjectType(QAPISchemaType):
+>
+>      def visit(self, visitor):
+>          super().visit(visitor)
+> -        visitor.visit_object_type(self.name, self.info, self.ifcond,
+> -                                  self.base, self.local_members, self.va=
+riants,
+> -                                  self.features)
+> -        visitor.visit_object_type_flat(self.name, self.info, self.ifcond=
+,
+> -                                       self.members, self.variants,
+> -                                       self.features)
+> +        visitor.visit_object_type(
+> +            self.name, self.info, self.ifcond, self.features,
+> +            self.base, self.local_members, self.variants)
+> +        visitor.visit_object_type_flat(
+> +            self.name, self.info, self.ifcond, self.features,
+> +            self.members, self.variants)
 >
 >
-> -class QAPISchemaObjectTypeVariants:
-> +class QAPISchemaVariants:
->      def __init__(self, tag_name, info, tag_member, variants):
->          # Flat unions pass tag_name but not tag_member.
->          # Simple unions and alternates pass tag_member but not tag_name.
-> @@ -522,7 +522,7 @@ class QAPISchemaObjectTypeVariants:
->          assert (isinstance(tag_name, str) or
->                  isinstance(tag_member, QAPISchemaObjectTypeMember))
->          for v in variants:
-> -            assert isinstance(v, QAPISchemaObjectTypeVariant)
-> +            assert isinstance(v, QAPISchemaVariant)
->          self._tag_name =3D tag_name
->          self.info =3D info
->          self.tag_member =3D tag_member
-> @@ -572,8 +572,8 @@ class QAPISchemaObjectTypeVariants:
->              cases =3D {v.name for v in self.variants}
->              for m in self.tag_member.type.members:
->                  if m.name not in cases:
-> -                    v =3D QAPISchemaObjectTypeVariant(m.name, self.info,
-> -                                                    'q_empty', m.ifcond)
-> +                    v =3D QAPISchemaVariant(m.name, self.info,
-> +                                          'q_empty', m.ifcond)
->                      v.set_defined_in(self.tag_member.defined_in)
->                      self.variants.append(v)
->          if not self.variants:
-> @@ -681,7 +681,7 @@ class QAPISchemaObjectTypeMember(QAPISchemaMember):
->                                          self.describe)
+>  class QAPISchemaMember:
+> @@ -745,12 +745,10 @@ class QAPISchemaCommand(QAPISchemaEntity):
+>
+>      def visit(self, visitor):
+>          super().visit(visitor)
+> -        visitor.visit_command(self.name, self.info, self.ifcond,
+> -                              self.arg_type, self.ret_type,
+> -                              self.gen, self.success_response,
+> -                              self.boxed, self.allow_oob,
+> -                              self.allow_preconfig,
+> -                              self.features)
+> +        visitor.visit_command(
+> +            self.name, self.info, self.ifcond, self.features,
+> +            self.arg_type, self.ret_type, self.gen, self.success_respons=
+e,
+> +            self.boxed, self.allow_oob, self.allow_preconfig)
 >
 >
-> -class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
-> +class QAPISchemaVariant(QAPISchemaObjectTypeMember):
->      role =3D 'branch'
+>  class QAPISchemaEvent(QAPISchemaEntity):
+> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+> index d0d5c03646..3ad33af4ee 100644
+> --- a/scripts/qapi/types.py
+> +++ b/scripts/qapi/types.py
+> @@ -289,8 +289,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisi=
+tor):
+>              self._genh.add(gen_array(name, element_type))
+>              self._gen_type_cleanup(name)
 >
->      def __init__(self, name, info, typ, ifcond=3DNone):
-> @@ -987,7 +987,7 @@ class QAPISchema:
->              None))
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts,
+> -                          features):
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+>          # Nothing to do for the special empty builtin
+>          if name =3D=3D 'q_empty':
+>              return
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 6e5ed781d7..23d9194aa4 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -326,8 +326,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
+itor):
+>              self._genh.add(gen_visit_decl(name))
+>              self._genc.add(gen_visit_list(name, element_type))
 >
->      def _make_variant(self, case, typ, ifcond, info):
-> -        return QAPISchemaObjectTypeVariant(case, info, typ, ifcond)
-> +        return QAPISchemaVariant(case, info, typ, ifcond)
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts,
+> -                          features):
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+>          # Nothing to do for the special empty builtin
+>          if name =3D=3D 'q_empty':
+>              return
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+> index af5b57a0b1..8e09e54edb 100755
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -46,8 +46,8 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+>          print('array %s %s' % (name, element_type.name))
+>          self._print_if(ifcond)
 >
->      def _make_simple_variant(self, case, typ, ifcond, info):
->          if isinstance(typ, list):
-> @@ -996,7 +996,7 @@ class QAPISchema:
->          typ =3D self._make_implicit_object_type(
->              typ, info, self.lookup_type(typ),
->              'wrapper', [self._make_member('data', typ, None, info)])
-> -        return QAPISchemaObjectTypeVariant(case, info, typ, ifcond)
-> +        return QAPISchemaVariant(case, info, typ, ifcond)
+> -    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts,
+> -                          features):
+> +    def visit_object_type(self, name, info, ifcond, features,
+> +                          base, members, variants):
+>          print('object %s' % name)
+>          if base:
+>              print('    base %s' % base.name)
+> @@ -65,9 +65,9 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+>          self._print_if(ifcond)
+>          self._print_features(features)
 >
->      def _def_union_type(self, expr, info, doc):
->          name =3D expr['union']
-> @@ -1026,7 +1026,7 @@ class QAPISchema:
->          self._def_entity(
->              QAPISchemaObjectType(name, info, doc, ifcond, features,
->                                   base, members,
-> -                                 QAPISchemaObjectTypeVariants(
-> +                                 QAPISchemaVariants(
->                                       tag_name, info, tag_member, variant=
-s)))
->
->      def _def_alternate_type(self, expr, info, doc):
-> @@ -1040,7 +1040,7 @@ class QAPISchema:
->          tag_member =3D QAPISchemaObjectTypeMember('type', info, 'QType',=
- False)
->          self._def_entity(
->              QAPISchemaAlternateType(name, info, doc, ifcond, features,
-> -                                    QAPISchemaObjectTypeVariants(
-> +                                    QAPISchemaVariants(
->                                          None, info, tag_member, variants=
-)))
->
->      def _def_command(self, expr, info, doc):
+> -    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+> -                      success_response, boxed, allow_oob, allow_preconfi=
+g,
+> -                      features):
+> +    def visit_command(self, name, info, ifcond, features,
+> +                      arg_type, ret_type, gen, success_response, boxed,
+> +                      allow_oob, allow_preconfig):
+>          print('command %s %s -> %s'
+>                % (name, arg_type and arg_type.name,
+>                   ret_type and ret_type.name))
 > --
 > 2.21.1
 >
