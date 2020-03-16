@@ -2,74 +2,56 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6E1C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A93B6C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:46:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C02C920679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:45:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02C920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 767A920679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:46:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 767A920679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDssC-0002XD-UD
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:45:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46945)
+	id 1jDssN-0002qU-It
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:46:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jDqgY-0006xC-C8
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:25:44 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jDqkv-0000D2-Fk
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jDqgW-0005ow-Tw
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:25:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57754)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jDqgW-0005ce-N1
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:25:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jDqgU-0002JR-SR
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 14:25:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BB8BE2E80D3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 14:25:38 +0000 (UTC)
+ (envelope-from <its@irrelevant.dk>) id 1jDqku-0002yE-3G
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:13 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48606)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jDqkp-0007uv-DZ; Mon, 16 Mar 2020 10:30:07 -0400
+Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
+ [80.62.117.52])
+ by charlie.dont.surf (Postfix) with ESMTPSA id A882ABF91F;
+ Mon, 16 Mar 2020 14:29:44 +0000 (UTC)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: [PATCH v6 18/42] nvme: support identify namespace descriptor list
+Date: Mon, 16 Mar 2020 07:29:04 -0700
+Message-Id: <20200316142928.153431-19-its@irrelevant.dk>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
+References: <20200316142928.153431-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 16 Mar 2020 14:20:22 -0000
-From: Andreas Hasenack <andreas@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Incomplete; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h paelzer tstrike34
-X-Launchpad-Bug-Reporter: tstrike (tstrike34)
-X-Launchpad-Bug-Modifier: Andreas Hasenack (ahasenack)
-References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
-Message-Id: <158436842225.11736.2918985588472857115.malone@soybean.canonical.com>
-Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 99c216ee5a6345a92279a609a67302c7949b8672
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,102 +60,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The package from the PPA failed the same way for me:
+From: Klaus Jensen <k.jensen@samsung.com>
 
-ubuntu@f1:~$ qemu-system-x86_64 --enable-kvm -cpu Penryn,vmx=3Don -m 512 --=
-nodefaults --nographic
-qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.=
-01H:ECX.sse4.1 [bit 19]
-KVM internal error. Suberror: 1
-emulation failure
-EAX=3D00000000 EBX=3D00000000 ECX=3D000086d4 EDX=3D00000000
-ESI=3D00000000 EDI=3D00000000 EBP=3D000086d4 ESP=3D00006d7c
-EIP=3D00007acf EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 ffffffff 00809300
-CS =3Df000 000f0000 ffffffff 00809b00
-SS =3D0000 00000000 ffffffff 00809300
-DS =3D0000 00000000 ffffffff 00809300
-FS =3D0000 00000000 ffffffff 00809300
-GS =3D0000 00000000 ffffffff 00809300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     000f6200 00000037
-IDT=3D     00000000 000003ff
-CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000 =
+Since we are not providing the NGUID or EUI64 fields, we must support
+the Namespace UUID. We do not have any way of storing a persistent
+unique identifier, so conjure up a UUID that is just the namespace id.
 
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-EFER=3D0000000000000000
-Code=3Db8 90 d9 00 00 66 e8 6b f7 ff ff 66 b8 0a 00 00 00 e9 61 f2 <f3> 0f =
-1e fb 66 57 66 56 66 53 66 53 66 89 c7 67 66 89 14 24 66 89 ce 66 e8 15 f8 =
-ff ff 88
-^Cqemu-system-x86_64: terminating on signal 2
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme.c       | 38 ++++++++++++++++++++++++++++++++++++++
+ hw/block/trace-events |  1 +
+ 2 files changed, 39 insertions(+)
 
-ubuntu@f1:~$ qemu-system-x86_64 --help 2>&1|head -n 1
-QEMU emulator version 4.2.0 (Debian 1:4.2-3ubuntu3~ppa1)
-ubuntu@f1:~$
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 16de3ca1c5d5..007f8817f101 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -942,6 +942,42 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, Nv=
+meIdentify *c)
+     return ret;
+ }
+=20
++static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeIdentify *c=
+)
++{
++    uint32_t nsid =3D le32_to_cpu(c->nsid);
++    uint64_t prp1 =3D le64_to_cpu(c->prp1);
++    uint64_t prp2 =3D le64_to_cpu(c->prp2);
++
++    void *list;
++    uint16_t ret;
++    NvmeIdNsDescr *ns_descr;
++
++    trace_nvme_dev_identify_ns_descr_list(nsid);
++
++    if (unlikely(nsid =3D=3D 0 || nsid > n->num_namespaces)) {
++        trace_nvme_dev_err_invalid_ns(nsid, n->num_namespaces);
++        return NVME_INVALID_NSID | NVME_DNR;
++    }
++
++    list =3D g_malloc0(NVME_IDENTIFY_DATA_SIZE);
++    ns_descr =3D list;
++
++    /*
++     * Because the NGUID and EUI64 fields are 0 in the Identify Namespac=
+e data
++     * structure, a Namespace UUID (nidt =3D 0x3) must be reported in th=
+e
++     * Namespace Identification Descriptor. Add a very basic Namespace U=
+UID
++     * here.
++     */
++    ns_descr->nidt =3D NVME_NIDT_UUID;
++    ns_descr->nidl =3D NVME_NIDT_UUID_LEN;
++    stl_be_p(ns_descr + sizeof(*ns_descr), nsid);
++
++    ret =3D nvme_dma_read_prp(n, (uint8_t *) list, NVME_IDENTIFY_DATA_SI=
+ZE, prp1,
++                            prp2);
++    g_free(list);
++    return ret;
++}
++
+ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+ {
+     NvmeIdentify *c =3D (NvmeIdentify *)cmd;
+@@ -953,6 +989,8 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *c=
+md)
+         return nvme_identify_ctrl(n, c);
+     case NVME_ID_CNS_NS_ACTIVE_LIST:
+         return nvme_identify_nslist(n, c);
++    case NVME_ID_CNS_NS_DESCR_LIST:
++        return nvme_identify_ns_descr_list(n, c);
+     default:
+         trace_nvme_dev_err_invalid_identify_cns(le32_to_cpu(c->cns));
+         return NVME_INVALID_FIELD | NVME_DNR;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 13e2c71664f6..4cde0844ef64 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -41,6 +41,7 @@ nvme_dev_del_cq(uint16_t cqid) "deleted completion queu=
+e, sqid=3D%"PRIu16""
+ nvme_dev_identify_ctrl(void) "identify controller"
+ nvme_dev_identify_ns(uint32_t ns) "nsid %"PRIu32""
+ nvme_dev_identify_nslist(uint32_t ns) "nsid %"PRIu32""
++nvme_dev_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
+ nvme_dev_getfeat(uint16_t cid, uint32_t fid) "cid %"PRIu16" fid 0x%"PRIx=
+32""
+ nvme_dev_setfeat(uint16_t cid, uint32_t fid, uint32_t val) "cid %"PRIu16=
+" fid 0x%"PRIx32" val 0x%"PRIx32""
+ nvme_dev_getfeat_vwcache(const char* result) "get feature volatile write=
+ cache, result=3D%s"
+--=20
+2.25.1
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1866870
-
-Title:
-  KVM Guest pauses after upgrade to Ubuntu 20.04
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  Incomplete
-
-Bug description:
-  Symptom:
-  Error unpausing domain: internal error: unable to execute QEMU command 'c=
-ont': Resetting the Virtual Machine is required
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
- in resume
-      self._backend.resume()
-    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
-      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
-t': Resetting the Virtual Machine is required
-
-  =
-
-  ---
-
-  As outlined here:
-  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
-
-  After upgrade, all KVM guests are in a default pause state. Even after
-  forcing them off via virsh, and restarting them the guests are paused.
-
-  These Guests are not nested.
-
-  A lot of diganostic information are outlined in the previous bug
-  report link provided. The solution mentioned in previous report had
-  been allegedly integrated into the downstream updates.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
