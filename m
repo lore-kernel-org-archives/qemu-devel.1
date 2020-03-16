@@ -2,89 +2,69 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED1DC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F46C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:59:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77F0020409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:59:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ww+aZF5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77F0020409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 57E4C20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:59:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E4C20409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDu1a-0001fa-KB
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:59:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52872)
+	id 1jDu1b-0001iz-GG
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:59:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXo-0003jw-0F
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:55 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsPZ-0007si-BW
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXm-0002GG-3m
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:51 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39437)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtXk-00020M-Pm
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:48 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f7so18999895wml.4
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=MAHQhCP1EsmDE6wKXYKQ2zDHbwGxedIVpJYdWHpls/o=;
- b=ww+aZF5OpnWN5e2C6qHOIqmZLHQtZ/WjQ9gNDlJN6ZyLGJQvihBhJzt+1zwEazRh8p
- r7tDOpd8UDrNO5y9aZr3+LpewTVUztHfSqtPBxbSSIJIHwaGYoepg/DLpeIZbRLh+lNR
- MUF/bf3YKfk2ONZphBbgNm+ey7E1ejYFzF3UXrf65Dk+F/qKxTup0VsFr+M2CJlxfine
- ekWJq3oRVcs8sfCiZf9CWTXQWmd1NHMFOAHfzudiZL+bAkgE6XzmVRGom4vwFX7+0txb
- 9I21iGbPicaklv1ynaccdJd5ZE7LIoOKP87+5c7KGk3U68CXHek9WnZtpNiuP60JINoD
- 3/kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MAHQhCP1EsmDE6wKXYKQ2zDHbwGxedIVpJYdWHpls/o=;
- b=EH9u3/3RaS7/eSzTSHSblYxZsRXhVci42u2TR8ewsE1Dio4RZ08DpNP1+OAIFOGE11
- 49sqxChHvnHw8AfYVc1wSf/BA96XsDXetfqecCT3ZvaX/VkMcFtqgWoJ2n5ElFFSZ3nr
- 1JGCuVGAvxuXxRidhRdbb51tjQ5CAhn778+QPsTg9pvxYECws9AbVpmC9Roo+wF0gyKO
- RIFfV25VnOQhZDtW9rVIvuklcC3dnyXJfpIehYbvKmsI3Vl9RNdiw6WUUh5R/jsQhPVc
- DB9B1Bg0Z24AYCzZm21sQn63JZw9jx69/0LOrRMaHcjTC18Cb56vxqvLrWDOx3+Tu6XD
- jTkQ==
-X-Gm-Message-State: ANhLgQ0sgvQ75jHcbdQIPo3ULSTEpdOOqZlJRODLbjGRKkr6K5kAOXW4
- WPuyPYL40WIEPfI1DX2cY2392Q==
-X-Google-Smtp-Source: ADFU+vvimbDUmZ5ULfnXKeABWmJ5G5n/o51aolPJk+z6auQ+u5hZbNkHtum4VgZV/o9S929KmS8iFg==
-X-Received: by 2002:a1c:750e:: with SMTP id o14mr178869wmc.156.1584379723271; 
- Mon, 16 Mar 2020 10:28:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a186sm446743wmh.33.2020.03.16.10.28.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:28:41 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 422431FFAA;
- Mon, 16 Mar 2020 17:21:57 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1jDsPX-0007Th-Vt
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:17 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:43915)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsPX-0007Jc-Ll
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:15 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MpTpc-1jfE1Q2EZQ-00pryl; Mon, 16 Mar 2020 17:16:04 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 20/28] tests/tcg/aarch64: userspace system register test
-Date: Mon, 16 Mar 2020 17:21:47 +0000
-Message-Id: <20200316172155.971-21-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+Subject: [PULL 02/38] linux-user/i386: Split out gen_signal
+Date: Mon, 16 Mar 2020 17:15:14 +0100
+Message-Id: <20200316161550.336150-3-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Provags-ID: V03:K1:KrL6I/F7MNRegfxQaiB29bAN8Uwn/7ObA5TnQeZdB4gWJH9ikUW
+ Ra1813wakb/rt0BRgSu9R8jfn1sFryE/E8krtgeCWu4xv0wCvN1rgbTTseygIPS8i3eGg+N
+ Gi35z7nG/QTWBranhBE5ofLHdPM2Ja7kRBDVzRbAXgIDRlaqup/v5c7Txl0/hJ95FCX+HCf
+ t25MCMT7BVRw8HcPshu5w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:i01+A/033oY=:EB1CbLBRvjfyCHmdn/VBhw
+ LSmjpjvGWmDh5Zr/qHvhah5Ojqsr+qtvpUqdTky9jqOONjxDkTUAs3GUJogL3tCbonp0Qa1fR
+ bW7+PoyR741cYkTcRpXPkO/9N8jGgOzaLBmfjPXxD5j1tuwe134HFRNNLeHHsv8/TLyWt4P3V
+ zIWISABaT9/aXFigAIf78HfiUQWz3MNGHTnz50ZcyG09vJqXfqfDyRJg+EW/qTKCaivk/DPf9
+ 9EmOQKUCp3rFTU/g8aK8xQb7Ju7ekFmcRww9VL3VMR0urhstx9XvuLwpbav1bO+kFtT4Raz6j
+ iJ4TpXnThm/Q9yyL1A85Okmr8PoLyIl8oDPoy5q2fBuy08P9yoiZJpxwaH9OFR5sxvwMIXFZu
+ 4nhF6v3ipeMHdFk0pLuSTvAdB/V8MMGMghzJqlyhB+8EfO+jTNZ11QdpgB2s5+1NIy5cy+391
+ 9ZE88/NIH5tdbhmkeDD07pVBubD7Azspl9CG9nFPPZ8NpxHDWor3rgY3Fi1bKxp6jhxE8Jfnb
+ RZx/kbu/k796z8NyB7glX1/dslcwtacC3N0X1k69lVSmgSKjIGeA6I9yUTEMhReb2RMq7VjCs
+ RYCRJLeHMrQu/jQCC2xpGpZC1H8+GBnnpQ0MUEKAmXVeNP54r81xfCutjbvMPW5EzEL234zmi
+ 142JjxLtLMO+x2PH2aAQMBPaauU/TN3q5lwgO4lQKu7dEdtkkVLg3g+NbfDyFZQONwmPMyY4G
+ F8kRnmBbdulR4k6lwBSd4l641HcNe45+lvWgR1S3ogO5hqjDzpXCPybKMwuplCajgSl7AeXLT
+ tMzUkMwYXEm7jq1C+sFeXjDPw/4piLaQ3mBIOZKGSmyh1Oj5/SamcGVCtQ24ru1tGmNQwmB
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,224 +76,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This tests a bunch of registers that the kernel allows userspace to
-read including the CPUID registers. We need a SVE aware compiler as we
-are testing the id_aa64zfr0_el1 register in the set.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190205190224.2198-7-alex.bennee@linaro.org>
+This is a bit tidier than open-coding the 5 lines necessary
+to initialize the target_siginfo_t.  In addition, this zeros
+the remaining bytes of the target_siginfo_t, rather than
+passing in garbage.
 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-3-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
-vgdbstub
-  - don't build unless using docker or CROSS_CC_HAS_SVE
----
- tests/tcg/aarch64/sysregs.c       | 172 ++++++++++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.target |   6 ++
- 2 files changed, 178 insertions(+)
- create mode 100644 tests/tcg/aarch64/sysregs.c
+ linux-user/i386/cpu_loop.c | 93 ++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 60 deletions(-)
 
-diff --git a/tests/tcg/aarch64/sysregs.c b/tests/tcg/aarch64/sysregs.c
-new file mode 100644
-index 00000000000..40cf8d2877e
---- /dev/null
-+++ b/tests/tcg/aarch64/sysregs.c
-@@ -0,0 +1,172 @@
-+/*
-+ * Check emulated system register access for linux-user mode.
-+ *
-+ * See: https://www.kernel.org/doc/Documentation/arm64/cpu-feature-registers.txt
-+ *
-+ * Copyright (c) 2019 Linaro
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <asm/hwcap.h>
-+#include <stdio.h>
-+#include <sys/auxv.h>
-+#include <signal.h>
-+#include <string.h>
-+#include <stdbool.h>
-+
-+#ifndef HWCAP_CPUID
-+#define HWCAP_CPUID (1 << 11)
-+#endif
-+
-+int failed_bit_count;
-+
-+/* Read and print system register `id' value */
-+#define get_cpu_reg(id) ({                                      \
-+            unsigned long __val = 0xdeadbeef;                   \
-+            asm("mrs %0, "#id : "=r" (__val));                  \
-+            printf("%-20s: 0x%016lx\n", #id, __val);            \
-+            __val;                                               \
-+        })
-+
-+/* As above but also check no bits outside of `mask' are set*/
-+#define get_cpu_reg_check_mask(id, mask) ({                     \
-+            unsigned long __cval = get_cpu_reg(id);             \
-+            unsigned long __extra = __cval & ~mask;             \
-+            if (__extra) {                                      \
-+                printf("%-20s: 0x%016lx\n", "  !!extra bits!!", __extra);   \
-+                failed_bit_count++;                            \
-+            }                                                   \
-+})
-+
-+/* As above but check RAZ */
-+#define get_cpu_reg_check_zero(id) ({                           \
-+            unsigned long __val = 0xdeadbeef;                   \
-+            asm("mrs %0, "#id : "=r" (__val));                  \
-+            if (__val) {                                        \
-+                printf("%-20s: 0x%016lx (not RAZ!)\n", #id, __val);        \
-+                failed_bit_count++;                            \
-+            }                                                   \
-+})
-+
-+/* Chunk up mask into 63:48, 47:32, 31:16, 15:0 to ease counting */
-+#define _m(a, b, c, d) (0x ## a ## b ## c ## d ##ULL)
-+
-+bool should_fail;
-+int should_fail_count;
-+int should_not_fail_count;
-+uintptr_t failed_pc[10];
-+
-+void sigill_handler(int signo, siginfo_t *si, void *data)
-+{
-+    ucontext_t *uc = (ucontext_t *)data;
-+
-+    if (should_fail) {
-+        should_fail_count++;
-+    } else {
-+        uintptr_t pc = (uintptr_t) uc->uc_mcontext.pc;
-+        failed_pc[should_not_fail_count++] =  pc;
-+    }
-+    uc->uc_mcontext.pc += 4;
-+}
-+
-+int main(void)
-+{
-+    struct sigaction sa;
-+
-+    /* Hook in a SIGILL handler */
-+    memset(&sa, 0, sizeof(struct sigaction));
-+    sa.sa_flags = SA_SIGINFO;
-+    sa.sa_sigaction = &sigill_handler;
-+    sigemptyset(&sa.sa_mask);
-+
-+    if (sigaction(SIGILL, &sa, 0) != 0) {
-+        perror("sigaction");
-+        return 1;
-+    }
-+
-+    /* Counter values have been exposed since Linux 4.12 */
-+    printf("Checking Counter registers\n");
-+
-+    get_cpu_reg(ctr_el0);
-+    get_cpu_reg(cntvct_el0);
-+    get_cpu_reg(cntfrq_el0);
-+
-+    /* HWCAP_CPUID indicates we can read feature registers, since Linux 4.11 */
-+    if (!(getauxval(AT_HWCAP) & HWCAP_CPUID)) {
-+        printf("CPUID registers unavailable\n");
-+        return 1;
-+    } else {
-+        printf("Checking CPUID registers\n");
-+    }
-+
-+    /*
-+     * Some registers only expose some bits to user-space. Anything
-+     * that is IMPDEF is exported as 0 to user-space. The _mask checks
-+     * assert no extra bits are set.
-+     *
-+     * This check is *not* comprehensive as some fields are set to
-+     * minimum valid fields - for the purposes of this check allowed
-+     * to have non-zero values.
-+     */
-+    get_cpu_reg_check_mask(id_aa64isar0_el1, _m(00ff,ffff,f0ff,fff0));
-+    get_cpu_reg_check_mask(id_aa64isar1_el1, _m(0000,00f0,ffff,ffff));
-+    /* TGran4 & TGran64 as pegged to -1 */
-+    get_cpu_reg_check_mask(id_aa64mmfr0_el1, _m(0000,0000,ff00,0000));
-+    get_cpu_reg_check_zero(id_aa64mmfr1_el1);
-+    /* EL1/EL0 reported as AA64 only */
-+    get_cpu_reg_check_mask(id_aa64pfr0_el1,  _m(000f,000f,00ff,0011));
-+    get_cpu_reg_check_mask(id_aa64pfr1_el1,  _m(0000,0000,0000,00f0));
-+    /* all hidden, DebugVer fixed to 0x6 (ARMv8 debug architecture) */
-+    get_cpu_reg_check_mask(id_aa64dfr0_el1,  _m(0000,0000,0000,0006));
-+    get_cpu_reg_check_zero(id_aa64dfr1_el1);
-+    get_cpu_reg_check_zero(id_aa64zfr0_el1);
-+
-+    get_cpu_reg_check_zero(id_aa64afr0_el1);
-+    get_cpu_reg_check_zero(id_aa64afr1_el1);
-+
-+    get_cpu_reg_check_mask(midr_el1,         _m(0000,0000,ffff,ffff));
-+    /* mpidr sets bit 31, everything else hidden */
-+    get_cpu_reg_check_mask(mpidr_el1,        _m(0000,0000,8000,0000));
-+    /* REVIDR is all IMPDEF so should be all zeros to user-space */
-+    get_cpu_reg_check_zero(revidr_el1);
-+
-+    /*
-+     * There are a block of more registers that are RAZ in the rest of
-+     * the Op0=3, Op1=0, CRn=0, CRm=0,4,5,6,7 space. However for
-+     * brevity we don't check stuff that is currently un-allocated
-+     * here. Feel free to add them ;-)
-+     */
-+
-+    printf("Remaining registers should fail\n");
-+    should_fail = true;
-+
-+    /* Unexposed register access causes SIGILL */
-+    get_cpu_reg(id_mmfr0_el1);
-+    get_cpu_reg(id_mmfr1_el1);
-+    get_cpu_reg(id_mmfr2_el1);
-+    get_cpu_reg(id_mmfr3_el1);
-+
-+    get_cpu_reg(mvfr0_el1);
-+    get_cpu_reg(mvfr1_el1);
-+
-+    if (should_not_fail_count > 0) {
-+        int i;
-+        for (i = 0; i < should_not_fail_count; i++) {
-+            uintptr_t pc = failed_pc[i];
-+            uint32_t insn = *(uint32_t *) pc;
-+            printf("insn %#x @ %#lx unexpected FAIL\n", insn, pc);
-+        }
-+        return 1;
-+    }
-+
-+    if (failed_bit_count > 0) {
-+        printf("Extra information leaked to user-space!\n");
-+        return 1;
-+    }
-+
-+    return should_fail_count == 6 ? 0 : 1;
-+}
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 8ed477d0d51..a25afc071cc 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -42,4 +42,10 @@ run-semiconsole: semiconsole
- run-plugin-semiconsole-with-%:
- 	$(call skip-test, $<, "MANUAL ONLY")
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+index 024b6f4d588c..e217cca5ee1e 100644
+--- a/linux-user/i386/cpu_loop.c
++++ b/linux-user/i386/cpu_loop.c
+@@ -81,13 +81,23 @@ static void set_idt(int n, unsigned int dpl)
+ }
+ #endif
  
-+ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_SVE),)
-+# System Registers Tests
-+AARCH64_TESTS += sysregs
-+sysregs: CFLAGS+=-march=armv8.1-a+sve
-+endif
++static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
++{
++    target_siginfo_t info = {
++        .si_signo = sig,
++        .si_code = code,
++        ._sifields._sigfault._addr = addr
++    };
 +
- TESTS += $(AARCH64_TESTS)
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
+ void cpu_loop(CPUX86State *env)
+ {
+     CPUState *cs = env_cpu(env);
+     int trapnr;
+     abi_ulong pc;
+     abi_ulong ret;
+-    target_siginfo_t info;
+ 
+     for(;;) {
+         cpu_exec_start(cs);
+@@ -134,70 +144,45 @@ void cpu_loop(CPUX86State *env)
+ #endif
+         case EXCP0B_NOSEG:
+         case EXCP0C_STACK:
+-            info.si_signo = TARGET_SIGBUS;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_SI_KERNEL;
+-            info._sifields._sigfault._addr = 0;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGBUS, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0D_GPF:
+             /* XXX: potential problem if ABI32 */
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_fault(env);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0E_PAGE:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            if (!(env->error_code & 1))
+-                info.si_code = TARGET_SEGV_MAPERR;
+-            else
+-                info.si_code = TARGET_SEGV_ACCERR;
+-            info._sifields._sigfault._addr = env->cr[2];
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGSEGV,
++                       (env->error_code & 1 ?
++                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR),
++                       env->cr[2]);
+             break;
+         case EXCP00_DIVZ:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                /* division by zero */
+-                info.si_signo = TARGET_SIGFPE;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_FPE_INTDIV;
+-                info._sifields._sigfault._addr = env->eip;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGFPE, TARGET_FPE_INTDIV, env->eip);
+             break;
+         case EXCP01_DB:
+         case EXCP03_INT3:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
++                break;
++            }
+ #endif
+-            {
+-                info.si_signo = TARGET_SIGTRAP;
+-                info.si_errno = 0;
+-                if (trapnr == EXCP01_DB) {
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    info._sifields._sigfault._addr = env->eip;
+-                } else {
+-                    info.si_code = TARGET_SI_KERNEL;
+-                    info._sifields._sigfault._addr = 0;
+-                }
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            if (trapnr == EXCP01_DB) {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, env->eip);
++            } else {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_SI_KERNEL, 0);
+             }
+             break;
+         case EXCP04_INTO:
+@@ -205,31 +190,19 @@ void cpu_loop(CPUX86State *env)
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP06_ILLOP:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->eip;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGILL, TARGET_ILL_ILLOPN, env->eip);
+             break;
+         case EXCP_INTERRUPT:
+             /* just indicate that signals should be handled asap */
+             break;
+         case EXCP_DEBUG:
+-            info.si_signo = TARGET_SIGTRAP;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_TRAP_BRKPT;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, 0);
+             break;
+         case EXCP_ATOMIC:
+             cpu_exec_step_atomic(cs);
 -- 
-2.20.1
+2.24.1
 
 
