@@ -2,66 +2,82 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EF2C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CD0C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEB132071C
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:23:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB132071C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3C05E205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 10:24:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="P5YlIRNa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C05E205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDmuR-0002Dc-Gd
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 06:23:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58127)
+	id 1jDmvP-0002UI-Ti
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 06:24:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jDlY2-0005lB-T7
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:37 -0400
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jDmgp-00060l-RP
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jDlY1-0003fX-Ke
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:34 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:42327)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDlY1-0003IV-9u
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:33 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M730b-1jE0Wd1nMF-008YVF; Mon, 16 Mar 2020 09:56:24 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/4] linux-user: generate syscall_nr.h from linux unistd.h
-Date: Mon, 16 Mar 2020 09:56:16 +0100
-Message-Id: <20200316085620.309769-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:GOZ4C5AVBeyNueFbXnRc+0t8mumemR/aijjymyYfYLXqd7RnupJ
- AWctDb28LchxFjTYFGQiU6TU8rLZRkpGODBm65l/td8uBHo6ECtuaOkXTO2AckQoXnZNnVm
- fSBSRapS2FqN9eeZzm21391Z8CZE0D8FizjWY6xSWHq3NOzvU/AU0LUZpj1tTadBj7AGwie
- g95P4WSwdtmKGl8Mti9vQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dJY4cKYwXTQ=:RiIbKqFJlVMnXrJYEKwG6H
- fWpEAnAUvYZO1u5oJ7Hd7p6m8ibLR8CMIYRMMw9YMaueKsAdFDw5iRiseuyh4gs9i2XqnZZsD
- AQNiTKqkWKcm16J++LAqmACWlcnFbd04RaF0ncaXsyrHUjfc1fGffSlk/z1n7i8K6u/8HfrRs
- 59lP+MQYryEG/g3Da33i/AlXbBKgyrlj4TkZy1mqrXHYUa/y+jrRJIJsAidqDfqDAsSPwPtgP
- 7mqROuj/xJRiPAlitOlFCA5XCpCVERqFQCD6cEcsd3NTNG9bml8xHulYFQtL09gIvfVZ6MM8p
- tO8LtubOLEpkDJFKLgxSB4nrr+V+5fWsnnEZitp3tjeE4t7XSRKjXCZHGsvNkgwyCP/qCz7Pl
- LdrALX5kRcwafeTZfLJp6oLGheP/qa+w76NqHcG7vrb7Yv2GW5Jc5nm48wFjPyI6zQLpxB76f
- EqwbrVSba1GtFZcrtfCeyVsHfKeVgjSb5T8WDi6KzHKdHDjAtF3eRu0/T8BSkeOPif8XO/+1p
- diIFRv9vzUq1LVxRkPKZJKenc8m2R2aweWNWTsJGVCatQrNoiCEQK3LK5Ichm/Uhy20IJ3NKD
- 30UM/q2VViBukFnZQVjWD6vo3D3RkE5rgwgbJJPXuPb+s4WK5oeFB5Hd6YEddVihqnqq06H+I
- OWFIxcDwM/7LyfJFoYQ2uTvf1T+QC5sXHHuZ4Qd4YvtwIIZvTkV/L7A+Q/69BzKoHdoCzpubD
- MxY1QiXmnKhmUz2kl0AIDA14mwVCoLlRTKDYWP0rtB4DVpI2tX5t8USMj3nGFpZkN9HlD79SP
- 5TUImQTrJ+zrVrGjHx2r+QFmV+UG3z5qY6I0j5RHyrGKwneR6G2VASe5pqBl9d3BfOlmBQV
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+ (envelope-from <yuri.benditovich@daynix.com>) id 1jDmgo-0003RE-M5
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:43 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46681)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1jDmgn-00031P-UB
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:42 -0400
+Received: by mail-wr1-x444.google.com with SMTP id w16so3960190wrv.13
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 03:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=8dqIf7x4xvvX+26xdYNWGyCJJwyBAGUEznQ6buBcw6A=;
+ b=P5YlIRNaXZXXUWABWiLqMPjHrDDFw3B/JNgcZuStci3s/VcFfCEr4WwJn7v2DfHU28
+ +uFkahDviksvyAe2jmdQA8ClT7OAHHHXgREJRc49YdRyhsdzOwMGp89xfhaw4Co6puyj
+ MLHyRPHVVsQd3fwz2IRgwnVdtjCw8MPSlCYdehYY0/FkSikYW2mXrLBpXJYqCd/Ux9fc
+ TiB9ocnYJPIUYzIb/qm8RmtPTDI7+EsWcZoUCMjIFg6FmesOx3DQL9zPExmdc8OQ1oCS
+ kQTnSZPSRwmv7l1qMmlt/pi1PiODR/ihasklTTOJvkyNPmu4ovtANFU3zG8ToOL0RQJG
+ lmzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=8dqIf7x4xvvX+26xdYNWGyCJJwyBAGUEznQ6buBcw6A=;
+ b=uIifRT/RjEke3sVo6mQh3cjPOwFC8tsVtT5BZm8OtI7DHdJ/Ak+mPY2TwS7ruEHFpl
+ 31R+Cu/G3k4yusagaRHoHBzskGylLgHMhisWUFLzSWqboo+B5I4GbpKBH+CCtJsz6mIO
+ vq9SEaoSBvlSsXskMa5+6etST9arnkT3o4xrz6YLediqyCP9+fR+/hCWIYHUIpvYcRxy
+ jeeOq2MQ5Yz8BRuubsu6cj6auPWWmhbTjgd6v9vCEHlzuP+HTOr0hT6DWPIBBIn63j31
+ gPr+M8mdbv87c+qCAoUJyLEsKP4kJyzBE2ZbEkFetgzupWt8baxaf5U3IY8o/kV3pFuP
+ PceQ==
+X-Gm-Message-State: ANhLgQ3enQhW5ULa94ujKVppwdpJkPsdazVx0vyCRDniVmdsPhniaZdS
+ cs0oatq3dV8Tz59V29GjfBx1/+Vbx8cizw==
+X-Google-Smtp-Source: ADFU+vvwTnoV7VAAmoEoXdKVRk1j7rQMG+fFSNXsnj8pe6Vw3jW3nhzIRIjbtx+Ijx0I88gJFN2QLQ==
+X-Received: by 2002:a5d:68c1:: with SMTP id p1mr22167486wrw.198.1584353380201; 
+ Mon, 16 Mar 2020 03:09:40 -0700 (PDT)
+Received: from f2.redhat.com (bzq-79-183-43-120.red.bezeqint.net.
+ [79.183.43.120])
+ by smtp.gmail.com with ESMTPSA id l7sm22083171wrw.33.2020.03.16.03.09.38
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 16 Mar 2020 03:09:39 -0700 (PDT)
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+To: qemu-devel@nongnu.org,
+	mst@redhat.com,
+	jasowang@redhat.com
+Subject: [PATCH v4 0/6] reference implementation of RSS and hash report
+Date: Mon, 16 Mar 2020 12:09:27 +0200
+Message-Id: <20200316100933.11499-1-yuri.benditovich@daynix.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,49 +89,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: yan@daynix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds a script to generate syscall_nr.h for
-architectures that don't use syscall.tbl but asm-generic/unistd.h
+Support for VIRTIO_NET_F_RSS and VIRTIO_NET_F_HASH_REPORT
+features in QEMU for reference purpose.
+Implements Toeplitz hash calculation for incoming
+packets according to configuration provided by driver.
+Uses calculated hash for decision on receive virtqueue
+and/or reports the hash in the virtio header
 
-The script uses several cpp passes and filters result with a grep/sed/tr sequence.
-The result must be checked before being used, so it's why the script is not
-automatically run.
+Changes from v3
+Use pointer for indirections table instead of array
+Cosmetic changes per v3 review
 
-I have run the script, checked and added new files for arm64, nios2, openrisc.
+Changes from v2:
+Implemented migration support
+Added implementation of hash report
+Changed reporting of error during processing of command
+(per review of v2)
+Cosmetic changes per v2 review
 
-I don't include result for riscv as Alistair is already working on a series
-for this architecture and it needs some changes in syscall.c as some
-syscalls are not defined.
+Yuri Benditovich (6):
+  virtio-net: introduce RSS and hash report features
+  virtio-net: implement RSS configuration command
+  virtio-net: implement RX RSS processing
+  tap: allow extended virtio header with hash info
+  virtio-net: reference implementation of hash report
+  virtio-net: add migration support for RSS and hash report
 
-We also need to add the _time64 variant of syscalls added by the update of the
-syscall_nr.h.
-
-Based-on: <20200310103403.3284090-1-laurent@vivier.eu>
-
-v3: remove useless upper command
-v2: add comments suggested by Taylor
-
-Laurent Vivier (4):
-  scripts: add a script to generate syscall_nr.h
-  linux-user, aarch64: sync syscall numbers with kernel v5.5
-  linux-user,nios2: sync syscall numbers with kernel v5.5
-  linux-user, openrisc: sync syscall numbers with kernel v5.5
-
- linux-user/aarch64/syscall_nr.h  |  34 +-
- linux-user/nios2/syscall_nr.h    | 650 +++++++++++++++----------------
- linux-user/openrisc/syscall_nr.h | 309 +++------------
- scripts/gensyscalls.sh           | 102 +++++
- 4 files changed, 513 insertions(+), 582 deletions(-)
- create mode 100755 scripts/gensyscalls.sh
+ hw/net/trace-events            |   3 +
+ hw/net/virtio-net.c            | 437 +++++++++++++++++++++++++++++++--
+ include/hw/virtio/virtio-net.h |  16 ++
+ net/tap.c                      |  11 +-
+ 4 files changed, 439 insertions(+), 28 deletions(-)
 
 -- 
-2.24.1
+2.17.1
 
 
