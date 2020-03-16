@@ -2,93 +2,148 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B35A9C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85137C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:43:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7519420674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:38:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JOykOFt2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7519420674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 458E120772
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:43:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 458E120772
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvYl-0004L6-M2
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:37:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43124)
+	id 1jDve3-0006TB-Bi
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:43:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1jDvY1-0003V4-GY
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:37:14 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1jDvdL-0005fk-Qw
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1jDvXz-0007Z6-V9
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:37:13 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36779)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1jDvXz-0007Qb-NS
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:37:11 -0400
-Received: by mail-pf1-x441.google.com with SMTP id i13so10528640pfe.3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:37:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=L89ZWrRD+o41kxNk0fnpcdzdsDuN76+Y+I0X9Rp+gms=;
- b=JOykOFt2/Pic/Ya/IJ1Yuxkfir9truF3YSQWCcT0DMz/IOBBBgUasm4tSdf1lbYH+C
- KQFeRRmYukwQXIfxV7PiTbjLDRkheJGHGkIcbWD8ukyAGXKnbe7CmubS9P0iR96MXISV
- QPcDoCC3TJnR7ADHr0FEeX9DuMN4Jpww5d8KoHi8f7iEMCzGYL/zGtMYSWxxXnwWW545
- t4t9ttJSJzT78RaBCd6izDyZnmN8Va//drpARvGb3gsINYt2DZjytGl3i0EjGhogROOl
- nECne9eMCiClmtmHmwomneU1aXuC9lfHDIEMrYLeb6r6lJHz+KR5IlDrMQrtGUlkCovL
- JCDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=L89ZWrRD+o41kxNk0fnpcdzdsDuN76+Y+I0X9Rp+gms=;
- b=UAlUtQVuwPePsNkqzJuKOV/1JGERssxboCtj1NsFnyStD6wKvY7tUx7g/LUTgp2yMq
- LzH0ZoiP+GdHCVBNmTSVqSCXGrPyYUcTDRTpxbxb26/098kX55l4O44x2e6KdTi+K96m
- 8eXEVYilVJ8EfTKfIboaAEdSyAANfIUQmjK1Al2nRaJdeG3U1UbBw4mzepMeGUuIgSUC
- 42jfZ+Uzu6SoHztsI/ZfCaiqNgh3CZgkz3jAXhSNs7HtCnoc1yn3cQPzAqJ1x+JGf0Hq
- kk/sqr4iE+aB5JzwU2KgMVq1B7U903TVwe8ZsvXL0an0wmpE0diiejcPvgi77GQhi59L
- FQvA==
-X-Gm-Message-State: ANhLgQ3xVVOUDUpXaydISFI7tXjtHgnmu1OvmuKMXj8b/dSRwBiK4M1M
- cBRhV9P6pdWbIPfMtikRkyRP2Q==
-X-Google-Smtp-Source: ADFU+vvhNufPP7bu7Lbr300PVxk4IJgWKvd7lJvPzyrN4DkPlsGgJZsWycA0QGAqYFPlScuXekBqTA==
-X-Received: by 2002:aa7:8711:: with SMTP id b17mr1118088pfo.315.1584387430595; 
- Mon, 16 Mar 2020 12:37:10 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- g13sm673135pfi.183.2020.03.16.12.37.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 12:37:09 -0700 (PDT)
-Subject: Re: [PATCH v3 04/19] target/arm: Restric the Address Translate
- operations to TCG accel
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-5-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c257230b-277c-d568-756b-39acb93ac308@linaro.org>
-Date: Mon, 16 Mar 2020 12:37:07 -0700
+ (envelope-from <borntraeger@de.ibm.com>) id 1jDvdK-0000a8-Bj
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37628
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jDvdK-0000T1-4d
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:42 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 02GJYriN006350
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 15:42:41 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yrr6ta8ux-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 15:42:41 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Mon, 16 Mar 2020 19:42:39 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 16 Mar 2020 19:42:36 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 02GJgZv118809016
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Mar 2020 19:42:35 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AA9BC11C04A;
+ Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 561A911C054;
+ Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.87.212])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
+Subject: Re: [PATCH v9] fixup! Fix subcode/pbt
+To: Cornelia Huck <cohuck@redhat.com>
+References: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
+ <20200313095232.2392-1-frankja@linux.ibm.com>
+ <20200316152738.4c1c65ee.cohuck@redhat.com>
+ <bbbabbb0-2325-406d-a619-f2d03f447c8c@linux.ibm.com>
+ <20200316155457.73e97d9c.cohuck@redhat.com>
+ <a39815f9-6c36-5c7e-39e0-3cd49a66c571@de.ibm.com>
+ <20200316185708.30d23522.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Mon, 16 Mar 2020 20:42:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200316160634.3386-5-philmd@redhat.com>
+In-Reply-To: <20200316185708.30d23522.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20031619-0008-0000-0000-0000035E4BBE
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20031619-0009-0000-0000-00004A7FA019
+Message-Id: <0fcd69fc-0e23-5cd1-bd21-0c4923a99ef1@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
+ definitions=2020-03-16_08:2020-03-12,
+ 2020-03-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 suspectscore=0
+ phishscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=985 adultscore=0 impostorscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2003160081
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,115 +155,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-s390x@nongnu.org, david@redhat.com,
+ Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
-> Under KVM the ATS instruction will trap.
-
-Not trap, they'll just work.
-Otherwise similar comment as for dcpop.
 
 
-r~
-
+On 16.03.20 18:57, Cornelia Huck wrote:
+> On Mon, 16 Mar 2020 16:04:00 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  target/arm/helper.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+>> On 16.03.20 15:54, Cornelia Huck wrote:
+>>> On Mon, 16 Mar 2020 15:47:41 +0100
+>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>   
+>>>> On 3/16/20 3:27 PM, Cornelia Huck wrote:  
+>>>>> On Fri, 13 Mar 2020 05:52:32 -0400
+>>>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>>>     
+>>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>>> ---
+>>>>>>  hw/s390x/ipl.h      | 11 +++++++----
+>>>>>>  target/s390x/diag.c |  2 +-
+>>>>>>  2 files changed, 8 insertions(+), 5 deletions(-)  
+>>>
+>>>   
+>>>>>> @@ -118,7 +118,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>>>>>>  
+>>>>>>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+>>>>>>  
+>>>>>> -        if (!iplb_valid(iplb)) {
+>>>>>> +        if (!iplb_valid(iplb, subcode)) {
+>>>>>>              env->regs[r1 + 1] = DIAG_308_RC_INVALID;
+>>>>>>              goto out;
+>>>>>>          }    
+>>>>>
+>>>>> ...because you're basically checking whether you either have a valid
+>>>>> normal iplb, or a valid pv iplb, with the two being mutually exclusive,
+>>>>> IIUC. So what about introducing iplb_valid_pv and calling that for the
+>>>>> pv case? Would be a bit nicer to read, I think, and also matches what
+>>>>> you do for the STORE case.
+>>>>>     
+>>>>
+>>>> The idea was to get rid of all of these ifs and elses and only have one
+>>>> iplb_valid function. Your suggestion would defeat hiding that complexity
+>>>> behind this function.  
+>>>
+>>> I'd argue that this is a complexity we should not hide; for non-pv, we
+>>> can have several formats, for pv, only one, and we cannot use a pv iplb
+>>> in a non-pv context and vice versa.  
+>>
+>> So you suggest to split these case statements?
+>> case DIAG308_STORE:
+>> case DIAG308_PV_STORE:
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 924deffd65..a5280c091b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3322,7 +3322,7 @@ static void par_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->      }
->  }
->  
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->  /* get_phys_addr() isn't present for user-mode-only targets */
->  
->  static CPAccessResult ats_access(CPUARMState *env, const ARMCPRegInfo *ri,
-> @@ -3631,7 +3631,7 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
->  
->      env->cp15.par_el[1] = do_ats_write(env, value, access_type, mmu_idx);
->  }
-> -#endif
-> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
->  
->  static const ARMCPRegInfo vapa_cp_reginfo[] = {
->      { .name = "PAR", .cp = 15, .crn = 7, .crm = 4, .opc1 = 0, .opc2 = 0,
-> @@ -3639,7 +3639,7 @@ static const ARMCPRegInfo vapa_cp_reginfo[] = {
->        .bank_fieldoffsets = { offsetoflow32(CPUARMState, cp15.par_s),
->                               offsetoflow32(CPUARMState, cp15.par_ns) },
->        .writefn = par_write },
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      /* This underdecoding is safe because the reginfo is NO_RAW. */
->      { .name = "ATS", .cp = 15, .crn = 7, .crm = 8, .opc1 = 0, .opc2 = CP_ANY,
->        .access = PL1_W, .accessfn = ats_access,
-> @@ -4880,7 +4880,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
->        .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 7, .opc2 = 6,
->        .access = PL2_W, .type = ARM_CP_NO_RAW,
->        .writefn = tlbi_aa64_alle1is_write },
-> -#ifndef CONFIG_USER_ONLY
-> +
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      /* 64 bit address translation operations */
->      { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
->        .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 8, .opc2 = 0,
-> @@ -4929,7 +4930,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
->        .access = PL1_RW, .resetvalue = 0,
->        .fieldoffset = offsetof(CPUARMState, cp15.par_el[1]),
->        .writefn = par_write },
-> -#endif
-> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
-> +
->      /* TLB invalidate last level of translation table walk */
->      { .name = "TLBIMVALIS", .cp = 15, .opc1 = 0, .crn = 8, .crm = 3, .opc2 = 5,
->        .type = ARM_CP_NO_RAW, .access = PL1_W, .accessfn = access_ttlb,
-> @@ -5536,7 +5538,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
->        .opc0 = 1, .opc1 = 4, .crn = 8, .crm = 3, .opc2 = 5,
->        .access = PL2_W, .type = ARM_CP_NO_RAW,
->        .writefn = tlbi_aa64_vae2is_write },
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      /* Unlike the other EL2-related AT operations, these must
->       * UNDEF from EL3 if EL2 is not implemented, which is why we
->       * define them here rather than with the rest of the AT ops.
-> @@ -6992,7 +6994,7 @@ static const ARMCPRegInfo vhe_reginfo[] = {
->      REGINFO_SENTINEL
->  };
->  
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->  static const ARMCPRegInfo ats1e1_reginfo[] = {
->      { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
->        .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
-> @@ -7894,14 +7896,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      if (cpu_isar_feature(aa64_pan, cpu)) {
->          define_one_arm_cp_reg(cpu, &pan_reginfo);
->      }
-> -#ifndef CONFIG_USER_ONLY
-> +#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
->      if (cpu_isar_feature(aa64_ats1e1, cpu)) {
->          define_arm_cp_regs(cpu, ats1e1_reginfo);
->      }
->      if (cpu_isar_feature(aa32_ats1e1, cpu)) {
->          define_arm_cp_regs(cpu, ats1cp_reginfo);
->      }
-> -#endif
-> +#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
->      if (cpu_isar_feature(aa64_uao, cpu)) {
->          define_one_arm_cp_reg(cpu, &uao_reginfo);
->      }
-> 
+> Why? Those cases are already done in the way I suggest for these here
+> as well (i.e. keep common checks, just split the iplb handling.)
+
+This was more of a question. I was not sure what your suggestion was.
 
 
