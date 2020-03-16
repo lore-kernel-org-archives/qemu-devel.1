@@ -2,97 +2,89 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4023BC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE82C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:08:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17FE420719
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:07:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17FE420719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3759620674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:08:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eycMvEju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3759620674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDu9e-00073E-8u
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58560)
+	id 1jDuAQ-00004v-7f
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:08:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mahesh@linux.vnet.ibm.com>) id 1jDte1-0006YE-AR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:35:18 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtRY-0000vU-5q
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mahesh@linux.vnet.ibm.com>) id 1jDtdz-0002uh-Gb
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:35:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15892)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mahesh@linux.vnet.ibm.com>)
- id 1jDtdz-0002nR-2o
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:35:15 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02GHWjk1084719
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:35:12 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yrue238ex-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:35:11 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mahesh@linux.vnet.ibm.com>;
- Mon, 16 Mar 2020 17:35:09 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 16 Mar 2020 17:35:05 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02GHY3CT49021232
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Mar 2020 17:34:03 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 65C714C052;
- Mon, 16 Mar 2020 17:35:04 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EC9584C046;
- Mon, 16 Mar 2020 17:35:02 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.45.53])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon, 16 Mar 2020 17:35:02 +0000 (GMT)
-Date: Mon, 16 Mar 2020 23:05:00 +0530
-From: Mahesh J Salgaonkar <mahesh@linux.vnet.ibm.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 7/8] ppc/spapr: Implement FWNMI System Reset delivery
-References: <20200316142613.121089-1-npiggin@gmail.com>
- <20200316142613.121089-8-npiggin@gmail.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtRW-00012A-77
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:23 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36699)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jDtRV-0000vP-Iv
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:21 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s5so22319150wrg.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=YMlB9rnlkVZWq7aBeAA4aFi+84nzrz8PdlJho1DInq4=;
+ b=eycMvEjub0i5emzZ1DOfsnTttyLBPiy5DmlNj5r6vpWOvo0NWSboY1G7RzK0qCnuCx
+ 3zcqL0fAedsyKdgCVXm0gTjlCmuowoPOGYWpQdltcKbwULEXeYKSJBZ1yItjwX6aPhFo
+ 3VU1osJPm42L0U6tqTZe+cE3VtSVR+AOK/qJJ1ejWhMYuEx80P75zHcfeuK7kH/T84J+
+ 89rYg8GTKCP/gGJY07w4yup+r8vnnsYjc+u2n5ccc0/c3mPCiNQO5f6fdApGFChpMLWF
+ XKVwXY3V+RwA7UMlDH2TjLnBUbV7vGyAk8A5O8qIyHYa6hGZjOCuXyKd+/mDdVjb+5W0
+ KEnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=YMlB9rnlkVZWq7aBeAA4aFi+84nzrz8PdlJho1DInq4=;
+ b=f3Y8BB7xUa3t62po4LVUNWK4LI4w0TcV24CVJC6e5DzT9SCIQQooEVhuLq5+27eiIJ
+ VlzyWp2Q+ZPeEDsmIR5BudYv6fLeDs+Oa9deRffneVEuGHIslyhGKlx9Wm34HFUV/NXJ
+ jzoboPrbasD728XJHL1Wph1YaCvkSS6sFUy/Mi+LCZkr4FwYAKiCEPkzdgyzVWJmgvtQ
+ TXvO7kyBwUUWO94Z9EnpdFlkHyeHZGOKZLeVF2R7m87lzk1VnHx1ymQ5HsS6jkxzu4Wv
+ Wb9t4zlficPBzicsHObkxpaE1oLkzF+tTEPFTvzomyOpfZVqxruA9M7fkrb3WqdSxUB4
+ fO9Q==
+X-Gm-Message-State: ANhLgQ330utMXVLuT4hsdnefH18vsCeDJTKK6C07tJffaicuwmLhMlOQ
+ T1XgtLR1Dj5RkWAPVC5FZ9/nzg==
+X-Google-Smtp-Source: ADFU+vt8uFGwoe5APsmUStPp4qEec6TZDxyjy4aZUvNb4VeRBhgGxxmJwRa69Nq9I4K26PCWLqrcqg==
+X-Received: by 2002:a5d:4ad1:: with SMTP id y17mr370285wrs.119.1584379340279; 
+ Mon, 16 Mar 2020 10:22:20 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l26sm417018wmi.37.2020.03.16.10.22.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 10:22:13 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F07D21FF98;
+ Mon, 16 Mar 2020 17:21:55 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 09/28] gdbstub: move mem_buf to GDBState and use GByteArray
+Date: Mon, 16 Mar 2020 17:21:36 +0000
+Message-Id: <20200316172155.971-10-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
+References: <20200316172155.971-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200316142613.121089-8-npiggin@gmail.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20031617-0008-0000-0000-0000035E3F42
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031617-0009-0000-0000-00004A7F9342
-Message-Id: <20200316173500.576hdvush3fzvvef@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-16_07:2020-03-12,
- 2020-03-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0
- phishscore=0 adultscore=0 mlxlogscore=835 suspectscore=1 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 spamscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003160077
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Mon, 16 Mar 2020 13:49:15 -0400
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,107 +96,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: mahesh@linux.vnet.ibm.com
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-03-17 00:26:12 Tue, Nicholas Piggin wrote:
-> PAPR requires that if "ibm,nmi-register" succeeds, then the hypervisor
-> delivers all system reset and machine check exceptions to the registered
-> addresses.
-> 
-> System Resets are delivered with registers set to the architected state,
-> and with no interlock.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  hw/ppc/spapr.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 44 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 25221d843c..78e649f47d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -967,7 +967,29 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->      _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
->                       maxdomains, sizeof(maxdomains)));
-> 
-> -    _FDT(fdt_setprop_cell(fdt, rtas, "rtas-size", RTAS_SIZE));
-> +    /*
-> +     * FWNMI reserves RTAS_ERROR_LOG_MAX for the machine check error log,
-> +     * and 16 bytes per CPU for system reset error log plus an extra 8 bytes.
-> +     *
-> +     * The system reset requirements are driven by existing Linux and PowerVM
-> +     * implementation which (contrary to PAPR) saves r3 in the error log
-> +     * structure like machine check, so Linux expects to find the saved r3
-> +     * value at the address in r3 upon FWNMI-enabled sreset interrupt (and
-> +     * does not look at the error value).
-> +     *
-> +     * System reset interrupts are not subject to interlock like machine
-> +     * check, so this memory area could be corrupted if the sreset is
-> +     * interrupted by a machine check (or vice versa) if it was shared. To
-> +     * prevent this, system reset uses per-CPU areas for the sreset save
-> +     * area. A system reset that interrupts a system reset handler could
-> +     * still overwrite this area, but Linux doesn't try to recover in that
-> +     * case anyway.
-> +     *
-> +     * The extra 8 bytes is required because Linux's FWNMI error log check
-> +     * is off-by-one.
-> +     */
-> +    _FDT(fdt_setprop_cell(fdt, rtas, "rtas-size", RTAS_ERROR_LOG_MAX +
-> +			  ms->smp.max_cpus * sizeof(uint64_t)*2 + sizeof(uint64_t)));
+This is in preparation for further re-factoring of the register API
+with the rest of the code. Theoretically the read register function
+could overwrite the MAX_PACKET_LENGTH buffer although currently all
+registers are well within the size range.
 
-Currently the rtas region is only of size 2048 (i.e RTAS_ERROR_LOG_MAX).
-Do we need SLOF change to increase rtas area as well ? Otherwise QEMU
-may corrupt guest memory area OR Am I wrong ?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+Tested-by: Damien Hedde <damien.hedde@greensocs.com>
 
-Thanks,
--Mahesh/
+---
+v4
+  - don't set_set to len on rcmd (it's zeroed before we get here)
+v3
+  - fixed up email on Damien's tags
+---
+ gdbstub.c | 56 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 35 insertions(+), 21 deletions(-)
 
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-error-log-max",
->                            RTAS_ERROR_LOG_MAX));
->      _FDT(fdt_setprop_cell(fdt, rtas, "rtas-event-scan-rate",
-> @@ -3399,8 +3421,28 @@ static void spapr_machine_finalizefn(Object *obj)
-> 
->  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
->  {
-> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +
->      cpu_synchronize_state(cs);
-> -    ppc_cpu_do_system_reset(cs, -1);
-> +    /* If FWNMI is inactive, addr will be -1, which will deliver to 0x100 */
-> +    if (spapr->fwnmi_system_reset_addr != -1) {
-> +        uint64_t rtas_addr, addr;
-> +        PowerPCCPU *cpu = POWERPC_CPU(cs);
-> +        CPUPPCState *env = &cpu->env;
-> +
-> +        /* get rtas addr from fdt */
-> +        rtas_addr = spapr_get_rtas_addr();
-> +        if (!rtas_addr) {
-> +            qemu_system_guest_panicked(NULL);
-> +            return;
-> +        }
-> +
-> +        addr = rtas_addr + RTAS_ERROR_LOG_MAX + cs->cpu_index * sizeof(uint64_t)*2;
-> +        stq_be_phys(&address_space_memory, addr, env->gpr[3]);
-> +        stq_be_phys(&address_space_memory, addr + sizeof(uint64_t), 0);
-> +        env->gpr[3] = addr;
-> +    }
-> +    ppc_cpu_do_system_reset(cs, spapr->fwnmi_system_reset_addr);
->  }
-> 
->  static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
-> -- 
-> 2.23.0
-> 
-> 
-
+diff --git a/gdbstub.c b/gdbstub.c
+index f6b42825445..db537a712cc 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -367,6 +367,7 @@ typedef struct GDBState {
+     char syscall_buf[256];
+     gdb_syscall_complete_cb current_syscall_cb;
+     GString *str_buf;
++    GByteArray *mem_buf;
+ } GDBState;
+ 
+ /* By default use no IRQs and no timers while single stepping so as to
+@@ -382,6 +383,7 @@ static void init_gdbserver_state(void)
+     memset(&gdbserver_state, 0, sizeof(GDBState));
+     gdbserver_state.init = true;
+     gdbserver_state.str_buf = g_string_new(NULL);
++    gdbserver_state.mem_buf = g_byte_array_sized_new(MAX_PACKET_LENGTH);
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+@@ -576,12 +578,13 @@ static void memtohex(GString *buf, const uint8_t *mem, int len)
+     g_string_append_c(buf, '\0');
+ }
+ 
+-static void hextomem(uint8_t *mem, const char *buf, int len)
++static void hextomem(GByteArray *mem, const char *buf, int len)
+ {
+     int i;
+ 
+     for(i = 0; i < len; i++) {
+-        mem[i] = (fromhex(buf[0]) << 4) | fromhex(buf[1]);
++        guint8 byte = fromhex(buf[0]) << 4 | fromhex(buf[1]);
++        g_byte_array_append(mem, &byte, 1);
+         buf += 2;
+     }
+ }
+@@ -1412,7 +1415,6 @@ static int cmd_parse_params(const char *data, const char *schema,
+ typedef struct GdbCmdContext {
+     GdbCmdVariant *params;
+     int num_params;
+-    uint8_t mem_buf[MAX_PACKET_LENGTH];
+ } GdbCmdContext;
+ 
+ typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
+@@ -1503,6 +1505,7 @@ static void run_cmd_parser(const char *data, const GdbCmdParseEntry *cmd)
+     }
+ 
+     g_string_set_size(gdbserver_state.str_buf, 0);
++    g_byte_array_set_size(gdbserver_state.mem_buf, 0);
+ 
+     /* In case there was an error during the command parsing we must
+     * send a NULL packet to indicate the command is not supported */
+@@ -1715,8 +1718,8 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
+ 
+     reg_size = strlen(gdb_ctx->params[1].data) / 2;
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
+-    gdb_write_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf,
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[1].data, reg_size);
++    gdb_write_register(gdbserver_state.g_cpu, gdbserver_state.mem_buf->data,
+                        gdb_ctx->params[0].val_ull);
+     put_packet("OK");
+ }
+@@ -1735,14 +1738,17 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
+-    reg_size = gdb_read_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf,
++    reg_size = gdb_read_register(gdbserver_state.g_cpu,
++                                 gdbserver_state.mem_buf->data,
+                                  gdb_ctx->params[0].val_ull);
+     if (!reg_size) {
+         put_packet("E14");
+         return;
++    } else {
++        g_byte_array_set_size(gdbserver_state.mem_buf, reg_size);
+     }
+ 
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, reg_size);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data, reg_size);
+     put_strbuf();
+ }
+ 
+@@ -1759,11 +1765,11 @@ static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[2].data,
+              gdb_ctx->params[1].val_ull);
+     if (target_memory_rw_debug(gdbserver_state.g_cpu, gdb_ctx->params[0].val_ull,
+-                               gdb_ctx->mem_buf,
+-                               gdb_ctx->params[1].val_ull, true)) {
++                               gdbserver_state.mem_buf->data,
++                               gdbserver_state.mem_buf->len, true)) {
+         put_packet("E14");
+         return;
+     }
+@@ -1784,14 +1790,17 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
++    g_byte_array_set_size(gdbserver_state.mem_buf, gdb_ctx->params[1].val_ull);
++
+     if (target_memory_rw_debug(gdbserver_state.g_cpu, gdb_ctx->params[0].val_ull,
+-                               gdb_ctx->mem_buf,
+-                               gdb_ctx->params[1].val_ull, false)) {
++                               gdbserver_state.mem_buf->data,
++                               gdbserver_state.mem_buf->len, false)) {
+         put_packet("E14");
+         return;
+     }
+ 
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data,
++             gdbserver_state.mem_buf->len);
+     put_strbuf();
+ }
+ 
+@@ -1806,9 +1815,9 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
+ 
+     cpu_synchronize_state(gdbserver_state.g_cpu);
+-    registers = gdb_ctx->mem_buf;
+     len = strlen(gdb_ctx->params[0].data) / 2;
+-    hextomem(registers, gdb_ctx->params[0].data, len);
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[0].data, len);
++    registers = gdbserver_state.mem_buf->data;
+     for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs && len > 0;
+          addr++) {
+         reg_size = gdb_write_register(gdbserver_state.g_cpu, registers, addr);
+@@ -1825,11 +1834,14 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     cpu_synchronize_state(gdbserver_state.g_cpu);
+     len = 0;
+     for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs; addr++) {
+-        len += gdb_read_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf + len,
++        len += gdb_read_register(gdbserver_state.g_cpu,
++                                 gdbserver_state.mem_buf->data + len,
+                                  addr);
+     }
++    /* FIXME: This is after the fact sizing */
++    g_byte_array_set_size(gdbserver_state.mem_buf, len);
+ 
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, len);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data, len);
+     put_strbuf();
+ }
+ 
+@@ -2078,6 +2090,7 @@ static void handle_query_offsets(GdbCmdContext *gdb_ctx, void *user_ctx)
+ #else
+ static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
++    const guint8 zero = 0;
+     int len;
+ 
+     if (!gdb_ctx->num_params) {
+@@ -2091,12 +2104,13 @@ static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
++    g_assert(gdbserver_state.mem_buf->len == 0);
+     len = len / 2;
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[0].data, len);
+-    gdb_ctx->mem_buf[len++] = 0;
+-    qemu_chr_be_write(gdbserver_state.mon_chr, gdb_ctx->mem_buf, len);
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[0].data, len);
++    g_byte_array_append(gdbserver_state.mem_buf, &zero, 1);
++    qemu_chr_be_write(gdbserver_state.mon_chr, gdbserver_state.mem_buf->data,
++                      gdbserver_state.mem_buf->len);
+     put_packet("OK");
+-
+ }
+ #endif
+ 
 -- 
-Mahesh J Salgaonkar
+2.20.1
 
 
