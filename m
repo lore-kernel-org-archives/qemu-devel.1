@@ -2,89 +2,84 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC79DC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2068C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86ADE20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:10:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FEC420674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:11:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O/ZHaq+4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86ADE20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJmVePaY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FEC420674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuBu-00049h-OU
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:10:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45434)
+	id 1jDuDE-0005uI-PU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRZ-0000z0-R0
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:28 -0400
+ (envelope-from <jandryuk@gmail.com>) id 1jDtp4-0002jr-PR
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRW-00015y-SV
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:25 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35360)
+ (envelope-from <jandryuk@gmail.com>) id 1jDtp3-0001EL-No
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:46:42 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45066)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtRW-00011D-Lw
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:22 -0400
-Received: by mail-wm1-x344.google.com with SMTP id m3so18986520wmi.0
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5wBDeZKmYofKOsnZiNwMAFl1gvv88UQfd1fG073rc/U=;
- b=O/ZHaq+4jqJ1zeOhhv8adHC0sTLb41OJphB8gOFfwFNIKK95KvhUhpcoZx1htTfaph
- 3EzpkoPgrc92HV79JPkUZe709WIGflu3o5NOD8MYgtFSuI7frK5hb0sI8tg0cN6to/GE
- jH8P5+JC+glZ0b52Za1WCK3Jp4NNo6erz7TTLV5rjwXE8BU0k6j3898SnN5+DLn1X4W+
- rdHqYQH/aPcvPSPwzbT2f1ROyt69pU+Y0IfI1Y25I6w6NC3kIvBX7F8FL3FNLhUuXVCs
- MSY5WSeisnVTkBDbEV832Q2VGMLYYYvHf70kvvGWsablTuYkvKHKlYmN2D6FVNgxzZeb
- jLsQ==
+ (Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1jDtp2-000148-GI
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:46:41 -0400
+Received: by mail-qk1-x741.google.com with SMTP id c145so27686146qke.12
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NYPa99RBsG8rBPsOgUkdsta0LQOmg9QvpdRKwBSChSo=;
+ b=aJmVePaYLx0Akua/GEgMz5TMWILWbGFdp+mUZ4yY/lvBbVHvLCOpmxstv0xcwKVh5v
+ ExM2+XQNYUaHvEkT1ZqDwZo9Zom3k2n1WBbioYTcyGQ3FVyzfQF/VjmFE+UxgdwD1kFE
+ 4pRUdJsu6E2oZeX3MGFx55wnq9wQDvVN6PV7qdcqE0FFLcFQe/W6bpetNqyPTQDmrX75
+ Lph0BKCgvWdczGdO8RYwhbg6Q2Xp/4YjDIQsDymTGtzeNic0WCeDX7FOC0Uce9fbMeRV
+ qPTeCnjCu4pRmuzYSvA5okPtfCy1dORZAuHP2nD1gYnV4BISa+3ljOVOHCvQifznb4Dg
+ b8ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=5wBDeZKmYofKOsnZiNwMAFl1gvv88UQfd1fG073rc/U=;
- b=BHXpytI6j7bdQK1Xewrw+CYuc3Uwzw5Zy4kH1l4O1KpMSVzNG5ft4RWmds3qmhqR+N
- 8+TaPodj6WU7i68IFhEw3huyaHjFFxEW2zZUfxlnYLGN4VhdAzDwKClIun/oc4cI/O86
- HiKiQQawIWQSRULRpiMlh/DQT7xoWtX2UaG/ZjfUlGHZnLKTzsEJCOiM2WTEfpWt2A6V
- VxUB2MmprjyM2KnaujyxzBe8EXYChq1zsmckDy5dJAgwgTjD3D/w9EEHQpoIbQf5bmBN
- Td5MPKWfvpe/RSFJ51slai8+gCAJHh9LUVSumLzr7tYMW5yz//UiLhsni0CGLtln9KPP
- I8fA==
-X-Gm-Message-State: ANhLgQ3tU3oDuaBjh0Nw6fRDBQbKXmbSgqeTc2i+po56THJYc10V9isB
- xXoQ9y43gODOwZCUhaKejw0Sng==
-X-Google-Smtp-Source: ADFU+vtepgVND9dXrAr3lAHeZb1+zcrFt059iGnfun1ovyDggTxuhLjwSvm26r+2aJzf4HmXxKpT1Q==
-X-Received: by 2002:a7b:c5cd:: with SMTP id n13mr156570wmk.172.1584379341542; 
- Mon, 16 Mar 2020 10:22:21 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s131sm417588wmf.35.2020.03.16.10.22.05
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NYPa99RBsG8rBPsOgUkdsta0LQOmg9QvpdRKwBSChSo=;
+ b=quFyUlUPFUmz4wY18dBwbk/35u3nMiwwtrBBESHp9G9VgFgonao/5qDoKv6NeZxK/n
+ Mje2CF9DZlkR4A4qLZyudZOTOhioE2YKVkhf9Gc+u7Zedt3IQYIOb6jw/DB3T+p2BrzF
+ UHgIp3S5Wul17dvPBZZi6PW9TMToISkZA5LhK2Z0XfXyWZAwvB9b4l/TsJSQeJL0MSmv
+ yvLvMehFwKr4fqDQXx2rxlDRJ5V3H7phZwMqRmVPUpi1batjb0bH0jNm5jdoR4kqgsNI
+ gUquRRGo6cyqlbw/354yCQwucb9mc3trakBKay4aEcw5w1jQ66+clz5HYJrl7QOHDk6e
+ OWxw==
+X-Gm-Message-State: ANhLgQ2shwUdcnKP8/hh89UvGVU/ChhaaZ9Pu8Z82Vo0V4c3BNmk2VJO
+ aQbhaGTvHsIZyBZC1safhDA=
+X-Google-Smtp-Source: ADFU+vv2O7HnGZcU2Bjkh0J5Fg5IfkZw555n6o6hrVh/82lVv3s5xY/Un5JSLyjWV+xPRF3Py27kiw==
+X-Received: by 2002:a37:6285:: with SMTP id w127mr886653qkb.138.1584380799866; 
+ Mon, 16 Mar 2020 10:46:39 -0700 (PDT)
+Received: from pm2-ws13.praxislan02.com ([2001:470:8:67e:7408:9006:8741:9ceb])
+ by smtp.gmail.com with ESMTPSA id
+ g7sm218422qki.64.2020.03.16.10.46.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:22:13 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3A6731FF9B;
- Mon, 16 Mar 2020 17:21:56 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 12/28] target/m68k: use gdb_get_reg helpers
-Date: Mon, 16 Mar 2020 17:21:39 +0000
-Message-Id: <20200316172155.971-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+ Mon, 16 Mar 2020 10:46:39 -0700 (PDT)
+From: Jason Andryuk <jandryuk@gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>
+Subject: [PATCH v2 0/4] usb-serial: xHCI and timeout fixes
+Date: Mon, 16 Mar 2020 13:46:06 -0400
+Message-Id: <20200316174610.115820-1-jandryuk@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,86 +91,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Jason Andryuk <jandryuk@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is cleaner than poking memory directly and will make later
-clean-ups easier.
+This patch series includes two fixes for usb-serial.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+The first is a data corruption issue with xHCI controllers.  The FTDI
+data packets need to have a 2 byte header start every 64 bytes of packet
+data.  For EHCI this is not a problem since USBPacket size is 64, so
+only 1 such chunk fits in a packet.  xHCI controllers supply 512 byte
+USBPackets, and usb-serial would only write a single header.  This
+confuses drivers since they interpret some data bytes as header bytes.
+Chunk the data with headers at every 64 byte offset.
 
----
-v3
-  - fix mem_buf references
-  - fix mem_buf + len cases
----
- target/m68k/helper.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+To allow full use of the 512 USBPackets, increase the buffer size to 512
+- 2 * 8 = 496 bytes.
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index baf7729af00..c23b70f854d 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -72,19 +72,15 @@ static int cf_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 8) {
-         float_status s;
--        stfq_p(mem_buf, floatx80_to_float64(env->fregs[n].d, &s));
--        return 8;
-+        return gdb_get_reg64(mem_buf, floatx80_to_float64(env->fregs[n].d, &s));
-     }
-     switch (n) {
-     case 8: /* fpcontrol */
--        stl_be_p(mem_buf, env->fpcr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpcr);
-     case 9: /* fpstatus */
--        stl_be_p(mem_buf, env->fpsr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpsr);
-     case 10: /* fpiar, not implemented */
--        memset(mem_buf, 0, 4);
--        return 4;
-+        return gdb_get_reg32(mem_buf, 0);
-     }
-     return 0;
- }
-@@ -112,21 +108,18 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 8) {
--        stw_be_p(mem_buf, env->fregs[n].l.upper);
--        memset(mem_buf + 2, 0, 2);
--        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
--        return 12;
-+        int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
-+        len += gdb_get_reg16(mem_buf + len, 0);
-+        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
-+        return len;
-     }
-     switch (n) {
-     case 8: /* fpcontrol */
--        stl_be_p(mem_buf, env->fpcr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpcr);
-     case 9: /* fpstatus */
--        stl_be_p(mem_buf, env->fpsr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpsr);
-     case 10: /* fpiar, not implemented */
--        memset(mem_buf, 0, 4);
--        return 4;
-+        return gdb_get_reg32(mem_buf, 0);
-     }
-     return 0;
- }
+A second fix is to set the FTDI_THRE (Transmitter Holding Register) and
+FTDI_TEMT (Transmitter Empty) status bits in a GetModemStat response.
+This makes the linux driver happy when closing the device and avoids a
+30 second timeout.
+
+v2: Add braces to single line if statements to comply with coding style.
+    Added Samuel's R-b to 3 & 4.  1 & 2 only changed by the addition of
+    braces, but I don't know the protocol for this situation.
+
+Jason Andryuk (4):
+  usb-serial: Move USB_TOKEN_IN into a helper function
+  usb-serial: chunk data to wMaxPacketSize
+  usb-serial: Increase receive buffer to 496
+  usb-serial: Fix timeout closing the device
+
+ hw/usb/dev-serial.c | 95 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 59 insertions(+), 36 deletions(-)
+
 -- 
-2.20.1
+2.24.1
 
 
