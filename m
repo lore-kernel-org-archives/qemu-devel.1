@@ -2,53 +2,95 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C1E7C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEBDC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20EEE20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20EEE20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 25C2B20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:55:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXqD2tug"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C2B20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDt1I-0002L0-8t
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:55:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53614)
+	id 1jDt1b-0003DT-87
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:55:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDqkw-0000DC-VT
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDsGa-00048r-2O
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDqkq-0002Y1-R8
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:14 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48566)
+ (envelope-from <philmd@redhat.com>) id 1jDsGX-0007nz-T1
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:06:59 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:22709)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDqkl-0007i3-TT; Mon, 16 Mar 2020 10:30:04 -0400
-Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
- [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id 95F6FBF538;
- Mon, 16 Mar 2020 14:29:42 +0000 (UTC)
-From: Klaus Jensen <its@irrelevant.dk>
-To: qemu-block@nongnu.org
-Subject: [PATCH v6 14/42] nvme: add missing mandatory features
-Date: Mon, 16 Mar 2020 07:29:00 -0700
-Message-Id: <20200316142928.153431-15-its@irrelevant.dk>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
-References: <20200316142928.153431-1-its@irrelevant.dk>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDsGX-0007mA-Ok
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:06:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584374817;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dGhG21x/brBabH+9g/T50LsdW2AZT9lQa/ZmuQmYRQ4=;
+ b=AXqD2tugI4Tsn2zG9QneSgw7jcj09LZbkgwZARX9KXNzAbPg7yPm8HdroyKmeCJ4WGbTgP
+ yNbfFrd9+4E215dnxu0DUB2DVdicBZQxbeFEj9BVv9kjflYGHUfL0DkX/285ZokZnv7kJJ
+ j7DFc9JcFlmqNXBAxSuL5Jwu506bmzg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-o5XWOx81NjCCbkZtuNet4Q-1; Mon, 16 Mar 2020 12:06:55 -0400
+X-MC-Unique: o5XWOx81NjCCbkZtuNet4Q-1
+Received: by mail-wr1-f69.google.com with SMTP id c6so9182040wrm.18
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:06:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=va3NBmW9VPeLqbh+njzNv2dIJgLWDq461h5IT9vGT6A=;
+ b=B4IXl4fK0V0DkW5jI/uUDJ2f3zd6K7LsKvMUyUgTaVzcech9axy4wcqlwYlFXA28mf
+ 8JBsBUVx4YOzO+fcrP9sJS1PJsYQv/A/msif0IT+0+Hfx5p8ZvjT7enMiDEGwYKpdmSr
+ wC/UyFBfaW8zAvGdR761W2COYWeauLpmvi973qRU5XfZMC2s49r+wfM2OaMmqDw/iFfD
+ gXSxRctaFMaJlfjKEZnTwLHaTxJ1brHLNWlWO/3TKgj/6fy2LhIvSmv6KUVJ9+wuHKEt
+ avXExhnREoq5/D+PUtXUEVsYmdmNRabh001WIYPY1m0jVBFWMHkQBo5WiQFmD34wg6U7
+ qNTg==
+X-Gm-Message-State: ANhLgQ0ZCKCYnBXGsvHqI8PFSgwPGP6mqE9HC8h5lBtYjAjyrIZX1JDi
+ Qh9+25BIIY4zcUbB7ZFeoq/oVLLPOdLmVZq9HKyCreWKLZx85LfJfYdxcFSwwItQB+lJcjwITAQ
+ WZiSHclEP/FPKunY=
+X-Received: by 2002:adf:e28b:: with SMTP id v11mr59301wri.229.1584374813953;
+ Mon, 16 Mar 2020 09:06:53 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsw+1a9QL9jAQlQpFFxDwzh9qiZwTfMeMpXHBQWjLbwXCSV+9K1X0BxvHZoZJuaTV1SZQZCVA==
+X-Received: by 2002:adf:e28b:: with SMTP id v11mr59285wri.229.1584374813809;
+ Mon, 16 Mar 2020 09:06:53 -0700 (PDT)
+Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
+ [83.59.163.96])
+ by smtp.gmail.com with ESMTPSA id b12sm483914wro.66.2020.03.16.09.06.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 09:06:53 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG accel
+Date: Mon, 16 Mar 2020 17:06:18 +0100
+Message-Id: <20200316160634.3386-4-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
+References: <20200316160634.3386-1-philmd@redhat.com>
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,222 +102,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+Under KVM the 'Data or unified Cache line Clean by VA to PoP'
+instruction will trap.
 
-Add support for returning a resonable response to Get/Set Features of
-mandatory features.
-
-Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
+Fixes: 0d57b4999 ("Add support for DC CVAP & DC CVADP ins")
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/block/nvme.c       | 60 ++++++++++++++++++++++++++++++++++++++++++-
- hw/block/trace-events |  2 ++
- include/block/nvme.h  |  6 ++++-
- 3 files changed, 66 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ff8975cd6667..eb9c722df968 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1025,7 +1025,15 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-     uint32_t result;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b61ee73d18..924deffd65 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6777,7 +6777,7 @@ static const ARMCPRegInfo rndr_reginfo[] =3D {
+     REGINFO_SENTINEL
+ };
 =20
-+    trace_nvme_dev_getfeat(nvme_cid(req), dw10);
-+
-     switch (dw10) {
-+    case NVME_ARBITRATION:
-+        result =3D cpu_to_le32(n->features.arbitration);
-+        break;
-+    case NVME_POWER_MANAGEMENT:
-+        result =3D cpu_to_le32(n->features.power_mgmt);
-+        break;
-     case NVME_TEMPERATURE_THRESHOLD:
-         result =3D 0;
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+ static void dccvap_writefn(CPUARMState *env, const ARMCPRegInfo *opaque,
+                           uint64_t value)
+ {
+@@ -6820,9 +6820,9 @@ static const ARMCPRegInfo dcpodp_reg[] =3D {
+       .accessfn =3D aa64_cacheop_poc_access, .writefn =3D dccvap_writefn }=
+,
+     REGINFO_SENTINEL
+ };
+-#endif /*CONFIG_USER_ONLY*/
++#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
 =20
-@@ -1046,9 +1054,12 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-             break;
+-#endif
++#endif /* TARGET_AARCH64 */
+=20
+ static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo =
+*ri,
+                                      bool isread)
+@@ -7929,7 +7929,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (cpu_isar_feature(aa64_rndr, cpu)) {
+         define_arm_cp_regs(cpu, rndr_reginfo);
+     }
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+     /* Data Cache clean instructions up to PoP */
+     if (cpu_isar_feature(aa64_dcpop, cpu)) {
+         define_one_arm_cp_reg(cpu, dcpop_reg);
+@@ -7938,8 +7938,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+             define_one_arm_cp_reg(cpu, dcpodp_reg);
          }
+     }
+-#endif /*CONFIG_USER_ONLY*/
+-#endif
++#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
++#endif /* TARGET_AARCH64 */
 =20
-+        break;
-+    case NVME_ERROR_RECOVERY:
-+        result =3D cpu_to_le32(n->features.err_rec);
-         break;
-     case NVME_VOLATILE_WRITE_CACHE:
--        result =3D blk_enable_write_cache(n->conf.blk);
-+        result =3D cpu_to_le32(blk_enable_write_cache(n->conf.blk));
-         trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-         break;
-     case NVME_NUMBER_OF_QUEUES:
-@@ -1058,6 +1069,19 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_get_feature_timestamp(n, cmd);
-+    case NVME_INTERRUPT_COALESCING:
-+        result =3D cpu_to_le32(n->features.int_coalescing);
-+        break;
-+    case NVME_INTERRUPT_VECTOR_CONF:
-+        if ((dw11 & 0xffff) > n->params.max_ioqpairs + 1) {
-+            return NVME_INVALID_FIELD | NVME_DNR;
-+        }
-+
-+        result =3D cpu_to_le32(n->features.int_vector_config[dw11 & 0xff=
-ff]);
-+        break;
-+    case NVME_WRITE_ATOMICITY:
-+        result =3D cpu_to_le32(n->features.write_atomicity);
-+        break;
-     case NVME_ASYNCHRONOUS_EVENT_CONF:
-         result =3D cpu_to_le32(n->features.async_config);
-         break;
-@@ -1093,6 +1117,8 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
-md *cmd, NvmeRequest *req)
-     uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
-     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-=20
-+    trace_nvme_dev_setfeat(nvme_cid(req), dw10, dw11);
-+
-     switch (dw10) {
-     case NVME_TEMPERATURE_THRESHOLD:
-         if (NVME_TEMP_TMPSEL(dw11)) {
-@@ -1120,6 +1146,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-=20
-         break;
-     case NVME_VOLATILE_WRITE_CACHE:
-+        if (blk_enable_write_cache(n->conf.blk)) {
-+            blk_flush(n->conf.blk);
-+        }
-+
-         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
-         break;
-     case NVME_NUMBER_OF_QUEUES:
-@@ -1135,6 +1165,13 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-     case NVME_ASYNCHRONOUS_EVENT_CONF:
-         n->features.async_config =3D dw11;
-         break;
-+    case NVME_ARBITRATION:
-+    case NVME_POWER_MANAGEMENT:
-+    case NVME_ERROR_RECOVERY:
-+    case NVME_INTERRUPT_COALESCING:
-+    case NVME_INTERRUPT_VECTOR_CONF:
-+    case NVME_WRITE_ATOMICITY:
-+        return NVME_FEAT_NOT_CHANGABLE | NVME_DNR;
-     default:
-         trace_nvme_dev_err_invalid_setfeat(dw10);
-         return NVME_INVALID_FIELD | NVME_DNR;
-@@ -1716,6 +1753,25 @@ static void nvme_init_state(NvmeCtrl *n)
-     n->temperature =3D NVME_TEMPERATURE;
-     n->features.temp_thresh_hi =3D NVME_TEMPERATURE_WARNING;
-     n->starttime_ms =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+
-+    /*
-+     * There is no limit on the number of commands that the controller m=
-ay
-+     * launch at one time from a particular Submission Queue.
-+     */
-+    n->features.arbitration =3D NVME_ARB_AB_NOLIMIT;
-+
-+    n->features.int_vector_config =3D g_malloc0_n(n->params.max_ioqpairs=
- + 1,
-+        sizeof(*n->features.int_vector_config));
-+
-+    for (int i =3D 0; i < n->params.max_ioqpairs + 1; i++) {
-+        n->features.int_vector_config[i] =3D i;
-+
-+        /* interrupt coalescing is not supported for the admin queue */
-+        if (i =3D=3D 0) {
-+            n->features.int_vector_config[i] |=3D NVME_INTVC_NOCOALESCIN=
-G;
-+        }
-+    }
-+
-     n->aer_reqs =3D g_new0(NvmeRequest *, n->params.aerl + 1);
- }
-=20
-@@ -1804,6 +1860,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-     id->cqes =3D (0x4 << 4) | 0x4;
-     id->nn =3D cpu_to_le32(n->num_namespaces);
-     id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP=
-);
-+
-     id->psd[0].mp =3D cpu_to_le16(0x9c4);
-     id->psd[0].enlat =3D cpu_to_le32(0x10);
-     id->psd[0].exlat =3D cpu_to_le32(0x4);
-@@ -1879,6 +1936,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->cq);
-     g_free(n->sq);
-     g_free(n->aer_reqs);
-+    g_free(n->features.int_vector_config);
-=20
-     if (n->params.cmb_size_mb) {
-         g_free(n->cmbuf);
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 3952c36774cf..4cf39961989d 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -41,6 +41,8 @@ nvme_dev_del_cq(uint16_t cqid) "deleted completion queu=
-e, sqid=3D%"PRIu16""
- nvme_dev_identify_ctrl(void) "identify controller"
- nvme_dev_identify_ns(uint16_t ns) "identify namespace, nsid=3D%"PRIu16""
- nvme_dev_identify_nslist(uint16_t ns) "identify namespace list, nsid=3D%=
-"PRIu16""
-+nvme_dev_getfeat(uint16_t cid, uint32_t fid) "cid %"PRIu16" fid 0x%"PRIx=
-32""
-+nvme_dev_setfeat(uint16_t cid, uint32_t fid, uint32_t val) "cid %"PRIu16=
-" fid 0x%"PRIx32" val 0x%"PRIx32""
- nvme_dev_getfeat_vwcache(const char* result) "get feature volatile write=
- cache, result=3D%s"
- nvme_dev_getfeat_numq(int result) "get feature number of queues, result=3D=
-%d"
- nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "reque=
-sted cq_count=3D%d sq_count=3D%d, responding with cq_count=3D%d sq_count=3D=
-%d"
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index f2a8b07c0f2f..ecc02fbe8bb8 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -490,7 +490,8 @@ enum NvmeStatusCodes {
-     NVME_FW_REQ_RESET           =3D 0x010b,
-     NVME_INVALID_QUEUE_DEL      =3D 0x010c,
-     NVME_FID_NOT_SAVEABLE       =3D 0x010d,
--    NVME_FID_NOT_NSID_SPEC      =3D 0x010f,
-+    NVME_FEAT_NOT_CHANGABLE     =3D 0x010e,
-+    NVME_FEAT_NOT_NS_SPEC       =3D 0x010f,
-     NVME_FW_REQ_SUSYSTEM_RESET  =3D 0x0110,
-     NVME_CONFLICTING_ATTRS      =3D 0x0180,
-     NVME_INVALID_PROT_INFO      =3D 0x0181,
-@@ -706,6 +707,7 @@ typedef struct NvmeFeatureVal {
- } NvmeFeatureVal;
-=20
- #define NVME_ARB_AB(arb)    (arb & 0x7)
-+#define NVME_ARB_AB_NOLIMIT 0x7
- #define NVME_ARB_LPW(arb)   ((arb >> 8) & 0xff)
- #define NVME_ARB_MPW(arb)   ((arb >> 16) & 0xff)
- #define NVME_ARB_HPW(arb)   ((arb >> 24) & 0xff)
-@@ -713,6 +715,8 @@ typedef struct NvmeFeatureVal {
- #define NVME_INTC_THR(intc)     (intc & 0xff)
- #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
-=20
-+#define NVME_INTVC_NOCOALESCING (0x1 << 16)
-+
- #define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
- #define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
- #define NVME_TEMP_TMPTH(temp)  ((temp >>  0) & 0xffff)
+     if (cpu_isar_feature(any_predinv, cpu)) {
+         define_arm_cp_regs(cpu, predinv_reginfo);
 --=20
-2.25.1
+2.21.1
 
 
