@@ -2,134 +2,90 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E37C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDA7C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:24:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3B71205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:22:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9373F20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="L5Y14zDd";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="aID6pQOz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B71205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iV90Vo5z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9373F20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuNe-0007Ey-33
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:22:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47221)
+	id 1jDuPS-0002m7-ON
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:24:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1jDsUN-0000UT-FU
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:21:17 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtXm-0003hP-O2
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1jDsUL-0004Kc-05
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:21:15 -0400
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:26743)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1jDsUJ-0003rc-5o
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:21:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1584375671; x=1615911671;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=fPg+jc+IvHPUzOBB2FYYnYqnKSb1EDy3DluJkh0bCWg=;
- b=L5Y14zDdGpqCMYnqFi/mQ4+jeg7+PNH3TZP6r5c7/mCHk0pI1uEYaIZg
- UE2s8H44OxCXeRFVHzElYIapezsxjlrQyAQsDlm0x6q7y8U/B7maQFT1/
- mQQF0opGe1t7uOTV4wqzD91YlF1uzBP1FVUSx44JamKbtZXnOpKQiKO15 k=;
-Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 16 Mar 2020 09:21:07 -0700
-Received: from nasanexm01b.na.qualcomm.com ([10.85.0.82])
- by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 16 Mar 2020 09:21:07 -0700
-Received: from eusanexr01e.eu.qualcomm.com (10.85.0.100) by
- NASANEXM01B.na.qualcomm.com (10.85.0.82) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 16 Mar 2020 09:21:06 -0700
-Received: from nasanexm03f.na.qualcomm.com (10.85.0.47) by
- eusanexr01e.eu.qualcomm.com (10.85.0.100) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 16 Mar 2020 09:21:04 -0700
-Received: from NAM04-SN1-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03f.na.qualcomm.com (10.85.0.47) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2 via Frontend Transport; Mon, 16 Mar 2020 09:21:04 -0700
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
- by BYAPR02MB4197.namprd02.prod.outlook.com (2603:10b6:a02:ff::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.22; Mon, 16 Mar
- 2020 16:21:03 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2814.021; Mon, 16 Mar 2020
- 16:21:03 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH v3 1/4] scripts: add a script to generate syscall_nr.h
-Thread-Topic: [PATCH v3 1/4] scripts: add a script to generate syscall_nr.h
-Thread-Index: AQHV+3DS+Ab8fmhERUaut8JIIMz4GKhLY3Uw
-Date: Mon, 16 Mar 2020 16:21:02 +0000
-Message-ID: <BYAPR02MB4886D8ECC90C0845C3BFE27FDEF90@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <20200316085620.309769-1-laurent@vivier.eu>
- <20200316085620.309769-2-laurent@vivier.eu>
-In-Reply-To: <20200316085620.309769-2-laurent@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [70.115.140.19]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8a42ac6b-0793-45e1-2340-08d7c9c60592
-x-ms-traffictypediagnostic: BYAPR02MB4197:
-x-microsoft-antispam-prvs: <BYAPR02MB4197F1A226A61B201814D5E7DEF90@BYAPR02MB4197.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 03449D5DD1
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(199004)(110136005)(54906003)(86362001)(64756008)(8936002)(66476007)(66556008)(33656002)(66446008)(8676002)(498600001)(186003)(6506007)(53546011)(71200400001)(26005)(5660300002)(81166006)(81156014)(52536014)(4326008)(2906002)(7696005)(55016002)(76116006)(9686003)(66946007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4197;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: X21UOsfFv5yJEUDfLA0nnAwCPELpXMhfBMm/aer3nyRHMRvDzF0SFvPhGYcaaZjSAMePSsolpc/oOQm+DhRWPqhnkfGaC8+KnoW8W+4J1ZposWlXgbJ5NdziTVCvMvNRV5O+8DSxIpzlXX6MR/V6TE1R8J4D+mXfRTeUOQBeHnZAeey53x2mKz6yjuLyiYxuDYNFpaxuxBNEwx0+SBQ+q1oRikOg+7u9w0S+zl8VmBjs/oZPxgiijMpnQhW7VYkG7PzTRWAEJuwd4mauI2on/jDAWAX8n5U5s0vxSDehg2GSXgzhM+fWFCnutiJ2by/NilhKlh1beMl7z1NC0jUE5XOjDEVcWp/SA2HZNg6GZqNYaGTZMfLF+gEf4vBSU+8SCknwGPD/xG6xPMrQ7TZlOWSENeqt98kBW0ADjjj7sp1rxuqnOp0Er0Rxn522ghTP
-x-ms-exchange-antispam-messagedata: 8oFzRjSj37ip91X9taDhFCuRdcgrmVO64C9QvVL24YqfRQS8h+0HdtepE+4bbJDtDiMaSwSTqQIocwnb0be1pRneEt6B+oljbGm79Ox37r0yP1b9WCfmLdgQPZp+AnyENef+4p02qkouBCOebf4szg==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SWOyjJrrchqXeDB0L6ABzGEvYZowgDt9U5AJh4We24zfbsxPN/InyeLSEaPnOZglFOwP6FMgniSqH2ddoyFOu+iMYI4Foe6sRIZdDT/K8JbzY0tXslGfVRakCgxnAnT+/FyJyRP9QrEgOmQzqJfldYPoUBHLTz8NeecugEjoVyjIgsxn+U6mQDNnkpJH8aVYBWhJU/PMF/9vvzembdtLaoOQ+aXK495ysjsZ+8+sS0CaCM+vBKixBR+5PwqAXbu6sjGF2zxoEZUjg9vh0C09IAnJ+u9PoWdCtKv8AtnJ6e+U19dr/vbJ83WwQrwRyy/af1U1//eB/g9FYGZmUKpmsA==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PcitaUP2psmXDvGNOWvQixTcty/DoPn1ZyfDLegjO3Q=;
- b=WY6tFuBnOs6KuYYxWvqUOFZDeFz9/EuvPRy0KrHkvT3sMShsyQeqqAHN1uqASmlN7l7nhgOJtlFevXYXgBQeTcECJsQ6zbm9F/fxKPLCcj00vEKgx2zX6RTAcUVNOhP67C7WNKePcULRXdcyF9ZqidT4TC1pOCQQxCD/2i8xzV8PEblEPgSof4WdKi9Tf4ZugUCS4UooIEtlioUr8lYVJi92ptSLwQX8dgjhxbLELwt0wAlisawseU0mEWzVFrRox3Bv47Ojm5iJQN5M2VL6leDZMXBkRuh6IOE8hw3CGoWOmf91OxurhRvvpjyP83c5lf4MuLCHSAnZV6nEHr+B6A==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PcitaUP2psmXDvGNOWvQixTcty/DoPn1ZyfDLegjO3Q=;
- b=aID6pQOzRYmE/GQI9SuVPP50HBcH6BFMH9aW7tge4x1i8HwUDN1eF3iFka3K/SxVb5yEGFtHhymx4YvrkTXfoH4Z8nwSm4AZJRE2yjoemBxgsd9c+sIouOEuHOzKWgta6ny32+o6Tmw7uM8436pKqDF3Gd4kY2tTCUdjpCvvOYQ=
-x-ms-exchange-crosstenant-network-message-id: 8a42ac6b-0793-45e1-2340-08d7c9c60592
-x-ms-exchange-crosstenant-originalarrivaltime: 16 Mar 2020 16:21:02.8786 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: 2wqPAe5+DddUop1WxjBL7Ojjo4obTV9UAJ2HzH1lLuXxNajZHy/WLaPEz2SqvW66dCocPIkc6+T9cGHzQMvpDQ==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4197
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtXj-00023c-HP
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:50 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35441)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jDtXf-0001xk-E8
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:44 -0400
+Received: by mail-wm1-x342.google.com with SMTP id m3so19006973wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yUqZL/+EsOIhpSixaMOYl0gTsp0kyBV675HHFe8iFMo=;
+ b=iV90Vo5zQtHo+/3KEwDM+d2FBYneCuuNVz8T4cqYF7PpyzXfLxiUjcUR0wvmV0GfvY
+ +/OBoRORhWOTMX7FqIg/EwZ2iaxt/K7B6F9Wu2xfFuhDo5YZgxLCP6fznU3zHb9lWjQ+
+ rkBuFehiHClM13lSss4v+Repuu8e39M4kzYgtw3NqU5Bhdse5tkEuxaIOcSiC0E0kNeO
+ btGkMcIql6d4ZrqQUmY+y9xI3yfclLQeqK4zhpViH+E/7AXf4dovBglp82kqo7iCt4HL
+ Eh3WHQJ39Ll8CQsV19w089Jh8uCqx6rP1rZcBi9uzRKEd7K7CmCpAdP9kvjx+Q+ueTWW
+ 9qwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=yUqZL/+EsOIhpSixaMOYl0gTsp0kyBV675HHFe8iFMo=;
+ b=nWlsLyxibn++Iz/2Q4W7bVpuT/fLl9Jev/sNutrCkuU9o1v9Nix7ndqsm+G2TeWqru
+ X6gKODiTiXbfk8TMsWi1v0CfeOTW7RHWQts32WzFyhaApT+QmxEOEjK/Frj0fTqO0vmo
+ 4CUAWifuU8XwcIvWKDceM9rpdV3cdKPu3JFI1PG/22l7LZcsqJxC2sv6akXqefD72FIA
+ /6/gbZ98EzBRE90RcRmYuMW2HVVzYiGi/bYw/wadenEoi6X0Ky8uc003Pj0K/R+yCTFw
+ 6Goc6wjzTQ+t9QVqh6x+HJkOIk2zHvIlnOnNYgLjwrfFXJgzan2mN7CaRoDQ4HNSTC+2
+ joRA==
+X-Gm-Message-State: ANhLgQ2XjvrLGLp62/KLqQzGL3tXGNlUX+qAIPEyvz50nx4WDk56Hj3t
+ 7J/4FzIMUGrwZEGvui+UUnmxwQ==
+X-Google-Smtp-Source: ADFU+vsTbxJ0mDaj7IKSkZgExZLDl3LO+cxeuSbsqOtEuiRkeysTsjWFfXSx+eC8+gXh4f2hwj1QCw==
+X-Received: by 2002:a05:600c:258:: with SMTP id 24mr163187wmj.59.1584379718264; 
+ Mon, 16 Mar 2020 10:28:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x17sm465210wmi.28.2020.03.16.10.28.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 10:28:35 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 17D241FFA6;
+ Mon, 16 Mar 2020 17:21:57 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 18/28] target/arm: generate xml description of our SVE
+ registers
+Date: Mon, 16 Mar 2020 17:21:45 +0000
+Message-Id: <20200316172155.971-19-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
+References: <20200316172155.971-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: quicinc.com
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,52 +97,377 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We also expose a the helpers to read/write the the registers.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 
-> -----Original Message-----
-> From: Laurent Vivier <laurent@vivier.eu>
-> Sent: Monday, March 16, 2020 3:56 AM
-> To: qemu-devel@nongnu.org
-> Cc: Laurent Vivier <laurent@vivier.eu>; Richard Henderson
-> <richard.henderson@linaro.org>; Riku Voipio <riku.voipio@iki.fi>; Taylor
-> Simpson <tsimpson@quicinc.com>; Alistair Francis
-> <alistair.francis@wdc.com>
-> Subject: [PATCH v3 1/4] scripts: add a script to generate syscall_nr.h
->
-> This script is needed for targets based on asm-generic syscall numbers
-> generation
->
-> +
-> +filter_defines()
-> +{
-> +    grep -e "#define __NR_" -e "#define __NR3264"
+---
+v2
+  - instead of zNpM expose zN at sve_max_vq width
+  - wrap union in union q(us), d(usf), s(usf), h(usf), b(us)
+v3
+  - add a vg pseudo register for current width
+  - spacing fixes
+  - use switch/case for whole group
+  - drop fpsr_pos marker
+  - remove unused variables
+v4
+  - const-ify vec_lanes
+  - drop vg
+v6
+  - restore vg based on sve_zcr_len_for_el(env, arm_current_el(env)) + 1)
+v7
+  - vg = vq * 2
+---
+ target/arm/cpu.h     |   7 ++-
+ target/arm/gdbstub.c | 134 +++++++++++++++++++++++++++++++++++++++++++
+ target/arm/helper.c  | 125 +++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 261 insertions(+), 5 deletions(-)
 
-For Hexagon, we're still running a 4.9 kernel.  When I tried out this scrip=
-t on that code base, there are a handful of these
-    #undef __NR_syscalls
-    #define __NR_syscalls 291
-This works fine with normal C preprocessing, and the last one wins.  Howeve=
-r, when the #undef's are filtered out, it lease to build errors from multip=
-le #define's of TARGET_NR_syscalls.  AFAIK, qemu doesn't use this, so it sh=
-ould be OK to filter out.  So, I changed the above line to
-    grep -e "#define __NR_" -e "#define __NR3264" | grep -v "__NR_syscalls"
-
-If you're OK incorporating that now, great!  Otherwise, I'll add it to the =
-Hexagon RFC patch series until we get to a newer kernel.
-
-Thanks,
-Taylor
-
-
-> +}
-> +
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index fbfd73a7b5b..8b9f2961ba0 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -756,6 +756,7 @@ struct ARMCPU {
+     int32_t cpreg_vmstate_array_len;
+ 
+     DynamicGDBXMLInfo dyn_sysreg_xml;
++    DynamicGDBXMLInfo dyn_svereg_xml;
+ 
+     /* Timers used by the generic (architected) timer */
+     QEMUTimer *gt_timer[NUM_GTIMERS];
+@@ -977,10 +978,12 @@ hwaddr arm_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
+ int arm_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ 
+-/* Dynamically generates for gdb stub an XML description of the sysregs from
+- * the cp_regs hashtable. Returns the registered sysregs number.
++/*
++ * Helpers to dynamically generates XML descriptions of the sysregs
++ * and SVE registers. Returns the number of registers in each set.
+  */
+ int arm_gen_dynamic_sysreg_xml(CPUState *cpu, int base_reg);
++int arm_gen_dynamic_svereg_xml(CPUState *cpu, int base_reg);
+ 
+ /* Returns the dynamically generated XML for the gdb stub.
+  * Returns a pointer to the XML contents for the specified XML file or NULL
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index 69c35462a63..d9ef7d2187c 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -171,12 +171,146 @@ int arm_gen_dynamic_sysreg_xml(CPUState *cs, int base_reg)
+     return cpu->dyn_sysreg_xml.num;
+ }
+ 
++struct TypeSize {
++    const char *gdb_type;
++    int  size;
++    const char sz, suffix;
++};
++
++static const struct TypeSize vec_lanes[] = {
++    /* quads */
++    { "uint128", 128, 'q', 'u' },
++    { "int128", 128, 'q', 's' },
++    /* 64 bit */
++    { "uint64", 64, 'd', 'u' },
++    { "int64", 64, 'd', 's' },
++    { "ieee_double", 64, 'd', 'f' },
++    /* 32 bit */
++    { "uint32", 32, 's', 'u' },
++    { "int32", 32, 's', 's' },
++    { "ieee_single", 32, 's', 'f' },
++    /* 16 bit */
++    { "uint16", 16, 'h', 'u' },
++    { "int16", 16, 'h', 's' },
++    { "ieee_half", 16, 'h', 'f' },
++    /* bytes */
++    { "uint8", 8, 'b', 'u' },
++    { "int8", 8, 'b', 's' },
++};
++
++
++int arm_gen_dynamic_svereg_xml(CPUState *cs, int base_reg)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    GString *s = g_string_new(NULL);
++    DynamicGDBXMLInfo *info = &cpu->dyn_svereg_xml;
++    g_autoptr(GString) ts = g_string_new("");
++    int i, bits, reg_width = (cpu->sve_max_vq * 128);
++    info->num = 0;
++    g_string_printf(s, "<?xml version=\"1.0\"?>");
++    g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
++    g_string_append_printf(s, "<feature name=\"org.qemu.gdb.aarch64.sve\">");
++
++    /* First define types and totals in a whole VL */
++    for (i = 0; i < ARRAY_SIZE(vec_lanes); i++) {
++        int count = reg_width / vec_lanes[i].size;
++        g_string_printf(ts, "vq%d%c%c", count,
++                        vec_lanes[i].sz, vec_lanes[i].suffix);
++        g_string_append_printf(s,
++                               "<vector id=\"%s\" type=\"%s\" count=\"%d\"/>",
++                               ts->str, vec_lanes[i].gdb_type, count);
++    }
++    /*
++     * Now define a union for each size group containing unsigned and
++     * signed and potentially float versions of each size from 128 to
++     * 8 bits.
++     */
++    for (bits = 128; bits >= 8; bits /= 2) {
++        int count = reg_width / bits;
++        g_string_append_printf(s, "<union id=\"vq%dn\">", count);
++        for (i = 0; i < ARRAY_SIZE(vec_lanes); i++) {
++            if (vec_lanes[i].size == bits) {
++                g_string_append_printf(s, "<field name=\"%c\" type=\"vq%d%c%c\"/>",
++                                       vec_lanes[i].suffix,
++                                       count,
++                                       vec_lanes[i].sz, vec_lanes[i].suffix);
++            }
++        }
++        g_string_append(s, "</union>");
++    }
++    /* And now the final union of unions */
++    g_string_append(s, "<union id=\"vq\">");
++    for (bits = 128; bits >= 8; bits /= 2) {
++        int count = reg_width / bits;
++        for (i = 0; i < ARRAY_SIZE(vec_lanes); i++) {
++            if (vec_lanes[i].size == bits) {
++                g_string_append_printf(s, "<field name=\"%c\" type=\"vq%dn\"/>",
++                                       vec_lanes[i].sz, count);
++                break;
++            }
++        }
++    }
++    g_string_append(s, "</union>");
++
++    /* Then define each register in parts for each vq */
++    for (i = 0; i < 32; i++) {
++        g_string_append_printf(s,
++                               "<reg name=\"z%d\" bitsize=\"%d\""
++                               " regnum=\"%d\" group=\"vector\""
++                               " type=\"vq\"/>",
++                               i, reg_width, base_reg++);
++        info->num++;
++    }
++    /* fpscr & status registers */
++    g_string_append_printf(s, "<reg name=\"fpsr\" bitsize=\"32\""
++                           " regnum=\"%d\" group=\"float\""
++                           " type=\"int\"/>", base_reg++);
++    g_string_append_printf(s, "<reg name=\"fpcr\" bitsize=\"32\""
++                           " regnum=\"%d\" group=\"float\""
++                           " type=\"int\"/>", base_reg++);
++    info->num += 2;
++    /*
++     * Predicate registers aren't so big they are worth splitting up
++     * but we do need to define a type to hold the array of quad
++     * references.
++     */
++    g_string_append_printf(s,
++                           "<vector id=\"vqp\" type=\"uint16\" count=\"%d\"/>",
++                           cpu->sve_max_vq);
++    for (i = 0; i < 16; i++) {
++        g_string_append_printf(s,
++                               "<reg name=\"p%d\" bitsize=\"%d\""
++                               " regnum=\"%d\" group=\"vector\""
++                               " type=\"vqp\"/>",
++                               i, cpu->sve_max_vq * 16, base_reg++);
++        info->num++;
++    }
++    g_string_append_printf(s,
++                           "<reg name=\"ffr\" bitsize=\"%d\""
++                           " regnum=\"%d\" group=\"vector\""
++                           " type=\"vqp\"/>",
++                           cpu->sve_max_vq * 16, base_reg++);
++    g_string_append_printf(s,
++                           "<reg name=\"vg\" bitsize=\"64\""
++                           " regnum=\"%d\" group=\"vector\""
++                           " type=\"uint32\"/>",
++                           base_reg++);
++    info->num += 2;
++    g_string_append_printf(s, "</feature>");
++    cpu->dyn_svereg_xml.desc = g_string_free(s, false);
++
++    return cpu->dyn_svereg_xml.num;
++}
++
++
+ const char *arm_gdb_get_dynamic_xml(CPUState *cs, const char *xmlname)
+ {
+     ARMCPU *cpu = ARM_CPU(cs);
+ 
+     if (strcmp(xmlname, "system-registers.xml") == 0) {
+         return cpu->dyn_sysreg_xml.desc;
++    } else if (strcmp(xmlname, "sve-registers.xml") == 0) {
++        return cpu->dyn_svereg_xml.desc;
+     }
+     return NULL;
+ }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 90135731353..7e560ea7db6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -202,6 +202,15 @@ static void write_raw_cp_reg(CPUARMState *env, const ARMCPRegInfo *ri,
+     }
+ }
+ 
++/**
++ * arm_get/set_gdb_*: get/set a gdb register
++ * @env: the CPU state
++ * @buf: a buffer to copy to/from
++ * @reg: register number (offset from start of group)
++ *
++ * We return the number of bytes copied
++ */
++
+ static int arm_gdb_get_sysreg(CPUARMState *env, GByteArray *buf, int reg)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -225,6 +234,102 @@ static int arm_gdb_set_sysreg(CPUARMState *env, uint8_t *buf, int reg)
+     return 0;
+ }
+ 
++#ifdef TARGET_AARCH64
++static int arm_gdb_get_svereg(CPUARMState *env, GByteArray *buf, int reg)
++{
++    ARMCPU *cpu = env_archcpu(env);
++
++    switch (reg) {
++    /* The first 32 registers are the zregs */
++    case 0 ... 31:
++    {
++        int vq, len = 0;
++        for (vq = 0; vq < cpu->sve_max_vq; vq++) {
++            len += gdb_get_reg128(buf,
++                                  env->vfp.zregs[reg].d[vq * 2 + 1],
++                                  env->vfp.zregs[reg].d[vq * 2]);
++        }
++        return len;
++    }
++    case 32:
++        return gdb_get_reg32(buf, vfp_get_fpsr(env));
++    case 33:
++        return gdb_get_reg32(buf, vfp_get_fpcr(env));
++    /* then 16 predicates and the ffr */
++    case 34 ... 50:
++    {
++        int preg = reg - 34;
++        int vq, len = 0;
++        for (vq = 0; vq < cpu->sve_max_vq; vq = vq + 4) {
++            len += gdb_get_reg64(buf, env->vfp.pregs[preg].p[vq / 4]);
++        }
++        return len;
++    }
++    case 51:
++    {
++        /*
++         * We report in Vector Granules (VG) which is 64bit in a Z reg
++         * while the ZCR works in Vector Quads (VQ) which is 128bit chunks.
++         */
++        int vq = sve_zcr_len_for_el(env, arm_current_el(env)) + 1;
++        return gdb_get_reg32(buf, vq * 2);
++    }
++    default:
++        /* gdbstub asked for something out our range */
++        qemu_log_mask(LOG_UNIMP, "%s: out of range register %d", __func__, reg);
++        break;
++    }
++
++    return 0;
++}
++
++static int arm_gdb_set_svereg(CPUARMState *env, uint8_t *buf, int reg)
++{
++    ARMCPU *cpu = env_archcpu(env);
++
++    /* The first 32 registers are the zregs */
++    switch (reg) {
++    /* The first 32 registers are the zregs */
++    case 0 ... 31:
++    {
++        int vq, len = 0;
++        uint64_t *p = (uint64_t *) buf;
++        for (vq = 0; vq < cpu->sve_max_vq; vq++) {
++            env->vfp.zregs[reg].d[vq * 2 + 1] = *p++;
++            env->vfp.zregs[reg].d[vq * 2] = *p++;
++            len += 16;
++        }
++        return len;
++    }
++    case 32:
++        vfp_set_fpsr(env, *(uint32_t *)buf);
++        return 4;
++    case 33:
++        vfp_set_fpcr(env, *(uint32_t *)buf);
++        return 4;
++    case 34 ... 50:
++    {
++        int preg = reg - 34;
++        int vq, len = 0;
++        uint64_t *p = (uint64_t *) buf;
++        for (vq = 0; vq < cpu->sve_max_vq; vq = vq + 4) {
++            env->vfp.pregs[preg].p[vq / 4] = *p++;
++            len += 8;
++        }
++        return len;
++    }
++    case 51:
++        /* cannot set vg via gdbstub */
++        return 0;
++    default:
++        /* gdbstub asked for something out our range */
++        break;
++    }
++
++    return 0;
++}
++#endif /* TARGET_AARCH64 */
++
+ static bool raw_accessors_invalid(const ARMCPRegInfo *ri)
+ {
+    /* Return true if the regdef would cause an assertion if you called
+@@ -7959,9 +8064,22 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+     CPUARMState *env = &cpu->env;
+ 
+     if (arm_feature(env, ARM_FEATURE_AARCH64)) {
+-        gdb_register_coprocessor(cs, aarch64_fpu_gdb_get_reg,
+-                                 aarch64_fpu_gdb_set_reg,
+-                                 34, "aarch64-fpu.xml", 0);
++        /*
++         * The lower part of each SVE register aliases to the FPU
++         * registers so we don't need to include both.
++         */
++#ifdef TARGET_AARCH64
++        if (isar_feature_aa64_sve(&cpu->isar)) {
++            gdb_register_coprocessor(cs, arm_gdb_get_svereg, arm_gdb_set_svereg,
++                                     arm_gen_dynamic_svereg_xml(cs, cs->gdb_num_regs),
++                                     "sve-registers.xml", 0);
++        } else
++#endif
++        {
++            gdb_register_coprocessor(cs, aarch64_fpu_gdb_get_reg,
++                                     aarch64_fpu_gdb_set_reg,
++                                     34, "aarch64-fpu.xml", 0);
++        }
+     } else if (arm_feature(env, ARM_FEATURE_NEON)) {
+         gdb_register_coprocessor(cs, vfp_gdb_get_reg, vfp_gdb_set_reg,
+                                  51, "arm-neon.xml", 0);
+@@ -7975,6 +8093,7 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+     gdb_register_coprocessor(cs, arm_gdb_get_sysreg, arm_gdb_set_sysreg,
+                              arm_gen_dynamic_sysreg_xml(cs, cs->gdb_num_regs),
+                              "system-registers.xml", 0);
++
+ }
+ 
+ /* Sort alphabetically by type name, except for "any". */
+-- 
+2.20.1
 
 
