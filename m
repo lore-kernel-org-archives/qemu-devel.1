@@ -2,83 +2,94 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8153DC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED2E3C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B18D2051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8E0420575
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4wk6LOH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B18D2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WkfX1AtK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E0420575
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDqAB-00029T-UE
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 09:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46896)
+	id 1jDqJM-0005pb-C9
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:01:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDoy8-0000U9-KQ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:47 -0400
+ (envelope-from <liran.alon@oracle.com>) id 1jDobm-0000Uq-7P
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDoy7-0007OR-FR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31539
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDoy7-0007Ik-8J
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584362142;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AwGbThKUayZFmTsEgOSli9T1zKZzRE8pFg9snwazUkk=;
- b=C4wk6LOHBL643Br33Jr1UMxkucsljg7AkD/LEEQxDKd8oM6d5MZul3ZabXUx8mMBW/jS9b
- /nlz4FevqFX2TbJmPU+qsFN/teNzHW3Rk3cZm58nxv0conVuxNsZVr1HXn2VwnSzvpV8GF
- N+iJe7J7CL9iDiZyx9fInX/Ug1/ah9w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-aM25U8FNP1CrgSwCFkqf8A-1; Mon, 16 Mar 2020 08:35:40 -0400
-X-MC-Unique: aM25U8FNP1CrgSwCFkqf8A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EACB9DB67;
- Mon, 16 Mar 2020 12:35:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
- [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D4410027A7;
- Mon, 16 Mar 2020 12:35:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 129841138404; Mon, 16 Mar 2020 13:35:38 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] net: Complete qapi-fication of netdev_add
-References: <20200312211440.3767626-1-eblake@redhat.com>
- <877dznewyh.fsf@dusky.pond.sub.org>
-Date: Mon, 16 Mar 2020 13:35:38 +0100
-In-Reply-To: <877dznewyh.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Fri, 13 Mar 2020 23:01:10 +0100")
-Message-ID: <87o8swiijp.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <liran.alon@oracle.com>) id 1jDobk-0007kv-Hd
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:37 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46460)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+ id 1jDobk-00077w-6R
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:36 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02GC8iX7066974;
+ Mon, 16 Mar 2020 12:12:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=ReZQJWcnA6vBF7ZqTDr4kwx19RG8syAyKejIDYPf+yc=;
+ b=WkfX1AtKu/QKWuTFWYhVxJ5nZEQC4CdY/mjMZ6k1mhaBuinnsTseiuDxMYifhj5OXqgd
+ Ufki093hNJRlkLjFIN3qWl2clgLjKTJiHLq9pLQxJHKPi72Jo9v3SWNJDrPFvj8bX550
+ zecuAK2nYjY6JbEdTrN63CWZwfka2sblYMY+7b6e1KCoFhpFvj3cAPU2ShTYgkfo46YA
+ 5VmXjoJEfTMZojIcvMR+w0S0W82lSpGEquMN4Ddfp6ER1idvxpxgJbV52fITln3Xwsah
+ pyQtyYtmo3M78JQIpJF1umDv7QWgqIZ9Yy5gX8K8bU15Vs5BlCpVCrRwApzzAUndHuUm Cg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2yrq7kpg4m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Mar 2020 12:12:21 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02GC8LSx041307;
+ Mon, 16 Mar 2020 12:12:21 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 2ys8yvp776-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Mar 2020 12:12:21 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02GCCJax026561;
+ Mon, 16 Mar 2020 12:12:19 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 16 Mar 2020 05:12:18 -0700
+From: Liran Alon <liran.alon@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] hw/scsi/vmw_pvscsi: Remove assertion for kick after reset
+Date: Mon, 16 Mar 2020 14:14:28 +0200
+Message-Id: <20200316121428.48723-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9561
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ mlxlogscore=999 mlxscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 spamscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003160061
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9561
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 suspectscore=1
+ adultscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
+ malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2003160061
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,81 +101,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lekiravi@yandex-team.ru, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com,
+ liran.alon@oracle.com, elazar@vastdata.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+From: Elazar Leibovich <elazar.leibovich@oracle.com>
 
-[...]
-> We better check all other uses of option group "netdev".
+When running Ubuntu 3.13.0-65-generic guest, QEMU sometimes crashes
+during guest ACPI reset. It crashes on assert(s->rings_info_valid)
+in pvscsi_process_io().
 
-To the best of my grepping abilities:
+Analyzing the crash revealed that it happens when userspace issues
+a sync during a reboot syscall.
 
-=3D Definition =3D
+Below are backtraces we gathered from the guests.
 
-* qemu_netdev_opts
+Guest backtrace when issuing PVSCSI_CMD_ADAPTER_RESET:
+    pci_device_shutdown
+    device_shutdown
+    init_pid_ns
+    init_pid_ns
+    kernel_power_off
+    SYSC_reboot
 
-  Option group definition, with empty .desc[].
+Guest backtrace when issuing PVSCSI_REG_OFFSET_KICK_RW_IO:
+    scsi_done
+    scsi_dispatch_cmd
+    blk_add_timer
+    scsi_request_fn
+    elv_rb_add
+    __blk_run_queue
+    queue_unplugged
+    blk_flush_plug_list
+    blk_finish_plug
+    ext4_writepages
+    set_next_entity
+    do_writepages
+    __filemap_fdatawrite_range
+    filemap_write_and_wait_range
+    ext4_sync_file
+    ext4_sync_file
+    do_fsync
+    sys_fsync
 
-=3D CLI =3D
+Since QEMU pvscsi should imitate VMware pvscsi device emulation,
+we decided to imitate VMware's behavior in this case.
 
-Keep in mind: we finish processing CLI netdev before we start monitors
-(we call net_init_clients() is mon_init_func()).  Monitor commands can
-mess with CLI netdevs, but CLI cannot mess with monitor netdevs.
+To check VMware behavior, we wrote a kernel module that issues
+a reset to the pvscsi device and then issues a kick. We ran it on
+VMware ESXi 6.5 and it seems that it simply ignores the kick.
+Hence, we decided to ignore the kick as well.
 
-* main()
+Signed-off-by: Elazar Leibovich <elazar.leibovich@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ hw/scsi/vmw_pvscsi.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-  - case QEMU_OPTION_netdev
-
-    Straighforward parse of option argument; record in
-    @qemu_netdev_opts.
-
-  - case QEMU_OPTION_readconfig
-
-    Similar.
-
-  - case QEMU_OPTION_writeconfig
-
-    "Unparse" of @qemu_netdev_opts.  Can contains only CLI netdevs.
-
-* net_init_clients()
-
-  Pass the CLI netdevs to net_client_init().
-
-=3D Monitor =3D
-
-* hmp_netdev_add()
-
-  Straighforward parse of command argument (record in
-  @qemu_netdev_opts), pass to net_client_init() via netdev_add().
-
-* qmp_netdev_add()
-
-  Before your patch: convert from JSON to QemuOpts (record in
-  @qemu_netdev_opts), pass to net_client_init() via netdev_add().
-
-  Note: net_client_init() converts QemuOpts to QAPI type Netdev, and
-  passes that to net_client_init1().
-
-  Afterwards: convert JSON straight to Netdev, pass to
-  net_client_init1().  Also create in @qemu_netdev_opts, but empty apart
-  from ID.
-
-* qmp_netdev_del()
-* netdev_del_completion()
-
-  Both implement a "NetClientState is a netdev" predicate by checking
-  "@qemu_netdev_opts has an entry with this name".
-
-Looks like the only thing we do with the QemuOpts recorded in
-@qemu_netdev_opts is checking existence.  Your patch preserves that.  I
-doesn't preserve the option parameters, but they are not used.  Okay.
-
-The correctness argument becomes simpler if we implement the "is a
-netdev" predicate without @qemu_netdev_opts.  Could be done either
-before or after this patch.
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index c91352cf46de..2491f204ddd7 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -29,6 +29,7 @@
+ #include "qapi/error.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/module.h"
++#include "qemu/log.h"
+ #include "hw/scsi/scsi.h"
+ #include "migration/vmstate.h"
+ #include "scsi/constants.h"
+@@ -719,7 +720,12 @@ pvscsi_process_io(PVSCSIState *s)
+     PVSCSIRingReqDesc descr;
+     hwaddr next_descr_pa;
+ 
+-    assert(s->rings_info_valid);
++    if (!s->rings_info_valid) {
++        qemu_log("WARNING: PVSCSI: Cannot process I/O when "
++                 "rings are not valid.\n");
++        return;
++    }
++
+     while ((next_descr_pa = pvscsi_ring_pop_req_descr(&s->rings)) != 0) {
+ 
+         /* Only read after production index verification */
+-- 
+2.20.1
 
 
