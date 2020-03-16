@@ -2,86 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5A4C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72937C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6BAB20719
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:33:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D29720663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:35:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2LmqH8G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6BAB20719
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5OeceMG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D29720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDsfu-0007Gd-2o
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:33:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49137)
+	id 1jDshx-0001Dc-2S
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:35:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npiggin@gmail.com>) id 1jDqiB-0007Ze-IB
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:27:25 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jDqhm-0007Nw-9H
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npiggin@gmail.com>) id 1jDqiA-0004Wp-H3
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:27:23 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46725)
+ (envelope-from <npiggin@gmail.com>) id 1jDqhl-00005A-AR
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:26:58 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36326)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <npiggin@gmail.com>)
- id 1jDqi7-0003xO-MN; Mon, 16 Mar 2020 10:27:19 -0400
-Received: by mail-pf1-x443.google.com with SMTP id c19so10020115pfo.13;
- Mon, 16 Mar 2020 07:27:19 -0700 (PDT)
+ id 1jDqhh-00082R-SZ; Mon, 16 Mar 2020 10:26:54 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id nu11so5546603pjb.1;
+ Mon, 16 Mar 2020 07:26:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xoJs9JmfNpjFP9lD5gKsVcM5Uv6sOBouIT9l/N6aKbw=;
- b=f2LmqH8Gfi09naAZnCcoCiAqT69lfJyqeGyfVw42FZHuUAv1C+SX/SW5gjSFWQhhFx
- dTvkVUpgq1ODDFCk+0u2jHLg9IX20O8n305r9HbusgE74CCekh7z4GhXjq+I/sYd8mzw
- B394VkBq+YKxGT/DX5ic359e/6t+OmaNCcQd9EwvbKuj6si9hcwq6xydAk1jLA9SF8rE
- RwM6PI++I5gF34wtHcacd/ZhleBwDFry76o0kZyzpW2bv9mVqn1IlZPYJxmCjuH4/hVg
- epGQ0j4ceQ4UcViy3XWSHqpOiDUXn6P+5v09bBKKF7vznBEeyhT8ovHGgGGjT7cHCskZ
- /2FQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i5D0yWQL9Fea9nHxAcnwd4Pw7HLyVMj68QCZAf63FYA=;
+ b=e5OeceMGPC6F5sYOBXp2yqPDd8sVtEEkb0D/70PQx0/AxzH6t7k0FkvRBfLIAdXxv5
+ 974S6/eUm25qFMExIWf3uW9HGAZa9a28+C9RyCoXE+tJE3pbuIBSZ/Ndwft3ICWG4iaT
+ CrtUwnP6ZCbtA8bJ47tZBsLjXNfzhkZ6UxJ2qoXnUxW8JWebsd7gImiDvmLp0L8yxeQM
+ M9SxVqABIomzRP4hx1L4JL18VEblfkDjdRmKAc56LWzOblCl+KhhT0iYeuZfnH/aZ0MC
+ rcz2vZwybU5O5mp3rz9bAObtGQ/9AeYFegXf1L6PvVcszl/xIJV8D1lFtkVO5HUR5drJ
+ Wh+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xoJs9JmfNpjFP9lD5gKsVcM5Uv6sOBouIT9l/N6aKbw=;
- b=pigqx2hLq8SuAMaKWFWiOD2ny2Mh9kJfnqh2CHfzFRFaknOaKuaaVGR1qhu7RWkwGd
- QtB/gC+9mEnN+7B3qND9HcBhtjA6+IMzLkJMdXYe9efeDcG90B2h0nZTEJroZW6qfzRr
- sroQlH+25PblY6B9oAj/nAO0A3OEQ5m2cLS7foT/v2MhyykUuOmvREXMYvxN5OlQIVtF
- ReSP1VXUCRqtX3fIrlsyQjw9iInoryDTpq8nxs5k9Eam0aG0iD3jMYje4mwLflPDvwU1
- 3hBmGzrAuyFFTl4JWf2yxMsX+J6szIia+G4JXEnhhHdNmTJyqesVltShfmhIIzMaGRDh
- oIyA==
-X-Gm-Message-State: ANhLgQ1C+NXqijhNlJF6oPPTFR3mmbWhODAlcyOkohRE2zeCYXtixiQw
- Zj2lwcxywbkUmx9oykmX9SRYcdkCRUc=
-X-Google-Smtp-Source: ADFU+vth6saRD+39UwULMq4tukN+3zxkwyb1qLhjY9w+XT8k6AKcjosPoHiIWK6PGDu2ft3UCiyJFw==
-X-Received: by 2002:a63:5011:: with SMTP id e17mr139169pgb.338.1584368838557; 
- Mon, 16 Mar 2020 07:27:18 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i5D0yWQL9Fea9nHxAcnwd4Pw7HLyVMj68QCZAf63FYA=;
+ b=O/WttuuqdTjGJIeL/IBnu/0cHbwAHvG5bHob5u9ly+sicMcP799ScL/dOQKVTP6Kfb
+ YYWRZ1MINursJnCkXzJb3YCy5zlAxGDhzdbUZeoCeZsvnPV8h7QryDrlZzGWSSFIp/ab
+ wcHoBCZ5R243170HpLZ5uKlT//zXzmD9BYQPsjL/Mr+6QRYOtjHvvAeYC+RbwO6IlESl
+ cKet+/BrEv11S77+5RWvzMljKxJKX6Eval6XcaPxbs35cNkLQ+jy/2BURh5bd1+Nd7Xi
+ PQeU4zbsK0befAoEKoW1ft2Xh+mYQZPuzpoUW9gM84fBR3hi9Br3pyym5VIw/66CRXUs
+ B24A==
+X-Gm-Message-State: ANhLgQ2ZAwGcokbgi0GlukJW5yUVa8eEEWhKWXvv/k/HEHAuzv6vBHAX
+ L6TvslFWpfN3P/yCbQdBQkSl7fLr
+X-Google-Smtp-Source: ADFU+vvF8PBfhOCqdJxtRSDuQsLB4LMWKdtsU0WLMN27Q3lMNCmYWUFgGVNyy6yrIew/R9AlL/rDMQ==
+X-Received: by 2002:a17:902:b582:: with SMTP id
+ a2mr6018199pls.176.1584368811804; 
+ Mon, 16 Mar 2020 07:26:51 -0700 (PDT)
 Received: from bobo.ozlabs.ibm.com ([203.63.160.49])
- by smtp.gmail.com with ESMTPSA id v1sm45564pjy.35.2020.03.16.07.27.14
+ by smtp.gmail.com with ESMTPSA id v1sm45564pjy.35.2020.03.16.07.26.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 07:27:18 -0700 (PDT)
+ Mon, 16 Mar 2020 07:26:51 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset to take an
- alternate vector
-Date: Tue, 17 Mar 2020 00:26:11 +1000
-Message-Id: <20200316142613.121089-7-npiggin@gmail.com>
+Subject: [PATCH v2 0/8] FWNMI fixes / changes
+Date: Tue, 17 Mar 2020 00:26:05 +1000
+Message-Id: <20200316142613.121089-1-npiggin@gmail.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200316142613.121089-1-npiggin@gmail.com>
-References: <20200316142613.121089-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,63 +99,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide for an alternate delivery location, -1 defaults to the
-architected address.
+Hi,
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- hw/ppc/spapr.c           | 2 +-
- target/ppc/cpu.h         | 2 +-
- target/ppc/excp_helper.c | 5 ++++-
- 3 files changed, 6 insertions(+), 3 deletions(-)
+Since v1, I fixed the intermediate compile error spotted by Greg, and
+rediffed the series on top of ppc-for-5.0, plus Alexey's patch
+("spapr/rtas: Reserve space for RTAS blob and log").
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5f93c49706..25221d843c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3400,7 +3400,7 @@ static void spapr_machine_finalizefn(Object *obj)
- void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
- {
-     cpu_synchronize_state(cs);
--    ppc_cpu_do_system_reset(cs);
-+    ppc_cpu_do_system_reset(cs, -1);
- }
- 
- static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 3953680534..f8c7d6f19c 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1220,7 +1220,7 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
- int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque);
- #ifndef CONFIG_USER_ONLY
--void ppc_cpu_do_system_reset(CPUState *cs);
-+void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector);
- void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector);
- extern const VMStateDescription vmstate_ppc_cpu;
- #endif
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index 7f2b5899d3..08bc885ca6 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -961,12 +961,15 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-     }
- }
- 
--void ppc_cpu_do_system_reset(CPUState *cs)
-+void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector)
- {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     CPUPPCState *env = &cpu->env;
- 
-     powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_RESET);
-+    if (vector != -1) {
-+        env->nip = vector;
-+    }
- }
- 
- void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)
+The first 6 patches are otherwise unchanged since last posting.
+
+Patch 7 implements fwnim sreset interrupts now in a way that's
+compatible with existing Linux guests (which doesn't necessarily quite
+match PAPR, but does match PowerVM behaviour).
+
+Patch 8 isn't required but it papers over Linux warning messages caused
+by another quirk.
+
+Thanks,
+Nick
+
+Nicholas Piggin (8):
+  ppc/spapr: Fix FWNMI machine check failure handling
+  ppc/spapr: Change FWNMI names
+  ppc/spapr: Add FWNMI System Reset state
+  ppc/spapr: Fix FWNMI machine check interrupt delivery
+  ppc/spapr: Allow FWNMI on TCG
+  target/ppc: Allow ppc_cpu_do_system_reset to take an alternate vector
+  ppc/spapr: Implement FWNMI System Reset delivery
+  ppc/spapr: Ignore common "ibm,nmi-interlock" Linux bug
+
+ hw/ppc/spapr.c                    | 76 ++++++++++++++++++++++-------
+ hw/ppc/spapr_caps.c               | 19 ++++----
+ hw/ppc/spapr_events.c             | 38 ++++-----------
+ hw/ppc/spapr_rtas.c               | 43 +++++++++++++----
+ include/hw/ppc/spapr.h            | 28 +++++++----
+ target/ppc/cpu.h                  |  3 +-
+ target/ppc/excp_helper.c          | 79 ++++++++++++++++++++++---------
+ tests/qtest/libqos/libqos-spapr.h |  2 +-
+ 8 files changed, 188 insertions(+), 100 deletions(-)
+
 -- 
 2.23.0
 
