@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CA6C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BE9C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64E4A205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:46:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F4E0205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:47:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ab1dPlXM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E4A205ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlkNHDPI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4E0205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxZY-0004ET-HX
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43045)
+	id 1jDxZc-0004M2-Fa
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:47:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxI6-0004EM-BY
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:55 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHg-0003kf-DC
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxI5-0006qf-9Y
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:54 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23633)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHf-00052y-5O
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:28 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:47907)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxI5-0006od-4u
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:53 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHe-00051S-Vz
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394132;
+ s=mimecast20190719; t=1584394106;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OEXZN7d+6n7gWz53+DQEczdQFDnzAa/V+SlH8NwCP94=;
- b=Ab1dPlXMzda4nBDcMZEbo7RNtoBr5CClnQW52e+si1LTyE3/HAi4d3IHH9q9lc+vxCyTQ3
- EUuSvT3uuqlmvfS/S5HsorQwXkF7E5sov/mJ/uPy03hKpQ5uh3GcPtw5v5nFQAxayZrBvD
- Ica362OIoypfSv8X7Q7SmI4zCk53zc8=
+ bh=WOnGfxVvr/2gh78JhcyB0MNCc4EfkJRvrQjMy1iHHM8=;
+ b=KlkNHDPIdWgGEZLq6U4/Wbq1LFiErRvmpPzq3oMh1nByPqh6obwTAa+eD1YoAqhQ7o8vDi
+ NFlF7z6jjh03mSDeEd02towGm0DrJRY+qo+ntTP34nknXodB9iac2ME3J+d9qRfUApnAMi
+ s9Syhcr/5KFWKyGV+WVpYxjcCx4I5mw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-6Ni7UIzfM-OobxOkwQM8Rw-1; Mon, 16 Mar 2020 17:28:51 -0400
-X-MC-Unique: 6Ni7UIzfM-OobxOkwQM8Rw-1
+ us-mta-440-tWaDFzbXPm-Uw49b0F9TkQ-1; Mon, 16 Mar 2020 17:28:24 -0400
+X-MC-Unique: tWaDFzbXPm-Uw49b0F9TkQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5206A800D53
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71B28100726B
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:23 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C40F19C4F;
- Mon, 16 Mar 2020 21:28:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C00519C4F;
+ Mon, 16 Mar 2020 21:28:21 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 42/61] hw/display: Use memory_region_init_rom() with read-only
- regions
-Date: Mon, 16 Mar 2020 22:27:09 +0100
-Message-Id: <1584394048-44994-43-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 27/61] hw/usb/quirks: Use smaller types to reduce .rodata by
+ 10KiB
+Date: Mon, 16 Mar 2020 22:26:54 +0100
+Message-Id: <1584394048-44994-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,49 +92,96 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+The USB descriptor sizes are specified as 16-bit for idVendor /
+idProduct, and 8-bit for bInterfaceClass / bInterfaceSubClass /
+bInterfaceProtocol. Doing so we reduce the usbredir_raw_serial_ids[]
+and usbredir_ftdi_serial_ids[] arrays from 16KiB to 6KiB (size
+reported on x86_64 host, building with --extra-cflags=3D-Os).
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/display/cg3.c | 5 ++---
- hw/display/tcx.c | 5 ++---
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ hw/usb/quirks.c |  4 ++--
+ hw/usb/quirks.h | 22 +++++++++++++---------
+ 2 files changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/hw/display/cg3.c b/hw/display/cg3.c
-index 4fb67c6..a1ede10 100644
---- a/hw/display/cg3.c
-+++ b/hw/display/cg3.c
-@@ -287,9 +287,8 @@ static void cg3_initfn(Object *obj)
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     CG3State *s =3D CG3(obj);
+diff --git a/hw/usb/quirks.c b/hw/usb/quirks.c
+index 38a9c56..23ea7a2 100644
+--- a/hw/usb/quirks.c
++++ b/hw/usb/quirks.c
+@@ -22,10 +22,10 @@ static bool usb_id_match(const struct usb_device_id *id=
+s,
+                          uint8_t interface_protocol) {
+     int i;
 =20
--    memory_region_init_ram_nomigrate(&s->rom, obj, "cg3.prom", FCODE_MAX_R=
-OM_SIZE,
--                           &error_fatal);
--    memory_region_set_readonly(&s->rom, true);
-+    memory_region_init_rom_nomigrate(&s->rom, obj, "cg3.prom",
-+                                     FCODE_MAX_ROM_SIZE, &error_fatal);
-     sysbus_init_mmio(sbd, &s->rom);
+-    for (i =3D 0; ids[i].vendor_id !=3D -1; i++) {
++    for (i =3D 0; ids[i].terminating_entry =3D=3D 0; i++) {
+         if (ids[i].vendor_id  =3D=3D vendor_id &&
+             ids[i].product_id =3D=3D product_id &&
+-            (ids[i].interface_class =3D=3D -1 ||
++            (ids[i].interface_protocol_used =3D=3D 0 ||
+              (ids[i].interface_class =3D=3D interface_class &&
+               ids[i].interface_subclass =3D=3D interface_subclass &&
+               ids[i].interface_protocol =3D=3D interface_protocol))) {
+diff --git a/hw/usb/quirks.h b/hw/usb/quirks.h
+index 89480be..50ef2f9 100644
+--- a/hw/usb/quirks.h
++++ b/hw/usb/quirks.h
+@@ -21,19 +21,23 @@
+ #include "quirks-pl2303-ids.h"
 =20
-     memory_region_init_io(&s->reg, obj, &cg3_reg_ops, s, "cg3.reg",
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index ca458f9..76de16e 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -755,9 +755,8 @@ static void tcx_initfn(Object *obj)
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     TCXState *s =3D TCX(obj);
+ struct usb_device_id {
+-    int vendor_id;
+-    int product_id;
+-    int interface_class;
+-    int interface_subclass;
+-    int interface_protocol;
++    uint16_t vendor_id;
++    uint16_t product_id;
++    uint8_t interface_class;
++    uint8_t interface_subclass;
++    uint8_t interface_protocol;
++    uint8_t interface_protocol_used:1,
++            terminating_entry:1,
++            reserved:6;
+ };
 =20
--    memory_region_init_ram_nomigrate(&s->rom, obj, "tcx.prom", FCODE_MAX_R=
-OM_SIZE,
--                           &error_fatal);
--    memory_region_set_readonly(&s->rom, true);
-+    memory_region_init_rom_nomigrate(&s->rom, obj, "tcx.prom",
-+                                     FCODE_MAX_ROM_SIZE, &error_fatal);
-     sysbus_init_mmio(sbd, &s->rom);
+ #define USB_DEVICE(vendor, product) \
+-    .vendor_id =3D vendor, .product_id =3D product, .interface_class =3D -=
+1,
++    .vendor_id =3D vendor, .product_id =3D product, .interface_protocol_us=
+ed =3D 0,
 =20
-     /* 2/STIP : Stippler */
+ #define USB_DEVICE_AND_INTERFACE_INFO(vend, prod, iclass, isubclass, iprot=
+o) \
+     .vendor_id =3D vend, .product_id =3D prod, .interface_class =3D iclass=
+, \
+-    .interface_subclass =3D isubclass, .interface_protocol =3D iproto
++    .interface_subclass =3D isubclass, .interface_protocol =3D iproto, \
++    .interface_protocol_used =3D 1
+=20
+ static const struct usb_device_id usbredir_raw_serial_ids[] =3D {
+     /*
+@@ -206,7 +210,7 @@ static const struct usb_device_id usbredir_raw_serial_i=
+ds[] =3D {
+     { USB_DEVICE(ADLINK_VENDOR_ID, ADLINK_ND6530_PRODUCT_ID) },
+     { USB_DEVICE(SMART_VENDOR_ID, SMART_PRODUCT_ID) },
+=20
+-    { USB_DEVICE(-1, -1) } /* Terminating Entry */
++    { .terminating_entry =3D 1 } /* Terminating Entry */
+ };
+=20
+ static const struct usb_device_id usbredir_ftdi_serial_ids[] =3D {
+@@ -906,7 +910,7 @@ static const struct usb_device_id usbredir_ftdi_serial_=
+ids[] =3D {
+     { USB_DEVICE(FTDI_VID, FTDI_DISTORTEC_JTAG_LOCK_PICK_PID) },
+     { USB_DEVICE(FTDI_VID, FTDI_LUMEL_PD12_PID) },
+=20
+-    { USB_DEVICE(-1, -1) } /* Terminating Entry */
++    { .terminating_entry =3D 1 } /* Terminating Entry */
+ };
+=20
+ #undef USB_DEVICE
 --=20
 1.8.3.1
 
