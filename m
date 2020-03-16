@@ -6,86 +6,85 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E885C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA460C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB82E20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:23:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D53520663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:30:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYetZtCn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB82E20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="emIWZhrl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D53520663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDraV-0003jJ-Ar
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 11:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43641)
+	id 1jDrgy-0006Yx-5m
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 11:30:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jDqLG-00073j-BN
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:03:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jDpWi-0004Jn-RW
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:11:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jDqLF-0004sk-72
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:03:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49531
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDqLF-0004oA-1b
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:03:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584367420;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XnLZtjIU8Lbvy5ksQnk5dr0jubYOTU2++eNk5on0R/s=;
- b=eYetZtCnr2IAWnZTBpcmtP/SBoKYlVNvCGGGbew8Fgt6/cVRVcasY8/zN5ivCmwsQ2XBt4
- 2csiSdWaKWRL0N5YOOHczSkJ97AvVVeGHomJmmyO4r4YpBJrMb3Cjkp0Zt7VFbmqbqSyFq
- VNkCM2jubg0eZ1EyB0jbzO/ImsYJHWk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-ICNL31ALMn6TCQ8FymRcwg-1; Mon, 16 Mar 2020 10:03:39 -0400
-X-MC-Unique: ICNL31ALMn6TCQ8FymRcwg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D2A801FAD;
- Mon, 16 Mar 2020 14:03:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
- [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3215A60BE2;
- Mon, 16 Mar 2020 14:03:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B1A601138404; Mon, 16 Mar 2020 15:03:32 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 6/8] hw/ide: Do ide_drive_get() within
- pci_ide_create_devs()
-References: <cover.1584134074.git.balaton@eik.bme.hu>
- <49bf646a9419c3b20125187a26f8a4fd5f35f399.1584134074.git.balaton@eik.bme.hu>
- <alpine.BSF.2.22.395.2003132307280.85181@zero.eik.bme.hu>
- <cb660aa6-6bb6-b75e-ebe3-8fc0e59fb1da@redhat.com>
- <87d09c3jjj.fsf@dusky.pond.sub.org>
- <f3aa3c0d-0786-18aa-0c75-e195910b7a77@redhat.com>
-Date: Mon, 16 Mar 2020 15:03:32 +0100
-In-Reply-To: <f3aa3c0d-0786-18aa-0c75-e195910b7a77@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 16 Mar 2020 09:30:52
- +0100")
-Message-ID: <87pndcgzwr.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1jDpWh-0006ej-90
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:11:28 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46134)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jDpWg-0006Ot-VS
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:11:27 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w16so4727739wrv.13
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 06:11:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=GTGbDrZWAe1kBhlQPsBLVtU3hWPPyCvRJvwhRo3puPU=;
+ b=emIWZhrlfqf02XoBcGQ40O5z+7xNmxQ7ImuQghZ7tpt3MwMHPOjgvOgEQn7i7EHGUM
+ vYtnjq5vUns28O97b2udgXl2OC8OmsFuMmc6Gv6si4KA0QIHvqcDDY6Hx2V4IDe6sxry
+ kelsscWhB52FhVT+m8cOxlaLHwz2NHKz0Y9CoV0eqQYZDUTUMxcuCwpNM4VYyX3ULQ2m
+ Xl9+WkbSXr+bqJicvOFtlYh+2Mj04AxWodWY/AAVY8lCTq24nIEki1flJblpCi1qtFLv
+ Mtb3YCi/hi/t/UVvj60tsLeYu4jCRpdkj7iaa5ewJldmcvtV+EcUss6axqDRhUQ5QlN6
+ Z+3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=GTGbDrZWAe1kBhlQPsBLVtU3hWPPyCvRJvwhRo3puPU=;
+ b=Y9ZrFKkddHUW5GaeFgxzge6u2+Jg3ysN2GiZ2LTJoIVOPKEO0Ov3v59md74AmjVhA9
+ V8EmrAtlp1XvmvBanIiy9FxV3IK3Evn4t1/SPng6EgZpVUKeOYxyc1P92/LYoUBBWmKa
+ qZZDIde6+kOJrq/GudrMFqRJZamGlDqKrxBSAHVvjxBpsuwiRBWNGo0dNIUKyTlYMwhH
+ rr04NnAwN6vP+S7iDyrsvCsyhqXh+ahORoI628MLuY2KW1Gwy1gS9uvcaHmJP4dl/9js
+ NMK9d7+8C6T2H2HS05ys9kBZIypxceqCgyQUEcgVNq1YgzBXnrTf/F+j/GARqvWqYnoX
+ 6sAw==
+X-Gm-Message-State: ANhLgQ2VGln/CjDjEijWBES+22T8K8JZ5Q+Pls4thkMnSLtzFshwUTyM
+ G8zzJDJ1iw38C1FgvUmaFn3fmA==
+X-Google-Smtp-Source: ADFU+vvHKGgCXT4MoMymF61HizAgOpLiD2C5KB3kv+UCJQQeLZazjpaU2Vavmd2+z7qXlQdRl4Nfzw==
+X-Received: by 2002:adf:e581:: with SMTP id l1mr22215033wrm.395.1584364285688; 
+ Mon, 16 Mar 2020 06:11:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d18sm30891278wrq.22.2020.03.16.06.11.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 06:11:23 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 33E391FF7E;
+ Mon, 16 Mar 2020 13:11:23 +0000 (GMT)
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <20200316123807.GG1528804@redhat.com>
+User-agent: mu4e 1.3.10; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+In-reply-to: <20200316123807.GG1528804@redhat.com>
+Date: Mon, 16 Mar 2020 13:11:23 +0000
+Message-ID: <87zhcgjvgk.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +96,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Erik Skultety <eskultet@redhat.com>, Wainer Moschetta <wmoschet@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 3/16/20 7:23 AM, Markus Armbruster wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->>> On 13/03/20 23:16, BALATON Zoltan wrote:
->>>>>
->>>>> +=C2=A0=C2=A0=C2=A0 pci_dev =3D pci_create_simple(pci_bus, -1, "cmd64=
-6-ide");
->>>>> +=C2=A0=C2=A0=C2=A0 pci_ide_create_devs(pci_dev);
->>>>
->>>> Additionally, I think it may also make sense to move pci_ide_create_de=
-vs
->>>> call into the realize methods of these IDE controllers so boards do no=
-t
->>>> need to do it explicitely. These calls always follow the creation of t=
-he
->>>> device immediately so could just be done internally in IDE device and
->>>> simplify it further. I can attempt to prepare additional patches for
->>>> that but first I'd like to hear if anyone has anything against that to
->>>> avoid doing useless work.
->>>
->>> No, it's better to do it separately.  I think that otherwise you could
->>> add another IDE controller with -device, and both controllers would try
->>> to add the drives.
->>
->> Correct.
->>
->> Creating device frontends for -drive if=3Dide is the board's job.  Board=
-s
->> may delegate to suitable helpers.  I'd very much prefer these helpers
->> not to live with device model code.  Board and device model code should
->> be cleanly separated to to reduce the temptation to muddle their
->> responsibilities.  It's separation of concerns.
->>
->> I actually wish we had separate sub-trees for boards and devices instead
->> of keeping both in hw/.
->
-> Never too late!
->
-> To be clear, you suggest:
->
-> - one dir with machines, boards, system-on-module
-> - one dir with devices, cpu, system-on-chips
->
-> Correct?
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-In QOM terms:
+> On Thu, Mar 12, 2020 at 03:36:11PM -0400, Cleber Rosa wrote:
+>> The idea about a public facing Gating CI for QEMU was lastly
+>> summarized in an RFC[1].  Since then, it was decided that a
+>> simpler version should be attempted first.
+>>=20
+>> Changes from the RFC patches[2] accompanying the RFC document:
+>>=20
+>> - Moved gating job definitions to .gitlab-ci-gating.yml
+>> - Added info on "--disable-libssh" build option requirement
+>>   (https://bugs.launchpad.net/qemu/+bug/1838763) to Ubuntu 18.04 jobs
+>> - Added info on "--disable-glusterfs" build option requirement
+>>   (there's no static version of those libs in distro supplied
+>>   packages) to one
+>> - Dropped ubuntu-18.04.3-x86_64-notools job definition, because it
+>>   doesn't fall into the general scope of gating job described by PMM
+>>   (and it did not run any test)
+>> - Added w32 and w64 cross builds based on Fedora 30
+>> - Added a FreeBSD based job that builds all targets and runs `make
+>>   check`
+>> - Added "-j`nproc`" and "-j`sysctl -n hw.ncpu`" options to make as a
+>>   simple but effective way of speeding up the builds and tests by
+>>   using a number of make jobs matching the number of CPUs
+>> - Because the Ansible playbooks reference the content on Dockerfiles,
+>>   some fixes to some Dockerfiles caught in the process were included
+>> - New patch with script to check or wait on a pipeline execution
+>>=20
+>> [1] - https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00231.html
+>> [2] - https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00154.html
+>>=20
+>> Cleber Rosa (5):
+>>   tests/docker: add CentOS 8 Dockerfile
+>>   tests/docker: make "buildah bud" output similar to "docker build"
+>>   GitLab CI: avoid calling before_scripts on unintended jobs
+>>   GitLab Gating CI: introduce pipeline-status contrib script
+>>   GitLab Gating CI: initial set of jobs, documentation and scripts
+>>=20
+>>  .gitlab-ci-gating.yml                         | 111 ++++++++++
+>>  .gitlab-ci.yml                                |  32 ++-
+>>  contrib/ci/orgs/qemu/build-environment.yml    | 208 ++++++++++++++++++
+>>  contrib/ci/orgs/qemu/gitlab-runner.yml        |  65 ++++++
+>>  contrib/ci/orgs/qemu/inventory                |   2 +
+>>  contrib/ci/orgs/qemu/vars.yml                 |  13 ++
+>>  contrib/ci/scripts/gitlab-pipeline-status     | 148 +++++++++++++
+>
+> FYI, the contrib/ directory is generally a place for arbitrary / adhoc
+> but interesting user contributed files/sources that are not officially
+> supported deliverables of the project.
+>
+> IOW, this is not a good home for the official CI scripts.
+>
+> We already have a .gitlab-ci.d/ directory that looks like it would
+> be good for this.  Or if that's not suitable, then scripts/ci/ is
+> a second choice.
 
-* One sub-tree with descendants of TYPE_DEVICE
-* One sub-tree with descendants of TYPE_MACHINE
+I'd vote for scripts/ci/ or scripts/gitlab/ as the .gitlab-ci.d might be
+a little hidden.
 
+--=20
+Alex Benn=C3=A9e
 
