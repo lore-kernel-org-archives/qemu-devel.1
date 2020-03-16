@@ -6,75 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ABDC18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0D6C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DA722071C
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 15:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95E232051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:04:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVfIpJiI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA722071C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DePusss4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E232051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDs73-0008Cu-OA
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 11:57:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45730)
+	id 1jDsEO-0002RI-4e
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:04:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jDpl7-0001UE-UE
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:23 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jDpBV-0004ma-Ab
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jDpl5-0000vE-Fq
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39876
+ (envelope-from <imammedo@redhat.com>) id 1jDpBP-0003bZ-KK
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20948
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDpl5-0000qY-A3
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:26:19 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDpBP-0003Zx-F5
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584365179;
+ s=mimecast20190719; t=1584362967;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=84FK/whIcqud6MQ9tDuDfoxHPB6HJs1Ch1gm48BLGw4=;
- b=QVfIpJiIXiLuwLRKWnf5cLG2UbaaP3hJ6gN9DTcRSF1+4BxcnIZEa6BdXGa4W7QVabyUON
- z64VCpPjUI0WCMA9+GcTDGF6Wdjky/8O4hfwvyrsctFkDMQ1z5NyQOLhrszycURYUS+YRD
- zrj6J/JQP7giEu+GQLFBB1yrn7r79BM=
+ bh=oMBmqqjrVDoNBM0i5RDn4Af4LJu1yJvrmIbMkJ1iq0I=;
+ b=DePusss4z8LPhGQFPKvSok4bPVsUt1fMSLt33Mh5Dv16Q8xbSBomJ/KHOzNKexeSrpr8zI
+ cv3uyAXDPFtuFA0IuO1bTMa4zAWD1Uiu3gUY0AogZEWcpsLkerIMfJ++0VgUnfTWHVOALc
+ ENOujqF7plnjJHKfwfv/BTgjN2+pYzQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-PjlUvtwVMXSFvu3ZBi3_dg-1; Mon, 16 Mar 2020 09:26:17 -0400
-X-MC-Unique: PjlUvtwVMXSFvu3ZBi3_dg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-214-T7fC42KaNySOZ_ub-KuZIA-1; Mon, 16 Mar 2020 08:49:25 -0400
+X-MC-Unique: T7fC42KaNySOZ_ub-KuZIA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CD61189F768;
- Mon, 16 Mar 2020 13:26:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39FC518FF660;
+ Mon, 16 Mar 2020 12:49:24 +0000 (UTC)
 Received: from localhost (ovpn-200-42.brq.redhat.com [10.40.200.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 63A8F5DA7B;
- Mon, 16 Mar 2020 13:26:11 +0000 (UTC)
-Date: Mon, 16 Mar 2020 14:26:09 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AE53260BE2;
+ Mon, 16 Mar 2020 12:49:16 +0000 (UTC)
+Date: Mon, 16 Mar 2020 13:49:14 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] acpi: Add Windows ACPI Emulated Device Table (WAET)
-Message-ID: <20200316142609.5b73a0ca@redhat.com>
-In-Reply-To: <20200313110940-mutt-send-email-mst@kernel.org>
-References: <20200311170826.79419-1-liran.alon@oracle.com>
- <20200312172745.1b7b2222@redhat.com>
- <20200312130854-mutt-send-email-mst@kernel.org>
- <20200313103656.094ec89b@redhat.com>
- <20200313110940-mutt-send-email-mst@kernel.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 8/8] qapi/misc: Restrict device memory commands to
+ machine code
+Message-ID: <20200316134914.2152130a@redhat.com>
+In-Reply-To: <20200316000348.29692-9-philmd@redhat.com>
+References: <20200316000348.29692-1-philmd@redhat.com>
+ <20200316000348.29692-9-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,119 +86,349 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org,
- Liran Alon <liran.alon@oracle.com>, Elad Gabay <elad.gabay@oracle.com>,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 13 Mar 2020 11:26:45 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Mon, 16 Mar 2020 01:03:48 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> On Fri, Mar 13, 2020 at 10:36:56AM +0100, Igor Mammedov wrote:
-> > On Thu, 12 Mar 2020 13:09:51 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Thu, Mar 12, 2020 at 05:27:45PM +0100, Igor Mammedov wrote:  
-> > > > On Wed, 11 Mar 2020 19:08:26 +0200
-> > > > Liran Alon <liran.alon@oracle.com> wrote:
-> > > >     
-> > > > > From: Elad Gabay <elad.gabay@oracle.com>
-> > > > > 
-> > > > > Microsoft introduced this ACPI table to avoid Windows guests performing
-> > > > > various workarounds for device erratas. As the virtual device emulated
-> > > > > by VMM may not have the errata.
-> > > > > 
-> > > > > Currently, WAET allows hypervisor to inform guest about two
-> > > > > specific behaviors: One for RTC and the other for ACPI PM Timer.
-> > > > > 
-> > > > > Support for WAET have been introduced since Windows Vista. This ACPI
-> > > > > table is also exposed by other hypervisors, such as VMware, by default.
-> > > > > 
-> > > > > This patch adds WAET ACPI Table to QEMU. It also makes sure to introduce
-> > > > > the new ACPI table only for new machine-types.    
-> > > > 
-> > > > in addition to comments made by Michael ...
-> > > >     
-> > > > > 
-> > > > > Signed-off-by: Elad Gabay <elad.gabay@oracle.com>
-> > > > > Co-developed-by: Liran Alon <liran.alon@oracle.com>
-> > > > > Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> > > > > ---
-> > > > >  hw/i386/acpi-build.c        | 18 ++++++++++++++++++
-> > > > >  hw/i386/pc_piix.c           |  2 ++
-> > > > >  hw/i386/pc_q35.c            |  2 ++
-> > > > >  include/hw/acpi/acpi-defs.h | 25 +++++++++++++++++++++++++
-> > > > >  include/hw/i386/pc.h        |  1 +
-> > > > >  5 files changed, 48 insertions(+)
-> > > > > 
-> > > > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > > > index 9c4e46fa7466..29f70741cd96 100644
-> > > > > --- a/hw/i386/acpi-build.c
-> > > > > +++ b/hw/i386/acpi-build.c
-> > > > > @@ -2512,6 +2512,19 @@ build_dmar_q35(GArray *table_data, BIOSLinker *linker)
-> > > > >      build_header(linker, table_data, (void *)(table_data->data + dmar_start),
-> > > > >                   "DMAR", table_data->len - dmar_start, 1, NULL, NULL);
-> > > > >  }
-> > > > > +
-> > > > > +static void
-> > > > > +build_waet(GArray *table_data, BIOSLinker *linker)    
-> > > > see build_hmat_lb() for example how to doc comment for such function
-> > > > should look like. Use earliest spec version where table was introduced.
-> > > >     
-> > > > > +{
-> > > > > +    AcpiTableWaet *waet;
-> > > > > +
-> > > > > +    waet = acpi_data_push(table_data, sizeof(*waet));
-> > > > > +    waet->emulated_device_flags = cpu_to_le32(ACPI_WAET_PM_TIMER_GOOD);    
-> > > > 
-> > > > we don't use packed structures for building ACPI tables anymore (there is
-> > > > old code that still does but that's being converted when we touch it)
-> > > > 
-> > > > pls use build_append_int_noprefix() api instead, see build_amd_iommu() as
-> > > > an example how to build binary tables using it and how to use comments
-> > > > to document fields.
-> > > > Basic idea is that api makes function building a table match table's
-> > > > description in spec (each call represents a row in spec) and comment
-> > > > belonging to a row should contain verbatim field name as used by spec
-> > > > so reader could copy/past and grep it easily.    
-> > > 
-> > > 
-> > > BTW how about a better name for this function?  
-> > 
-> > how about [aml|acpi]_int_raw 
-> > [...]  
-> 
-> I'm not sure how this helps.  I think the main problems are
-> 1- very long name
-> 2- only makes sense if you know that ACPI has a special integer prefix
-> 3- easy to confuse which is the value which is the length
-> 4- length is in bytes (typical documentation is in bits)
-in acpi spec, they use bytes mostly (with occasional bits deviation)
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> 
-> Your suggestion only fixes issue 1.
-that's what I don't like the most about current name, it's way too long.
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-> Having listed it all out, I suggest the following for the purpose of
-> building structures:
-> 
-> 	acpi/aml/build_append_u8
-> 	acpi/aml/build_append_u16
-> 	acpi/aml/build_append_u32
-> 	acpi/aml/build_append_u64
-I prefer having length argument, so when I'm reviewing code, I'm basically
-comparing it with value in the table.
-The same applies to function name, having a bunch of different
-names would be distracting, at least where it comes to composing
-tables.
-So I prefer keeping current list of arguments.
- 
-> and maybe
-> 	acpi/aml/build_append_pad( length)
-> 
-> I'm not sure what the best prefix is. I guess we can have them all
-> with the slightly different arguments.
+> ---
+>  qapi/machine.json               | 131 +++++++++++++++++++++++++++++++
+>  qapi/misc.json                  | 132 --------------------------------
+>  include/hw/mem/memory-device.h  |   1 +
+>  include/hw/virtio/virtio-pmem.h |   2 +-
+>  4 files changed, 133 insertions(+), 133 deletions(-)
+>=20
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index 33b259dbd0..17ccebda14 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -1476,3 +1476,134 @@
+>  #
+>  ##
+>  { 'command': 'query-pci', 'returns': ['PciInfo'] }
+> +
+> +##
+> +# @MemoryInfo:
+> +#
+> +# Actual memory information in bytes.
+> +#
+> +# @base-memory: size of "base" memory specified with command line
+> +#               option -m.
+> +#
+> +# @plugged-memory: size of memory that can be hot-unplugged. This field
+> +#                  is omitted if target doesn't support memory hotplug
+> +#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
+> +#
+> +# Since: 2.11.0
+> +##
+> +{ 'struct': 'MemoryInfo',
+> +  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
+> +
+> +##
+> +# @query-memory-size-summary:
+> +#
+> +# Return the amount of initially allocated and present hotpluggable (if
+> +# enabled) memory in bytes.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-memory-size-summary" }
+> +# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
+> +#
+> +# Since: 2.11.0
+> +##
+> +{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
+> +
+> +##
+> +# @PCDIMMDeviceInfo:
+> +#
+> +# PCDIMMDevice state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @addr: physical address, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @slot: slot number at which device is plugged in
+> +#
+> +# @node: NUMA node number where device is plugged in
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# @hotplugged: true if device was hotplugged
+> +#
+> +# @hotpluggable: true if device if could be added/removed while machine =
+is running
+> +#
+> +# Since: 2.1
+> +##
+> +{ 'struct': 'PCDIMMDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'addr': 'int',
+> +            'size': 'int',
+> +            'slot': 'int',
+> +            'node': 'int',
+> +            'memdev': 'str',
+> +            'hotplugged': 'bool',
+> +            'hotpluggable': 'bool'
+> +          }
+> +}
+> +
+> +##
+> +# @VirtioPMEMDeviceInfo:
+> +#
+> +# VirtioPMEM state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @memaddr: physical address in memory, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'struct': 'VirtioPMEMDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'memaddr': 'size',
+> +            'size': 'size',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+> +##
+> +# @MemoryDeviceInfo:
+> +#
+> +# Union containing information about a memory device
+> +#
+> +# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> +#
+> +# Since: 2.1
+> +##
+> +{ 'union': 'MemoryDeviceInfo',
+> +  'data': { 'dimm': 'PCDIMMDeviceInfo',
+> +            'nvdimm': 'PCDIMMDeviceInfo',
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+> +          }
+> +}
+> +
+> +##
+> +# @query-memory-devices:
+> +#
+> +# Lists available memory devices and their state
+> +#
+> +# Since: 2.1
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-memory-devices" }
+> +# <- { "return": [ { "data":
+> +#                       { "addr": 5368709120,
+> +#                         "hotpluggable": true,
+> +#                         "hotplugged": true,
+> +#                         "id": "d1",
+> +#                         "memdev": "/objects/memX",
+> +#                         "node": 0,
+> +#                         "size": 1073741824,
+> +#                         "slot": 0},
+> +#                    "type": "dimm"
+> +#                  } ] }
+> +#
+> +##
+> +{ 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 92b3926c6b..670b902999 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -518,39 +518,6 @@
+>  ##
+>  { 'command': 'closefd', 'data': {'fdname': 'str'} }
+> =20
+> -##
+> -# @MemoryInfo:
+> -#
+> -# Actual memory information in bytes.
+> -#
+> -# @base-memory: size of "base" memory specified with command line
+> -#               option -m.
+> -#
+> -# @plugged-memory: size of memory that can be hot-unplugged. This field
+> -#                  is omitted if target doesn't support memory hotplug
+> -#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
+> -#
+> -# Since: 2.11.0
+> -##
+> -{ 'struct': 'MemoryInfo',
+> -  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
+> -
+> -##
+> -# @query-memory-size-summary:
+> -#
+> -# Return the amount of initially allocated and present hotpluggable (if
+> -# enabled) memory in bytes.
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "query-memory-size-summary" }
+> -# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
+> -#
+> -# Since: 2.11.0
+> -##
+> -{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
+> -
+> -
+>  ##
+>  # @AddfdInfo:
+>  #
+> @@ -788,105 +755,6 @@
+>   'returns': ['CommandLineOptionInfo'],
+>   'allow-preconfig': true }
+> =20
+> -##
+> -# @PCDIMMDeviceInfo:
+> -#
+> -# PCDIMMDevice state information
+> -#
+> -# @id: device's ID
+> -#
+> -# @addr: physical address, where device is mapped
+> -#
+> -# @size: size of memory that the device provides
+> -#
+> -# @slot: slot number at which device is plugged in
+> -#
+> -# @node: NUMA node number where device is plugged in
+> -#
+> -# @memdev: memory backend linked with device
+> -#
+> -# @hotplugged: true if device was hotplugged
+> -#
+> -# @hotpluggable: true if device if could be added/removed while machine =
+is running
+> -#
+> -# Since: 2.1
+> -##
+> -{ 'struct': 'PCDIMMDeviceInfo',
+> -  'data': { '*id': 'str',
+> -            'addr': 'int',
+> -            'size': 'int',
+> -            'slot': 'int',
+> -            'node': 'int',
+> -            'memdev': 'str',
+> -            'hotplugged': 'bool',
+> -            'hotpluggable': 'bool'
+> -          }
+> -}
+> -
+> -##
+> -# @VirtioPMEMDeviceInfo:
+> -#
+> -# VirtioPMEM state information
+> -#
+> -# @id: device's ID
+> -#
+> -# @memaddr: physical address in memory, where device is mapped
+> -#
+> -# @size: size of memory that the device provides
+> -#
+> -# @memdev: memory backend linked with device
+> -#
+> -# Since: 4.1
+> -##
+> -{ 'struct': 'VirtioPMEMDeviceInfo',
+> -  'data': { '*id': 'str',
+> -            'memaddr': 'size',
+> -            'size': 'size',
+> -            'memdev': 'str'
+> -          }
+> -}
+> -
+> -##
+> -# @MemoryDeviceInfo:
+> -#
+> -# Union containing information about a memory device
+> -#
+> -# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> -#
+> -# Since: 2.1
+> -##
+> -{ 'union': 'MemoryDeviceInfo',
+> -  'data': { 'dimm': 'PCDIMMDeviceInfo',
+> -            'nvdimm': 'PCDIMMDeviceInfo',
+> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+> -          }
+> -}
+> -
+> -##
+> -# @query-memory-devices:
+> -#
+> -# Lists available memory devices and their state
+> -#
+> -# Since: 2.1
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "query-memory-devices" }
+> -# <- { "return": [ { "data":
+> -#                       { "addr": 5368709120,
+> -#                         "hotpluggable": true,
+> -#                         "hotplugged": true,
+> -#                         "id": "d1",
+> -#                         "memdev": "/objects/memX",
+> -#                         "node": 0,
+> -#                         "size": 1073741824,
+> -#                         "slot": 0},
+> -#                    "type": "dimm"
+> -#                  } ] }
+> -#
+> -##
+> -{ 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
+> -
+>  ##
+>  # @ReplayMode:
+>  #
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-devic=
+e.h
+> index 04476acb8f..76f3de0f7e 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -14,6 +14,7 @@
+>  #define MEMORY_DEVICE_H
+> =20
+>  #include "hw/qdev-core.h"
+> +#include "qapi/qapi-types-machine.h"
+>  #include "qapi/qapi-types-misc.h"
+>  #include "qom/object.h"
+> =20
+> diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-p=
+mem.h
+> index 33f1999320..72863412b2 100644
+> --- a/include/hw/virtio/virtio-pmem.h
+> +++ b/include/hw/virtio/virtio-pmem.h
+> @@ -15,7 +15,7 @@
+>  #define HW_VIRTIO_PMEM_H
+> =20
+>  #include "hw/virtio/virtio.h"
+> -#include "qapi/qapi-types-misc.h"
+> +#include "qapi/qapi-types-machine.h"
+> =20
+>  #define TYPE_VIRTIO_PMEM "virtio-pmem"
+> =20
 
 
