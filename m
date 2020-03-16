@@ -2,81 +2,93 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A38C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA0CC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EC4520719
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:12:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F5FC20658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 20:17:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sv5GzYNw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC4520719
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FoJB4AMP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5FC20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDw6M-0005c9-9u
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 16:12:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57716)
+	id 1jDwAp-0007kd-Ks
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 16:17:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jDw5T-0004Lv-Th
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:11:48 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDwA9-0007D4-Q4
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jDw5S-00017H-Pg
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:11:47 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39222)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDwA8-0005pA-Ns
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:16:37 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:35426)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jDw5S-00010C-KW
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:11:46 -0400
-Received: by mail-oi1-x242.google.com with SMTP id d63so19246871oig.6
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:11:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDwA8-0005kb-GU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 16:16:36 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id mq3so9284677pjb.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:16:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ijs2BAIZQngYJr60lDXDIztUajpq/leFmXIdziG2LkM=;
- b=sv5GzYNwiSh3FeS0FRD8JM9TyIwu42PNDUBqb2XRpr7JWlyBhsNwNdpjQBWBU+l1bR
- WN6v2XTv991YfA+F1LJE3nqARuovbsoRT3n4bJouPNyhgwsi6Fl2xAIdDG+rNfRWzw9N
- BeyPq/wVWSA56Wg5t/+hJhUDQuLoL92VYEEyb76M2cFYJjW/MPndakK64X7XPFlhMDcc
- MnKhzJo21aBHp9XNHOLp4MHAGgi6uP28iPP2tAmsbd4osuHZ1UQKD6YU81yz+a8mt1wv
- KExbnv7HV333vv/xrvNbN6VMES9N3EELGs5ODy6fE7X+/Obh6Cw/X+6S1RJdf6t6o3H8
- OnSQ==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=FhITnVcXOIhnDs6uomlU7NICQahFSW5Nno5Xh6Sq2S4=;
+ b=FoJB4AMPXLMvqJ/PwEVqdjzE4axxigJIAJXVIgptDfwHvaprZTEE5YOdc/y1goBOvu
+ 4ZZaQY5MzFzgkwfBhc4G6K7luBCzEvSeoGcAaYETYA7PnJtCwMVh8x/6uMPN5r/rJgGe
+ YvRU50ybHtZ0mOlJF+eVXe7HpEaZrykr6uypERcyCu8bFl/CtCsdL0lE+IqAYOw0mHse
+ AftV/lzKuiYcwTV9dV9xl96SMyhsFYDe2VXitZfHl2W6PrAaSmtQp92OiscOzfWMIIXG
+ 1Ek0faM4ssdTahTxkQcazBtwMjZurKMef+/NGaY6EsxiQaKqFpYLIQQbwlUIk/7+peV1
+ mfuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ijs2BAIZQngYJr60lDXDIztUajpq/leFmXIdziG2LkM=;
- b=gp+LLwY+zw81AmyO/8bGXzq5501AYmsQ+qG9XZvO37rLywKDwXWqUbZbNYi528nYli
- +ZW8qoOxmWrD16jtKGKK7pH1zEaUL6b2TdOhMpHIy8RiyjWZ/h08fjS1mD/96KE3rzYT
- SScXZzgRYDOSxOxYkWLr/KDLzc3Pa93W9FaXFUtnmmhCLxRExBusr8Bctpgq122rip2J
- Cu5qXpwCfth7g0ZsjMIUyZz8PK+Dw3aidMFkjafZOAZtiWlQux9OxxBB90geENpnmAtE
- +m8gDrxwQdY9H6ho79cKsQmTqr1o//RuOyrvuMN5PC5ijmU2og01Gim2q8kgkKdHv0Un
- NMxg==
-X-Gm-Message-State: ANhLgQ0gSn/L6JFfN8MPz3PPI1e50bPQW6OY6dqrbX6wZM10xaaqguw1
- ehk8gQI3XpUEsSgd2cMx3XydLpwXko2kdzXxVE0WTQ==
-X-Google-Smtp-Source: ADFU+vuNAGWfTNfTG7BCG62IAVcWTMGcJnSdFo65qjGsPUVKe0hQPlhhs0R7X5BcJqT9yHK67QFaPQIXmPb88pVygO4=
-X-Received: by 2002:aca:190f:: with SMTP id l15mr937814oii.48.1584389505745;
- Mon, 16 Mar 2020 13:11:45 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FhITnVcXOIhnDs6uomlU7NICQahFSW5Nno5Xh6Sq2S4=;
+ b=ftKpQNRzJvxUbH6VSEESEbbf3xGRjx6ua93QtNu5nfIetwqUYz4HE313NZoS9bziW7
+ JhlHzrGxZmEmKy5xzq6rQtsrEJ6yP0yav3rW7UN4UDNKXmBO7tdNM8xSiuZhBjxdZuO4
+ Co5baMKlcKoorIzFCrLEl8cOVuRvr95vyQBwbc/SMbynIe5jObmX96UfAiwg+pJdSLle
+ EPBj1sfYvsAB8a/YD5UbMCY3yXgTrGdI4niirwc7ItUbP2/chxPE2vfeSdnqI+ZH1sLV
+ g68mSMTvJZj/p9WJjDOwOQDtjmaRMhm+xUtfail4D5t16DiWPFpziqCE2FnRzVHRqoF6
+ Zfdw==
+X-Gm-Message-State: ANhLgQ0nOKoyRYs7JeumNpPFrfLbVfbqG2yF9sG4QUYQv/krRjHI4Z8J
+ vdM7ixDoQcPzGbHv5Ajsu1Oa8w==
+X-Google-Smtp-Source: ADFU+vvXz6vFHeF1yKbPbpgcnf+53vX8VlT/JrnRIIROKRDHpkh55asOanh1rtAanRMRpWVarvC1uw==
+X-Received: by 2002:a17:90b:d8d:: with SMTP id
+ bg13mr1312350pjb.29.1584389794888; 
+ Mon, 16 Mar 2020 13:16:34 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ 67sm677082pfe.168.2020.03.16.13.16.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 13:16:34 -0700 (PDT)
+Subject: Re: [PATCH v3 01/19] target/arm: Rename KVM set_feature() as
+ kvm_set_feature()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-4-philmd@redhat.com>
- <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
-In-Reply-To: <f570579b-da9c-e89a-3430-08e82d9052c1@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Mar 2020 20:11:34 +0000
-Message-ID: <CAFEAcA8K-njh=TyjS_4deD4wTjhqnc=t6SQB1DbKgWWS5rixSQ@mail.gmail.com>
-Subject: Re: [PATCH v3 03/19] target/arm: Restrict DC-CVAP instruction to TCG
- accel
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ <20200316160634.3386-2-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cb3178f1-5a0c-b11c-a012-c41beeb66cd2@linaro.org>
+Date: Mon, 16 Mar 2020 13:16:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200316160634.3386-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,57 +100,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- kvm-devel <kvm@vger.kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 at 19:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I'm not 100% sure how the system regs function under kvm.
->
-> If they are not used at all, then we should avoid them all en masse an not
-> piecemeal like this.
->
-> If they are used for something, then we should keep them registered and change
-> the writefn like so:
->
-> #ifdef CONFIG_TCG
->     /* existing stuff */
-> #else
->     /* Handled by hardware accelerator. */
->     g_assert_not_reached();
-> #endif
+On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
+> +++ b/target/arm/kvm32.c
+> @@ -22,7 +22,7 @@
+>  #include "internals.h"
+>  #include "qemu/log.h"
+>  
+> -static inline void set_feature(uint64_t *features, int feature)
+> +static inline void kvm_set_feature(uint64_t *features, int feature)
 
-(1) for those registers where we need to know the value within
-QEMU code (notably anything involved in VA-to-PA translation,
-as this is used by gdbstub accesses, etc, but sometimes we
-want other register values too): the sysreg struct is
-what lets us map from the KVM register to the field in the
-CPU struct when we do a sync of data to/from the kernel.
+Why, what's wrong with the existing name?
+Plus, with patch 2, you can just remove these.
 
-(2) for other registers, the sync lets us make the register
-visible as an r/o register in the gdbstub. (this is not
-very important, but it's nice)
 
-(3) Either way, the sync works via the raw_read/raw_write
-accessors (this is a big part of what they're for), which are
-supposed to just stuff the data into/out of the underlying
-CPU struct field. (But watch out because we fall back to
-using the non-raw read/writefn if there's no raw version
-provided for a particular register.) If a regdef is marked
-as NO_RAW then it means there is no raw access and we don't
-sync the value.
-
-(4) I think that in KVM mode we won't deliberately do
-non-raw accesses, and a quick grep through of the places
-that do 'readfn' accesses supports that.
-
-thanks
--- PMM
+r~
 
