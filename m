@@ -2,90 +2,69 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E1EC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA1AC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:03:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 670A420409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:02:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qUx6dsgq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670A420409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4924C20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:03:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4924C20409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDu4F-000599-F4
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:02:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44995)
+	id 1jDu5c-00072j-Fb
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:03:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRJ-0000Xy-F5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:13 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsQK-0008F4-5T
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRF-0007uz-Qs
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:08 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:40536)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtRF-0007mM-DC
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:05 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id f3so15285632wrw.7
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=GepS+RBgIfLthS0hHsFgjFpLev7UFXBivw+uaPGBApc=;
- b=qUx6dsgqVC2U0YNRqa+a3JBiPqNaMAKBGYqmHIoPjpBSZZclRm15foe2xZeH0I1ccm
- /R1qADFU1V7mZ6zJBW7jbPRKjxdLi48H/+ZCeCSsVPKxyrCK7o4b+QTAVpijmGQjlaKJ
- VsOwtDrymGoxoE1B1GjQnVyHCafQVnPmaFoFny19hulQ5Ach6B7xDRyVPjNFRS/UfYuz
- +VrX9vsD4XATfGzi2xVfH5Yw4e85c4GrVUxWaNX80L0rb2V/ZVevnMg7PTt5VbLGcLnz
- SqJHFP7MFcVINRN8zm3pAdwztVeSFoqt9ELeM6bEKuEkw75zMhr7lNPBXCsgA/QySyPX
- Tk1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=GepS+RBgIfLthS0hHsFgjFpLev7UFXBivw+uaPGBApc=;
- b=s9F4HAW769B7w+nIQVGHq1yM0Esdj5grN8jgmsnSusXLM2hJCZRYGrVkj0gP6rBYqw
- mPfjnjaJ2Zv1ks/v11mH4c6fluJgkhh6evdV1qYi4A7werlPvKtMzng9SOA1OdIGRijO
- UQC3oBYOEnkg9TFGP9bVPCA6H9i3XJ9l4l47njq3erUASpSpZ37ZcvKsQBvULQ9Cg4HT
- soMOc1ZteIvM2fNzSq/RQniXDj0mlxUbHlD+hyNVINJRYzzVdg/ofH1q8XjcFK9AfxJg
- x1X2KRVRp2BwU8clSI57xLVrSFi72sdyCfNv2mPII//ekMORD7wjBi+6xDf+OGf51gHN
- icBw==
-X-Gm-Message-State: ANhLgQ3lSaVzPK4eQYnlbFEZ+F76znHYKYR/Dhh2nd11nRle3mglMSKe
- fe1wW3GiQEFca4rCGe4OBPxgE3Eu3Mg=
-X-Google-Smtp-Source: ADFU+vunb8f+NCXHLrZ4yIAkGI7wyPJBJcb6fuPiaZ0cJkgAilJFfkyv+ig0Q6CUQopY3rUGIg4QdQ==
-X-Received: by 2002:a05:6000:189:: with SMTP id
- p9mr353182wrx.391.1584379323180; 
- Mon, 16 Mar 2020 10:22:03 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o5sm483071wmb.8.2020.03.16.10.21.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:21:57 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7E7B01FF90;
- Mon, 16 Mar 2020 17:21:55 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1jDsQE-0005eZ-2l
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:17:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:51469)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsQD-0005XK-Nz
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:57 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MzkK9-1jZYA345mz-00vgqc; Mon, 16 Mar 2020 17:16:31 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 04/28] tests/docker: Update VirGL to v0.8.0
-Date: Mon, 16 Mar 2020 17:21:31 +0000
-Message-Id: <20200316172155.971-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+Subject: [PULL 23/38] linux-user,
+ s390x: remove syscall definitions for !TARGET_S390X
+Date: Mon, 16 Mar 2020 17:15:35 +0100
+Message-Id: <20200316161550.336150-24-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-Provags-ID: V03:K1:vXl1IZPWp8DdKm+cVIDa7OXMEOh98xlz9U2d7u5H3qmRjsPJrBP
+ DahlMWhpNWD/EndjI3aKtuo7VYfWo1v1BrtM1ulgfh5lAO2CMuHxaL9N/6PLoFuo8+JMyvg
+ Qq+MND7DaUXX0Hudh2NMyKeP+mzvfRUVx0Q7C0LDwNWp4zqTjJU3aIfOY41RLT2h8A/8wNq
+ 0pqi3WrazRmmTY/RbKlbQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BgHa6KlryuA=:QcMxTf3AWd9ZMzt6FK4ZPS
+ sApnC43GKH4N4tqDQGTX/rj+qgc8NPGvO2gZLI5SoeHeRPk0MwBWZall0vbssVWwvOw0ZNfmn
+ chc8CieXPhvySw77NUavKTBa2SJywrVIGlf0H3EiTmf9ZPWO6j9P8YKnvea0M3G+uBMLz1Ij4
+ BNrxIjg4WUCei17WxIyfDI7UY2n1jM2ss+FI5fEhBDuiHsmH5MA5Adn4FI46lP0oZ2lrduUpI
+ V8RCI8hrA3CAobOZNgpjI6Hq2HF0JVNLpbDj/ReIodrOasfbc05SMpDpMYnL1IGlBfP2/tVbr
+ FJL5Io6Em40EyWkW6OaxMGDRodQq+96peU5mN65jInsOdm1Ub6MU+NWuTriv5gUnpGyBUvOWB
+ bQi1/C2NAQlde87Hv2xrzK8DPyryvXtjUE3diZIsBytG6S8n82BqitEVwROMUIN6/O6jG8Ejo
+ lnXK74cWEg43PPC4JIA0kEGoQTOcuH5V9E+kqPY1/otIWI3kRzd6UzvK/sSb1gNdwRLpA6Oyr
+ 30NUdNJ7vWtNVDdx/JKre62tP2Kv7OnHbnWNHrZr1lHGcqq2aaasBYnbyhZRUitewoYIKfUiH
+ QCYCOEKBEMobGu9arc11gfcMcy9WUCypVvR5EQzEWjVtXVGlAol45wwNccgUB7E7xkoRZ3Vc8
+ p59skZj+Dg3mUfGRMYPmk0JixwD6Zg1oWYDqP2FUuK5VyVsOf9e9ur6GYBHzsL2mx26ZBW597
+ J43RswhDsh9ZBsrEXDyGNx4c/GXmXTHHkSA+2BbT0Zff36YiNlU6g3ZXO9b0NpLBW22qb0cEL
+ 0Bu7xVTvrvcgfWGbrvK7/7iWScvdYQxxk0hiqR3X4Uzwbsk2x16ZtxHvzdki5j1D40yD+v0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,65 +76,378 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+We don't support other 32bit architecture.
+Update file to comply with coding style (TAB).
 
-Building the qemu:debian-amd64 fails when building VirGL:
-
-  make[2]: Entering directory '/usr/src/virglrenderer/src/gallium/auxiliary'
-    CC       cso_cache/cso_cache.lo
-    CC       cso_cache/cso_hash.lo
-    CC       os/os_misc.lo
-    CC       util/u_debug.lo
-    CC       util/u_debug_describe.lo
-    CC       util/u_format.lo
-    GEN      util/u_format_table.c
-  Traceback (most recent call last):
-    File "./util/u_format_table.py", line 168, in <module>
-      main()
-    File "./util/u_format_table.py", line 164, in main
-      write_format_table(formats)
-    File "./util/u_format_table.py", line 132, in write_format_table
-      print("   %s,\t/* is_array */" % (bool_map(format.is_array()),))
-    File "/usr/src/virglrenderer/src/gallium/auxiliary/util/u_format_parse.py", line 164, in is_array
-      return self.array_element() != None
-    File "/usr/src/virglrenderer/src/gallium/auxiliary/util/u_format_parse.py", line 73, in __eq__
-      return self.type == other.type and self.norm == other.norm and self.pure == other.pure and self.size == other.size
-  AttributeError: 'NoneType' object has no attribute 'type'
-  make[2]: Leaving directory '/usr/src/virglrenderer/src/gallium/auxiliary'
-  make[2]: *** [Makefile:906: util/u_format_table.c] Error 1
-  make[1]: *** [Makefile:631: install-recursive] Error 1
-
-VirGL commits a8962eda1..a613dcc82 fix this problem.
-Update to VirGL 0.8.0 which contains them.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200212202709.12665-4-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
+Message-Id: <20200310103403.3284090-11-laurent@vivier.eu>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ linux-user/s390x/syscall_nr.h | 313 +++++++++++++---------------------
+ 1 file changed, 123 insertions(+), 190 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index a1d40a56fa1..c70c916343e 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -28,7 +28,7 @@ RUN apt update && \
-         libepoxy-dev \
-         libgbm-dev
- RUN git clone https://gitlab.freedesktop.org/virgl/virglrenderer.git /usr/src/virglrenderer && \
--    cd /usr/src/virglrenderer && git checkout virglrenderer-0.7.0
-+    cd /usr/src/virglrenderer && git checkout virglrenderer-0.8.0
- RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --disable-tests && make install
+diff --git a/linux-user/s390x/syscall_nr.h b/linux-user/s390x/syscall_nr.h
+index b1553a0810c8..261da1b0c30e 100644
+--- a/linux-user/s390x/syscall_nr.h
++++ b/linux-user/s390x/syscall_nr.h
+@@ -11,7 +11,7 @@
+ #define TARGET_NR_write                4
+ #define TARGET_NR_open                 5
+ #define TARGET_NR_close                6
+-#define TARGET_NR_restart_syscall	  7
++#define TARGET_NR_restart_syscall         7
+ #define TARGET_NR_creat                8
+ #define TARGET_NR_link                 9
+ #define TARGET_NR_unlink              10
+@@ -108,6 +108,7 @@
+ #define TARGET_NR_personality        136
+ #define TARGET_NR_afs_syscall        137 /* Syscall for Andrew File System */
+ #define TARGET_NR_getdents           141
++#define TARGET_NR_select                142
+ #define TARGET_NR_flock              143
+ #define TARGET_NR_msync              144
+ #define TARGET_NR_readv              145
+@@ -147,116 +148,137 @@
+ #define TARGET_NR_capset             185
+ #define TARGET_NR_sigaltstack        186
+ #define TARGET_NR_sendfile           187
+-#define TARGET_NR_getpmsg		188
+-#define TARGET_NR_putpmsg		189
+-#define TARGET_NR_vfork		190
++#define TARGET_NR_getpmsg               188
++#define TARGET_NR_putpmsg               189
++#define TARGET_NR_vfork         190
++#define TARGET_NR_getrlimit             191     /* SuS compliant getrlimit */
++#define TARGET_NR_lchown                198
++#define TARGET_NR_getuid                199
++#define TARGET_NR_getgid                200
++#define TARGET_NR_geteuid               201
++#define TARGET_NR_getegid               202
++#define TARGET_NR_setreuid              203
++#define TARGET_NR_setregid              204
++#define TARGET_NR_getgroups     205
++#define TARGET_NR_setgroups     206
++#define TARGET_NR_fchown                207
++#define TARGET_NR_setresuid     208
++#define TARGET_NR_getresuid     209
++#define TARGET_NR_setresgid     210
++#define TARGET_NR_getresgid     211
++#define TARGET_NR_chown                 212
++#define TARGET_NR_setuid                213
++#define TARGET_NR_setgid                214
++#define TARGET_NR_setfsuid              215
++#define TARGET_NR_setfsgid              216
+ #define TARGET_NR_pivot_root         217
+ #define TARGET_NR_mincore            218
+ #define TARGET_NR_madvise            219
+-#define TARGET_NR_getdents64		220
+-#define TARGET_NR_readahead		222
+-#define TARGET_NR_setxattr		224
+-#define TARGET_NR_lsetxattr		225
+-#define TARGET_NR_fsetxattr		226
+-#define TARGET_NR_getxattr		227
+-#define TARGET_NR_lgetxattr		228
+-#define TARGET_NR_fgetxattr		229
+-#define TARGET_NR_listxattr		230
+-#define TARGET_NR_llistxattr		231
+-#define TARGET_NR_flistxattr		232
+-#define TARGET_NR_removexattr	233
+-#define TARGET_NR_lremovexattr	234
+-#define TARGET_NR_fremovexattr	235
+-#define TARGET_NR_gettid		236
+-#define TARGET_NR_tkill		237
+-#define TARGET_NR_futex		238
+-#define TARGET_NR_sched_setaffinity	239
+-#define TARGET_NR_sched_getaffinity	240
+-#define TARGET_NR_tgkill		241
++#define TARGET_NR_getdents64            220
++#define TARGET_NR_readahead             222
++#define TARGET_NR_setxattr              224
++#define TARGET_NR_lsetxattr             225
++#define TARGET_NR_fsetxattr             226
++#define TARGET_NR_getxattr              227
++#define TARGET_NR_lgetxattr             228
++#define TARGET_NR_fgetxattr             229
++#define TARGET_NR_listxattr             230
++#define TARGET_NR_llistxattr            231
++#define TARGET_NR_flistxattr            232
++#define TARGET_NR_removexattr   233
++#define TARGET_NR_lremovexattr  234
++#define TARGET_NR_fremovexattr  235
++#define TARGET_NR_gettid                236
++#define TARGET_NR_tkill         237
++#define TARGET_NR_futex         238
++#define TARGET_NR_sched_setaffinity     239
++#define TARGET_NR_sched_getaffinity     240
++#define TARGET_NR_tgkill                241
+ /* Number 242 is reserved for tux */
+-#define TARGET_NR_io_setup		243
+-#define TARGET_NR_io_destroy		244
+-#define TARGET_NR_io_getevents	245
+-#define TARGET_NR_io_submit		246
+-#define TARGET_NR_io_cancel		247
+-#define TARGET_NR_exit_group		248
+-#define TARGET_NR_epoll_create	249
+-#define TARGET_NR_epoll_ctl		250
+-#define TARGET_NR_epoll_wait		251
+-#define TARGET_NR_set_tid_address	252
+-#define TARGET_NR_fadvise64		253
+-#define TARGET_NR_timer_create	254
+-#define TARGET_NR_timer_settime	(TARGET_NR_timer_create+1)
+-#define TARGET_NR_timer_gettime	(TARGET_NR_timer_create+2)
+-#define TARGET_NR_timer_getoverrun	(TARGET_NR_timer_create+3)
+-#define TARGET_NR_timer_delete	(TARGET_NR_timer_create+4)
+-#define TARGET_NR_clock_settime	(TARGET_NR_timer_create+5)
+-#define TARGET_NR_clock_gettime	(TARGET_NR_timer_create+6)
+-#define TARGET_NR_clock_getres	(TARGET_NR_timer_create+7)
+-#define TARGET_NR_clock_nanosleep	(TARGET_NR_timer_create+8)
++#define TARGET_NR_io_setup              243
++#define TARGET_NR_io_destroy            244
++#define TARGET_NR_io_getevents  245
++#define TARGET_NR_io_submit             246
++#define TARGET_NR_io_cancel             247
++#define TARGET_NR_exit_group            248
++#define TARGET_NR_epoll_create  249
++#define TARGET_NR_epoll_ctl             250
++#define TARGET_NR_epoll_wait            251
++#define TARGET_NR_set_tid_address       252
++#define TARGET_NR_fadvise64             253
++#define TARGET_NR_timer_create  254
++#define TARGET_NR_timer_settime (TARGET_NR_timer_create + 1)
++#define TARGET_NR_timer_gettime (TARGET_NR_timer_create + 2)
++#define TARGET_NR_timer_getoverrun      (TARGET_NR_timer_create + 3)
++#define TARGET_NR_timer_delete  (TARGET_NR_timer_create + 4)
++#define TARGET_NR_clock_settime (TARGET_NR_timer_create + 5)
++#define TARGET_NR_clock_gettime (TARGET_NR_timer_create + 6)
++#define TARGET_NR_clock_getres  (TARGET_NR_timer_create + 7)
++#define TARGET_NR_clock_nanosleep       (TARGET_NR_timer_create + 8)
+ /* Number 263 is reserved for vserver */
+-#define TARGET_NR_statfs64		265
+-#define TARGET_NR_fstatfs64		266
+-#define TARGET_NR_remap_file_pages	267
++#define TARGET_NR_statfs64              265
++#define TARGET_NR_fstatfs64             266
++#define TARGET_NR_remap_file_pages      267
+ /* Number 268 is reserved for new sys_mbind */
+ /* Number 269 is reserved for new sys_get_mempolicy */
+ /* Number 270 is reserved for new sys_set_mempolicy */
+-#define TARGET_NR_mq_open		271
+-#define TARGET_NR_mq_unlink		272
+-#define TARGET_NR_mq_timedsend	273
+-#define TARGET_NR_mq_timedreceive	274
+-#define TARGET_NR_mq_notify		275
+-#define TARGET_NR_mq_getsetattr	276
+-#define TARGET_NR_kexec_load		277
+-#define TARGET_NR_add_key		278
+-#define TARGET_NR_request_key	279
+-#define TARGET_NR_keyctl		280
+-#define TARGET_NR_waitid		281
+-#define TARGET_NR_ioprio_set		282
+-#define TARGET_NR_ioprio_get		283
+-#define TARGET_NR_inotify_init	284
+-#define TARGET_NR_inotify_add_watch	285
+-#define TARGET_NR_inotify_rm_watch	286
++#define TARGET_NR_mq_open               271
++#define TARGET_NR_mq_unlink             272
++#define TARGET_NR_mq_timedsend  273
++#define TARGET_NR_mq_timedreceive       274
++#define TARGET_NR_mq_notify             275
++#define TARGET_NR_mq_getsetattr 276
++#define TARGET_NR_kexec_load            277
++#define TARGET_NR_add_key               278
++#define TARGET_NR_request_key   279
++#define TARGET_NR_keyctl                280
++#define TARGET_NR_waitid                281
++#define TARGET_NR_ioprio_set            282
++#define TARGET_NR_ioprio_get            283
++#define TARGET_NR_inotify_init  284
++#define TARGET_NR_inotify_add_watch     285
++#define TARGET_NR_inotify_rm_watch      286
+ /* Number 287 is reserved for new sys_migrate_pages */
+-#define TARGET_NR_openat		288
+-#define TARGET_NR_mkdirat		289
+-#define TARGET_NR_mknodat		290
+-#define TARGET_NR_fchownat		291
+-#define TARGET_NR_futimesat		292
+-#define TARGET_NR_unlinkat		294
+-#define TARGET_NR_renameat		295
+-#define TARGET_NR_linkat		296
+-#define TARGET_NR_symlinkat		297
+-#define TARGET_NR_readlinkat		298
+-#define TARGET_NR_fchmodat		299
+-#define TARGET_NR_faccessat		300
+-#define TARGET_NR_pselect6		301
+-#define TARGET_NR_ppoll		302
+-#define TARGET_NR_unshare		303
+-#define TARGET_NR_set_robust_list	304
+-#define TARGET_NR_get_robust_list	305
+-#define TARGET_NR_splice		306
+-#define TARGET_NR_sync_file_range	307
+-#define TARGET_NR_tee		308
+-#define TARGET_NR_vmsplice		309
++#define TARGET_NR_openat                288
++#define TARGET_NR_mkdirat               289
++#define TARGET_NR_mknodat               290
++#define TARGET_NR_fchownat              291
++#define TARGET_NR_futimesat             292
++#define TARGET_NR_newfstatat            293
++#define TARGET_NR_unlinkat              294
++#define TARGET_NR_renameat              295
++#define TARGET_NR_linkat                296
++#define TARGET_NR_symlinkat             297
++#define TARGET_NR_readlinkat            298
++#define TARGET_NR_fchmodat              299
++#define TARGET_NR_faccessat             300
++#define TARGET_NR_pselect6              301
++#define TARGET_NR_ppoll         302
++#define TARGET_NR_unshare               303
++#define TARGET_NR_set_robust_list       304
++#define TARGET_NR_get_robust_list       305
++#define TARGET_NR_splice                306
++#define TARGET_NR_sync_file_range       307
++#define TARGET_NR_tee           308
++#define TARGET_NR_vmsplice              309
+ /* Number 310 is reserved for new sys_move_pages */
+-#define TARGET_NR_getcpu		311
+-#define TARGET_NR_epoll_pwait	312
+-#define TARGET_NR_utimes		313
+-#define TARGET_NR_fallocate		314
+-#define TARGET_NR_utimensat		315
+-#define TARGET_NR_signalfd		316
+-#define TARGET_NR_timerfd		317
+-#define TARGET_NR_eventfd		318
+-#define TARGET_NR_timerfd_create	319
+-#define TARGET_NR_timerfd_settime	320
+-#define TARGET_NR_timerfd_gettime	321
+-#define TARGET_NR_signalfd4		322
+-#define TARGET_NR_eventfd2		323
+-#define TARGET_NR_inotify_init1	324
+-#define TARGET_NR_pipe2		325
+-#define TARGET_NR_dup3		326
+-#define TARGET_NR_epoll_create1	327
++#define TARGET_NR_getcpu                311
++#define TARGET_NR_epoll_pwait   312
++#define TARGET_NR_utimes                313
++#define TARGET_NR_fallocate             314
++#define TARGET_NR_utimensat             315
++#define TARGET_NR_signalfd              316
++#define TARGET_NR_timerfd               317
++#define TARGET_NR_eventfd               318
++#define TARGET_NR_timerfd_create        319
++#define TARGET_NR_timerfd_settime       320
++#define TARGET_NR_timerfd_gettime       321
++#define TARGET_NR_signalfd4             322
++#define TARGET_NR_eventfd2              323
++#define TARGET_NR_inotify_init1 324
++#define TARGET_NR_pipe2         325
++#define TARGET_NR_dup3          326
++#define TARGET_NR_epoll_create1 327
+ #define TARGET_NR_preadv                328
+ #define TARGET_NR_pwritev               329
+ #define TARGET_NR_rt_tgsigqueueinfo     330
+@@ -305,94 +327,5 @@
+ #define TARGET_NR_shutdown              373
+ #define TARGET_NR_mlock2                374
  
- # netmap
+-/*
+- * There are some system calls that are not present on 64 bit, some
+- * have a different name although they do the same (e.g. TARGET_NR_chown32
+- * is TARGET_NR_chown on 64 bit).
+- */
+-#ifndef TARGET_S390X
+-
+-#define TARGET_NR_time		 13
+-#define TARGET_NR_lchown		 16
+-#define TARGET_NR_setuid		 23
+-#define TARGET_NR_getuid		 24
+-#define TARGET_NR_stime		 25
+-#define TARGET_NR_setgid		 46
+-#define TARGET_NR_getgid		 47
+-#define TARGET_NR_geteuid		 49
+-#define TARGET_NR_getegid		 50
+-#define TARGET_NR_setreuid		 70
+-#define TARGET_NR_setregid		 71
+-#define TARGET_NR_getrlimit		 76
+-#define TARGET_NR_getgroups		 80
+-#define TARGET_NR_setgroups		 81
+-#define TARGET_NR_fchown		 95
+-#define TARGET_NR_ioperm		101
+-#define TARGET_NR_setfsuid		138
+-#define TARGET_NR_setfsgid		139
+-#define TARGET_NR__llseek		140
+-#define TARGET_NR__newselect 	142
+-#define TARGET_NR_setresuid		164
+-#define TARGET_NR_getresuid		165
+-#define TARGET_NR_setresgid		170
+-#define TARGET_NR_getresgid		171
+-#define TARGET_NR_chown		182
+-#define TARGET_NR_ugetrlimit		191	/* SuS compliant getrlimit */
+-#define TARGET_NR_mmap2		192
+-#define TARGET_NR_truncate64		193
+-#define TARGET_NR_ftruncate64	194
+-#define TARGET_NR_stat64		195
+-#define TARGET_NR_lstat64		196
+-#define TARGET_NR_fstat64		197
+-#define TARGET_NR_lchown32		198
+-#define TARGET_NR_getuid32		199
+-#define TARGET_NR_getgid32		200
+-#define TARGET_NR_geteuid32		201
+-#define TARGET_NR_getegid32		202
+-#define TARGET_NR_setreuid32		203
+-#define TARGET_NR_setregid32		204
+-#define TARGET_NR_getgroups32	205
+-#define TARGET_NR_setgroups32	206
+-#define TARGET_NR_fchown32		207
+-#define TARGET_NR_setresuid32	208
+-#define TARGET_NR_getresuid32	209
+-#define TARGET_NR_setresgid32	210
+-#define TARGET_NR_getresgid32	211
+-#define TARGET_NR_chown32		212
+-#define TARGET_NR_setuid32		213
+-#define TARGET_NR_setgid32		214
+-#define TARGET_NR_setfsuid32		215
+-#define TARGET_NR_setfsgid32		216
+-#define TARGET_NR_fcntl64		221
+-#define TARGET_NR_sendfile64		223
+-#define TARGET_NR_fadvise64_64	264
+-#define TARGET_NR_fstatat64		293
+-
+-#else
+-
+-#define TARGET_NR_select		142
+-#define TARGET_NR_getrlimit		191	/* SuS compliant getrlimit */
+-#define TARGET_NR_lchown  		198
+-#define TARGET_NR_getuid  		199
+-#define TARGET_NR_getgid  		200
+-#define TARGET_NR_geteuid  		201
+-#define TARGET_NR_getegid  		202
+-#define TARGET_NR_setreuid  		203
+-#define TARGET_NR_setregid  		204
+-#define TARGET_NR_getgroups  	205
+-#define TARGET_NR_setgroups  	206
+-#define TARGET_NR_fchown  		207
+-#define TARGET_NR_setresuid  	208
+-#define TARGET_NR_getresuid  	209
+-#define TARGET_NR_setresgid  	210
+-#define TARGET_NR_getresgid  	211
+-#define TARGET_NR_chown  		212
+-#define TARGET_NR_setuid  		213
+-#define TARGET_NR_setgid  		214
+-#define TARGET_NR_setfsuid  		215
+-#define TARGET_NR_setfsgid  		216
+-#define TARGET_NR_newfstatat		293
+-
+-#endif
+ 
+ #endif
 -- 
-2.20.1
+2.24.1
 
 
