@@ -2,86 +2,81 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D5FC18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 11:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90998C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 11:38:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB9E72076A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 11:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F29DC20724
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 11:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="w+Svhp4c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9E72076A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA7/aw/l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29DC20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDnye-0001rK-Oa
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 07:32:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38282)
+	id 1jDo4z-0004Fx-CB
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 07:38:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55089)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jDmgv-000635-CH
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:50 -0400
+ (envelope-from <kchamart@redhat.com>) id 1jDnUf-000873-4I
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1jDmgu-0004LW-75
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:49 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40168)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1jDmgt-0003zS-V4
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 06:09:48 -0400
-Received: by mail-wm1-x343.google.com with SMTP id z12so8107477wmf.5
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 03:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=6H29QJg5B7bgS/AMKBONCsgkT/bfdiwpiQn7qsNuQ08=;
- b=w+Svhp4cGh5E4G64FVtLDqRzoo9jo6hTS5Mtm6YdRuvLH7sVjCIjXBsJFqEQG+qD7D
- NjF4pOrrmcOW4ItqTVoxnL/TMI2ymHKhSdbR4K7kFjrgWLTlZbdmvt2zLgk87SQcO3VF
- UHYQqgkBsVY1T5XN4TpftCaIDc646eYgIIZIFuH0c90nLnK3639Vr8mb5IIz0oXSEi9S
- Zy7JodrXqz6zQV8vyWnbHfOOfV7kJt06wfwbfxGXsrMPRq8kUyJ8LD9X2NnI4+XZEoF0
- eytsfT2esSnkt/vcsAQkj0NOt2F/BodvvVDTgFoytezV8w6gxJaZNpZboIKnUKNaiQhv
- ycoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=6H29QJg5B7bgS/AMKBONCsgkT/bfdiwpiQn7qsNuQ08=;
- b=TXCaPgB/IDG3bz1tOdRclLnqpaI8lNtEvqHU8TAMq96F8VoRKQPKRlmOh0Sg4S4nKp
- lc/OAqnk6OGOjx+khfX7untEYCeCOQ6XQzZLhnPtBtop++Dzyy8Mx97MRbBFqovoyMAQ
- 9Rdd9/24hOLWuDQg6GFyV2oys2uuj4BgKrINshSEEDroalLyKuuLtS6VcRvoxZfKNoaX
- HJmqv8alT357sx9PefpcU6Y98JczR+4OEhx1m0YLNP/3nyPY+76dRvzDEvaBbXIB7GOp
- g8LiE7wduyiVzYVljouHMs++lwl1InOZHBxfpTuhmwAni7QQuRJclsARwZA3tVQipQPr
- K2Bg==
-X-Gm-Message-State: ANhLgQ3duV42GnHRZJetugr9aNzVjW9E1i9VXsRfDAYQKs33DurlvFHV
- TxbxJmFielqR1DUwN343vpmxfM55Njvq1A==
-X-Google-Smtp-Source: ADFU+vuXByjITBfw2urnYct3pk7FPEG9hsldv4bbJLUH3odgAyGaE/i9Jh/tBaOiohze0LTgfTst7A==
-X-Received: by 2002:a7b:cb86:: with SMTP id m6mr2648250wmi.72.1584353385175;
- Mon, 16 Mar 2020 03:09:45 -0700 (PDT)
-Received: from f2.redhat.com (bzq-79-183-43-120.red.bezeqint.net.
- [79.183.43.120])
- by smtp.gmail.com with ESMTPSA id l7sm22083171wrw.33.2020.03.16.03.09.43
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 16 Mar 2020 03:09:44 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org,
-	mst@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH v4 4/6] tap: allow extended virtio header with hash info
-Date: Mon, 16 Mar 2020 12:09:31 +0200
-Message-Id: <20200316100933.11499-5-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200316100933.11499-1-yuri.benditovich@daynix.com>
-References: <20200316100933.11499-1-yuri.benditovich@daynix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+ (envelope-from <kchamart@redhat.com>) id 1jDnUT-0000gH-27
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:01:08 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57078
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1jDnUP-0000CZ-GJ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:00:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584356450;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Dg6Z/zM68y6egVxjTIxJNihvnmhssR0VTz+eymxL59Y=;
+ b=bA7/aw/lp5fWg19tNMkChvsyNSGBffRekC3daLAe5be0XTT32aEtZ6FILSsV6bahRLNRMH
+ arXbS+00sP1DYMcdvhufigDnjYoVxrukf4njZy2j1P8yFZNxDHkePotfbGCQ0hZ5oIYwBb
+ p+sGtOYxtIhA012MxeyoSfNJeI8D/kM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-BFVJiV76NR-2JZ9X_6LFDQ-1; Mon, 16 Mar 2020 07:00:48 -0400
+X-MC-Unique: BFVJiV76NR-2JZ9X_6LFDQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11EF6105253F;
+ Mon, 16 Mar 2020 11:00:47 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.119.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 140248B756;
+ Mon, 16 Mar 2020 11:00:46 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 9FDF23E048A; Mon, 16 Mar 2020 12:00:43 +0100 (CET)
+Date: Mon, 16 Mar 2020 12:00:43 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] softmmu/vl.c: Handle '-cpu help' and '-device help'
+ before 'no default machine'
+Message-ID: <20200316110043.GN22884@paraplu>
+References: <20200313172447.15471-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20200313172447.15471-1-peter.maydell@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,46 +88,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- net/tap.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+[Cc: Markus; he'd be pleasantly surprised with this, if he already
+hadn't noticed this, as he was also mildly annoyed about this the other
+day.]
 
-diff --git a/net/tap.c b/net/tap.c
-index 6207f61f84..47de7fdeb6 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -63,6 +63,14 @@ typedef struct TAPState {
-     Notifier exit;
- } TAPState;
- 
-+/* TODO: remove when virtio_net.h updated */
-+struct virtio_net_hdr_v1_hash {
-+    struct virtio_net_hdr_v1 hdr;
-+    uint32_t hash_value;
-+    uint16_t hash_report;
-+    uint16_t padding;
-+};
-+
- static void launch_script(const char *setup_script, const char *ifname,
-                           int fd, Error **errp);
- 
-@@ -254,7 +262,8 @@ static void tap_set_vnet_hdr_len(NetClientState *nc, int len)
- 
-     assert(nc->info->type == NET_CLIENT_DRIVER_TAP);
-     assert(len == sizeof(struct virtio_net_hdr_mrg_rxbuf) ||
--           len == sizeof(struct virtio_net_hdr));
-+           len == sizeof(struct virtio_net_hdr) ||
-+           len == sizeof(struct virtio_net_hdr_v1_hash));
- 
-     tap_fd_set_vnet_hdr_len(s->fd, len);
-     s->host_vnet_hdr_len = len;
--- 
-2.17.1
+On Fri, Mar 13, 2020 at 05:24:47PM +0000, Peter Maydell wrote:
+> Currently if you try to ask for the list of CPUs for a target
+> architecture which does not specify a default machine type
+> you just get an error:
+>=20
+>   $ qemu-system-arm -cpu help
+>   qemu-system-arm: No machine specified, and there is no default
+>   Use -machine help to list supported machines
+
+I just applied the patch and built on QEMU.
+
+With `qemu-system-arm`:
+
+    $> ./arm-softmmu/qemu-system-arm -cpu help | head -5
+    Available CPUs:
+      arm1026
+      arm1136
+      arm1136-r2
+      arm1176
+
+    $> ./arm-softmmu/qemu-system-arm -device help | head -5
+    Controller/Bridge/Hub devices:
+    name "i82801b11-bridge", bus PCI
+    name "ioh3420", bus PCI, desc "Intel IOH device id 3420 PCIE Root Port"
+    name "pci-bridge", bus PCI, desc "Standard PCI Bridge"
+    name "pci-bridge-seat", bus PCI, desc "Standard PCI Bridge (multiseat)"
+
+With `qemu-system-aarch64`:
+
+    $> ./aarch64-softmmu/qemu-system-aarch64 -cpu help | head -5
+    Available CPUs:
+      arm1026
+      arm1136
+      arm1136-r2
+      arm1176
+
+    $> ./aarch64-softmmu/qemu-system-aarch64 -device help | head -5
+    Controller/Bridge/Hub devices:
+    name "i82801b11-bridge", bus PCI
+    name "ioh3420", bus PCI, desc "Intel IOH device id 3420 PCIE Root Port"
+    name "pci-bridge", bus PCI, desc "Standard PCI Bridge"
+    name "pci-bridge-seat", bus PCI, desc "Standard PCI Bridge (multiseat)"
+
+> Since the list of CPUs doesn't depend on the machine, this is
+> unnecessarily unhelpful. "-device help" has a similar problem.
+>=20
+> Move the checks for "did the user ask for -cpu help or -device help"
+> up so they precede the select_machine() call which checks that the
+> user specified a valid machine type.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Tested-by: Kashyap Chamarthy <kchamart@redhat.com>
+
+> ---
+> This has been on-and-off irritating me for years, and it's
+> embarrassing how simple the fix turns out to be...
+> ---
+>  softmmu/vl.c | 26 ++++++++++++++++----------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
+
+[...]=20
+
+Thanks. :)
+
+--=20
+/kashyap
 
 
