@@ -2,84 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3E1C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8153DC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B19D2051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B18D2051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 13:52:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pL+dBtWV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B19D2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4wk6LOH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B18D2051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDq8j-0001XW-9w
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 09:50:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39820)
+	id 1jDqAB-00029T-UE
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 09:52:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jDobd-0000Rj-UZ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:31 -0400
+ (envelope-from <armbru@redhat.com>) id 1jDoy8-0000U9-KQ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jDobc-0006Bo-FJ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:29 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41418)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jDobc-0005zq-9e
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:28 -0400
-Received: by mail-oi1-x242.google.com with SMTP id b17so2528813oic.8
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xA/NkwmBQS1Ovh/Xq0r0lrVPATIm9+TuTnIjrlEFY8Y=;
- b=pL+dBtWV+hPjTE18GX3gS/DP3w1IA0EvZqVpgxznSgI0vsX8H5qW4bd/KmEGh3SFIT
- igDOrQI0ajFrNdD9DPRTzf4aOrm8nrHfFGAlB+ZLC7tjT02b46vRl5MyMc/EdNfZlzZC
- pr6FrRlRzGTu3SoWfe4IyejIMxio1JEXxQP3aQfIBryTLy1Ur5z1f9/WDPiNXVoFBw98
- gWDTF97VAsWADMqwYINizkuLDRsT1hKDxTLnKjrAFxQaSHXIZpoJ2on4h32mdQ4tEc2e
- aAmpAleBGrA2d+RG3f/U0AFFhui3bOHzqeZKvQxshe1kTopsL+9Mp6yEfwXeflM76Lsx
- AHYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xA/NkwmBQS1Ovh/Xq0r0lrVPATIm9+TuTnIjrlEFY8Y=;
- b=L8vEq38Nd9EbquIBaypYKnetpDVlnMZnEOALJ+tdVym6JLqeyB8vUtT5jBJWEvky8+
- ti1R6lP448QofvwwwxGp1DjezTWpb/6GJHvmXW349ctQUcmtCeVoKxPAzHeUqAVG/04z
- 8RFuApPzt2oVQ703w08V0Rrmj9sSFH68FGgIRJYiMDoWgxjs5h7uyRVS4lZJMqteqv86
- ieBBryh5AnQfnv6AGbsZg3DYLz7IVdD2s7nlpK6p2STSmtd8wjo+KFliGxY91Jd6Gv4e
- AJBLRLOSvykmHjdMF0CpFTnsLpgdj1q7mpgTt7COLT1KrXad0Du902yoPY0EdYUbSYuJ
- ulHw==
-X-Gm-Message-State: ANhLgQ02UHSKpDGrDgPE3++DlMfTr1064kg9seHQNAKR0CsuUrldnO62
- APKFyGl8CIkt6LWqPoN2BHQkC55zc3q8/tI1oTpHwA==
-X-Google-Smtp-Source: ADFU+vu//EMTq90o9vQiWKqx72DkxmkAoGtZEN9JXuzbrpClRgeer3NU6+J49pc+PXOVBiR7tP6+fVEfTvddrDlzRjw=
-X-Received: by 2002:aca:190f:: with SMTP id l15mr6339972oii.48.1584360747205; 
- Mon, 16 Mar 2020 05:12:27 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1jDoy7-0007OR-FR
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31539
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jDoy7-0007Ik-8J
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:35:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584362142;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AwGbThKUayZFmTsEgOSli9T1zKZzRE8pFg9snwazUkk=;
+ b=C4wk6LOHBL643Br33Jr1UMxkucsljg7AkD/LEEQxDKd8oM6d5MZul3ZabXUx8mMBW/jS9b
+ /nlz4FevqFX2TbJmPU+qsFN/teNzHW3Rk3cZm58nxv0conVuxNsZVr1HXn2VwnSzvpV8GF
+ N+iJe7J7CL9iDiZyx9fInX/Ug1/ah9w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-aM25U8FNP1CrgSwCFkqf8A-1; Mon, 16 Mar 2020 08:35:40 -0400
+X-MC-Unique: aM25U8FNP1CrgSwCFkqf8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EACB9DB67;
+ Mon, 16 Mar 2020 12:35:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-49.ams2.redhat.com
+ [10.36.116.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D4410027A7;
+ Mon, 16 Mar 2020 12:35:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 129841138404; Mon, 16 Mar 2020 13:35:38 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] net: Complete qapi-fication of netdev_add
+References: <20200312211440.3767626-1-eblake@redhat.com>
+ <877dznewyh.fsf@dusky.pond.sub.org>
+Date: Mon, 16 Mar 2020 13:35:38 +0100
+In-Reply-To: <877dznewyh.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 13 Mar 2020 23:01:10 +0100")
+Message-ID: <87o8swiijp.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200312193616.438922-1-crosa@redhat.com>
- <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
- <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
- <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
- <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Mar 2020 12:12:16 +0000
-Message-ID: <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
-Subject: Re: [PATCH 0/5] QEMU Gating CI
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,49 +90,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Wainer Moschetta <wmoschet@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: lekiravi@yandex-team.ru, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 at 12:04, Cleber Rosa <crosa@redhat.com> wrote:
-> A few possible reasons come to my mind:
->
-> 1) It usually takes a few seconds after the push for the pipeline to
->
-> 2) If you've pushed to a repo different than gitlab.com/qemu-project/qemu=
-,
->    you'd have to tweak the project ID (-p|--project-id).
->
-> 3) The local branch is not called "staging", so the script can not find t=
-he
->    commit ID, in that case you can use -c|--commit.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Yes, the local branch is something else for the purposes of
-testing this series. But using --commit doesn't work either:
+[...]
+> We better check all other uses of option group "netdev".
 
-$ ./contrib/ci/scripts/gitlab-pipeline-status --verbose --commit
-81beaaab0851fe8c4db971 --wait
-ERROR: No pipeline found
-failure
+To the best of my grepping abilities:
 
-On the web UI:
-https://gitlab.com/qemu-project/qemu/pipelines
-the pipelines are marked "stuck" (I don't know why there
-are two of them for the same commit); drilling down,
-the build part has completed but all the test parts are
-pending with "=EF=BB=BFThis job is stuck because you don't have
-any active runners online with any of these tags assigned
-to them" type messages.
-=EF=BB=BF=EF=BB=BF=EF=BB=BF
-thanks
--- PMM
+=3D Definition =3D
+
+* qemu_netdev_opts
+
+  Option group definition, with empty .desc[].
+
+=3D CLI =3D
+
+Keep in mind: we finish processing CLI netdev before we start monitors
+(we call net_init_clients() is mon_init_func()).  Monitor commands can
+mess with CLI netdevs, but CLI cannot mess with monitor netdevs.
+
+* main()
+
+  - case QEMU_OPTION_netdev
+
+    Straighforward parse of option argument; record in
+    @qemu_netdev_opts.
+
+  - case QEMU_OPTION_readconfig
+
+    Similar.
+
+  - case QEMU_OPTION_writeconfig
+
+    "Unparse" of @qemu_netdev_opts.  Can contains only CLI netdevs.
+
+* net_init_clients()
+
+  Pass the CLI netdevs to net_client_init().
+
+=3D Monitor =3D
+
+* hmp_netdev_add()
+
+  Straighforward parse of command argument (record in
+  @qemu_netdev_opts), pass to net_client_init() via netdev_add().
+
+* qmp_netdev_add()
+
+  Before your patch: convert from JSON to QemuOpts (record in
+  @qemu_netdev_opts), pass to net_client_init() via netdev_add().
+
+  Note: net_client_init() converts QemuOpts to QAPI type Netdev, and
+  passes that to net_client_init1().
+
+  Afterwards: convert JSON straight to Netdev, pass to
+  net_client_init1().  Also create in @qemu_netdev_opts, but empty apart
+  from ID.
+
+* qmp_netdev_del()
+* netdev_del_completion()
+
+  Both implement a "NetClientState is a netdev" predicate by checking
+  "@qemu_netdev_opts has an entry with this name".
+
+Looks like the only thing we do with the QemuOpts recorded in
+@qemu_netdev_opts is checking existence.  Your patch preserves that.  I
+doesn't preserve the option parameters, but they are not used.  Okay.
+
+The correctness argument becomes simpler if we implement the "is a
+netdev" predicate without @qemu_netdev_opts.  Could be done either
+before or after this patch.
+
 
