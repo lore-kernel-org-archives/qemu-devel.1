@@ -2,64 +2,63 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC760C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 03:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A34C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 03:53:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6CEB20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 03:26:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cIw7C2dB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CEB20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 6F63120658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 03:53:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F63120658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDgP1-0004RN-HX
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 23:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37292)
+	id 1jDgoQ-0000XZ-BA
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 23:53:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jDgAp-00011M-4J
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 23:12:16 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jDgd5-000729-Dk
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 23:41:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jDgAm-0007NE-M9
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 23:12:14 -0400
-Received: from ozlabs.org ([203.11.71.1]:48559)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jDgd4-00089w-2i
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 23:41:27 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:39839)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jDgAm-0007Ap-8B; Sun, 15 Mar 2020 23:12:12 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48ghDS5Kq2z9sPJ; Mon, 16 Mar 2020 14:12:08 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584328328;
- bh=QRM+IirhiZ861gBYjVcwxKd6OTKPrvhzpdyPSNheM0Q=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cIw7C2dBYAbqg0hsywQaBcEENsRWYC2bxltIAbmDLyXlO3gw/KqYUBMBdCQKh21k/
- z+CBjAAOMILgWmsoLAZc8AfBMh2zad3D+gH/a8supvdD8V/NWn0aMqSKuE+c9a/j/M
- eHzCcSQLJ95cW3sz6UTqDUlV0glm3fu6TuEmdRV8=
-Date: Mon, 16 Mar 2020 13:57:04 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Vitaly Chikunov <vt@altlinux.org>
-Subject: Re: [PATCH] target/ppc: Fix rlwinm on ppc64
-Message-ID: <20200316025704.GG2013@umbus.fritz.box>
-References: <20200309204557.14836-1-vt@altlinux.org>
- <20200310231503.GR660117@umbus.fritz.box>
- <20200311130022.sswvce3wx3dii4mf@altlinux.org>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jDgd3-0007IW-L3; Sun, 15 Mar 2020 23:41:26 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.2153771|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_enroll_verification|0.146117-0.000291037-0.853592;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03299; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.H06RVuP_1584330075; 
+Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H06RVuP_1584330075)
+ by smtp.aliyun-inc.com(10.147.44.118);
+ Mon, 16 Mar 2020 11:41:16 +0800
+Subject: Re: [PATCH v5 40/60] target/riscv: vector floating-point merge
+ instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200312145900.2054-1-zhiwei_liu@c-sky.com>
+ <20200312145900.2054-41-zhiwei_liu@c-sky.com>
+ <37215373-eead-9185-faf9-f2ebc0cb4193@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <ef0a9b7e-65c4-93e7-61b6-b288afa1c13a@c-sky.com>
+Date: Mon, 16 Mar 2020 11:41:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bFsKbPszpzYNtEU6"
-Content-Disposition: inline
-In-Reply-To: <20200311130022.sswvce3wx3dii4mf@altlinux.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <37215373-eead-9185-faf9-f2ebc0cb4193@linaro.org>
+Content-Type: multipart/alternative;
+ boundary="------------11784943C168B05E918B8879"
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,118 +70,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, mdroth@us.ibm.com, qemu-stable@nongnu.org
+Cc: guoren@linux.alibaba.com, wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is a multi-part message in MIME format.
+--------------11784943C168B05E918B8879
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---bFsKbPszpzYNtEU6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 11, 2020 at 04:00:22PM +0300, Vitaly Chikunov wrote:
-> David,
->=20
-> On Wed, Mar 11, 2020 at 10:15:03AM +1100, David Gibson wrote:
-> > On Mon, Mar 09, 2020 at 11:45:57PM +0300, Vitaly Chikunov wrote:
-> > > rlwinm cannot just AND with Mask if shift value is zero on ppc64 when
-> > > Mask Begin is greater than Mask End and high bits are set to 1.
-> > >=20
-> > > Note that PowerISA 3.0B says that for `rlwinm' ROTL32 is used, and
-> > > ROTL32 is defined (in 3.3.14) so that rotated value should have two
-> > > copies of lower word of the source value.
-> > >=20
-> > > This seems to be another incarnation of the fix from 820724d170
-> > > ("target-ppc: Fix rlwimi, rlwinm, rlwnm again"), except I leave
-> > > optimization when Mask value is less than 32 bits.
-> > >=20
-> > > Fixes: 7b4d326f47 ("target-ppc: Use the new deposit and extract ops")
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> >=20
-> > Applied to ppc-for-5.0.
->=20
-> Thanks! FYI, there is at least one real case of this bug:
->   https://github.com/iovisor/bcc/issues/2771
-> so this is not theoretical, and, probably, should go to the stable
-> too.
 
-Adding CC to Mike Roth who looks after the stable branch.
+On 2020/3/15 6:47, Richard Henderson wrote:
+> On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+>> +
+>> +/* Vector Floating-Point Merge Instruction */
+>> +static bool opfvf_vfmerge_check(DisasContext *s, arg_rmrr *a)
+>> +{
+>> +    return (vext_check_isa_ill(s, RVV) &&
+>> +            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
+>> +            vext_check_reg(s, a->rd, false) &&
+>> +            vext_check_reg(s, a->rs2, false) &&
+>> +            ((a->vm == 0) || (a->rs2 == 0)) &&
+>> +            (s->sew != 0));
+>> +}
+>> +GEN_OPFVF_TRANS(vfmerge_vfm, opfvf_vfmerge_check)
+> Similar comments as for integer merge, using tcg_gen_gvec_dup_i64 for
+> unpredicated merges.
+>
+> In fact, there's no reason at all to define a helper function for this one.  I
+> would expect you do be able to use the exact same helpers as for the integer
+> merges.
 
-Can you include this one, please.
+Do you mean that I should expands TCGv to TCGv_i64 for vmv.v.x in 
+translation?
+So that I can reuse it.
 
->=20
-> Thanks,
->=20
->=20
-> >=20
-> > > ---
-> > >  target/ppc/translate.c | 20 +++++++++++---------
-> > >  1 file changed, 11 insertions(+), 9 deletions(-)
-> > >=20
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index 36fa27367c..127c82a24e 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -1938,15 +1938,17 @@ static void gen_rlwinm(DisasContext *ctx)
-> > >          me +=3D 32;
-> > >  #endif
-> > >          mask =3D MASK(mb, me);
-> > > -        if (sh =3D=3D 0) {
-> > > -            tcg_gen_andi_tl(t_ra, t_rs, mask);
-> > > -        } else if (mask <=3D 0xffffffffu) {
-> > > -            TCGv_i32 t0 =3D tcg_temp_new_i32();
-> > > -            tcg_gen_trunc_tl_i32(t0, t_rs);
-> > > -            tcg_gen_rotli_i32(t0, t0, sh);
-> > > -            tcg_gen_andi_i32(t0, t0, mask);
-> > > -            tcg_gen_extu_i32_tl(t_ra, t0);
-> > > -            tcg_temp_free_i32(t0);
-> > > +        if (mask <=3D 0xffffffffu) {
-> > > +            if (sh =3D=3D 0) {
-> > > +                tcg_gen_andi_tl(t_ra, t_rs, mask);
-> > > +            } else {
-> > > +                TCGv_i32 t0 =3D tcg_temp_new_i32();
-> > > +                tcg_gen_trunc_tl_i32(t0, t_rs);
-> > > +                tcg_gen_rotli_i32(t0, t0, sh);
-> > > +                tcg_gen_andi_i32(t0, t0, mask);
-> > > +                tcg_gen_extu_i32_tl(t_ra, t0);
-> > > +                tcg_temp_free_i32(t0);
-> > > +            }
-> > >          } else {
-> > >  #if defined(TARGET_PPC64)
-> > >              tcg_gen_deposit_i64(t_ra, t_rs, t_rs, 32, 32);
-> >=20
->=20
->=20
+void gen_helper_vmv_v_x(TCG_ptr, TCGv_i64, TCGv_env, TCGv_i32);
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Zhiwei
 
---bFsKbPszpzYNtEU6
-Content-Type: application/pgp-signature; name="signature.asc"
+>
+> r~
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5u6wAACgkQbDjKyiDZ
-s5JSQxAAsRh6FvlOquv+vAwgK1D1wZvoCmlBBesmpjj0emDJHRUb5uVQPImgW6Lo
-gtc2ZyKOopzv9z4MnjQgvJGyZ2GBzdt1UZ01g4quVUQVMgHDh4U4BIc5Uf01wkVU
-3Uvpyol01Vv2Us6nKuUJeCLFJIeqV9bgdYRro8HlXifgOaKCFJ2gvlb/dM5EJSmD
-RVmhUarn0sDuOouTMpnWHwRjM8QNVm5tu7SL5/bKnvZpv3dfft6AYLrWQKSi3Dxe
-8x2CNorWGmdn0jRShLnzOASirkbU92PXYHxc2JSr24kCcwxaG+ZuwhskU+neypzc
-MFfBW1WgD9upYGvVloVBzPGA4xVoDXILRXiuDHkouJusFTKph2fMJTS8ohjCTic+
-ewIBSgM4hmM7K/UDdDP8Tg7e8ahVFYzidTQC5IU6YAsq+xRQvxYEu+XAYBnPBPvy
-Cc06jA5lTXXHjXc4Qz5mj80qPNKDcxItLGzb2zVr+7rzV2EzSeNscWOOOigbtadD
-jyNPKiyA6KioIvI/D1CgcYQ4li+rVPdNXhzaKWA0//0HeG8+IJm9UMxpuARGl1Jl
-dOaSGRSZpBPwQ1Y/sRUDQUDknzC/9W8aHXXzGXR3/BCluvt8kvsNfHepBTHx/eHC
-1VsQu8Z+J2JMrZuA+qgmL3qQqVrYJMlATIF54GS1TQ1cPgtVGTE=
-=8pUu
------END PGP SIGNATURE-----
+--------------11784943C168B05E918B8879
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---bFsKbPszpzYNtEU6--
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/3/15 6:47, Richard Henderson
+      wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:37215373-eead-9185-faf9-f2ebc0cb4193@linaro.org">
+      <pre class="moz-quote-pre" wrap="">On 3/12/20 7:58 AM, LIU Zhiwei wrote:
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+
++/* Vector Floating-Point Merge Instruction */
++static bool opfvf_vfmerge_check(DisasContext *s, arg_rmrr *a)
++{
++    return (vext_check_isa_ill(s, RVV) &amp;&amp;
++            vext_check_overlap_mask(s, a-&gt;rd, a-&gt;vm, false) &amp;&amp;
++            vext_check_reg(s, a-&gt;rd, false) &amp;&amp;
++            vext_check_reg(s, a-&gt;rs2, false) &amp;&amp;
++            ((a-&gt;vm == 0) || (a-&gt;rs2 == 0)) &amp;&amp;
++            (s-&gt;sew != 0));
++}
++GEN_OPFVF_TRANS(vfmerge_vfm, opfvf_vfmerge_check)
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Similar comments as for integer merge, using tcg_gen_gvec_dup_i64 for
+unpredicated merges.
+
+In fact, there's no reason at all to define a helper function for this one.  I
+would expect you do be able to use the exact same helpers as for the integer
+merges.
+</pre>
+    </blockquote>
+    <br>
+    Do you mean that I should expands TCGv to TCGv_i64 for vmv.v.x in
+    translation?<br>
+    So that I can reuse it.<br>
+    <pre>void gen_helper_vmv_v_x(TCG_ptr, TCGv_i64, TCGv_env, TCGv_i32);</pre>
+    <pre>Zhiwei
+</pre>
+    <blockquote type="cite"
+      cite="mid:37215373-eead-9185-faf9-f2ebc0cb4193@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+
+r~
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
+
+--------------11784943C168B05E918B8879--
 
