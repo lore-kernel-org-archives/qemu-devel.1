@@ -2,79 +2,85 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0D6C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 301EFC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:06:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95E232051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFF192051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:06:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DePusss4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E232051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQhphno+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFF192051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDsEO-0002RI-4e
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:04:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37699)
+	id 1jDsGQ-0003M0-CP
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jDpBV-0004ma-Ab
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:38 -0400
+ (envelope-from <npiggin@gmail.com>) id 1jDqhy-0007Th-Rw
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:27:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jDpBP-0003bZ-KK
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:32 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20948
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDpBP-0003Zx-F5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:49:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584362967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oMBmqqjrVDoNBM0i5RDn4Af4LJu1yJvrmIbMkJ1iq0I=;
- b=DePusss4z8LPhGQFPKvSok4bPVsUt1fMSLt33Mh5Dv16Q8xbSBomJ/KHOzNKexeSrpr8zI
- cv3uyAXDPFtuFA0IuO1bTMa4zAWD1Uiu3gUY0AogZEWcpsLkerIMfJ++0VgUnfTWHVOALc
- ENOujqF7plnjJHKfwfv/BTgjN2+pYzQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-T7fC42KaNySOZ_ub-KuZIA-1; Mon, 16 Mar 2020 08:49:25 -0400
-X-MC-Unique: T7fC42KaNySOZ_ub-KuZIA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39FC518FF660;
- Mon, 16 Mar 2020 12:49:24 +0000 (UTC)
-Received: from localhost (ovpn-200-42.brq.redhat.com [10.40.200.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE53260BE2;
- Mon, 16 Mar 2020 12:49:16 +0000 (UTC)
-Date: Mon, 16 Mar 2020 13:49:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 8/8] qapi/misc: Restrict device memory commands to
- machine code
-Message-ID: <20200316134914.2152130a@redhat.com>
-In-Reply-To: <20200316000348.29692-9-philmd@redhat.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
- <20200316000348.29692-9-philmd@redhat.com>
+ (envelope-from <npiggin@gmail.com>) id 1jDqhx-0002QJ-Lf
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:27:10 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35160)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <npiggin@gmail.com>)
+ id 1jDqhu-0001ke-Ev; Mon, 16 Mar 2020 10:27:06 -0400
+Received: by mail-pf1-x442.google.com with SMTP id u68so10036676pfb.2;
+ Mon, 16 Mar 2020 07:27:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=bDbE0pWdx402i6b4b97coyniPhlyf+H/P2krEymTHzo=;
+ b=bQhphno+Hlq4pjljuaxdLywBWXs/8rlmt2MBj1CLSi90+BOJHhDwHF18Y/rxXAYxej
+ w6QxaW2z0Ps3rDss0oWYkrRkzC1QHCuJ9DcWFB3CyCegef/BSG6KNtV8wZvAYfnUHZHi
+ qVkSwyqA44nILFceOPm9LHG91o2dqDCJ2Dx0KLGo57LRi+x6kj9/5jQAk6RBWD1j5iBk
+ Q01ylOTonjGbwYpZj4KtjFa1Lsbkk7XokSk65P25yAPUJz37ezhvyZ0Iq4GrTROl8jNm
+ kDGy62kwUDotsRHncOkUvLcv29AZTws5kJuaW+7xCPC21wPX2PWJLTE2LaJs3ZdUt3el
+ ou3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=bDbE0pWdx402i6b4b97coyniPhlyf+H/P2krEymTHzo=;
+ b=QlPJEWglG/653rhZQKmajp5AFJPP3vl/Adn4n1KgLGhzZryCBSmF5VVa446exfR4/U
+ rh9U4lL8H1gJQjL3citcim3zuIP59D18PzQC23BOqIXqh9XRO0mqvztgwdAdUK8NMo29
+ A+iV5+zLxQcP1g32qdY9GIW2f6axey+iVTeY2iBnVG9jkjHJk/pEHDmpS40E3j4nD+tR
+ Z4B/g4t8X26SlMNKNPtbZRVSInxy9BwSkCBemmbjY+Y4I+JlJCLcPKEW1DPcT3eeUDTn
+ c8PvmoXrkAW0IHdrDiPqJDgF8+5gMe4vG/thlWAPdVmdq32EjGN6aUTmNN/NWTIN29xv
+ dsXg==
+X-Gm-Message-State: ANhLgQ02T86Sv4U2YXdH8NfzCi36lFDjMFcPZnwTAPp8TO1zT4Oh8s7x
+ iPl+VTWm1P/Pu3UZpgYF6FNm8Ty99zY=
+X-Google-Smtp-Source: ADFU+vt6Q3FCOIX+XkBV1/Lz8CiZKg5IzFJYn3PXeKhkU+1PwPCAjKbQcx3E5cWK/SwLZ2zRmO1aHg==
+X-Received: by 2002:a62:b604:: with SMTP id j4mr28928311pff.93.1584368825345; 
+ Mon, 16 Mar 2020 07:27:05 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com ([203.63.160.49])
+ by smtp.gmail.com with ESMTPSA id v1sm45564pjy.35.2020.03.16.07.27.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 07:27:04 -0700 (PDT)
+From: Nicholas Piggin <npiggin@gmail.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH v2 3/8] ppc/spapr: Add FWNMI System Reset state
+Date: Tue, 17 Mar 2020 00:26:08 +1000
+Message-Id: <20200316142613.121089-4-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200316142613.121089-1-npiggin@gmail.com>
+References: <20200316142613.121089-1-npiggin@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,349 +92,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
+ Nicholas Piggin <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 01:03:48 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+The FWNMI option must deliver system reset interrupts to their
+registered address, and there are a few constraints on the handler
+addresses specified in PAPR. Add the system reset address state and
+checks.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ hw/ppc/spapr.c         |  2 ++
+ hw/ppc/spapr_rtas.c    | 14 +++++++++++++-
+ include/hw/ppc/spapr.h |  3 ++-
+ 3 files changed, 17 insertions(+), 2 deletions(-)
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  qapi/machine.json               | 131 +++++++++++++++++++++++++++++++
->  qapi/misc.json                  | 132 --------------------------------
->  include/hw/mem/memory-device.h  |   1 +
->  include/hw/virtio/virtio-pmem.h |   2 +-
->  4 files changed, 133 insertions(+), 133 deletions(-)
->=20
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 33b259dbd0..17ccebda14 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -1476,3 +1476,134 @@
->  #
->  ##
->  { 'command': 'query-pci', 'returns': ['PciInfo'] }
-> +
-> +##
-> +# @MemoryInfo:
-> +#
-> +# Actual memory information in bytes.
-> +#
-> +# @base-memory: size of "base" memory specified with command line
-> +#               option -m.
-> +#
-> +# @plugged-memory: size of memory that can be hot-unplugged. This field
-> +#                  is omitted if target doesn't support memory hotplug
-> +#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
-> +#
-> +# Since: 2.11.0
-> +##
-> +{ 'struct': 'MemoryInfo',
-> +  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
-> +
-> +##
-> +# @query-memory-size-summary:
-> +#
-> +# Return the amount of initially allocated and present hotpluggable (if
-> +# enabled) memory in bytes.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-memory-size-summary" }
-> +# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
-> +#
-> +# Since: 2.11.0
-> +##
-> +{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-> +
-> +##
-> +# @PCDIMMDeviceInfo:
-> +#
-> +# PCDIMMDevice state information
-> +#
-> +# @id: device's ID
-> +#
-> +# @addr: physical address, where device is mapped
-> +#
-> +# @size: size of memory that the device provides
-> +#
-> +# @slot: slot number at which device is plugged in
-> +#
-> +# @node: NUMA node number where device is plugged in
-> +#
-> +# @memdev: memory backend linked with device
-> +#
-> +# @hotplugged: true if device was hotplugged
-> +#
-> +# @hotpluggable: true if device if could be added/removed while machine =
-is running
-> +#
-> +# Since: 2.1
-> +##
-> +{ 'struct': 'PCDIMMDeviceInfo',
-> +  'data': { '*id': 'str',
-> +            'addr': 'int',
-> +            'size': 'int',
-> +            'slot': 'int',
-> +            'node': 'int',
-> +            'memdev': 'str',
-> +            'hotplugged': 'bool',
-> +            'hotpluggable': 'bool'
-> +          }
-> +}
-> +
-> +##
-> +# @VirtioPMEMDeviceInfo:
-> +#
-> +# VirtioPMEM state information
-> +#
-> +# @id: device's ID
-> +#
-> +# @memaddr: physical address in memory, where device is mapped
-> +#
-> +# @size: size of memory that the device provides
-> +#
-> +# @memdev: memory backend linked with device
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'VirtioPMEMDeviceInfo',
-> +  'data': { '*id': 'str',
-> +            'memaddr': 'size',
-> +            'size': 'size',
-> +            'memdev': 'str'
-> +          }
-> +}
-> +
-> +##
-> +# @MemoryDeviceInfo:
-> +#
-> +# Union containing information about a memory device
-> +#
-> +# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
-> +#
-> +# Since: 2.1
-> +##
-> +{ 'union': 'MemoryDeviceInfo',
-> +  'data': { 'dimm': 'PCDIMMDeviceInfo',
-> +            'nvdimm': 'PCDIMMDeviceInfo',
-> +            'virtio-pmem': 'VirtioPMEMDeviceInfo'
-> +          }
-> +}
-> +
-> +##
-> +# @query-memory-devices:
-> +#
-> +# Lists available memory devices and their state
-> +#
-> +# Since: 2.1
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-memory-devices" }
-> +# <- { "return": [ { "data":
-> +#                       { "addr": 5368709120,
-> +#                         "hotpluggable": true,
-> +#                         "hotplugged": true,
-> +#                         "id": "d1",
-> +#                         "memdev": "/objects/memX",
-> +#                         "node": 0,
-> +#                         "size": 1073741824,
-> +#                         "slot": 0},
-> +#                    "type": "dimm"
-> +#                  } ] }
-> +#
-> +##
-> +{ 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 92b3926c6b..670b902999 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -518,39 +518,6 @@
->  ##
->  { 'command': 'closefd', 'data': {'fdname': 'str'} }
-> =20
-> -##
-> -# @MemoryInfo:
-> -#
-> -# Actual memory information in bytes.
-> -#
-> -# @base-memory: size of "base" memory specified with command line
-> -#               option -m.
-> -#
-> -# @plugged-memory: size of memory that can be hot-unplugged. This field
-> -#                  is omitted if target doesn't support memory hotplug
-> -#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
-> -#
-> -# Since: 2.11.0
-> -##
-> -{ 'struct': 'MemoryInfo',
-> -  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
-> -
-> -##
-> -# @query-memory-size-summary:
-> -#
-> -# Return the amount of initially allocated and present hotpluggable (if
-> -# enabled) memory in bytes.
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-memory-size-summary" }
-> -# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
-> -#
-> -# Since: 2.11.0
-> -##
-> -{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-> -
-> -
->  ##
->  # @AddfdInfo:
->  #
-> @@ -788,105 +755,6 @@
->   'returns': ['CommandLineOptionInfo'],
->   'allow-preconfig': true }
-> =20
-> -##
-> -# @PCDIMMDeviceInfo:
-> -#
-> -# PCDIMMDevice state information
-> -#
-> -# @id: device's ID
-> -#
-> -# @addr: physical address, where device is mapped
-> -#
-> -# @size: size of memory that the device provides
-> -#
-> -# @slot: slot number at which device is plugged in
-> -#
-> -# @node: NUMA node number where device is plugged in
-> -#
-> -# @memdev: memory backend linked with device
-> -#
-> -# @hotplugged: true if device was hotplugged
-> -#
-> -# @hotpluggable: true if device if could be added/removed while machine =
-is running
-> -#
-> -# Since: 2.1
-> -##
-> -{ 'struct': 'PCDIMMDeviceInfo',
-> -  'data': { '*id': 'str',
-> -            'addr': 'int',
-> -            'size': 'int',
-> -            'slot': 'int',
-> -            'node': 'int',
-> -            'memdev': 'str',
-> -            'hotplugged': 'bool',
-> -            'hotpluggable': 'bool'
-> -          }
-> -}
-> -
-> -##
-> -# @VirtioPMEMDeviceInfo:
-> -#
-> -# VirtioPMEM state information
-> -#
-> -# @id: device's ID
-> -#
-> -# @memaddr: physical address in memory, where device is mapped
-> -#
-> -# @size: size of memory that the device provides
-> -#
-> -# @memdev: memory backend linked with device
-> -#
-> -# Since: 4.1
-> -##
-> -{ 'struct': 'VirtioPMEMDeviceInfo',
-> -  'data': { '*id': 'str',
-> -            'memaddr': 'size',
-> -            'size': 'size',
-> -            'memdev': 'str'
-> -          }
-> -}
-> -
-> -##
-> -# @MemoryDeviceInfo:
-> -#
-> -# Union containing information about a memory device
-> -#
-> -# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
-> -#
-> -# Since: 2.1
-> -##
-> -{ 'union': 'MemoryDeviceInfo',
-> -  'data': { 'dimm': 'PCDIMMDeviceInfo',
-> -            'nvdimm': 'PCDIMMDeviceInfo',
-> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
-> -          }
-> -}
-> -
-> -##
-> -# @query-memory-devices:
-> -#
-> -# Lists available memory devices and their state
-> -#
-> -# Since: 2.1
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-memory-devices" }
-> -# <- { "return": [ { "data":
-> -#                       { "addr": 5368709120,
-> -#                         "hotpluggable": true,
-> -#                         "hotplugged": true,
-> -#                         "id": "d1",
-> -#                         "memdev": "/objects/memX",
-> -#                         "node": 0,
-> -#                         "size": 1073741824,
-> -#                         "slot": 0},
-> -#                    "type": "dimm"
-> -#                  } ] }
-> -#
-> -##
-> -{ 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
-> -
->  ##
->  # @ReplayMode:
->  #
-> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-devic=
-e.h
-> index 04476acb8f..76f3de0f7e 100644
-> --- a/include/hw/mem/memory-device.h
-> +++ b/include/hw/mem/memory-device.h
-> @@ -14,6 +14,7 @@
->  #define MEMORY_DEVICE_H
-> =20
->  #include "hw/qdev-core.h"
-> +#include "qapi/qapi-types-machine.h"
->  #include "qapi/qapi-types-misc.h"
->  #include "qom/object.h"
-> =20
-> diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-p=
-mem.h
-> index 33f1999320..72863412b2 100644
-> --- a/include/hw/virtio/virtio-pmem.h
-> +++ b/include/hw/virtio/virtio-pmem.h
-> @@ -15,7 +15,7 @@
->  #define HW_VIRTIO_PMEM_H
-> =20
->  #include "hw/virtio/virtio.h"
-> -#include "qapi/qapi-types-misc.h"
-> +#include "qapi/qapi-types-machine.h"
-> =20
->  #define TYPE_VIRTIO_PMEM "virtio-pmem"
-> =20
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b03b26370d..5f93c49706 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1704,6 +1704,7 @@ static void spapr_machine_reset(MachineState *machine)
+ 
+     spapr->cas_reboot = false;
+ 
++    spapr->fwnmi_system_reset_addr = -1;
+     spapr->fwnmi_machine_check_addr = -1;
+     spapr->fwnmi_machine_check_interlock = -1;
+ 
+@@ -2023,6 +2024,7 @@ static const VMStateDescription vmstate_spapr_fwnmi = {
+     .needed = spapr_fwnmi_needed,
+     .pre_save = spapr_fwnmi_pre_save,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT64(fwnmi_system_reset_addr, SpaprMachineState),
+         VMSTATE_UINT64(fwnmi_machine_check_addr, SpaprMachineState),
+         VMSTATE_INT32(fwnmi_machine_check_interlock, SpaprMachineState),
+         VMSTATE_END_OF_LIST()
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 0b8c481593..521e6b0b72 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -414,6 +414,7 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+                                   uint32_t nret, target_ulong rets)
+ {
+     hwaddr rtas_addr;
++    target_ulong sreset_addr, mce_addr;
+ 
+     if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI) == SPAPR_CAP_OFF) {
+         rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+@@ -426,7 +427,18 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+         return;
+     }
+ 
+-    spapr->fwnmi_machine_check_addr = rtas_ld(args, 1);
++    sreset_addr = rtas_ld(args, 0);
++    mce_addr = rtas_ld(args, 1);
++
++    /* PAPR requires these are in the first 32M of memory and within RMA */
++    if (sreset_addr >= 32 * MiB || sreset_addr >= spapr->rma_size ||
++           mce_addr >= 32 * MiB ||    mce_addr >= spapr->rma_size) {
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++        return;
++    }
++
++    spapr->fwnmi_system_reset_addr = sreset_addr;
++    spapr->fwnmi_machine_check_addr = mce_addr;
+ 
+     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+ }
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 64b83402cb..42d64a0368 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -194,9 +194,10 @@ struct SpaprMachineState {
+ 
+     /* State related to FWNMI option */
+ 
+-    /* Machine Check Notification Routine address
++    /* System Reset and Machine Check Notification Routine addresses
+      * registered by "ibm,nmi-register" RTAS call.
+      */
++    target_ulong fwnmi_system_reset_addr;
+     target_ulong fwnmi_machine_check_addr;
+ 
+     /* Machine Check FWNMI synchronization, fwnmi_machine_check_interlock is
+-- 
+2.23.0
 
 
