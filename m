@@ -2,96 +2,81 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0631C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B423C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:15:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 997CB20754
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:13:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0165320575
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:15:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WldMrYth"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 997CB20754
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQLWfo49"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0165320575
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDqV2-0001rn-Aa
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:13:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48940)
+	id 1jDqWR-0002MW-K1
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:15:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDoRC-0004st-5S
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:43 -0400
+ (envelope-from <berrange@redhat.com>) id 1jDp0p-0001KH-Mi
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDoRA-0003gj-AX
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35364
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1jDp0n-0006oC-8c
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:31 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43950
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDoRA-0003Z0-1l
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:40 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1jDp0n-0006Zt-38
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584360099;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1584362307;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HlGkUQINU1XL5BZcdoDWS13ome2PPFT7O4TXXUDcprw=;
- b=WldMrYthIRFkeVin2caijG8AkQlNfcvoRkqOEJga4A62ijCZDHLIot5gE+crsfreotXa2D
- FgvEBUYY2ZLO++7KFA9Tzvtr/l4UpfDTiWzZotnIsmawYswEUXByNnbsgej3670fu0Wltd
- RbstnCX95ZSVyHS0Kl/l0u52n9cnNGM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-vHT4nODjNfarwmfefKbxbg-1; Mon, 16 Mar 2020 08:01:38 -0400
-X-MC-Unique: vHT4nODjNfarwmfefKbxbg-1
-Received: by mail-wr1-f72.google.com with SMTP id u18so8847725wrn.11
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:01:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=fXllARJpmIuUPtHipMeTZSkndpZ7FGG8n+mythjRvfc=;
- b=qrd/2G40fALavdYgJVuivn0Johduf1yJUT6/MPnM+adlwsyEFgePGkztUZQ7/s7HMh
- ndUQHWcBARaYkufN1YtzMTyBudz2LO2eu1CIZDkdzKGfQ3BXwkkQJQZdA0N+7Etxdtw7
- N/iOUen9Ls/VGcpLf6Mfv8JkCG9znVr4JhB7BZj7Tv3jHSThaLBWSt2wRqp/xOBy8F5O
- QF18l5zuy7U12x8/J1a3cwV/sfrzhKwrAYYqvKoOLzYy3l+Y0DE+vwb9xUGxnwwTuKIn
- LDJ9Vi4/ujnw5fk2uoQq9JA1z5Wjm3Vc3B3n7wSi0xCXgQ/xwd0rylWI42SlxyA/1Vg9
- 3OiQ==
-X-Gm-Message-State: ANhLgQ2BE108m4zbCrN3r1NwF0tokhYdWRj71XDYXPRcTnvVNOLYRpSf
- 1v/dkcIVeQpY8ITll7J9NpDGufb0VNV8HvxCWaVbpAEmz5fzu34oaUE4wTlX0z3TgDuiP7pc5k/
- UoaasVK2pa3YlBbA=
-X-Received: by 2002:a5d:66c2:: with SMTP id k2mr10999575wrw.408.1584360096848; 
- Mon, 16 Mar 2020 05:01:36 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuDJHiZxwpQzdRJzQb4B10w+dJRi5gbqeE8iLVTMi6greRpAqxzKWoY5v8KNqfA+KRY3TJMJw==
-X-Received: by 2002:a5d:66c2:: with SMTP id k2mr10999537wrw.408.1584360096456; 
- Mon, 16 Mar 2020 05:01:36 -0700 (PDT)
-Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id c26sm29139172wmb.8.2020.03.16.05.01.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 05:01:35 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 08/11] target/Kconfig: Allow targets to use Kconfig
-Date: Mon, 16 Mar 2020 13:00:46 +0100
-Message-Id: <20200316120049.11225-9-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316120049.11225-1-philmd@redhat.com>
-References: <20200316120049.11225-1-philmd@redhat.com>
+ bh=eWvomnxaUXY+4089nhzBiG0Xxg7JaSqP2Yu8nO1j6zw=;
+ b=VQLWfo49OW+gWvTmtN2mBxVJEq6bfhbIQO93it2w4upOSCrB6PzKapmhcG+dqrUFljaa/D
+ vXZEMGCyaMA2cIDjx7zy4XPIQcekhiz5e98wOYfoUgqOsbsYluAjCpUhymWkjGAr6E2jfJ
+ zMYVmHl8ZxSgCAjTZvHcqXpu+Sd3ZtM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-vVM6EV70PS20qbNWbXejww-1; Mon, 16 Mar 2020 08:38:18 -0400
+X-MC-Unique: vVM6EV70PS20qbNWbXejww-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E30AE13F8;
+ Mon, 16 Mar 2020 12:38:16 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.112.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0EF291D7D;
+ Mon, 16 Mar 2020 12:38:10 +0000 (UTC)
+Date: Mon, 16 Mar 2020 12:38:07 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+Message-ID: <20200316123807.GG1528804@redhat.com>
+References: <20200312193616.438922-1-crosa@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200312193616.438922-1-crosa@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,52 +88,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Erik Skultety <eskultet@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer Moschetta <wmoschet@redhat.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow targets to select target-specific Kconfig values.
+On Thu, Mar 12, 2020 at 03:36:11PM -0400, Cleber Rosa wrote:
+> The idea about a public facing Gating CI for QEMU was lastly
+> summarized in an RFC[1].  Since then, it was decided that a
+> simpler version should be attempted first.
+>=20
+> Changes from the RFC patches[2] accompanying the RFC document:
+>=20
+> - Moved gating job definitions to .gitlab-ci-gating.yml
+> - Added info on "--disable-libssh" build option requirement
+>   (https://bugs.launchpad.net/qemu/+bug/1838763) to Ubuntu 18.04 jobs
+> - Added info on "--disable-glusterfs" build option requirement
+>   (there's no static version of those libs in distro supplied
+>   packages) to one
+> - Dropped ubuntu-18.04.3-x86_64-notools job definition, because it
+>   doesn't fall into the general scope of gating job described by PMM
+>   (and it did not run any test)
+> - Added w32 and w64 cross builds based on Fedora 30
+> - Added a FreeBSD based job that builds all targets and runs `make
+>   check`
+> - Added "-j`nproc`" and "-j`sysctl -n hw.ncpu`" options to make as a
+>   simple but effective way of speeding up the builds and tests by
+>   using a number of make jobs matching the number of CPUs
+> - Because the Ansible playbooks reference the content on Dockerfiles,
+>   some fixes to some Dockerfiles caught in the process were included
+> - New patch with script to check or wait on a pipeline execution
+>=20
+> [1] - https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00231.html
+> [2] - https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00154.html
+>=20
+> Cleber Rosa (5):
+>   tests/docker: add CentOS 8 Dockerfile
+>   tests/docker: make "buildah bud" output similar to "docker build"
+>   GitLab CI: avoid calling before_scripts on unintended jobs
+>   GitLab Gating CI: introduce pipeline-status contrib script
+>   GitLab Gating CI: initial set of jobs, documentation and scripts
+>=20
+>  .gitlab-ci-gating.yml                         | 111 ++++++++++
+>  .gitlab-ci.yml                                |  32 ++-
+>  contrib/ci/orgs/qemu/build-environment.yml    | 208 ++++++++++++++++++
+>  contrib/ci/orgs/qemu/gitlab-runner.yml        |  65 ++++++
+>  contrib/ci/orgs/qemu/inventory                |   2 +
+>  contrib/ci/orgs/qemu/vars.yml                 |  13 ++
+>  contrib/ci/scripts/gitlab-pipeline-status     | 148 +++++++++++++
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- Makefile       | 6 ++++--
- target/Kconfig | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
- create mode 100644 target/Kconfig
+FYI, the contrib/ directory is generally a place for arbitrary / adhoc
+but interesting user contributed files/sources that are not officially
+supported deliverables of the project.
 
-diff --git a/Makefile b/Makefile
-index 1cf9d76ce7..e402c33811 100644
---- a/Makefile
-+++ b/Makefile
-@@ -421,9 +421,11 @@ MINIKCONF_ARGS =3D \
-=20
- MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host \
-                    $(SRC_PATH)/accel/Kconfig \
--                   $(SRC_PATH)/hw/Kconfig
-+                   $(SRC_PATH)/hw/Kconfig \
-+                   $(SRC_PATH)/target/Kconfig
- MINIKCONF_DEPS =3D $(MINIKCONF_INPUTS) \
--                 $(wildcard $(SRC_PATH)/hw/*/Kconfig)
-+                 $(wildcard $(SRC_PATH)/hw/*/Kconfig) \
-+                 $(wildcard $(SRC_PATH)/target/*/Kconfig)
- MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py \
-=20
- $(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIK=
-CONF_DEPS) $(BUILD_DIR)/config-host.mak
-diff --git a/target/Kconfig b/target/Kconfig
-new file mode 100644
-index 0000000000..8b13789179
---- /dev/null
-+++ b/target/Kconfig
-@@ -0,0 +1 @@
-+
+IOW, this is not a good home for the official CI scripts.
+
+We already have a .gitlab-ci.d/ directory that looks like it would
+be good for this.  Or if that's not suitable, then scripts/ci/ is
+a second choice.
+
+>  docs/devel/testing.rst                        | 142 ++++++++++++
+>  tests/docker/dockerfiles/centos8.docker       |  32 +++
+>  .../dockerfiles/debian-win32-cross.docker     |   2 +-
+>  10 files changed, 751 insertions(+), 4 deletions(-)
+>  create mode 100644 .gitlab-ci-gating.yml
+>  create mode 100644 contrib/ci/orgs/qemu/build-environment.yml
+>  create mode 100644 contrib/ci/orgs/qemu/gitlab-runner.yml
+>  create mode 100644 contrib/ci/orgs/qemu/inventory
+>  create mode 100644 contrib/ci/orgs/qemu/vars.yml
+>  create mode 100755 contrib/ci/scripts/gitlab-pipeline-status
+>  create mode 100644 tests/docker/dockerfiles/centos8.docker
+
+Regards,
+Daniel
 --=20
-2.21.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
