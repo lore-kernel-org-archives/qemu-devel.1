@@ -2,83 +2,68 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CECD4C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157C2C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 956EE20658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cz+mv0/z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956EE20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD1D520658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD1D520658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDm7O-00022a-Hx
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 05:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34352)
+	id 1jDm7s-0002Eu-IX
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 05:33:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bharatb.linux@gmail.com>) id 1jDlZy-0006VS-32
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:58:36 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDlY8-0005nN-Im
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bharatb.linux@gmail.com>) id 1jDlZw-0007PS-H5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:58:34 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:36547)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
- id 1jDlZw-0007Mh-CL; Mon, 16 Mar 2020 04:58:32 -0400
-Received: by mail-qt1-x841.google.com with SMTP id m33so13448818qtb.3;
- Mon, 16 Mar 2020 01:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=o51b5WA8RMrUDFBZ8LAXRdoLsjD+Nw2rMzhTFOJCz5o=;
- b=cz+mv0/z4ArIXGCvlfJs7xev7IJLokt9qRCLpzYvQbcn4ot6ItXWZalPxGefsAubeS
- eQXcVpIoq+6oywTXz2qrFpBWE6Nd0h8nUXnikMTgS6RDSb+qoFffCU/m8AaXgnU4B5Go
- f+lzGIXFXChQ6uM9NXFDiQ0i166eMkYcvGWctHkntWj11nH9BOKtQFrhtmxg/kwbAiMF
- MlarkGA+6ZRR/cATIV5hilOmRX4xQzhHQPJP60mlrxJSM2lJMi1akglyP1g7qlMzHum5
- INXZToz1dG2nkjiTIvjRVgb7LlZ8wYpP2Gh4nX0mYSiyiOo0/xeSTl0ZJizb7zsd2rfv
- Q3mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o51b5WA8RMrUDFBZ8LAXRdoLsjD+Nw2rMzhTFOJCz5o=;
- b=cL1jxyqsbcQvrIFrfZoTnxqn3gvZfRS3KEka+8KMX1SFvqwIqm29rqYNX8oGaQp9gI
- eaZntF3UKG4b8OvA91zB/IvPuKV8mctQb5DbiAbZxglsmctaQSlfVjJsVn3KzHgk4BKx
- D/gUJwdeVetXgmFpSHoeSvLMhO8UMp9syK3jFyubdZCkdHTLaigOGjRJyyj8jMUBpGCw
- RBYycWmwWakYT/O1XNvrVA12jNGD4zuMMWNWKXadaVIo/4ZVfYK6LILhN8E0fHJtK90a
- G3N0TC138scOURULKDaMI1Fw38BbnRgmEyicO+qKnylFFCtW2mwxg7vmyjnnRtmoS6P/
- CcCw==
-X-Gm-Message-State: ANhLgQ3r5ySkWyhazDhNXAi8Y0jVXtkvDwucCdJRnEU3CdLDmGe0HFME
- vID4mEEj43LTsc5eLaCk+qDgwyHHZP+8WrMNQJA=
-X-Google-Smtp-Source: ADFU+vsf4wvenoeubEMqGMYGnCR2NFEHt8YP+MacbZz/zzEYzxFMdctJ3EPTLLAuu7eRw2/tt611WK1P54JfIpTVm4M=
-X-Received: by 2002:ac8:5395:: with SMTP id x21mr16311244qtp.321.1584349111590; 
- Mon, 16 Mar 2020 01:58:31 -0700 (PDT)
+ (envelope-from <laurent@vivier.eu>) id 1jDlY7-0004Yh-Bp
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:40 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:53569)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDlY7-0004NI-2Z
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:39 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1Mt71D-1jT5TE0N1l-00tULv; Mon, 16 Mar 2020 09:56:25 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/4] scripts: add a script to generate syscall_nr.h
+Date: Mon, 16 Mar 2020 09:56:17 +0100
+Message-Id: <20200316085620.309769-2-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316085620.309769-1-laurent@vivier.eu>
+References: <20200316085620.309769-1-laurent@vivier.eu>
 MIME-Version: 1.0
-References: <20200313074811.27175-1-bbhushan2@marvell.com>
- <20200313074811.27175-4-bbhushan2@marvell.com>
- <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
- <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
- <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
- <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
-In-Reply-To: <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
-From: Bharat Bhushan <bharatb.linux@gmail.com>
-Date: Mon, 16 Mar 2020 14:28:20 +0530
-Message-ID: <CAAeCc_nnM-DGCyXjFJuk-6L8F+Oetq076SEjeV8kUAGxfJVQTw@mail.gmail.com>
-Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:paUhu87fai0bc55XxkcvyXlle9WCNvuQWyw4QMXOTWHbTY3Wfou
+ 2+iRqN05G1mqnkryJwv6YHcyylVw9IU8fUP/tGksL/7aReGe/yz10t+iZQvk8OwqDxE+Aqr
+ nq555bMP+onz8q0o2nSUE1gUM+dBl2gU/kfGzaNGKCOEwaika0E9x2w4qNnbxMgZDeX1YoR
+ q9wwu9eUOjSDhxM0P+wqg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:O2r8lWPhCM4=:hWGagtIEwo4FE1ipiBF4DA
+ 14Sbx1LoP8KcJEeoEpKvtoJhzWtjsQEvP2jhiGXEtE1JfIVH1WSGpUcsbo7mAp/e6wQIg4fpJ
+ buWNo9QShKVg/zlusmSq4JaOq95p7CSqIgXggq2EzBH8RkmqhSJumQlAysQIGTBIfDO9Ztfh0
+ y/RLaPJnUXD+Zy0qiRVdu0AeNI3WY9mYANmC+vSyVv3afpnuQTcJj4MtZAVtWbiFKEdan2L5S
+ 5lq+g2zcObjvAYgyB3URxxTcI1bYo0yVjEzUbV64dhOAP2ciFALYNTvJmfIpKo4PFyp1dR0I+
+ VAsjvAfwmyxyQbSkCn5/tk+KXEc+zeyDrOlSXWbKxRKD5G/fig8DbDrqalkAi1btUxBUyy+i4
+ XWD0Xh5zs+bYML9v+9PJE24x54Z1MEMzl/PHhT4DhrnVv0CIHT4N31Z64S5L9usfDM3kFKBkk
+ CUoAchBOZIAP16eT/NDH+nzSMjpF4QVR/v1h4inpUjfxSC+APcKKxzsN0sFKSpb6dF+nbSuq/
+ WkocsiVoRte2Zx9YVeUCbpsJJqaLSftkA2a1/sy3A0PTFN4nwbTfGh8RLxGnbIGiMuNP+uzGc
+ uU8SrdfaHIf0N+eK0m2NqteFwOC7LoTpGbtFs7vtF+AyNxhGclMn7HOj2nEr28ScsStvRcRvP
+ 40jLU2Yen7ExQHvy/eT51d1NL5ImpxAEDIWCNDVSpl9oGd8hD/cYHl5FP9fEhC37iTdCQI5mV
+ 5SxCeVl4FpjSVpTrNQmjNNEdsJ8uyYSeBaNweFCskqmPRyB/VH6M2KEzjOQMeTsxjGdrp7upP
+ Z1VCE5x9kjHOZrrq6mxh6zVsTmrn8lDXlAmmtc1gXzU7t02fCJk47nbyw8OPGjcD5XPGXy1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,217 +75,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- mst@redhat.com, drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
- alex.williamson@redhat.com, qemu-arm@nongnu.org,
- Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
- eric.auger.pro@gmail.com
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
+This script is needed for targets based on asm-generic syscall numbers generation
 
-On Mon, Mar 16, 2020 at 1:15 PM Bharat Bhushan <bharatb.linux@gmail.com> wrote:
->
-> Hi Eric,
->
-> On Mon, Mar 16, 2020 at 1:02 PM Auger Eric <eric.auger@redhat.com> wrote:
-> >
-> > Hi Bharat,
-> >
-> > On 3/16/20 7:41 AM, Bharat Bhushan wrote:
-> > > Hi Eric,
-> > >
-> > > On Fri, Mar 13, 2020 at 8:11 PM Auger Eric <eric.auger@redhat.com> wrote:
-> > >>
-> > >> Hi Bharat
-> > >>
-> > >> On 3/13/20 8:48 AM, Bharat Bhushan wrote:
-> > >>> iommu-notifier are called when a device is attached
-> > >> IOMMU notifiers
-> > >>> or detached to as address-space.
-> > >>> This is needed for VFIO.
-> > >> and vhost for detach
-> > >>>
-> > >>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> > >>> ---
-> > >>>  hw/virtio/virtio-iommu.c | 47 ++++++++++++++++++++++++++++++++++++++++
-> > >>>  1 file changed, 47 insertions(+)
-> > >>>
-> > >>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> > >>> index e51344a53e..2006f72901 100644
-> > >>> --- a/hw/virtio/virtio-iommu.c
-> > >>> +++ b/hw/virtio/virtio-iommu.c
-> > >>> @@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
-> > >>>      uint32_t id;
-> > >>>      VirtIOIOMMUDomain *domain;
-> > >>>      QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
-> > >>> +    VirtIOIOMMU *viommu;
-> > >> This needs specal care on post-load. When migrating the EPs, only the id
-> > >> is migrated. On post-load you need to set viommu as it is done for
-> > >> domain. migration is allowed with vhost.
-> > >
-> > > ok, I have not tried vhost/migration. Below change set viommu when
-> > > reconstructing endpoint.
-> >
-> >
-> > Yes I think this should be OK.
-> >
-> > By the end I did the series a try with vhost/vfio. with vhost it works
-> > (not with recent kernel though, but the issue may be related to kernel).
-> > With VFIO however it does not for me.
-> >
-> > First issue is: your guest can use 4K page and your host can use 64KB
-> > pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
-> > a way to pass the host settings to the VIRTIO-IOMMU device.
-> >
-> > Even with 64KB pages, it did not work for me. I have obviously not the
-> > storm of VFIO_DMA_MAP failures but I have some, most probably due to
-> > some wrong notifications somewhere. I will try to investigate on my side.
-> >
-> > Did you test with VFIO on your side?
->
-> I did not tried with different page sizes, only tested with 4K page size.
->
-> Yes it works, I tested with two n/w device assigned to VM, both interfaces works
->
-> First I will try with 64k page size.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-64K page size does not work for me as well,
+Notes:
+    v3: remove useless upper command
+    v2: add comments suggested by Taylor
 
-I think we are not passing correct page_size_mask here
-(config.page_size_mask is set to TARGET_PAGE_MASK ( which is
-0xfffffffffffff000))
+ scripts/gensyscalls.sh | 102 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
+ create mode 100755 scripts/gensyscalls.sh
 
-We need to set this correctly as per host page size, correct?
+diff --git a/scripts/gensyscalls.sh b/scripts/gensyscalls.sh
+new file mode 100755
+index 000000000000..b7b8456f6312
+--- /dev/null
++++ b/scripts/gensyscalls.sh
+@@ -0,0 +1,102 @@
++#!/bin/sh
++#
++# Update syscall_nr.h files from linux headers asm-generic/unistd.h
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
++#
++
++linux="$1"
++output="$2"
++
++TMP=$(mktemp -d)
++
++if [ "$linux" = "" ] ; then
++    echo "Needs path to linux source tree" 1>&2
++    exit 1
++fi
++
++if [ "$output" = "" ] ; then
++    output="$PWD"
++fi
++
++upper()
++{
++    echo "$1" | tr "[:lower:]" "[:upper:]" | tr "[:punct:]" "_"
++}
++
++qemu_arch()
++{
++    case "$1" in
++    arm64)
++        echo "aarch64"
++        ;;
++    *)
++        echo "$1"
++        ;;
++    esac
++}
++
++read_includes()
++{
++    arch=$1
++    bits=$2
++
++     cpp -P -nostdinc -fdirectives-only \
++        -D_UAPI_ASM_$(upper ${arch})_BITSPERLONG_H \
++        -D__BITS_PER_LONG=${bits} \
++        -I${linux}/arch/${arch}/include/uapi/ \
++        -I${linux}/include/uapi \
++        -I${TMP} \
++        "${linux}/arch/${arch}/include/uapi/asm/unistd.h"
++}
++
++filter_defines()
++{
++    grep -e "#define __NR_" -e "#define __NR3264"
++}
++
++rename_defines()
++{
++    sed "s/ __NR_/ TARGET_NR_/g;s/(__NR_/(TARGET_NR_/g"
++}
++
++evaluate_values()
++{
++    sed "s/#define TARGET_NR_/QEMU TARGET_NR_/" | \
++    cpp -P -nostdinc | \
++    sed "s/^QEMU /#define /"
++}
++
++generate_syscall_nr()
++{
++    arch=$1
++    bits=$2
++    file="$3"
++    guard="$(upper LINUX_USER_$(qemu_arch $arch)_$(basename "$file"))"
++
++    (echo "/*"
++    echo " * This file contains the system call numbers."
++    echo " * Do not modify."
++    echo " * This file is generated by scripts/gensyscalls.sh"
++    echo " */"
++    echo "#ifndef ${guard}"
++    echo "#define ${guard}"
++    echo
++    read_includes $arch $bits | filter_defines | rename_defines | \
++                                evaluate_values | sort -n -k 3
++    echo
++    echo "#endif /* ${guard} */"
++    echo) > "$file"
++}
++
++mkdir "$TMP/asm"
++> "$TMP/asm/bitsperlong.h"
++
++generate_syscall_nr arm64 64 "$output/linux-user/aarch64/syscall_nr.h"
++generate_syscall_nr nios2 32 "$output/linux-user/nios2/syscall_nr.h"
++generate_syscall_nr openrisc 32 "$output/linux-user/openrisc/syscall_nr.h"
++
++generate_syscall_nr riscv 32 "$output/linux-user/riscv/syscall32_nr.h"
++generate_syscall_nr riscv 64 "$output/linux-user/riscv/syscall64_nr.h"
++rm -fr "$TMP"
+-- 
+2.24.1
 
-Thanks
--Bharat
-
->
-> Thanks
-> -Bharat
->
-> >
-> > Thanks
-> >
-> > Eric
-> > >
-> > > @@ -984,6 +973,7 @@ static gboolean reconstruct_endpoints(gpointer
-> > > key, gpointer value,
-> > >
-> > >      QLIST_FOREACH(iter, &d->endpoint_list, next) {
-> > >          iter->domain = d;
-> > > +       iter->viommu = s;
-> > >          g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-> > >      }
-> > >      return false; /* continue the domain traversal */
-> > >
-> > >>>  } VirtIOIOMMUEndpoint;
-> > >>>
-> > >>>  typedef struct VirtIOIOMMUInterval {
-> > >>> @@ -155,8 +156,44 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
-> > >>>      memory_region_notify_iommu(mr, 0, entry);
-> > >>>  }
-> > >>>
-> > >>> +static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
-> > >>> +                                           gpointer data)
-> > >>> +{
-> > >>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-> > >>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-> > >>> +
-> > >>> +    virtio_iommu_notify_unmap(mr, interval->low,
-> > >>> +                              interval->high - interval->low + 1);
-> > >>> +
-> > >>> +    return false;
-> > >>> +}
-> > >>> +
-> > >>> +static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
-> > >>> +                                         gpointer data)
-> > >>> +{
-> > >>> +    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
-> > >>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-> > >>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-> > >>> +
-> > >>> +    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
-> > >>> +                            interval->high - interval->low + 1);
-> > >>> +
-> > >>> +    return false;
-> > >>> +}
-> > >>> +
-> > >>>  static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
-> > >>>  {
-> > >>> +    VirtioIOMMUNotifierNode *node;
-> > >>> +    VirtIOIOMMU *s = ep->viommu;
-> > >>> +    VirtIOIOMMUDomain *domain = ep->domain;
-> > >>> +
-> > >>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
-> > >>> +        if (ep->id == node->iommu_dev->devfn) {
-> > >>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
-> > >>> +                           &node->iommu_dev->iommu_mr);
-> > >> I understand this should fo the job for domain removal
-> > >
-> > > did not get the comment, are you saying we should do this on domain removal?
-> > see my reply on 2/5
-> >
-> > Note the above code should be moved after the check of !ep->domain below
->
-> ohh yes, will move
->
-> Thanks
-> -Bharat
->
-> > >
-> > >>> +        }
-> > >>> +    }
-> > >>> +
-> > >>>      if (!ep->domain) {
-> > >>>          return;
-> > >>>      }
-> > >>> @@ -178,6 +215,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-> > >>>      }
-> > >>>      ep = g_malloc0(sizeof(*ep));
-> > >>>      ep->id = ep_id;
-> > >>> +    ep->viommu = s;
-> > >>>      trace_virtio_iommu_get_endpoint(ep_id);
-> > >>>      g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
-> > >>>      return ep;
-> > >>> @@ -272,6 +310,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-> > >>>  {
-> > >>>      uint32_t domain_id = le32_to_cpu(req->domain);
-> > >>>      uint32_t ep_id = le32_to_cpu(req->endpoint);
-> > >>> +    VirtioIOMMUNotifierNode *node;
-> > >>>      VirtIOIOMMUDomain *domain;
-> > >>>      VirtIOIOMMUEndpoint *ep;
-> > >>>
-> > >>> @@ -299,6 +338,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-> > >>>
-> > >>>      ep->domain = domain;
-> > >>>
-> > >>> +    /* Replay existing address space mappings on the associated memory region */
-> > >> maybe use the "domain" terminology here.
-> > >
-> > > ok,
-> > >
-> > > Thanks
-> > > -Bharat
-> > >
-> > >>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
-> > >>> +        if (ep_id == node->iommu_dev->devfn) {
-> > >>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
-> > >>> +                           &node->iommu_dev->iommu_mr);
-> > >>> +        }
-> > >>> +    }
-> > >>> +
-> > >>>      return VIRTIO_IOMMU_S_OK;
-> > >>>  }
-> > >>>
-> > >>>
-> > >> Thanks
-> > >>
-> > >> Eric
-> > >>
-> > >
-> >
 
