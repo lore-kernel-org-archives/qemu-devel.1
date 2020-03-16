@@ -2,56 +2,82 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D5CC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 08:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 012C3C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 08:01:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88E8720663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 08:01:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E8720663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id BFF7E20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 08:01:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ThS1t8Dm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF7E20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDkgg-0001EX-Bp
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 04:01:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56370)
+	id 1jDkgp-0001GQ-Hx
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 04:01:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDkRF-0004bM-W2
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:45:32 -0400
+ (envelope-from <bharatb.linux@gmail.com>) id 1jDkRX-0004m0-Fn
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDkRD-000132-Pm
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:45:29 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47670)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDkR8-0008MA-Fo; Mon, 16 Mar 2020 03:45:22 -0400
-Received: from apples.localdomain (80-62-117-52-mobile.dk.customer.tdc.net
- [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id 2EA6CBF5E1;
- Mon, 16 Mar 2020 07:45:21 +0000 (UTC)
-Date: Mon, 16 Mar 2020 00:45:17 -0700
-From: Klaus Birkelund Jensen <its@irrelevant.dk>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v5 10/26] nvme: add support for the get log page command
-Message-ID: <20200316074517.wvbz2psaienlx3iq@apples.localdomain>
-References: <20200204095208.269131-1-k.jensen@samsung.com>
- <CGME20200204095221eucas1p216ca2452c4184eb06bff85cff3c6a82b@eucas1p2.samsung.com>
- <20200204095208.269131-11-k.jensen@samsung.com>
- <58d27132d98667f1e177505c3f87795c953051a7.camel@redhat.com>
+ (envelope-from <bharatb.linux@gmail.com>) id 1jDkRV-000360-Sc
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:45:47 -0400
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:33482)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
+ id 1jDkRV-000307-CZ; Mon, 16 Mar 2020 03:45:45 -0400
+Received: by mail-qv1-xf44.google.com with SMTP id cz10so8297790qvb.0;
+ Mon, 16 Mar 2020 00:45:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fZftNYcpGXT78FMRsnc4SZnM9Z6P6UdIlZg56sEcZIA=;
+ b=ThS1t8DmIbZAiZ9pIW29/iYOs8b0NAerDEecEO/l0HBcmo5ay6HISbg9EPWlutIOsV
+ PAqFjbTNBEVm058ZqZQfReUCjCyWu3J4+UVsg2MmhsDEUIw/xRh7qv4NC0DRMMHdlumM
+ xofCVFdXPNI1X+nf6Zw2qEV7O281cfWXphIQJRm3KS7++h4vAaulU2Kgfb2bS4NZMfM2
+ yXppRrebUxxQSBBlo+ywDsUZJTrpjGD6/Ep45I+QdU6t8hHsLrCXBI2zA1IchMsxkqFY
+ 9mwnkgVIfnGfFHQvXgG/WggPl355zMltK1Mh8WDn199bNpVhK1nsHPG/lJc4l5g2CzdR
+ hCVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fZftNYcpGXT78FMRsnc4SZnM9Z6P6UdIlZg56sEcZIA=;
+ b=ZIgWyHrRS8uYUaedIWa+zunxC7pI0/hR2v80UnQoplDgrbPefeiAui8Wkuefg4kxuK
+ Rq1hU51rH3wS6Wi4j2ytSyEbyT/REftEzOQsqIQP6ZgnxpxAuCCmvQ6j78OBXk7oImcs
+ sW4gj9J1mfWzVDgqFbjkOskCDK3t2XIFC1D/8xNtdfuZH4H0ga3YY4yRmkXu2oX8kgxY
+ ItzxuiuRLjcJcWW97mjQJ8ZaHaL+Q4o2v6S6gu2dGF9IKFUuvocuwFpRVZDxpKr30QsK
+ UUbYufuI1Ncs7GMs92cHujcRaD1beNg049K4c0fuI+GIa6lBHkhmXPOUPa5lQV66ySej
+ /DJw==
+X-Gm-Message-State: ANhLgQ0gIyjBbJHrsm4yWJBpA4VWbc2gcGNN81w5sbj5EPobZEl6FbI2
+ o33gEo7TD+0xEsuWcp7EJxX7gxQg7nZlAKr9noQ=
+X-Google-Smtp-Source: ADFU+vso0v9JsyZJMlvpO1CdkLFHzAPE5Xwg/OhEuER97afuZhVDiEXUYhJT7FsprG0Vzc3LhvX4j37c4g58SM0oz5s=
+X-Received: by 2002:a0c:aee5:: with SMTP id n37mr22052207qvd.173.1584344744284; 
+ Mon, 16 Mar 2020 00:45:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <58d27132d98667f1e177505c3f87795c953051a7.camel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+References: <20200313074811.27175-1-bbhushan2@marvell.com>
+ <20200313074811.27175-4-bbhushan2@marvell.com>
+ <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
+ <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+ <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
+In-Reply-To: <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Mon, 16 Mar 2020 13:15:33 +0530
+Message-ID: <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
+Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,290 +89,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Javier Gonzalez <javier.gonz@samsung.com>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ mst@redhat.com, drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Feb 12 11:35, Maxim Levitsky wrote:
-> On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
-> > Add support for the Get Log Page command and basic implementations of
-> > the mandatory Error Information, SMART / Health Information and Firmware
-> > Slot Information log pages.
-> > 
-> > In violation of the specification, the SMART / Health Information log
-> > page does not persist information over the lifetime of the controller
-> > because the device has no place to store such persistent state.
-> Yea, not the end of the world.
-> > 
-> > Note that the LPA field in the Identify Controller data structure
-> > intentionally has bit 0 cleared because there is no namespace specific
-> > information in the SMART / Health information log page.
-> Makes sense.
-> > 
-> > Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
-> > Section 5.10 ("Get Log Page command").
-> > 
-> > Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
-> > ---
-> >  hw/block/nvme.c       | 122 +++++++++++++++++++++++++++++++++++++++++-
-> >  hw/block/nvme.h       |  10 ++++
-> >  hw/block/trace-events |   2 +
-> >  include/block/nvme.h  |   2 +-
-> >  4 files changed, 134 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index f72348344832..468c36918042 100644
-> > --- a/hw/block/nvme.c
-> > +++ b/hw/block/nvme.c
-> > @@ -569,6 +569,123 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
-> >      return NVME_SUCCESS;
-> >  }
-> >  
-> > +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-> > +    uint64_t off, NvmeRequest *req)
-> > +{
-> > +    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-> > +    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-> > +    uint32_t nsid = le32_to_cpu(cmd->nsid);
-> > +
-> > +    uint32_t trans_len;
-> > +    time_t current_ms;
-> > +    uint64_t units_read = 0, units_written = 0, read_commands = 0,
-> > +        write_commands = 0;
-> > +    NvmeSmartLog smart;
-> > +    BlockAcctStats *s;
-> > +
-> > +    if (nsid && nsid != 0xffffffff) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    s = blk_get_stats(n->conf.blk);
-> > +
-> > +    units_read = s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
-> > +    units_written = s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
-> > +    read_commands = s->nr_ops[BLOCK_ACCT_READ];
-> > +    write_commands = s->nr_ops[BLOCK_ACCT_WRITE];
-> > +
-> > +    if (off > sizeof(smart)) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    trans_len = MIN(sizeof(smart) - off, buf_len);
-> > +
-> > +    memset(&smart, 0x0, sizeof(smart));
-> > +
-> > +    smart.data_units_read[0] = cpu_to_le64(units_read / 1000);
-> > +    smart.data_units_written[0] = cpu_to_le64(units_written / 1000);
-> > +    smart.host_read_commands[0] = cpu_to_le64(read_commands);
-> > +    smart.host_write_commands[0] = cpu_to_le64(write_commands);
-> > +
-> > +    smart.temperature[0] = n->temperature & 0xff;
-> > +    smart.temperature[1] = (n->temperature >> 8) & 0xff;
-> > +
-> > +    if ((n->temperature > n->features.temp_thresh_hi) ||
-> > +        (n->temperature < n->features.temp_thresh_low)) {
-> > +        smart.critical_warning |= NVME_SMART_TEMPERATURE;
-> > +    }
-> > +
-> > +    current_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-> > +    smart.power_on_hours[0] = cpu_to_le64(
-> > +        (((current_ms - n->starttime_ms) / 1000) / 60) / 60);
-> > +
-> > +    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
-> > +        prp2);
-> > +}
-> Looks OK.
-> > +
-> > +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
-> > +    uint64_t off, NvmeRequest *req)
-> > +{
-> > +    uint32_t trans_len;
-> > +    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-> > +    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-> > +    NvmeFwSlotInfoLog fw_log;
-> > +
-> > +    if (off > sizeof(fw_log)) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +
-> > +    memset(&fw_log, 0, sizeof(NvmeFwSlotInfoLog));
-> > +
-> > +    trans_len = MIN(sizeof(fw_log) - off, buf_len);
-> > +
-> > +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1,
-> > +        prp2);
-> > +}
-> Looks OK
-> > +
-> > +static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> > +{
-> > +    uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> > +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
-> > +    uint32_t dw12 = le32_to_cpu(cmd->cdw12);
-> > +    uint32_t dw13 = le32_to_cpu(cmd->cdw13);
-> > +    uint8_t  lid = dw10 & 0xff;
-> > +    uint8_t  rae = (dw10 >> 15) & 0x1;
-> > +    uint32_t numdl, numdu;
-> > +    uint64_t off, lpol, lpou;
-> > +    size_t   len;
-> > +
-> > +    numdl = (dw10 >> 16);
-> > +    numdu = (dw11 & 0xffff);
-> > +    lpol = dw12;
-> > +    lpou = dw13;
-> > +
-> > +    len = (((numdu << 16) | numdl) + 1) << 2;
-> > +    off = (lpou << 32ULL) | lpol;
-> > +
-> > +    if (off & 0x3) {
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> 
-> Good. 
-> Note that there are plenty of other places in the driver that don't honor
-> such tiny formal bits of the spec, like for instance checking for the reserved
-> bits in commands.
+Hi Eric,
 
-Yeah. I know. You think its fair we leave that for subsequent patches?
-It's not like its breaking the device, but compliance is not complete.
+On Mon, Mar 16, 2020 at 1:02 PM Auger Eric <eric.auger@redhat.com> wrote:
+>
+> Hi Bharat,
+>
+> On 3/16/20 7:41 AM, Bharat Bhushan wrote:
+> > Hi Eric,
+> >
+> > On Fri, Mar 13, 2020 at 8:11 PM Auger Eric <eric.auger@redhat.com> wrote:
+> >>
+> >> Hi Bharat
+> >>
+> >> On 3/13/20 8:48 AM, Bharat Bhushan wrote:
+> >>> iommu-notifier are called when a device is attached
+> >> IOMMU notifiers
+> >>> or detached to as address-space.
+> >>> This is needed for VFIO.
+> >> and vhost for detach
+> >>>
+> >>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+> >>> ---
+> >>>  hw/virtio/virtio-iommu.c | 47 ++++++++++++++++++++++++++++++++++++++++
+> >>>  1 file changed, 47 insertions(+)
+> >>>
+> >>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+> >>> index e51344a53e..2006f72901 100644
+> >>> --- a/hw/virtio/virtio-iommu.c
+> >>> +++ b/hw/virtio/virtio-iommu.c
+> >>> @@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
+> >>>      uint32_t id;
+> >>>      VirtIOIOMMUDomain *domain;
+> >>>      QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
+> >>> +    VirtIOIOMMU *viommu;
+> >> This needs specal care on post-load. When migrating the EPs, only the id
+> >> is migrated. On post-load you need to set viommu as it is done for
+> >> domain. migration is allowed with vhost.
+> >
+> > ok, I have not tried vhost/migration. Below change set viommu when
+> > reconstructing endpoint.
+>
+>
+> Yes I think this should be OK.
+>
+> By the end I did the series a try with vhost/vfio. with vhost it works
+> (not with recent kernel though, but the issue may be related to kernel).
+> With VFIO however it does not for me.
+>
+> First issue is: your guest can use 4K page and your host can use 64KB
+> pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
+> a way to pass the host settings to the VIRTIO-IOMMU device.
+>
+> Even with 64KB pages, it did not work for me. I have obviously not the
+> storm of VFIO_DMA_MAP failures but I have some, most probably due to
+> some wrong notifications somewhere. I will try to investigate on my side.
+>
+> Did you test with VFIO on your side?
 
-> > +
-> > +    trace_nvme_dev_get_log(nvme_cid(req), lid, rae, len, off);
-> > +
-> > +    switch (lid) {
-> > +    case NVME_LOG_ERROR_INFO:
-> > +        if (off) {
-> > +            return NVME_INVALID_FIELD | NVME_DNR;
-> > +        }
-> 
-> I think you might want to memset the user given buffer to zero:
-> 
-> "This is a 64-bit incrementing error count, indicating a unique identifier for this error.
-> The error count starts at 1h, is incremented for each unique error log entry, and is retained across
-> power off conditions. A value of 0h indicates an invalid entry; this value is used when there are
-> lost entries or when there are fewer errors than the maximum number of entries the controller
-> supports."
+I did not tried with different page sizes, only tested with 4K page size.
 
-Good catch. Fixed!
+Yes it works, I tested with two n/w device assigned to VM, both interfaces works
 
-> > +
-> > +        return NVME_SUCCESS;
-> > +    case NVME_LOG_SMART_INFO:
-> > +        return nvme_smart_info(n, cmd, len, off, req);
-> > +    case NVME_LOG_FW_SLOT_INFO:
-> > +        return nvme_fw_log_info(n, cmd, len, off, req);
-> > +    default:
-> > +        trace_nvme_dev_err_invalid_log_page(nvme_cid(req), lid);
-> > +        return NVME_INVALID_FIELD | NVME_DNR;
-> > +    }
-> > +}
-> 
-> 
-> > +
-> >  static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *n)
-> >  {
-> >      n->cq[cq->cqid] = NULL;
-> > @@ -914,6 +1031,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-> >          return nvme_del_sq(n, cmd);
-> >      case NVME_ADM_CMD_CREATE_SQ:
-> >          return nvme_create_sq(n, cmd);
-> > +    case NVME_ADM_CMD_GET_LOG_PAGE:
-> > +        return nvme_get_log(n, cmd, req);
-> >      case NVME_ADM_CMD_DELETE_CQ:
-> >          return nvme_del_cq(n, cmd);
-> >      case NVME_ADM_CMD_CREATE_CQ:
-> > @@ -1411,6 +1530,7 @@ static void nvme_init_state(NvmeCtrl *n)
-> >  
-> >      n->temperature = NVME_TEMPERATURE;
-> >      n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
-> > +    n->starttime_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-> >  }
-> >  
-> >  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-> > @@ -1491,7 +1611,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-> >       */
-> >      id->acl = 3;
-> >      id->frmw = 7 << 1;
-> > -    id->lpa = 1 << 0;
-> > +    id->lpa = 1 << 2;
-> >  
-> >      /* recommended default value (~70 C) */
-> >      id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
-> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> > index 1518f32557a3..89b0aafa02a2 100644
-> > --- a/hw/block/nvme.h
-> > +++ b/hw/block/nvme.h
-> > @@ -109,6 +109,7 @@ typedef struct NvmeCtrl {
-> >      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
-> >      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-> >      uint16_t    temperature;
-> > +    uint64_t    starttime_ms;
-> >  
-> >      NvmeNamespace   *namespaces;
-> >      NvmeSQueue      **sq;
-> > @@ -124,4 +125,13 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
-> >      return n->ns_size >> nvme_ns_lbads(ns);
-> >  }
-> >  
-> > +static inline uint16_t nvme_cid(NvmeRequest *req)
-> > +{
-> > +    if (req) {
-> > +        return le16_to_cpu(req->cqe.cid);
-> > +    }
-> > +
-> > +    return 0xffff;
-> > +}
-> 
-> I see that you added command ID reporting to trace events you added,
-> which makes sense.
-> I think it would be nice later to add it to existing trace events where it makes sense.
-> 
+First I will try with 64k page size.
 
-Exactly. I'm doing that as I encounter it and it makes sense to have it
-in the patch.
+Thanks
+-Bharat
 
-> 
-> > +
-> >  #endif /* HW_NVME_H */
-> > diff --git a/hw/block/trace-events b/hw/block/trace-events
-> > index ade506ea2bb2..7da088479f39 100644
-> > --- a/hw/block/trace-events
-> > +++ b/hw/block/trace-events
-> > @@ -46,6 +46,7 @@ nvme_dev_getfeat_numq(int result) "get feature number of queues, result=%d"
-> >  nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
-> >  nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
-> >  nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
-> > +nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
-> >  nvme_dev_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
-> >  nvme_dev_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
-> >  nvme_dev_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
-> > @@ -85,6 +86,7 @@ nvme_dev_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completi
-> >  nvme_dev_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
-> >  nvme_dev_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
-> >  nvme_dev_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
-> > +nvme_dev_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
-> >  nvme_dev_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
-> >  nvme_dev_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
-> >  nvme_dev_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
-> > diff --git a/include/block/nvme.h b/include/block/nvme.h
-> > index ff31cb32117c..9a6055adeb61 100644
-> > --- a/include/block/nvme.h
-> > +++ b/include/block/nvme.h
-> > @@ -515,7 +515,7 @@ enum NvmeSmartWarn {
-> >      NVME_SMART_FAILED_VOLATILE_MEDIA  = 1 << 4,
-> >  };
-> >  
-> > -enum LogIdentifier {
-> > +enum NvmeLogIdentifier {
-> >      NVME_LOG_ERROR_INFO     = 0x01,
-> >      NVME_LOG_SMART_INFO     = 0x02,
-> >      NVME_LOG_FW_SLOT_INFO   = 0x03,
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
+>
+> Thanks
+>
+> Eric
+> >
+> > @@ -984,6 +973,7 @@ static gboolean reconstruct_endpoints(gpointer
+> > key, gpointer value,
+> >
+> >      QLIST_FOREACH(iter, &d->endpoint_list, next) {
+> >          iter->domain = d;
+> > +       iter->viommu = s;
+> >          g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
+> >      }
+> >      return false; /* continue the domain traversal */
+> >
+> >>>  } VirtIOIOMMUEndpoint;
+> >>>
+> >>>  typedef struct VirtIOIOMMUInterval {
+> >>> @@ -155,8 +156,44 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
+> >>>      memory_region_notify_iommu(mr, 0, entry);
+> >>>  }
+> >>>
+> >>> +static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
+> >>> +                                           gpointer data)
+> >>> +{
+> >>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
+> >>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+> >>> +
+> >>> +    virtio_iommu_notify_unmap(mr, interval->low,
+> >>> +                              interval->high - interval->low + 1);
+> >>> +
+> >>> +    return false;
+> >>> +}
+> >>> +
+> >>> +static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
+> >>> +                                         gpointer data)
+> >>> +{
+> >>> +    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
+> >>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
+> >>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+> >>> +
+> >>> +    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
+> >>> +                            interval->high - interval->low + 1);
+> >>> +
+> >>> +    return false;
+> >>> +}
+> >>> +
+> >>>  static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
+> >>>  {
+> >>> +    VirtioIOMMUNotifierNode *node;
+> >>> +    VirtIOIOMMU *s = ep->viommu;
+> >>> +    VirtIOIOMMUDomain *domain = ep->domain;
+> >>> +
+> >>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> >>> +        if (ep->id == node->iommu_dev->devfn) {
+> >>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
+> >>> +                           &node->iommu_dev->iommu_mr);
+> >> I understand this should fo the job for domain removal
+> >
+> > did not get the comment, are you saying we should do this on domain removal?
+> see my reply on 2/5
+>
+> Note the above code should be moved after the check of !ep->domain below
+
+ohh yes, will move
+
+Thanks
+-Bharat
+
+> >
+> >>> +        }
+> >>> +    }
+> >>> +
+> >>>      if (!ep->domain) {
+> >>>          return;
+> >>>      }
+> >>> @@ -178,6 +215,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+> >>>      }
+> >>>      ep = g_malloc0(sizeof(*ep));
+> >>>      ep->id = ep_id;
+> >>> +    ep->viommu = s;
+> >>>      trace_virtio_iommu_get_endpoint(ep_id);
+> >>>      g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
+> >>>      return ep;
+> >>> @@ -272,6 +310,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+> >>>  {
+> >>>      uint32_t domain_id = le32_to_cpu(req->domain);
+> >>>      uint32_t ep_id = le32_to_cpu(req->endpoint);
+> >>> +    VirtioIOMMUNotifierNode *node;
+> >>>      VirtIOIOMMUDomain *domain;
+> >>>      VirtIOIOMMUEndpoint *ep;
+> >>>
+> >>> @@ -299,6 +338,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+> >>>
+> >>>      ep->domain = domain;
+> >>>
+> >>> +    /* Replay existing address space mappings on the associated memory region */
+> >> maybe use the "domain" terminology here.
+> >
+> > ok,
+> >
+> > Thanks
+> > -Bharat
+> >
+> >>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> >>> +        if (ep_id == node->iommu_dev->devfn) {
+> >>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
+> >>> +                           &node->iommu_dev->iommu_mr);
+> >>> +        }
+> >>> +    }
+> >>> +
+> >>>      return VIRTIO_IOMMU_S_OK;
+> >>>  }
+> >>>
+> >>>
+> >> Thanks
+> >>
+> >> Eric
+> >>
+> >
+>
 
