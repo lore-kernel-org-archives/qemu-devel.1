@@ -2,64 +2,93 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46568C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39492C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:59:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ABE5206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:58:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABE5206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0229C20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:59:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wl1Y4XNA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0229C20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuwy-0006fE-5q
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:58:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57599)
+	id 1jDuxt-0000Zx-4T
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:59:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1jDu23-0003C1-Ny
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:00:09 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDuZV-000438-KR
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1jDu21-0002Jf-Gi
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:00:07 -0400
-Received: from 5.mo7.mail-out.ovh.net ([178.32.120.239]:56152)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jDu21-00024R-8h
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:00:05 -0400
-Received: from player730.ha.ovh.net (unknown [10.108.54.217])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id F0E03157014
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 19:00:02 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id C48C810553AF1;
- Mon, 16 Mar 2020 17:59:55 +0000 (UTC)
-Subject: Re: [PATCH v2 4/8] ppc/spapr: Fix FWNMI machine check interrupt
- delivery
-To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
-References: <20200316142613.121089-1-npiggin@gmail.com>
- <20200316142613.121089-5-npiggin@gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2ff9bfbf-5a6a-2a79-e14e-4b7c76aff062@kaod.org>
-Date: Mon, 16 Mar 2020 18:59:47 +0100
+ (envelope-from <richard.henderson@linaro.org>) id 1jDuZU-0005dY-LM
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:41 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:46540)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDuZU-0005Xu-FX
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:34:40 -0400
+Received: by mail-pl1-x644.google.com with SMTP id r3so348302pls.13
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=PC2ldSLzBIGyBSvA9ZmOPp4tVJwN/WY+kDxO7U/JLuE=;
+ b=Wl1Y4XNAeLvQNwX566xDFe85W8KyJrcvDX6J10fv+m0wYL+JW25xh7K6r+h2Qheawu
+ O+pklhhG9PHcOqNKXo43tPmDRS4KKZ5Hd0N2s7bIesUMj7hJFfP5Ozje7pEXsOOvqTLF
+ a2abxh1+DJD3KRsWHBRvrflXIq9qu/WPmNzyZ8zYmibfZt3W8RGKqq1TQpiL3wKZORRW
+ zguNcoJQVNDmIGUd5tOIokHhYnLI4J5dTfMcMDZYh/dkxv8PL6dwqJ534ftKChB+s56l
+ RZIjvouWMnpo4sphNj870/f21602na7bmZk0IvdLodMI75jINl4jTo96mwW12pwyQFi2
+ h03g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=PC2ldSLzBIGyBSvA9ZmOPp4tVJwN/WY+kDxO7U/JLuE=;
+ b=LNu29u96KjYHhIXog+Wvvwg8Eb1SOhfOdoyOlYUzoLcLhCjqeuHGNMr315ZeYpQXQ+
+ 36Tjoo/ZlC0l6kTN6pe0ECQrgOvkWCNTkpruBtMVYroCzGW15nZeEih/83UxcFz+B3aw
+ JaxYBkRs5x9uDku4Jl/kYqJuAzpghYtIGUFg0xJfmI5aR5hsumx8n3jevFQw9cD2gx3C
+ tgKY1aFn8Uz14kwJ42Bdv3i1IUII8N2GNs2UEDL9ApwhCSTyUKwrR2alH/Q0nJxLCsp1
+ QI3eguA4vfp/8xigM3BApsgBV6BuFKfJLcNiIx3ASdqV8Xb/9FCD0sKhWGpp/SZZCRK/
+ DGWQ==
+X-Gm-Message-State: ANhLgQ0Pu+G8O88FZarIOg8AIwi3605inHlyCciwNu59/1Ap9IKFrSlU
+ Y0FlhxvTnt+Vy2gNhWrg0sYxkA==
+X-Google-Smtp-Source: ADFU+vtnItt3QTgIwsLaiSBbZ5RZmIlwQ80uqEu2MbvD9kszgcX8iuAzeXxMIY/NHizm7WCVLwm7Rg==
+X-Received: by 2002:a17:90a:cf96:: with SMTP id
+ i22mr949791pju.66.1584383679409; 
+ Mon, 16 Mar 2020 11:34:39 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ h64sm543729pfg.191.2020.03.16.11.34.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 11:34:38 -0700 (PDT)
+Subject: Re: [PATCH 09/11] target/mips: Always enable CONFIG_SEMIHOSTING
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200316120049.11225-1-philmd@redhat.com>
+ <20200316120049.11225-10-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <68624737-0447-3e19-4971-1d1bbe2fde8c@linaro.org>
+Date: Mon, 16 Mar 2020 11:34:36 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316142613.121089-5-npiggin@gmail.com>
+In-Reply-To: <20200316120049.11225-10-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13736541813535575014
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeftddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.120.239
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,202 +100,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 3:26 PM, Nicholas Piggin wrote:
-> FWNMI machine check delivery misses a few things that will make it fail
-> with TCG at least (which we would like to allow in future to improve
-> testing).
-
-I don't understand which issues are addressed in the patch.
-
-> It's not nice to scatter interrupt delivery logic around the tree, so
-> move it to excp_helper.c and share code where possible.
-
-It looks correct but this is touching the ugliest routine in the QEMU 
-PPC universe. I would split the patch in two to introduce the helper
-powerpc_set_excp_state().
-
-It does not seem to need to be an inline also.
-
-C. 
-
+On 3/16/20 5:00 AM, Philippe Mathieu-Daudé wrote:
+> On MIPS, the semihosting feature is always required on user-space.
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/ppc/spapr_events.c    | 24 +++----------
->  target/ppc/cpu.h         |  1 +
->  target/ppc/excp_helper.c | 74 ++++++++++++++++++++++++++++------------
->  3 files changed, 57 insertions(+), 42 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index 27ba8a2c19..323fcef4aa 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -785,28 +785,13 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
->  static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
->  {
->      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> -    uint64_t rtas_addr;
-> +    CPUState *cs = CPU(cpu);
->      CPUPPCState *env = &cpu->env;
-> -    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> -    target_ulong msr = 0;
-> +    uint64_t rtas_addr;
->      struct rtas_error_log log;
->      struct mc_extended_log *ext_elog;
->      uint32_t summary;
->  
-> -    /*
-> -     * Properly set bits in MSR before we invoke the handler.
-> -     * SRR0/1, DAR and DSISR are properly set by KVM
-> -     */
-> -    if (!(*pcc->interrupts_big_endian)(cpu)) {
-> -        msr |= (1ULL << MSR_LE);
-> -    }
-> -
-> -    if (env->msr & (1ULL << MSR_SF)) {
-> -        msr |= (1ULL << MSR_SF);
-> -    }
-> -
-> -    msr |= (1ULL << MSR_ME);
-> -
->      ext_elog = g_malloc0(sizeof(*ext_elog));
->      summary = spapr_mce_get_elog_type(cpu, recovered, ext_elog);
->  
-> @@ -834,12 +819,11 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
->      cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
->                                sizeof(env->gpr[3]) + sizeof(log), ext_elog,
->                                sizeof(*ext_elog));
-> +    g_free(ext_elog);
->  
->      env->gpr[3] = rtas_addr + RTAS_ERROR_LOG_OFFSET;
-> -    env->msr = msr;
-> -    env->nip = spapr->fwnmi_machine_check_addr;
->  
-> -    g_free(ext_elog);
-> +    ppc_cpu_do_fwnmi_machine_check(cs, spapr->fwnmi_machine_check_addr);
->  }
->  
->  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 5a55fb02bd..3953680534 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1221,6 +1221,7 @@ int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
->                                 int cpuid, void *opaque);
->  #ifndef CONFIG_USER_ONLY
->  void ppc_cpu_do_system_reset(CPUState *cs);
-> +void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector);
->  extern const VMStateDescription vmstate_ppc_cpu;
->  #endif
->  
-> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-> index 027f54c0ed..7f2b5899d3 100644
-> --- a/target/ppc/excp_helper.c
-> +++ b/target/ppc/excp_helper.c
-> @@ -128,6 +128,37 @@ static uint64_t ppc_excp_vector_offset(CPUState *cs, int ail)
->      return offset;
->  }
->  
-> +static inline void powerpc_set_excp_state(PowerPCCPU *cpu,
-> +                                          target_ulong vector, target_ulong msr)
-> +{
-> +    CPUState *cs = CPU(cpu);
-> +    CPUPPCState *env = &cpu->env;
-> +
-> +    /*
-> +     * We don't use hreg_store_msr here as already have treated any
-> +     * special case that could occur. Just store MSR and update hflags
-> +     *
-> +     * Note: We *MUST* not use hreg_store_msr() as-is anyway because it
-> +     * will prevent setting of the HV bit which some exceptions might need
-> +     * to do.
-> +     */
-> +    env->msr = msr & env->msr_mask;
-> +    hreg_compute_hflags(env);
-> +    env->nip = vector;
-> +    /* Reset exception state */
-> +    cs->exception_index = POWERPC_EXCP_NONE;
-> +    env->error_code = 0;
-> +
-> +    /* Reset the reservation */
-> +    env->reserve_addr = -1;
-> +
-> +    /*
-> +     * Any interrupt is context synchronizing, check if TCG TLB needs
-> +     * a delayed flush on ppc64
-> +     */
-> +    check_tlb_flush(env, false);
-> +}
-> +
->  /*
->   * Note that this function should be greatly optimized when called
->   * with a constant excp, from ppc_hw_interrupt
-> @@ -768,29 +799,8 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
->          }
->      }
->  #endif
-> -    /*
-> -     * We don't use hreg_store_msr here as already have treated any
-> -     * special case that could occur. Just store MSR and update hflags
-> -     *
-> -     * Note: We *MUST* not use hreg_store_msr() as-is anyway because it
-> -     * will prevent setting of the HV bit which some exceptions might need
-> -     * to do.
-> -     */
-> -    env->msr = new_msr & env->msr_mask;
-> -    hreg_compute_hflags(env);
-> -    env->nip = vector;
-> -    /* Reset exception state */
-> -    cs->exception_index = POWERPC_EXCP_NONE;
-> -    env->error_code = 0;
->  
-> -    /* Reset the reservation */
-> -    env->reserve_addr = -1;
-> -
-> -    /*
-> -     * Any interrupt is context synchronizing, check if TCG TLB needs
-> -     * a delayed flush on ppc64
-> -     */
-> -    check_tlb_flush(env, false);
-> +    powerpc_set_excp_state(cpu, vector, new_msr);
->  }
->  
->  void ppc_cpu_do_interrupt(CPUState *cs)
-> @@ -958,6 +968,26 @@ void ppc_cpu_do_system_reset(CPUState *cs)
->  
->      powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_RESET);
->  }
-> +
-> +void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)
-> +{
-> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
-> +    CPUPPCState *env = &cpu->env;
-> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> +    target_ulong msr = 0;
-> +
-> +    /*
-> +     * Set MSR and NIP for the handler, SRR0/1, DAR and DSISR have already
-> +     * been set by KVM.
-> +     */
-> +    msr = (1ULL << MSR_ME);
-> +    msr |= env->msr & (1ULL << MSR_SF);
-> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
-> +        msr |= (1ULL << MSR_LE);
-> +    }
-> +
-> +    powerpc_set_excp_state(cpu, vector, msr);
-> +}
->  #endif /* !CONFIG_USER_ONLY */
->  
->  bool ppc_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-> 
+>  default-configs/mips-linux-user-common.mak | 4 ++++
+>  default-configs/mips-linux-user.mak        | 2 ++
+>  default-configs/mips64-linux-user.mak      | 2 ++
+>  default-configs/mips64el-linux-user.mak    | 2 ++
+>  default-configs/mipsel-linux-user.mak      | 2 ++
+>  default-configs/mipsn32-linux-user.mak     | 2 ++
+>  default-configs/mipsn32el-linux-user.mak   | 2 ++
+>  7 files changed, 16 insertions(+)
+>  create mode 100644 default-configs/mips-linux-user-common.mak
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
 
