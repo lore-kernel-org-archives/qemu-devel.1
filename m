@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D56C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B422C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A008A2071C
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E632A20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZghqREJz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A008A2071C
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SNXfGnn1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E632A20409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuTc-0001q4-Qe
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:28:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
+	id 1jDuTl-00028G-3X
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDtXr-0003px-1e
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:57 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtEV-0001uc-KX
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:08:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDtXo-0002Tw-Er
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:54 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50262)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtEU-0001dz-Dc
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:08:55 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56248)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jDtXo-0002NW-1e
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:52 -0400
-Received: by mail-wm1-x344.google.com with SMTP id z13so2549942wml.0
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:51 -0700 (PDT)
+ id 1jDtEU-0001a9-6A
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:08:54 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 6so18534773wmi.5
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:08:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=EPnkFehuoY8i9HEKpPlDslyHYZfmul1u7YpuP2BpokM=;
- b=ZghqREJzaSEtrozbZV7tluTdr+QkgyxjfdoH5vyOi5FLUkY2Z648wGoAIXA29vzrHr
- fmbkAfIXJiGX4Ic/c7n9B0D55/7Z8vXk3KK32wmP3hR1glGxemZYtHv/8X18tiyh91ai
- q3JeEVPfyVgs31/euZpQ76YRQUxfHgRmpGHE66oavFx+sznx/g+Y5uc5gGZKYswGtrta
- 9fb1kheRE/0xb+0QPm59lu9XaK9kzLyQV7Xh6ibyjA6avdesTjkA03sKuhpum/tY1aGR
- v6/fGqsKtTTcMEAdhWo+nwsZsW2YToj2RCDH8Jf8n4Y4xUFBgmXxmXns6s3jMnxfgPO6
- 17sg==
+ bh=99dn/GuhwAHx2S002190vY0CnNI7zHUp3az7R7L8TFY=;
+ b=SNXfGnn1xK7BuGqjlOmsRLybZbnL6/G4lYfntprIlEMiqL9aKfp9cvJ8qid8swothV
+ MyMT8ojXC86NwCSylza4bF9oPXy9TOcLeiX3VrPC95zmltsAnJdx+85b2AbXsiI8u9jD
+ M5TFHhtX/Rc2MK3znjHGCESydIQSugwD9y3nzAjl6eSPrvxWP1JQhdkbgF8r+otCQ0Yv
+ a2h1IL8Gq3il9txBBrsi7uQmcTcRqlRVqNFL2r5R7d/IxrD+cXir0G7U6Ammp9eE7v0M
+ WyHEmgb3hT15kMlsLLuH5Y76loKBUmQgpbo7wXhAkE5rpyIHJIZgsLkdFcSIL0a8Ps9v
+ luPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=EPnkFehuoY8i9HEKpPlDslyHYZfmul1u7YpuP2BpokM=;
- b=jrQKT/NuzdTp/Bjfl8XogzHR5pTAUd9PZlqmox066uUF8Mt4/0BcTRpL46+5Bs8eNE
- V0sZxMnF2S/aSooE2idlUYxhWzN4Bm+w6J/NDLsG4OOI+TZkyHpgHAZbC90D3o2oqjNq
- 2tGpD0e/6ms/tFAlDK3IJpUghn7trK/QajTCnw3n5xRrY+mSYvbNcobQl1Ok2Vmd0Urg
- 4qK9m0hU8mU7/wQ5iREtN0w3sjPjOGHPZ6Mb2N5qs55BggeAUhSdbhftUgiIdk5BPOZq
- dgnC6gSEZbEWuAC5Y0Vw4lRWfhkgybST/0e0h16kLkHOJez/d/AvKNxl9jwiUdj9+sdY
- vWiw==
-X-Gm-Message-State: ANhLgQ2dzWhgInfykz+msaRA+g9WBgizghLKrBWt9OnYaHURsawpx1pX
- mAdkCT4BPJQXg7b8zZAtXI8SmcfU7aJNOBFmLCY=
-X-Google-Smtp-Source: ADFU+vt6TGZYv/yqRZBrAzcXuCIEiuhwu1UwExmaurjGJg1CtAQPmEHVUzT2Neocln/w9lWCsXT8BrZbOL6neCS4GQ0=
-X-Received: by 2002:a7b:cc8b:: with SMTP id p11mr224991wma.26.1584379731060;
- Mon, 16 Mar 2020 10:28:51 -0700 (PDT)
+ bh=99dn/GuhwAHx2S002190vY0CnNI7zHUp3az7R7L8TFY=;
+ b=RCv6S18CW7vsuSjwkWln3jVnYFX19AaWspKq2B69CH0F+dW8UrP1oq5Be0Vk/kpA0x
+ J4VUPZrro93twlg628rxvoOE8Uk6LMu8vKqg4Ebix+QXy0BAXC1FEY7n1t92JVePDV7p
+ F/3gMBoi9fkRWOsBQiKL9AxyCNUkQcmzoJnIpnOUigX6MgXgR6WoInhTjuG11PyfHRlY
+ ZUOxXJGwYrzg6nEq+F6fzHg+frgECM/VIMAbtTb4k9U/h/NcLmmt6+pWtM1fcBPS6vmW
+ WvnANHGHoACpuCNvUY6qPinFNraV7LKylyxPN86Ez0KD2vnCR6LhzYTTjknI9o5x0CyO
+ iohA==
+X-Gm-Message-State: ANhLgQ2W6AxePw4LiilCurrYrRBy6LmuHRQabFT7m3+Ezw/JuRgEoVsv
+ zNh5jnSPuiz7iLtv3KWHQukDCXmKzYnXUKRxqMBNb467Mwc=
+X-Google-Smtp-Source: ADFU+vsY6bDMIelg9RQTfRctssaH0FJTf5nDOtFgI0so9ofMIlqkzT2h6uOUIK8zOhueHwHeQAJF5H38kF5qvL4wx8c=
+X-Received: by 2002:a1c:1fc9:: with SMTP id f192mr147752wmf.4.1584378533159;
+ Mon, 16 Mar 2020 10:08:53 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-23-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-23-armbru@redhat.com>
+ <20200315144653.22660-20-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-20-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 16 Mar 2020 18:28:25 +0100
-Message-ID: <CAJ+F1CKD_hfU3XWLjTPHh4xkNCU6MokbL6yz5-LVEtBbfkTMAg@mail.gmail.com>
-Subject: Re: [PATCH v3 22/34] qapi: Simplify how qmp_dispatch() deals with
- QCO_NO_SUCCESS_RESP
+Date: Mon, 16 Mar 2020 18:08:41 +0100
+Message-ID: <CAJ+F1CLZ-Nh-nkQZcYbKnYTdAw3QkUtb4D=kk5L8SyB+0Bcnuw@mail.gmail.com>
+Subject: Re: [PATCH v3 19/34] qapi/schema: Call QAPIDoc.connect_member() in
+ just one place
 To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,8 +95,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 15, 2020 at 3:51 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Sun, Mar 15, 2020 at 4:00 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
+>
+> The .connect_doc() of classes that have QAPISchemaMember connect them
+> to their documentation.  Change them to delegate the actual work to
+> new QAPISchemaMember.connect_doc().  Matches the .connect_doc() that
+> already exist.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
@@ -104,68 +109,65 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  qapi/qmp-dispatch.c | 25 +++++++++++++------------
->  1 file changed, 13 insertions(+), 12 deletions(-)
+>  scripts/qapi/schema.py | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
 >
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index a588072523..550d1fe8d2 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -106,7 +106,7 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *re=
-quest,
->      QDict *dict =3D qobject_to(QDict, request);
->      QObject *id =3D dict ? qdict_get(dict, "id") : NULL;
->      QObject *ret =3D NULL;
-> -    QDict *rsp;
-> +    QDict *rsp =3D NULL;
+> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+> index 033c84c4a0..59e1f5a395 100644
+> --- a/scripts/qapi/schema.py
+> +++ b/scripts/qapi/schema.py
+> @@ -252,9 +252,8 @@ class QAPISchemaEnumType(QAPISchemaType):
+>      def connect_doc(self, doc=3DNone):
+>          super().connect_doc(doc)
+>          doc =3D doc or self.doc
+> -        if doc:
+> -            for m in self.members:
+> -                doc.connect_member(m)
+> +        for m in self.members:
+> +            m.connect_doc(doc)
 >
->      dict =3D qmp_dispatch_check_obj(request, allow_oob, &err);
->      if (!dict) {
-> @@ -151,31 +151,32 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *=
-request,
->          args =3D qdict_get_qdict(dict, "arguments");
->          qobject_ref(args);
->      }
-> -
->      cmd->fn(args, &ret, &err);
-> +    qobject_unref(args);
->      if (err) {
-> -        ;
-> -    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
-> +        goto out;
-> +    }
+>      def is_implicit(self):
+>          # See QAPISchema._make_implicit_enum_type() and ._def_predefined=
+s()
+> @@ -396,11 +395,10 @@ class QAPISchemaObjectType(QAPISchemaType):
+>      def connect_doc(self, doc=3DNone):
+>          super().connect_doc(doc)
+>          doc =3D doc or self.doc
+> -        if doc:
+> -            if self.base and self.base.is_implicit():
+> -                self.base.connect_doc(doc)
+> -            for m in self.local_members:
+> -                doc.connect_member(m)
+> +        if self.base and self.base.is_implicit():
+> +            self.base.connect_doc(doc)
+> +        for m in self.local_members:
+> +            m.connect_doc(doc)
+>
+>      @property
+>      def ifcond(self):
+> @@ -496,9 +494,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>      def connect_doc(self, doc=3DNone):
+>          super().connect_doc(doc)
+>          doc =3D doc or self.doc
+> -        if doc:
+> -            for v in self.variants.variants:
+> -                doc.connect_member(v)
+> +        for v in self.variants.variants:
+> +            v.connect_doc(doc)
+>
+>      def c_type(self):
+>          return c_name(self.name) + pointer_suffix
+> @@ -627,6 +624,10 @@ class QAPISchemaMember:
+>                  % (self.describe(info), seen[cname].describe(info)))
+>          seen[cname] =3D self
+>
+> +    def connect_doc(self, doc):
+> +        if doc:
+> +            doc.connect_member(self)
 > +
-> +    if (cmd->options & QCO_NO_SUCCESS_RESP) {
->          g_assert(!ret);
-> +        return NULL;
->      } else if (!ret) {
->          /* TODO turn into assertion */
->          ret =3D QOBJECT(qdict_new());
->      }
->
-> -    qobject_unref(args);
-> +    rsp =3D qdict_new();
-> +    qdict_put_obj(rsp, "return", ret);
->
->  out:
->      if (err) {
-> +        assert(!rsp);
->          rsp =3D qmp_error_response(err);
-> -    } else if (ret) {
-> -        rsp =3D qdict_new();
-> -        qdict_put_obj(rsp, "return", ret);
-> -    } else {
-> -        /* Can only happen for commands with QCO_NO_SUCCESS_RESP */
-> -        rsp =3D NULL;
->      }
->
-> -    if (rsp && id) {
-> +    assert(rsp);
-> +
-> +    if (id) {
->          qdict_put_obj(rsp, "id", qobject_ref(id));
->      }
->
+>      def describe(self, info):
+>          role =3D self.role
+>          defined_in =3D self.defined_in
 > --
 > 2.21.1
 >
