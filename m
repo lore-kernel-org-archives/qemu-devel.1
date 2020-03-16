@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0D4C5ACBF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD57C10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:08:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8B820674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:04:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7977205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 01:08:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYkUF8PO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8B820674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Su1olYXk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7977205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDeB8-0004EC-83
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 21:04:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50254)
+	id 1jDeF1-0005kb-9C
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 21:08:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDdF1-0005aP-Lj
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:04:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDdLr-0008DR-9x
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDdF0-0001eh-FY
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:04:23 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34866
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1jDdLp-00046D-61
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39068
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDdF0-0001Yu-7k
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:04:22 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDdLp-00044B-1A
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 20:11:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584317059;
+ s=mimecast20190719; t=1584317484;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0EBS/JGM5sdypwmOBkqVZGaFaD89p2CN4vt6aH7d1PA=;
- b=HYkUF8POkf4q6e+Ob425IrJsNW7nK0DTkGJ3kyEEeDDqQwBig/3QvEta3wz5pqSv5hbRJh
- hHq7sPB177ojCinBKqzJtacm5mR0qnoQMgLpWllZosHszEhQC514k88X+Ma7hk4bkIgM3D
- 5nGqutoxLscJVqadIQU00t2oK+5K0rg=
+ bh=jznyG6ZwK2HqBmm0XWTDAnNXPpietF898ys70w4PLHk=;
+ b=Su1olYXksk3/ivw8SeEMoD8lsZluSD0O8RLOLVPAVASNZXSyGrApHkvo23Fsmgg3BxzR5U
+ KLZdeIblREKundgO5WXjVlpqbs1+6HSADwUFtqARF6saTypppT8w7b7lwB/8hO3xvcuJCY
+ j92Yceoy5vMAJBwxhHVHoyYFxzEdftg=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-WL07sWO3NtGxl3gx28tsnA-1; Sun, 15 Mar 2020 20:04:18 -0400
-X-MC-Unique: WL07sWO3NtGxl3gx28tsnA-1
-Received: by mail-wr1-f69.google.com with SMTP id g4so481493wrv.12
- for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 17:04:17 -0700 (PDT)
+ us-mta-439-lG9mLbDeNnOgNNSjR1vUTA-1; Sun, 15 Mar 2020 20:11:21 -0400
+X-MC-Unique: lG9mLbDeNnOgNNSjR1vUTA-1
+Received: by mail-wr1-f69.google.com with SMTP id t10so1852435wrp.15
+ for <qemu-devel@nongnu.org>; Sun, 15 Mar 2020 17:11:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sZKHWj2M/9wdQufG5pPSxGofUinM5PxKM5oyG6rDjBQ=;
- b=HRuy51KreoUYE5YDRDLc5tc2+6GDcq5rPQizZga6G4kVvSpHGx6uR8v3G4RjLJ0uAF
- a1vgBrrlrmtq75USm4SNrpY8fdfz7vyjHTCACywIB1/IUfgN9OU4uufbDgFvRlc+92gT
- KyejGQjkk/tqAovZEyX6LOcTrFC+pegomN6hEnuQMfdQYBu/jYdm+DNHmoKRtqtzUnuI
- YC7Ul0kj2l4MPFfWzOMUFcq3ymN+iSvVz2V5z0eaBpgkBQ4Lnm6FBIMEURHhtvVsOxaN
- Iipif6o7YoVPgaEfTk6t0BFAGfRBLPqy9M4y8P5/LOgZ6zAjGsuL6b9MmpQI8CrtcYdI
- R1NQ==
-X-Gm-Message-State: ANhLgQ2lJ0q1DDYUCAkVwVTxdDF8q6rRwMvn6BB4jhKe6OO80k3zp6Gj
- P+6EReNu3Vpp2bzyg1FzS3NBFdZJWqXD7hC5jZWBjLp1FblSmqX6TJujkat591P3iCugfsm/+Mw
- 12YWljim7rC4PiME=
-X-Received: by 2002:adf:f14a:: with SMTP id y10mr31395212wro.325.1584317056472; 
- Sun, 15 Mar 2020 17:04:16 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtKqvx1pofLFsHgi5e88usg+4x+zLxOwr4aI+pcqFQa++Zv752HeSdlfFwcnF913ImMvHJEHw==
-X-Received: by 2002:adf:f14a:: with SMTP id y10mr31395185wro.325.1584317056249; 
- Sun, 15 Mar 2020 17:04:16 -0700 (PDT)
+ bh=cjkIxsGDVLhIoi2wxX81/gLAzGZQZKT/spQLce8K0hQ=;
+ b=Iyufo3tsX7LDDKcBe/kKTYGGq1mYJWOFnSgTISK66CglK3c5XOfiCkv4qYkbV6iDsk
+ 033twQPQWbjsQJqbzB3ZASMQwCVlrsKjqTKeqOQKY8idPyIc5bcHhfnRptpOL3vimzMm
+ 1wLH8d1qOzc9F7bjO4gCjZBAT6HMCS1FK16TC1Dz+INx9FBrXWqNUtsJhLG3G19ioPPH
+ SSbOwPq0BRRMPa2ZED+dI53QRfN9WYn+TdhWLkiW6802H0mj+wWaQ/BeHIXcsPqaLjW8
+ YVX6/Km+YXGQbCVwujdeWFOCg3m9YfAHgmhrDn3qnAKzd+s/pjMeldhZno/CzjVD3XvH
+ rkIw==
+X-Gm-Message-State: ANhLgQ1HyJxwRnGeTU5FTrSWhJ9g2wZCOdiuYpy72wz4mVTGBGbLQMQJ
+ r44pxGp0gtsNYLRvzNst0nPd60Ck9XrHCuwXsp0oNE6HLwuLO4vqhyv1kr6HIfoEJUdzyFARokz
+ EYj9D0i0J0FJmEaw=
+X-Received: by 2002:a1c:6605:: with SMTP id a5mr24393043wmc.32.1584317479913; 
+ Sun, 15 Mar 2020 17:11:19 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuo0cRj+iuolTs3FlbHkV8ErFMyIFtT512xgxL4hi8D0xSKaiNthiT2j73tAx6df9E9vsCwHw==
+X-Received: by 2002:a1c:6605:: with SMTP id a5mr24393015wmc.32.1584317479669; 
+ Sun, 15 Mar 2020 17:11:19 -0700 (PDT)
 Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id n1sm46775573wrj.77.2020.03.15.17.04.14
+ by smtp.gmail.com with ESMTPSA id f15sm16109952wrt.9.2020.03.15.17.11.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Mar 2020 17:04:15 -0700 (PDT)
+ Sun, 15 Mar 2020 17:11:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/8] qapi/misc: Move query-uuid command with block code
-Date: Mon, 16 Mar 2020 01:03:44 +0100
-Message-Id: <20200316000348.29692-5-philmd@redhat.com>
+Subject: [PATCH v2 1/9] hw/core/qdev-properties: Use qemu_strtol() in
+ set_mac() handler
+Date: Mon, 16 Mar 2020 01:11:03 +0100
+Message-Id: <20200316001111.31004-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316000348.29692-1-philmd@redhat.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
+In-Reply-To: <20200316001111.31004-1-philmd@redhat.com>
+References: <20200316001111.31004-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -91,7 +92,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,133 +105,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The MACAddr structure contains an array of uint8_t. Previously
+if a value was out of the [0..255] range, it was silently casted
+and no input validation was done.
+Replace strtol() by qemu_strtol() -- so checkpatch.pl won't
+complain if we move this code later -- and return EINVAL if the
+input is invalid.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- qapi/block-core.json | 30 ++++++++++++++++++++++++++++++
- qapi/misc.json       | 30 ------------------------------
- block/iscsi.c        |  2 +-
- stubs/uuid.c         |  2 +-
- 4 files changed, 32 insertions(+), 32 deletions(-)
+v2: Comment we added input validation (rth)
+---
+ hw/core/qdev-properties.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 91586fb1fb..5c3fa6c5d0 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5415,3 +5415,33 @@
- { 'command': 'blockdev-snapshot-delete-internal-sync',
-   'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
-   'returns': 'SnapshotInfo' }
-+
-+##
-+# @UuidInfo:
-+#
-+# Guest UUID information (Universally Unique Identifier).
-+#
-+# @UUID: the UUID of the guest
-+#
-+# Since: 0.14.0
-+#
-+# Notes: If no UUID was specified for the guest, a null UUID is returned.
-+##
-+{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
-+
-+##
-+# @query-uuid:
-+#
-+# Query the guest UUID information.
-+#
-+# Returns: The @UuidInfo for the guest
-+#
-+# Since: 0.14.0
-+#
-+# Example:
-+#
-+# -> { "execute": "query-uuid" }
-+# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
-+#
-+##
-+{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true =
-}
-diff --git a/qapi/misc.json b/qapi/misc.json
-index ed28e41229..f70025f34c 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -97,36 +97,6 @@
- ##
- { 'command': 'query-kvm', 'returns': 'KvmInfo' }
-=20
--##
--# @UuidInfo:
--#
--# Guest UUID information (Universally Unique Identifier).
--#
--# @UUID: the UUID of the guest
--#
--# Since: 0.14.0
--#
--# Notes: If no UUID was specified for the guest, a null UUID is returned.
--##
--{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
--
--##
--# @query-uuid:
--#
--# Query the guest UUID information.
--#
--# Returns: The @UuidInfo for the guest
--#
--# Since: 0.14.0
--#
--# Example:
--#
--# -> { "execute": "query-uuid" }
--# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
--#
--##
--{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true =
-}
--
- ##
- # @IOThreadInfo:
- #
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 682abd8e09..68ed5cf3f8 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -42,7 +42,7 @@
- #include "qemu/uuid.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-block-core.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "crypto/secret.h"
-diff --git a/stubs/uuid.c b/stubs/uuid.c
-index 67f182fa3a..9ef75fdae4 100644
---- a/stubs/uuid.c
-+++ b/stubs/uuid.c
-@@ -1,5 +1,5 @@
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 59380ed761..48e4c98cf0 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1,4 +1,5 @@
  #include "qemu/osdep.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-block-core.h"
- #include "qemu/uuid.h"
++#include "qemu/cutils.h"
+ #include "net/net.h"
+ #include "hw/qdev-properties.h"
+ #include "qapi/error.h"
+@@ -532,7 +533,8 @@ static void set_mac(Object *obj, Visitor *v, const char=
+ *name, void *opaque,
+     MACAddr *mac =3D qdev_get_prop_ptr(dev, prop);
+     Error *local_err =3D NULL;
+     int i, pos;
+-    char *str, *p;
++    char *str;
++    const char *p;
 =20
- UuidInfo *qmp_query_uuid(Error **errp)
+     if (dev->realized) {
+         qdev_prop_set_after_realize(dev, name, errp);
+@@ -546,6 +548,8 @@ static void set_mac(Object *obj, Visitor *v, const char=
+ *name, void *opaque,
+     }
+=20
+     for (i =3D 0, pos =3D 0; i < 6; i++, pos +=3D 3) {
++        long val;
++
+         if (!qemu_isxdigit(str[pos])) {
+             goto inval;
+         }
+@@ -561,7 +565,10 @@ static void set_mac(Object *obj, Visitor *v, const cha=
+r *name, void *opaque,
+                 goto inval;
+             }
+         }
+-        mac->a[i] =3D strtol(str+pos, &p, 16);
++        if (qemu_strtol(str + pos, &p, 16, &val) < 0 || val > 0xff) {
++            goto inval;
++        }
++        mac->a[i] =3D val;
+     }
+     g_free(str);
+     return;
 --=20
 2.21.1
 
