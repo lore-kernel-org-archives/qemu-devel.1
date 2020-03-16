@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD2CC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDBD9C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F73C20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C12C20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzV5aF3A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F73C20674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oc97rTGx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C12C20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDkKj-0002Gy-1J
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:38:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52046)
+	id 1jDkKn-0002JB-Dz
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1jDkFB-0000be-3w
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:03 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jDkFI-0000di-EU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1jDkF9-0004xN-I2
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57791
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1jDkFG-0005lw-PT
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42611
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1jDkF9-0004tH-C8
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:32:59 -0400
+ id 1jDkFG-0005bW-Gn
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584343978;
+ s=mimecast20190719; t=1584343986;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wf3WwVL/JBIClkEjmfQynOAqNs2BQUeZP5Q2JbyPWw4=;
- b=ZzV5aF3A8yi+92QpAisncRcOe39uZerLHC8ztbQCcIg2xVdevJ46up0yS28cQYdracyJh/
- ByXkDA7FtddYgCfv6IQ76zIbsUYTjqrR+sGyFVNKvEL8qrdSmC5Pc3Ceccjug6K7PxWKlJ
- Dz21sClwBRS2JNyz42RuWM9BXB6C618=
+ bh=v+61qPTf5vwQgvoFdP/S2rqcE0YL1D5c8EAzWuQ9S9o=;
+ b=Oc97rTGxGDKKtPgU8rZcSsgdq6aKWszsSNRvpDuAwR89xN9hT9SPtILM0H68LlBKTz2n0s
+ bmOZ3C49E5UKCioFCkUdzJp9cHZPSNt6jOsp2IUFmI/chfor+BP2sBoggA/0IWVbykEAWO
+ GA6DU9Pz7cMf+PCuKJi2DBfzJkysKaI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-dKLpBODMP9eskMr_QQzfUw-1; Mon, 16 Mar 2020 03:32:55 -0400
-X-MC-Unique: dKLpBODMP9eskMr_QQzfUw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-399-SbWYjq-MPmKX_GRjVo3fpw-1; Mon, 16 Mar 2020 03:33:04 -0400
+X-MC-Unique: SbWYjq-MPmKX_GRjVo3fpw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4ED800D50;
- Mon, 16 Mar 2020 07:32:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B8A6801E53;
+ Mon, 16 Mar 2020 07:33:02 +0000 (UTC)
 Received: from [10.36.118.12] (unknown [10.36.118.12])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 115E460BE2;
- Mon, 16 Mar 2020 07:32:40 +0000 (UTC)
-Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C62A8FC1E;
+ Mon, 16 Mar 2020 07:32:49 +0000 (UTC)
+Subject: Re: [PATCH v7 2/5] virtio-iommu: Add iommu notifier for map/unmap
 To: Bharat Bhushan <bharatb.linux@gmail.com>
 References: <20200313074811.27175-1-bbhushan2@marvell.com>
- <20200313074811.27175-4-bbhushan2@marvell.com>
- <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
- <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+ <20200313074811.27175-3-bbhushan2@marvell.com>
+ <369b162f-3a0c-6861-0737-96aa8914b915@redhat.com>
+ <CAAeCc_mEoFLUux6mScyCbA_9n9eJf7Tt9tGrGOG-ENN5Kmr_7A@mail.gmail.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
-Date: Mon, 16 Mar 2020 08:32:37 +0100
+Message-ID: <f42d9697-22f2-0919-352f-54127a97e16d@redhat.com>
+Date: Mon, 16 Mar 2020 08:32:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+In-Reply-To: <CAAeCc_mEoFLUux6mScyCbA_9n9eJf7Tt9tGrGOG-ENN5Kmr_7A@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,166 +104,195 @@ Sender: "Qemu-devel"
 
 Hi Bharat,
 
-On 3/16/20 7:41 AM, Bharat Bhushan wrote:
+On 3/16/20 7:36 AM, Bharat Bhushan wrote:
 > Hi Eric,
 > 
-> On Fri, Mar 13, 2020 at 8:11 PM Auger Eric <eric.auger@redhat.com> wrote:
+> On Fri, Mar 13, 2020 at 7:55 PM Auger Eric <eric.auger@redhat.com> wrote:
 >>
->> Hi Bharat
->>
+>> Hi Bharat,
 >> On 3/13/20 8:48 AM, Bharat Bhushan wrote:
->>> iommu-notifier are called when a device is attached
->> IOMMU notifiers
->>> or detached to as address-space.
->>> This is needed for VFIO.
->> and vhost for detach
+>>> This patch extends VIRTIO_IOMMU_T_MAP/UNMAP request to
+>>> notify registered iommu-notifier. Which will call vfio
+>> s/iommu-notifier/iommu-notifiers
+>>> notifier to map/unmap region in iommu.
+>> can be any notifier (vhost/vfio).
 >>>
 >>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>> ---
->>>  hw/virtio/virtio-iommu.c | 47 ++++++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 47 insertions(+)
+>>>  hw/virtio/trace-events           |  2 +
+>>>  hw/virtio/virtio-iommu.c         | 66 +++++++++++++++++++++++++++++++-
+>>>  include/hw/virtio/virtio-iommu.h |  6 +++
+>>>  3 files changed, 73 insertions(+), 1 deletion(-)
 >>>
+>>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+>>> index e83500bee9..d94a1cd8a3 100644
+>>> --- a/hw/virtio/trace-events
+>>> +++ b/hw/virtio/trace-events
+>>> @@ -73,3 +73,5 @@ virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+>>>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+>>>  virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+>>>  virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoint, uint64_t addr) "FAULT reason=%d flags=%d endpoint=%d address =0x%"PRIx64
+>>> +virtio_iommu_notify_map(const char *name, uint64_t iova, uint64_t paddr, uint64_t map_size) "mr=%s iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64
+>>> +virtio_iommu_notify_unmap(const char *name, uint64_t iova, uint64_t map_size) "mr=%s iova=0x%"PRIx64" size=0x%"PRIx64
 >>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
->>> index e51344a53e..2006f72901 100644
+>>> index 4cee8083bc..e51344a53e 100644
 >>> --- a/hw/virtio/virtio-iommu.c
 >>> +++ b/hw/virtio/virtio-iommu.c
->>> @@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
->>>      uint32_t id;
->>>      VirtIOIOMMUDomain *domain;
->>>      QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
->>> +    VirtIOIOMMU *viommu;
->> This needs specal care on post-load. When migrating the EPs, only the id
->> is migrated. On post-load you need to set viommu as it is done for
->> domain. migration is allowed with vhost.
-> 
-> ok, I have not tried vhost/migration. Below change set viommu when
-> reconstructing endpoint.
-
-
-Yes I think this should be OK.
-
-By the end I did the series a try with vhost/vfio. with vhost it works
-(not with recent kernel though, but the issue may be related to kernel).
-With VFIO however it does not for me.
-
-First issue is: your guest can use 4K page and your host can use 64KB
-pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
-a way to pass the host settings to the VIRTIO-IOMMU device.
-
-Even with 64KB pages, it did not work for me. I have obviously not the
-storm of VFIO_DMA_MAP failures but I have some, most probably due to
-some wrong notifications somewhere. I will try to investigate on my side.
-
-Did you test with VFIO on your side?
-
-Thanks
-
-Eric
-> 
-> @@ -984,6 +973,7 @@ static gboolean reconstruct_endpoints(gpointer
-> key, gpointer value,
-> 
->      QLIST_FOREACH(iter, &d->endpoint_list, next) {
->          iter->domain = d;
-> +       iter->viommu = s;
->          g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
->      }
->      return false; /* continue the domain traversal */
-> 
->>>  } VirtIOIOMMUEndpoint;
->>>
->>>  typedef struct VirtIOIOMMUInterval {
->>> @@ -155,8 +156,44 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
->>>      memory_region_notify_iommu(mr, 0, entry);
+>>> @@ -123,6 +123,38 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+>>>      }
 >>>  }
 >>>
->>> +static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
->>> +                                           gpointer data)
+>>> +static void virtio_iommu_notify_map(IOMMUMemoryRegion *mr, hwaddr iova,
+>>> +                                    hwaddr paddr, hwaddr size)
 >>> +{
->>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
->>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+>>> +    IOMMUTLBEntry entry;
 >>> +
->>> +    virtio_iommu_notify_unmap(mr, interval->low,
->>> +                              interval->high - interval->low + 1);
+>>> +    entry.target_as = &address_space_memory;
+>>> +    entry.addr_mask = size - 1;
 >>> +
->>> +    return false;
+>>> +    entry.iova = iova;
+>>> +    trace_virtio_iommu_notify_map(mr->parent_obj.name, iova, paddr, size);
+>>> +    entry.perm = IOMMU_RW;
+>>> +    entry.translated_addr = paddr;
+>>> +
+>>> +    memory_region_notify_iommu(mr, 0, entry);
 >>> +}
 >>> +
->>> +static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
->>> +                                         gpointer data)
+>>> +static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
+>>> +                                      hwaddr size)
 >>> +{
->>> +    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
->>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
->>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+>>> +    IOMMUTLBEntry entry;
 >>> +
->>> +    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
->>> +                            interval->high - interval->low + 1);
+>>> +    entry.target_as = &address_space_memory;
+>>> +    entry.addr_mask = size - 1;
 >>> +
->>> +    return false;
+>>> +    entry.iova = iova;
+>>> +    trace_virtio_iommu_notify_unmap(mr->parent_obj.name, iova, size);
+>>> +    entry.perm = IOMMU_NONE;
+>>> +    entry.translated_addr = 0;
+>>> +
+>>> +    memory_region_notify_iommu(mr, 0, entry);
 >>> +}
 >>> +
 >>>  static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
 >>>  {
->>> +    VirtioIOMMUNotifierNode *node;
->>> +    VirtIOIOMMU *s = ep->viommu;
->>> +    VirtIOIOMMUDomain *domain = ep->domain;
->>> +
->>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
->>> +        if (ep->id == node->iommu_dev->devfn) {
->>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
->>> +                           &node->iommu_dev->iommu_mr);
->> I understand this should fo the job for domain removal
-> 
-> did not get the comment, are you saying we should do this on domain removal?
-see my reply on 2/5
-
-Note the above code should be moved after the check of !ep->domain below
-> 
->>> +        }
->>> +    }
->>> +
 >>>      if (!ep->domain) {
->>>          return;
->>>      }
->>> @@ -178,6 +215,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
->>>      }
->>>      ep = g_malloc0(sizeof(*ep));
->>>      ep->id = ep_id;
->>> +    ep->viommu = s;
->>>      trace_virtio_iommu_get_endpoint(ep_id);
->>>      g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
->>>      return ep;
->>> @@ -272,6 +310,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
->>>  {
->>>      uint32_t domain_id = le32_to_cpu(req->domain);
->>>      uint32_t ep_id = le32_to_cpu(req->endpoint);
+>>> @@ -307,9 +339,12 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
+>>>      uint64_t virt_start = le64_to_cpu(req->virt_start);
+>>>      uint64_t virt_end = le64_to_cpu(req->virt_end);
+>>>      uint32_t flags = le32_to_cpu(req->flags);
+>>> +    hwaddr size = virt_end - virt_start + 1;
 >>> +    VirtioIOMMUNotifierNode *node;
 >>>      VirtIOIOMMUDomain *domain;
->>>      VirtIOIOMMUEndpoint *ep;
+>>>      VirtIOIOMMUInterval *interval;
+>>>      VirtIOIOMMUMapping *mapping;
+>>> +    VirtIOIOMMUEndpoint *ep;
 >>>
->>> @@ -299,6 +338,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+>>>      if (flags & ~VIRTIO_IOMMU_MAP_F_MASK) {
+>>>          return VIRTIO_IOMMU_S_INVAL;
+>>> @@ -339,9 +374,37 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
 >>>
->>>      ep->domain = domain;
+>>>      g_tree_insert(domain->mappings, interval, mapping);
 >>>
->>> +    /* Replay existing address space mappings on the associated memory region */
->> maybe use the "domain" terminology here.
-> 
-> ok,
-> 
-> Thanks
-> -Bharat
-> 
+>>> +    /* All devices in an address-space share mapping */
 >>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
->>> +        if (ep_id == node->iommu_dev->devfn) {
->>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
->>> +                           &node->iommu_dev->iommu_mr);
+>>> +        QLIST_FOREACH(ep, &domain->endpoint_list, next) {
+>>> +            if (ep->id == node->iommu_dev->devfn) {
+>>> +                virtio_iommu_notify_map(&node->iommu_dev->iommu_mr,
+>>> +                                        virt_start, phys_start, size);
+>>> +            }
 >>> +        }
 >>> +    }
 >>> +
 >>>      return VIRTIO_IOMMU_S_OK;
 >>>  }
 >>>
+>>> +static void virtio_iommu_remove_mapping(VirtIOIOMMU *s, VirtIOIOMMUDomain *domain,
+>>> +                                        VirtIOIOMMUInterval *interval)
+>>> +{
+>>> +    VirtioIOMMUNotifierNode *node;
+>>> +    VirtIOIOMMUEndpoint *ep;
+>>> +
+>>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+>>> +        QLIST_FOREACH(ep, &domain->endpoint_list, next) {
+>>> +            if (ep->id == node->iommu_dev->devfn) {
+>>> +                virtio_iommu_notify_unmap(&node->iommu_dev->iommu_mr,
+>>> +                                          interval->low,
+>>> +                                          interval->high - interval->low + 1);
+>>> +            }
+>>> +        }
+>>> +    }
+>>> +    g_tree_remove(domain->mappings, (gpointer)(interval));
+>>> +}
+>> What about virtio_iommu_put_domain() where you destroy the mapping
+>> gtree. I guess you also need to send invalidations there?
+> 
+> In virtio_iommu_put_domain(), before destroying domain->mappings we
+> are calling virtio_iommu_detach_endpoint_from_domain(), which send
+> invalidations, no ?
+Yes I noticed that later as it is in patch 3/5 (this is the comment you
+did not get)
+> 
+>>> +
+>>>  static int virtio_iommu_unmap(VirtIOIOMMU *s,
+>>>                                struct virtio_iommu_req_unmap *req)
+>>>  {
+>>> @@ -368,7 +431,7 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
+>>>          uint64_t current_high = iter_key->high;
 >>>
+>>>          if (interval.low <= current_low && interval.high >= current_high) {
+>>> -            g_tree_remove(domain->mappings, iter_key);
+>>> +            virtio_iommu_remove_mapping(s, domain, iter_key);
+>>>              trace_virtio_iommu_unmap_done(domain_id, current_low, current_high);
+>>>          } else {
+>>>              ret = VIRTIO_IOMMU_S_RANGE;
+>>> @@ -655,6 +718,7 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
+>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>>      VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
+>>>
+>>> +    QLIST_INIT(&s->notifiers_list);
+>>>      virtio_init(vdev, "virtio-iommu", VIRTIO_ID_IOMMU,
+>>>                  sizeof(struct virtio_iommu_config));
+>>>
+>>> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
+>>> index 6f67f1020a..4539c8ae72 100644
+>>> --- a/include/hw/virtio/virtio-iommu.h
+>>> +++ b/include/hw/virtio/virtio-iommu.h
+>>> @@ -44,6 +44,11 @@ typedef struct IOMMUPciBus {
+>>>      IOMMUDevice  *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
+>>>  } IOMMUPciBus;
+>>>
+>>> +typedef struct VirtioIOMMUNotifierNode {
+>>> +    IOMMUDevice *iommu_dev;
+>>> +    QLIST_ENTRY(VirtioIOMMUNotifierNode) next;
+>>> +} VirtioIOMMUNotifierNode;
+>> You may use scripts/git.orderfile for a better diff ordering.
+> 
+> ok, run "git config diff.orderFile scripts/git.orderfile"
+> 
+>>> +
+>>>  typedef struct VirtIOIOMMU {
+>>>      VirtIODevice parent_obj;
+>>>      VirtQueue *req_vq;
+>>> @@ -56,6 +61,7 @@ typedef struct VirtIOIOMMU {
+>>>      GTree *domains;
+>>>      QemuMutex mutex;
+>>>      GTree *endpoints;
+>>> +    QLIST_HEAD(, VirtioIOMMUNotifierNode) notifiers_list;
+>> See what was done in smmuv3 and intel. We now directly use a list of
+>> IOMMUDevice directly. VirtioIOMMUNotifierNode does not bring anything extra.
+> 
+> ok,
+> 
+> Thanks
+> -Bharat
+> 
+>>>  } VirtIOIOMMU;
+>>>
+>>>  #endif
+>>>
+>>
 >> Thanks
 >>
 >> Eric
