@@ -2,97 +2,69 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 497E0C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B83C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05F8B20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F8B20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4C4520409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4C4520409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDu6E-0008G0-4A
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:04:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54310)
+	id 1jDu6H-0008Nf-Rs
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mahesh@linux.vnet.ibm.com>) id 1jDtYs-00062c-Fq
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:29:59 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsPe-0007uR-DK
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mahesh@linux.vnet.ibm.com>) id 1jDtYr-0005pk-1w
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:29:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42952)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mahesh@linux.vnet.ibm.com>)
- id 1jDtYq-0005cI-NV
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:29:56 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02GHMLgi119300
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:29:55 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yrubn2fwc-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 13:29:55 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mahesh@linux.vnet.ibm.com>;
- Mon, 16 Mar 2020 17:29:52 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 16 Mar 2020 17:29:49 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02GHSmCZ48562522
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Mar 2020 17:28:48 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EF3B24C044;
- Mon, 16 Mar 2020 17:29:48 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 79C5B4C040;
- Mon, 16 Mar 2020 17:29:47 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.199.45.53])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon, 16 Mar 2020 17:29:47 +0000 (GMT)
-Date: Mon, 16 Mar 2020 22:59:45 +0530
-From: Mahesh J Salgaonkar <mahesh@linux.vnet.ibm.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 3/8] ppc/spapr: Add FWNMI System Reset state
-References: <20200316142613.121089-1-npiggin@gmail.com>
- <20200316142613.121089-4-npiggin@gmail.com>
+ (envelope-from <laurent@vivier.eu>) id 1jDsPd-0008KB-8K
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:22 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:49873)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsPc-0008AT-V9
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:21 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MfL5v-1joKxH1kap-00glYi; Mon, 16 Mar 2020 17:16:16 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 11/38] linux-user/syscall: Add support for
+ clock_gettime64/clock_settime64
+Date: Mon, 16 Mar 2020 17:15:23 +0100
+Message-Id: <20200316161550.336150-12-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200316142613.121089-4-npiggin@gmail.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20031617-0020-0000-0000-000003B56862
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031617-0021-0000-0000-0000220DC90D
-Message-Id: <20200316172945.fkh5cowdseomgd7g@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-16_07:2020-03-12,
- 2020-03-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=1
- adultscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 impostorscore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003160076
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Mon, 16 Mar 2020 13:49:15 -0400
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:E5zxhOXJJ3t7m3Z20tOxSleG9nVmiKdnpH+eTyNTpG7FgbczEw6
+ 0UNAIHImIYojHqyqJULjz8klSh0a7q5EmzwDpMCfm3SdCVVfSsC5lw/GC5q5HU53zIVgwcX
+ jvbkJWmrITFp3FllJd5Oe43l6vJ8pNnQZ7C26Hv9ryAQVcV48Dm9NZvHaA9O3MqeJ82QSFT
+ fmpYaVDZVKIf70C88s9/w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PPljKfhmlKA=:xlxSBG02YJsoahLq4LaOkY
+ PRWVtPR1mvumRAu+hDpQ3zhVNRlsc4npal+fbWMn19qvkjlUSlGGFakVkGTlZGJ/1vR+Owept
+ r8RYyCHKdm6Ndc5SrzvP5+zWIa6+7+uN8+jCo21jMDXGFRAjrqHXxJcrSos0ihPDbvLQJKH/2
+ JH9qT42Xwv/i6kz3Yt7a/+PSG2X6pgPlyUGA1aL+j4wmgtI1ShFNY46956s64XLn5QEoLvs7T
+ M2XRZc9v/h/CO9scSZoxjEqhz7LkFhCLcoGkANLMuzXI93wqC1I5qnaIqYzGTb5VV0RTQemzB
+ EUTEF8THcXnCNxH6+8GKXK1FXjZQrdtoeO2Z2aX+0l6/VPsnYxnr69JgO9p39ErTUioawar8h
+ hSo+c2wtIZyTTHGsTJD0eUi8VjfXXaUMQYLH2c5GF4fBa1PCamFwGIl/ilOkes2kNFBbHIuvB
+ oNsp9O6q9VpaP8XJWbhJwxo1P0H8HZilXGw1NUIdWtUE0vxihQ1CZCb0R1/2IM0OVQFAo9vK8
+ yJlQOIJNE+44sD0y7lx2CzmADA3wsmIYOWgQ1lzjiCoMqJn2cXSq9OKk6Cnwmk9B9EGxH+Olf
+ JDDFjDB4QciokxnUTN9svegcvWLF3uV5GBcf+smjNqygkI7SPfFHkoDsdjUEtyFcnXUyh72Y8
+ i2wtI2l3oAZk6uc1kAShHFZDrgJWl6fBFeuUxF0RbuX49OSjKVpKzWVeu6ag1qScFfC1M3vFy
+ Gx8+LBZvCzBvD21Zk8qACTfLRexo+9rIbpD3fDmrHpN2H9CBEcsJNvjpzmWrPx4CNtb/hVPsf
+ WLZweNRxV+yn15O3mRaQN9i6x3eJDGGagYsc6/Y2aRxDcFKajgVNcrOlf8WTWsyPVcrjI7+
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,109 +76,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: mahesh@linux.vnet.ibm.com
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-03-17 00:26:08 Tue, Nicholas Piggin wrote:
-> The FWNMI option must deliver system reset interrupts to their
-> registered address, and there are a few constraints on the handler
-> addresses specified in PAPR. Add the system reset address state and
-> checks.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-Looks good to me.
+Add support for the clock_gettime64/clock_settime64 syscalls.
 
-Reviwed-by: Mahesh Salgaonkar <mahesh@linux.ibm.com>
+If your host is 64-bit or is 32-bit with the *_time64 syscall then the
+timespec will correctly be a 64-bit time_t. Otherwise the host will
+return a 32-bit time_t which will be rounded to 64-bits. This will be
+incorrect after y2038.
 
-Thanks,
--Mahesh.
-> ---
->  hw/ppc/spapr.c         |  2 ++
->  hw/ppc/spapr_rtas.c    | 14 +++++++++++++-
->  include/hw/ppc/spapr.h |  3 ++-
->  3 files changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b03b26370d..5f93c49706 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1704,6 +1704,7 @@ static void spapr_machine_reset(MachineState *machine)
-> 
->      spapr->cas_reboot = false;
-> 
-> +    spapr->fwnmi_system_reset_addr = -1;
->      spapr->fwnmi_machine_check_addr = -1;
->      spapr->fwnmi_machine_check_interlock = -1;
-> 
-> @@ -2023,6 +2024,7 @@ static const VMStateDescription vmstate_spapr_fwnmi = {
->      .needed = spapr_fwnmi_needed,
->      .pre_save = spapr_fwnmi_pre_save,
->      .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(fwnmi_system_reset_addr, SpaprMachineState),
->          VMSTATE_UINT64(fwnmi_machine_check_addr, SpaprMachineState),
->          VMSTATE_INT32(fwnmi_machine_check_interlock, SpaprMachineState),
->          VMSTATE_END_OF_LIST()
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 0b8c481593..521e6b0b72 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -414,6 +414,7 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->                                    uint32_t nret, target_ulong rets)
->  {
->      hwaddr rtas_addr;
-> +    target_ulong sreset_addr, mce_addr;
-> 
->      if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI) == SPAPR_CAP_OFF) {
->          rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> @@ -426,7 +427,18 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->          return;
->      }
-> 
-> -    spapr->fwnmi_machine_check_addr = rtas_ld(args, 1);
-> +    sreset_addr = rtas_ld(args, 0);
-> +    mce_addr = rtas_ld(args, 1);
-> +
-> +    /* PAPR requires these are in the first 32M of memory and within RMA */
-> +    if (sreset_addr >= 32 * MiB || sreset_addr >= spapr->rma_size ||
-> +           mce_addr >= 32 * MiB ||    mce_addr >= spapr->rma_size) {
-> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> +        return;
-> +    }
-> +
-> +    spapr->fwnmi_system_reset_addr = sreset_addr;
-> +    spapr->fwnmi_machine_check_addr = mce_addr;
-> 
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 64b83402cb..42d64a0368 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -194,9 +194,10 @@ struct SpaprMachineState {
-> 
->      /* State related to FWNMI option */
-> 
-> -    /* Machine Check Notification Routine address
-> +    /* System Reset and Machine Check Notification Routine addresses
->       * registered by "ibm,nmi-register" RTAS call.
->       */
-> +    target_ulong fwnmi_system_reset_addr;
->      target_ulong fwnmi_machine_check_addr;
-> 
->      /* Machine Check FWNMI synchronization, fwnmi_machine_check_interlock is
-> -- 
-> 2.23.0
-> 
-> 
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <4a7fd05532400d10aa0f684c9043e2ac7b34d91c.1584051142.git.alistair.francis@wdc.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 479db1940ee9..aaf62d48992a 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1229,6 +1229,22 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_settime64)
++static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
++                                                 abi_ulong target_addr)
++{
++    struct target__kernel_timespec *target_ts;
++
++    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
++        return -TARGET_EFAULT;
++    }
++    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
++    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    unlock_user_struct(target_ts, target_addr, 0);
++    return 0;
++}
++#endif
++
+ static inline abi_long host_to_target_timespec(abi_ulong target_addr,
+                                                struct timespec *host_ts)
+ {
+@@ -11491,6 +11507,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         return ret;
+     }
+ #endif
++#ifdef TARGET_NR_clock_settime64
++    case TARGET_NR_clock_settime64:
++    {
++        struct timespec ts;
++
++        ret = target_to_host_timespec64(&ts, arg2);
++        if (!is_error(ret)) {
++            ret = get_errno(clock_settime(arg1, &ts));
++        }
++        return ret;
++    }
++#endif
+ #ifdef TARGET_NR_clock_gettime
+     case TARGET_NR_clock_gettime:
+     {
+@@ -11502,6 +11530,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         return ret;
+     }
+ #endif
++#ifdef TARGET_NR_clock_gettime64
++    case TARGET_NR_clock_gettime64:
++    {
++        struct timespec ts;
++        ret = get_errno(clock_gettime(arg1, &ts));
++        if (!is_error(ret)) {
++            ret = host_to_target_timespec64(arg2, &ts);
++        }
++        return ret;
++    }
++#endif
+ #ifdef TARGET_NR_clock_getres
+     case TARGET_NR_clock_getres:
+     {
 -- 
-Mahesh J Salgaonkar
+2.24.1
 
 
