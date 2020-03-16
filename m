@@ -2,79 +2,61 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EFBC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE56C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9B8920719
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:57:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hbvLgK9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B8920719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D135720719
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:58:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D135720719
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuvt-0004qw-Sg
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:57:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49576)
+	id 1jDuw4-0005Be-P3
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59143)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jDuIO-0005eL-F4
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:17:02 -0400
+ (envelope-from <groug@kaod.org>) id 1jDu39-0004Z4-52
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jDuIM-0003kz-CU
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:17:00 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:36229)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jDuIK-0003gy-Ii
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:16:56 -0400
-Received: by mail-ot1-x334.google.com with SMTP id 39so3445341otu.3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PDKfkt/7GNWfIxzYViVpwmsnx9I9g5wa+HyMTwUIL9A=;
- b=hbvLgK9ovh35wFr7fxloKHfSslpOq3wlPLwyTEs+NM+DOfm08wN82XujGINDWHW0Fa
- mJnlvwcIPEU1R82qFzReLXtv7g2youcFguxV3w6ZeZD+0WQ1yh/HYntpKGlO0WnFNcZH
- 8iy1Wr4lqaONTx+AZiz7FOm1sQQBsjiz3W1neEGGH4rCmFisYNGorBsbdIDHLXMo2yHW
- NZeY683fBOaNhPjg+8tJTi6d8nx1Ed5WeRWcBeBY1em+Bco6YPHa5yDyqsXNhThN7laX
- oSHjJrIDUp/mOht13+vuo0P563aSmsd+3rpSuCuUHelCusBoHDx/Vel8U9mujyUk3AvM
- v/tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PDKfkt/7GNWfIxzYViVpwmsnx9I9g5wa+HyMTwUIL9A=;
- b=NT4JbLWfJhmt84QGuXmeyzC/QuRg0ItrlW3e+um40IA4UeiDWwQntTrN4u3zuYqqcF
- JX6+suG9fBgk4p2bLYeSsGIUT4BxA+JrrJIXhojyFyuMx46Lh3+da9Hj+CPWns0wNtjO
- bm3ClRPevd7VUNgaeaedchxgmYvZsy12UvhQZYpg/yhdy3PAik+PqvDeAY06c/pU+5qi
- kmAVdanigKGbsIVq2y8wCkPoGHVhkA3LAkL5lbpj6HpnZJQAPIYs8S8eCgzSR4QINF6Z
- AwY16uyuZAMHFN12DbSUpHnaHyyaTlkFgxtEV2JdaC0CL1Qdmh+m2RT04zomeGmkv19s
- Er/w==
-X-Gm-Message-State: ANhLgQ0iWzAVC0TANEP2fOXDxchbyMfQI3nxdujFijDvhpf5gz7t3fQB
- Q8Wg1VZJ+CDMVDyXeldvzApC3xuW0ZrtgvNZG0vXdg==
-X-Google-Smtp-Source: ADFU+vt9MlWkl0700BvRRFfiSW5OY0t76jXROlgdE/BQ9MAYKjjTAoA6w0xHMEC65Ht97Lues+OYHWmYP1yiTUfCX64=
-X-Received: by 2002:a9d:19ca:: with SMTP id k68mr456718otk.232.1584382615404; 
- Mon, 16 Mar 2020 11:16:55 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1jDu38-0007ta-1U
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:15 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:41115)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jDu37-0007oB-Rg
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:13 -0400
+Received: from player697.ha.ovh.net (unknown [10.108.35.128])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id DF83A13391A
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 19:01:11 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id 359DC107DFC69;
+ Mon, 16 Mar 2020 18:01:05 +0000 (UTC)
+Date: Mon, 16 Mar 2020 19:01:03 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 5/8] ppc/spapr: Allow FWNMI on TCG
+Message-ID: <20200316190103.00bd1628@bahia.lan>
+In-Reply-To: <20200316142613.121089-6-npiggin@gmail.com>
+References: <20200316142613.121089-1-npiggin@gmail.com>
+ <20200316142613.121089-6-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200316124820.22063-1-kraxel@redhat.com>
-In-Reply-To: <20200316124820.22063-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Mar 2020 18:16:44 +0000
-Message-ID: <CAFEAcA_BNH3vj0STUN-_BoCUfDczsvn_zLiXx-jqsyJV22K3HA@mail.gmail.com>
-Subject: Re: [PULL 0/1] Vga 20200316 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::334
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13755963587237419459
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeljedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.111.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,36 +68,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 at 14:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 61c265f0660ee476985808c8aa7915617c44fd53:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20200313a' into staging (2020-03-13 10:33:04 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20200316-pull-request
->
-> for you to fetch changes up to f872c76296b991fde4db5fb87a1cfbd8d4c22c88:
->
->   stdvga+bochs-display: add dummy mmio handler (2020-03-16 12:40:47 +0100)
->
-> ----------------------------------------------------------------
-> vga: stdvga/bochs mmio fix.
->
-> ----------------------------------------------------------------
->
+On Tue, 17 Mar 2020 00:26:10 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
+> There should no longer be a reason to prevent TCG providing FWNMI.
+> System Reset interrupts are generated to the guest with nmi monitor
+> command and H_SIGNAL_SYS_RESET. Machine Checks can not be injected
+> currently, but this could be implemented with the mce monitor cmd
+> similarly to i386.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  hw/ppc/spapr_caps.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index f626d769a0..679ae7959f 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -516,10 +516,7 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr, uint8_t val,
+>          return; /* Disabled by default */
+>      }
+>  
+> -    if (tcg_enabled()) {
+> -        warn_report("Firmware Assisted Non-Maskable Interrupts(FWNMI) not "
+> -                    "supported in TCG");
 
-Applied, thanks.
+With this warning removed, we can now drop the "cap-fwnmi=off" setting
+in qtest, but this can be done as a followup.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
--- PMM
+> -    } else if (kvm_enabled()) {
+> +    if (kvm_enabled()) {
+>          if (kvmppc_set_fwnmi() < 0) {
+>              error_setg(errp, "Firmware Assisted Non-Maskable Interrupts(FWNMI) "
+>                               "not supported by KVM");
+
 
