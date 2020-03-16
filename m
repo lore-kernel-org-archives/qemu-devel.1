@@ -6,74 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 474F2C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E95EC2BB1D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 142BB20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E070F2051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:42:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlKgNqQX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 142BB20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AIIBTS+z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E070F2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDquo-0003c1-O8
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:40:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44846)
+	id 1jDqwt-0004Zu-JM
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:42:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jDpV5-0003RM-9v
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:09:48 -0400
+ (envelope-from <kraxel@redhat.com>) id 1jDpAT-0004Vf-1M
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jDpV4-000562-1F
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:09:47 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36242
+ (envelope-from <kraxel@redhat.com>) id 1jDpAR-0004oX-Ug
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:48:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46502
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jDpV3-0004zs-Sd
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 09:09:45 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jDpAR-0004j1-P4
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:48:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584364185;
+ s=mimecast20190719; t=1584362907;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ji6W5MVJziJ0ZX9L3kszFiFNaa2iMgdSBH/Fx0f1UZ4=;
- b=GlKgNqQXWYT5KsDcNKHdIIfzBF/Ivl4h7fLYXPdQjzIIDATObDsuYbxf79kNVsU1/8+KVh
- 9jv8kyE/qxEODhppJedH14Ip6S/ZoqVPvXL41uA7pHaeyzKKiNhZBUTfyUcgDnpLQKrDKV
- GXn+IZi0i1qkudveBmCyWjL7XD0xzUs=
+ bh=TlPyNwnohSBBRgqa9xzMvhZb4FmYT1Lu8PWrE8MRHfs=;
+ b=AIIBTS+zThjmRug4b98dLI4Qo6FI640K1z2oPktv7a75Lq/hLOM+KXBkokBoz/ksvIOy89
+ l4wyiebBX3H5QhwIp/RyapLaNDldkZp9PRLWyewVpgFU0dutI8CPTju3CecXCCXjo20UlN
+ 7mTkKc/Ndll6WsI5Z2pPtI+JuJ8fTOU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-nSpadLffMPy5YTZqSrCN2Q-1; Mon, 16 Mar 2020 09:09:42 -0400
-X-MC-Unique: nSpadLffMPy5YTZqSrCN2Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-171--V6Pol5KN_2LdFuHk7tbog-1; Mon, 16 Mar 2020 08:48:25 -0400
+X-MC-Unique: -V6Pol5KN_2LdFuHk7tbog-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF28113EA;
- Mon, 16 Mar 2020 13:09:40 +0000 (UTC)
-Received: from localhost (ovpn-200-42.brq.redhat.com [10.40.200.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C99BE5D9E2;
- Mon, 16 Mar 2020 13:09:32 +0000 (UTC)
-Date: Mon, 16 Mar 2020 14:09:30 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 4/8] qapi/misc: Move query-uuid command with block code
-Message-ID: <20200316134317.4d40d16b@redhat.com>
-In-Reply-To: <20200316000348.29692-5-philmd@redhat.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
- <20200316000348.29692-5-philmd@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DCF9800D4E;
+ Mon, 16 Mar 2020 12:48:24 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-117.ams2.redhat.com
+ [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3F36B7388E;
+ Mon, 16 Mar 2020 12:48:21 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 73F439D13; Mon, 16 Mar 2020 13:48:20 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/1] stdvga+bochs-display: add dummy mmio handler
+Date: Mon, 16 Mar 2020 13:48:20 +0100
+Message-Id: <20200316124820.22063-2-kraxel@redhat.com>
+In-Reply-To: <20200316124820.22063-1-kraxel@redhat.com>
+References: <20200316124820.22063-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,143 +87,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S.
- Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Alistair Francis <alistair23@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 01:03:44 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+The bochs-display mmio bar has some sub-regions with the actual hardware
+registers.  What happens when the guest access something outside those
+regions depends on the archirecture.  On x86 those reads succeed (and
+return 0xff I think).  On risc-v qemu aborts.
 
-here should be why
+This patch adds handlers for the parent region, to make the wanted
+behavior explicit and to make things consistent across architectures.
 
-PS:
- I don't see a reason to move it to block code at all
-if this command is moved then it should be machine code
+v2:
+ - use existing unassigned_io_ops.
+ - also cover stdvga.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  qapi/block-core.json | 30 ++++++++++++++++++++++++++++++
->  qapi/misc.json       | 30 ------------------------------
->  block/iscsi.c        |  2 +-
->  stubs/uuid.c         |  2 +-
->  4 files changed, 32 insertions(+), 32 deletions(-)
->=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 91586fb1fb..5c3fa6c5d0 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -5415,3 +5415,33 @@
->  { 'command': 'blockdev-snapshot-delete-internal-sync',
->    'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
->    'returns': 'SnapshotInfo' }
-> +
-> +##
-> +# @UuidInfo:
-> +#
-> +# Guest UUID information (Universally Unique Identifier).
-> +#
-> +# @UUID: the UUID of the guest
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Notes: If no UUID was specified for the guest, a null UUID is returned=
-.
-> +##
-> +{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
-> +
-> +##
-> +# @query-uuid:
-> +#
-> +# Query the guest UUID information.
-> +#
-> +# Returns: The @UuidInfo for the guest
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-uuid" }
-> +# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
-> +#
-> +##
-> +{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': tru=
-e }
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index ed28e41229..f70025f34c 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -97,36 +97,6 @@
->  ##
->  { 'command': 'query-kvm', 'returns': 'KvmInfo' }
-> =20
-> -##
-> -# @UuidInfo:
-> -#
-> -# Guest UUID information (Universally Unique Identifier).
-> -#
-> -# @UUID: the UUID of the guest
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Notes: If no UUID was specified for the guest, a null UUID is returned=
-.
-> -##
-> -{ 'struct': 'UuidInfo', 'data': {'UUID': 'str'} }
-> -
-> -##
-> -# @query-uuid:
-> -#
-> -# Query the guest UUID information.
-> -#
-> -# Returns: The @UuidInfo for the guest
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-uuid" }
-> -# <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
-> -#
-> -##
-> -{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': tru=
-e }
-> -
->  ##
->  # @IOThreadInfo:
->  #
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 682abd8e09..68ed5cf3f8 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -42,7 +42,7 @@
->  #include "qemu/uuid.h"
->  #include "sysemu/replay.h"
->  #include "qapi/error.h"
-> -#include "qapi/qapi-commands-misc.h"
-> +#include "qapi/qapi-commands-block-core.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
->  #include "crypto/secret.h"
-> diff --git a/stubs/uuid.c b/stubs/uuid.c
-> index 67f182fa3a..9ef75fdae4 100644
-> --- a/stubs/uuid.c
-> +++ b/stubs/uuid.c
-> @@ -1,5 +1,5 @@
->  #include "qemu/osdep.h"
-> -#include "qapi/qapi-commands-misc.h"
-> +#include "qapi/qapi-commands-block-core.h"
->  #include "qemu/uuid.h"
-> =20
->  UuidInfo *qmp_query_uuid(Error **errp)
+Cc: Alistair Francis <alistair23@gmail.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20200309100009.17624-1-kraxel@redhat.com
+---
+ hw/display/bochs-display.c | 4 ++--
+ hw/display/vga-pci.c       | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index 62085f9fc063..70eb619ef424 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -284,8 +284,8 @@ static void bochs_display_realize(PCIDevice *dev, Error=
+ **errp)
+     memory_region_init_io(&s->qext, obj, &bochs_display_qext_ops, s,
+                           "qemu extended regs", PCI_VGA_QEXT_SIZE);
+=20
+-    memory_region_init(&s->mmio, obj, "bochs-display-mmio",
+-                       PCI_VGA_MMIO_SIZE);
++    memory_region_init_io(&s->mmio, obj, &unassigned_io_ops, NULL,
++                          "bochs-display-mmio", PCI_VGA_MMIO_SIZE);
+     memory_region_add_subregion(&s->mmio, PCI_VGA_BOCHS_OFFSET, &s->vbe);
+     memory_region_add_subregion(&s->mmio, PCI_VGA_QEXT_OFFSET, &s->qext);
+=20
+diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
+index b34632467399..6b9db86e363c 100644
+--- a/hw/display/vga-pci.c
++++ b/hw/display/vga-pci.c
+@@ -249,8 +249,8 @@ static void pci_std_vga_realize(PCIDevice *dev, Error *=
+*errp)
+=20
+     /* mmio bar for vga register access */
+     if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_MMIO)) {
+-        memory_region_init(&d->mmio, NULL, "vga.mmio",
+-                           PCI_VGA_MMIO_SIZE);
++        memory_region_init_io(&d->mmio, OBJECT(dev), &unassigned_io_ops, N=
+ULL,
++                              "vga.mmio", PCI_VGA_MMIO_SIZE);
+=20
+         if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
+             qext =3D true;
+@@ -285,8 +285,8 @@ static void pci_secondary_vga_realize(PCIDevice *dev, E=
+rror **errp)
+     s->con =3D graphic_console_init(DEVICE(dev), 0, s->hw_ops, s);
+=20
+     /* mmio bar */
+-    memory_region_init(&d->mmio, OBJECT(dev), "vga.mmio",
+-                       PCI_VGA_MMIO_SIZE);
++    memory_region_init_io(&d->mmio, OBJECT(dev), &unassigned_io_ops, NULL,
++                          "vga.mmio", PCI_VGA_MMIO_SIZE);
+=20
+     if (d->flags & (1 << PCI_VGA_FLAG_ENABLE_QEXT)) {
+         qext =3D true;
+--=20
+2.18.2
 
 
