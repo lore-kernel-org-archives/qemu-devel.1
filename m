@@ -2,80 +2,90 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 530B4C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7CEBC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C27C20658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:44:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FDA720674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:45:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSST7MUj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C27C20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rxCt8s5O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FDA720674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuic-0003fm-Da
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:44:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41785)
+	id 1jDuk7-0006Ft-Jn
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:45:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1jDtoO-0001RK-I5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:46:01 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtXg-0003cL-GJ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1jDtoM-0003dL-Av
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:45:59 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:29381)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jDtoM-0003RG-54
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:45:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584380756;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FOywFMwykn3RqRxJjL73ctBYdJYeQHkwMxdYnJ2Elrs=;
- b=QSST7MUjlUHa0Yc+DJjRxJYChmXsitPxYP4cX9iyg6EOSfBb6QwuvrXxSfi823VSdISOCA
- 5NYTy2DcCWO8xcJbthJ/4srhr27/oxgnLzweUBrvdJAWgqeWjiR3iQxMJxYl8IEvSxMZ4o
- 2fkqRPZTT4JG4NI7c49vUtlBIimH0TE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-fXZsOh3ZPkasCpZnQ_GQ-A-1; Mon, 16 Mar 2020 13:45:55 -0400
-X-MC-Unique: fXZsOh3ZPkasCpZnQ_GQ-A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE156127A6F5;
- Mon, 16 Mar 2020 17:25:10 +0000 (UTC)
-Received: from redhat.com (ovpn-116-35.ams2.redhat.com [10.36.116.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7ED877E303;
- Mon, 16 Mar 2020 17:25:08 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 1/2] migration: avoid suspicious strncpy() use
-In-Reply-To: <20200316160702.478964-2-stefanha@redhat.com> (Stefan Hajnoczi's
- message of "Mon, 16 Mar 2020 16:07:01 +0000")
-References: <20200316160702.478964-1-stefanha@redhat.com>
- <20200316160702.478964-2-stefanha@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Mon, 16 Mar 2020 18:25:04 +0100
-Message-ID: <87pndcnrf3.fsf@secure.laptop>
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtXd-0001zN-Ju
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:43 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55007)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jDtXa-0001vS-AJ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:39 -0400
+Received: by mail-wm1-x344.google.com with SMTP id n8so18592653wmc.4
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=06upHfcJvurHEqRqXZxgM7CdWpLdWAWn6DtNQywwJZ8=;
+ b=rxCt8s5OoOLvHRbo/k7sI7lrYMCY235QQ56t3odLROKNvVD40SD87Iv25oeI0Yvvav
+ yOxQV/hgROD8DxYEOUS3nt0HenrKKQxE2cU0mU0xi4IjyXkQhs9l32Rbcp4sndPdD9az
+ M5+Cq4Nq47g9GL51vJUuJrbz3DLclu9OLysvOYQUm4mD4j/NQ9V+aND5up8OhLrX8grh
+ ia3JKvkeuZzyWdGNiQQs2ZTV2JKe/jvJnVCh7OcgN76gNuiK6lyJp95PSUgKNK2f0YTo
+ CFKOCSOnz+nOfoiG1gqwbp6wYopaa7wwr9MDEVXrfmVKzs0dhcKAr1VZwl5Cs4qYEnsr
+ Tjgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=06upHfcJvurHEqRqXZxgM7CdWpLdWAWn6DtNQywwJZ8=;
+ b=hCXT9Ayvyw/S6KW/ECsEmKUpWgUeLQjoipWBW+T94wj/B5xi0S9nqrazfE+az3TRh1
+ Vf9EMHLGMQ5ojBogdOMzutg8oJ6dmB+HRH4S2sBN7ymk+DmyYNWVUzgijuCo4IRsqPC2
+ fNyy8UIIvhUxWSEZeosJAK7DSRJUVrq+kN6fIAOUrGv+0i1OPUhGFMnV9HI2Oe+7kF1t
+ 9KgWvUTz5+Srk0yKz/9t7PWzygybdyD0sb7mFWGE1ZCcn/oNEK5MWpqlGyCFJqJjiWEt
+ HfskwXx6uhH0e0Ozp990tDSg+L2tA8u48VdDc73rid3IuFETtG3UsODua27BtwdGReKO
+ 1KsA==
+X-Gm-Message-State: ANhLgQ0Iz8s1fcCWPorfjtJEFalCNjPNivhsLnUjNoTQcd8AI6pchUc6
+ nBpfU5btHHfEn3pGwqj+SkJfvA==
+X-Google-Smtp-Source: ADFU+vuBA3uteprROJQ5kvIqO2S/z5P3CI22HY9shQgGF7TReHRRy49ZzIPQn2TgzCfnRIBPJ2v7eA==
+X-Received: by 2002:a05:600c:214f:: with SMTP id
+ v15mr201958wml.110.1584379716962; 
+ Mon, 16 Mar 2020 10:28:36 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l12sm770079wrt.73.2020.03.16.10.28.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 10:28:35 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 978F41FFAF;
+ Mon, 16 Mar 2020 17:21:57 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 24/28] tests/tcg/aarch64: add SVE iotcl test
+Date: Mon, 16 Mar 2020 17:21:51 +0000
+Message-Id: <20200316172155.971-25-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
+References: <20200316172155.971-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,45 +97,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> gcc (GCC) 9.2.1 20190827 (Red Hat 9.2.1-1) with sanitizers enabled
-> reports the following error:
->
->     CC      migration/global_state.o
->   In file included from /usr/include/string.h:495,
->                    from /home/stefanha/qemu/include/qemu/osdep.h:101,
->                    from migration/global_state.c:13:
->   In function =E2=80=98strncpy=E2=80=99,
->       inlined from =E2=80=98global_state_store_running=E2=80=99 at migrat=
-ion/global_state.c:47:5:
->   /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_=
-strncpy=E2=80=99 specified bound 100 equals destination size [-Werror=3Dstr=
-ingop-truncation]
->     106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (=
-__dest));
->         |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
->
-> Use pstrcpy() instead of strncpy().  It is guaranteed to NUL-terminate
-> strings.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+This is a fairly bare-bones test of setting the various vector sizes
+for SVE which will only fail if the PR_SVE_SET_VL can't reduce the
+user-space vector length by powers of 2.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+However we will also be able to use it in a future test which
+exercises the GDB stub.
 
-This is the film where:
-- one put a size 100
-- none of the current elements has a size of 20
-- for extra security one put one assert to make sure tha there are
-  space.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-And compiler still find a reason for complaining O:-)
+---
+v3
+  - use index to fill zreg
+  - CROSS_CC_HAS_SVE
+v5
+  - merge conflicts
+v6
+  - drop id check
+---
+ tests/tcg/aarch64/sve-ioctls.c    | 70 +++++++++++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |  4 ++
+ 2 files changed, 74 insertions(+)
+ create mode 100644 tests/tcg/aarch64/sve-ioctls.c
+
+diff --git a/tests/tcg/aarch64/sve-ioctls.c b/tests/tcg/aarch64/sve-ioctls.c
+new file mode 100644
+index 00000000000..9544dffa0ee
+--- /dev/null
++++ b/tests/tcg/aarch64/sve-ioctls.c
+@@ -0,0 +1,70 @@
++/*
++ * SVE ioctls tests
++ *
++ * Test the SVE width setting ioctls work and provide a base for
++ * testing the gdbstub.
++ *
++ * Copyright (c) 2019 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include <sys/prctl.h>
++#include <asm/hwcap.h>
++#include <stdio.h>
++#include <sys/auxv.h>
++#include <stdint.h>
++#include <stdlib.h>
++
++#ifndef HWCAP_CPUID
++#define HWCAP_CPUID (1 << 11)
++#endif
++
++#define SVE_MAX_QUADS  (2048 / 128)
++#define BYTES_PER_QUAD (128 / 8)
++
++#define get_cpu_reg(id) ({                                      \
++            unsigned long __val;                                \
++            asm("mrs %0, "#id : "=r" (__val));                  \
++            __val;                                              \
++        })
++
++static int do_sve_ioctl_test(void)
++{
++    int i, res, init_vq;
++
++    res = prctl(PR_SVE_GET_VL, 0, 0, 0, 0);
++    if (res < 0) {
++        printf("FAILED to PR_SVE_GET_VL (%d)", res);
++        return -1;
++    }
++    init_vq = res & PR_SVE_VL_LEN_MASK;
++
++    for (i = init_vq; i > 15; i /= 2) {
++        printf("Checking PR_SVE_SET_VL=%d\n", i);
++        res = prctl(PR_SVE_SET_VL, i, 0, 0, 0, 0);
++        if (res < 0) {
++            printf("FAILED to PR_SVE_SET_VL (%d)", res);
++            return -1;
++        }
++        asm("index z0.b, #0, #1\n"
++            ".global __sve_ld_done\n"
++            "__sve_ld_done:\n"
++            "mov z0.b, #0\n"
++            : /* no outputs kept */
++            : /* no inputs */
++            : "memory", "z0");
++    }
++    printf("PASS\n");
++    return 0;
++}
++
++int main(int argc, char **argv)
++{
++    /* we also need to probe for the ioctl support */
++    if (getauxval(AT_HWCAP) & HWCAP_SVE) {
++        return do_sve_ioctl_test();
++    } else {
++        printf("SKIP: no HWCAP_SVE on this system\n");
++        return 0;
++    }
++}
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index b61b53e4dd1..c879932ff6c 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -47,6 +47,10 @@ ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_SVE),)
+ AARCH64_TESTS += sysregs
+ sysregs: CFLAGS+=-march=armv8.1-a+sve
+ 
++# SVE ioctl test
++AARCH64_TESTS += sve-ioctls
++sve-ioctls: CFLAGS+=-march=armv8.1-a+sve
++
+ ifneq ($(HAVE_GDB_BIN),)
+ GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
+ 
+-- 
+2.20.1
 
 
