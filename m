@@ -2,72 +2,101 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C781C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3334C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:49:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D711F2073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A8A720658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:49:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBPg0X5Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D711F2073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDCoMVnD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A8A720658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDumT-0002gm-RE
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:48:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32925)
+	id 1jDunr-0004kT-Qg
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:49:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55884)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1jDtgB-0002s7-4O
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:32 -0400
+ (envelope-from <peterx@redhat.com>) id 1jDtay-0000cE-7J
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:32:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1jDtg9-0007r5-Mt
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:31 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44594)
+ (envelope-from <peterx@redhat.com>) id 1jDtav-0001z1-Q2
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:32:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26117)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1jDtg9-0007fg-HA
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:29 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jDtav-0001uF-LD
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:32:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584380248;
+ s=mimecast20190719; t=1584379924;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OAl1dT5jiMn/VOa6zocxfyaR3dkTlnrd2JVBKKp9vcw=;
- b=WBPg0X5QgOeGCDafNL/O7jWnyg6rY101tHdXCzH9Ylc1ogEoM2P0KOrIaZNqwM3mq5CzGb
- uS/ZliOti3eOGVWxwC6wYhP5J7bMe9IjRnmI0hT0r9J0nktjq0hfOSOTmW9RGV4uFMH5Kn
- n/H2TN8rIMZVMZYME7aIWvugBs/xDE8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-mnrub6aZM0WI9VrGPoTF8w-1; Mon, 16 Mar 2020 13:37:26 -0400
-X-MC-Unique: mnrub6aZM0WI9VrGPoTF8w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53EB811AB5F9
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 17:18:28 +0000 (UTC)
-Received: from localhost (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 531E85C1B2;
- Mon, 16 Mar 2020 17:18:25 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6/v7 RESEND] qmp: constify QmpCommand and list
-Date: Mon, 16 Mar 2020 18:18:24 +0100
-Message-Id: <20200316171824.2319695-1-marcandre.lureau@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+zXe/Cypv6iQt9TRbMdAATGCxdNG99ZrItay448Obtc=;
+ b=LDCoMVnD4kX7N8aJwVwhFgPflKaY73D6baaEJWQ2z+eNgAtigTWzL3Ohuu30A6947WSbVw
+ HrHKhCdkhRtrx9x7XfQNg/C8KA8tnW+d+le2hTsA/yKQhiYptB9roInA3Pl9jrKjEdOGWC
+ 9DtC9ucZ3kAFFWEJFNxesou2uwQQKqk=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-bxrWPdrgNNKofLLWC9os-A-1; Mon, 16 Mar 2020 13:32:02 -0400
+X-MC-Unique: bxrWPdrgNNKofLLWC9os-A-1
+Received: by mail-qt1-f197.google.com with SMTP id w3so17940033qtc.8
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:32:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=spPuwoYunkpmdwPPr04o6nutT9ci5GMlz/2rV3S0aG4=;
+ b=ahWIveoVchH5+FiiBX74nEXx4lyfcq0Rf4f8MI8uzCFMhKndsZxh6fFwKMxckLMWwK
+ 21XLfsRiXChAEPFbSz0hOiUTAK0qEOHDiANeQ/UugzlV3Tf5DwHHbskTgJV13hEoaax5
+ mUJwKb932JhrSSRGwgE2OF5nBfthb8lKUk3rA8Rikxy5/rcIZgp52jNvn75j1oCuoI+3
+ byidoJOjQSkPeILKALy6xH9IH7tH72+oFjm2MVfd5lU1sZSiT8FKP/eo/86OoBzCUdMG
+ W7QquBOEm+dV3WwiZGRMEJMDjc8ntzH0wlGppNnqPUKGDffB4kMTMuT2uXtBQptTAUqA
+ PKAA==
+X-Gm-Message-State: ANhLgQ2HoC4CuC0qEXFscIbbU5DJGSrPHzSTQCBWkQUH1w/SkwuU8vFz
+ A/hSL0zrsuJ5KV3luZ/7DXlFJSSj4lPSIzYBesbf08SDQ6uH6xV3oIAdXvPi1KVXhT0YYXWsEkm
+ VaJIba5bcwNoXjIM=
+X-Received: by 2002:a05:6214:188e:: with SMTP id
+ cx14mr877639qvb.187.1584379921779; 
+ Mon, 16 Mar 2020 10:32:01 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsWuMjJvp/Ur6iTw7+bb6SJ4PFCdvKYwHdCx0qMP/ekQ/if+1Ts89B1jhy7zrNuOObB5BIZAA==
+X-Received: by 2002:a05:6214:188e:: with SMTP id
+ cx14mr877608qvb.187.1584379921454; 
+ Mon, 16 Mar 2020 10:32:01 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id l18sm169395qke.132.2020.03.16.10.31.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 10:32:00 -0700 (PDT)
+Date: Mon, 16 Mar 2020 13:31:58 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
+Message-ID: <20200316173158.GA184827@xz-x1>
+References: <20200226142839.4263de9b.pasic@linux.ibm.com>
+ <20200226083654-mutt-send-email-mst@kernel.org>
+ <20200226163618.31aa86ed.pasic@linux.ibm.com>
+ <20200226115009-mutt-send-email-mst@kernel.org>
+ <20200227140215.2d12149c.pasic@linux.ibm.com>
+ <20200227104233-mutt-send-email-mst@kernel.org>
+ <20200313134446.782c5f7c.pasic@linux.ibm.com>
+ <20200313112902-mutt-send-email-mst@kernel.org>
+ <20200313163122.GB95517@xz-x1>
+ <20200316175737.365d7b32.pasic@linux.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200316175737.365d7b32.pasic@linux.ibm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 216.205.24.74
@@ -82,196 +111,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- armbru@redhat.com
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since 0b69f6f72ce47a37a749b056b6d5ec64c61f11e8 "qapi: remove
-qmp_unregister_command()", the command list can be declared const.
+On Mon, Mar 16, 2020 at 05:57:37PM +0100, Halil Pasic wrote:
+> On Fri, 13 Mar 2020 12:31:22 -0400
+> Peter Xu <peterx@redhat.com> wrote:
+>=20
+> > On Fri, Mar 13, 2020 at 11:29:59AM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Mar 13, 2020 at 01:44:46PM +0100, Halil Pasic wrote:
+> > > > [..]
+> > > > > >=20
+> > > > > > CCing Tom. @Tom does vhost-vsock work for you with SEV and curr=
+ent qemu?
+> > > > > >=20
+> > > > > > Also, one can specify iommu_platform=3Don on a device that ain'=
+t a part of
+> > > > > > a secure-capable VM, just for the fun of it. And that breaks
+> > > > > > vhost-vsock. Or is setting iommu_platform=3Don only valid if
+> > > > > > qemu-system-s390x is protected virtualization capable?
+> > > > > >=20
+> > > > > > BTW, I don't have a strong opinion on the fixes tag. We current=
+ly do not
+> > > > > > recommend setting iommu_platform, and thus I don't think we car=
+e too
+> > > > > > much about past qemus having problems with it.
+> > > > > >=20
+> > > > > > Regards,
+> > > > > > Halil
+> > > > >=20
+> > > > >=20
+> > > > > Let's just say if we do have a Fixes: tag we want to set it corre=
+ctly to
+> > > > > the commit that needs this fix.
+> > > > >=20
+> > > >=20
+> > > > I finally did some digging regarding the performance degradation. F=
+or
+> > > > s390x the performance degradation on vhost-net was introduced by co=
+mmit
+> > > > 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Before
+> > > > IOMMUTLBEntry.addr_mask used to be based on plen, which in turn was
+> > > > calculated as the rest of the memory regions size (from address), a=
+nd
+> > > > covered most of the guest address space. That is we didn't have a w=
+hole
+> > > > lot of IOTLB API overhead.
+> > > >=20
+> > > > With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xfff w=
+hich comes
+> > > > as ~TARGET_PAGE_MASK from flatview_do_translate(). To have things w=
+orking
+> > > > properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the lev=
+el of
+> > > > 076a93d797 and 076a93d797~1.
+> > >=20
+> > > Peter, what's your take on this one?
+> >=20
+> > Commit 076a93d797 was one of the patchset where we want to provide
+> > sensible IOTLB entries and also that should start to work with huge
+> > pages.  Frankly speaking after a few years I forgot the original
+> > motivation of that whole thing, but IIRC there's a patch that was
+> > trying to speedup especially for vhost but I noticed it's not merged:
+> >=20
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00574.html
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
----
- include/qapi/qmp/dispatch.h | 9 +++++----
- monitor/monitor-internal.h  | 2 +-
- monitor/qmp-cmds-control.c  | 2 +-
- qapi/qmp-dispatch.c         | 6 +++---
- qapi/qmp-registry.c         | 6 +++---
- qga/commands.c              | 2 +-
- qga/main.c                  | 6 +++---
- 7 files changed, 17 insertions(+), 16 deletions(-)
+[1]
 
-diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 9aa426a398..5a9cf82472 100644
---- a/include/qapi/qmp/dispatch.h
-+++ b/include/qapi/qmp/dispatch.h
-@@ -39,7 +39,8 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpComman=
-dList;
-=20
- void qmp_register_command(QmpCommandList *cmds, const char *name,
-                           QmpCommandFunc *fn, QmpCommandOptions options);
--QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
-+const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
-+                                   const char *name);
- void qmp_disable_command(QmpCommandList *cmds, const char *name);
- void qmp_enable_command(QmpCommandList *cmds, const char *name);
-=20
-@@ -47,13 +48,13 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
- const char *qmp_command_name(const QmpCommand *cmd);
- bool qmp_has_success_response(const QmpCommand *cmd);
- QDict *qmp_error_response(Error *err);
--QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-+QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
-                     bool allow_oob);
- bool qmp_is_oob(const QDict *dict);
-=20
--typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
-+typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaque);
-=20
--void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
-+void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_fn =
-fn,
-                           void *opaque);
-=20
- #endif
-diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-index 3e6baba88f..8f60ccc70a 100644
---- a/monitor/monitor-internal.h
-+++ b/monitor/monitor-internal.h
-@@ -133,7 +133,7 @@ typedef struct {
-      * qmp_capabilities succeeds, we go into command mode, and
-      * @command becomes &qmp_commands.
-      */
--    QmpCommandList *commands;
-+    const QmpCommandList *commands;
-     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
-     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
-     /*
-diff --git a/monitor/qmp-cmds-control.c b/monitor/qmp-cmds-control.c
-index 5cd9bb817c..8f04cfa6e6 100644
---- a/monitor/qmp-cmds-control.c
-+++ b/monitor/qmp-cmds-control.c
-@@ -101,7 +101,7 @@ VersionInfo *qmp_query_version(Error **errp)
-     return info;
- }
-=20
--static void query_commands_cb(QmpCommand *cmd, void *opaque)
-+static void query_commands_cb(const QmpCommand *cmd, void *opaque)
- {
-     CommandInfoList *info, **list =3D opaque;
-=20
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index bc264b3c9b..857399c5fe 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -75,14 +75,14 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
-uest, bool allow_oob,
-     return dict;
- }
-=20
--static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
-+static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *reque=
-st,
-                                 bool allow_oob, Error **errp)
- {
-     Error *local_err =3D NULL;
-     bool oob;
-     const char *command;
-     QDict *args, *dict;
--    QmpCommand *cmd;
-+    const QmpCommand *cmd;
-     QObject *ret =3D NULL;
-=20
-     dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
-@@ -164,7 +164,7 @@ bool qmp_is_oob(const QDict *dict)
-         && !qdict_haskey(dict, "execute");
- }
-=20
--QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
-+QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
-                     bool allow_oob)
- {
-     Error *err =3D NULL;
-diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
-index ca00f74795..d0f9a1d3e3 100644
---- a/qapi/qmp-registry.c
-+++ b/qapi/qmp-registry.c
-@@ -27,7 +27,7 @@ void qmp_register_command(QmpCommandList *cmds, const cha=
-r *name,
-     QTAILQ_INSERT_TAIL(cmds, cmd, node);
- }
-=20
--QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
-+const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const char =
-*name)
- {
-     QmpCommand *cmd;
-=20
-@@ -77,10 +77,10 @@ bool qmp_has_success_response(const QmpCommand *cmd)
-     return !(cmd->options & QCO_NO_SUCCESS_RESP);
- }
-=20
--void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
-+void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_fn =
-fn,
-                           void *opaque)
- {
--    QmpCommand *cmd;
-+    const QmpCommand *cmd;
-=20
-     QTAILQ_FOREACH(cmd, cmds, node) {
-         fn(cmd, opaque);
-diff --git a/qga/commands.c b/qga/commands.c
-index 43c323cead..f8852beb9c 100644
---- a/qga/commands.c
-+++ b/qga/commands.c
-@@ -54,7 +54,7 @@ void qmp_guest_ping(Error **errp)
-     slog("guest-ping called");
- }
-=20
--static void qmp_command_info(QmpCommand *cmd, void *opaque)
-+static void qmp_command_info(const QmpCommand *cmd, void *opaque)
- {
-     GuestAgentInfo *info =3D opaque;
-     GuestAgentCommandInfo *cmd_info;
-diff --git a/qga/main.c b/qga/main.c
-index e5c39c189a..8ee2736f8e 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -359,7 +359,7 @@ static gint ga_strcmp(gconstpointer str1, gconstpointer=
- str2)
- }
-=20
- /* disable commands that aren't safe for fsfreeze */
--static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
-+static void ga_disable_non_whitelisted(const QmpCommand *cmd, void *opaque=
-)
- {
-     bool whitelisted =3D false;
-     int i =3D 0;
-@@ -378,7 +378,7 @@ static void ga_disable_non_whitelisted(QmpCommand *cmd,=
- void *opaque)
- }
-=20
- /* [re-]enable all commands, except those explicitly blacklisted by user *=
-/
--static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
-+static void ga_enable_non_blacklisted(const QmpCommand *cmd, void *opaque)
- {
-     GList *blacklist =3D opaque;
-     const char *name =3D qmp_command_name(cmd);
-@@ -918,7 +918,7 @@ int64_t ga_get_fd_handle(GAState *s, Error **errp)
-     return handle;
- }
-=20
--static void ga_print_cmd(QmpCommand *cmd, void *opaque)
-+static void ga_print_cmd(const QmpCommand *cmd, void *opaque)
- {
-     printf("%s\n", qmp_command_name(cmd));
- }
+> >=20
+>=20
+> From the looks of it, I don't think we would have seen that big
+> performance degradation had this patch been included. I can give
+> it a spin if you like. Shall I?
+>=20
+> > Regarding to the current patch, I'm not sure I understand it
+> > correctly, but is that performance issue only happens when (1) there's
+> > no intel-iommu device, and (2) there is iommu_platform=3Don specified
+> > for the vhost backend?
+> >=20
+>=20
+> I can confirm, that your description covers my scenario. I didn't
+> investigate what happens when we have an intel-iommu, because s390 does
+> not do intel-iommu. I can also confirm that no performance degradation
+> is observed when the virtio-net has iommu_platform=3Doff. The property
+> iommu_platform is a virtio device (and not a backend) level property.
+> =20
+>=20
+> > If so, I'd confess I am not too surprised if this fails the boot with
+> > vhost-vsock because after all we speicified iommu_platform=3Don
+> > explicitly in the cmdline, so if we want it to work we can simply
+> > remove that iommu_platform=3Don when vhost-vsock doesn't support it
+> > yet...  I thougth iommu_platform=3Don was added for that case - when we
+> > want to force IOMMU to be enabled from host side, and it should always
+> > be used with a vIOMMU device.
+> >=20
+>=20
+> The problem is that the virtio feature bit F_ACCESS_PLATFORM, which is
+> directly controlled by the iommu_platform proprerty stands for two things
+> 1) need to do IOVA translation
+> 2) the access of the device to the guests RAM is restricted.
+>=20
+> There are cases where 2) does apply and 1) does not. We need to specify
+> iommu_platform=3Don to make the virtio implementation in the guest use
+> the dma api, because we need to grant access to memory as required. But
+> we don't need translation and we don't have a vIOMMU.
+
+I see the point of this patch now.  I'm still unclear on how s390
+works for DMA protection, but it seems totally different from the
+IOMMU model on x86/arm.  Considering this, please ignore above patch
+[1] because that's hackish in all cases to play with iotlb caches, and
+current patch should be much better (and easier) IMHO.
+
+Thanks,
+
 --=20
-2.25.0.rc2.1.g09a9a1a997
+Peter Xu
 
 
