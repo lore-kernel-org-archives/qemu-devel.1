@@ -6,64 +6,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 157C2C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9A4C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD1D520658
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:33:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD1D520658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 6060620658
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 09:37:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6060620658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDm7s-0002Eu-IX
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 05:33:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58327)
+	id 1jDmBe-0003eC-0s
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 05:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jDlY8-0005nN-Im
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:43 -0400
+ (envelope-from <longpeng2@huawei.com>) id 1jDlGZ-0007Dt-Jx
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jDlY7-0004Yh-Bp
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:40 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:53569)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDlY7-0004NI-2Z
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:56:39 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mt71D-1jT5TE0N1l-00tULv; Mon, 16 Mar 2020 09:56:25 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/4] scripts: add a script to generate syscall_nr.h
-Date: Mon, 16 Mar 2020 09:56:17 +0100
-Message-Id: <20200316085620.309769-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200316085620.309769-1-laurent@vivier.eu>
-References: <20200316085620.309769-1-laurent@vivier.eu>
+ (envelope-from <longpeng2@huawei.com>) id 1jDlGY-0003to-GC
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:38:31 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43088 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+ id 1jDlGX-0002XN-Ns
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 04:38:30 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 8CD24C56B6550B5CA07B;
+ Mon, 16 Mar 2020 16:38:22 +0800 (CST)
+Received: from DESKTOP-27KDQMV.china.huawei.com (10.173.228.124) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 16 Mar 2020 16:38:16 +0800
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] cpus: avoid stucking in pause_all_vcpus due to race
+Date: Mon, 16 Mar 2020 16:37:32 +0800
+Message-ID: <20200316083732.2010-1-longpeng2@huawei.com>
+X-Mailer: git-send-email 2.25.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:paUhu87fai0bc55XxkcvyXlle9WCNvuQWyw4QMXOTWHbTY3Wfou
- 2+iRqN05G1mqnkryJwv6YHcyylVw9IU8fUP/tGksL/7aReGe/yz10t+iZQvk8OwqDxE+Aqr
- nq555bMP+onz8q0o2nSUE1gUM+dBl2gU/kfGzaNGKCOEwaika0E9x2w4qNnbxMgZDeX1YoR
- q9wwu9eUOjSDhxM0P+wqg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:O2r8lWPhCM4=:hWGagtIEwo4FE1ipiBF4DA
- 14Sbx1LoP8KcJEeoEpKvtoJhzWtjsQEvP2jhiGXEtE1JfIVH1WSGpUcsbo7mAp/e6wQIg4fpJ
- buWNo9QShKVg/zlusmSq4JaOq95p7CSqIgXggq2EzBH8RkmqhSJumQlAysQIGTBIfDO9Ztfh0
- y/RLaPJnUXD+Zy0qiRVdu0AeNI3WY9mYANmC+vSyVv3afpnuQTcJj4MtZAVtWbiFKEdan2L5S
- 5lq+g2zcObjvAYgyB3URxxTcI1bYo0yVjEzUbV64dhOAP2ciFALYNTvJmfIpKo4PFyp1dR0I+
- VAsjvAfwmyxyQbSkCn5/tk+KXEc+zeyDrOlSXWbKxRKD5G/fig8DbDrqalkAi1btUxBUyy+i4
- XWD0Xh5zs+bYML9v+9PJE24x54Z1MEMzl/PHhT4DhrnVv0CIHT4N31Z64S5L9usfDM3kFKBkk
- CUoAchBOZIAP16eT/NDH+nzSMjpF4QVR/v1h4inpUjfxSC+APcKKxzsN0sFKSpb6dF+nbSuq/
- WkocsiVoRte2Zx9YVeUCbpsJJqaLSftkA2a1/sy3A0PTFN4nwbTfGh8RLxGnbIGiMuNP+uzGc
- uU8SrdfaHIf0N+eK0m2NqteFwOC7LoTpGbtFs7vtF+AyNxhGclMn7HOj2nEr28ScsStvRcRvP
- 40jLU2Yen7ExQHvy/eT51d1NL5ImpxAEDIWCNDVSpl9oGd8hD/cYHl5FP9fEhC37iTdCQI5mV
- 5SxCeVl4FpjSVpTrNQmjNNEdsJ8uyYSeBaNweFCskqmPRyB/VH6M2KEzjOQMeTsxjGdrp7upP
- Z1VCE5x9kjHOZrrq6mxh6zVsTmrn8lDXlAmmtc1gXzU7t02fCJk47nbyw8OPGjcD5XPGXy1
+Content-Type: text/plain
+X-Originating-IP: [10.173.228.124]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,139 +64,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, arei.gonglei@huawei.com,
+ huangzhichao@huawei.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Longpeng <longpeng2@huawei.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This script is needed for targets based on asm-generic syscall numbers generation
+From: Longpeng <longpeng2@huawei.com>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+We found an issue when repeat reboot in guest during migration, it cause =
+the
+migration thread never be waken up again.
+
+<main loop>                        |<migration_thread>
+                                   |
+LOCK BQL                           |
+...                                |
+main_loop_should_exit              |
+ pause_all_vcpus                   |
+  1. set all cpus ->stop=3Dtrue      |
+     and then kick                 |
+  2. return if all cpus is paused  |
+     (by '->stopped =3D=3D true'), else|
+  3. qemu_cond_wait [BQL UNLOCK]   |
+                                   |LOCK BQL
+                                   |...
+                                   |do_vm_stop
+                                   | pause_all_vcpus
+                                   |  (A)set all cpus ->stop=3Dtrue
+                                   |     and then kick
+                                   |  (B)return if all cpus is paused
+                                   |     (by '->stopped =3D=3D true'), el=
+se
+                                   |  (C)qemu_cond_wait [BQL UNLOCK]
+  4. be waken up and LOCK BQL      |  (D)be waken up BUT wait for  BQL
+  5. goto 2.                       |
+ (BQL is still LOCKed)             |
+ resume_all_vcpus                  |
+  1. set all cpus ->stop=3Dfalse     |
+     and ->stopped=3Dfalse           |
+...                                |
+BQL UNLOCK                         |  (E)LOCK BQL
+                                   |  (F)goto B. [but stopped is false no=
+w!]
+                                   |Finally, sleep at step 3 forever.
+
+As suggested by Paolo, resume_all_vcpus should notice this race, so we ne=
+ed
+to move the change of runstate before pause_all_vcpus in do_vm_stop() and
+ignore the resume request if runstate is not running.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Dr . David Alan Gilbert <dgilbert@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Longpeng <longpeng2@huawei.com>
 ---
+ cpus.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Notes:
-    v3: remove useless upper command
-    v2: add comments suggested by Taylor
-
- scripts/gensyscalls.sh | 102 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 102 insertions(+)
- create mode 100755 scripts/gensyscalls.sh
-
-diff --git a/scripts/gensyscalls.sh b/scripts/gensyscalls.sh
-new file mode 100755
-index 000000000000..b7b8456f6312
---- /dev/null
-+++ b/scripts/gensyscalls.sh
-@@ -0,0 +1,102 @@
-+#!/bin/sh
-+#
-+# Update syscall_nr.h files from linux headers asm-generic/unistd.h
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
+diff --git a/cpus.c b/cpus.c
+index b4f8b84..ef441bd 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1026,9 +1026,9 @@ static int do_vm_stop(RunState state, bool send_sto=
+p)
+     int ret =3D 0;
+=20
+     if (runstate_is_running()) {
++        runstate_set(state);
+         cpu_disable_ticks();
+         pause_all_vcpus();
+-        runstate_set(state);
+         vm_state_notify(0, state);
+         if (send_stop) {
+             qapi_event_send_stop();
+@@ -1899,6 +1899,10 @@ void resume_all_vcpus(void)
+ {
+     CPUState *cpu;
+=20
++    if (!runstate_is_running()) {
++        return;
++    }
 +
-+linux="$1"
-+output="$2"
-+
-+TMP=$(mktemp -d)
-+
-+if [ "$linux" = "" ] ; then
-+    echo "Needs path to linux source tree" 1>&2
-+    exit 1
-+fi
-+
-+if [ "$output" = "" ] ; then
-+    output="$PWD"
-+fi
-+
-+upper()
-+{
-+    echo "$1" | tr "[:lower:]" "[:upper:]" | tr "[:punct:]" "_"
-+}
-+
-+qemu_arch()
-+{
-+    case "$1" in
-+    arm64)
-+        echo "aarch64"
-+        ;;
-+    *)
-+        echo "$1"
-+        ;;
-+    esac
-+}
-+
-+read_includes()
-+{
-+    arch=$1
-+    bits=$2
-+
-+     cpp -P -nostdinc -fdirectives-only \
-+        -D_UAPI_ASM_$(upper ${arch})_BITSPERLONG_H \
-+        -D__BITS_PER_LONG=${bits} \
-+        -I${linux}/arch/${arch}/include/uapi/ \
-+        -I${linux}/include/uapi \
-+        -I${TMP} \
-+        "${linux}/arch/${arch}/include/uapi/asm/unistd.h"
-+}
-+
-+filter_defines()
-+{
-+    grep -e "#define __NR_" -e "#define __NR3264"
-+}
-+
-+rename_defines()
-+{
-+    sed "s/ __NR_/ TARGET_NR_/g;s/(__NR_/(TARGET_NR_/g"
-+}
-+
-+evaluate_values()
-+{
-+    sed "s/#define TARGET_NR_/QEMU TARGET_NR_/" | \
-+    cpp -P -nostdinc | \
-+    sed "s/^QEMU /#define /"
-+}
-+
-+generate_syscall_nr()
-+{
-+    arch=$1
-+    bits=$2
-+    file="$3"
-+    guard="$(upper LINUX_USER_$(qemu_arch $arch)_$(basename "$file"))"
-+
-+    (echo "/*"
-+    echo " * This file contains the system call numbers."
-+    echo " * Do not modify."
-+    echo " * This file is generated by scripts/gensyscalls.sh"
-+    echo " */"
-+    echo "#ifndef ${guard}"
-+    echo "#define ${guard}"
-+    echo
-+    read_includes $arch $bits | filter_defines | rename_defines | \
-+                                evaluate_values | sort -n -k 3
-+    echo
-+    echo "#endif /* ${guard} */"
-+    echo) > "$file"
-+}
-+
-+mkdir "$TMP/asm"
-+> "$TMP/asm/bitsperlong.h"
-+
-+generate_syscall_nr arm64 64 "$output/linux-user/aarch64/syscall_nr.h"
-+generate_syscall_nr nios2 32 "$output/linux-user/nios2/syscall_nr.h"
-+generate_syscall_nr openrisc 32 "$output/linux-user/openrisc/syscall_nr.h"
-+
-+generate_syscall_nr riscv 32 "$output/linux-user/riscv/syscall32_nr.h"
-+generate_syscall_nr riscv 64 "$output/linux-user/riscv/syscall64_nr.h"
-+rm -fr "$TMP"
--- 
-2.24.1
+     qemu_clock_enable(QEMU_CLOCK_VIRTUAL, true);
+     CPU_FOREACH(cpu) {
+         cpu_resume(cpu);
+--=20
+1.8.3.1
 
 
