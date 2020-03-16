@@ -2,79 +2,85 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74974C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EC4C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:27:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BFD620753
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41D2720753
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:27:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ith/4CTW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BFD620753
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ufWK8By/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D2720753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvNx-0004IE-Eh
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:26:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46050)
+	id 1jDvOZ-0005Fq-E0
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:27:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jDvFE-0005SS-TA
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:17:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jDvHb-0001jG-Sl
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:20:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jDvFD-0007Qt-Kv
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:17:48 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:46663)
+ (envelope-from <peter.maydell@linaro.org>) id 1jDvHa-000676-Pi
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:20:15 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45298)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jDvFD-0007GP-E5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:17:47 -0400
-Received: by mail-oi1-x236.google.com with SMTP id x5so1297765oic.13
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:17:47 -0700 (PDT)
+ id 1jDvHa-00063z-Ja
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:20:14 -0400
+Received: by mail-ot1-x342.google.com with SMTP id e9so11855222otr.12
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Nh1gca7DWlva8jvc916/+LZBDcoP04sdDF28s1vKbHM=;
- b=Ith/4CTWEe1CLR6rFVVlOxewPLRzl6ScW6hua8JA4Yya7x6Q6FFxBdmVlklTsvxJcN
- ypwZ+2qXSOkOrO5tb+qtHc9cOgIb/sc2TgtoBaGCL8fcy8t4rFiHApWrWnQ9VT532jQQ
- yJTyLlBmsWsOsp3RSGrnIQLPD89SwUbTkt7pUGLESMD2oCbXpEiG4u7VEwAURDdgrxhX
- 2G/mq40Y7b+Z5cfYqoq4ZDvyjZsSzGGHwMhGBCKpmmsmK5Osh7Z8w5wdYFUaqsLRO8ga
- wZVhqz5MKZIM3dDjjzcuJWKZwXKbROCN+5AVSTVUXFiaUFuEOiZWn+4nJ0z2/7wikNLK
- ClDQ==
+ :cc; bh=cFODzTkX5tNbBR2vnGIyVCmfvGDiw7qKMa8wynYRbRo=;
+ b=ufWK8By/tgSE3G09+GNBUzLeo2hZq5ez7HrUTfMB3Zj1/aZ1qpFbbFJAY4uezDa4L9
+ c4eN27QCls7/O5NMP37o603U9Ki0JPJxuHAHHLKCIWqfhNGeTSC7uuTBvmaxeVuO/Nt2
+ YDe3b8N08fyY18uHC3+XgXYLP4wlFTovm1G2FU5EWaiBJMXOVudy+j9Ju5CQV5TdQvMZ
+ h3nNbrRpiZHgQEyOtFJdEvmziMSXaRkdFOMjh9sB9TC0oNuRcTW/MKxoZlPjKLKTgkvi
+ jaU8O5WXiLcQbV+N+FFO5VEVFGzJiEkTk7L8t9POHIE1lZ7S0IDNW4qTSf9YomQmMPG3
+ ZJxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Nh1gca7DWlva8jvc916/+LZBDcoP04sdDF28s1vKbHM=;
- b=heTRqiy62HAccKi/o2Aiq+QeHpkS7tWZ8mCI6WqloKun6TqLAixHtoZe9Z95H9IzWc
- TnLdjmfgBwmAHdIqu/2/2d1fU4S0xETwmEe9fOyp0ZUlfGFzLcgYFG7gubK62mvK2Rd0
- /BrPMeNDcAwt+qOcZV2OLXJtv7j9A4/s+kX92mtXmHJW5SV/9I+M7Q4g1jf21Xo7J10A
- Xl1hPRPSEbP9UN0O3zocUF0v0jKVoc4+pZfPksDWJxQrPSUkmeg4QJQ5sycKZkIh0eog
- oUcuE4ZxKRf4SimUll0iqU9NqKy0RBwzOGoWqEUUT915VHh3I5x7lBjUQ9l2OBp2aElU
- 5CwQ==
-X-Gm-Message-State: ANhLgQ1rTUNtSEff2TJcyGsMr9pyiySLYFM2Qvi4eZgLf1QkzUDvr45c
- gQ6UtsJP2Qtv4L6Z6ok3W9nb1FQGN/xlxYBfxqDtEh7/YlmWPw==
-X-Google-Smtp-Source: ADFU+vvaK4bv1s8wKLpzam6ryuI+zRzkFUQZn755av2/RnlYNMEM6i61u1yhWva4wBkec5uZf0fmrtAXoS5YsHcuM04=
-X-Received: by 2002:aca:c608:: with SMTP id w8mr770628oif.163.1584386266444;
- Mon, 16 Mar 2020 12:17:46 -0700 (PDT)
+ bh=cFODzTkX5tNbBR2vnGIyVCmfvGDiw7qKMa8wynYRbRo=;
+ b=mQ/gPHaODRPbhHoHs5ZGsgOoer57meBAO1iYUtwcjhqwTQ1+M+D35Gg5VvT4Vpyvs8
+ ODKvRa9xs5q13wdGMzl4SiLQQMcbM744FYGzR9x/Lr8SpuHlv8yOM+DW/bomW1islNAv
+ iI0T+SuEjDJu3t0RD1pfpWJotT+ziau7wHI2C2XGPkyTCwrBtVBYRYTpldCVgFNqz/Ag
+ 9LApZ+kirBD4Mwx+1y+sW5lXITHR+Zoo4waabJeyWDSWlb1Dze1ZMycRl0GzE1c8uIJp
+ X+MlwzgvsfBYbykwtxkNpUD9Mx6NlHNY0p0zBAUYeo+EhBKNU6L4I5PT/xjBUBer3yGc
+ VGfg==
+X-Gm-Message-State: ANhLgQ1aFs7rsXaZya4t+GemrjIxUo2tATwqSfYhZRgQBkBxDkyHymsO
+ /CvS7vmDx1ka+QD1ukTSwyWh4vIroofNAgqT429GFw==
+X-Google-Smtp-Source: ADFU+vswIaJfFvcY3/dKOheAkVqoFFf455YHAoad+70ntpvTdoJJyIiZ2OZz87XUVN9BitNWXvOXBHZydMmIo4diBmQ=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr640075otm.91.1584386413554;
+ Mon, 16 Mar 2020 12:20:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200316161550.336150-1-laurent@vivier.eu>
-In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200311232342.1614944-1-ehabkost@redhat.com>
+ <20200311232342.1614944-3-ehabkost@redhat.com>
+ <20200315154559.GW1187748@habkost.net>
+ <20200315170229-mutt-send-email-mst@kernel.org>
+ <20200316173039.GB1817047@habkost.net>
+ <CAFEAcA9CYeTjmUSbMtGjDazrh1p=5vLAd3bq7JBtLd0RfnruDw@mail.gmail.com>
+ <20200316184046.GD1817047@habkost.net>
+In-Reply-To: <20200316184046.GD1817047@habkost.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 16 Mar 2020 19:17:35 +0000
-Message-ID: <CAFEAcA8L7S9LmXKr5mb5XmMiqUy_M4hCSL2jzxovoFNQdpHeeA@mail.gmail.com>
-Subject: Re: [PULL 00/38] Linux user for 5.0 patches
-To: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 16 Mar 2020 19:20:02 +0000
+Message-ID: <CAFEAcA-i_S1TZWoDQ5L4J32t3N+aHWvm9dGqHxFHB7wuKpE0iA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] mmap-alloc: Include osdep.h before checking
+ CONFIG_LINUX
+To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,53 +92,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?J=C3=A1n_Tomko?= <jtomko@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Mar 2020 at 17:43, Laurent Vivier <laurent@vivier.eu> wrote:
+On Mon, 16 Mar 2020 at 18:40, Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
-> The following changes since commit 373c7068dd610e97f0b551b5a6d0a27cd6da4506:
+> On Mon, Mar 16, 2020 at 06:08:54PM +0000, Peter Maydell wrote:
+> > The usual approach is that if you don't have the Linux-specific
+> > feature available you quietly fall back to whatever the sensible
+> > behaviour is for when the feature isn't present. We definitely
+> > don't want to be printing warnings on non-Linux systems that
+> > are effectively just saying "you're not running Linux". Same goes
+> > for "host happens not to be running a bleeding-edge Linux kernel
+> > and this feature isn't available yet".
 >
->   qemu.nsi: Install Sphinx documentation (2020-03-09 16:45:00 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
->
-> for you to fetch changes up to 63e05b3db1e5f0560ae579050c53d1ee36ed5aca:
->
->   linux-user, openrisc: sync syscall numbers with kernel v5.5 (2020-03-16 14:20:07 +0100)
->
-> ----------------------------------------------------------------
-> update syscall numbers to linux 5.5 (with scripts)
-> add futex_time64/clock_gettime64/clock_settime64
-> add AT_EXECFN
-> Emulate x86_64 vsyscalls
+> I don't think using pmem=on without MAP_SYNC is expected to be a
+> supported use case, is it?  If a use case is not supported, the
+> sensible behavior is to tell the user it is not supported.
 
-Compile failure, aarch32:
-
-/home/peter.maydell/qemu/linux-user/syscall.c: In function 'do_sys_futex':
-/home/peter.maydell/qemu/linux-user/syscall.c:6946:16: error: implicit
-declaration of function 'sys_futex_time64'; did you mean
-'safe_futex_time64'? [-Werror=implicit-function-declaration]
-         return sys_futex_time64(uaddr, op, val, timeout, uaddr2, val3);
-                ^~~~~~~~~~~~~~~~
-                safe_futex_time64
-
-
-Compile failure, x86-64 with clang:
-
-/home/petmay01/linaro/qemu-for-merges/linux-user/syscall.c:1291:24:
-error: unused function 'copy_to_user_timezone'
-[-Werror,-Wunused-function]
-static inline abi_long copy_to_user_timezone(abi_ulong target_tz_addr,
-                       ^
-1 error generated.
-/home/petmay01/linaro/qemu-for-merges/rules.mak:69: recipe for target
-'linux-user/syscall.o' failed
-
+Yeah, that's fair. But the code at the moment does a fallback
+to "proceed without SHARED_VALIDATE | SYNC", so I assumed it
+was supposed to work.
 
 thanks
 -- PMM
