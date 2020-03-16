@@ -2,96 +2,80 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD86C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238F7C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9004820679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3277205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTrua9Zj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9004820679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mQyc7ztP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3277205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtgS-0002uA-MT
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:37:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56263)
+	id 1jDth6-0004H8-4q
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:38:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDsHx-0004lD-G0
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:08:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jDrq8-0002je-97
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDsHw-0000Xx-8A
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:08:25 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34591)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDsHw-0000SQ-3E
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:08:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584374903;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kzAY54Ug/Dgdb4+XERmlSJiZ/8IMgFtKzZJKBnbDjxY=;
- b=fTrua9ZjmkILkwKsASTfyk3KZK0sdXp8P3WZFpRyFKm7C+o/VU021XBhdxqMhT49YA8B8n
- wCUWaoX5XQeevRKTvRw/fv3vbyBEvdFSB+uAidbW7Mdhz4M1KGS4chUab9emRZTjdqdA1z
- QbUMvxpyn3M/I8xQ6aQfWnveF99piUE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-oLOXEYRmOKKttTi9ZD2d8A-1; Mon, 16 Mar 2020 12:08:19 -0400
-X-MC-Unique: oLOXEYRmOKKttTi9ZD2d8A-1
-Received: by mail-ed1-f69.google.com with SMTP id g11so15548941edu.10
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:08:18 -0700 (PDT)
+ (envelope-from <peter.maydell@linaro.org>) id 1jDrq7-000338-7T
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:39:40 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33193)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jDrq7-00031s-2j
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:39:39 -0400
+Received: by mail-ot1-x343.google.com with SMTP id x26so1248514otk.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 08:39:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QY+2OTb9MtqR8dUS65wKid5CTkKHyVlGBNUsDgaEhho=;
+ b=mQyc7ztP/hyXeViBYmkn0Bq8YywvRqacuV7dFmrekRLjD1YoWVHelUsamUdNOwbWJu
+ libKIWV9wJFflpOcVxEGjuY0GgLlvWKjS+Hbohvq9veacQ3gFa2TkzGKklbDmADThxpL
+ GB1g+Ug0YI0n/WdfixNVcnmPwBQYHLkw6n1B44y5l1xF78YbgDEu+gU+hJyZXa0DiNTL
+ aA+2Mnl7x9p6ElyK0kNtPbyOIbtUX0wBgj6umXxSfkdZzo5zuBdvd9WgPY9hNJmdlAnz
+ 8Zhn4KHdG5NZ+bycf4IbBoeF+qCSL5XovMZ+MG6vwhSpofV7lPnewdTMLLtISK5iMm1/
+ UbGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Q9pxkDoDUc80lR6q2sbnb9Lu1UrGguk51WkG66GGoIk=;
- b=lzNZvjA5FxUvmmwGBC4Qx/UbGkOR8cYhVUhGeE2w7xk8PI5bIXpz45fQ5laMPYfV28
- DC9IHMVi0AOe4nzQnzloEDZX5trwNgpK8E02SSPAFlB5BN3UjzeDOFLKZI3pNHaQo3W+
- fLGG0t6CBpNR+cf13SCMOR/q8LZJHipr0QS7uezTcfS/XV62wXGe8YxH9LhBmq3E5134
- XIDeCb/JBoWaVy38r6WZkKKMjtiqrXM9TD/LaTHHVNBfqnJpeRmutbmGurCIR2OftIBC
- rr58p7CL8o/23eXiHwaymyq1TkaWiH6X4UWIXOo5RWr8NluBJXGCazpLYZpLdwQHDdVM
- AjMw==
-X-Gm-Message-State: ANhLgQ35wA2k1spUGdvmp0iQVXGDofWKS5PhJYRhyrfUYVAs6DhUhMfW
- y0eXcucr7Q9Eya7fcA3SIkW3juuVAQMuRr+R3AYcCT4RgM/fX+dJeh4rDUehR/RJTi+uX4w71CC
- g+lTr9KEcdyO91S0=
-X-Received: by 2002:a05:6402:889:: with SMTP id
- e9mr725048edy.204.1584374897409; 
- Mon, 16 Mar 2020 09:08:17 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtucDPtYCUUmNKo1v786732XgsbrhpkRJ66ECnTqKEicI6pa/tNzUTcvXKFSS8tLcL/QhoQsA==
-X-Received: by 2002:adf:b3d6:: with SMTP id x22mr99071wrd.242.1584374896425;
- Mon, 16 Mar 2020 09:08:16 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id x13sm268246wmj.5.2020.03.16.09.08.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 09:08:15 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 18/19] hw/arm: Do not build to 'virt' machine on Xen
-Date: Mon, 16 Mar 2020 17:06:33 +0100
-Message-Id: <20200316160634.3386-19-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
-References: <20200316160634.3386-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QY+2OTb9MtqR8dUS65wKid5CTkKHyVlGBNUsDgaEhho=;
+ b=Ud02n9phcK3dc2CfrUrgHsT8cPwwpTE1Sz5OtXZNTetHfcTpec9OE4SbaoEj1sU9zg
+ YmkWQ9l4g8TWiH293Np47znni6O8ADjCLZEda9IokcPSqSJWxYiP8BWse7XIDRJcRXX4
+ yDoOZuKu3n5W2fwy7dtJextsqlCVhwv/Be+eQDCHtejriG3l+wjtFcxLrYW2WEUfY57U
+ k//W95lfg2GmYkdtMWI1L7esuTFGNjTtzRNXdfZSQSbcNeNkHuYyJ8gvJml7uI5LeiJi
+ xMYPvB6+FKOgGlYUJo8pOHE0oO/3JDdSOvAhEt9aZO2vYlWQr13JUQefsNTXCmhHd0U/
+ w5tQ==
+X-Gm-Message-State: ANhLgQ3V0rGXhMLZT8hwYwEtWLpoARDqqkBGGJ6KlM23FGA9XhFhgwuP
+ Q5IsTXqENTomKQ+Itogoiwk5HY+pwDCg0EJX1qJr6A==
+X-Google-Smtp-Source: ADFU+vtBhJb8IIcessTKIRqdr4NAhDnfCkrgpiP/NxD8BpYZcB1yu1e69JsmaS0vuRM+9JkvkRHnXN48pk+5hd8VHuI=
+X-Received: by 2002:a9d:1d43:: with SMTP id m61mr14088916otm.91.1584373178312; 
+ Mon, 16 Mar 2020 08:39:38 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200313161506.8834-1-linux@roeck-us.net>
+In-Reply-To: <20200313161506.8834-1-linux@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Mar 2020 15:39:27 +0000
+Message-ID: <CAFEAcA-63OJfcnjE0V4W5a0R2tq_t0oRL7dre_WY_We0Jz9KoA@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/fsl-imx7: Instantiate apbh_dma and ocotp as
+ unimplemented devices
+To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,50 +87,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- kvm@vger.kernel.org, Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Xen on ARM does not use QEMU machines [*]. Disable the 'virt'
-machine there to avoid odd errors such:
+On Fri, 13 Mar 2020 at 16:15, Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> Instantiating apbh_dma and ocotp as unimplemented devices prevents crashes
+> when booting Linux.
+>
+> apbh_dma:
+>
+> [   14.046518] Unhandled fault: external abort on non-linefetch (0x808) at 0xd0852008
+> [   14.047287] pgd = (ptrval)
+> [   14.047607] [d0852008] *pgd=8b028811, *pte=33000653, *ppte=33000453
+> [   14.050074] Internal error: : 808 [#1] SMP ARM
+> ...
+> [   14.077029] [<c0856530>] (stmp_clear_poll_bit) from [<c0856580>] (stmp_reset_block+0x10/0xb8)
+> [   14.077642] [<c0856580>] (stmp_reset_block) from [<c1a9655c>] (mxs_dma_probe+0x1f4/0x370)
+> [   14.078158] [<c1a9655c>] (mxs_dma_probe) from [<c0b6a7e8>] (platform_drv_probe+0x48/0x98)
+> [   14.078641] [<c0b6a7e8>] (platform_drv_probe) from [<c0b685c4>] (really_probe+0x228/0x2d0)
+>
+> ocotp:
+>
+> [   71.286109] Unhandled fault: external abort on non-linefetch (0x008) at 0xd0ff0000
+> [   71.287891] pgd = (ptrval)
+> [   71.288449] [d0ff0000] *pgd=8b497811, *pte=30350653, *ppte=30350453
+> [   71.291389] Internal error: : 8 [#1] SMP ARM
+> [   71.292302] Modules linked in:
+> [   71.293583] CPU: 0 PID: 112 Comm: kworker/0:3 Not tainted 5.0.0-10153-g065b6c4c913d-dirty #2
+> [   71.294148] Hardware name: Freescale i.MX7 Dual (Device Tree)
+> [   71.296728] Workqueue: events deferred_probe_work_func
+> [   71.297740] PC is at imx_ocotp_read+0x68/0x180
+> [   71.298154] LR is at mark_held_locks+0x48/0x74
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+>  hw/arm/fsl-imx7.c         | 11 +++++++++++
+>  include/hw/arm/fsl-imx7.h |  6 ++++++
+>  2 files changed, 17 insertions(+)
+>
+> diff --git a/hw/arm/fsl-imx7.c b/hw/arm/fsl-imx7.c
+> index 119b281a50..a17136f83c 100644
+> --- a/hw/arm/fsl-imx7.c
+> +++ b/hw/arm/fsl-imx7.c
+> @@ -459,6 +459,17 @@ static void fsl_imx7_realize(DeviceState *dev, Error **errp)
+>       */
+>      create_unimplemented_device("sdma", FSL_IMX7_SDMA_ADDR, FSL_IMX7_SDMA_SIZE);
+>
+> +    /*
+> +     * OCOTP
+> +     */
+> +    create_unimplemented_device("octop", FSL_IMX7_OCOTP_ADDR,
+> +                                FSL_IMX7_OCOTP_SIZE);
 
-    CC      i386-softmmu/hw/cpu/a15mpcore.o
-  hw/cpu/a15mpcore.c:28:10: fatal error: kvm_arm.h: No such file or directo=
-ry
+"octop" or "ocotp" ?
 
-[*] https://wiki.xenproject.org/wiki/Xen_ARM_with_Virtualization_Extensions=
-#Use_of_qemu-system-i386_on_ARM
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Paul Durrant <paul@xen.org>
-Cc: xen-devel@lists.xenproject.org
----
- hw/arm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 8e801cd15f..69a8e30125 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -1,5 +1,6 @@
- config ARM_VIRT
-     bool
-+    depends on !XEN
-     default y if KVM
-     imply PCI_DEVICES
-     imply TEST_DEVICES
---=20
-2.21.1
-
+thanks
+-- PMM
 
