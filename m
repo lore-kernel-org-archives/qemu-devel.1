@@ -2,67 +2,67 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A59C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20875C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:35:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C9E20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8EEE20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:34:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+nXSBYY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C9E20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKxWD8oE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8EEE20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxN1-0001aY-S3
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:33:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41976)
+	id 1jDxNy-0002vv-R2
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:34:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHM-0003BF-8z
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:09 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHH-00031U-Oe
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHK-0003DS-QQ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:55553)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxHG-0002gT-9p
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:58838)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHK-00038y-Kd
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:06 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHG-0002cM-4Q
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394086;
+ s=mimecast20190719; t=1584394081;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NTHE5XrNCt2Y1BWJERvCGNKHLBh/laOkgh5BdDwVuzQ=;
- b=I+nXSBYYYYjr5k+DAxYeZ+QFctar0dXp7ZWWod3Ef/aMWwnYd5eCkqnEXO44V1dskcNmB3
- m69LRulz+0t8ng8MWlVoYKoQ6uTZsrZgfSrVMzC2sIUr2Agzbkv+RdBa4x7TnobBPfheX1
- uuyMmyajZXX/+s4G7ANQZHSLT9T0QEQ=
+ bh=TY9UYpkZpqX4mfvmY/RqqrdkZCQ7roAxViM/kJBm9Bg=;
+ b=JKxWD8oEGfvJ2LbUI3wX4xMEfyG9lzLu64M7RiJV6rcuKnUOMwV73yOCUgPE8aqPURak+t
+ eJuUXI///LPH+TFm7BuKXpgxaGeufSmFDcF8nQ8CMDcb/CiHh7CzeVx1OiU2F/eG1NgZIX
+ TuI0j5hRAMDURH/CqXtD0JaeBiLo55A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-iQNIO709NBe2-3ONOnAMkA-1; Mon, 16 Mar 2020 17:27:54 -0400
-X-MC-Unique: iQNIO709NBe2-3ONOnAMkA-1
+ us-mta-348--kjMsyyvPD-rVqF7rEju1Q-1; Mon, 16 Mar 2020 17:27:58 -0400
+X-MC-Unique: -kjMsyyvPD-rVqF7rEju1Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF6208017DF
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:27:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 132321804547;
+ Mon, 16 Mar 2020 21:27:57 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 67CC619C4F;
- Mon, 16 Mar 2020 21:27:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2E1C19C4F;
+ Mon, 16 Mar 2020 21:27:55 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/61] build-sys: do not make qemu-ga link with pixman
-Date: Mon, 16 Mar 2020 22:26:39 +0100
-Message-Id: <1584394048-44994-13-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 14/61] configure: Fix building with SASL on Windows
+Date: Mon, 16 Mar 2020 22:26:41 +0100
+Message-Id: <1584394048-44994-15-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -84,59 +84,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Alexey Pavlov <alexpux@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Biswapriyo Nath <nathbappai@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Since commit d52c454aadcdae74506f315ebf8b58bb79a05573 ("contrib: add
-vhost-user-gpu"), qemu-ga is linking with pixman.
+The Simple Authentication and Security Layer (SASL) library
+re-defines the struct iovec on Win32 [*]. QEMU also re-defines
+it in "qemu/osdep.h". The two definitions then clash on a MinGW
+build.
+We can avoid the SASL definition by defining STRUCT_IOVEC_DEFINED.
+Since QEMU already defines 'struct iovec' if it is missing, add
+the definition to vnc_sasl_cflags to avoid SASL re-defining it.
 
-This is because the Make-based build-system use a global namespace for
-variables, and we rely on "main.o-libs" for different linking targets.
+[*] https://github.com/cyrusimap/cyrus-sasl/blob/cyrus-sasl-2.1.27/include/=
+sasl.h#L187
 
-Note: this kind of variable clashing is hard to fix or prevent
-currently.  meson should help, as declarations have a linear
-dependency and doesn't rely so much on variables and clever tricks.
-
-Note2: we have a lot of main.c (or other duplicated names!) in
-tree. Imho, it would be annoying and a bad workaroud to rename all
-those to avoid conflicts like I did here.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1811670
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200311160923.882474-1-marcandre.lureau@redhat.com>
+Cc: Alexey Pavlov <alexpux@gmail.com>
+Cc: Biswapriyo Nath <nathbappai@gmail.com>
+Reported-by: Youry Metlitsky <winaes@yandex.ru>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20200309122454.22551-2-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/vhost-user-gpu/Makefile.objs                | 6 +++---
- contrib/vhost-user-gpu/{main.c =3D> vhost-user-gpu.c} | 0
- 2 files changed, 3 insertions(+), 3 deletions(-)
- rename contrib/vhost-user-gpu/{main.c =3D> vhost-user-gpu.c} (100%)
+ configure | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/vhost-user-gpu/Makefile.objs b/contrib/vhost-user-gpu/=
-Makefile.objs
-index 6170c91..0929609 100644
---- a/contrib/vhost-user-gpu/Makefile.objs
-+++ b/contrib/vhost-user-gpu/Makefile.objs
-@@ -1,7 +1,7 @@
--vhost-user-gpu-obj-y =3D main.o virgl.o vugbm.o
-+vhost-user-gpu-obj-y =3D vhost-user-gpu.o virgl.o vugbm.o
-=20
--main.o-cflags :=3D $(PIXMAN_CFLAGS) $(GBM_CFLAGS)
--main.o-libs :=3D $(PIXMAN_LIBS)
-+vhost-user-gpu.o-cflags :=3D $(PIXMAN_CFLAGS) $(GBM_CFLAGS)
-+vhost-user-gpu.o-libs :=3D $(PIXMAN_LIBS)
-=20
- virgl.o-cflags :=3D $(VIRGL_CFLAGS) $(GBM_CFLAGS)
- virgl.o-libs :=3D $(VIRGL_LIBS)
-diff --git a/contrib/vhost-user-gpu/main.c b/contrib/vhost-user-gpu/vhost-u=
-ser-gpu.c
-similarity index 100%
-rename from contrib/vhost-user-gpu/main.c
-rename to contrib/vhost-user-gpu/vhost-user-gpu.c
+diff --git a/configure b/configure
+index a7f2c3e..44a70cf 100755
+--- a/configure
++++ b/configure
+@@ -3367,7 +3367,9 @@ if test "$vnc" =3D "yes" && test "$vnc_sasl" !=3D "no=
+" ; then
+ int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
+ EOF
+   # Assuming Cyrus-SASL installed in /usr prefix
+-  vnc_sasl_cflags=3D""
++  # QEMU defines struct iovec in "qemu/osdep.h",
++  # we don't want libsasl to redefine it in <sasl/sasl.h>.
++  vnc_sasl_cflags=3D"-DSTRUCT_IOVEC_DEFINED"
+   vnc_sasl_libs=3D"-lsasl2"
+   if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
+     vnc_sasl=3Dyes
 --=20
 1.8.3.1
 
