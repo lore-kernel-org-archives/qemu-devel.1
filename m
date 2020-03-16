@@ -4,92 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED2E3C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05572C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E0420575
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C54CF20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:01:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="WkfX1AtK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E0420575
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZEsv8NV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C54CF20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDqJM-0005pb-C9
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:01:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40005)
+	id 1jDqJU-0005rS-HC
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liran.alon@oracle.com>) id 1jDobm-0000Uq-7P
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:39 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDoR7-0004rd-Rp
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liran.alon@oracle.com>) id 1jDobk-0007kv-Hd
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:37 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46460)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liran.alon@oracle.com>)
- id 1jDobk-00077w-6R
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:12:36 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02GC8iX7066974;
- Mon, 16 Mar 2020 12:12:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=ReZQJWcnA6vBF7ZqTDr4kwx19RG8syAyKejIDYPf+yc=;
- b=WkfX1AtKu/QKWuTFWYhVxJ5nZEQC4CdY/mjMZ6k1mhaBuinnsTseiuDxMYifhj5OXqgd
- Ufki093hNJRlkLjFIN3qWl2clgLjKTJiHLq9pLQxJHKPi72Jo9v3SWNJDrPFvj8bX550
- zecuAK2nYjY6JbEdTrN63CWZwfka2sblYMY+7b6e1KCoFhpFvj3cAPU2ShTYgkfo46YA
- 5VmXjoJEfTMZojIcvMR+w0S0W82lSpGEquMN4Ddfp6ER1idvxpxgJbV52fITln3Xwsah
- pyQtyYtmo3M78JQIpJF1umDv7QWgqIZ9Yy5gX8K8bU15Vs5BlCpVCrRwApzzAUndHuUm Cg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2yrq7kpg4m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Mar 2020 12:12:21 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02GC8LSx041307;
- Mon, 16 Mar 2020 12:12:21 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 2ys8yvp776-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Mar 2020 12:12:21 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 02GCCJax026561;
- Mon, 16 Mar 2020 12:12:19 GMT
-Received: from spark.ravello.local (/213.57.127.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 16 Mar 2020 05:12:18 -0700
-From: Liran Alon <liran.alon@oracle.com>
+ (envelope-from <philmd@redhat.com>) id 1jDoR6-0002hw-FZ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41844
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDoR6-0002Yk-9I
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584360095;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BKSSwdYJPbb4uWxYFI4KLBXnduxOuP5K8YYFHLhNPUQ=;
+ b=BZEsv8NVqWMvGIO5rMLM/8p2p6dV46YF6KPgFCaa6m+VqLeJmA0pszQ3beB9MJN3cG5kwK
+ xMIrlU2U6gg4BFpo2uzZ0kWhFhqWv3vWQyD1dnSFkUxQjn4x9pnkqxc15OuZBzDOD8BqkC
+ BFOQ6PaymWAqFVg6JLa0Wr6xsR68m2U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-oSx4aRQuOHiMBx-sV0oaLw-1; Mon, 16 Mar 2020 08:01:32 -0400
+X-MC-Unique: oSx4aRQuOHiMBx-sV0oaLw-1
+Received: by mail-wr1-f72.google.com with SMTP id p2so6381082wrw.8
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:01:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ylBxkMSvWixSUv3eUrtex/sRwwpJbll3EWs6AmFjBwc=;
+ b=EZ7CCH3OrNqG9+ukiRMyhq+bSWdTP1x1R2r/r7kXBFeW3u0lwKu0u5Y3chgOs5IinJ
+ E9tneswC3RKtSHMh4ewmfS2eXZfLYGnHLhViGqBpVCW9DzE66yXuhsIwvU1TtLsObIKJ
+ NOakAKWI4S1gV9aFfYrVsfi+WVXinxeoXkcxoiQgm0R37xGmHf+NT02GhhCvKoiklYD4
+ 9f0KrQW0jw2l2skYoKyh7PinH8Q7lL9lA6ME6kMK9GpbJ6AkTF9Nukm87rP6AzVYG1KV
+ P4ODLkx1XqBtu49zZNf++4epB9VyPoisYoWXagNUgG0giAmuhU6ABvn5+W/aswXUt1aO
+ Rsjw==
+X-Gm-Message-State: ANhLgQ1Ah1/Ie3NLp1yNALmW/7X3YMEVvvecYAN61LIIgsuyWqNlCriW
+ UIpom5mq2LaLs6fRYkC0TQkIuMxwdnAVOaptiDkmpI7cIioAm3GAWUK4rb/sBsVajQ7JtjP7kfI
+ XLMKNtp51UOJPkf8=
+X-Received: by 2002:a1c:9658:: with SMTP id y85mr18536330wmd.63.1584360091192; 
+ Mon, 16 Mar 2020 05:01:31 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vvgH/LCRRK5hjnAH0MnxUIJFYgZJRhg6C/xMUSn1N/pliNnfO/ap89kxvNeMIXgbKnqazxTUQ==
+X-Received: by 2002:a1c:9658:: with SMTP id y85mr18536305wmd.63.1584360091007; 
+ Mon, 16 Mar 2020 05:01:31 -0700 (PDT)
+Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.191])
+ by smtp.gmail.com with ESMTPSA id 133sm30707476wmd.5.2020.03.16.05.01.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 05:01:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] hw/scsi/vmw_pvscsi: Remove assertion for kick after reset
-Date: Mon, 16 Mar 2020 14:14:28 +0200
-Message-Id: <20200316121428.48723-1-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH 07/11] accel/Kconfig: Add the TCG selector
+Date: Mon, 16 Mar 2020 13:00:45 +0100
+Message-Id: <20200316120049.11225-8-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200316120049.11225-1-philmd@redhat.com>
+References: <20200316120049.11225-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9561
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxlogscore=999 mlxscore=0
- adultscore=0 bulkscore=0 malwarescore=0 spamscore=0 suspectscore=1
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003160061
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9561
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 suspectscore=1
- adultscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
- malwarescore=0 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2003160061
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,92 +104,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com, dmitry.fleytman@gmail.com,
- liran.alon@oracle.com, elazar@vastdata.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elazar Leibovich <elazar.leibovich@oracle.com>
+Expose the CONFIG_TCG selector to let minikconf.py uses it.
 
-When running Ubuntu 3.13.0-65-generic guest, QEMU sometimes crashes
-during guest ACPI reset. It crashes on assert(s->rings_info_valid)
-in pvscsi_process_io().
+When building with --disable-tcg build, this helps to deselect
+devices that are TCG-dependent.
 
-Analyzing the crash revealed that it happens when userspace issues
-a sync during a reboot syscall.
-
-Below are backtraces we gathered from the guests.
-
-Guest backtrace when issuing PVSCSI_CMD_ADAPTER_RESET:
-    pci_device_shutdown
-    device_shutdown
-    init_pid_ns
-    init_pid_ns
-    kernel_power_off
-    SYSC_reboot
-
-Guest backtrace when issuing PVSCSI_REG_OFFSET_KICK_RW_IO:
-    scsi_done
-    scsi_dispatch_cmd
-    blk_add_timer
-    scsi_request_fn
-    elv_rb_add
-    __blk_run_queue
-    queue_unplugged
-    blk_flush_plug_list
-    blk_finish_plug
-    ext4_writepages
-    set_next_entity
-    do_writepages
-    __filemap_fdatawrite_range
-    filemap_write_and_wait_range
-    ext4_sync_file
-    ext4_sync_file
-    do_fsync
-    sys_fsync
-
-Since QEMU pvscsi should imitate VMware pvscsi device emulation,
-we decided to imitate VMware's behavior in this case.
-
-To check VMware behavior, we wrote a kernel module that issues
-a reset to the pvscsi device and then issues a kick. We ran it on
-VMware ESXi 6.5 and it seems that it simply ignores the kick.
-Hence, we decided to ignore the kick as well.
-
-Signed-off-by: Elazar Leibovich <elazar.leibovich@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/scsi/vmw_pvscsi.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ Makefile      | 1 +
+ accel/Kconfig | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index c91352cf46de..2491f204ddd7 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -29,6 +29,7 @@
- #include "qapi/error.h"
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
-+#include "qemu/log.h"
- #include "hw/scsi/scsi.h"
- #include "migration/vmstate.h"
- #include "scsi/constants.h"
-@@ -719,7 +720,12 @@ pvscsi_process_io(PVSCSIState *s)
-     PVSCSIRingReqDesc descr;
-     hwaddr next_descr_pa;
- 
--    assert(s->rings_info_valid);
-+    if (!s->rings_info_valid) {
-+        qemu_log("WARNING: PVSCSI: Cannot process I/O when "
-+                 "rings are not valid.\n");
-+        return;
-+    }
+diff --git a/Makefile b/Makefile
+index d1e2ec10e7..1cf9d76ce7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -405,6 +405,7 @@ endif
+ MINIKCONF_ARGS =3D \
+     $(CONFIG_MINIKCONF_MODE) \
+     $@ $*/config-devices.mak.d $< $(MINIKCONF_INPUTS) \
++    CONFIG_TCG=3D$(CONFIG_TCG) \
+     CONFIG_KVM=3D$(CONFIG_KVM) \
+     CONFIG_SPICE=3D$(CONFIG_SPICE) \
+     CONFIG_IVSHMEM=3D$(CONFIG_IVSHMEM) \
+diff --git a/accel/Kconfig b/accel/Kconfig
+index c21802bb49..2ad94a3839 100644
+--- a/accel/Kconfig
++++ b/accel/Kconfig
+@@ -1,3 +1,6 @@
++config TCG
++    bool
 +
-     while ((next_descr_pa = pvscsi_ring_pop_req_descr(&s->rings)) != 0) {
- 
-         /* Only read after production index verification */
--- 
-2.20.1
+ config KVM
+     bool
+=20
+--=20
+2.21.1
 
 
