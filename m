@@ -2,81 +2,72 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D553CC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5A1C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:37:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96D7F206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:37:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cEusEkXy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D7F206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 50B9C20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:37:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50B9C20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDozS-0000Ds-Af
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:37:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51742)
+	id 1jDp05-0000Wo-1f
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1jDnwx-00022I-QR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:30:31 -0400
+ (envelope-from <cathy.zhang@intel.com>) id 1jDo9X-0006i5-Sy
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:43:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1jDnwv-0001Cv-Cb
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:30:27 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45755
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <cathy.zhang@intel.com>) id 1jDo9W-0006jC-4N
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:43:27 -0400
+Received: from mga04.intel.com ([192.55.52.120]:19656)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1jDnwv-00018P-71
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:30:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584358224;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k2+gky+iQX2sRF3Cj4Ap1jl4jZVwiMISvIxm8ts03s8=;
- b=cEusEkXyJso773L8pDQiHsjEOR+9UyHtoyE+gft2kqDXclXO4fo/kMH+5mrvyRtWGo3Pdh
- iIKrWQgMmZVWwEEZQ88zLblGFALCSbl6FrRpH2qQuIcDk0LtN08Q7xJULRbiNbA8SqArHO
- hdhyvyujq4sQeKfPWQG88vSCe6yN9+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-Ze1VJ06pP0egSUsibdhZKw-1; Mon, 16 Mar 2020 07:30:20 -0400
-X-MC-Unique: Ze1VJ06pP0egSUsibdhZKw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79BAD8017CC;
- Mon, 16 Mar 2020 11:30:19 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-117.ams2.redhat.com
- [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64C165DA2C;
- Mon, 16 Mar 2020 11:30:16 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 9D20D9D21; Mon, 16 Mar 2020 12:30:15 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/6] audio: consistency changes
-Date: Mon, 16 Mar 2020 12:30:12 +0100
-Message-Id: <20200316113015.28013-4-kraxel@redhat.com>
-In-Reply-To: <20200316113015.28013-1-kraxel@redhat.com>
-References: <20200316113015.28013-1-kraxel@redhat.com>
+ (Exim 4.71) (envelope-from <cathy.zhang@intel.com>)
+ id 1jDo9S-0005gx-Oa
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:43:26 -0400
+IronPort-SDR: dc3mJ2Txl8DGff1CoF3YZ1rFIxDu8wJfoitlWg8vjIE3JwpKboshJMQce77fr2Xava+UQe0E1I
+ jg46N/9ZINAg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 16 Mar 2020 04:43:18 -0700
+IronPort-SDR: EiABYRNHEKMltH1YHmSZmtD4LD6EuWsh4veiMbeCVAEJ1wfHX3sE+fcwdr7qzHuUjLfxrMAwtw
+ WbXrAwofZsKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,560,1574150400"; d="scan'208";a="247429353"
+Received: from zhangj4-mobl1.ccr.corp.intel.com (HELO [10.249.174.94])
+ ([10.249.174.94])
+ by orsmga006.jf.intel.com with ESMTP; 16 Mar 2020 04:43:16 -0700
+Subject: Re: [PATCH 0/2] Fix Cooperlake CPU model
+To: Paolo Bonzini <pbonzini@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20191225063018.20038-1-xiaoyao.li@intel.com>
+ <93c9cc8c-09ec-d13f-f012-edf86fd945ab@redhat.com>
+ <759b848d-8261-5997-2e2b-531246bcdf92@intel.com>
+ <a972442e-2d29-674b-7ad6-2f056330ed84@redhat.com>
+ <d86b7681-8d99-523b-ebb5-d7d388ef4ca5@intel.com>
+ <4ef3f6f0-564b-c28e-a783-15af3ba4c927@redhat.com>
+From: "Zhang, Cathy" <cathy.zhang@intel.com>
+Message-ID: <c4c67eac-d34d-30f2-58a3-6efc70dc7aed@intel.com>
+Date: Mon, 16 Mar 2020 19:43:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <4ef3f6f0-564b-c28e-a783-15af3ba4c927@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,41 +79,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Volker R=C3=BCmelin <vr_qemu@t-online.de>
-
-Change the clip_natural_float_from_mono() function in
-audio/mixeng.c to be consistent with the clip_*_from_mono()
-functions in audio/mixeng_template.h.
-
-Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
-Message-id: 20200308193321.20668-3-vr_qemu@t-online.de
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/mixeng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/audio/mixeng.c b/audio/mixeng.c
-index b57fad83bf3b..725b529be7da 100644
---- a/audio/mixeng.c
-+++ b/audio/mixeng.c
-@@ -316,7 +316,7 @@ static void clip_natural_float_from_mono(void *dst, con=
-st struct st_sample *src,
-     float *out =3D (float *)dst;
-=20
-     while (samples--) {
--        *out++ =3D CLIP_NATURAL_FLOAT(src->l) + CLIP_NATURAL_FLOAT(src->r)=
-;
-+        *out++ =3D CLIP_NATURAL_FLOAT(src->l + src->r);
-         src++;
-     }
- }
---=20
-2.18.2
-
+On 3/16/2020 6:24 PM, Paolo Bonzini wrote:
+> On 16/03/20 11:19, Zhang, Cathy wrote:
+>> Yes, I see they are already in master, but not in v4.2 yet, so will they
+>> be in the next release v5.0?
+> Yes, that's what master will become.
+>
+> Paolo
+That's great! Thanks for your response!
 
