@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCBEC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B747C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6507420409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 050F820409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:16:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EokaQiWH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6507420409
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5zw/xAI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 050F820409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtKS-0005E2-Eb
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:15:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49654)
+	id 1jDtLw-0007gJ-5y
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:16:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jDrOU-00088V-OO
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:08 -0400
+ (envelope-from <eblake@redhat.com>) id 1jDrPZ-00007n-RZ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jDrOT-0004dt-NJ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:06 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52713)
+ (envelope-from <eblake@redhat.com>) id 1jDrPY-0005wK-Of
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:12:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:59828)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jDrOT-0004Z2-HQ
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:05 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jDrPY-0005rt-Id
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:12:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584371465;
+ s=mimecast20190719; t=1584371532;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hpjvqKas4y2b/BCytF+DA/jQXRt+9X/sXAyOVsioO4I=;
- b=EokaQiWH546H2g+Q+KjOJi252tXYpy359OJuXluhjeuhZYv1T5Iq2dSCCJGQmvcTvwH1Ac
- 51LjYp0bDKYZSQod6TjBwkKTdBcsdMjtWax/2BYn7NFqzIya33Oy8MzgiWlLaTD67JgSUV
- Bn2sK55e4uM94OauL+c14j9wRjkRLHA=
+ bh=uIWA3mHYdWsduqEBakmGNZd3s9YlFiSpSAJaP0cYABE=;
+ b=H5zw/xAIqwm8/PmSxuSb9xVAS+u4z7Z0GXCj6Bz9hExu8A/eQg/pSqNXj1uaLPAqtCMlYA
+ MSLSOQjgKk/WK/SFv4ZdemHiPhXtOmFZOyP6v+V+ipcIEEIJex0uMrEhERXHi5WBgVd4lF
+ swfC23BPDsCEfjVhhzycfCTEkaex2l8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-dfzUOCylNmeSpMyNYTVzjg-1; Mon, 16 Mar 2020 11:11:01 -0400
-X-MC-Unique: dfzUOCylNmeSpMyNYTVzjg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-108-GEIfcMk9M9SkMlVO2CzgRQ-1; Mon, 16 Mar 2020 11:12:10 -0400
+X-MC-Unique: GEIfcMk9M9SkMlVO2CzgRQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EED2C1922973;
- Mon, 16 Mar 2020 15:10:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D372835B4E;
+ Mon, 16 Mar 2020 15:12:09 +0000 (UTC)
 Received: from [10.3.118.63] (ovpn-118-63.phx2.redhat.com [10.3.118.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A94105D9C9;
- Mon, 16 Mar 2020 15:10:59 +0000 (UTC)
-Subject: Re: [PATCH v3 02/34] qapi: Belatedly update doc comment for @wait
- deprecation
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C43692706B;
+ Mon, 16 Mar 2020 15:12:08 +0000 (UTC)
+Subject: Re: [PATCH v3 03/34] docs/devel/qapi-code-gen: Clarify allow-oob
+ introspection
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-3-armbru@redhat.com>
+ <20200315144653.22660-4-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <22d56f68-934f-86b4-c746-9fec70132569@redhat.com>
-Date: Mon, 16 Mar 2020 10:10:59 -0500
+Message-ID: <0279449b-b6b4-6aaa-c0e3-6eb61e806fac@redhat.com>
+Date: Mon, 16 Mar 2020 10:12:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200315144653.22660-3-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-4-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,30 +96,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/15/20 9:46 AM, Markus Armbruster wrote:
-> Commit a9b305ba29 "socket: allow wait=false for client socket"
-> deprecated use of @wait for client socket chardevs, but neglected to
-> update char.json's doc comment.  Make up for that.
+> Mention SchemaInfo variant member "allow-oob" defaults to false.
 > 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   qapi/char.json | 1 +
->   1 file changed, 1 insertion(+)
+>   docs/devel/qapi-code-gen.txt | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 > 
-> diff --git a/qapi/char.json b/qapi/char.json
-> index 6907b2bfdb..daceb20f84 100644
-> --- a/qapi/char.json
-> +++ b/qapi/char.json
-> @@ -258,6 +258,7 @@
->   # @server: create server socket (default: true)
->   # @wait: wait for incoming connection on server
->   #        sockets (default: false).
-> +#        Silently ignored with server: false.  This use is deprecated.
->   # @nodelay: set TCP_NODELAY socket option (default: false)
->   # @telnet: enable telnet protocol on server
->   #          sockets (default: false)
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 59d6973e1e..5906602504 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -988,9 +988,9 @@ The SchemaInfo for a command has meta-type "command", and variant
+>   members "arg-type", "ret-type" and "allow-oob".  On the wire, the
+>   "arguments" member of a client's "execute" command must conform to the
+>   object type named by "arg-type".  The "return" member that the server
+> -passes in a success response conforms to the type named by
+> -"ret-type".  When "allow-oob" is set, it means the command supports
+> -out-of-band execution.
+> +passes in a success response conforms to the type named by "ret-type".
+> +When "allow-oob" is true, it means the command supports out-of-band
+> +execution.  It defaults to false.
+>   
+>   If the command takes no arguments, "arg-type" names an object type
+>   without members.  Likewise, if the command returns nothing, "ret-type"
 > 
 
 -- 
