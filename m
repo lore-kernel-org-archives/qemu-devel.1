@@ -2,96 +2,61 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC115C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36B5C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:30:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69B87205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:30:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Au1jdn9O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B87205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFC34205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:30:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC34205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtYu-0005de-HC
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54464)
+	id 1jDtZS-0006LN-TQ
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:30:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDsH7-0004PO-Qs
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:35 -0400
+ (envelope-from <groug@kaod.org>) id 1jDres-0006O1-A5
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDsH6-00025f-MM
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:33 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:57715)
+ (envelope-from <groug@kaod.org>) id 1jDreq-0005JD-TS
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:28:01 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:40759)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDsH6-00022r-HH
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584374852;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vKQK/gk4+Rfzeay1FIA++WnEXh1sOGPFugrslQ2WqSM=;
- b=Au1jdn9OdAoljJHMLjmhRtQUBMryFuISLxuJr6JYVwhQ8SGcb4Lgbf8h7d+5D70iEqoYNJ
- oRiXz672D2fmuHXPIYkMMGfxsu64yxVOom2bLs4LW5b8WzKGeNjXXtWFp0WuPq13TW+zik
- 1fEERVOlANiw/pdCywY4ngNmGipFR5U=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-E1xAdKtEOoiRFvGSgVZy_g-1; Mon, 16 Mar 2020 12:07:28 -0400
-X-MC-Unique: E1xAdKtEOoiRFvGSgVZy_g-1
-Received: by mail-wr1-f72.google.com with SMTP id l16so8540364wrr.6
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:07:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ZbHLr8MN7Y181YkXNU9q35GGyibM63M9cMs0mFzNFC4=;
- b=RP6/lUU4ttC2PWYu8FSfGYO5Xo9P44jNd/eqeL5iM0S9Kg17rgm+b/Lthz2j7INaiI
- ruY2rlkj2+ufWtXCZO+QB3TeSbQ8vvRgX7s9SmFNzINTsuf9MEHK3CGq6/FigbspW5Rm
- CT7ihxBpAUM4PLjPYKiBwmkrCLmuK36tTNNfOoonhAuEoVsA7TTxa1HfpjhMUxMtJgIO
- 8nnmtHIPc0oDErGQEsYtspAf0wQi4euFjI3fDrouigSZYvn5hnk00/UPAH4IVvGFB/XR
- 9aiymxNTPGUuGwWxT9o92BfMeV7OgAclpFKyCnmTtqCnxs1I50o6623zE5ASXaVWUGW2
- ZPbw==
-X-Gm-Message-State: ANhLgQ0IBQQsBk1lQjC7XCPUlZOU6p6w/JwAjoLCWLKKLmxWWbfSAvMr
- o5RwwXqMBp3DAwJiyPCAGbRDP9BpEvC4oPW/icTVeAXeHreQNAKmNDrse7ZTx1hRnt0tNPB/W3L
- +l3+EBHtJepFcTIQ=
-X-Received: by 2002:a1c:de82:: with SMTP id v124mr27908592wmg.70.1584374847192; 
- Mon, 16 Mar 2020 09:07:27 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvmhZSbs8NzLKXqUjgdCfW3w9WctLHdMyXVqEBO9jZ0UEFAr0Le+jcnqG4RZo4FMyA5CMMs0Q==
-X-Received: by 2002:a1c:de82:: with SMTP id v124mr27908565wmg.70.1584374846997; 
- Mon, 16 Mar 2020 09:07:26 -0700 (PDT)
-Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id k5sm221948wmj.18.2020.03.16.09.07.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 09:07:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 09/19] target/arm: Move ARM_V7M Kconfig from hw/ to target/
-Date: Mon, 16 Mar 2020 17:06:24 +0100
-Message-Id: <20200316160634.3386-10-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
-References: <20200316160634.3386-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jDreq-00046X-JT
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:28:00 -0400
+Received: from player687.ha.ovh.net (unknown [10.110.171.50])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 66E9A86968
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 16:27:52 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player687.ha.ovh.net (Postfix) with ESMTPSA id BC461106EF578;
+ Mon, 16 Mar 2020 15:27:44 +0000 (UTC)
+Date: Mon, 16 Mar 2020 16:27:37 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 1/8] ppc/spapr: Fix FWNMI machine check failure handling
+Message-ID: <20200316162737.40a78537@bahia.lan>
+In-Reply-To: <20200316142613.121089-2-npiggin@gmail.com>
+References: <20200316142613.121089-1-npiggin@gmail.com>
+ <20200316142613.121089-2-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11166675278096013763
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedgjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 46.105.50.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,58 +68,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ARM_V7M is a concept tied to the architecture. Move it to the
-target/arm/ directory to keep the hardware/architecture separation
-clearer.
+On Tue, 17 Mar 2020 00:26:06 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/arm/Kconfig     | 3 ---
- target/Kconfig     | 2 +-
- target/arm/Kconfig | 2 ++
- 3 files changed, 3 insertions(+), 4 deletions(-)
- create mode 100644 target/arm/Kconfig
+> ppc_cpu_do_system_reset delivers a system rreset interrupt to the guest,
+> which is certainly not what is intended here. Panic the guest like other
+> failure cases here do.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index e5a876c8d1..e3d7e7694a 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -285,9 +285,6 @@ config ZYNQ
-     select XILINX_SPIPS
-     select ZYNQ_DEVCFG
-=20
--config ARM_V7M
--    bool
--
- config ALLWINNER_A10
-     bool
-     select AHCI
-diff --git a/target/Kconfig b/target/Kconfig
-index 8b13789179..130d0c7a85 100644
---- a/target/Kconfig
-+++ b/target/Kconfig
-@@ -1 +1 @@
--
-+source arm/Kconfig
-diff --git a/target/arm/Kconfig b/target/arm/Kconfig
-new file mode 100644
-index 0000000000..e68c71a6ff
---- /dev/null
-+++ b/target/arm/Kconfig
-@@ -0,0 +1,2 @@
-+config ARM_V7M
-+    bool
---=20
-2.21.1
+Makes sense.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_events.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 2afd1844e4..11303258d4 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -785,7 +785,6 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
+>  static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>  {
+>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> -    CPUState *cs = CPU(cpu);
+>      uint64_t rtas_addr;
+>      CPUPPCState *env = &cpu->env;
+>      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> @@ -823,8 +822,7 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>      /* get rtas addr from fdt */
+>      rtas_addr = spapr_get_rtas_addr();
+>      if (!rtas_addr) {
+> -        /* Unable to fetch rtas_addr. Hence reset the guest */
+> -        ppc_cpu_do_system_reset(cs);
+> +        qemu_system_guest_panicked(NULL);
+>          g_free(ext_elog);
+>          return;
+>      }
 
 
