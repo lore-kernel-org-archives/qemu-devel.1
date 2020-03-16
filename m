@@ -2,82 +2,63 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E54C4C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 186E1C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:01:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A5920663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:00:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/XRHFTn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A5920663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFD9020663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:01:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD9020663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuya-0001XX-QK
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:00:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42736)
+	id 1jDuz5-0001uh-42
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:01:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1jDuCd-0005gF-BF
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:05 -0400
+ (envelope-from <clg@kaod.org>) id 1jDu2w-0004HJ-UZ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1jDuCb-0004Iz-F0
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:02 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60557)
+ (envelope-from <clg@kaod.org>) id 1jDu2v-00077p-P4
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:02 -0400
+Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:58864)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1jDuCa-0004Ge-VV
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:11:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584382260;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=M3KjyDukERh1d5BPBXiKd9VP3IiPYhebJi6stTONZAA=;
- b=A/XRHFTnUqYkiLf1pcFzsKKNZkDqXuUZzUZk6hOWecgLi8ZhyqHeOXY+lV4mrG5/yIKd9F
- EDq+ja3VJejFL0e+Pg/pUOuAgo9qW04L9dEOmGDByXWOJREqLYK6Vbl0v6X7oT6fVWLA1P
- pUPMnklyc9I/3hp/o3pJaK3cKVeorcU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-AoxoeXZtNa-js2AwAtH10g-1; Mon, 16 Mar 2020 14:10:56 -0400
-X-MC-Unique: AoxoeXZtNa-js2AwAtH10g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E31CF94C1CB;
- Mon, 16 Mar 2020 17:58:39 +0000 (UTC)
-Received: from gondolin (ovpn-117-70.ams2.redhat.com [10.36.117.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D3FD5C1B2;
- Mon, 16 Mar 2020 17:58:35 +0000 (UTC)
-Date: Mon, 16 Mar 2020 18:58:25 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v9] fixup! Fix subcode/pbt
-Message-ID: <20200316185825.5129e15c.cohuck@redhat.com>
-In-Reply-To: <344cf3c0-64dd-22be-e62b-448ef70dcc18@linux.ibm.com>
-References: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
- <20200313095232.2392-1-frankja@linux.ibm.com>
- <20200316152738.4c1c65ee.cohuck@redhat.com>
- <bbbabbb0-2325-406d-a619-f2d03f447c8c@linux.ibm.com>
- <20200316155457.73e97d9c.cohuck@redhat.com>
- <344cf3c0-64dd-22be-e62b-448ef70dcc18@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jDu2v-0006zV-H4
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:01:01 -0400
+Received: from player716.ha.ovh.net (unknown [10.110.208.183])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id BB8CD1B564F
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 19:00:59 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player716.ha.ovh.net (Postfix) with ESMTPSA id 2C48B1069AEFC;
+ Mon, 16 Mar 2020 18:00:47 +0000 (UTC)
+Subject: Re: [PATCH v2 5/8] ppc/spapr: Allow FWNMI on TCG
+To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
+References: <20200316142613.121089-1-npiggin@gmail.com>
+ <20200316142613.121089-6-npiggin@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <531bdcf7-e54a-4fe4-ff78-7d8bc5ef1e7c@kaod.org>
+Date: Mon, 16 Mar 2020 19:00:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/78OVCEWBtgBbjRizafzIhHj";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <20200316142613.121089-6-npiggin@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 13752585887778507750
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 178.33.45.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,107 +70,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/78OVCEWBtgBbjRizafzIhHj
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 16 Mar 2020 16:05:03 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 3/16/20 3:54 PM, Cornelia Huck wrote:
-> > On Mon, 16 Mar 2020 15:47:41 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> On 3/16/20 3:27 PM, Cornelia Huck wrote: =20
-> >>> On Fri, 13 Mar 2020 05:52:32 -0400
-> >>> Janosch Frank <frankja@linux.ibm.com> wrote:
-> >>>    =20
-> >>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >>>> ---
-> >>>>  hw/s390x/ipl.h      | 11 +++++++----
-> >>>>  target/s390x/diag.c |  2 +-
-> >>>>  2 files changed, 8 insertions(+), 5 deletions(-) =20
-> >=20
-> >  =20
-> >>>> @@ -118,7 +118,7 @@ void handle_diag_308(CPUS390XState *env, uint64_=
-t r1, uint64_t r3, uintptr_t ra)
-> >>>> =20
-> >>>>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len)=
-);
-> >>>> =20
-> >>>> -        if (!iplb_valid(iplb)) {
-> >>>> +        if (!iplb_valid(iplb, subcode)) {
-> >>>>              env->regs[r1 + 1] =3D DIAG_308_RC_INVALID;
-> >>>>              goto out;
-> >>>>          }   =20
-> >>>
-> >>> ...because you're basically checking whether you either have a valid
-> >>> normal iplb, or a valid pv iplb, with the two being mutually exclusiv=
-e,
-> >>> IIUC. So what about introducing iplb_valid_pv and calling that for th=
-e
-> >>> pv case? Would be a bit nicer to read, I think, and also matches what
-> >>> you do for the STORE case.
-> >>>    =20
-> >>S390_IPL_TYPE_CCW
-> >> The idea was to get rid of all of these ifs and elses and only have on=
-e
-> >> iplb_valid function. Your suggestion would defeat hiding that complexi=
-ty
-> >> behind this function. =20
-> >=20
-> > I'd argue that this is a complexity we should not hide; for non-pv, we
-> > can have several formats, for pv, only one, and we cannot use a pv iplb
-> > in a non-pv context and vice versa.
-> >  =20
+On 3/16/20 3:26 PM, Nicholas Piggin wrote:
+> There should no longer be a reason to prevent TCG providing FWNMI.
+> System Reset interrupts are generated to the guest with nmi monitor
+> command and H_SIGNAL_SYS_RESET. Machine Checks can not be injected
+> currently, but this could be implemented with the mce monitor cmd
+> similarly to i386.
 >=20
-> Ok, then please let me split this out into a new function within diag.c.
-> Something like:
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+> ---
+>  hw/ppc/spapr_caps.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >=20
-> static bool diag308_pbt_subcode_validity(uint8_t pbt, uint64_t subcode)
-> {
-> =09if (subcode =3D=3D DIAG308_SET) {
-> =09=09return (pbt =3D=3D S390_IPL_TYPE_FCP || pbt =3D=3D S390_IPL_TYPE_CC=
-W)
-> =09} else if (subcode =3D=3D DIAG308_PV_SET && pbt =3D=3D S390_IPL_TYPE_P=
-V) {
-> =09return true;
-> }
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index f626d769a0..679ae7959f 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -516,10 +516,7 @@ static void cap_fwnmi_apply(SpaprMachineState *spa=
+pr, uint8_t val,
+>          return; /* Disabled by default */
+>      }
+> =20
+> -    if (tcg_enabled()) {
+> -        warn_report("Firmware Assisted Non-Maskable Interrupts(FWNMI) =
+not "
+> -                    "supported in TCG");
+> -    } else if (kvm_enabled()) {
+> +    if (kvm_enabled()) {
+>          if (kvmppc_set_fwnmi() < 0) {
+>              error_setg(errp, "Firmware Assisted Non-Maskable Interrupt=
+s(FWNMI) "
+>                               "not supported by KVM");
 >=20
-> =09return false;
-> }
->=20
-
-Sorry, you now managed to confuse me... where is that supposed to be
-called?
-
---Sig_/78OVCEWBtgBbjRizafzIhHj
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5vvkEACgkQ3s9rk8bw
-L6/aWQ//SFdhw8E4QQhOVawRkRadV5oliTKKyV+iR2ITa2UZs9aUR/w5z3mSjOul
-ijmz6uSsnI9IAF5wK49VqeTgY3P6xH1dWWiU/Zm/g3Ssq1ZX1R9oOm5Xjb+2f30Z
-JJx/wZXYNLhstZmKdattYqNP7kSqAIS5iqr6foLtt4XZx3My76IF6/fJnfBNxyKT
-IE5jIC9BaFQGg8qlySBLwMl67HtHTGrnAnJsdZQkoGhsrPXyQ2ZvXdTM2PwuMjwL
-kaPCN0AtGpb5wNnxy6V7wSP2DygS4EmTYeizKD/DTcKjnaoAKtUhxHhNSZ30YryY
-gsJ5hn21vvODL9dJaBeD/X40OZJLFx0eQ82Nu4jMKm07NrtvUJWH/YFYlk+ZKA+y
-rTxdHPvcqTOnkHLH1GW/PmzkVPhI3zju/2hXIpO4Du3Fi8t/r20R/QF2CF/n93aH
-MoNjB0EStK5TMVF3LXzXpYWOxl+UPV0VymgvSjKyfLyaVAsxmQ4+955cloXoXkCm
-a/4C82oo8SKcEmarK45WniUNjj6Sxd0sdHJZBJcvv5Rz0I+3TWOq+djOhmVRH+mD
-iJVh/wtZOx7sx+6UlV6EB8yFUlnuBJfJg0p8ylhIrPDRBYAKukOszWZrV7Osgbhw
-DZ++N07xOeNgrVoiNoL2e9DWhpudiHA+HimeqHLA2QCIo/r3+MM=
-=zbxO
------END PGP SIGNATURE-----
-
---Sig_/78OVCEWBtgBbjRizafzIhHj--
 
 
