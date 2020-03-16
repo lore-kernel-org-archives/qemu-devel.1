@@ -2,90 +2,75 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10383C18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C781C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D0B2073E
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D711F2073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:48:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HBvq+Gr1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D0B2073E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBPg0X5Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D711F2073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDumF-0002EA-2U
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:47:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53013)
+	id 1jDumT-0002gm-RE
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:48:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXr-0003qg-Cn
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:57 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1jDtgB-0002s7-4O
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtXn-0002Qk-UD
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:55 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42894)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtXn-0002Ji-HR
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:28:51 -0400
-Received: by mail-wr1-x432.google.com with SMTP id v11so22320923wrm.9
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:28:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=m8trnK4dsJcOAkqMwuDk8oN/65638+mbTVeX6RjAM68=;
- b=HBvq+Gr1rLXtJLvRVXx6L79nqcvJ2B+xPBsegPXIx70/Li1laLUTPSzyQ7N1knJBT9
- A5hB/O6zxN0U6SAyyL4of8l97vq2fOvasvtL8DId2Q9vwr1TWF0+VnP7oGFNX/h6GPXb
- K0BIJ6QsrFkChDqvYM2KEnqNVl8LvwWuQsHbfdNaDTqyhSKUvqXwJI1PSTCt6R3x0H+C
- VfPQ0WYwkE1VkYcmjGF20YNhFKw0K5vMoPlsnCnHKL4F07cU+ytdwdznYHsYtNwcUl+A
- j3aR7YnTUUSa6MNtR62gvnuBrnQuxIuWp7S9xPx7ErAwbDE2s7dfpS2KosyP4vjntqyd
- QbDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=m8trnK4dsJcOAkqMwuDk8oN/65638+mbTVeX6RjAM68=;
- b=Y7MkFhfseBzA3eeH8heWVlGH3eSKUlXjpG/XmdzPkV7YN5xz9ETjiZH8v5oqPREwQN
- yRoJBPiW6rBhEcHuow13WofH9M8LDVpj09rWbi7s09mws/8Ovk55GAFRcg3u+AOYtP5w
- TguueUXR9Sl81/oGWvQWHcwA8zTibCkORFBjPIQDkSY8G1GcJKtUEXPtHDKGWAyPOUA7
- A+yKR8r9YS14bFvK/KWz7ASKy7ENpte7gZr7YiBZjFlOYlVQfrrDwwxpXVUdcKyc3opt
- ksOSKyRFsVbpiYLpesN57jZSxiAD/k/6ORb5m4iPacDBypP1/oJtAwMYIsTEkOnzTyLz
- tbbg==
-X-Gm-Message-State: ANhLgQ3/4MdwefmpYhewBz8vmZL4GJKrk8Q+7XFTsJm6GqMEQ0PsQzYg
- Pqasp8SqAemJ/XQBT2qq9kopew==
-X-Google-Smtp-Source: ADFU+vuZHzlkb3X9TGWbTjsEEpevcVTZ7Ke10xn8DgpeFvoA4hK1S37CzkczmHtXeNtOh4BrSUjPQA==
-X-Received: by 2002:a5d:5342:: with SMTP id t2mr456320wrv.104.1584379730464;
- Mon, 16 Mar 2020 10:28:50 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 9sm443006wmx.32.2020.03.16.10.28.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:28:46 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 815581FFAE;
- Mon, 16 Mar 2020 17:21:57 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <marcandre.lureau@redhat.com>) id 1jDtg9-0007r5-Mt
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:31 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44594)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1jDtg9-0007fg-HA
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:37:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584380248;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=OAl1dT5jiMn/VOa6zocxfyaR3dkTlnrd2JVBKKp9vcw=;
+ b=WBPg0X5QgOeGCDafNL/O7jWnyg6rY101tHdXCzH9Ylc1ogEoM2P0KOrIaZNqwM3mq5CzGb
+ uS/ZliOti3eOGVWxwC6wYhP5J7bMe9IjRnmI0hT0r9J0nktjq0hfOSOTmW9RGV4uFMH5Kn
+ n/H2TN8rIMZVMZYME7aIWvugBs/xDE8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-mnrub6aZM0WI9VrGPoTF8w-1; Mon, 16 Mar 2020 13:37:26 -0400
+X-MC-Unique: mnrub6aZM0WI9VrGPoTF8w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53EB811AB5F9
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 17:18:28 +0000 (UTC)
+Received: from localhost (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 531E85C1B2;
+ Mon, 16 Mar 2020 17:18:25 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 23/28] tests/tcg/aarch64: add a gdbstub testcase for SVE
- registers
-Date: Mon, 16 Mar 2020 17:21:50 +0000
-Message-Id: <20200316172155.971-24-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+Subject: [PATCH v6/v7 RESEND] qmp: constify QmpCommand and list
+Date: Mon, 16 Mar 2020 18:18:24 +0100
+Message-Id: <20200316171824.2319695-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::432
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,155 +82,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A very simple test case which sets and reads SVE registers while
-running a test case. We don't really need to compile a SVE binary for
-this case but we will later so keep it simple for now.
+Since 0b69f6f72ce47a37a749b056b6d5ec64c61f11e8 "qapi: remove
+qmp_unregister_command()", the command list can be declared const.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
-v5
-  - properly plumb in
-  - skip if fails to connect
----
- tests/.gitignore                      |  1 +
- tests/tcg/aarch64/Makefile.target     | 15 +++++
- tests/tcg/aarch64/gdbstub/test-sve.py | 81 +++++++++++++++++++++++++++
- 3 files changed, 97 insertions(+)
- create mode 100644 tests/tcg/aarch64/gdbstub/test-sve.py
+ include/qapi/qmp/dispatch.h | 9 +++++----
+ monitor/monitor-internal.h  | 2 +-
+ monitor/qmp-cmds-control.c  | 2 +-
+ qapi/qmp-dispatch.c         | 6 +++---
+ qapi/qmp-registry.c         | 6 +++---
+ qga/commands.c              | 2 +-
+ qga/main.c                  | 6 +++---
+ 7 files changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/tests/.gitignore b/tests/.gitignore
-index 7306866f216..d03c037d772 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -10,6 +10,7 @@ qht-bench
- rcutorture
- test-*
- !test-*.c
-+!test-*.py
- !docker/test-*
- test-qapi-commands.[ch]
- test-qapi-init-commands.[ch]
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index a25afc071cc..b61b53e4dd1 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -46,6 +46,21 @@ ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_SVE),)
- # System Registers Tests
- AARCH64_TESTS += sysregs
- sysregs: CFLAGS+=-march=armv8.1-a+sve
-+
-+ifneq ($(HAVE_GDB_BIN),)
-+GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
-+
-+AARCH64_TESTS += gdbstub-sysregs
-+
-+.PHONY: gdbstub-sysregs
-+run-gdbstub-sysregs: sysregs
-+	$(call run-test, $@, $(GDB_SCRIPT) \
-+		--gdb $(HAVE_GDB_BIN) \
-+		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
-+		--bin $< --test $(AARCH64_SRC)/gdbstub/test-sve.py, \
-+	"basic gdbstub SVE support")
-+endif
-+
- endif
- 
- TESTS += $(AARCH64_TESTS)
-diff --git a/tests/tcg/aarch64/gdbstub/test-sve.py b/tests/tcg/aarch64/gdbstub/test-sve.py
-new file mode 100644
-index 00000000000..90201d80094
---- /dev/null
-+++ b/tests/tcg/aarch64/gdbstub/test-sve.py
-@@ -0,0 +1,81 @@
-+from __future__ import print_function
-+#
-+# Test the SVE registers are visable and changeable via gdbstub
-+#
-+# This is launched via tests/guest-debug/run-test.py
-+#
-+
-+import gdb
-+import sys
-+
-+MAGIC = 0xDEADBEEF
-+
-+failcount = 0
-+
-+def report(cond, msg):
-+    "Report success/fail of test"
-+    if cond:
-+        print ("PASS: %s" % (msg))
-+    else:
-+        print ("FAIL: %s" % (msg))
-+        global failcount
-+        failcount += 1
-+
-+def run_test():
-+    "Run through the tests one by one"
-+
-+    gdb.execute("info registers")
-+    report(True, "info registers")
-+
-+    gdb.execute("info registers vector")
-+    report(True, "info registers vector")
-+
-+    # Now all the zregs
-+    frame = gdb.selected_frame()
-+    for i in range(0, 32):
-+        rname = "z%d" % (i)
-+        zreg = frame.read_register(rname)
-+        report(True, "Reading %s" % rname)
-+        for j in range(0, 4):
-+            cmd = "set $%s.q.u[%d] = 0x%x" % (rname, j, MAGIC)
-+            gdb.execute(cmd)
-+            report(True, "%s" % cmd)
-+        for j in range(0, 4):
-+            reg = "$%s.q.u[%d]" % (rname, j)
-+            v = gdb.parse_and_eval(reg)
-+            report(str(v.type) == "uint128_t", "size of %s" % (reg))
-+        for j in range(0, 8):
-+            cmd = "set $%s.d.u[%d] = 0x%x" % (rname, j, MAGIC)
-+            gdb.execute(cmd)
-+            report(True, "%s" % cmd)
-+        for j in range(0, 8):
-+            reg = "$%s.d.u[%d]" % (rname, j)
-+            v = gdb.parse_and_eval(reg)
-+            report(str(v.type) == "uint64_t", "size of %s" % (reg))
-+            report(int(v) == MAGIC, "%s is 0x%x" % (reg, MAGIC))
-+
-+#
-+# This runs as the script it sourced (via -x, via run-test.py)
-+#
-+try:
-+    inferior = gdb.selected_inferior()
-+    arch = inferior.architecture()
-+    report(arch.name() == "aarch64", "connected to aarch64")
-+except (gdb.error, AttributeError):
-+    print("SKIPPING (not connected)", file=sys.stderr)
-+    exit(0)
-+
-+try:
-+    # These are not very useful in scripts
-+    gdb.execute("set pagination off")
-+    gdb.execute("set confirm off")
-+
-+    # Run the actual tests
-+    run_test()
-+except:
-+    print ("GDB Exception: %s" % (sys.exc_info()[0]))
-+    failcount += 1
-+
-+print("All tests complete: %d failures" % failcount)
-+
-+exit(failcount)
--- 
-2.20.1
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 9aa426a398..5a9cf82472 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -39,7 +39,8 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpComman=
+dList;
+=20
+ void qmp_register_command(QmpCommandList *cmds, const char *name,
+                           QmpCommandFunc *fn, QmpCommandOptions options);
+-QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
++const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
++                                   const char *name);
+ void qmp_disable_command(QmpCommandList *cmds, const char *name);
+ void qmp_enable_command(QmpCommandList *cmds, const char *name);
+=20
+@@ -47,13 +48,13 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QDict *qmp_error_response(Error *err);
+-QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+                     bool allow_oob);
+ bool qmp_is_oob(const QDict *dict);
+=20
+-typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
++typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaque);
+=20
+-void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_fn =
+fn,
+                           void *opaque);
+=20
+ #endif
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 3e6baba88f..8f60ccc70a 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -133,7 +133,7 @@ typedef struct {
+      * qmp_capabilities succeeds, we go into command mode, and
+      * @command becomes &qmp_commands.
+      */
+-    QmpCommandList *commands;
++    const QmpCommandList *commands;
+     bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
+     bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+     /*
+diff --git a/monitor/qmp-cmds-control.c b/monitor/qmp-cmds-control.c
+index 5cd9bb817c..8f04cfa6e6 100644
+--- a/monitor/qmp-cmds-control.c
++++ b/monitor/qmp-cmds-control.c
+@@ -101,7 +101,7 @@ VersionInfo *qmp_query_version(Error **errp)
+     return info;
+ }
+=20
+-static void query_commands_cb(QmpCommand *cmd, void *opaque)
++static void query_commands_cb(const QmpCommand *cmd, void *opaque)
+ {
+     CommandInfoList *info, **list =3D opaque;
+=20
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index bc264b3c9b..857399c5fe 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -75,14 +75,14 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
+uest, bool allow_oob,
+     return dict;
+ }
+=20
+-static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
++static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *reque=
+st,
+                                 bool allow_oob, Error **errp)
+ {
+     Error *local_err =3D NULL;
+     bool oob;
+     const char *command;
+     QDict *args, *dict;
+-    QmpCommand *cmd;
++    const QmpCommand *cmd;
+     QObject *ret =3D NULL;
+=20
+     dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
+@@ -164,7 +164,7 @@ bool qmp_is_oob(const QDict *dict)
+         && !qdict_haskey(dict, "execute");
+ }
+=20
+-QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
++QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+                     bool allow_oob)
+ {
+     Error *err =3D NULL;
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index ca00f74795..d0f9a1d3e3 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -27,7 +27,7 @@ void qmp_register_command(QmpCommandList *cmds, const cha=
+r *name,
+     QTAILQ_INSERT_TAIL(cmds, cmd, node);
+ }
+=20
+-QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
++const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const char =
+*name)
+ {
+     QmpCommand *cmd;
+=20
+@@ -77,10 +77,10 @@ bool qmp_has_success_response(const QmpCommand *cmd)
+     return !(cmd->options & QCO_NO_SUCCESS_RESP);
+ }
+=20
+-void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback_fn =
+fn,
+                           void *opaque)
+ {
+-    QmpCommand *cmd;
++    const QmpCommand *cmd;
+=20
+     QTAILQ_FOREACH(cmd, cmds, node) {
+         fn(cmd, opaque);
+diff --git a/qga/commands.c b/qga/commands.c
+index 43c323cead..f8852beb9c 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -54,7 +54,7 @@ void qmp_guest_ping(Error **errp)
+     slog("guest-ping called");
+ }
+=20
+-static void qmp_command_info(QmpCommand *cmd, void *opaque)
++static void qmp_command_info(const QmpCommand *cmd, void *opaque)
+ {
+     GuestAgentInfo *info =3D opaque;
+     GuestAgentCommandInfo *cmd_info;
+diff --git a/qga/main.c b/qga/main.c
+index e5c39c189a..8ee2736f8e 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -359,7 +359,7 @@ static gint ga_strcmp(gconstpointer str1, gconstpointer=
+ str2)
+ }
+=20
+ /* disable commands that aren't safe for fsfreeze */
+-static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
++static void ga_disable_non_whitelisted(const QmpCommand *cmd, void *opaque=
+)
+ {
+     bool whitelisted =3D false;
+     int i =3D 0;
+@@ -378,7 +378,7 @@ static void ga_disable_non_whitelisted(QmpCommand *cmd,=
+ void *opaque)
+ }
+=20
+ /* [re-]enable all commands, except those explicitly blacklisted by user *=
+/
+-static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
++static void ga_enable_non_blacklisted(const QmpCommand *cmd, void *opaque)
+ {
+     GList *blacklist =3D opaque;
+     const char *name =3D qmp_command_name(cmd);
+@@ -918,7 +918,7 @@ int64_t ga_get_fd_handle(GAState *s, Error **errp)
+     return handle;
+ }
+=20
+-static void ga_print_cmd(QmpCommand *cmd, void *opaque)
++static void ga_print_cmd(const QmpCommand *cmd, void *opaque)
+ {
+     printf("%s\n", qmp_command_name(cmd));
+ }
+--=20
+2.25.0.rc2.1.g09a9a1a997
 
 
