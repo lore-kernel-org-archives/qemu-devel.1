@@ -6,59 +6,60 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 315E3C10DCE
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 02:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 585CFC10DCE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 02:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBB0D20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 02:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18B3B2051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 02:57:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZdFTEqI0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB0D20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SDzCF4gg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B3B2051A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDfSr-0000Ma-Pv
-	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 22:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38381)
+	id 1jDfw4-0004gD-Ji
+	for qemu-devel@archiver.kernel.org; Sun, 15 Mar 2020 22:57:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jDfNf-00083H-Ql
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 22:21:31 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jDfqP-00037B-Az
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 22:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jDfNd-0008LX-Nw
- for qemu-devel@nongnu.org; Sun, 15 Mar 2020 22:21:27 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:45035)
+ (envelope-from <dgibson@ozlabs.org>) id 1jDfqO-00043Y-2w
+ for qemu-devel@nongnu.org; Sun, 15 Mar 2020 22:51:09 -0400
+Received: from ozlabs.org ([203.11.71.1]:47751)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jDfNc-0007LK-O7; Sun, 15 Mar 2020 22:21:25 -0400
+ id 1jDfqN-0003Wo-73; Sun, 15 Mar 2020 22:51:08 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48gg5l0n8Sz9sPk; Mon, 16 Mar 2020 13:21:15 +1100 (AEDT)
+ id 48ggm53mHwz9sQx; Mon, 16 Mar 2020 13:51:01 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584325275;
- bh=kNPuvmutNMSpow2OEw0f9w0Hrn2qrGtSJHoDupFgDlY=;
+ d=gibson.dropbear.id.au; s=201602; t=1584327061;
+ bh=QUiuKWsf+iHqX412R07IjOGicNpwSw9a7YbkzZjv/tA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ZdFTEqI0b40VhWqxYNlNIsgTEMcxJ7Pwfk/uqTPrnbryvdNPunmGN7yO/AQPLCs2D
- ZfcARtGYlPN/xd7DrhVTg86+UMyJfTktToBxThjuqwPEU9zuLO0TqFCJzq9gCgbj7n
- BdCqMBySKXEv8Dq9Q/4xGoM/xFbVt1F9b9O7XQ10=
-Date: Mon, 16 Mar 2020 13:21:07 +1100
+ b=SDzCF4ggI3XLqgSSRjI/W9dHGsoU0+496/dLIQ3p+hnVxf5r0y5sB3Q4VlVbvs12p
+ xcFJ95TtC4ctfe3QGC1uMVqC9ci8QmEUrS3zhtYD6Uu4v0Asy5997+lPR0kBJlB4HY
+ MVNo8Le/VDQyxEmtE+qn1+8Nl3fDzwE30NPZbp80=
+Date: Mon, 16 Mar 2020 13:42:31 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Vincent Fazio <vfazio@gmail.com>
-Subject: Re: [PATCH 1/1] target/ppc: fix ELFv2 signal handler endianness
-Message-ID: <20200316022107.GA2013@umbus.fritz.box>
-References: <20200315155202.13107-1-vfazio@xes-inc.com>
- <346e47c8-4a80-860c-ec55-e38d2021d63d@vivier.eu>
- <CAOrEah5Fq7Kp9wF_4Vtb4Qfcdm0gtwin_5b_ft7h7my+RnTOWA@mail.gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 2/4] spapr: Move creation of ibm,architecture-vec-5
+ property
+Message-ID: <20200316024231.GD2013@umbus.fritz.box>
+References: <20200313040539.819138-1-david@gibson.dropbear.id.au>
+ <20200313040539.819138-3-david@gibson.dropbear.id.au>
+ <20200313124003.63b87232@bahia.home>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="82I3+IH0IqGh5yIs"
+ protocol="application/pgp-signature"; boundary="pZs/OQEoSSbxGlYw"
 Content-Disposition: inline
-In-Reply-To: <CAOrEah5Fq7Kp9wF_4Vtb4Qfcdm0gtwin_5b_ft7h7my+RnTOWA@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20200313124003.63b87232@bahia.home>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,138 +71,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vincent Fazio <vfazio@xes-inc.com>, qemu-trivial@nongnu.org,
- Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org
+Cc: qemu-ppc@nongnu.org, philmd@redhat.com, clg@kaod.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---82I3+IH0IqGh5yIs
-Content-Type: text/plain; charset=iso-8859-1
+--pZs/OQEoSSbxGlYw
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 15, 2020 at 07:29:04PM -0500, Vincent Fazio wrote:
-> Laurent,
+On Fri, Mar 13, 2020 at 12:40:03PM +0100, Greg Kurz wrote:
+> On Fri, 13 Mar 2020 15:05:37 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> On Sun, Mar 15, 2020 at 1:10 PM Laurent Vivier <laurent@vivier.eu> wrote:
-> >
-> > Le 15/03/2020 =E0 16:52, Vincent Fazio a =E9crit :
-> > > From: Vincent Fazio <vfazio@gmail.com>
-> > >
-> > > In ELFv2, function pointers are entry points and are in host endianne=
-ss.
-> >
-> > "host endianness" is misleading here. "target endianness" is better.
-
-Yeah, the trouble here is that I think the ELF spec will use "host"
-and "target" in a quite different sense than qemu.
-
-> I do want to clarify here. In a mixed endian scenario (my test case
-> was an x86 host and e5500 PPC BE target), the function pointers are in
-> host endianness (little endian) so that the virtual address can be
-> dereferenced by the host for the target instructions to be
-> translated.
-
-This can't be right.  The ELF is operating entirely within the guest,
-and has no concept of a host (in the qemu sense).  Therefore it's
-impossible for it to specify anything as "host endian" (again in the
-qemu sense).
-
-It *is* possible that it's little endian explicitly (in which case
-we'd need a conditional swap that's different from the one we have
-now).
-
-But even that seems pretty odd.  AFAICT that target_sigaction
-structure is copied verbatim from guest memory when the guest makes
-the sigaction() syscall.  Are we expecting a BE process to put LE
-parameters into a syscall structure?  That seems unlikely.
-
-I really think you need to put some instrumentation in the sigaction()
-call that comes before this, to see exactly what the guest process is
-supplying there.
-
-And then we maybe need to look at your guest side libc and/or a native
-e5500 BE kernel to see what it expects in that structure.
-
-> > > Previously, the signal handler would be swapped if the target CPU was=
- a
-> > > different endianness than the host. This would cause a SIGSEGV when
-> > > attempting to translate the opcode pointed to by the swapped address.
-> >
-> > This is correct.
-> >
-> > >  Thread 1 "qemu-ppc64" received signal SIGSEGV, Segmentation fault.
-> > >  0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at qemu/in=
-clude/qemu/bswap.h:351
-> > >  351        __builtin_memcpy(&r, ptr, sizeof(r));
-> > >
-> > >  #0  0x00000000600a9257 in ldl_he_p (ptr=3D0x4c2c061000000000) at qem=
-u/include/qemu/bswap.h:351
-> > >  #1  0x00000000600a92fe in ldl_be_p (ptr=3D0x4c2c061000000000) at qem=
-u/include/qemu/bswap.h:449
-> > >  #2  0x00000000600c0790 in translator_ldl_swap at qemu/include/exec/t=
-ranslator.h:201
-> > >  #3  0x000000006011c1ab in ppc_tr_translate_insn at qemu/target/ppc/t=
-ranslate.c:7856
-> > >  #4  0x000000006005ae70 in translator_loop at qemu/accel/tcg/translat=
-or.c:102
-> > >
-> > > Now, no swap is performed and execution continues properly.
-> > >
-> > > Signed-off-by: Vincent Fazio <vfazio@gmail.com>
-> > > ---
-> > >  linux-user/ppc/signal.c | 10 +++++++---
-> > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
-> > > index 5b82af6cb6..c7f6455170 100644
-> > > --- a/linux-user/ppc/signal.c
-> > > +++ b/linux-user/ppc/signal.c
-> > > @@ -567,9 +567,13 @@ void setup_rt_frame(int sig, struct target_sigac=
-tion *ka,
-> > >          env->nip =3D tswapl(handler->entry);
-> > >          env->gpr[2] =3D tswapl(handler->toc);
-> > >      } else {
-> > > -        /* ELFv2 PPC64 function pointers are entry points, but R12
-> > > -         * must also be set */
-> > > -        env->nip =3D tswapl((target_ulong) ka->_sa_handler);
-> > > +        /*
-> > > +         * ELFv2 PPC64 function pointers are entry points and are in=
- host
-> > > +         * endianness so should not to be swapped.
-> >
-> > "target endianness"
-> >
-> > > +         *
-> > > +         * Note: R12 must also be set.
-> > > +         */
-> > > +        env->nip =3D (target_ulong) ka->_sa_handler;
-> >
-> > The cast is not needed: nip and _sa_handler are abi_ulong.
+> > This is currently called from spapr_dt_cas_updates() which is a hang ov=
+er
+> > from when we created this only as a diff to the DT at CAS time.  Now th=
+at
+> > we fully rebuild the DT at CAS time, just create it alon with the rest
 >=20
-> I'll drop this in v2
+> s/alon/along
+
+Corrected, thanks.
+
 >=20
-> >
-> > >          env->gpr[12] =3D env->nip;
-> > >      }
-> > >  #else
-> > >
-> >
-> > If you repost with the fix I've reported above you can add my:
-> >
-> > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> >
+> > of the properties in /chosen.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr.c | 26 +++-----------------------
+> >  1 file changed, 3 insertions(+), 23 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 66289ffef5..fc28d9df25 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -889,22 +889,6 @@ static int spapr_rng_populate_dt(void *fdt)
+> >      return ret ? -1 : 0;
+> >  }
+> > =20
+> > -static int spapr_dt_cas_updates(SpaprMachineState *spapr, void *fdt,
+> > -                                SpaprOptionVector *ov5_updates)
 >=20
-> I'll hold off on reposting until the endianness wording is figured out.
+> Heh I should have looked at patch 2 before commenting on patch 1 :)
 >=20
-> > Thanks,
-> > Laurent
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 >=20
-> Thanks,
-> -Vincent
+> > -{
+> > -    int offset;
+> > -
+> > -    offset =3D fdt_path_offset(fdt, "/chosen");
+> > -    if (offset < 0) {
+> > -        offset =3D fdt_add_subnode(fdt, 0, "chosen");
+> > -        if (offset < 0) {
+> > -            return offset;
+> > -        }
+> > -    }
+> > -    return spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
+> > -                                  "ibm,architecture-vec-5");
+> > -}
+> > -
+> >  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+> >  {
+> >      MachineState *ms =3D MACHINE(spapr);
+> > @@ -1115,6 +1099,9 @@ static void spapr_dt_chosen(SpaprMachineState *sp=
+apr, void *fdt)
+> > =20
+> >      spapr_dt_ov5_platform_support(spapr, fdt, chosen);
+> > =20
+> > +    _FDT(spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
+> > +                                "ibm,architecture-vec-5"));
+> > +
+> >      g_free(stdout_path);
+> >      g_free(bootlist);
+> >  }
+> > @@ -1263,13 +1250,6 @@ void *spapr_build_fdt(SpaprMachineState *spapr, =
+bool reset, size_t space)
+> >          }
+> >      }
+> > =20
+> > -    /* ibm,client-architecture-support updates */
+> > -    ret =3D spapr_dt_cas_updates(spapr, fdt, spapr->ov5_cas);
+> > -    if (ret < 0) {
+> > -        error_report("couldn't setup CAS properties fdt");
+> > -        exit(1);
+> > -    }
+> > -
+> >      if (smc->dr_phb_enabled) {
+> >          ret =3D spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB=
+);
+> >          if (ret < 0) {
 >=20
 
 --=20
@@ -210,25 +171,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---82I3+IH0IqGh5yIs
+--pZs/OQEoSSbxGlYw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5u4pMACgkQbDjKyiDZ
-s5Igsg/+Mvu/+X+e+CbgPKcjNA0dOSBYCdBEzoAPI3cfIk+OoAKmTBDObK2BKJ4X
-88axe7ZIcZp5zsVkpLFHsPFoSAkNTvVKPQFoGqqN8FCHH0fdt32JDHhErkjCIl4O
-sZ2svN60qemNvNyK/tnrFGifeQedpfOSiiGhi1CVwBplDkd8LMX6XyqkJG+b8vh5
-WIqhcUPTzgaCyUh/JSyY3yvBlhQXKWL/J2jlAUTIQxn2pXYajafaSQoawHCst6Hy
-W+0clM4641izXfYxMJjFQa6vrGy/JPnhUSuAClHqO8yJ52zvQq0iHtHm4FIpg4sF
-Km0VDp482k6ze9qK6Qt8nUTTLMN3LX18Rh6xI2mvNjOY1FBggc6pMg9PaGXSz5Gu
-vneTkUFvQORe3TxrAdnHKajFHpG+5g99y9YgP5q4usJKsbZ7VJmw+BOwvmwyik3y
-NXblhPuVnuPtOIUN7LMuYzjI3M00B+MviTqqRph1CN2gcWq2AGLQC+jW+05v02r5
-0l5WsLIBNaflPw4Fk+DtGxR/ACpuIzLylK+sw9T+6tICepxLMKQNoxanS6o2w44a
-EA1NWd0z7/aw0++eEsU/CDM4TY+AZLdo/HLiAY4p9pv7Uu1KRsbbKvdScRmZaraM
-iElE6zjsZbDm7s2VIJGKrUc5gXYUA87tuzPuoGVv7A3WDviDWn4=
-=4ygq
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5u55YACgkQbDjKyiDZ
+s5LaKA/9FfVb5uDxTqnj+AQlJKJbsQcK8pYLHy+Kh4IFg0zZKHRlCaslvGMquD2d
+zeJI5xu60qcW9NZYIse2hv8SQIUwZr7jCeuIxxDsUuIgjm6ON6x9WhUhCQXHUYeZ
+zJjkiCmJywsmjppccdAzLa7taaHS1zLKQfmjQUVwrp8xUaLu3nZWRg6lkyQIENIV
+vewKduTmtY9mmriZh9bnIc93XSDCCSHGUZ6vRS77xfCyhYq1tZAPaCWizWRahNjK
+J2YgUjjUJphcJREDKE0GeYVyTZaZ5xCEcWjdz3WidmvIG0zg4bumpBl1+EaUL7Rl
+DuuwUbvD1UNUKw+z/WJE21cxSguKwhoGtP5cBzc55F9GALnwNxuxmZubOmNgs+J/
+ZqBEJD2blk4tkF+MWL/g+/hkXvxcXggtzB83Y4TtkJaiiP8bTl3WgZr6IE8A8PIG
+I5HFRza4BNO1bt037zW2yIhTNxtiAjTJQRMRfOX/wYgY1G+rc9Idj43JjBYlorp9
+xaHtNyvfchTtZzG4u41vdhK9a7RYnUrmukLm0VG/WIC6ttcPFCyv8+fPEAPZ6SRY
+9ZXDAuPNZAOG0ht5MqPhxv0+ip+EpG65J+31Dhcj0dFv49YimCDc2Bg0VxeZg2Ee
+AnTDaPYImXQ+JLeui0iwp1zG/78tN7QWL39lvZVk89k5LRmAlUY=
+=OwcO
 -----END PGP SIGNATURE-----
 
---82I3+IH0IqGh5yIs--
+--pZs/OQEoSSbxGlYw--
 
