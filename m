@@ -2,62 +2,74 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6C6C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE16C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C85E2051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:14:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C85E2051A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2F3F20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 12:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F3F20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDodL-0000Us-Sr
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42016)
+	id 1jDome-0003xM-GB
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 08:23:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiangyifei@huawei.com>) id 1jDo7i-0005zy-R5
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:41:36 -0400
+ (envelope-from <bounces@canonical.com>) id 1jDoQu-0004lV-TP
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiangyifei@huawei.com>) id 1jDo7h-00021L-M3
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:41:34 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3204 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiangyifei@huawei.com>)
- id 1jDo7h-00015R-7p
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 07:41:33 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 0F1E3771176EB3E7AF93;
- Mon, 16 Mar 2020 19:41:26 +0800 (CST)
-Received: from huawei.com (10.133.201.158) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Mon, 16 Mar 2020
- 19:41:19 +0800
-From: Yifei Jiang <jiangyifei@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH 2/2] accel/tcg: avoid integer overflow
-Date: Mon, 16 Mar 2020 19:40:50 +0800
-Message-ID: <20200316114050.3167-3-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
-In-Reply-To: <20200316114050.3167-1-jiangyifei@huawei.com>
-References: <20200316114050.3167-1-jiangyifei@huawei.com>
+ (envelope-from <bounces@canonical.com>) id 1jDoQr-00080H-9G
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48878)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1jDoQq-0007mx-U9
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jDoQn-0006fn-Is
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:01:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8BD762E80C9
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:01:17 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.201.158]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Mar 2020 11:43:46 -0000
+From: Boris  Derzhavets <1866870@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahasenack dbaxps0220 dgilbert-h paelzer tstrike34
+X-Launchpad-Bug-Reporter: tstrike (tstrike34)
+X-Launchpad-Bug-Modifier: Boris  Derzhavets (dbaxps0220)
+References: <158386023038.12575.5865810528923078550.malonedeb@soybean.canonical.com>
+Message-Id: <158435902679.20696.14831571544434691201.malone@wampee.canonical.com>
+Subject: [Bug 1866870] Re: KVM Guest pauses after upgrade to Ubuntu 20.04
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 53ea2c1469e97358dd8ed57d7ca081ee42db910a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -66,67 +78,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, limingwang@huawei.com,
- victor.zhangxiaofeng@huawei.com, Yifei Jiang <jiangyifei@huawei.com>,
- Euler Robot <euler.robot@huawei.com>, pbonzini@redhat.com, rth@twiddle.net,
- dengkai1@huawei.com
+Reply-To: Bug 1866870 <1866870@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes coverity issues 75235919, etc.,
-    1524    /* Handle CPU specific unaligned behaviour */
-CID 75235919: (OVERFLOW_BEFORE_WIDEN)
-    1525. overflow_before_widen: Potentially overflowing expression "1 <<=
- a_bits" with type "int" (32 bits, signed) is evaluated using 32-bit arit=
-hmetic, and then used in a context that expects an expression of type "ta=
-rget_ulong" (64 bits, unsigned).
-    1525    if (addr & ((1 << a_bits) - 1)) {
+No luck when testing [2]. Reports are attached
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Mingwang Li <limingwang@huawei.com>
-Reported-by: Euler Robot <euler.robot@huawei.com>
----
- accel/tcg/cputlb.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+** Attachment added: "PPA packages installed"
+   https://bugs.launchpad.net/qemu/+bug/1866870/+attachment/5337552/+files/=
+report.install.ppa
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index e3b5750c3b..73b5e680be 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1412,7 +1412,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, t=
-arget_ulong addr,
-     retaddr -=3D GETPC_ADJ;
-=20
-     /* Enforce guest required alignment.  */
--    if (unlikely(a_bits > 0 && (addr & ((1 << a_bits) - 1)))) {
-+    if (unlikely(a_bits > 0 && (addr & (((target_ulong)1 << a_bits) - 1)=
-))) {
-         /* ??? Maybe indicate atomic op to cpu_unaligned_access */
-         cpu_unaligned_access(env_cpu(env), addr, MMU_DATA_STORE,
-                              mmu_idx, retaddr);
-@@ -1522,7 +1522,7 @@ load_helper(CPUArchState *env, target_ulong addr, T=
-CGMemOpIdx oi,
-     size_t size =3D memop_size(op);
-=20
-     /* Handle CPU specific unaligned behaviour */
--    if (addr & ((1 << a_bits) - 1)) {
-+    if (addr & (((target_ulong)1 << a_bits) - 1)) {
-         cpu_unaligned_access(env_cpu(env), addr, access_type,
-                              mmu_idx, retaddr);
-     }
-@@ -1911,7 +1911,7 @@ store_helper(CPUArchState *env, target_ulong addr, =
-uint64_t val,
-     size_t size =3D memop_size(op);
-=20
-     /* Handle CPU specific unaligned behaviour */
--    if (addr & ((1 << a_bits) - 1)) {
-+    if (addr & (((target_ulong)1 << a_bits) - 1)) {
-         cpu_unaligned_access(env_cpu(env), addr, MMU_DATA_STORE,
-                              mmu_idx, retaddr);
-     }
---=20
-2.19.1
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1866870
 
+Title:
+  KVM Guest pauses after upgrade to Ubuntu 20.04
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Symptom:
+  Error unpausing domain: internal error: unable to execute QEMU command 'c=
+ont': Resetting the Virtual Machine is required
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
+wrapper
+      callback(asyncjob, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
+pcb
+      callback(*args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
+e 66, in newfn
+      ret =3D fn(self, *args, **kwargs)
+    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1311,=
+ in resume
+      self._backend.resume()
+    File "/usr/lib/python3/dist-packages/libvirt.py", line 2174, in resume
+      if ret =3D=3D -1: raise libvirtError ('virDomainResume() failed', dom=
+=3Dself)
+  libvirt.libvirtError: internal error: unable to execute QEMU command 'con=
+t': Resetting the Virtual Machine is required
+
+  =
+
+  ---
+
+  As outlined here:
+  https://bugs.launchpad.net/qemu/+bug/1813165/comments/15
+
+  After upgrade, all KVM guests are in a default pause state. Even after
+  forcing them off via virsh, and restarting them the guests are paused.
+
+  These Guests are not nested.
+
+  A lot of diganostic information are outlined in the previous bug
+  report link provided. The solution mentioned in previous report had
+  been allegedly integrated into the downstream updates.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1866870/+subscriptions
 
