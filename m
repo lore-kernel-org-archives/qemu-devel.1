@@ -7,71 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C9BC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CA6C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:46:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08B42206C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64E4A205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:46:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KGV8WTin"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B42206C0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ab1dPlXM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E4A205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxYK-0002uc-6x
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:45:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42883)
+	id 1jDxZY-0004ET-HX
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:46:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHz-00048l-PV
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:49 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxI6-0004EM-BY
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHx-0006Wx-Va
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:47 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:39569)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxI5-0006qf-9Y
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:54 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:23633)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHx-0006VJ-Py
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:45 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxI5-0006od-4u
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394125;
+ s=mimecast20190719; t=1584394132;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dEPVzIMyMWMKB/q/1uEhyznN7dRLW8w5wO1zuVp/Uhk=;
- b=KGV8WTinssBFmn7NAsVTRe7Db/zliQqjElw8JupbWIlCD6s4Vjcl+NyFv5BwO+XEGz1DfJ
- OEZjQL86uNEnhQge3L34vQinTLRv4qpCbj1O2KQUuSagCv3iLCJ8LH31jzvfXy6o/vbwj2
- 2BWrvhG13VWrsT0w5PRyD/H2ZH3RYK4=
+ bh=OEXZN7d+6n7gWz53+DQEczdQFDnzAa/V+SlH8NwCP94=;
+ b=Ab1dPlXMzda4nBDcMZEbo7RNtoBr5CClnQW52e+si1LTyE3/HAi4d3IHH9q9lc+vxCyTQ3
+ EUuSvT3uuqlmvfS/S5HsorQwXkF7E5sov/mJ/uPy03hKpQ5uh3GcPtw5v5nFQAxayZrBvD
+ Ica362OIoypfSv8X7Q7SmI4zCk53zc8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-zfjTpfouNUeThZK4NlgKWA-1; Mon, 16 Mar 2020 17:28:42 -0400
-X-MC-Unique: zfjTpfouNUeThZK4NlgKWA-1
+ us-mta-31-6Ni7UIzfM-OobxOkwQM8Rw-1; Mon, 16 Mar 2020 17:28:51 -0400
+X-MC-Unique: 6Ni7UIzfM-OobxOkwQM8Rw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CFF3800D53
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5206A800D53
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:50 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 15FCB19C4F;
- Mon, 16 Mar 2020 21:28:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C40F19C4F;
+ Mon, 16 Mar 2020 21:28:49 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 36/61] lockable: add QemuRecMutex support
-Date: Mon, 16 Mar 2020 22:27:03 +0100
-Message-Id: <1584394048-44994-37-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 42/61] hw/display: Use memory_region_init_rom() with read-only
+ regions
+Date: Mon, 16 Mar 2020 22:27:09 +0100
+Message-Id: <1584394048-44994-43-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,120 +86,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-The polymorphic locking macros don't support QemuRecMutex yet.  Add it
-so that lock guards can be used with QemuRecMutex.
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
-Convert TCG plugins functions that benefit from these macros.  Manual
-qemu_rec_mutex_lock/unlock() callers are left unmodified in cases where
-clarity would not improve by switching to the macros.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/qemu/lockable.h |  2 ++
- plugins/core.c          |  7 +++----
- plugins/loader.c        | 16 ++++++++--------
- 3 files changed, 13 insertions(+), 12 deletions(-)
+ hw/display/cg3.c | 5 ++---
+ hw/display/tcx.c | 5 ++---
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
-index 2b52c7c..44b3f4b 100644
---- a/include/qemu/lockable.h
-+++ b/include/qemu/lockable.h
-@@ -50,6 +50,7 @@ qemu_make_lockable(void *x, QemuLockable *lockable)
- #define QEMU_LOCK_FUNC(x) ((QemuLockUnlockFunc *)    \
-     QEMU_GENERIC(x,                                  \
-                  (QemuMutex *, qemu_mutex_lock),     \
-+                 (QemuRecMutex *, qemu_rec_mutex_lock), \
-                  (CoMutex *, qemu_co_mutex_lock),    \
-                  (QemuSpin *, qemu_spin_lock),       \
-                  unknown_lock_type))
-@@ -57,6 +58,7 @@ qemu_make_lockable(void *x, QemuLockable *lockable)
- #define QEMU_UNLOCK_FUNC(x) ((QemuLockUnlockFunc *)  \
-     QEMU_GENERIC(x,                                  \
-                  (QemuMutex *, qemu_mutex_unlock),   \
-+                 (QemuRecMutex *, qemu_rec_mutex_unlock), \
-                  (CoMutex *, qemu_co_mutex_unlock),  \
-                  (QemuSpin *, qemu_spin_unlock),     \
-                  unknown_lock_type))
-diff --git a/plugins/core.c b/plugins/core.c
-index ed86301..51bfc94 100644
---- a/plugins/core.c
-+++ b/plugins/core.c
-@@ -15,6 +15,7 @@
- #include "qemu/error-report.h"
- #include "qemu/config-file.h"
- #include "qapi/error.h"
-+#include "qemu/lockable.h"
- #include "qemu/option.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/xxhash.h"
-@@ -150,11 +151,11 @@ do_plugin_register_cb(qemu_plugin_id_t id, enum qemu_=
-plugin_event ev,
- {
-     struct qemu_plugin_ctx *ctx;
+diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+index 4fb67c6..a1ede10 100644
+--- a/hw/display/cg3.c
++++ b/hw/display/cg3.c
+@@ -287,9 +287,8 @@ static void cg3_initfn(Object *obj)
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+     CG3State *s =3D CG3(obj);
 =20
--    qemu_rec_mutex_lock(&plugin.lock);
-+    QEMU_LOCK_GUARD(&plugin.lock);
-     ctx =3D plugin_id_to_ctx_locked(id);
-     /* if the plugin is on its way out, ignore this request */
-     if (unlikely(ctx->uninstalling)) {
--        goto out_unlock;
-+        return;
-     }
-     if (func) {
-         struct qemu_plugin_cb *cb =3D ctx->callbacks[ev];
-@@ -178,8 +179,6 @@ do_plugin_register_cb(qemu_plugin_id_t id, enum qemu_pl=
-ugin_event ev,
-     } else {
-         plugin_unregister_cb__locked(ctx, ev);
-     }
-- out_unlock:
--    qemu_rec_mutex_unlock(&plugin.lock);
- }
+-    memory_region_init_ram_nomigrate(&s->rom, obj, "cg3.prom", FCODE_MAX_R=
+OM_SIZE,
+-                           &error_fatal);
+-    memory_region_set_readonly(&s->rom, true);
++    memory_region_init_rom_nomigrate(&s->rom, obj, "cg3.prom",
++                                     FCODE_MAX_ROM_SIZE, &error_fatal);
+     sysbus_init_mmio(sbd, &s->rom);
 =20
- void plugin_register_cb(qemu_plugin_id_t id, enum qemu_plugin_event ev,
-diff --git a/plugins/loader.c b/plugins/loader.c
-index 15fc7e5..685d334 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -19,6 +19,7 @@
- #include "qemu/error-report.h"
- #include "qemu/config-file.h"
- #include "qapi/error.h"
-+#include "qemu/lockable.h"
- #include "qemu/option.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/qht.h"
-@@ -367,15 +368,14 @@ void plugin_reset_uninstall(qemu_plugin_id_t id,
-     struct qemu_plugin_reset_data *data;
-     struct qemu_plugin_ctx *ctx;
+     memory_region_init_io(&s->reg, obj, &cg3_reg_ops, s, "cg3.reg",
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+index ca458f9..76de16e 100644
+--- a/hw/display/tcx.c
++++ b/hw/display/tcx.c
+@@ -755,9 +755,8 @@ static void tcx_initfn(Object *obj)
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+     TCXState *s =3D TCX(obj);
 =20
--    qemu_rec_mutex_lock(&plugin.lock);
--    ctx =3D plugin_id_to_ctx_locked(id);
--    if (ctx->uninstalling || (reset && ctx->resetting)) {
--        qemu_rec_mutex_unlock(&plugin.lock);
--        return;
-+    WITH_QEMU_LOCK_GUARD(&plugin.lock) {
-+        ctx =3D plugin_id_to_ctx_locked(id);
-+        if (ctx->uninstalling || (reset && ctx->resetting)) {
-+            return;
-+        }
-+        ctx->resetting =3D reset;
-+        ctx->uninstalling =3D !reset;
-     }
--    ctx->resetting =3D reset;
--    ctx->uninstalling =3D !reset;
--    qemu_rec_mutex_unlock(&plugin.lock);
+-    memory_region_init_ram_nomigrate(&s->rom, obj, "tcx.prom", FCODE_MAX_R=
+OM_SIZE,
+-                           &error_fatal);
+-    memory_region_set_readonly(&s->rom, true);
++    memory_region_init_rom_nomigrate(&s->rom, obj, "tcx.prom",
++                                     FCODE_MAX_ROM_SIZE, &error_fatal);
+     sysbus_init_mmio(sbd, &s->rom);
 =20
-     data =3D g_new(struct qemu_plugin_reset_data, 1);
-     data->ctx =3D ctx;
+     /* 2/STIP : Stippler */
 --=20
 1.8.3.1
 
