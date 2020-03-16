@@ -2,148 +2,93 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85137C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B5FC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 458E120772
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:43:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 458E120772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C281220738
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:47:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mGKIQ3rE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C281220738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDve3-0006TB-Bi
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50784)
+	id 1jDvhe-00089g-Ue
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1jDvdL-0005fk-Qw
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:44 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDvgp-0007Pm-Jz
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1jDvdK-0000a8-Bj
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37628
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1jDvdK-0000T1-4d
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:42:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02GJYriN006350
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 15:42:41 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yrr6ta8ux-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 15:42:41 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 16 Mar 2020 19:42:39 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 16 Mar 2020 19:42:36 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 02GJgZv118809016
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Mar 2020 19:42:35 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AA9BC11C04A;
- Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 561A911C054;
- Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.87.212])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 16 Mar 2020 19:42:35 +0000 (GMT)
-Subject: Re: [PATCH v9] fixup! Fix subcode/pbt
-To: Cornelia Huck <cohuck@redhat.com>
-References: <a1ed33c4-91c0-90fa-2f95-417e320e172c@de.ibm.com>
- <20200313095232.2392-1-frankja@linux.ibm.com>
- <20200316152738.4c1c65ee.cohuck@redhat.com>
- <bbbabbb0-2325-406d-a619-f2d03f447c8c@linux.ibm.com>
- <20200316155457.73e97d9c.cohuck@redhat.com>
- <a39815f9-6c36-5c7e-39e0-3cd49a66c571@de.ibm.com>
- <20200316185708.30d23522.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Mon, 16 Mar 2020 20:42:33 +0100
+ (envelope-from <richard.henderson@linaro.org>) id 1jDvgo-00007a-Ai
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:46:19 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36345)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDvgo-0008R5-2r
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:46:18 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id nu11so5994364pjb.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:46:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Fg2dIkWCB/O1LDCS9geq5EAQZZnI+9IQOwUr+ztmSSo=;
+ b=mGKIQ3rE/W8YR3Tzqn81ilyK3CO1Ckuz06TR4oE12XPjyGjnVygcOSBCEyTP/ur6wK
+ ZhZSaPC3s5+Ajp8rFzkY1Mcl68rlCzQf4AbCKoUhdl5++AWnjsrEXDI8shYLaXRJACCm
+ ZMrewNmmoGQEYKPq044ZuJMeddaSyT+h/V0puTLnwSZ0RP99deWKvo8uuJ8dlvQdkZrk
+ n6W2JHtyS+NLry3j+lRtQznf6WtI8/dgD3OoVRPRvu38VnItydo87odGkP22hDsIghqa
+ 772EEJQPrVqPlmr3rrabk/n15X6Kwod4NPjAJFArFpcZPoAic684k9ktoYHlQQq3NLIO
+ F0eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Fg2dIkWCB/O1LDCS9geq5EAQZZnI+9IQOwUr+ztmSSo=;
+ b=AxugVFfsJlMHEyJiQDok7/SMo9UJeuheAa+zC5qUQWa/jaLROCrvHS1dRhO6s06Q6c
+ SRbaPPADd9fQrxgP6YX9DH47VswG16uaQUEMbZG8OROtMbPaLi0Tn0znEij9CbF5t6Ib
+ GNpMt1U92QduyL9SLjdVUz5hDtlwUra97wX/zWHcYpKCyGCWaYRzsDl2OngD9OrR+Zu7
+ mb8hamxnEcMdosnynb9xBc+jUAHPV/nSeg77LE9BJkUQy9eIqW3HEA9Rc2lP67pBcLVG
+ tWGLHUX34sid95ojdCAP+Mdd/K/jMy8DoHlVbxjDf13Sm7Rm0Xf+sViHsY009x87kuFU
+ SWZw==
+X-Gm-Message-State: ANhLgQ1Y1iylqaVrriOxfkG1l2HrqCT3GlefbL1F/VDJshP8rbKASFXp
+ hIdEZD2mER3Nx6Dc6UdOcXboXA==
+X-Google-Smtp-Source: ADFU+vuJRnVHlZ/NwMSs1hoyK2nwN/EKxc3cwui5H4fXByD28JtCPHowfGZeHQezFemq4Tc7M7mueg==
+X-Received: by 2002:a17:90a:2489:: with SMTP id
+ i9mr1069737pje.183.1584387976837; 
+ Mon, 16 Mar 2020 12:46:16 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ u41sm335812pgn.8.2020.03.16.12.46.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 12:46:16 -0700 (PDT)
+Subject: Re: [PATCH v3 08/19] target/arm: Add semihosting stub to allow
+ building without TCG
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200316160634.3386-1-philmd@redhat.com>
+ <20200316160634.3386-9-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a0aba55b-61d7-c0f4-9fc7-bf6b5675281f@linaro.org>
+Date: Mon, 16 Mar 2020 12:46:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316185708.30d23522.cohuck@redhat.com>
+In-Reply-To: <20200316160634.3386-9-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031619-0008-0000-0000-0000035E4BBE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031619-0009-0000-0000-00004A7FA019
-Message-Id: <0fcd69fc-0e23-5cd1-bd21-0c4923a99ef1@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-16_08:2020-03-12,
- 2020-03-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0
- phishscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=985 adultscore=0 impostorscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003160081
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,65 +100,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, david@redhat.com,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 3/16/20 9:06 AM, Philippe Mathieu-Daudé wrote:
+> Semihosting requires TCG. When configured with --disable-tcg, the
+> build fails because the 'do_arm_semihosting' is missing. Instead
+> of adding more few more #ifdeffery to the helper code, add a stub.
+...
+>  ifeq ($(CONFIG_TCG),y)
+>  
+> -obj-y += arm-semi.o
+> +obj-$(CONFIG_SEMIHOSTING) += arm-semi.o
+> +obj-$(call lnot,$(CONFIG_SEMIHOSTING)) += arm-semi-stub.o
+>  
+>  endif # CONFIG_TCG
+
+This code doesn't match the comment.
+
+Why isn't this
+
+obj-$(call land,$(CONFIG_TCG),$(CONFIG_SEMIHOSTING)) += arm-semi.o
+obj-$(call lnot,$(call land ...)) += arm-semi-stub.o
 
 
-On 16.03.20 18:57, Cornelia Huck wrote:
-> On Mon, 16 Mar 2020 16:04:00 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 16.03.20 15:54, Cornelia Huck wrote:
->>> On Mon, 16 Mar 2020 15:47:41 +0100
->>> Janosch Frank <frankja@linux.ibm.com> wrote:
->>>   
->>>> On 3/16/20 3:27 PM, Cornelia Huck wrote:  
->>>>> On Fri, 13 Mar 2020 05:52:32 -0400
->>>>> Janosch Frank <frankja@linux.ibm.com> wrote:
->>>>>     
->>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>> ---
->>>>>>  hw/s390x/ipl.h      | 11 +++++++----
->>>>>>  target/s390x/diag.c |  2 +-
->>>>>>  2 files changed, 8 insertions(+), 5 deletions(-)  
->>>
->>>   
->>>>>> @@ -118,7 +118,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
->>>>>>  
->>>>>>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
->>>>>>  
->>>>>> -        if (!iplb_valid(iplb)) {
->>>>>> +        if (!iplb_valid(iplb, subcode)) {
->>>>>>              env->regs[r1 + 1] = DIAG_308_RC_INVALID;
->>>>>>              goto out;
->>>>>>          }    
->>>>>
->>>>> ...because you're basically checking whether you either have a valid
->>>>> normal iplb, or a valid pv iplb, with the two being mutually exclusive,
->>>>> IIUC. So what about introducing iplb_valid_pv and calling that for the
->>>>> pv case? Would be a bit nicer to read, I think, and also matches what
->>>>> you do for the STORE case.
->>>>>     
->>>>
->>>> The idea was to get rid of all of these ifs and elses and only have one
->>>> iplb_valid function. Your suggestion would defeat hiding that complexity
->>>> behind this function.  
->>>
->>> I'd argue that this is a complexity we should not hide; for non-pv, we
->>> can have several formats, for pv, only one, and we cannot use a pv iplb
->>> in a non-pv context and vice versa.  
->>
->> So you suggest to split these case statements?
->> case DIAG308_STORE:
->> case DIAG308_PV_STORE:
-> 
-> Why? Those cases are already done in the way I suggest for these here
-> as well (i.e. keep common checks, just split the iplb handling.)
-
-This was more of a question. I was not sure what your suggestion was.
+r~
 
 
