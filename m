@@ -7,96 +7,95 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5571EC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D636AC18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2044420575
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2CC52071C
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVg5eNoX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2044420575
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6o43tBE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CC52071C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDqLb-0006Yh-NG
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47775)
+	id 1jDqO9-0007Ph-CC
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:06:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDoyu-0000hz-Ok
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:36:34 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDp0P-0001Cv-5i
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDoys-00064e-IK
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:36:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39613
+ (envelope-from <pbonzini@redhat.com>) id 1jDp0O-0003Et-0j
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52672
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDoyr-0005tb-4t
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:36:29 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDp0N-00038q-SP
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584362188;
+ s=mimecast20190719; t=1584362283;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XQ9Sh4N2YEJYb/hLXgC3HaPD6Usx8BcDx4hkOCzaw3U=;
- b=hVg5eNoX6eqdyUwNrldj2QGnDZj5dRyuVCteFqfwu3P6XrRBOXb751XuZLsO7gC489b1Aa
- /QV9dWMUxWm6HwzujZvqaoy8dm3P0IwBaqXyydQDoK65OLe8VdnUABNAJWurfbRg0VkbfX
- H+HnzeHypVU/LwcRxI2lcpbDcxJW8LQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-h-X87GOXNVSTlKLcRQJBqw-1; Mon, 16 Mar 2020 08:36:27 -0400
-X-MC-Unique: h-X87GOXNVSTlKLcRQJBqw-1
-Received: by mail-ed1-f72.google.com with SMTP id c2so2630648edx.16
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:36:26 -0700 (PDT)
+ bh=X8s1pbMd8HiFdjP0FyxZTLEw+ccXxxpvBh8ui/fgRtc=;
+ b=U6o43tBET/rNDe8frZqNUubrr7WMnO818C4uBLnqbe+rpCgwGJS1ZC5F7I5i275NB0fKca
+ no3rn2f979H4mdHSPBoCMmqg/drMp52W1s4qDsCTNWPbA1H0E/PCd6Si7NEza6CvJkCyiu
+ 05HIz0ukPcbVtN4c+ywx9brqngIFi6o=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-raHmH3HuOMKikvbd8j9NqA-1; Mon, 16 Mar 2020 08:38:01 -0400
+X-MC-Unique: raHmH3HuOMKikvbd8j9NqA-1
+Received: by mail-wr1-f72.google.com with SMTP id 94so4288409wrr.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:38:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=dAmnWd0zI62YSjEtFRQ6G7VQKY+XV02vfFULd99Xows=;
- b=gZdKZZZ0VrmT5fvg+uWWOz1sQJOm5AuQY4ukTKr2gaH0v1SHOB9nhs7gLdZ/IISqRS
- tQjzLD+XycsT7pTqguVu0udZeYnz2DXAxcbCA3yEabYRsSIp0C4Co/9Hoe1Ht4DOWCyN
- 6VDu97TaIfZNLYAogfK7jDEu+XpcSfLvdSSelXRSdRJXahYyJfHa6a4EAs7XOvX8bTqv
- MMGTdTRrEQCUjpWHAfhPYqo595XKBEQwwpW/xnXsCmNwxYOUf4aB+YXdPvInoqUTS01g
- CQR1/mbw1mw3brawoXT2zkFsNiBoLHeFDftB42aQnUKL1b3/yOw6kwNfPVDzUjh1iOyJ
- CPCw==
-X-Gm-Message-State: ANhLgQ1N9E2WEmczKWZmOgFoLaHv4Dngc16UJKVqCE6AGiYrLgsd8D5i
- fNgPesxOxusRLVZIBNVr9T3evXh+WMK3KdVdes+dGl6A8kMIWjU2l7ogLHdX9mjBhK58wTnydrj
- fvRncSGH5CDRgzI0=
-X-Received: by 2002:a50:ed0f:: with SMTP id j15mr2046892eds.311.1584362185863; 
- Mon, 16 Mar 2020 05:36:25 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vv3FPv1j7y6RtVx2WSJHuql278xYaD3pbcx/My4kFJxFlikmDSJFzbmspu4/S3wHxFXnWmneQ==
-X-Received: by 2002:a50:ed0f:: with SMTP id j15mr2046861eds.311.1584362185673; 
- Mon, 16 Mar 2020 05:36:25 -0700 (PDT)
-Received: from [192.168.1.40] (191.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id e20sm196924ejd.46.2020.03.16.05.36.24
+ bh=74Ivas21HF4MoE96e8hQMSlPbRf3Nzcooh5m6Iuis2I=;
+ b=bKjEDe2cfBBMFIc8X22Wu2ub6fI1/Yf8ogpRi8mb9pXrTAwI88MWQUjSfBafmNLrsI
+ 7s/aF0cTqLgPGTgJ8S6Cm2F42kLEA9XMEtpum2sJ3GbYA432Dgao+CMNydfpNnnXqRZX
+ S11sboB+xkjU3D95tLcoPeh8hw8EdsJdV1fa8H97ANZCi/xqv+6j7dqHylDrQjOS/P9h
+ f328IzBExD6A5X0/dSkicMylXqDEIedl7W8ozN6zwfeaxA/9FLc7GkZFCsNQPpWhjmTN
+ if2eRKproFUb/QP6SkFfQuOyVBFVgEeDH1e61PPmlKCxEI5tRVsk7ibNXv5Ym1IQ+vlx
+ q6Iw==
+X-Gm-Message-State: ANhLgQ1+QYx7dHqQT/aZsuRABRa+1/g2hHSBY/HnQA2KUqVZeQMGihde
+ W6jbgPdEYwEEOJcuRAVzT+SNb/orhJrfXgFpnRvpaypsvmpEAzLPpgDtLuuiz9qTNoCvPO2nmAe
+ nR3gHD7CSjROO1/k=
+X-Received: by 2002:adf:f18a:: with SMTP id h10mr12780718wro.255.1584362280329; 
+ Mon, 16 Mar 2020 05:38:00 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vttllZIVd7rfj2P3jTwFi9aXCPgkpbu9vI1mAOa6elnistYO5w6CJRc6xKANCZ/RXsdh2i4QQ==
+X-Received: by 2002:adf:f18a:: with SMTP id h10mr12780704wro.255.1584362280120; 
+ Mon, 16 Mar 2020 05:38:00 -0700 (PDT)
+Received: from [192.168.178.58] ([151.30.82.39])
+ by smtp.gmail.com with ESMTPSA id v2sm6948546wrt.58.2020.03.16.05.37.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 05:36:25 -0700 (PDT)
-Subject: Re: [PATCH 04/11] MAINTAINERS: Add an entry for the HVF accelerator
-To: Roman Bolshakov <r.bolshakov@yadro.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200316120049.11225-1-philmd@redhat.com>
- <20200316120049.11225-5-philmd@redhat.com>
- <20200316121241.GA4312@SPB-NB-133.local>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <71fafc19-359a-f5b8-d372-2bc3576cd012@redhat.com>
-Date: Mon, 16 Mar 2020 13:36:23 +0100
+ Mon, 16 Mar 2020 05:37:59 -0700 (PDT)
+Subject: Re: [PATCH] MAINTAINERS: Mark the LatticeMico32 target as orphan
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>,
+ qemu-devel@nongnu.org, Michael Walle <michael@walle.cc>
+References: <20200316122641.14017-1-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ca8fb038-43e4-d702-5ebc-bcc78b99445b@redhat.com>
+Date: Mon, 16 Mar 2020 13:37:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200316121241.GA4312@SPB-NB-133.local>
+In-Reply-To: <20200316122641.14017-1-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,81 +107,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Cameron Esfahani <dirty@apple.com>, Laurent Vivier <laurent@vivier.eu>,
- Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>,
- Patrick Colp <patrick.colp@oracle.com>, Liran Alon <liran.alon@oracle.com>,
- "Reviewed-by : Nikita Leshenko" <nikita.leshchenko@oracle.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Heiher <r@hev.cc>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, "Emilio G . Cota" <cota@braap.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Roman,
-
-On 3/16/20 1:12 PM, Roman Bolshakov wrote:
-> Hi Philippe,
+On 16/03/20 13:26, Philippe Mathieu-Daud=C3=A9 wrote:
+> Michael Walle expressed his desire to orphan the lm32 target [*]:
 >=20
-> I can take the ownership if nobody wants it. At the moment I'm working
-> on APIC for HVF to get kvm-unit-tests fixed.
+>   I guess it is time to pull the plug. Mainly, because I have
+>   no time for this anymore. I've always worked on this on my
+>   spare time and life changed. And secondly, I guess RISC-V is
+>   taking over ;) It has a far better ecosystem. Also, to my
+>   knowledge the only (public) user of LM32 is milkymist and this
+>   project is dead for years now..
 >=20
-> Next items on the list (in no particular order):
-> * MMX emulation
-> * SSE emulation
-> * qxl display
-> * gdb stub
-> * virtio-gpu/virgil running on metal
-> * VFIO-PCI based on macOS user-space DriverKit framework
-
-Glad to hear :)
-I suppose Paolo will be happy to have someone caring about HVF.
-Do you mind sending a patch to step in?
-
-Thanks,
-
-Phil.
-
+>   So time to say goodbye. It was fun and I've learned a lot -
+>   technically and also how a huge open source project works.
+>   Thank you everyone for that :)
 >=20
-> Best regards,
-> Roman
+>   Basically everything still works and there are even TCG test
+>   cases which covers all instructions the processor has.
 >=20
-> On Mon, Mar 16, 2020 at 01:00:42PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->> Cc: Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
->> Cc: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
->> Cc: Roman Bolshakov <r.bolshakov@yadro.com>
->> Cc: Patrick Colp <patrick.colp@oracle.com>
->> Cc: Cameron Esfahani <dirty@apple.com>
->> Cc: Liran Alon <liran.alon@oracle.com>
->> Cc: Heiher <r@hev.cc>
->> ---
->>   MAINTAINERS | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 7ec42a18f7..bcf40afb85 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -420,6 +420,12 @@ F: accel/stubs/hax-stub.c
->>   F: target/i386/hax-all.c
->>   F: include/sysemu/hax.h
->>  =20
->> +HVF Accelerator
->> +S: Orphan
->> +F: accel/stubs/hvf-stub.c
->> +F: target/i386/hvf/hvf.c
->> +F: include/sysemu/hvf.h
->> +
->>   WHPX CPUs
->>   M: Sunil Muthuswamy <sunilmut@microsoft.com>
->>   S: Supported
->> --=20
->> 2.21.1
->>
+> Many thanks to Michael for his substantial contributions to QEMU,
+> and for maintaining the LM32 target for various years!
 >=20
+> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg605024.html
+>=20
+> Cc: Michael Walle <michael@walle.cc>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Michael: Do you want to keep your M: entry, switch it to R: or remove?
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 32867bc636..5376c59581 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -184,7 +184,7 @@ F: include/hw/net/lasi_82596.h
+> =20
+>  LM32 TCG CPUs
+>  M: Michael Walle <michael@walle.cc>
+> -S: Maintained
+> +S: Orphan
+>  F: target/lm32/
+>  F: disas/lm32.c
+>  F: hw/lm32/
+>=20
+
+Cc: qemu-trivial@nongnu.org
 
 
