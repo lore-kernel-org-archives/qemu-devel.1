@@ -2,89 +2,68 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C19C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D0FC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACBD32051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:47:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O65mI6S1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBD32051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9608520674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:47:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9608520674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44775 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtpj-0003FT-Sh
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:47:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
+	id 1jDtq1-0003ml-PU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:47:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRM-0000dT-9K
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:13 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsPW-0007s0-SC
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jDtRJ-0008Hm-3f
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:12 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38045)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jDtRI-0008Af-PD
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:08 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s1so537139wrv.5
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=KcowZQvidWsL6K9vNr5PA0mK1ZdxCgzSQNRXFm9TCF8=;
- b=O65mI6S1wghhbDmZGb4kMT2DANfOqEHorC4qwoQPHMJCzjoMPAkjP4jqfPM/05mU/U
- spKNsYXasfvwGbMI0VTaWHGB8cVg+hDrHJSSoXHgBp+7Kj2uCKhGgxjIA6w2EkPlT+Qy
- ZqkDGgJspqo7mRjDTuFoDaNXkO6ORIxVABgd9iJVlUyKf+JuH+p+K0l9zRF5iwP+Gj+K
- MwQT2CittElXYO7F4qppuCGAMtpbp6A1ESzR8dkJ+M7nOviS94PS0DzJ77VY8UlgnQMj
- EE0CtM5aQieW01lY80gxxTzVH6N3om9IOUmlqqddFIRf10OSMkXbII9ZkS+zWeh3RaFe
- A1Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KcowZQvidWsL6K9vNr5PA0mK1ZdxCgzSQNRXFm9TCF8=;
- b=uEJNCYsBp8gCxy/Cj6tY6NhZDD9U2Mf/1ruNcSJFKeBn1rTBRKwPh9k1+Ri6ZI9gmo
- IiQaZx9BYiMKrfbJRzDCzIDsO/Mqu5FZcUHyyeeY3lQzk69sU7GXwr6Jm07kwDC9rByk
- S/30/jMDoZ+Y2KAHOpxUTkRwTeetXTrwxeTXLTk3FLNEfVLQY0f1FQoqGccDqiA72ltf
- DFfUUhsGYrjLbnrb98TvfWFIqJPBURmtarNznCsnQ5gH8/DT3FuhfXBmzx8qkh5jTWZx
- W1PF87FliHYOZzFto/jnZZd3LSKvU8VDhsbDGXWolXakdkCD/aycJIdUlR40UX8x/p1l
- SKoA==
-X-Gm-Message-State: ANhLgQ3esbOQbpt919/gQIg+ikOAadaxBz4BkwoaI1L3mdN1Zxlm6E9a
- msYrkDvlK6JpoMNT376/bhxOvQ==
-X-Google-Smtp-Source: ADFU+vtqfxNnNe9C4oS0NYzhtcXzWASHHXW36WvL0X0M1eTUondQrZmNah97qVvcfm9lCI4LFc4RWQ==
-X-Received: by 2002:adf:e50d:: with SMTP id j13mr431884wrm.34.1584379327687;
- Mon, 16 Mar 2020 10:22:07 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n6sm460988wmn.13.2020.03.16.10.22.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 10:22:04 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 11E4B1FF99;
- Mon, 16 Mar 2020 17:21:56 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <laurent@vivier.eu>) id 1jDsPV-0007A5-Rb
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:33739)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsPV-0006zr-7Y
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:13 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1M8k65-1jI1HP0mQ5-004gec; Mon, 16 Mar 2020 17:16:10 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 10/28] gdbstub: add helper for 128 bit registers
-Date: Mon, 16 Mar 2020 17:21:37 +0000
-Message-Id: <20200316172155.971-11-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
-References: <20200316172155.971-1-alex.bennee@linaro.org>
+Subject: [PULL 06/38] linux-user: Add AT_EXECFN auxval
+Date: Mon, 16 Mar 2020 17:15:18 +0100
+Message-Id: <20200316161550.336150-7-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Provags-ID: V03:K1:5R+rosIIZqp4x+AWEBJhCWkTQnritmsp1GCrgjdkNp0r9j7M2qd
+ Fpe5OxSdENan4w1x+6Je3h9DAu8lrSl6cWpuelUSAdDChMmDETB/UEXWQdCPBIr22ViG1V0
+ lDPNi+3G6vmxHI08oCn8aHZiY1GGB0MrmE7czPb2Q50IDbHkLZv0YJ6aJMOr8PxlSpk+l4p
+ KOP3HOWAY5nbR7TARsXgA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nykbyp/CenE=:lndPYVXu8QLgV+0fNHOVZa
+ aQORoa0iWOho71WoOmiTaal7shXg9g5Vl1QmF4r0HbdudU88I0b0ZVxvgT2OAfnjHCOHzGlpD
+ jmgNyKrBCZuSjzdylgne413u2qmUiuYl+V213vKRuSFwhbZoAlj7ZKb1FDxak+kwcrZ2dcLhU
+ NmTQ5R4s9GZoyeEcgkPMxh9tK8dfe4R+CgryxwtOHasIcCYnBx1adqlvwswAMgYw9YyrUIfnk
+ ZHwBharQGj4bELOKsdd4JFwBmupsDgCizPw/wPGaP8Oskx4PrSwFXfabMFEFwqs3P1qpP9ZzW
+ uIfuxr6lGbRttiZV01RR0k0EAihl+sYhDUUuwXIDIEscp270LqIhuHIciLsr+kR+8S1bREsSP
+ TBGWfNlqsTELX4+vAlbJ270mY6ci3eOL8FlWGo0wm+NeT+keksBjejPkntKLIf22f0+PbJt6H
+ 22WidEmLi7JctGN7USLs/QZYrOavVE27hQWvqD6YTMSLSCKT616SdwFiC8uzqBecwEviYn8Lz
+ lpEINyz8IXxGk1THu27vuyOQexJWMD6auvdjaSDzN681O0sH8PVoS//uE1ovgK1Gs/5QnRwfs
+ 6Affz16Z/M/bZsTyDj//9cnnadEdxzOvWOTYKsg1fCUVIO+Arnx2EDYJ+P0jnzEaEaxjVYtUY
+ XjvctbqfjSj7U9Vnq79GkBoVC/NWkckgMypAuIgWZNxoFk6vF9LbvJnzgV9NO4caOtRaF8SW8
+ Cc1gGtFNoxrxSs4iUh7bsAyDSbBHzNvGq6n4XR1obvPSOSL2tEd4WupCjDlTjAopGRcKTqlk+
+ DmFZwRJ1WLwMZkfHXvzbEIAOluLyFXs/pnBC2jNJA1lbq6EkkM36CO3FoMnmhTmjEWAF4Nb
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,48 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Lirong Yuan <yuanzi@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2
-  - take care of endianess of the whole 128 bit word
----
- include/exec/gdbstub.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+From: Lirong Yuan <yuanzi@google.com>
 
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 08363969c14..59e366ba3af 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -102,6 +102,19 @@ static inline int gdb_get_reg64(uint8_t *mem_buf, uint64_t val)
-     return 8;
- }
+This change adds the support for AT_EXECFN auxval.
+
+Signed-off-by: Lirong Yuan <yuanzi@google.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200302193153.66415-1-yuanzi@google.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/elfload.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index db748c58775f..8198be044604 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1573,7 +1573,7 @@ struct exec
+                                  ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+ #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
  
-+static inline int gdb_get_reg128(uint8_t *mem_buf, uint64_t val_hi,
-+                                 uint64_t val_lo)
-+{
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    stq_p(mem_buf, val_hi);
-+    stq_p(mem_buf + 8, val_lo);
-+#else
-+    stq_p(mem_buf, val_lo);
-+    stq_p(mem_buf + 8, val_hi);
-+#endif
-+    return 16;
-+}
-+
- #if TARGET_LONG_BITS == 64
- #define gdb_get_regl(buf, val) gdb_get_reg64(buf, val)
- #define ldtul_p(addr) ldq_p(addr)
+-#define DLINFO_ITEMS 15
++#define DLINFO_ITEMS 16
+ 
+ static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
+ {
+@@ -2037,6 +2037,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+     NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+     NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
++    NEW_AUX_ENT(AT_EXECFN, info->file_string);
+ 
+ #ifdef ELF_HWCAP2
+     NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
 -- 
-2.20.1
+2.24.1
 
 
