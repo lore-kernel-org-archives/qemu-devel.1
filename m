@@ -2,99 +2,83 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D276FC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD2CC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA6D20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:36:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F73C20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 07:38:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+Dz2+rO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA6D20674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzV5aF3A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F73C20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDkIf-0001GE-AW
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:36:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44236)
+	id 1jDkKj-0002Gy-1J
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 03:38:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52046)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDkCh-0000CU-Of
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:30:29 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1jDkFB-0000be-3w
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDkCf-0007GG-R4
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:30:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35792
+ (envelope-from <eric.auger@redhat.com>) id 1jDkF9-0004xN-I2
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:33:00 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57791
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDkCf-00076k-Lf
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:30:25 -0400
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1jDkF9-0004tH-C8
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 03:32:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584343825;
+ s=mimecast20190719; t=1584343978;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H34ZU0m/JKEVVY37wiPpcv2n5SL6jbwHHubuCc4wqdU=;
- b=H+Dz2+rOCgqK1twYeMf/VVWf329kkUDrKyMAkkZ7wvlhcYMWI1qO3XfCADoQdevjf1N86n
- NKADZIjW4ilBtfxX1YiBtwaHDe2sCAkT+XTXNq9VPyLEEuCJVImjFr5aiI2RIBNJu+5OCa
- N9ckejRv42lfKjEla5kmhZ7zVCJ9LtM=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-hUCbl-BUOwCxB4T-2-2ltA-1; Mon, 16 Mar 2020 03:30:22 -0400
-X-MC-Unique: hUCbl-BUOwCxB4T-2-2ltA-1
-Received: by mail-ed1-f69.google.com with SMTP id y23so14340170edt.2
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 00:30:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YYE4E5PXSbZFwrpnc4E4ZSnUSV/dPv9YcV2lt3qkmNs=;
- b=T9NsWjTNTWDzAumLygbWmC8asA+UDVQVd3y36mNMEU5Nn/l0O/Yui6oZPjBzY40S8R
- dK+zQt8d5Tgjk15kz9w0dad4OrwvdWNyY+dYJXehWUlQ1uFcEslGVtXBXQmjgNe2ar8q
- sEQYusYbMFiP6+i5tcptsp6nNQ1Xx6P2OekD+vfy09BrDxYFA3nUId+f1YAxFjJXwKhb
- v5kdz9b/8kL+rg4fgUXcOADMX0VDuT67rnpWuQ9iCVQ4exXka9DvcmYLYGbbMaZhyfS7
- 7L/xWrjhEMSVY6RE5AlENpQAM5x6GKDfy8wLvA0q06tIidBz1mXTLSvP5TTBJwJT5t6N
- gskQ==
-X-Gm-Message-State: ANhLgQ1SRPIVkE8unUgMB9tqKt4+0xb1sSDN4/n9NaZLoHOe8VmWcZOX
- ndy7IAaEAHkNEwSH2KaNKOJ+vTFO7tss1/MdawGTSOxpj6qzw7FeztYbZcb6WbtmnvS2Zu3mn47
- vfztm2nF+yUEwhAc=
-X-Received: by 2002:a50:ab42:: with SMTP id t2mr25842906edc.333.1584343820560; 
- Mon, 16 Mar 2020 00:30:20 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vvLWN0XW2uTgmi/4AdA639VaVakPMlf0n8xufeFNhJSLEcSQeNh2sbzBApkwfQMzIhU0RTXyA==
-X-Received: by 2002:a50:ab42:: with SMTP id t2mr25842860edc.333.1584343820158; 
- Mon, 16 Mar 2020 00:30:20 -0700 (PDT)
-Received: from [192.168.1.40] (191.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.191])
- by smtp.gmail.com with ESMTPSA id rl28sm1082700ejb.28.2020.03.16.00.30.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 00:30:19 -0700 (PDT)
-Subject: Re: [PATCH v2 1/8] target/i386: Restrict X86CPUFeatureWord to X86
- targets
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
- <20200316000348.29692-2-philmd@redhat.com>
- <CAL1e-=gWOZzFKd9OdkTRJj19NX56BcpQBz6r9RY3orsrgf9mMg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5d23de36-6b47-9120-f8cb-a6b122a9ed63@redhat.com>
-Date: Mon, 16 Mar 2020 08:30:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=wf3WwVL/JBIClkEjmfQynOAqNs2BQUeZP5Q2JbyPWw4=;
+ b=ZzV5aF3A8yi+92QpAisncRcOe39uZerLHC8ztbQCcIg2xVdevJ46up0yS28cQYdracyJh/
+ ByXkDA7FtddYgCfv6IQ76zIbsUYTjqrR+sGyFVNKvEL8qrdSmC5Pc3Ceccjug6K7PxWKlJ
+ Dz21sClwBRS2JNyz42RuWM9BXB6C618=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-dKLpBODMP9eskMr_QQzfUw-1; Mon, 16 Mar 2020 03:32:55 -0400
+X-MC-Unique: dKLpBODMP9eskMr_QQzfUw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC4ED800D50;
+ Mon, 16 Mar 2020 07:32:53 +0000 (UTC)
+Received: from [10.36.118.12] (unknown [10.36.118.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 115E460BE2;
+ Mon, 16 Mar 2020 07:32:40 +0000 (UTC)
+Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
+To: Bharat Bhushan <bharatb.linux@gmail.com>
+References: <20200313074811.27175-1-bbhushan2@marvell.com>
+ <20200313074811.27175-4-bbhushan2@marvell.com>
+ <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
+ <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
+Date: Mon, 16 Mar 2020 08:32:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gWOZzFKd9OdkTRJj19NX56BcpQBz6r9RY3orsrgf9mMg@mail.gmail.com>
+In-Reply-To: <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,281 +92,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, Peter Lieven <pl@kamp.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ mst@redhat.com, drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ Bharat Bhushan <bbhushan2@marvell.com>, linuc.decode@gmail.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 1:29 AM, Aleksandar Markovic wrote:
->=20
->=20
-> On Monday, March 16, 2020, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-=20
-> <mailto:philmd@redhat.com>> wrote:
->=20
->     Move out x86-specific structures from generic machine code.
->=20
->=20
-> Philippe,
->=20
-> I a kind of have hard time understanding what is achieved with this=20
-> patch. Is this pure code moving/reorganization? What is the logical=20
-> connection between this patch and the whole series (that is about=20
-> removing unneeded building for user mode)? How does this patch affect=20
-> build time for user mode?
+Hi Bharat,
 
-This code ends up in all linux-user binaries:
+On 3/16/20 7:41 AM, Bharat Bhushan wrote:
+> Hi Eric,
+> 
+> On Fri, Mar 13, 2020 at 8:11 PM Auger Eric <eric.auger@redhat.com> wrote:
+>>
+>> Hi Bharat
+>>
+>> On 3/13/20 8:48 AM, Bharat Bhushan wrote:
+>>> iommu-notifier are called when a device is attached
+>> IOMMU notifiers
+>>> or detached to as address-space.
+>>> This is needed for VFIO.
+>> and vhost for detach
+>>>
+>>> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+>>> ---
+>>>  hw/virtio/virtio-iommu.c | 47 ++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 47 insertions(+)
+>>>
+>>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+>>> index e51344a53e..2006f72901 100644
+>>> --- a/hw/virtio/virtio-iommu.c
+>>> +++ b/hw/virtio/virtio-iommu.c
+>>> @@ -49,6 +49,7 @@ typedef struct VirtIOIOMMUEndpoint {
+>>>      uint32_t id;
+>>>      VirtIOIOMMUDomain *domain;
+>>>      QLIST_ENTRY(VirtIOIOMMUEndpoint) next;
+>>> +    VirtIOIOMMU *viommu;
+>> This needs specal care on post-load. When migrating the EPs, only the id
+>> is migrated. On post-load you need to set viommu as it is done for
+>> domain. migration is allowed with vhost.
+> 
+> ok, I have not tried vhost/migration. Below change set viommu when
+> reconstructing endpoint.
 
-$ make clean mipsel-linux-user/all
-$ fgrep -r X86CPURegister32
-Binary file qapi/qapi-visit-machine.o matches
-qapi/qapi-visit-machine.h:void visit_type_X86CPURegister32(Visitor *v,=20
-const char *name, X86CPURegister32 *obj, Error **errp);
-qapi/qapi-types-machine.c:const QEnumLookup X86CPURegister32_lookup =3D {
-qapi/qapi-types-machine.h:typedef enum X86CPURegister32 {
-qapi/qapi-types-machine.h:} X86CPURegister32;
-qapi/qapi-types-machine.h:#define X86CPURegister32_str(val) \
-qapi/qapi-types-machine.h:    qapi_enum_lookup(&X86CPURegister32_lookup,=20
-(val))
-qapi/qapi-types-machine.h:extern const QEnumLookup X86CPURegister32_lookup;
-qapi/qapi-types-machine.h:    X86CPURegister32 cpuid_register;
-Binary file qapi/qapi-events-machine.o matches
-Binary file qapi/qapi-types-machine.o matches
-qapi/qapi-doc.texi:@deftp {Enum} X86CPURegister32
-qapi/qapi-doc.texi:@item @code{cpuid-register: X86CPURegister32}
-qapi/qapi-visit-machine.c:void visit_type_X86CPURegister32(Visitor *v,=20
-const char *name, X86CPURegister32 *obj, Error **errp)
-qapi/qapi-visit-machine.c:    visit_type_enum(v, name, &value,=20
-&X86CPURegister32_lookup, errp);
-qapi/qapi-visit-machine.c:    visit_type_X86CPURegister32(v,=20
-"cpuid-register", &obj->cpuid_register, &err);
-Binary file hw/core/qdev.o matches
-Binary file hw/core/cpu.o matches
-Binary file libqemuutil.a matches
-Binary file mipsel-linux-user/qemu-mipsel matches
-             \-----------------------------------/
 
-By restricting this structure on the x86 architecture, this is less time=20
-compiling unused code on others archs, and resulting binary is smaller too.
+Yes I think this should be OK.
 
->=20
-> Sincerely,
-> Aleksandar
->=20
->=20
->     Acked-by: Richard Henderson <richard.henderson@linaro.org
->     <mailto:richard.henderson@linaro.org>>
->     Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
->     <mailto:philmd@redhat.com>>
->     ---
->      =C2=A0qapi/machine-target.json=C2=A0 =C2=A0| 45 ++++++++++++++++++++=
-++++++++++++++++++
->      =C2=A0qapi/machine.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 42 -----=
-------------------------------
->      =C2=A0target/i386/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 =
-+-
->      =C2=A0target/i386/machine-stub.c | 22 +++++++++++++++++++
->      =C2=A0target/i386/Makefile.objs=C2=A0 |=C2=A0 3 ++-
->      =C2=A05 files changed, 70 insertions(+), 44 deletions(-)
->      =C2=A0create mode 100644 target/i386/machine-stub.c
->=20
->     diff --git a/qapi/machine-target.json b/qapi/machine-target.json
->     index f2c82949d8..fb7a4b7850 100644
->     --- a/qapi/machine-target.json
->     +++ b/qapi/machine-target.json
->     @@ -3,6 +3,51 @@
->      =C2=A0# This work is licensed under the terms of the GNU GPL, versio=
-n 2
->     or later.
->      =C2=A0# See the COPYING file in the top-level directory.
->=20
->     +##
->     +# @X86CPURegister32:
->     +#
->     +# A X86 32-bit register
->     +#
->     +# Since: 1.5
->     +##
->     +{ 'enum': 'X86CPURegister32',
->     +=C2=A0 'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'E=
-DI' ],
->     +=C2=A0 'if': 'defined(TARGET_I386)' }
->     +
->     +##
->     +# @X86CPUFeatureWordInfo:
->     +#
->     +# Information about a X86 CPU feature word
->     +#
->     +# @cpuid-input-eax: Input EAX value for CPUID instruction for that
->     feature word
->     +#
->     +# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
->     +#=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0feature word
->     +#
->     +# @cpuid-register: Output register containing the feature bits
->     +#
->     +# @features: value of output register, containing the feature bits
->     +#
->     +# Since: 1.5
->     +##
->     +{ 'struct': 'X86CPUFeatureWordInfo',
->     +=C2=A0 'data': { 'cpuid-input-eax': 'int',
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 '*cpuid-input-ecx': 'int',
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 'cpuid-register': 'X86CPUR=
-egister32',
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 'features': 'int' },
->     +=C2=A0 'if': 'defined(TARGET_I386)' }
->     +
->     +##
->     +# @DummyForceArrays:
->     +#
->     +# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList
->     internally
->     +#
->     +# Since: 2.5
->     +##
->     +{ 'struct': 'DummyForceArrays',
->     +=C2=A0 'data': { 'unused': ['X86CPUFeatureWordInfo'] },
->     +=C2=A0 'if': 'defined(TARGET_I386)' }
->     +
->      =C2=A0##
->      =C2=A0# @CpuModelInfo:
->      =C2=A0#
->     diff --git a/qapi/machine.json b/qapi/machine.json
->     index 6c11e3cf3a..de05730704 100644
->     --- a/qapi/machine.json
->     +++ b/qapi/machine.json
->     @@ -505,48 +505,6 @@
->      =C2=A0 =C2=A0 'dst': 'uint16',
->      =C2=A0 =C2=A0 'val': 'uint8' }}
->=20
->     -##
->     -# @X86CPURegister32:
->     -#
->     -# A X86 32-bit register
->     -#
->     -# Since: 1.5
->     -##
->     -{ 'enum': 'X86CPURegister32',
->     -=C2=A0 'data': [ 'EAX', 'EBX', 'ECX', 'EDX', 'ESP', 'EBP', 'ESI', 'E=
-DI' ] }
->     -
->     -##
->     -# @X86CPUFeatureWordInfo:
->     -#
->     -# Information about a X86 CPU feature word
->     -#
->     -# @cpuid-input-eax: Input EAX value for CPUID instruction for that
->     feature word
->     -#
->     -# @cpuid-input-ecx: Input ECX value for CPUID instruction for that
->     -#=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0feature word
->     -#
->     -# @cpuid-register: Output register containing the feature bits
->     -#
->     -# @features: value of output register, containing the feature bits
->     -#
->     -# Since: 1.5
->     -##
->     -{ 'struct': 'X86CPUFeatureWordInfo',
->     -=C2=A0 'data': { 'cpuid-input-eax': 'int',
->     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 '*cpuid-input-ecx': 'int',
->     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 'cpuid-register': 'X86CPUR=
-egister32',
->     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 'features': 'int' } }
->     -
->     -##
->     -# @DummyForceArrays:
->     -#
->     -# Not used by QMP; hack to let us use X86CPUFeatureWordInfoList
->     internally
->     -#
->     -# Since: 2.5
->     -##
->     -{ 'struct': 'DummyForceArrays',
->     -=C2=A0 'data': { 'unused': ['X86CPUFeatureWordInfo'] } }
->     -
->      =C2=A0##
->      =C2=A0# @NumaCpuOptions:
->      =C2=A0#
->     diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->     index a84553e50c..0753fe4935 100644
->     --- a/target/i386/cpu.c
->     +++ b/target/i386/cpu.c
->     @@ -37,7 +37,7 @@
->      =C2=A0#include "qemu/option.h"
->      =C2=A0#include "qemu/config-file.h"
->      =C2=A0#include "qapi/error.h"
->     -#include "qapi/qapi-visit-machine.h"
->     +#include "qapi/qapi-visit-machine-target.h"
->      =C2=A0#include "qapi/qapi-visit-run-state.h"
->      =C2=A0#include "qapi/qmp/qdict.h"
->      =C2=A0#include "qapi/qmp/qerror.h"
->     diff --git a/target/i386/machine-stub.c b/target/i386/machine-stub.c
->     new file mode 100644
->     index 0000000000..cb301af057
->     --- /dev/null
->     +++ b/target/i386/machine-stub.c
->     @@ -0,0 +1,22 @@
->     +/*
->     + * QAPI x86 CPU features stub
->     + *
->     + * Copyright (c) 2020 Red Hat, Inc.
->     + *
->     + * Author:
->     + *=C2=A0 =C2=A0Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
->     <mailto:philmd@redhat.com>>
->     + *
->     + * This work is licensed under the terms of the GNU GPL, version 2
->     or later.
->     + * See the COPYING file in the top-level directory.
->     + * SPDX-License-Identifier: GPL-2.0-or-later
->     + */
->     +
->     +#include "qemu/osdep.h"
->     +#include "qapi/error.h"
->     +#include "qapi/qapi-visit-machine-target.h"
->     +
->     +void visit_type_X86CPUFeatureWordInfoList(Visitor *v, const char *na=
-me,
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 X86CPUFe=
-atureWordInfoList **obj,
->     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Error **=
-errp)
->     +{
->     +}
->     diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
->     index 48e0c28434..1cdfc9f50c 100644
->     --- a/target/i386/Makefile.objs
->     +++ b/target/i386/Makefile.objs
->     @@ -17,6 +17,7 @@ obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posi=
-x.o
->      =C2=A0endif
->      =C2=A0obj-$(CONFIG_HVF) +=3D hvf/
->      =C2=A0obj-$(CONFIG_WHPX) +=3D whpx-all.o
->     -endif
->     +endif # CONFIG_SOFTMMU
->      =C2=A0obj-$(CONFIG_SEV) +=3D sev.o
->      =C2=A0obj-$(call lnot,$(CONFIG_SEV)) +=3D sev-stub.o
->     +obj-$(call lnot,$(CONFIG_SOFTMMU)) +=3D machine-stub.o
->     --=20
->     2.21.1
->=20
->=20
+By the end I did the series a try with vhost/vfio. with vhost it works
+(not with recent kernel though, but the issue may be related to kernel).
+With VFIO however it does not for me.
+
+First issue is: your guest can use 4K page and your host can use 64KB
+pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
+a way to pass the host settings to the VIRTIO-IOMMU device.
+
+Even with 64KB pages, it did not work for me. I have obviously not the
+storm of VFIO_DMA_MAP failures but I have some, most probably due to
+some wrong notifications somewhere. I will try to investigate on my side.
+
+Did you test with VFIO on your side?
+
+Thanks
+
+Eric
+> 
+> @@ -984,6 +973,7 @@ static gboolean reconstruct_endpoints(gpointer
+> key, gpointer value,
+> 
+>      QLIST_FOREACH(iter, &d->endpoint_list, next) {
+>          iter->domain = d;
+> +       iter->viommu = s;
+>          g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
+>      }
+>      return false; /* continue the domain traversal */
+> 
+>>>  } VirtIOIOMMUEndpoint;
+>>>
+>>>  typedef struct VirtIOIOMMUInterval {
+>>> @@ -155,8 +156,44 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
+>>>      memory_region_notify_iommu(mr, 0, entry);
+>>>  }
+>>>
+>>> +static gboolean virtio_iommu_mapping_unmap(gpointer key, gpointer value,
+>>> +                                           gpointer data)
+>>> +{
+>>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
+>>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+>>> +
+>>> +    virtio_iommu_notify_unmap(mr, interval->low,
+>>> +                              interval->high - interval->low + 1);
+>>> +
+>>> +    return false;
+>>> +}
+>>> +
+>>> +static gboolean virtio_iommu_mapping_map(gpointer key, gpointer value,
+>>> +                                         gpointer data)
+>>> +{
+>>> +    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
+>>> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
+>>> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
+>>> +
+>>> +    virtio_iommu_notify_map(mr, interval->low, mapping->phys_addr,
+>>> +                            interval->high - interval->low + 1);
+>>> +
+>>> +    return false;
+>>> +}
+>>> +
+>>>  static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
+>>>  {
+>>> +    VirtioIOMMUNotifierNode *node;
+>>> +    VirtIOIOMMU *s = ep->viommu;
+>>> +    VirtIOIOMMUDomain *domain = ep->domain;
+>>> +
+>>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+>>> +        if (ep->id == node->iommu_dev->devfn) {
+>>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_unmap,
+>>> +                           &node->iommu_dev->iommu_mr);
+>> I understand this should fo the job for domain removal
+> 
+> did not get the comment, are you saying we should do this on domain removal?
+see my reply on 2/5
+
+Note the above code should be moved after the check of !ep->domain below
+> 
+>>> +        }
+>>> +    }
+>>> +
+>>>      if (!ep->domain) {
+>>>          return;
+>>>      }
+>>> @@ -178,6 +215,7 @@ static VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
+>>>      }
+>>>      ep = g_malloc0(sizeof(*ep));
+>>>      ep->id = ep_id;
+>>> +    ep->viommu = s;
+>>>      trace_virtio_iommu_get_endpoint(ep_id);
+>>>      g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
+>>>      return ep;
+>>> @@ -272,6 +310,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+>>>  {
+>>>      uint32_t domain_id = le32_to_cpu(req->domain);
+>>>      uint32_t ep_id = le32_to_cpu(req->endpoint);
+>>> +    VirtioIOMMUNotifierNode *node;
+>>>      VirtIOIOMMUDomain *domain;
+>>>      VirtIOIOMMUEndpoint *ep;
+>>>
+>>> @@ -299,6 +338,14 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
+>>>
+>>>      ep->domain = domain;
+>>>
+>>> +    /* Replay existing address space mappings on the associated memory region */
+>> maybe use the "domain" terminology here.
+> 
+> ok,
+> 
+> Thanks
+> -Bharat
+> 
+>>> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+>>> +        if (ep_id == node->iommu_dev->devfn) {
+>>> +            g_tree_foreach(domain->mappings, virtio_iommu_mapping_map,
+>>> +                           &node->iommu_dev->iommu_mr);
+>>> +        }
+>>> +    }
+>>> +
+>>>      return VIRTIO_IOMMU_S_OK;
+>>>  }
+>>>
+>>>
+>> Thanks
+>>
+>> Eric
+>>
+> 
 
 
