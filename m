@@ -2,62 +2,67 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A84C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11244C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E403C20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:12:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RXJiF4EI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E403C20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id C01D720679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 23:14:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C01D720679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDyuh-0008Pq-3c
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 19:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55242)
+	id 1jDyvx-00013X-13
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 19:14:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jDys6-0004c4-Ji
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:11 -0400
+ (envelope-from <no-reply@patchew.org>) id 1jDysm-0005dm-6o
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jDys5-00040o-1l
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:10 -0400
-Received: from ozlabs.org ([203.11.71.1]:52725)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jDys3-0003VF-Q3; Mon, 16 Mar 2020 19:10:08 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hBpj080Jz9sRR; Tue, 17 Mar 2020 10:10:04 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584400205;
- bh=tFwaLF6KqT/GTJ1cW9sHDcbkLpguWm+pKPdq9WHCGC8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RXJiF4EIdSxmMdPf3DEWOXkO98ByPCN4aOX5CBIDOR30UWBI2SbryTKHk6FyQu7xc
- zFYRYIqagNkpQrZl2xI9zcgSGF21Q+XdKyR8Zg+A4iknHheQ2uzRd2KJKq8sxAC8g8
- xTjgwb/6F6aVRBzoXh+haGlJMTghZjRX9h4jDALE=
-Date: Tue, 17 Mar 2020 09:47:18 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 3/8] ppc/spapr: Add FWNMI System Reset state
-Message-ID: <20200316224718.GC20264@umbus.fritz.box>
-References: <20200316142613.121089-1-npiggin@gmail.com>
- <20200316142613.121089-4-npiggin@gmail.com>
+ (envelope-from <no-reply@patchew.org>) id 1jDysk-0002Mp-Mu
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 19:10:51 -0400
+Resent-Date: Mon, 16 Mar 2020 19:10:51 -0400
+Resent-Message-Id: <E1jDysk-0002Mp-Mu@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21134)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1jDysk-00028g-CL; Mon, 16 Mar 2020 19:10:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1584400231; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=lTJo3Ft9H5/oJfM+tkL+eNvI0GBJEAdoSc+zlpAho5RpIkrVp7peED+4HzJ1hV6llj2x5IvILV8Y/ZcfCQ0D4VfHaUruILnwuKQnCRg+0g8yNBPgs5t9JFvEKAwbBG1eRfhznqoKSCxs6d+IuYSw3HbmwSS87YQZBFKhnbJMCo0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1584400231;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ALw4DAB7Cs8zNB9H3tmmwtuvBjRFkW2rCw2X+VUNNy4=; 
+ b=NXUYzKG5seVchkE4a6BjKWi63GFLSNY35n5m1MQTDrD04K4W34r6LKgSP4ZTh26I16rEH8FWG9svZGSJMFiT9mYwiFKBnOLRzCQuahTWLGFh6TH4327zP2uGVnSzG8Wcyd2kW8p5doNTAA1cUiC9EYEOVGBASLeZ4KML/QjYQqg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1584400229998294.08700547819376;
+ Mon, 16 Mar 2020 16:10:29 -0700 (PDT)
+In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
+Subject: Re: [PATCH v3 00/19] Support disabling TCG on ARM (part 2)
+Message-ID: <158440022829.17104.10073980639396004207@39012742ff91>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="E13BgyNx05feLLmH"
-Content-Disposition: inline
-In-Reply-To: <20200316142613.121089-4-npiggin@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Mon, 16 Mar 2020 16:10:29 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,134 +74,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- qemu-ppc@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, thuth@redhat.com,
+ kvm@vger.kernel.org, philmd@redhat.com, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, pbonzini@redhat.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---E13BgyNx05feLLmH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Mar 17, 2020 at 12:26:08AM +1000, Nicholas Piggin wrote:
-> The FWNMI option must deliver system reset interrupts to their
-> registered address, and there are a few constraints on the handler
-> addresses specified in PAPR. Add the system reset address state and
-> checks.
->=20
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-
-Applied to ppc-for-5.0, thanks.
-
-> ---
->  hw/ppc/spapr.c         |  2 ++
->  hw/ppc/spapr_rtas.c    | 14 +++++++++++++-
->  include/hw/ppc/spapr.h |  3 ++-
->  3 files changed, 17 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b03b26370d..5f93c49706 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1704,6 +1704,7 @@ static void spapr_machine_reset(MachineState *machi=
-ne)
-> =20
->      spapr->cas_reboot =3D false;
-> =20
-> +    spapr->fwnmi_system_reset_addr =3D -1;
->      spapr->fwnmi_machine_check_addr =3D -1;
->      spapr->fwnmi_machine_check_interlock =3D -1;
-> =20
-> @@ -2023,6 +2024,7 @@ static const VMStateDescription vmstate_spapr_fwnmi=
- =3D {
->      .needed =3D spapr_fwnmi_needed,
->      .pre_save =3D spapr_fwnmi_pre_save,
->      .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT64(fwnmi_system_reset_addr, SpaprMachineState),
->          VMSTATE_UINT64(fwnmi_machine_check_addr, SpaprMachineState),
->          VMSTATE_INT32(fwnmi_machine_check_interlock, SpaprMachineState),
->          VMSTATE_END_OF_LIST()
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 0b8c481593..521e6b0b72 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -414,6 +414,7 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->                                    uint32_t nret, target_ulong rets)
->  {
->      hwaddr rtas_addr;
-> +    target_ulong sreset_addr, mce_addr;
-> =20
->      if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI) =3D=3D SPAPR_CAP_OFF) {
->          rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> @@ -426,7 +427,18 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->          return;
->      }
-> =20
-> -    spapr->fwnmi_machine_check_addr =3D rtas_ld(args, 1);
-> +    sreset_addr =3D rtas_ld(args, 0);
-> +    mce_addr =3D rtas_ld(args, 1);
-> +
-> +    /* PAPR requires these are in the first 32M of memory and within RMA=
- */
-> +    if (sreset_addr >=3D 32 * MiB || sreset_addr >=3D spapr->rma_size ||
-> +           mce_addr >=3D 32 * MiB ||    mce_addr >=3D spapr->rma_size) {
-> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> +        return;
-> +    }
-> +
-> +    spapr->fwnmi_system_reset_addr =3D sreset_addr;
-> +    spapr->fwnmi_machine_check_addr =3D mce_addr;
-> =20
->      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->  }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 64b83402cb..42d64a0368 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -194,9 +194,10 @@ struct SpaprMachineState {
-> =20
->      /* State related to FWNMI option */
-> =20
-> -    /* Machine Check Notification Routine address
-> +    /* System Reset and Machine Check Notification Routine addresses
->       * registered by "ibm,nmi-register" RTAS call.
->       */
-> +    target_ulong fwnmi_system_reset_addr;
->      target_ulong fwnmi_machine_check_addr;
-> =20
->      /* Machine Check FWNMI synchronization, fwnmi_machine_check_interloc=
-k is
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---E13BgyNx05feLLmH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5wAfYACgkQbDjKyiDZ
-s5LvGQ//eOSo/L61ikqnM4qiBcFrx0zki55of5qjT8os/4PGyzk0bBxsK9o+CWn7
-JRUTfeCI/0JQ21rL9YbKodR6oRJ98ElRb79A11cuHZZ9IqoBN2Sr6EDcueEPEjG4
-sNOJFHuorsARQ7Z+0G3OrW6+PxfRia6ECESjN0yU3IrCgba0i9otwlw3rBOG1Tpa
-Aw/YX0gwCRN8rlOPSdk6l/8/1V8zvUMtzHBtqUQaTTa8wbS8hQg9QthzXYAzNrYr
-R5YXnzLosfTV/xG7hLQZ11h2jgFaj0jCIqgvFzmHRQZpn/dhgGDflcs5G/VLH3yy
-TzLQ6NOyoMp2Sp0HClLBRJ1XAA6GcjbLgbng8pRxzHj2rqSaDHVBiyLL91/5MZaS
-4ErAVAMo0qMLQfLRLqMPrcceCgWP/kqmc1SHLj3kkGsM4LpcU+rBOD0QYWP3P5Tp
-rTjZw29ohcGiHFlgNgkAK/uI6sv605KIa3C2jCpTiP0YNTR4T509jD2JBDneizE/
-5wwusYvm0KvGoKU1hgjVlK5G8EZW/KD5bmArZ18jX0hEWLqBhEmDnYYbYRnVJ1O3
-fm6INXjc3m7ICydbzNabEmv9KMYxTHTFKjYT4HipF3ucleZRwchgYPRoe9RoKCBn
-xxvkUgx4XhJYuDnoFVouGdFIsdDymryBImbSGmosKFGFb3hVDnw=
-=m5Qe
------END PGP SIGNATURE-----
-
---E13BgyNx05feLLmH--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNjE2MDYzNC4zMzg2
+LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKbWlzc2luZyBvYmplY3QgdHlwZSAn
+b3ItaXJxJwpCcm9rZW4gcGlwZQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcXRlc3QvbGlicXRl
+c3QuYzoxNzU6IGtpbGxfcWVtdSgpIGRldGVjdGVkIFFFTVUgZGVhdGggZnJvbSBzaWduYWwgNiAo
+QWJvcnRlZCkgKGNvcmUgZHVtcGVkKQpFUlJPUiAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3Rl
+ZCA2LCBnb3QgNSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC1hYXJjaDY0XSBFcnJvciAxCm1ha2U6
+ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCkNvdWxkIG5vdCBhY2Nlc3MgS1ZN
+IGtlcm5lbCBtb2R1bGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKcWVtdS1zeXN0ZW0teDg2
+XzY0OiAtYWNjZWwga3ZtOiBmYWlsZWQgdG8gaW5pdGlhbGl6ZSBrdm06IE5vIHN1Y2ggZmlsZSBv
+ciBkaXJlY3RvcnkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21k
+KQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywg
+J2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWQ1MWZl
+NzMxNjA2NDRlMGJhNmEwZjNjZjFjMWQ2MjA4JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1v
+cHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9Jywg
+Jy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0Jywg
+Jy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zh
+ci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1j
+Y2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLXU4anU0c3NwL3NyYy9kb2NrZXItc3JjLjIwMjAtMDMtMTYtMTguNTcuMTMuMjEwMDc6L3Zh
+ci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0
+ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZp
+bHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWQ1MWZlNzMxNjA2NDRlMGJhNmEwZjNj
+ZjFjMWQ2MjA4Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2
+aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXU4anU0c3NwL3NyYycK
+bWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAg
+ICAxM20xNi4yMjhzCnVzZXIgICAgMG04Ljc2M3MKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzE2MTYwNjM0LjMzODYtMS1waGlsbWRA
+cmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
 
