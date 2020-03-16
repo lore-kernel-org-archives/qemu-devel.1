@@ -2,83 +2,99 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E372C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4D4C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB72520409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A435320674
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QagQRrJT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB72520409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf0DNZHi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A435320674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtTi-0004DJ-30
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:24:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50913)
+	id 1jDtVK-0007YP-RE
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:26:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDrPG-0008TX-U9
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDsGe-0004Ap-Ag
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDrPF-0003V0-GG
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:54 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54133)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jDrPF-0003MO-8R
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:11:53 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 25so18081371wmk.3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 08:11:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=9IVBUdikDm11L9fCTpSgxrTnLXOrniaS4l7ApCDWwiM=;
- b=QagQRrJTXf13LOdzwMvP23vXAKqb0Yaxtq14QnMR1CfE2LIOTwwDAzmK5C3apJC3Q+
- 41Y0UZrqQaU0squaFrwrCIQUAbKa+QLoBenisCa5IzCVlKMuapXw0tNnQfsWTAN7FuCC
- UO5FKVaAEMmqdCS3lCXUzIbOMpPNS563DyNtTzHZ3BsolY5dnhPf4rKjNLJulaPM0xAz
- IY3aUm8/VAJ1rCxGaHD73422PC3UUx6iNNYGnInMO1FQlixbnnRrlWnvmIhb2m2yQxjn
- +xmjbrMJXPKD91ExuRlxMtC4PsgOiRemJsCEqGqF76U3iZqReoXzZlBg8pNxwnFuanyJ
- aBmA==
+ (envelope-from <philmd@redhat.com>) id 1jDsGd-0008DL-1G
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:04 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39869)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDsGc-0008CR-T8
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:07:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584374822;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j2NQUGK1oGWALaGzXfEtj8AM5490glkq1or09z6B8W8=;
+ b=Zf0DNZHiVI4eFg98LAkhJz0J9cbICvHiZpIgeiQ5fXtSrrichYZ+Lcyzg1fRnNtlk7QRdS
+ 8Dt9TK/Sn0RkecrD1tTwHNf/rLpZybQ4Q8RSOQCJncrGDnDjIJ2FkI6Zmn9EybnAcIky65
+ uAPpaqoDm5uZvQGAv3vPJDY0AVn517I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-iZVhGtFkMxiy6byJlrL-qg-1; Mon, 16 Mar 2020 12:07:01 -0400
+X-MC-Unique: iZVhGtFkMxiy6byJlrL-qg-1
+Received: by mail-wr1-f72.google.com with SMTP id v6so9173910wrg.22
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:07:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=9IVBUdikDm11L9fCTpSgxrTnLXOrniaS4l7ApCDWwiM=;
- b=IWsXaAwS0qOD0eu+HOHV5/MzpC9Ue2eOva6bWsUfn8wOb2s7gm+0/3SwG0u6ydsuBg
- Gft7QMdzwHWjHHgLIVQBBHd0Dq5jPY4pdh/Xtz6h0X8Pey/Nv5yV9wKhGb9dXjNqQ2mb
- 0IQ/WCuSniAnzRA7FoSMvyvHzayw1gOb161YZdEOiWlU9djbSXCPCJcyXBhokIBAqH0h
- x0r9den3QPrKJ7z0zoQnKZD6odfr8TZmixH3CAkO15gjQRzzEtEnPhrJaXD53C7VUPZw
- HG8UTSZ9z8/5lUEdR3F1Gb7VfVg0PX4z67tVYPDkcEbYWzVtGPd6FLkCniejrDMezWPP
- 2D8A==
-X-Gm-Message-State: ANhLgQ2LbSeEPSNRb2t1qXFiRrFMPwc+YlUDh60zV6JNytxkTo3JGlgD
- +BYdfz+gP6CYHGxGUWlBuGiwFZj0Gs1hMF3kgivdaUodT7Y=
-X-Google-Smtp-Source: ADFU+vtNyG3llodxrAJAENFuYCGIfP1ScmpIWlntoIuJfZHLr9W/4s4Wa90PuN8Sy316MIdg8FsIHkgntkfB7I0Uxf0=
-X-Received: by 2002:a1c:1fc9:: with SMTP id f192mr29121339wmf.4.1584371512102; 
- Mon, 16 Mar 2020 08:11:52 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=x1weIqYNF3Fo5tV0WZvC7V944GYiMwvqowZHCwqs/e8=;
+ b=rXzFifaKD0RQWuCwEmemOHWYgq8aQOmn/tlatIwMzKTNYa4dqoDggH1OUdJJs3tquB
+ 02g5kO1fX7E7Edid19wha/SK43PJE320k/qO/iborihh2az1yrpRccdC5orqGKqEWn8l
+ 704/azvHKZAtTuSVnMT8jKWOwvif2+NrjCCBzsFMIHdIEkfdupF/PA578hBYDldErPIi
+ 1Ef4VjT2ZjxnIDMi74JOfmBFr+2+YONI32hIbVFFBo3Rh0NoJ54+2Mt88W3VKdRgxCGQ
+ zTiw1y5QMuZ2WRlS9em/HJOgw6pg7vv9qK4hkhaHEks2+ocGIeModriCaEpLBslMoyka
+ Zjzg==
+X-Gm-Message-State: ANhLgQ129fPiIgcAFGnC9yat1db4yeoeLhHHCbgojgcMXaxGEFOeUxp4
+ dfG8+JHZpgBUvvgwud56CJCL+rc++gJ8RgpjWoFtj1ymvLuC7YzumaKAeo2nTV1LSCG66CudeJQ
+ j0dyaljUTthotmLk=
+X-Received: by 2002:a1c:6385:: with SMTP id
+ x127mr28120927wmb.141.1584374819495; 
+ Mon, 16 Mar 2020 09:06:59 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsfX0n8OJNrHnrM7slMemare5ZJPKg4uT9S5KNvko7zVE1qXAD/IK5hEDswewh2HAjGFyl3Zg==
+X-Received: by 2002:a1c:6385:: with SMTP id
+ x127mr28120897wmb.141.1584374819229; 
+ Mon, 16 Mar 2020 09:06:59 -0700 (PDT)
+Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
+ [83.59.163.96])
+ by smtp.gmail.com with ESMTPSA id y5sm166058wmi.34.2020.03.16.09.06.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 09:06:58 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 04/19] target/arm: Restric the Address Translate operations
+ to TCG accel
+Date: Mon, 16 Mar 2020 17:06:19 +0100
+Message-Id: <20200316160634.3386-5-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200316160634.3386-1-philmd@redhat.com>
+References: <20200316160634.3386-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-9-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-9-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 16 Mar 2020 16:11:39 +0100
-Message-ID: <CAJ+F1C+CPtk+f58kLbOoWGWR6+_5EqzdS_Bv4hLj5eARdR2y0A@mail.gmail.com>
-Subject: Re: [PATCH v3 08/34] tests/test-qmp-event: Simplify test data setup
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,187 +106,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 15, 2020 at 3:55 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Building expected data with qdict_put() & friends is tedious to write
-> and hard to read.  Parse them from string literals with
-> qdict_from_jsonf_nofail() instead.
->
-> While there, use initializers instead of assignments for initializing
-> aggregate event arguments.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Under KVM the ATS instruction will trap.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ target/arm/helper.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-
-> ---
->  tests/test-qmp-event.c | 93 ++++++++++++------------------------------
->  1 file changed, 27 insertions(+), 66 deletions(-)
->
-> diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
-> index eee7e08ab6..430001e622 100644
-> --- a/tests/test-qmp-event.c
-> +++ b/tests/test-qmp-event.c
-> @@ -17,6 +17,7 @@
->  #include "qapi/error.h"
->  #include "qapi/qmp/qbool.h"
->  #include "qapi/qmp/qdict.h"
-> +#include "qapi/qmp/qjson.h"
->  #include "qapi/qmp/qnum.h"
->  #include "qapi/qmp/qstring.h"
->  #include "qapi/qmp-event.h"
-> @@ -124,17 +125,13 @@ static void event_prepare(TestEventData *data,
->      /* Global variable test_event_data was used to pass the expectation,=
- so
->         test cases can't be executed at same time. */
->      g_mutex_lock(&test_event_lock);
-> -
-> -    data->expect =3D qdict_new();
->      test_event_data =3D data;
->  }
->
->  static void event_teardown(TestEventData *data,
->                             const void *unused)
->  {
-> -    qobject_unref(data->expect);
->      test_event_data =3D NULL;
-> -
->      g_mutex_unlock(&test_event_lock);
->  }
->
-> @@ -152,90 +149,54 @@ static void event_test_add(const char *testpath,
->  static void test_event_a(TestEventData *data,
->                           const void *unused)
->  {
-> -    QDict *d;
-> -    d =3D data->expect;
-> -    qdict_put_str(d, "event", "EVENT_A");
-> +    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_A' }");
->      qapi_event_send_event_a();
-> +    qobject_unref(data->expect);
->  }
->
->  static void test_event_b(TestEventData *data,
->                           const void *unused)
->  {
-> -    QDict *d;
-> -    d =3D data->expect;
-> -    qdict_put_str(d, "event", "EVENT_B");
-> +    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_B' }");
->      qapi_event_send_event_b();
-> +    qobject_unref(data->expect);
->  }
->
->  static void test_event_c(TestEventData *data,
->                           const void *unused)
->  {
-> -    QDict *d, *d_data, *d_b;
-> -
-> -    UserDefOne b;
-> -    b.integer =3D 2;
-> -    b.string =3D g_strdup("test1");
-> -    b.has_enum1 =3D false;
-> -
-> -    d_b =3D qdict_new();
-> -    qdict_put_int(d_b, "integer", 2);
-> -    qdict_put_str(d_b, "string", "test1");
-> -
-> -    d_data =3D qdict_new();
-> -    qdict_put_int(d_data, "a", 1);
-> -    qdict_put(d_data, "b", d_b);
-> -    qdict_put_str(d_data, "c", "test2");
-> -
-> -    d =3D data->expect;
-> -    qdict_put_str(d, "event", "EVENT_C");
-> -    qdict_put(d, "data", d_data);
-> +    UserDefOne b =3D { .integer =3D 2, .string =3D (char *)"test1" };
->
-> +    data->expect =3D qdict_from_jsonf_nofail(
-> +        "{ 'event': 'EVENT_C', 'data': {"
-> +        " 'a': 1, 'b': { 'integer': 2, 'string': 'test1' }, 'c': 'test2'=
- } }");
->      qapi_event_send_event_c(true, 1, true, &b, "test2");
-> -
-> -    g_free(b.string);
-> +    qobject_unref(data->expect);
->  }
->
->  /* Complex type */
->  static void test_event_d(TestEventData *data,
->                           const void *unused)
->  {
-> -    UserDefOne struct1;
-> -    EventStructOne a;
-> -    QDict *d, *d_data, *d_a, *d_struct1;
-> -
-> -    struct1.integer =3D 2;
-> -    struct1.string =3D g_strdup("test1");
-> -    struct1.has_enum1 =3D true;
-> -    struct1.enum1 =3D ENUM_ONE_VALUE1;
-> -
-> -    a.struct1 =3D &struct1;
-> -    a.string =3D g_strdup("test2");
-> -    a.has_enum2 =3D true;
-> -    a.enum2 =3D ENUM_ONE_VALUE2;
-> -
-> -    d_struct1 =3D qdict_new();
-> -    qdict_put_int(d_struct1, "integer", 2);
-> -    qdict_put_str(d_struct1, "string", "test1");
-> -    qdict_put_str(d_struct1, "enum1", "value1");
-> -
-> -    d_a =3D qdict_new();
-> -    qdict_put(d_a, "struct1", d_struct1);
-> -    qdict_put_str(d_a, "string", "test2");
-> -    qdict_put_str(d_a, "enum2", "value2");
-> -
-> -    d_data =3D qdict_new();
-> -    qdict_put(d_data, "a", d_a);
-> -    qdict_put_str(d_data, "b", "test3");
-> -    qdict_put_str(d_data, "enum3", "value3");
-> -
-> -    d =3D data->expect;
-> -    qdict_put_str(d, "event", "EVENT_D");
-> -    qdict_put(d, "data", d_data);
-> +    UserDefOne struct1 =3D {
-> +        .integer =3D 2, .string =3D (char *)"test1",
-> +        .has_enum1 =3D true, .enum1 =3D ENUM_ONE_VALUE1,
-> +    };
-> +    EventStructOne a =3D {
-> +        .struct1 =3D &struct1,
-> +        .string =3D (char *)"test2",
-> +        .has_enum2 =3D true,
-> +        .enum2 =3D ENUM_ONE_VALUE2,
-> +    };
->
-> +    data->expect =3D qdict_from_jsonf_nofail(
-> +        "{ 'event': 'EVENT_D', 'data': {"
-> +        " 'a': {"
-> +        "  'struct1': { 'integer': 2, 'string': 'test1', 'enum1': 'value=
-1' },"
-> +        "  'string': 'test2', 'enum2': 'value2' },"
-> +        " 'b': 'test3', 'enum3': 'value3' } }");
->      qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VAL=
-UE3);
-> -
-> -    g_free(struct1.string);
-> -    g_free(a.string);
-> +    qobject_unref(data->expect);
->  }
->
->  int main(int argc, char **argv)
-> --
-> 2.21.1
->
->
-
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 924deffd65..a5280c091b 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3322,7 +3322,7 @@ static void par_write(CPUARMState *env, const ARMCPRe=
+gInfo *ri, uint64_t value)
+     }
+ }
+=20
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+ /* get_phys_addr() isn't present for user-mode-only targets */
+=20
+ static CPAccessResult ats_access(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -3631,7 +3631,7 @@ static void ats_write64(CPUARMState *env, const ARMCP=
+RegInfo *ri,
+=20
+     env->cp15.par_el[1] =3D do_ats_write(env, value, access_type, mmu_idx)=
+;
+ }
+-#endif
++#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
+=20
+ static const ARMCPRegInfo vapa_cp_reginfo[] =3D {
+     { .name =3D "PAR", .cp =3D 15, .crn =3D 7, .crm =3D 4, .opc1 =3D 0, .o=
+pc2 =3D 0,
+@@ -3639,7 +3639,7 @@ static const ARMCPRegInfo vapa_cp_reginfo[] =3D {
+       .bank_fieldoffsets =3D { offsetoflow32(CPUARMState, cp15.par_s),
+                              offsetoflow32(CPUARMState, cp15.par_ns) },
+       .writefn =3D par_write },
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+     /* This underdecoding is safe because the reginfo is NO_RAW. */
+     { .name =3D "ATS", .cp =3D 15, .crn =3D 7, .crm =3D 8, .opc1 =3D 0, .o=
+pc2 =3D CP_ANY,
+       .access =3D PL1_W, .accessfn =3D ats_access,
+@@ -4880,7 +4880,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] =3D {
+       .opc0 =3D 1, .opc1 =3D 4, .crn =3D 8, .crm =3D 7, .opc2 =3D 6,
+       .access =3D PL2_W, .type =3D ARM_CP_NO_RAW,
+       .writefn =3D tlbi_aa64_alle1is_write },
+-#ifndef CONFIG_USER_ONLY
++
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+     /* 64 bit address translation operations */
+     { .name =3D "AT_S1E1R", .state =3D ARM_CP_STATE_AA64,
+       .opc0 =3D 1, .opc1 =3D 0, .crn =3D 7, .crm =3D 8, .opc2 =3D 0,
+@@ -4929,7 +4930,8 @@ static const ARMCPRegInfo v8_cp_reginfo[] =3D {
+       .access =3D PL1_RW, .resetvalue =3D 0,
+       .fieldoffset =3D offsetof(CPUARMState, cp15.par_el[1]),
+       .writefn =3D par_write },
+-#endif
++#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
++
+     /* TLB invalidate last level of translation table walk */
+     { .name =3D "TLBIMVALIS", .cp =3D 15, .opc1 =3D 0, .crn =3D 8, .crm =
+=3D 3, .opc2 =3D 5,
+       .type =3D ARM_CP_NO_RAW, .access =3D PL1_W, .accessfn =3D access_ttl=
+b,
+@@ -5536,7 +5538,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
+       .opc0 =3D 1, .opc1 =3D 4, .crn =3D 8, .crm =3D 3, .opc2 =3D 5,
+       .access =3D PL2_W, .type =3D ARM_CP_NO_RAW,
+       .writefn =3D tlbi_aa64_vae2is_write },
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+     /* Unlike the other EL2-related AT operations, these must
+      * UNDEF from EL3 if EL2 is not implemented, which is why we
+      * define them here rather than with the rest of the AT ops.
+@@ -6992,7 +6994,7 @@ static const ARMCPRegInfo vhe_reginfo[] =3D {
+     REGINFO_SENTINEL
+ };
+=20
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+ static const ARMCPRegInfo ats1e1_reginfo[] =3D {
+     { .name =3D "AT_S1E1R", .state =3D ARM_CP_STATE_AA64,
+       .opc0 =3D 1, .opc1 =3D 0, .crn =3D 7, .crm =3D 9, .opc2 =3D 0,
+@@ -7894,14 +7896,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (cpu_isar_feature(aa64_pan, cpu)) {
+         define_one_arm_cp_reg(cpu, &pan_reginfo);
+     }
+-#ifndef CONFIG_USER_ONLY
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_TCG)
+     if (cpu_isar_feature(aa64_ats1e1, cpu)) {
+         define_arm_cp_regs(cpu, ats1e1_reginfo);
+     }
+     if (cpu_isar_feature(aa32_ats1e1, cpu)) {
+         define_arm_cp_regs(cpu, ats1cp_reginfo);
+     }
+-#endif
++#endif /* !CONFIG_USER_ONLY && CONFIG_TCG */
+     if (cpu_isar_feature(aa64_uao, cpu)) {
+         define_one_arm_cp_reg(cpu, &uao_reginfo);
+     }
 --=20
-Marc-Andr=C3=A9 Lureau
+2.21.1
+
 
