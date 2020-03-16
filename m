@@ -2,98 +2,94 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90026C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FFEC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:25:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5863220753
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:24:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D319020753
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:25:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnXLqmF7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5863220753
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UOnK+QCE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D319020753
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47597 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvM9-0002DP-Gi
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:24:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50723)
+	id 1jDvMr-0002uG-2B
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:25:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jDuye-000297-0J
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:00:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDuqZ-0002cq-FH
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:52:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jDuyc-0001Dr-7c
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:00:39 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:26039)
+ (envelope-from <philmd@redhat.com>) id 1jDuqY-0003m2-A8
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:52:19 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:31564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDuyc-00019Q-2G
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:00:38 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDuqY-0003jJ-5m
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:52:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584385237;
+ s=mimecast20190719; t=1584384737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GTcwy5EcrKMKytC/WSeHnaZ/vMtgK6arLEK3I1pmChw=;
- b=WnXLqmF7AKzvN5M97FSK4YEDuEh3dK0zx23h+yHAN8hz7nrXDrg5fKHg9O24oiNF8J0TRd
- F3IpIjtKauW+sgAnmWQmV1oY+y6dXiBHnRWuSmbH39RJ8VTfZTrekUjl0afFxWtRSPUlGQ
- 6FRfSGvgIMPU0dv43KPUm+20QkcoVSA=
+ bh=AR3d9nNMRFmjviCA9QeiC7WRyBhxuQ8IV0t5Cc30NxA=;
+ b=UOnK+QCEAIduUtzR4WpmA2AzLmKpP3A60lQqZSaTecbukW+OpEPpBqGuToOna+4bayq3Sw
+ F5s1t4HtsmR4OK+PS1G0PFZ9FLBcEiz7kpeoVPV53Hz5PU28YYabapfYnlv5AL2lEw7JT1
+ ViQmZSdbVhRBb6970xHBeFPsoVOgrGs=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-uMdiNIahNCSf5GR7A5Ze7w-1; Mon, 16 Mar 2020 15:00:31 -0400
-X-MC-Unique: uMdiNIahNCSf5GR7A5Ze7w-1
-Received: by mail-ed1-f70.google.com with SMTP id dn10so2307368edb.6
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:00:31 -0700 (PDT)
+ us-mta-345-I_KV75HMM2WbPqyMyvwK_A-1; Mon, 16 Mar 2020 14:52:13 -0400
+X-MC-Unique: I_KV75HMM2WbPqyMyvwK_A-1
+Received: by mail-ed1-f70.google.com with SMTP id dm17so13897392edb.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 11:52:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SBoLIS60m/R8vVlNjtCKtaSpPA1mtOn0IkBdkHi07aA=;
- b=eR6ggTwz3M0/ighoIVu/plUtkxrV60zLghH0XZULOzrSdUNDMU2x6YagtqNTjPedoV
- S3FUYepAWuJj4QM1Zp//FkGn1ciHtLIDTsISMMeSzbO1z3Aq6PBw3R3OvfqckyPjvrxi
- wrxYAaZEtxKFqeeoh2a7n851nepJ3SnVz1iQ/ihtMG5N+0cx/ZX+V3P0ft7I5wLW9z6p
- xvLw6UpaAMtgn1bTNuuhLbuxtBVck5o3mYrWTXImgcL8FPO39mV1uWlvopfi479RUPyM
- lA+KZ46B/IgYIkEUELz/mvS+5bX+dJxoBDHwNbDAm+0tMcz/8KYRj/1HuuUJXXxK2wZW
- gamg==
-X-Gm-Message-State: ANhLgQ2+UmuwbxyFDD/mbPxx0Cm7hfo+vBRBG6oj+h9Xh55HTN4Vfd6H
- JBLOW+SuRAb3FH+6tdvQXlmC0ljBfp66Q4Ym5bJk2nhiz+ijKOssgG6AK9JFwuqDO9lS4woinS0
- 01EPMjnyO1j5Lf00=
-X-Received: by 2002:a05:6402:180a:: with SMTP id
- g10mr1396201edy.352.1584385228635; 
- Mon, 16 Mar 2020 12:00:28 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vtBwTHbkTiIU9n1r6Qr6pyZg2hQ9rRIsQKNUEZ9lnKnt6gBUvvjzB3M5uPPCsZJF+W1RYG4Vw==
-X-Received: by 2002:a05:6402:180a:: with SMTP id
- g10mr1396167edy.352.1584385228380; 
- Mon, 16 Mar 2020 12:00:28 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TBpfmSRiP+jw9OHkhFWUdHoGBaG1dAqB4VuWEQEEYBw=;
+ b=N/AF96zMqDodo5oiE1rcKA3o8oNThc5U6I1eCwm9A07buXKx44Fdfpr1GWTxaRzxkV
+ ZzGvQnq6lQn8ZZWJX/KL34ZYidGZxnjaAG+6X8FCfLSBz+y6FHqZU9eClKuviIvQcMAS
+ PsLU/WbfYWxMuVv5JzgtDfv6eqzjjdJr9nmi+McJ1jNY9wZby4i8DPPJH4Qci6U17hT9
+ RAT5dIK+V7AqxnrZkQuCitVuxsLbUG2zLVj9936RegHdG0qoo4N3/YhgA0Fc5iXZ2kOg
+ IeatQhfbvR438uKv6CUyd7ttBWhSWf64V4qCZZA1w2x8fNadzN3SN8bwyhh7jCQDaTlH
+ 5zzQ==
+X-Gm-Message-State: ANhLgQ08VkD0xt0J2TqswYXN5eaJY60BrPUxjWOM35SBRGSdiDCqEeJ3
+ ptihqANHR0qPZ4fJRFHRCjfcqhQ1U4OtpK9/8guCXAnLzrcZk8MnDxzMiIbCSpo2dSlx61nwbu5
+ omqh5JkTwrZkoY+w=
+X-Received: by 2002:a50:ab5a:: with SMTP id t26mr1490340edc.380.1584384732774; 
+ Mon, 16 Mar 2020 11:52:12 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vsJAlBuLmYcN8n8KFL+8zOP47JcsAxX5A8HD5CQdNHCIL6+R6SB8mBOjKPnNRopA5/vp7Zr1Q==
+X-Received: by 2002:a50:ab5a:: with SMTP id t26mr1490321edc.380.1584384732567; 
+ Mon, 16 Mar 2020 11:52:12 -0700 (PDT)
+Received: from localhost.localdomain (96.red-83-59-163.dynamicip.rima-tde.net.
  [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id d9sm50792ejc.79.2020.03.16.12.00.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 12:00:27 -0700 (PDT)
-Subject: Re: [PATCH v3 18/19] hw/arm: Do not build to 'virt' machine on Xen
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200316160634.3386-1-philmd@redhat.com>
- <20200316160634.3386-19-philmd@redhat.com>
- <CAFEAcA_bXb_RZFxMSYJ8FAoAahAxrq3c0PBzidu+Z0iXTzZqFw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9a627400-c8bd-fcee-8cf8-9896c5b3760f@redhat.com>
-Date: Mon, 16 Mar 2020 20:00:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id e15sm51724eds.2.2020.03.16.11.52.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 11:52:12 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v3 24/25] hw/arm: Remove unnecessary
+ memory_region_set_readonly() on ROM alias
+Date: Mon, 16 Mar 2020 19:50:05 +0100
+Message-Id: <20200316185006.576-25-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
+References: <20200316185006.576-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_bXb_RZFxMSYJ8FAoAahAxrq3c0PBzidu+Z0iXTzZqFw@mail.gmail.com>
-Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -109,81 +105,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, kvm-devel <kvm@vger.kernel.org>,
- Paul Durrant <paul@xen.org>, Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "open list:Exynos" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/16/20 6:11 PM, Peter Maydell wrote:
-> On Mon, 16 Mar 2020 at 16:08, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> Xen on ARM does not use QEMU machines [*]. Disable the 'virt'
->> machine there to avoid odd errors such:
->>
->>      CC      i386-softmmu/hw/cpu/a15mpcore.o
->>    hw/cpu/a15mpcore.c:28:10: fatal error: kvm_arm.h: No such file or dir=
-ectory
->>
->> [*] https://wiki.xenproject.org/wiki/Xen_ARM_with_Virtualization_Extensi=
-ons#Use_of_qemu-system-i386_on_ARM
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->> Cc: Stefano Stabellini <sstabellini@kernel.org>
->> Cc: Anthony Perard <anthony.perard@citrix.com>
->> Cc: Paul Durrant <paul@xen.org>
->> Cc: xen-devel@lists.xenproject.org
->> ---
->>   hw/arm/Kconfig | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
->> index 8e801cd15f..69a8e30125 100644
->> --- a/hw/arm/Kconfig
->> +++ b/hw/arm/Kconfig
->> @@ -1,5 +1,6 @@
->>   config ARM_VIRT
->>       bool
->> +    depends on !XEN
->>       default y if KVM
->>       imply PCI_DEVICES
->>       imply TEST_DEVICES
->> --
->=20
-> This seems odd to me:
-> (1) the error message you quote is for a15mpcore.c, not virt.c
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
-This is the first device the virt board selects:
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/arm/exynos4210.c    | 1 -
+ hw/arm/stm32f205_soc.c | 1 -
+ hw/arm/stm32f405_soc.c | 1 -
+ 3 files changed, 3 deletions(-)
 
-config ARM_VIRT
-     bool
-     imply PCI_DEVICES
-     imply TEST_DEVICES
-     imply VFIO_AMD_XGBE
-     imply VFIO_PLATFORM
-     imply VFIO_XGMAC
-     imply TPM_TIS_SYSBUS
-     select A15MPCORE
-     ...
-
-> (2) shouldn't this be prevented by something saying "don't build
-> guest architecture X boards into Y-softmmu", rather than a specific
-> flag for a specific arm board ?
-
-Yes, agreed. This surgical change was quicker for my testing, but we=20
-don't need this patch right now, so let's drop it.
-
->=20
-> thanks
-> -- PMM
->=20
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index 3af6502a5e..4e1fd7edb3 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -320,7 +320,6 @@ static void exynos4210_realize(DeviceState *socdev, Err=
+or **errp)
+                              &s->irom_mem,
+                              0,
+                              EXYNOS4210_IROM_SIZE);
+-    memory_region_set_readonly(&s->irom_alias_mem, true);
+     memory_region_add_subregion(system_mem, EXYNOS4210_IROM_MIRROR_BASE_AD=
+DR,
+                                 &s->irom_alias_mem);
+=20
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index 2de56275b7..6e93726d45 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -97,7 +97,6 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, E=
+rror **errp)
+                            &error_fatal);
+     memory_region_init_alias(flash_alias, NULL, "STM32F205.flash.alias",
+                              flash, 0, FLASH_SIZE);
+-    memory_region_set_readonly(flash_alias, true);
+=20
+     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, flash);
+     memory_region_add_subregion(system_memory, 0, flash_alias);
+diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
+index b8fca13f95..d590cd040d 100644
+--- a/hw/arm/stm32f405_soc.c
++++ b/hw/arm/stm32f405_soc.c
+@@ -103,7 +103,6 @@ static void stm32f405_soc_realize(DeviceState *dev_soc,=
+ Error **errp)
+     }
+     memory_region_init_alias(&s->flash_alias, NULL, "STM32F405.flash.alias=
+",
+                              &s->flash, 0, FLASH_SIZE);
+-    memory_region_set_readonly(&s->flash_alias, true);
+=20
+     memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->fla=
+sh);
+     memory_region_add_subregion(system_memory, 0, &s->flash_alias);
+--=20
+2.21.1
 
 
