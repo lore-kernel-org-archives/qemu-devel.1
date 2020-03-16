@@ -2,100 +2,96 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D636AC18E5B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0631C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2CC52071C
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:06:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 997CB20754
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 14:13:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6o43tBE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CC52071C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WldMrYth"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 997CB20754
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDqO9-0007Ph-CC
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:06:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50561)
+	id 1jDqV2-0001rn-Aa
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 10:13:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDp0P-0001Cv-5i
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1jDoRC-0004st-5S
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDp0O-0003Et-0j
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52672
+ (envelope-from <philmd@redhat.com>) id 1jDoRA-0003gj-AX
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35364
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDp0N-00038q-SP
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:38:03 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jDoRA-0003Z0-1l
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 08:01:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584362283;
+ s=mimecast20190719; t=1584360099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=X8s1pbMd8HiFdjP0FyxZTLEw+ccXxxpvBh8ui/fgRtc=;
- b=U6o43tBET/rNDe8frZqNUubrr7WMnO818C4uBLnqbe+rpCgwGJS1ZC5F7I5i275NB0fKca
- no3rn2f979H4mdHSPBoCMmqg/drMp52W1s4qDsCTNWPbA1H0E/PCd6Si7NEza6CvJkCyiu
- 05HIz0ukPcbVtN4c+ywx9brqngIFi6o=
+ bh=HlGkUQINU1XL5BZcdoDWS13ome2PPFT7O4TXXUDcprw=;
+ b=WldMrYthIRFkeVin2caijG8AkQlNfcvoRkqOEJga4A62ijCZDHLIot5gE+crsfreotXa2D
+ FgvEBUYY2ZLO++7KFA9Tzvtr/l4UpfDTiWzZotnIsmawYswEUXByNnbsgej3670fu0Wltd
+ RbstnCX95ZSVyHS0Kl/l0u52n9cnNGM=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-raHmH3HuOMKikvbd8j9NqA-1; Mon, 16 Mar 2020 08:38:01 -0400
-X-MC-Unique: raHmH3HuOMKikvbd8j9NqA-1
-Received: by mail-wr1-f72.google.com with SMTP id 94so4288409wrr.3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:38:01 -0700 (PDT)
+ us-mta-260-vHT4nODjNfarwmfefKbxbg-1; Mon, 16 Mar 2020 08:01:38 -0400
+X-MC-Unique: vHT4nODjNfarwmfefKbxbg-1
+Received: by mail-wr1-f72.google.com with SMTP id u18so8847725wrn.11
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 05:01:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=74Ivas21HF4MoE96e8hQMSlPbRf3Nzcooh5m6Iuis2I=;
- b=bKjEDe2cfBBMFIc8X22Wu2ub6fI1/Yf8ogpRi8mb9pXrTAwI88MWQUjSfBafmNLrsI
- 7s/aF0cTqLgPGTgJ8S6Cm2F42kLEA9XMEtpum2sJ3GbYA432Dgao+CMNydfpNnnXqRZX
- S11sboB+xkjU3D95tLcoPeh8hw8EdsJdV1fa8H97ANZCi/xqv+6j7dqHylDrQjOS/P9h
- f328IzBExD6A5X0/dSkicMylXqDEIedl7W8ozN6zwfeaxA/9FLc7GkZFCsNQPpWhjmTN
- if2eRKproFUb/QP6SkFfQuOyVBFVgEeDH1e61PPmlKCxEI5tRVsk7ibNXv5Ym1IQ+vlx
- q6Iw==
-X-Gm-Message-State: ANhLgQ1+QYx7dHqQT/aZsuRABRa+1/g2hHSBY/HnQA2KUqVZeQMGihde
- W6jbgPdEYwEEOJcuRAVzT+SNb/orhJrfXgFpnRvpaypsvmpEAzLPpgDtLuuiz9qTNoCvPO2nmAe
- nR3gHD7CSjROO1/k=
-X-Received: by 2002:adf:f18a:: with SMTP id h10mr12780718wro.255.1584362280329; 
- Mon, 16 Mar 2020 05:38:00 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vttllZIVd7rfj2P3jTwFi9aXCPgkpbu9vI1mAOa6elnistYO5w6CJRc6xKANCZ/RXsdh2i4QQ==
-X-Received: by 2002:adf:f18a:: with SMTP id h10mr12780704wro.255.1584362280120; 
- Mon, 16 Mar 2020 05:38:00 -0700 (PDT)
-Received: from [192.168.178.58] ([151.30.82.39])
- by smtp.gmail.com with ESMTPSA id v2sm6948546wrt.58.2020.03.16.05.37.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Mar 2020 05:37:59 -0700 (PDT)
-Subject: Re: [PATCH] MAINTAINERS: Mark the LatticeMico32 target as orphan
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?B?w4Frb3MgS292w6Fjcw==?= <akoskovacs@gmx.com>,
- qemu-devel@nongnu.org, Michael Walle <michael@walle.cc>
-References: <20200316122641.14017-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ca8fb038-43e4-d702-5ebc-bcc78b99445b@redhat.com>
-Date: Mon, 16 Mar 2020 13:37:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=fXllARJpmIuUPtHipMeTZSkndpZ7FGG8n+mythjRvfc=;
+ b=qrd/2G40fALavdYgJVuivn0Johduf1yJUT6/MPnM+adlwsyEFgePGkztUZQ7/s7HMh
+ ndUQHWcBARaYkufN1YtzMTyBudz2LO2eu1CIZDkdzKGfQ3BXwkkQJQZdA0N+7Etxdtw7
+ N/iOUen9Ls/VGcpLf6Mfv8JkCG9znVr4JhB7BZj7Tv3jHSThaLBWSt2wRqp/xOBy8F5O
+ QF18l5zuy7U12x8/J1a3cwV/sfrzhKwrAYYqvKoOLzYy3l+Y0DE+vwb9xUGxnwwTuKIn
+ LDJ9Vi4/ujnw5fk2uoQq9JA1z5Wjm3Vc3B3n7wSi0xCXgQ/xwd0rylWI42SlxyA/1Vg9
+ 3OiQ==
+X-Gm-Message-State: ANhLgQ2BE108m4zbCrN3r1NwF0tokhYdWRj71XDYXPRcTnvVNOLYRpSf
+ 1v/dkcIVeQpY8ITll7J9NpDGufb0VNV8HvxCWaVbpAEmz5fzu34oaUE4wTlX0z3TgDuiP7pc5k/
+ UoaasVK2pa3YlBbA=
+X-Received: by 2002:a5d:66c2:: with SMTP id k2mr10999575wrw.408.1584360096848; 
+ Mon, 16 Mar 2020 05:01:36 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuDJHiZxwpQzdRJzQb4B10w+dJRi5gbqeE8iLVTMi6greRpAqxzKWoY5v8KNqfA+KRY3TJMJw==
+X-Received: by 2002:a5d:66c2:: with SMTP id k2mr10999537wrw.408.1584360096456; 
+ Mon, 16 Mar 2020 05:01:36 -0700 (PDT)
+Received: from localhost.localdomain (191.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.191])
+ by smtp.gmail.com with ESMTPSA id c26sm29139172wmb.8.2020.03.16.05.01.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 05:01:35 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 08/11] target/Kconfig: Allow targets to use Kconfig
+Date: Mon, 16 Mar 2020 13:00:46 +0100
+Message-Id: <20200316120049.11225-9-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200316120049.11225-1-philmd@redhat.com>
+References: <20200316120049.11225-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200316122641.14017-1-philmd@redhat.com>
-Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,60 +103,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, "Emilio G . Cota" <cota@braap.org>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/03/20 13:26, Philippe Mathieu-Daud=C3=A9 wrote:
-> Michael Walle expressed his desire to orphan the lm32 target [*]:
->=20
->   I guess it is time to pull the plug. Mainly, because I have
->   no time for this anymore. I've always worked on this on my
->   spare time and life changed. And secondly, I guess RISC-V is
->   taking over ;) It has a far better ecosystem. Also, to my
->   knowledge the only (public) user of LM32 is milkymist and this
->   project is dead for years now..
->=20
->   So time to say goodbye. It was fun and I've learned a lot -
->   technically and also how a huge open source project works.
->   Thank you everyone for that :)
->=20
->   Basically everything still works and there are even TCG test
->   cases which covers all instructions the processor has.
->=20
-> Many thanks to Michael for his substantial contributions to QEMU,
-> and for maintaining the LM32 target for various years!
->=20
-> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg605024.html
->=20
-> Cc: Michael Walle <michael@walle.cc>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Michael: Do you want to keep your M: entry, switch it to R: or remove?
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 32867bc636..5376c59581 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -184,7 +184,7 @@ F: include/hw/net/lasi_82596.h
-> =20
->  LM32 TCG CPUs
->  M: Michael Walle <michael@walle.cc>
-> -S: Maintained
-> +S: Orphan
->  F: target/lm32/
->  F: disas/lm32.c
->  F: hw/lm32/
->=20
+Allow targets to select target-specific Kconfig values.
 
-Cc: qemu-trivial@nongnu.org
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ Makefile       | 6 ++++--
+ target/Kconfig | 1 +
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+ create mode 100644 target/Kconfig
+
+diff --git a/Makefile b/Makefile
+index 1cf9d76ce7..e402c33811 100644
+--- a/Makefile
++++ b/Makefile
+@@ -421,9 +421,11 @@ MINIKCONF_ARGS =3D \
+=20
+ MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host \
+                    $(SRC_PATH)/accel/Kconfig \
+-                   $(SRC_PATH)/hw/Kconfig
++                   $(SRC_PATH)/hw/Kconfig \
++                   $(SRC_PATH)/target/Kconfig
+ MINIKCONF_DEPS =3D $(MINIKCONF_INPUTS) \
+-                 $(wildcard $(SRC_PATH)/hw/*/Kconfig)
++                 $(wildcard $(SRC_PATH)/hw/*/Kconfig) \
++                 $(wildcard $(SRC_PATH)/target/*/Kconfig)
+ MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py \
+=20
+ $(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIK=
+CONF_DEPS) $(BUILD_DIR)/config-host.mak
+diff --git a/target/Kconfig b/target/Kconfig
+new file mode 100644
+index 0000000000..8b13789179
+--- /dev/null
++++ b/target/Kconfig
+@@ -0,0 +1 @@
++
+--=20
+2.21.1
 
 
