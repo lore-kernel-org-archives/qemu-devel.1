@@ -2,81 +2,93 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3A3C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:51:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E622CC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:52:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7BE420679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE90620679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 19:52:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QL+OSl7m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7BE420679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AQjrgjZK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE90620679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDvm1-0002Js-6H
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:51:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33768)
+	id 1jDvn2-0003Tn-Ku
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 15:52:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1jDvlS-0001ur-Bh
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1jDvm5-0002Y1-Kd
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1jDvlQ-0000vI-Td
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:06 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36451)
+ (envelope-from <richard.henderson@linaro.org>) id 1jDvm4-00055u-Kd
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:45 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1jDvlQ-0000ro-Ob
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:04 -0400
-Received: by mail-oi1-x242.google.com with SMTP id k18so19194883oib.3
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=XfP6g/CgoXzXfQwEe29COf5Du2Wj9Ri79dwBaxsFKOo=;
- b=QL+OSl7mp+Z0jzwop0F22rMfloMbsE4oR9iURh7wZn5KvEyx4ATFvx6vSBUBez8Txb
- hkF/Nil0uCeNehQPBbkrXPB+FoaKzds0OV8yM8bbVGgRs5GZdsB93SXb0TMtQjS2+Ooh
- DC3vSmdDDeS8jJ1HcoxWHh7rh3r4Tyvd7rDGCcksisqu2AHk7gGFbIJq6rvD+vv64IqB
- mYYT01b3mHFPt7VL8audTs/4kzV1C9Y+bar+Lot0ArvyehOMrmULryvSlax/p+IkQvvX
- WIDAQARMn4Bvzp9nXlek7IxGC3PU4tqVyYOhv7Th+FHOx3FJGcouek0Nlb9X+7uhD/gL
- /BiQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1jDvm4-00051k-D6
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 15:51:44 -0400
+Received: by mail-pl1-x644.google.com with SMTP id g6so8491847plt.2
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 12:51:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dDpacGNq/K7yM6PKdJ9BQLRdTUbRwvHtCgHhyhlKoTg=;
+ b=AQjrgjZKqVW/SyhQvefTLDqlDuksBjLCZbzgROzXz0n3JVr1JybTnPwHORasM0VeEe
+ bq5kFWQxiy7uwsxIt9CDyb3Cq43Ew/R6BEHUV0xOQBY9NyeA/6TKyhKL3I1y7QL9NC/p
+ +zamfgWV7c/8s1b/1OzmI0cF5UKQKr6YcirpPVQhPDhEeojdSOBgn3uW4ItALdn4s/E4
+ ZXPaw1lxlqJzmAQEmMbkOXThEbnBjtDyx4ciihBUo5D5u9HB4IMzyJOrGm85up3rapRK
+ Glg//oOapd89gfUzTPU/7lWeB/O0ZGRy9j+vPrgmOkmGVZ8GS3kzUg/Yq6N4pLhhS8G3
+ BWTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=XfP6g/CgoXzXfQwEe29COf5Du2Wj9Ri79dwBaxsFKOo=;
- b=fBJgh75ahP/d22Hhv8h15cXz4nBvS8Ly12iq1gOg+P7ECJG76xXHSsJHIEjsetuSie
- nCvRjG6WTusMUmdoMTJp0EKeSiD7jA+KtUqGLETYl3l7bBPYxYbdNHewGzo6RV+BFb8Y
- JrenjCyIFiWWCGmHCvYJa9nta3palq82YpndtKJrNJSgR0tUDtwUxIdwYnXMm9lVRqPH
- hFcrPIAWOBIbOu1yiaqNxl4U4ebsM4CBkRYnbH9txeAnqTOzwCnkY1lAa5UYVBMnTp9m
- WuT9fvttkSVB4DOoXrT2qAIxuHsE3lOxfO7XR/wqvmEds0iG3pGBOVAIBaD+kngKThlH
- tMmw==
-X-Gm-Message-State: ANhLgQ0M46lHTkAwoI/zBcmzlAZLzWbAhc7JlGXczF778xcNUsVcEk1l
- 6BYuzJc+3LTMcAoJFMYGoMtpwftpqGln6Giz7v0=
-X-Google-Smtp-Source: ADFU+vt+jbPF2yzVe1vrpGdysU0coKzbtJ62PJFnFXsvjgvkl6GpeUCIWGuhxi0b0RTqebkCqHsqK9BoG0vyAe9ZMbM=
-X-Received: by 2002:aca:c596:: with SMTP id v144mr903618oif.136.1584388263818; 
- Mon, 16 Mar 2020 12:51:03 -0700 (PDT)
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dDpacGNq/K7yM6PKdJ9BQLRdTUbRwvHtCgHhyhlKoTg=;
+ b=gm95hcca6OmrKQq0QZ2hogbqwSSrzCi/YaQO+EwMRQ5TnTKCS/gN4dP9MgF6JmFa8V
+ wFDtrj1y24y5R3/mR+lISu/OsQeW0yBAPwpPlqNnsGW1OLpdaOUk+3y+2cptpNuS+0cz
+ fta7tHW6M44Qfh1Ldf7yq6bQK2LsvKukO9KDlRkZIoCyfhZDyfGvKYgsf/PhrH+fHcc4
+ /OwF/inPs28gkJka0oMWImYgY/F8njBtM0tkAweK1pV1qcQuTYBin+SrlTleABeE8Gbf
+ o2UYKIi2+/+D9eMOtq2u7aVDmUbESbMd2VJf4a95gPWhZ9YVvJ6jVrNR806ZJeZmNtIZ
+ kHmw==
+X-Gm-Message-State: ANhLgQ2aZodlFRnhUrkgRhnP2HKP/HQB5ddVko6CX6NeRx0c7bBvsTOy
+ IS8Fq/yq9KlLPrqhVojEqjIsOg==
+X-Google-Smtp-Source: ADFU+vvjl9rPaCPg+vR6UzDGMf3+UPc19rwSelQmwlrtWB0EVNu6h7E4JtH8civEN52sD0o5SxTzKA==
+X-Received: by 2002:a17:902:a9c5:: with SMTP id
+ b5mr789269plr.126.1584388303264; 
+ Mon, 16 Mar 2020 12:51:43 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ j19sm671763pfe.102.2020.03.16.12.51.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 16 Mar 2020 12:51:42 -0700 (PDT)
+Subject: Re: [PATCH v3 10/19] target/arm: Restrict ARMv4 cpus to TCG accel
+From: Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200316160634.3386-1-philmd@redhat.com>
+ <20200316160634.3386-11-philmd@redhat.com>
+ <b5c047f3-ab3e-825d-35c8-b24c8efc616e@linaro.org>
+Message-ID: <bd65d0e1-c94a-6823-cd5b-41aeef8df260@linaro.org>
+Date: Mon, 16 Mar 2020 12:51:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200316185006.576-1-philmd@redhat.com>
-In-Reply-To: <20200316185006.576-1-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 16 Mar 2020 20:50:52 +0100
-Message-ID: <CAL1e-=gymJ+t6nHZhtRdqZrT53kaK0Y+bz8an9W-Eiw+ysSnZw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/25] hw: Sanitize various MemoryRegion calls
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <b5c047f3-ab3e-825d-35c8-b24c8efc616e@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,113 +100,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 16, 2020 at 8:15 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> This series simplifies various memory API calls when creating
-> memory regions.
->
-> Most of the patches are generated with Coccinelle semantic
-> patches (provided).
-> Few more cleanups added while writting the patches have been
-> added.
->
+On 3/16/20 12:50 PM, Richard Henderson wrote:
+> I much prefer ARRAY_SIZE() to sentinels.
+> I know the existing code make much use of them,
+> but we don't need to replicate that here.
 
-FWIW, for the whole series:
+... but otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> v1 was 'Let devices own the MemoryRegion they create':
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg681960.html
->
-> Since v2:
-> - only keep generated/automatic patches
-> - add reviewers tags
->
-> Since v1:
-> - understood a bit more Peter Maydell comments regarding
->   how memory devices are migrated.
->
-> Philippe Mathieu-Daud=C3=A9 (25):
->   memory: Correctly return alias region type
->   memory: Simplify memory_region_init_rom_nomigrate() to ease review
->   scripts/cocci: Rename memory-region-{init-ram -> housekeeping}
->   scripts/cocci: Patch to replace memory_region_init_{ram,readonly ->
->     rom}
->   hw/arm: Use memory_region_init_rom() with read-only regions
->   hw/display: Use memory_region_init_rom() with read-only regions
->   hw/m68k: Use memory_region_init_rom() with read-only regions
->   hw/net: Use memory_region_init_rom() with read-only regions
->   hw/pci-host: Use memory_region_init_rom() with read-only regions
->   hw/ppc: Use memory_region_init_rom() with read-only regions
->   hw/riscv: Use memory_region_init_rom() with read-only regions
->   hw/sh4: Use memory_region_init_rom() with read-only regions
->   hw/sparc: Use memory_region_init_rom() with read-only regions
->   scripts/cocci: Patch to detect potential use of memory_region_init_rom
->   scripts/cocci: Patch to remove unnecessary
->     memory_region_set_readonly()
->   scripts/cocci: Patch to let devices own their MemoryRegions
->   hw/core: Let devices own the MemoryRegion they create
->   hw/display: Let devices own the MemoryRegion they create
->   hw/dma: Let devices own the MemoryRegion they create
->   hw/riscv: Let devices own the MemoryRegion they create
->   hw/char: Let devices own the MemoryRegion they create
->   hw/arm/stm32: Use memory_region_init_rom() with read-only regions
->   hw/ppc/ppc405: Use memory_region_init_rom() with read-only regions
->   hw/arm: Remove unnecessary memory_region_set_readonly() on ROM alias
->   hw/arm: Let devices own the MemoryRegion they create
->
->  .../memory-region-housekeeping.cocci          | 159 ++++++++++++++++++
->  .../coccinelle/memory-region-init-ram.cocci   |  38 -----
->  hw/arm/exynos4210.c                           |  14 +-
->  hw/arm/fsl-imx25.c                            |  10 +-
->  hw/arm/fsl-imx31.c                            |   6 +-
->  hw/arm/fsl-imx6.c                             |   6 +-
->  hw/arm/fsl-imx6ul.c                           |   9 +-
->  hw/arm/mainstone.c                            |   3 +-
->  hw/arm/msf2-soc.c                             |   6 +-
->  hw/arm/nrf51_soc.c                            |   2 +-
->  hw/arm/omap_sx1.c                             |   6 +-
->  hw/arm/palm.c                                 |   3 +-
->  hw/arm/spitz.c                                |   3 +-
->  hw/arm/stellaris.c                            |   3 +-
->  hw/arm/stm32f205_soc.c                        |  11 +-
->  hw/arm/stm32f405_soc.c                        |  12 +-
->  hw/arm/tosa.c                                 |   3 +-
->  hw/arm/xlnx-zynqmp.c                          |  11 +-
->  hw/char/serial.c                              |   7 +-
->  hw/core/platform-bus.c                        |   3 +-
->  hw/display/cg3.c                              |   5 +-
->  hw/display/g364fb.c                           |   3 +-
->  hw/display/macfb.c                            |   4 +-
->  hw/display/tcx.c                              |   5 +-
->  hw/dma/i8257.c                                |   2 +-
->  hw/dma/rc4030.c                               |   4 +-
->  hw/m68k/q800.c                                |   3 +-
->  hw/net/dp8393x.c                              |   5 +-
->  hw/pci-host/prep.c                            |   5 +-
->  hw/ppc/mac_newworld.c                         |   3 +-
->  hw/ppc/mac_oldworld.c                         |   3 +-
->  hw/ppc/ppc405_boards.c                        |   6 +-
->  hw/riscv/sifive_e.c                           |   9 +-
->  hw/riscv/sifive_u.c                           |   2 +-
->  hw/sh4/shix.c                                 |   3 +-
->  hw/sparc/leon3.c                              |   3 +-
->  memory.c                                      |  16 +-
->  MAINTAINERS                                   |   1 +
->  38 files changed, 244 insertions(+), 153 deletions(-)
->  create mode 100644 scripts/coccinelle/memory-region-housekeeping.cocci
->  delete mode 100644 scripts/coccinelle/memory-region-init-ram.cocci
->
-> --
-> 2.21.1
->
->
+r~
 
