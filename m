@@ -2,84 +2,53 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 406B8C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2F9C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 089FE20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:49:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q6Lqz+b3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089FE20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E8CC20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:49:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8CC20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDsvd-00089X-6y
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:49:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48717)
+	id 1jDsvp-0008UP-7Z
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:49:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDrNi-0007j7-VB
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:10:21 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jDqkX-0008S2-91
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDrNh-0005WE-2N
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:10:18 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45078)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jDrNg-0005L2-Pm
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 11:10:16 -0400
-Received: by mail-wr1-x444.google.com with SMTP id t2so11626094wrx.12
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 08:10:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Kukfon5TaR/JRHFnX48GSK2ov1UKVe7Azn6CQLvNDVQ=;
- b=q6Lqz+b3Y8xm/gfLr/lsdUb/Jr30XtFcXlUea69EGgLVqEKH8cinUfBj7X0Bdq9bQw
- bNLeHY19Vo6j4F8THMcrU4pydxWWbdgqp4NnfRCq3p8tvUEBeXRXH19Yq/XW6QliiobW
- u5FLKppxFPHLv+EBkcKU0/G11VGKaTKQtFK4KsEAj5zaBWAtfwNwLPcg0N0cl4/nVv1t
- 5lgVCiDMMLkB/NuMJ83TQPdI9MCrsTEQIqpN4dTqJ0uPqMQ7HuEY+TdE8kY+grWMj7OH
- gQ3TCAPARS+ed4kG22CbjVdbQtCJ7tdh2d9vTqpU2BN8U23jQGygUI2L+qCjs7b8DVg5
- l6Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Kukfon5TaR/JRHFnX48GSK2ov1UKVe7Azn6CQLvNDVQ=;
- b=r9D5jmS7mSaknaaiszSBHmmr37uXueOpn+DdFjB/wAj/Z0Gk7ZnUvGL9da94hzR5wA
- tmwRUnzjof4BY1MM7Vcd+OLQ6tts702uz8gs4pYMZDxrsWH6SaB1TyoH0d63/6N2qK61
- DvXl9aMxhtUGkgEYQpPz2o9gBwWbi6fskGunJuQiAJrjvPwZ+jsjMYx8/DPC3Dtz5g3+
- nWKwDh3SQy6uNyiZVJwpNKIVb4gsM96y6hTkeKZBRNM8eK3elJgK5/8EhKvWIygB6nn4
- phGRhaX5NT5ScqlVzhwb/pLEk3VnOAslmuGrPUZqL1XNKlSSDAnO94d/nK8jV04yeLUx
- TepQ==
-X-Gm-Message-State: ANhLgQ0jDbdZvdiqZnXiLFlgkdsI6CCcXwcpY1cyPlDebI4ZYV1wTWr3
- e0KJQbUcbM1zn4rSFZiIIZSF0MIuRx84kdfCWXE=
-X-Google-Smtp-Source: ADFU+vtTYs87v3rZSR++BCmLoLqnQlDQQ55P3Gw8PxnfAciZ7x4teKcplErC/XBMER1PqBboE53HG55snZOjnlswRZg=
-X-Received: by 2002:a05:6000:4a:: with SMTP id
- k10mr34789107wrx.381.1584371415577; 
- Mon, 16 Mar 2020 08:10:15 -0700 (PDT)
+ (envelope-from <its@irrelevant.dk>) id 1jDqkV-00086e-BQ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:29:49 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48524)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1jDqkP-0007S9-OT; Mon, 16 Mar 2020 10:29:42 -0400
+Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
+ [80.62.117.52])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 71B91BF6A1;
+ Mon, 16 Mar 2020 14:29:40 +0000 (UTC)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: [PATCH v6 10/42] nvme: refactor device realization
+Date: Mon, 16 Mar 2020 07:28:56 -0700
+Message-Id: <20200316142928.153431-11-its@irrelevant.dk>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
+References: <20200316142928.153431-1-its@irrelevant.dk>
 MIME-Version: 1.0
-References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-8-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-8-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 16 Mar 2020 16:10:03 +0100
-Message-ID: <CAJ+F1CJk+tP33rkRd=qEToXQUTZNRhYOVkxN_2DZit0uXRAp_A@mail.gmail.com>
-Subject: Re: [PATCH v3 07/34] tests/test-qmp-cmds: Simplify test data setup
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,216 +60,350 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 15, 2020 at 3:55 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
->
-> Building requests with qdict_put() & friends is tedious to write and
-> hard to read.  Parse them from string literals with
-> qdict_from_vjsonf_nofail() instead.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+From: Klaus Jensen <k.jensen@samsung.com>
 
-& fixes the leak introduced in patch 5.
+This patch splits up nvme_realize into multiple individual functions,
+each initializing a different subset of the device.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+Acked-by: Keith Busch <kbusch@kernel.org>
+---
+ hw/block/nvme.c | 178 ++++++++++++++++++++++++++++++------------------
+ hw/block/nvme.h |  23 ++++++-
+ 2 files changed, 134 insertions(+), 67 deletions(-)
 
-
-> ---
->  tests/test-qmp-cmds.c | 93 ++++++++++++++++++-------------------------
->  1 file changed, 38 insertions(+), 55 deletions(-)
->
-> diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-> index 464b370189..99013ff37b 100644
-> --- a/tests/test-qmp-cmds.c
-> +++ b/tests/test-qmp-cmds.c
-> @@ -1,5 +1,6 @@
->  #include "qemu/osdep.h"
->  #include "qapi/qmp/qdict.h"
-> +#include "qapi/qmp/qjson.h"
->  #include "qapi/qmp/qnum.h"
->  #include "qapi/qmp/qstring.h"
->  #include "qapi/error.h"
-> @@ -145,11 +146,16 @@ __org_qemu_x_Union1 *qmp___org_qemu_x_command(__org=
-_qemu_x_EnumList *a,
->  }
->
->
-> -static QObject *do_qmp_dispatch(QDict *req, bool allow_oob)
-> +static QObject *do_qmp_dispatch(bool allow_oob, const char *template, ..=
-.)
->  {
-> -    QDict *resp;
-> +    va_list ap;
-> +    QDict *req, *resp;
->      QObject *ret;
->
-> +    va_start(ap, template);
-> +    req =3D qdict_from_vjsonf_nofail(template, ap);
-> +    va_end(ap);
-> +
->      resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
->      g_assert(resp);
->      ret =3D qdict_get(resp, "return");
-> @@ -158,14 +164,21 @@ static QObject *do_qmp_dispatch(QDict *req, bool al=
-low_oob)
->
->      qobject_ref(ret);
->      qobject_unref(resp);
-> +    qobject_unref(req);
->      return ret;
->  }
->
-> -static void do_qmp_dispatch_error(QDict *req, bool allow_oob, ErrorClass=
- cls)
-> +static void do_qmp_dispatch_error(bool allow_oob, ErrorClass cls,
-> +                                  const char *template, ...)
->  {
-> -    QDict *resp;
-> +    va_list ap;
-> +    QDict *req, *resp;
->      QDict *error;
->
-> +    va_start(ap, template);
-> +    req =3D qdict_from_vjsonf_nofail(template, ap);
-> +    va_end(ap);
-> +
->      resp =3D qmp_dispatch(&qmp_commands, QOBJECT(req), allow_oob);
->      g_assert(resp);
->      error =3D qdict_get_qdict(resp, "error");
-> @@ -177,59 +190,43 @@ static void do_qmp_dispatch_error(QDict *req, bool =
-allow_oob, ErrorClass cls)
->      g_assert(qdict_size(resp) =3D=3D 1);
->
->      qobject_unref(resp);
-> +    qobject_unref(req);
->  }
->
->  /* test commands with no input and no return value */
->  static void test_dispatch_cmd(void)
->  {
-> -    QDict *req =3D qdict_new();
->      QDict *ret;
->
-> -    qdict_put_str(req, "execute", "user_def_cmd");
-> -
-> -    ret =3D qobject_to(QDict, do_qmp_dispatch(req, false));
-> +    ret =3D qobject_to(QDict,
-> +                     do_qmp_dispatch(false,
-> +                                     "{ 'execute': 'user_def_cmd' }"));
->      assert(ret && qdict_size(ret) =3D=3D 0);
-> -
->      qobject_unref(ret);
-> -    qobject_unref(req);
->  }
->
->  static void test_dispatch_cmd_oob(void)
->  {
-> -    QDict *req =3D qdict_new();
->      QDict *ret;
->
-> -    qdict_put_str(req, "exec-oob", "test-flags-command");
-> -
-> -    ret =3D qobject_to(QDict, do_qmp_dispatch(req, true));
-> +    ret =3D qobject_to(QDict,
-> +                     do_qmp_dispatch(true,
-> +                                     "{ 'exec-oob': 'test-flags-command'=
- }"));
->      assert(ret && qdict_size(ret) =3D=3D 0);
-> -
->      qobject_unref(ret);
-> -    qobject_unref(req);
->  }
->
->  /* test commands that return an error due to invalid parameters */
->  static void test_dispatch_cmd_failure(void)
->  {
-> -    QDict *req =3D qdict_new();
-> -    QDict *args =3D qdict_new();
-> -
-> -    qdict_put_str(req, "execute", "user_def_cmd2");
-> -
-> -    do_qmp_dispatch_error(req, false, ERROR_CLASS_GENERIC_ERROR);
-> -
-> -    qobject_unref(req);
-> -
-> -    /* check that with extra arguments it throws an error */
-> -    req =3D qdict_new();
-> -    qdict_put_int(args, "a", 66);
-> -    qdict_put(req, "arguments", args);
-> -
-> -    qdict_put_str(req, "execute", "user_def_cmd");
-> -
-> -    do_qmp_dispatch_error(req, false, ERROR_CLASS_GENERIC_ERROR);
-> -
-> -    qobject_unref(req);
-> +    /* missing arguments */
-> +    do_qmp_dispatch_error(false, ERROR_CLASS_GENERIC_ERROR,
-> +                          "{ 'execute': 'user_def_cmd2' }");
-> +
-> +    /* extra arguments */
-> +    do_qmp_dispatch_error(false, ERROR_CLASS_GENERIC_ERROR,
-> +                          "{ 'execute': 'user_def_cmd',"
-> +                          " 'arguments': { 'a': 66 } }");
->  }
->
->  static void test_dispatch_cmd_success_response(void)
-> @@ -246,26 +243,15 @@ static void test_dispatch_cmd_success_response(void=
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 7dfd8a1a392d..665485045066 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -44,6 +44,8 @@
+ #include "trace.h"
+ #include "nvme.h"
+=20
++#define NVME_CMB_BIR 2
++
+ #define NVME_GUEST_ERR(trace, fmt, ...) \
+     do { \
+         (trace_##trace)(__VA_ARGS__); \
+@@ -63,7 +65,7 @@ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr=
+ addr)
+=20
+ static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size=
 )
->  /* test commands that involve both input parameters and return values */
->  static void test_dispatch_cmd_io(void)
->  {
-> -    QDict *req =3D qdict_new();
-> -    QDict *args =3D qdict_new();
-> -    QDict *args3 =3D qdict_new();
-> -    QDict *ud1a =3D qdict_new();
-> -    QDict *ud1b =3D qdict_new();
->      QDict *ret, *ret_dict, *ret_dict_dict, *ret_dict_dict_userdef;
->      QDict *ret_dict_dict2, *ret_dict_dict2_userdef;
->      QNum *ret3;
->      int64_t val;
->
-> -    qdict_put_int(ud1a, "integer", 42);
-> -    qdict_put_str(ud1a, "string", "hello");
-> -    qdict_put_int(ud1b, "integer", 422);
-> -    qdict_put_str(ud1b, "string", "hello2");
-> -    qdict_put(args, "ud1a", ud1a);
-> -    qdict_put(args, "ud1b", ud1b);
-> -    qdict_put(req, "arguments", args);
-> -    qdict_put_str(req, "execute", "user_def_cmd2");
-> -
-> -    ret =3D qobject_to(QDict, do_qmp_dispatch(req, false));
-> +    ret =3D qobject_to(QDict, do_qmp_dispatch(false,
-> +        "{ 'execute': 'user_def_cmd2', 'arguments': {"
-> +        " 'ud1a': { 'integer': 42, 'string': 'hello' },"
-> +        " 'ud1b': { 'integer': 422, 'string': 'hello2' } } }"));
->
->      assert(!strcmp(qdict_get_str(ret, "string0"), "blah1"));
->      ret_dict =3D qdict_get_qdict(ret, "dict1");
-> @@ -282,11 +268,8 @@ static void test_dispatch_cmd_io(void)
->      assert(!strcmp(qdict_get_str(ret_dict_dict2, "string"), "blah4"));
->      qobject_unref(ret);
->
-> -    qdict_put_int(args3, "a", 66);
-> -    qdict_put(req, "arguments", args3);
-> -    qdict_put_str(req, "execute", "guest-get-time");
-> -
-> -    ret3 =3D qobject_to(QNum, do_qmp_dispatch(req, false));
-> +    ret3 =3D qobject_to(QNum, do_qmp_dispatch(false,
-> +        "{ 'execute': 'guest-get-time', 'arguments': { 'a': 66 } }"));
->      g_assert(qnum_get_try_int(ret3, &val));
->      g_assert_cmpint(val, =3D=3D, 66);
->      qobject_unref(ret3);
-> --
-> 2.21.1
->
->
-
-
+ {
+-    if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
++    if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
+         memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
+         return;
+     }
+@@ -157,7 +159,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOV=
+ector *iov, uint64_t prp1,
+     if (unlikely(!prp1)) {
+         trace_nvme_dev_err_invalid_prp();
+         return NVME_INVALID_FIELD | NVME_DNR;
+-    } else if (n->cmbsz && prp1 >=3D n->ctrl_mem.addr &&
++    } else if (n->bar.cmbsz && prp1 >=3D n->ctrl_mem.addr &&
+                prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size))=
+ {
+         qsg->nsg =3D 0;
+         qemu_iovec_init(iov, num_prps);
+@@ -1324,14 +1326,9 @@ static const MemoryRegionOps nvme_cmb_ops =3D {
+     },
+ };
+=20
+-static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
+ {
+-    NvmeCtrl *n =3D NVME(pci_dev);
+-    NvmeIdCtrl *id =3D &n->id_ctrl;
+-
+-    int i;
+-    int64_t bs_size;
+-    uint8_t *pci_conf;
++    NvmeParams *params =3D &n->params;
+=20
+     if (n->params.num_queues) {
+         warn_report("nvme: num_queues is deprecated; please use max_ioqp=
+airs "
+@@ -1340,57 +1337,100 @@ static void nvme_realize(PCIDevice *pci_dev, Err=
+or **errp)
+         n->params.max_ioqpairs =3D n->params.num_queues - 1;
+     }
+=20
+-    if (!n->params.max_ioqpairs) {
+-        error_setg(errp, "max_ioqpairs can't be less than 1");
++    if (params->max_ioqpairs < 1 ||
++        params->max_ioqpairs > PCI_MSIX_FLAGS_QSIZE) {
++        error_setg(errp, "nvme: max_ioqpairs must be ");
++        return -1;
+     }
+=20
+     if (!n->conf.blk) {
+-        error_setg(errp, "drive property not set");
+-        return;
++        error_setg(errp, "nvme: block backend not configured");
++        return -1;
+     }
+=20
+-    bs_size =3D blk_getlength(n->conf.blk);
+-    if (bs_size < 0) {
+-        error_setg(errp, "could not get backing file size");
+-        return;
++    if (!params->serial) {
++        error_setg(errp, "nvme: serial not configured");
++        return -1;
+     }
+=20
+-    if (!n->params.serial) {
+-        error_setg(errp, "serial property not set");
+-        return;
+-    }
++    return 0;
++}
++
++static int nvme_init_blk(NvmeCtrl *n, Error **errp)
++{
+     blkconf_blocksizes(&n->conf);
+     if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
+f.blk),
+                                        false, errp)) {
+-        return;
++        return -1;
+     }
+=20
+-    pci_conf =3D pci_dev->config;
+-    pci_conf[PCI_INTERRUPT_PIN] =3D 1;
+-    pci_config_set_prog_interface(pci_dev->config, 0x2);
+-    pci_config_set_class(pci_dev->config, PCI_CLASS_STORAGE_EXPRESS);
+-    pcie_endpoint_cap_init(pci_dev, 0x80);
++    return 0;
++}
+=20
++static void nvme_init_state(NvmeCtrl *n)
++{
+     n->num_namespaces =3D 1;
+     n->reg_size =3D pow2ceil(0x1008 + 2 * (n->params.max_ioqpairs) * 4);
+-    n->ns_size =3D bs_size / (uint64_t)n->num_namespaces;
+-
+     n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
+     n->sq =3D g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
+     n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
++}
+=20
+-    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n,
+-                          "nvme", n->reg_size);
+-    pci_register_bar(pci_dev, 0,
+-        PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64,
+-        &n->iomem);
++static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
++{
++    NVME_CMBLOC_SET_BIR(n->bar.cmbloc, NVME_CMB_BIR);
++    NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
++
++    NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
++    NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
++    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
++    NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
++    NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
++    NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2);
++    NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
++
++    n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
++    memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
++                          "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
++    pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
++                     PCI_BASE_ADDRESS_SPACE_MEMORY |
++                     PCI_BASE_ADDRESS_MEM_TYPE_64 |
++                     PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
++}
++
++static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
++{
++    uint8_t *pci_conf =3D pci_dev->config;
++
++    pci_conf[PCI_INTERRUPT_PIN] =3D 1;
++    pci_config_set_prog_interface(pci_conf, 0x2);
++    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
++    pci_config_set_device_id(pci_conf, 0x5845);
++    pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
++    pcie_endpoint_cap_init(pci_dev, 0x80);
++
++    memory_region_init_io(&n->iomem, OBJECT(n), &nvme_mmio_ops, n, "nvme=
+",
++                          n->reg_size);
++    pci_register_bar(pci_dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
++                     PCI_BASE_ADDRESS_MEM_TYPE_64, &n->iomem);
+     msix_init_exclusive_bar(pci_dev, n->params.max_ioqpairs + 1, 4, NULL=
+);
+=20
++    if (n->params.cmb_size_mb) {
++        nvme_init_cmb(n, pci_dev);
++    }
++}
++
++static void nvme_init_ctrl(NvmeCtrl *n)
++{
++    NvmeIdCtrl *id =3D &n->id_ctrl;
++    NvmeParams *params =3D &n->params;
++    uint8_t *pci_conf =3D n->parent_obj.config;
++
+     id->vid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_VENDOR_ID));
+     id->ssvid =3D cpu_to_le16(pci_get_word(pci_conf + PCI_SUBSYSTEM_VEND=
+OR_ID));
+     strpadcpy((char *)id->mn, sizeof(id->mn), "QEMU NVMe Ctrl", ' ');
+     strpadcpy((char *)id->fr, sizeof(id->fr), "1.0", ' ');
+-    strpadcpy((char *)id->sn, sizeof(id->sn), n->params.serial, ' ');
++    strpadcpy((char *)id->sn, sizeof(id->sn), params->serial, ' ');
+     id->rab =3D 6;
+     id->ieee[0] =3D 0x00;
+     id->ieee[1] =3D 0x02;
+@@ -1431,46 +1471,54 @@ static void nvme_realize(PCIDevice *pci_dev, Erro=
+r **errp)
+=20
+     n->bar.vs =3D 0x00010200;
+     n->bar.intmc =3D n->bar.intms =3D 0;
++}
+=20
+-    if (n->params.cmb_size_mb) {
++static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **e=
+rrp)
++{
++    int64_t bs_size;
++    NvmeIdNs *id_ns =3D &ns->id_ns;
+=20
+-        NVME_CMBLOC_SET_BIR(n->bar.cmbloc, 2);
+-        NVME_CMBLOC_SET_OFST(n->bar.cmbloc, 0);
++    bs_size =3D blk_getlength(n->conf.blk);
++    if (bs_size < 0) {
++        error_setg_errno(errp, -bs_size, "blk_getlength");
++        return -1;
++    }
+=20
+-        NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+-        NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+-        NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
+-        NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+-        NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+-        NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
+-        NVME_CMBSZ_SET_SZ(n->bar.cmbsz, n->params.cmb_size_mb);
++    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
++    n->ns_size =3D bs_size;
+=20
+-        n->cmbloc =3D n->bar.cmbloc;
+-        n->cmbsz =3D n->bar.cmbsz;
++    id_ns->nsze =3D cpu_to_le64(nvme_ns_nlbas(n, ns));
+=20
+-        n->cmbuf =3D g_malloc0(NVME_CMBSZ_GETSIZE(n->bar.cmbsz));
+-        memory_region_init_io(&n->ctrl_mem, OBJECT(n), &nvme_cmb_ops, n,
+-                              "nvme-cmb", NVME_CMBSZ_GETSIZE(n->bar.cmbs=
+z));
+-        pci_register_bar(pci_dev, NVME_CMBLOC_BIR(n->bar.cmbloc),
+-            PCI_BASE_ADDRESS_SPACE_MEMORY | PCI_BASE_ADDRESS_MEM_TYPE_64=
+ |
+-            PCI_BASE_ADDRESS_MEM_PREFETCH, &n->ctrl_mem);
++    /* no thin provisioning */
++    id_ns->ncap =3D id_ns->nsze;
++    id_ns->nuse =3D id_ns->ncap;
+=20
++    return 0;
++}
++
++static void nvme_realize(PCIDevice *pci_dev, Error **errp)
++{
++    NvmeCtrl *n =3D NVME(pci_dev);
++    int i;
++
++    if (nvme_check_constraints(n, errp)) {
++        return;
++    }
++
++    nvme_init_state(n);
++
++    if (nvme_init_blk(n, errp)) {
++        return;
+     }
+=20
+     for (i =3D 0; i < n->num_namespaces; i++) {
+-        NvmeNamespace *ns =3D &n->namespaces[i];
+-        NvmeIdNs *id_ns =3D &ns->id_ns;
+-        id_ns->nsfeat =3D 0;
+-        id_ns->nlbaf =3D 0;
+-        id_ns->flbas =3D 0;
+-        id_ns->mc =3D 0;
+-        id_ns->dpc =3D 0;
+-        id_ns->dps =3D 0;
+-        id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
+-        id_ns->ncap  =3D id_ns->nuse =3D id_ns->nsze =3D
+-            cpu_to_le64(n->ns_size >>
+-                id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas)].ds)=
+;
++        if (nvme_init_namespace(n, &n->namespaces[i], errp)) {
++            return;
++        }
+     }
++
++    nvme_init_pci(n, pci_dev);
++    nvme_init_ctrl(n);
+ }
+=20
+ static void nvme_exit(PCIDevice *pci_dev)
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 98f5b9479244..b7c465560eea 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -67,6 +67,22 @@ typedef struct NvmeNamespace {
+     NvmeIdNs        id_ns;
+ } NvmeNamespace;
+=20
++static inline NvmeLBAF *nvme_ns_lbaf(NvmeNamespace *ns)
++{
++    NvmeIdNs *id_ns =3D &ns->id_ns;
++    return &id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
++}
++
++static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
++{
++    return nvme_ns_lbaf(ns)->ds;
++}
++
++static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
++{
++    return 1 << nvme_ns_lbads(ns);
++}
++
+ #define TYPE_NVME "nvme"
+ #define NVME(obj) \
+         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
+@@ -88,8 +104,6 @@ typedef struct NvmeCtrl {
+     uint32_t    num_namespaces;
+     uint32_t    max_q_ents;
+     uint64_t    ns_size;
+-    uint32_t    cmbsz;
+-    uint32_t    cmbloc;
+     uint8_t     *cmbuf;
+     uint64_t    irq_status;
+     uint64_t    host_timestamp;                 /* Timestamp sent by the=
+ host */
+@@ -103,4 +117,9 @@ typedef struct NvmeCtrl {
+     NvmeIdCtrl      id_ctrl;
+ } NvmeCtrl;
+=20
++static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
++{
++    return n->ns_size >> nvme_ns_lbads(ns);
++}
++
+ #endif /* HW_NVME_H */
 --=20
-Marc-Andr=C3=A9 Lureau
+2.25.1
+
 
