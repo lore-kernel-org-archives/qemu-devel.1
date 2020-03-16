@@ -2,69 +2,90 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B83C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F8F0C18E5B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4C4520409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4C4520409
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 1366A20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:04:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZ63sTDl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1366A20409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDu6H-0008Nf-Rs
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:04:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40312)
+	id 1jDu6O-00005P-5i
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jDsPe-0007uR-DK
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:23 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtRM-0000eI-JJ
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jDsPd-0008KB-8K
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:22 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:49873)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsPc-0008AT-V9
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:21 -0400
-Received: from localhost.localdomain ([82.252.135.106]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MfL5v-1joKxH1kap-00glYi; Mon, 16 Mar 2020 17:16:16 +0100
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <alex.bennee@linaro.org>) id 1jDtRI-0008GJ-RP
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:12 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:51349)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1jDtRI-00082C-Fs
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:22:08 -0400
+Received: by mail-wm1-x331.google.com with SMTP id a132so18580312wme.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:22:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ZZCLDV01NVJMn0TsI5hdBQQvWUb6UiKnEo9bNWpw6gs=;
+ b=rZ63sTDlVfAcYzRWg00N/5cdhSxvYq8tQ7rIJdD2Hjwlh5YZsaGi/lTL6eKel5Zxco
+ LVVY1UfozQXF7JgHynTJQyzibiqzpIU+DHAmoiUQU9x62S7gCKSAjYBG4VIh4qaNRdyl
+ 7s1XkCMLw7O91Y507W2qtcAbZ0oSX1bxmcw/EqCR8MGvIByh7Fzfk4tbbYFFcQKCBu6g
+ +EUjYCmmNaTXB62y47o6Pc0RCS5/LSfWNqENnfUPuaSu1+WnAK12fYEkfWUCdVyR9H+l
+ fZclHfZvnuQKyHW8QXtebbjk95yQXqgnXdNgAqG5XuhKRKUrW/2Uer+oTWO4uifwGMqu
+ l3hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ZZCLDV01NVJMn0TsI5hdBQQvWUb6UiKnEo9bNWpw6gs=;
+ b=dAIF/2WTdzuMetgooInDmq2072IZtv7WekzK6rgP10g3yW39k/2YdV37hrOydO0r0s
+ d9FpKRp7+LqCOhKCeu9z8UuWi2i73v5bCLX63EOLwGKJQmTUOIFw+STe38VwZFhJaOTB
+ +ZvkVB7bJUosz1ht1sLc5KXRFm4St/yn5j01w2rhV+uBTPN1UjliiUpFGWdv/U3U5aNt
+ 4MSdy1iYLPMuEZqFFzT3K25ha3GVzYoxrxjelx15OU9T+lCZmjE3jJh8dX2WAsFmSl/2
+ CeiOiSVw57c8/31DuMzvP3hQk2r1qEzHR59pZfwHvRvlRq+4PBRhxEF3lMP9ZFbsPZnn
+ eFlg==
+X-Gm-Message-State: ANhLgQ1ZEvGr75oFNZtd72J+wWyX10FStxnBSKp8/OA3HVbaMpqJqbf7
+ NUDrVeARfYDrHh9MCQfmReb5qA==
+X-Google-Smtp-Source: ADFU+vvyAHLXN1VLmBH1AYEhQ7T8o/iXogIIBJfEd8MeQ9as9PXJ2jSPURLbW17Fd+D3G3zW3+7WJA==
+X-Received: by 2002:a05:600c:2c06:: with SMTP id
+ q6mr177487wmg.52.1584379326311; 
+ Mon, 16 Mar 2020 10:22:06 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f187sm457188wme.31.2020.03.16.10.21.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Mar 2020 10:22:03 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5295E1FF8C;
+ Mon, 16 Mar 2020 17:21:55 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/38] linux-user/syscall: Add support for
- clock_gettime64/clock_settime64
-Date: Mon, 16 Mar 2020 17:15:23 +0100
-Message-Id: <20200316161550.336150-12-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
-References: <20200316161550.336150-1-laurent@vivier.eu>
+Subject: [PATCH  v1 02/28] tests/docker: Update VirGL git repository URL
+Date: Mon, 16 Mar 2020 17:21:29 +0000
+Message-Id: <20200316172155.971-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200316172155.971-1-alex.bennee@linaro.org>
+References: <20200316172155.971-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:E5zxhOXJJ3t7m3Z20tOxSleG9nVmiKdnpH+eTyNTpG7FgbczEw6
- 0UNAIHImIYojHqyqJULjz8klSh0a7q5EmzwDpMCfm3SdCVVfSsC5lw/GC5q5HU53zIVgwcX
- jvbkJWmrITFp3FllJd5Oe43l6vJ8pNnQZ7C26Hv9ryAQVcV48Dm9NZvHaA9O3MqeJ82QSFT
- fmpYaVDZVKIf70C88s9/w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PPljKfhmlKA=:xlxSBG02YJsoahLq4LaOkY
- PRWVtPR1mvumRAu+hDpQ3zhVNRlsc4npal+fbWMn19qvkjlUSlGGFakVkGTlZGJ/1vR+Owept
- r8RYyCHKdm6Ndc5SrzvP5+zWIa6+7+uN8+jCo21jMDXGFRAjrqHXxJcrSos0ihPDbvLQJKH/2
- JH9qT42Xwv/i6kz3Yt7a/+PSG2X6pgPlyUGA1aL+j4wmgtI1ShFNY46956s64XLn5QEoLvs7T
- M2XRZc9v/h/CO9scSZoxjEqhz7LkFhCLcoGkANLMuzXI93wqC1I5qnaIqYzGTb5VV0RTQemzB
- EUTEF8THcXnCNxH6+8GKXK1FXjZQrdtoeO2Z2aX+0l6/VPsnYxnr69JgO9p39ErTUioawar8h
- hSo+c2wtIZyTTHGsTJD0eUi8VjfXXaUMQYLH2c5GF4fBa1PCamFwGIl/ilOkes2kNFBbHIuvB
- oNsp9O6q9VpaP8XJWbhJwxo1P0H8HZilXGw1NUIdWtUE0vxihQ1CZCb0R1/2IM0OVQFAo9vK8
- yJlQOIJNE+44sD0y7lx2CzmADA3wsmIYOWgQ1lzjiCoMqJn2cXSq9OKk6Cnwmk9B9EGxH+Olf
- JDDFjDB4QciokxnUTN9svegcvWLF3uV5GBcf+smjNqygkI7SPfFHkoDsdjUEtyFcnXUyh72Y8
- i2wtI2l3oAZk6uc1kAShHFZDrgJWl6fBFeuUxF0RbuX49OSjKVpKzWVeu6ag1qScFfC1M3vFy
- Gx8+LBZvCzBvD21Zk8qACTfLRexo+9rIbpD3fDmrHpN2H9CBEcsJNvjpzmWrPx4CNtb/hVPsf
- WLZweNRxV+yn15O3mRaQN9i6x3eJDGGagYsc6/Y2aRxDcFKajgVNcrOlf8WTWsyPVcrjI7+
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,95 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Alistair Francis <alistair.francis@wdc.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Add support for the clock_gettime64/clock_settime64 syscalls.
+freedesktop.org is moving to a GitLab instance,
+use the new url.
 
-If your host is 64-bit or is 32-bit with the *_time64 syscall then the
-timespec will correctly be a 64-bit time_t. Otherwise the host will
-return a 32-bit time_t which will be rounded to 64-bits. This will be
-incorrect after y2038.
+- https://www.fooishbar.org/blog/gitlab-fdo-introduction/
+- https://gitlab.freedesktop.org/freedesktop/freedesktop/-/wikis/home
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <4a7fd05532400d10aa0f684c9043e2ac7b34d91c.1584051142.git.alistair.francis@wdc.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200212202709.12665-2-philmd@redhat.com>
 ---
- linux-user/syscall.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ tests/docker/dockerfiles/debian-amd64.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 479db1940ee9..aaf62d48992a 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1229,6 +1229,22 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
- }
- #endif
+diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
+index 3b860af1068..b67fad54cb7 100644
+--- a/tests/docker/dockerfiles/debian-amd64.docker
++++ b/tests/docker/dockerfiles/debian-amd64.docker
+@@ -27,7 +27,7 @@ RUN apt update && \
+         libegl1-mesa-dev \
+         libepoxy-dev \
+         libgbm-dev
+-RUN git clone https://anongit.freedesktop.org/git/virglrenderer.git /usr/src/virglrenderer && \
++RUN git clone https://gitlab.freedesktop.org/virgl/virglrenderer.git /usr/src/virglrenderer && \
+     cd /usr/src/virglrenderer && git checkout virglrenderer-0.7.0
+ RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx --disable-tests && make install
  
-+#if defined(TARGET_NR_clock_settime64)
-+static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
-+                                                 abi_ulong target_addr)
-+{
-+    struct target__kernel_timespec *target_ts;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
-+        return -TARGET_EFAULT;
-+    }
-+    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
-+    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
-+    unlock_user_struct(target_ts, target_addr, 0);
-+    return 0;
-+}
-+#endif
-+
- static inline abi_long host_to_target_timespec(abi_ulong target_addr,
-                                                struct timespec *host_ts)
- {
-@@ -11491,6 +11507,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
-     }
- #endif
-+#ifdef TARGET_NR_clock_settime64
-+    case TARGET_NR_clock_settime64:
-+    {
-+        struct timespec ts;
-+
-+        ret = target_to_host_timespec64(&ts, arg2);
-+        if (!is_error(ret)) {
-+            ret = get_errno(clock_settime(arg1, &ts));
-+        }
-+        return ret;
-+    }
-+#endif
- #ifdef TARGET_NR_clock_gettime
-     case TARGET_NR_clock_gettime:
-     {
-@@ -11502,6 +11530,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
-     }
- #endif
-+#ifdef TARGET_NR_clock_gettime64
-+    case TARGET_NR_clock_gettime64:
-+    {
-+        struct timespec ts;
-+        ret = get_errno(clock_gettime(arg1, &ts));
-+        if (!is_error(ret)) {
-+            ret = host_to_target_timespec64(arg2, &ts);
-+        }
-+        return ret;
-+    }
-+#endif
- #ifdef TARGET_NR_clock_getres
-     case TARGET_NR_clock_getres:
-     {
 -- 
-2.24.1
+2.20.1
 
 
