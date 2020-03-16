@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79011C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DF9C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 507EE20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:59:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507EE20679
+	by mail.kernel.org (Postfix) with ESMTPS id 257582051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 16:59:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 257582051A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDt4v-0000sE-Fx
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53408)
+	id 1jDt5N-0001kL-9f
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 12:59:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDqkq-00009H-3A
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:10 -0400
+ (envelope-from <its@irrelevant.dk>) id 1jDqlI-0000SW-Tt
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDqko-0002EA-CK
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:07 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48540)
+ (envelope-from <its@irrelevant.dk>) id 1jDqlF-0004vi-Eg
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:36 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:48826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDqkk-0007Wn-Dy; Mon, 16 Mar 2020 10:30:02 -0400
+ id 1jDql9-000269-8S; Mon, 16 Mar 2020 10:30:27 -0400
 Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
  [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id 03608BF7B4;
- Mon, 16 Mar 2020 14:29:40 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 43EE4BF9DF;
+ Mon, 16 Mar 2020 14:29:50 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v6 11/42] nvme: add temperature threshold feature
-Date: Mon, 16 Mar 2020 07:28:57 -0700
-Message-Id: <20200316142928.153431-12-its@irrelevant.dk>
+Subject: [PATCH v6 29/42] nvme: refactor request bounds checking
+Date: Mon, 16 Mar 2020 07:29:15 -0700
+Message-Id: <20200316142928.153431-30-its@irrelevant.dk>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
 References: <20200316142928.153431-1-its@irrelevant.dk>
@@ -71,153 +71,74 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-It might seem wierd to implement this feature for an emulated device,
-but it is mandatory to support and the feature is useful for testing
-asynchronous event request support, which will be added in a later
-patch.
-
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Keith Busch <kbusch@kernel.org>
 ---
- hw/block/nvme.c      | 48 ++++++++++++++++++++++++++++++++++++++++++++
- hw/block/nvme.h      |  2 ++
- include/block/nvme.h |  8 +++++++-
- 3 files changed, 57 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 665485045066..64c42101df5c 100644
+index eecfad694bf8..ba520c76bae5 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -45,6 +45,9 @@
- #include "nvme.h"
-=20
- #define NVME_CMB_BIR 2
-+#define NVME_TEMPERATURE 0x143
-+#define NVME_TEMPERATURE_WARNING 0x157
-+#define NVME_TEMPERATURE_CRITICAL 0x175
-=20
- #define NVME_GUEST_ERR(trace, fmt, ...) \
-     do { \
-@@ -798,9 +801,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl =
-*n, NvmeCmd *cmd)
- static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
-*req)
- {
-     uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
-+    uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-     uint32_t result;
-=20
-     switch (dw10) {
-+    case NVME_TEMPERATURE_THRESHOLD:
-+        result =3D 0;
-+
-+        /*
-+         * The controller only implements the Composite Temperature sens=
-or, so
-+         * return 0 for all other sensors.
-+         */
-+        if (NVME_TEMP_TMPSEL(dw11)) {
-+            break;
-+        }
-+
-+        switch (NVME_TEMP_THSEL(dw11)) {
-+        case 0x0:
-+            result =3D cpu_to_le16(n->features.temp_thresh_hi);
-+            break;
-+        case 0x1:
-+            result =3D cpu_to_le16(n->features.temp_thresh_low);
-+            break;
-+        }
-+
-+        break;
-     case NVME_VOLATILE_WRITE_CACHE:
-         result =3D blk_enable_write_cache(n->conf.blk);
-         trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-@@ -845,6 +870,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCm=
-d *cmd, NvmeRequest *req)
-     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
-=20
-     switch (dw10) {
-+    case NVME_TEMPERATURE_THRESHOLD:
-+        if (NVME_TEMP_TMPSEL(dw11)) {
-+            break;
-+        }
-+
-+        switch (NVME_TEMP_THSEL(dw11)) {
-+        case 0x0:
-+            n->features.temp_thresh_hi =3D NVME_TEMP_TMPTH(dw11);
-+            break;
-+        case 0x1:
-+            n->features.temp_thresh_low =3D NVME_TEMP_TMPTH(dw11);
-+            break;
-+        default:
-+            return NVME_INVALID_FIELD | NVME_DNR;
-+        }
-+
-+        break;
-     case NVME_VOLATILE_WRITE_CACHE:
-         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
-         break;
-@@ -1374,6 +1416,7 @@ static void nvme_init_state(NvmeCtrl *n)
-     n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
-     n->sq =3D g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
-     n->cq =3D g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
-+    n->features.temp_thresh_hi =3D NVME_TEMPERATURE_WARNING;
+@@ -491,6 +491,20 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t e=
+vent_type)
+     }
  }
 =20
- static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-@@ -1451,6 +1494,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-     id->acl =3D 3;
-     id->frmw =3D 7 << 1;
-     id->lpa =3D 1 << 0;
++static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
++                                         uint64_t slba, uint32_t nlb,
++                                         NvmeRequest *req)
++{
++    uint64_t nsze =3D le64_to_cpu(ns->id_ns.nsze);
 +
-+    /* recommended default value (~70 C) */
-+    id->wctemp =3D cpu_to_le16(NVME_TEMPERATURE_WARNING);
-+    id->cctemp =3D cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
++    if (unlikely(UINT64_MAX - slba < nlb || slba + nlb > nsze)) {
++        trace_nvme_dev_err_invalid_lba_range(slba, nlb, nsze);
++        return NVME_LBA_RANGE | NVME_DNR;
++    }
 +
-     id->sqes =3D (0x6 << 4) | 0x6;
-     id->cqes =3D (0x4 << 4) | 0x4;
-     id->nn =3D cpu_to_le32(n->num_namespaces);
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index b7c465560eea..8cda5f02c622 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
-     uint64_t    irq_status;
-     uint64_t    host_timestamp;                 /* Timestamp sent by the=
- host */
-     uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-+    uint16_t    temperature;
++    return NVME_SUCCESS;
++}
++
+ static void nvme_rw_cb(void *opaque, int ret)
+ {
+     NvmeRequest *req =3D opaque;
+@@ -536,10 +550,11 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeN=
+amespace *ns, NvmeCmd *cmd,
+     uint32_t nlb  =3D le16_to_cpu(rw->nlb) + 1;
+     uint64_t offset =3D slba << data_shift;
+     uint32_t count =3D nlb << data_shift;
++    uint16_t status;
 =20
-     NvmeNamespace   *namespaces;
-     NvmeSQueue      **sq;
-@@ -115,6 +116,7 @@ typedef struct NvmeCtrl {
-     NvmeSQueue      admin_sq;
-     NvmeCQueue      admin_cq;
-     NvmeIdCtrl      id_ctrl;
-+    NvmeFeatureVal  features;
- } NvmeCtrl;
+-    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
+-        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+-        return NVME_LBA_RANGE | NVME_DNR;
++    status =3D nvme_check_bounds(n, ns, slba, nlb, req);
++    if (status) {
++        return status;
+     }
 =20
- static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index a083c1b3a613..91fc4738a3e0 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -688,7 +688,13 @@ enum NvmeIdCtrlOncs {
- typedef struct NvmeFeatureVal {
-     uint32_t    arbitration;
-     uint32_t    power_mgmt;
--    uint32_t    temp_thresh;
-+    union {
-+        struct {
-+            uint16_t temp_thresh_hi;
-+            uint16_t temp_thresh_low;
-+        };
-+        uint32_t temp_thresh;
-+    };
-     uint32_t    err_rec;
-     uint32_t    volatile_wc;
-     uint32_t    num_queues;
+     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+@@ -562,13 +577,14 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace =
+*ns, NvmeCmd *cmd,
+     uint64_t data_offset =3D slba << data_shift;
+     int is_write =3D rw->opcode =3D=3D NVME_CMD_WRITE ? 1 : 0;
+     enum BlockAcctType acct =3D is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT=
+_READ;
++    uint16_t status;
+=20
+     trace_nvme_dev_rw(is_write ? "write" : "read", nlb, data_size, slba)=
+;
+=20
+-    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
++    status =3D nvme_check_bounds(n, ns, slba, nlb, req);
++    if (status) {
+         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
+-        trace_nvme_dev_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+-        return NVME_LBA_RANGE | NVME_DNR;
++        return status;
+     }
+=20
+     if (nvme_map(n, cmd, &req->qsg, &req->iov, data_size, req)) {
 --=20
 2.25.1
 
