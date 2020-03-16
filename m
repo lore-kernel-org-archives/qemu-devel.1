@@ -6,49 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4779FC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B93C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CC1F2051A
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:10:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC1F2051A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id DBFB12051A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 17:10:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBFB12051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDtFY-0003gb-6G
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54350)
+	id 1jDtGS-0005IN-06
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 13:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1jDqlM-0000V9-Gy
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:43 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jDsQG-00088w-B4
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1jDqlI-0005HS-CB
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 10:30:40 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48824)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1jDql9-000268-Aq; Mon, 16 Mar 2020 10:30:27 -0400
-Received: from apples.local (80-62-117-52-mobile.dk.customer.tdc.net
- [80.62.117.52])
- by charlie.dont.surf (Postfix) with ESMTPSA id C3952BF9F3;
- Mon, 16 Mar 2020 14:29:50 +0000 (UTC)
-From: Klaus Jensen <its@irrelevant.dk>
-To: qemu-block@nongnu.org
-Subject: [PATCH v6 30/42] nvme: add check for mdts
-Date: Mon, 16 Mar 2020 07:29:16 -0700
-Message-Id: <20200316142928.153431-31-its@irrelevant.dk>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200316142928.153431-1-its@irrelevant.dk>
-References: <20200316142928.153431-1-its@irrelevant.dk>
+ (envelope-from <laurent@vivier.eu>) id 1jDsQD-0005eH-UU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:17:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:43397)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jDsQD-0005Vn-JU
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:16:57 -0400
+Received: from localhost.localdomain ([82.252.135.106]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MpTpc-1jfE0e0j08-00pryl; Mon, 16 Mar 2020 17:16:52 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 36/38] linux-user,
+ aarch64: sync syscall numbers with kernel v5.5
+Date: Mon, 16 Mar 2020 17:15:48 +0100
+Message-Id: <20200316161550.336150-37-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200316161550.336150-1-laurent@vivier.eu>
+References: <20200316161550.336150-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PJLJYUMCnxMn1bBvqSTVhRYkzoBwnzWRTRvSKVX6kv5iPg2Hiv+
+ OFcFaGatywuRmLeZ5o/U02HEy4oiqLgOWkjoX5wgCwvt1lKIkCDZA0tlmPJTnZthGdIGASB
+ kHfprMEBBfUh98/u7qZyordRJIxbmZkWS4TFCc2IDoU2S+9jwa4Xf455ghFamrlPm4jnP3k
+ GOgOqlvPFSM49BwHUEiFw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CnWs74U0D6M=:DQnFSBOOIutTreE6s5jMEb
+ TC026eh2yyastQGXVnl5FAFw40mveJ0OsUwOzOGcOPKkHGhj6gz43nxzzQ0ydIOfNOvnW/XEO
+ KwcMYO5bgRvB7YB72v7bJqVDs0wHnN1qC7FLPDpBsjSLf2k2ACMjQ2ZHY+RFYxv/mb+PVNc6F
+ kLsZ04Do5UHO3rCqSit85OJiOG42WUr3zQlpDPdsfpzANULoGhFAUH0Kp1XsOiONWhUDO6l8+
+ 9K70qtYXZpoTu/1Q+vdmk5vkwQ70mjwE4iH0dcreeIMIt3H0Yk5DfbhMLGD2Y15LKx0lbbaRX
+ t32vzMpFN9ZigBE1cQHW3MesBp+C/U/OsqOhjzxB7Smq5E55CJF5w/dgaG2KzT3nEHEeHwFKh
+ FNRrmpsNMDKhdYhvIRhQjOQEgZN5WDc6UaErXfoMIGLaGeAL5ypDmFH/dSCrNLg5KHCdEgoIs
+ YDJrHH4qC2WgaDSJC8IUsR5PyM9k5w+oPhz0Lt2fAqVjpyPSEFclsebg5UAXs1rz5+Iy70+fk
+ jirTC+yvavp0+DTCrb1uUdnMWtiUM2KEi3zlgb2PeDolKSt1Lst33QsKmCUPSow9AcNk5sKVz
+ tsXqUK4865Rs/WSeKQpzYVHl6SumA/Dh2hFj1gswg8PtUZjN9Ej+DLO9QBv9yXmPKKzACblOq
+ qbRVXdGIgCN/T3T4yn49eZAjOcxe4Wdw/gFdvq6rhp5jF2/CP0qCI3+vDpcJdSn/w+8I3Fh7s
+ EVAdI4Qs1qyzB8EXq7phpXO4Nc5jDR/OeSj/8vg4JPqMIk4Di1bwZyB+AIm6wFAloSDXvkiBl
+ SV7+ESFejGwG2H1xP+fRdHOS+5tyfe8HjlajWTkshz9dHmzFLeE72Y+oUJmd2xo5BQEc7Eq
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,152 +76,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>, Alistair Francis <alistair.francis@wdc.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+Use helper script scripts/gensyscalls.sh to generate the file.
 
-Add 'mdts' device parameter to control the Maximum Data Transfer Size of
-the controller and check that it is respected.
+This change TARGET_NR_fstatat64 by TARGET_NR_newfstatat that is correct
+because definitions from linux are:
 
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+arch/arm64/include/uapi/asm/unistd.h
+
+  #define __ARCH_WANT_NEW_STAT
+
+include/uapi/asm-generic/unistd.h
+
+  #if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
+  #define __NR3264_fstatat 79
+  __SC_3264(__NR3264_fstatat, sys_fstatat64, sys_newfstatat)
+  #define __NR3264_fstat 80
+  __SC_3264(__NR3264_fstat, sys_fstat64, sys_newfstat)
+  #endif
+  ...
+  #if __BITS_PER_LONG == 64 && !defined(__SYSCALL_COMPAT)
+  ...
+  #if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
+  #define __NR_newfstatat __NR3264_fstatat
+  #define __NR_fstat __NR3264_fstat
+  #endif
+  ...
+
+Add syscalls 286 (preadv2) to 435 (clone3).
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200316085620.309769-3-laurent@vivier.eu>
 ---
- hw/block/nvme.c       | 29 ++++++++++++++++++++++++++++-
- hw/block/nvme.h       |  4 +++-
- hw/block/trace-events |  1 +
- 3 files changed, 32 insertions(+), 2 deletions(-)
+ linux-user/aarch64/syscall_nr.h | 34 ++++++++++++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index ba520c76bae5..7d5340c272c6 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -19,7 +19,8 @@
-  *      -drive file=3D<file>,if=3Dnone,id=3D<drive_id>
-  *      -device nvme,drive=3D<drive_id>,serial=3D<serial>,id=3D<id[optio=
-nal]>, \
-  *              cmb_size_mb=3D<cmb_size_mb[optional]>, \
-- *              max_ioqpairs=3D<N[optional]>
-+ *              max_ioqpairs=3D<N[optional]>, \
-+ *              mdts=3D<mdts[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -491,6 +492,19 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t e=
-vent_type)
-     }
- }
-=20
-+static inline uint16_t nvme_check_mdts(NvmeCtrl *n, size_t len,
-+                                       NvmeRequest *req)
-+{
-+    uint8_t mdts =3D n->params.mdts;
+diff --git a/linux-user/aarch64/syscall_nr.h b/linux-user/aarch64/syscall_nr.h
+index f00ffd7fb82f..85de000b2490 100644
+--- a/linux-user/aarch64/syscall_nr.h
++++ b/linux-user/aarch64/syscall_nr.h
+@@ -1,7 +1,8 @@
+ /*
+  * This file contains the system call numbers.
++ * Do not modify.
++ * This file is generated by scripts/gensyscalls.sh
+  */
+-
+ #ifndef LINUX_USER_AARCH64_SYSCALL_NR_H
+ #define LINUX_USER_AARCH64_SYSCALL_NR_H
+ 
+@@ -84,7 +85,7 @@
+ #define TARGET_NR_splice 76
+ #define TARGET_NR_tee 77
+ #define TARGET_NR_readlinkat 78
+-#define TARGET_NR_fstatat64 79
++#define TARGET_NR_newfstatat 79
+ #define TARGET_NR_fstat 80
+ #define TARGET_NR_sync 81
+ #define TARGET_NR_fsync 82
+@@ -254,8 +255,8 @@
+ #define TARGET_NR_prlimit64 261
+ #define TARGET_NR_fanotify_init 262
+ #define TARGET_NR_fanotify_mark 263
+-#define TARGET_NR_name_to_handle_at         264
+-#define TARGET_NR_open_by_handle_at         265
++#define TARGET_NR_name_to_handle_at 264
++#define TARGET_NR_open_by_handle_at 265
+ #define TARGET_NR_clock_adjtime 266
+ #define TARGET_NR_syncfs 267
+ #define TARGET_NR_setns 268
+@@ -276,5 +277,28 @@
+ #define TARGET_NR_membarrier 283
+ #define TARGET_NR_mlock2 284
+ #define TARGET_NR_copy_file_range 285
++#define TARGET_NR_preadv2 286
++#define TARGET_NR_pwritev2 287
++#define TARGET_NR_pkey_mprotect 288
++#define TARGET_NR_pkey_alloc 289
++#define TARGET_NR_pkey_free 290
++#define TARGET_NR_statx 291
++#define TARGET_NR_io_pgetevents 292
++#define TARGET_NR_rseq 293
++#define TARGET_NR_kexec_file_load 294
++#define TARGET_NR_pidfd_send_signal 424
++#define TARGET_NR_io_uring_setup 425
++#define TARGET_NR_io_uring_enter 426
++#define TARGET_NR_io_uring_register 427
++#define TARGET_NR_open_tree 428
++#define TARGET_NR_move_mount 429
++#define TARGET_NR_fsopen 430
++#define TARGET_NR_fsconfig 431
++#define TARGET_NR_fsmount 432
++#define TARGET_NR_fspick 433
++#define TARGET_NR_pidfd_open 434
++#define TARGET_NR_clone3 435
++#define TARGET_NR_syscalls 436
 +
-+    if (mdts && len > n->page_size << mdts) {
-+        trace_nvme_dev_err_mdts(nvme_cid(req), n->page_size << mdts, len=
-);
-+        return NVME_INVALID_FIELD | NVME_DNR;
-+    }
-+
-+    return NVME_SUCCESS;
-+}
-+
- static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
-                                          uint64_t slba, uint32_t nlb,
-                                          NvmeRequest *req)
-@@ -581,6 +595,12 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *=
-ns, NvmeCmd *cmd,
-=20
-     trace_nvme_dev_rw(is_write ? "write" : "read", nlb, data_size, slba)=
-;
-=20
-+    status =3D nvme_check_mdts(n, data_size, req);
-+    if (status) {
-+        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-+        return status;
-+    }
-+
-     status =3D nvme_check_bounds(n, ns, slba, nlb, req);
-     if (status) {
-         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-@@ -871,6 +891,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cm=
-d, NvmeRequest *req)
-     uint32_t numdl, numdu;
-     uint64_t off, lpol, lpou;
-     size_t   len;
-+    uint16_t status;
-=20
-     numdl =3D (dw10 >> 16);
-     numdu =3D (dw11 & 0xffff);
-@@ -886,6 +907,11 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *c=
-md, NvmeRequest *req)
-=20
-     trace_nvme_dev_get_log(nvme_cid(req), lid, lsp, rae, len, off);
-=20
-+    status =3D nvme_check_mdts(n, len, req);
-+    if (status) {
-+        return status;
-+    }
-+
-     switch (lid) {
-     case NVME_LOG_ERROR_INFO:
-         return nvme_error_info(n, cmd, rae, len, off, req);
-@@ -2011,6 +2037,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-     id->ieee[0] =3D 0x00;
-     id->ieee[1] =3D 0x02;
-     id->ieee[2] =3D 0xb3;
-+    id->mdts =3D params->mdts;
-     id->ver =3D cpu_to_le32(NVME_SPEC_VER);
-     id->oacs =3D cpu_to_le16(0);
-=20
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 442b17bf1701..b05c2153aebf 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -9,7 +9,8 @@
-     DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 0), \
-     DEFINE_PROP_UINT32("max_ioqpairs", _state, _props.max_ioqpairs, 64),=
- \
-     DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
--    DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, =
-64)
-+    DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, =
-64), \
-+    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
-=20
- typedef struct NvmeParams {
-     char     *serial;
-@@ -18,6 +19,7 @@ typedef struct NvmeParams {
-     uint32_t cmb_size_mb;
-     uint8_t  aerl;
-     uint32_t aer_max_queued;
-+    uint8_t  mdts;
- } NvmeParams;
-=20
- typedef struct NvmeAsyncEvent {
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index e31e652fa04e..2df6aa38df1b 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -79,6 +79,7 @@ nvme_dev_mmio_doorbell_cq(uint16_t cqid, uint16_t new_h=
-ead) "cqid %"PRIu16" new_
- nvme_dev_mmio_doorbell_sq(uint16_t sqid, uint16_t new_tail) "cqid %"PRIu=
-16" new_tail %"PRIu16""
-=20
- # nvme traces for error conditions
-+nvme_dev_err_mdts(uint16_t cid, size_t mdts, size_t len) "cid %"PRIu16" =
-mdts %"PRIu64" len %"PRIu64""
- nvme_dev_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
- nvme_dev_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is nu=
-ll or not page aligned: 0x%"PRIx64""
- nvme_dev_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned=
-: 0x%"PRIx64""
---=20
-2.25.1
++#endif /* LINUX_USER_AARCH64_SYSCALL_NR_H */
+ 
+-#endif
+-- 
+2.24.1
 
 
