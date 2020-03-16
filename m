@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4080BC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F55BC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8A8D20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:17:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A5F520409
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqHL175Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A8D20409
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fv+SlBdr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5F520409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDuIW-0005BX-W0
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:17:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55869)
+	id 1jDuJG-0006K9-5k
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDsuV-000769-HY
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:48:16 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtV8-0007bY-50
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1jDsuU-0004JI-Ca
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:48:15 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53197)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jDtV6-0008Jl-Gr
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:26:05 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34717)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1jDsuQ-0004Bu-1c
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 12:48:10 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 11so18441376wmo.2
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 09:48:09 -0700 (PDT)
+ id 1jDtV6-0008Dk-8z
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:26:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id x3so13809250wmj.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 10:26:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=deJj+vvBHixf17+aV4bsjONR6VIn1aUycGcjFmJCu6Y=;
- b=SqHL175YW3tAFEVOMId9DGnhnA4aiwgwzXgyOrJfR76T9THhjDSCKs52mOsuAytANi
- G2UIhwLOCMH9Q9T++ahbNVpoBvmpHa4WVqUvjYOOGXhiJNWI2VJzTgdCq7JU9mDzuRT/
- bPNYFUyjm9H1c1YFTDvUl+Ni7CNYKwpD2fJwWFYwNPYcDsLH0voEwlYVggeHOTDktZPv
- MGpLebLQNKcAxA3nlgiqxmwrG8dm+nnEC6aVwM9jsISgHfU8ApenTOKe5WQD9OoYj3p0
- RQYi4xhFd0R2eM9bcf9h1lXw1DCezAqV4zSveBMAniJXidcn9W4V2yNclqSem3PNxdDQ
- bhDQ==
+ bh=dXWR932K4HOgQCUPYucSc3bUlAFTBYQcNOphnZlIFpc=;
+ b=fv+SlBdrX8TRZQIAicysyorbZwmp3ZkC67WsjChMoUwA9Hcw/9hRfi0M4dCAafobUg
+ j1/R3VeAUmzRxTaRHsbWfmpNJk4RTvs83WgaRQCAUyigYyWlLFUkApKz8D6hgJRDfd4h
+ 399ckE1SMn8LMVq3KQt64O089bZ9k3M5MF2ytScyoEuXia+0jYcBOfbKwFu5al2hXWov
+ gclT7eSO6gM+KBDzJVTGvw4xhmfTNwrtrRfiatVhh5Zm3A4hLL/kYCNd9NGw/1oGt/ch
+ E2qkDhyy5QYIu9ZVsjbi4GclnxXeWgfkEiE9GOK3R5M9lA3C2fJ1BqtPPJLdtZcTdaF0
+ GbVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=deJj+vvBHixf17+aV4bsjONR6VIn1aUycGcjFmJCu6Y=;
- b=DGUog4TTUbVlDJbwMbcBNeXWX3oLqcnopYsHjY/llXnfwhIGAegXxEbTsmOOVpsoEQ
- sUkN7pmbIxh152NXUZnBE0/g91h15UrndWUcaN0jeaLR1/TugC+fPWmhujfEjqGcjzYy
- rifBVCdPuq7o3xcCrD1X4IC2q7NrmdjRdrLyR6ruGFua4BBvZ02FWXmkcnoKHRVMqk7y
- Wp8qmXd0nsDzBgSeQvRbaKWwi2lLp9d5IKsWRZzSVw2t9TuBSStl7BeOQAYIf/QRNgnb
- 46xBv4Cp1u04B+mjNKuOkEJnCcPh2g3fmAeDg49kEarw6fK8+WZxGiKJCIpcfAO2tR5/
- mMwg==
-X-Gm-Message-State: ANhLgQ2//3dp+KU3GJXLnPYTdObceypyvE0ZwbpJLhbjaVF22aPQC6PN
- MKlSgM/OCyi6vxm5m9fGnPJymfhRQrwDlR8JYoM=
-X-Google-Smtp-Source: ADFU+vu4OpXZvOjFPBGorBMkZs1Ss35e45trs4x7BodfDV4bww3k+2RtstInRNPLWopRB8MxauW8wRQ7utgy4F6EYOQ=
-X-Received: by 2002:a7b:cc8b:: with SMTP id p11mr70027wma.26.1584377288857;
- Mon, 16 Mar 2020 09:48:08 -0700 (PDT)
+ bh=dXWR932K4HOgQCUPYucSc3bUlAFTBYQcNOphnZlIFpc=;
+ b=hS/CrhJy16XE+mxXygcEuNXVPTk+8QU1myxbac1BDbgFkGSljicZzC6AiSn5TPRzK2
+ R40LGNpZGGOUeWEXHIQqcGY2BRrbHx/5jkwxfVg0pEDZj0S0e0MF0zcqXWgljfXUGOJH
+ E9d7GjD2AD2itUyQJ+FhsC8Kz5DfzcUg5NtYAHvXNLCDqeQk/jCAsCb9LpeIYLXWvCMV
+ L1jKsNc9KXgZsSoyobhnUySKLEmVnl3XG3prNi08wSVV3g3RZB3h2j8VqK3+7npY+F/0
+ CN8oYuELB5RK0mdN+qpzbTT9qhM5URghnG5UOfhzkk0V9TTfdZutsslByASShuCB1wfR
+ RoFw==
+X-Gm-Message-State: ANhLgQ0POTD+oQkrodJ84HlbEdaTLtYDMKxS6Fv5j+CaYnQ7zY+E9EyG
+ ZnzlcbZtscSwiDakDppk1UnxYEVdo4Rt/ULJa2o=
+X-Google-Smtp-Source: ADFU+vvzi71oXMJPGrWQ2WRoRdqDWonUtAUiBQ1BYWVSun4bGncARKF6BSfGgmEwbnkJKnbM8zDRXJLKYXX8z+t1cDE=
+X-Received: by 2002:a7b:c7d9:: with SMTP id z25mr174858wmk.25.1584379563024;
+ Mon, 16 Mar 2020 10:26:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-12-armbru@redhat.com>
-In-Reply-To: <20200315144653.22660-12-armbru@redhat.com>
+ <20200315144653.22660-22-armbru@redhat.com>
+In-Reply-To: <20200315144653.22660-22-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 16 Mar 2020 17:47:56 +0100
-Message-ID: <CAJ+F1CKsBntx-W3k8Mb7XyVVRP3iSrAaiUxRco+uZgdmh-n1Ww@mail.gmail.com>
-Subject: Re: [PATCH v3 11/34] qapi/schema: Clean up around
- QAPISchemaEntity.connect_doc()
+Date: Mon, 16 Mar 2020 18:25:50 +0100
+Message-ID: <CAJ+F1CLTwBajW=8gNx1o3c7+A0AfyeLwDPdyCHhqXnfi7+J+mA@mail.gmail.com>
+Subject: Re: [PATCH v3 21/34] qapi: Inline do_qmp_dispatch() into
+ qmp_dispatch()
 To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,13 +95,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Mar 15, 2020 at 4:23 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Sun, Mar 15, 2020 at 4:05 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 >
-> QAPISchemaEntity calls doc.connect_feature() in .check().  Improper
-> since commit ee1e6a1f6c8 split .connect_doc() off .check().  Move the
-> call.  Requires making the children call super().connect_doc() as they
-> should.
+> Both functions check @request is a QDict, and both have code for
+> QCO_NO_SUCCESS_RESP.  This wasn't the case back when they were
+> created.  It's a sign of muddled responsibilities.  Inline.  The next
+> commits will clean up some more.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
@@ -109,71 +109,161 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi/schema.py | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+>  qapi/qmp-dispatch.c | 90 +++++++++++++++++++++------------------------
+>  1 file changed, 41 insertions(+), 49 deletions(-)
 >
-> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-> index d759308b4e..2a2b495987 100644
-> --- a/scripts/qapi/schema.py
-> +++ b/scripts/qapi/schema.py
-> @@ -53,13 +53,13 @@ class QAPISchemaEntity:
->          seen =3D {}
->          for f in self.features:
->              f.check_clash(self.info, seen)
-> -            if self.doc:
-> -                self.doc.connect_feature(f)
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index bc264b3c9b..a588072523 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -75,19 +75,42 @@ static QDict *qmp_dispatch_check_obj(const QObject *r=
+equest, bool allow_oob,
+>      return dict;
+>  }
+>
+> -static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> -                                bool allow_oob, Error **errp)
+> +QDict *qmp_error_response(Error *err)
+>  {
+> -    Error *local_err =3D NULL;
+> +    QDict *rsp;
+> +
+> +    rsp =3D qdict_from_jsonf_nofail("{ 'error': { 'class': %s, 'desc': %=
+s } }",
+> +                                  QapiErrorClass_str(error_get_class(err=
+)),
+> +                                  error_get_pretty(err));
+> +    error_free(err);
+> +    return rsp;
+> +}
+> +
+> +/*
+> + * Does @qdict look like a command to be run out-of-band?
+> + */
+> +bool qmp_is_oob(const QDict *dict)
+> +{
+> +    return qdict_haskey(dict, "exec-oob")
+> +        && !qdict_haskey(dict, "execute");
+> +}
+> +
+> +QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> +                    bool allow_oob)
+> +{
+> +    Error *err =3D NULL;
+>      bool oob;
+>      const char *command;
+> -    QDict *args, *dict;
+> +    QDict *args;
+>      QmpCommand *cmd;
+> +    QDict *dict =3D qobject_to(QDict, request);
+> +    QObject *id =3D dict ? qdict_get(dict, "id") : NULL;
+>      QObject *ret =3D NULL;
+> +    QDict *rsp;
+>
+> -    dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
+> +    dict =3D qmp_dispatch_check_obj(request, allow_oob, &err);
+>      if (!dict) {
+> -        return NULL;
+> +        goto out;
+>      }
+>
+>      command =3D qdict_get_try_str(dict, "execute");
+> @@ -99,27 +122,27 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds=
+, QObject *request,
+>      }
+>      cmd =3D qmp_find_command(cmds, command);
+>      if (cmd =3D=3D NULL) {
+> -        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +        error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
+>                    "The command %s has not been found", command);
+> -        return NULL;
+> +        goto out;
+>      }
+>      if (!cmd->enabled) {
+> -        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +        error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
+>                    "The command %s has been disabled for this instance",
+>                    command);
+> -        return NULL;
+> +        goto out;
+>      }
+>      if (oob && !(cmd->options & QCO_ALLOW_OOB)) {
+> -        error_setg(errp, "The command %s does not support OOB",
+> +        error_setg(&err, "The command %s does not support OOB",
+>                     command);
+> -        return NULL;
+> +        goto out;
+>      }
+>
+>      if (runstate_check(RUN_STATE_PRECONFIG) &&
+>          !(cmd->options & QCO_ALLOW_PRECONFIG)) {
+> -        error_setg(errp, "The command '%s' isn't permitted in '%s' state=
+",
+> +        error_setg(&err, "The command '%s' isn't permitted in '%s' state=
+",
+>                     cmd->name, RunState_str(RUN_STATE_PRECONFIG));
+> -        return NULL;
+> +        goto out;
+>      }
+>
+>      if (!qdict_haskey(dict, "arguments")) {
+> @@ -129,9 +152,9 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds,=
+ QObject *request,
+>          qobject_ref(args);
+>      }
+>
+> -    cmd->fn(args, &ret, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    cmd->fn(args, &ret, &err);
+> +    if (err) {
+> +        ;
+>      } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
+>          g_assert(!ret);
+>      } else if (!ret) {
+> @@ -141,38 +164,7 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds=
+, QObject *request,
+>
+>      qobject_unref(args);
+>
+> -    return ret;
+> -}
 > -
->          self._checked =3D True
->
->      def connect_doc(self, doc=3DNone):
-> -        pass
-> +        doc =3D doc or self.doc
-> +        if doc:
-> +            for f in self.features:
-> +                doc.connect_feature(f)
->
->      def check_doc(self):
->          if self.doc:
-> @@ -250,6 +250,7 @@ class QAPISchemaEnumType(QAPISchemaType):
->              m.check_clash(self.info, seen)
->
->      def connect_doc(self, doc=3DNone):
-> +        super().connect_doc(doc)
->          doc =3D doc or self.doc
->          if doc:
->              for m in self.members:
-> @@ -392,6 +393,7 @@ class QAPISchemaObjectType(QAPISchemaType):
->              m.check_clash(info, seen)
->
->      def connect_doc(self, doc=3DNone):
-> +        super().connect_doc(doc)
->          doc =3D doc or self.doc
->          if doc:
->              if self.base and self.base.is_implicit():
-> @@ -667,6 +669,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
->                  types_seen[qt] =3D v.name
->
->      def connect_doc(self, doc=3DNone):
-> +        super().connect_doc(doc)
->          doc =3D doc or self.doc
->          if doc:
->              for v in self.variants.variants:
-> @@ -733,6 +736,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
->                          % self.ret_type.describe())
->
->      def connect_doc(self, doc=3DNone):
-> +        super().connect_doc(doc)
->          doc =3D doc or self.doc
->          if doc:
->              if self.arg_type and self.arg_type.is_implicit():
-> @@ -775,6 +779,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
->                      % self.arg_type.describe())
->
->      def connect_doc(self, doc=3DNone):
-> +        super().connect_doc(doc)
->          doc =3D doc or self.doc
->          if doc:
->              if self.arg_type and self.arg_type.is_implicit():
+> -QDict *qmp_error_response(Error *err)
+> -{
+> -    QDict *rsp;
+> -
+> -    rsp =3D qdict_from_jsonf_nofail("{ 'error': { 'class': %s, 'desc': %=
+s } }",
+> -                                  QapiErrorClass_str(error_get_class(err=
+)),
+> -                                  error_get_pretty(err));
+> -    error_free(err);
+> -    return rsp;
+> -}
+> -
+> -/*
+> - * Does @qdict look like a command to be run out-of-band?
+> - */
+> -bool qmp_is_oob(const QDict *dict)
+> -{
+> -    return qdict_haskey(dict, "exec-oob")
+> -        && !qdict_haskey(dict, "execute");
+> -}
+> -
+> -QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> -                    bool allow_oob)
+> -{
+> -    Error *err =3D NULL;
+> -    QDict *dict =3D qobject_to(QDict, request);
+> -    QObject *ret, *id =3D dict ? qdict_get(dict, "id") : NULL;
+> -    QDict *rsp;
+> -
+> -    ret =3D do_qmp_dispatch(cmds, request, allow_oob, &err);
+> +out:
+>      if (err) {
+>          rsp =3D qmp_error_response(err);
+>      } else if (ret) {
 > --
 > 2.21.1
 >
