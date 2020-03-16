@@ -2,81 +2,64 @@ Return-Path: <SRS0=yzMV=5B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE3CC0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 325BAC0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD933206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:55:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjwamhG2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD933206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04FED206E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 18:56:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04FED206E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDutS-00006H-01
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:55:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46320)
+	id 1jDuu9-0001nU-6c
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 14:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1jDtry-0007on-Dj
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:49:43 -0400
+ (envelope-from <clg@kaod.org>) id 1jDuGu-0003oi-NF
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1jDtrx-00086g-CT
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:49:42 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:31725)
+ (envelope-from <clg@kaod.org>) id 1jDuGt-0002t3-9C
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:15:28 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:56835)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1jDtrx-00085V-8V
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 13:49:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584380981;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BJiape8B+6U7MnH0ijn0REvFQTDRIRYrPN6S7hbtkHw=;
- b=cjwamhG2ttUYvKHdG2wY8iTmqhweb8VcD18CPkq6GeKMjWmOaTJBUtgSROk2XPscHVSG6H
- 4pONLcfYnXERslssdlj6GRt1gOV6EHgTBJEPvR3Rd47olLZgqNZsMJBjtNrl9tkS2GbSAx
- rhBA2M1I+s/mgn/TFdM00igbk+KvVxI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-zSw07NsYNNGguLsWXNqv1Q-1; Mon, 16 Mar 2020 13:49:39 -0400
-X-MC-Unique: zSw07NsYNNGguLsWXNqv1Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8B8E192C67C;
- Mon, 16 Mar 2020 17:28:39 +0000 (UTC)
-Received: from redhat.com (ovpn-116-35.ams2.redhat.com [10.36.116.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79AC91001B28;
- Mon, 16 Mar 2020 17:28:36 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 2/2] hw/rdma: avoid suspicious strncpy() use
-In-Reply-To: <20200316160702.478964-3-stefanha@redhat.com> (Stefan Hajnoczi's
- message of "Mon, 16 Mar 2020 16:07:02 +0000")
-References: <20200316160702.478964-1-stefanha@redhat.com>
- <20200316160702.478964-3-stefanha@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Mon, 16 Mar 2020 18:28:33 +0100
-Message-ID: <87lfo0nr9a.fsf@secure.laptop>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1jDuGs-0002dT-W0
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 14:15:27 -0400
+Received: from player687.ha.ovh.net (unknown [10.108.42.239])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id B24691CDFBE
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 19:15:24 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player687.ha.ovh.net (Postfix) with ESMTPSA id 13EB21070DDFC;
+ Mon, 16 Mar 2020 18:15:17 +0000 (UTC)
+Subject: Re: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset to take
+ an alternate vector
+To: Nicholas Piggin <npiggin@gmail.com>, qemu-ppc@nongnu.org
+References: <20200316142613.121089-1-npiggin@gmail.com>
+ <20200316142613.121089-7-npiggin@gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <85cfff63-88e3-b5a5-75e3-aa29ac13ff60@kaod.org>
+Date: Mon, 16 Mar 2020 19:15:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200316142613.121089-7-npiggin@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13996061746096409574
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudeffedguddutdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 188.165.48.182
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,37 +71,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> gcc (GCC) 9.2.1 20190827 (Red Hat 9.2.1-1) with sanitizers enabled
-> reports the following error:
->
->   CC      x86_64-softmmu/hw/rdma/vmw/pvrdma_dev_ring.o
-> In file included from /usr/include/string.h:495,
->                  from include/qemu/osdep.h:101,
->                  from hw/rdma/vmw/pvrdma_dev_ring.c:16:
-> In function =E2=80=98strncpy=E2=80=99,
->     inlined from =E2=80=98pvrdma_ring_init=E2=80=99 at hw/rdma/vmw/pvrdma=
-_dev_ring.c:33:5:
-> /usr/include/bits/string_fortified.h:106:10: error: =E2=80=98__builtin_st=
-rncpy=E2=80=99 specified bound 32 equals destination size [-Werror=3Dstring=
-op-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__=
-dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
->
-> Use pstrcpy() instead of strncpy().  It is guaranteed to NUL-terminate
-> strings.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 3/16/20 3:26 PM, Nicholas Piggin wrote:
+> Provide for an alternate delivery location, -1 defaults to the
+> architected address.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I don't know what is the best approach, to override the vector addr
+computed by powerpc_excp() or use a machine class handler with 
+cpu->vhyp.
+
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>  hw/ppc/spapr.c           | 2 +-
+>  target/ppc/cpu.h         | 2 +-
+>  target/ppc/excp_helper.c | 5 ++++-
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 5f93c49706..25221d843c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3400,7 +3400,7 @@ static void spapr_machine_finalizefn(Object *obj)
+>  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg)
+>  {
+>      cpu_synchronize_state(cs);
+> -    ppc_cpu_do_system_reset(cs);
+> +    ppc_cpu_do_system_reset(cs, -1);
+>  }
+>  
+>  static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 3953680534..f8c7d6f19c 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1220,7 +1220,7 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>  int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+>                                 int cpuid, void *opaque);
+>  #ifndef CONFIG_USER_ONLY
+> -void ppc_cpu_do_system_reset(CPUState *cs);
+> +void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector);
+>  void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector);
+>  extern const VMStateDescription vmstate_ppc_cpu;
+>  #endif
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 7f2b5899d3..08bc885ca6 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -961,12 +961,15 @@ static void ppc_hw_interrupt(CPUPPCState *env)
+>      }
+>  }
+>  
+> -void ppc_cpu_do_system_reset(CPUState *cs)
+> +void ppc_cpu_do_system_reset(CPUState *cs, target_ulong vector)
+>  {
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>      CPUPPCState *env = &cpu->env;
+>  
+>      powerpc_excp(cpu, env->excp_model, POWERPC_EXCP_RESET);
+> +    if (vector != -1) {
+> +        env->nip = vector;
+> +    }
+>  }
+>  
+>  void ppc_cpu_do_fwnmi_machine_check(CPUState *cs, target_ulong vector)
+> 
 
 
