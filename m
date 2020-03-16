@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69330C0044D
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECC6C0044D
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F49B205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5A6C205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Mar 2020 21:50:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahlQWJeJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F49B205ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CiDiV8/C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A6C205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jDxbn-0008Nu-DM
-	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:49:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42153)
+	id 1jDxcu-0001dD-QV
+	for qemu-devel@archiver.kernel.org; Mon, 16 Mar 2020 17:50:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42972)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHT-0003QR-D0
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:16 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jDxI4-0004C6-Bq
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1jDxHS-0003tw-1g
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39623)
+ (envelope-from <pbonzini@redhat.com>) id 1jDxI2-0006cb-Ld
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:52 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36919)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHR-0003r9-RU
- for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:13 -0400
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jDxHz-0006Yk-TY
+ for qemu-devel@nongnu.org; Mon, 16 Mar 2020 17:28:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584394093;
+ s=mimecast20190719; t=1584394127;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PpGvtNCDlQfH6rOIsiKSImKl8aq6C5B4SOcZrIHugE4=;
- b=ahlQWJeJebsiF1T/zxI5U1+D7s7hUaTC7/UPmzhHeSG/iuKrKif4HvSVFIWc8jaIEa/XVZ
- 2nLxUZJ8SH6grh7nhERcAr4f+4+XRvJHc78zYv/AjIFYZ3B+tkmDH4U5Z0vQrkDm3ai4E2
- ZdEIQTYL+9uwxTqxjSbJ1GhHAOQp01s=
+ bh=fIaAJM7KMXJNIIdCPNvdGaGIRTIPdfuccqzByHYxV1c=;
+ b=CiDiV8/CjifsXZTfyaG/025Qfsq4lNh0yuBB6lEKH9dCrRlydGSTUlLvTVAtIZhLzWgL5V
+ isC01YICfBU3Paz1A3s2pdA6dVb+Wx1AFNpDeXdEz7235d6n0GvsTp+HNqC4aVH6cpeRI4
+ nTTcPofPUd4AuBJuje/tihiOKpsS3Pc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-cdlhqBcxMbCwnDWozQgwlA-1; Mon, 16 Mar 2020 17:28:11 -0400
-X-MC-Unique: cdlhqBcxMbCwnDWozQgwlA-1
+ us-mta-229--qIl5VHyNZm5xmtNQNze1g-1; Mon, 16 Mar 2020 17:28:45 -0400
+X-MC-Unique: -qIl5VHyNZm5xmtNQNze1g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1248B180454D;
- Mon, 16 Mar 2020 21:28:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0EE3100550E
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:28:40 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1D25719C4F;
- Mon, 16 Mar 2020 21:28:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 267DF3A7;
+ Mon, 16 Mar 2020 21:28:36 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/61] WHPX: Use proper synchronization primitives while
- processing
-Date: Mon, 16 Mar 2020 22:26:49 +0100
-Message-Id: <1584394048-44994-23-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 35/61] lockable: add lock guards
+Date: Mon, 16 Mar 2020 22:27:02 +0100
+Message-Id: <1584394048-44994-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 References: <1584394048-44994-1-git-send-email-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
@@ -85,73 +84,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sunil Muthuswamy <sunilmut@microsoft.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-WHPX wasn't using the proper synchronization primitives while
-processing async events, which can cause issues with SMP.
+This patch introduces two lock guard macros that automatically unlock a
+lock object (QemuMutex and others):
 
-Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+  void f(void) {
+      QEMU_LOCK_GUARD(&mutex);
+      if (!may_fail()) {
+          return; /* automatically unlocks mutex */
+      }
+      ...
+  }
+
+and:
+
+  WITH_QEMU_LOCK_GUARD(&mutex) {
+      if (!may_fail()) {
+          return; /* automatically unlocks mutex */
+      }
+  }
+  /* automatically unlocks mutex here */
+  ...
+
+Convert qemu-timer.c functions that benefit from these macros as an
+example.  Manual qemu_mutex_lock/unlock() callers are left unmodified in
+cases where clarity would not improve by switching to the macros.
+
+Many other QemuMutex users remain in the codebase that might benefit
+from lock guards.  Over time they can be converted, if that is
+desirable.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/whpx-all.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ include/qemu/lockable.h | 65 +++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ util/qemu-timer.c       | 23 +++++++++--------
+ 2 files changed, 76 insertions(+), 12 deletions(-)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index cb863b7..c78baac 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -905,9 +905,8 @@ static void whpx_vcpu_process_async_events(CPUState *cp=
-u)
-=20
-     if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
-         !(env->hflags & HF_SMM_MASK)) {
--
-+        whpx_cpu_synchronize_state(cpu);
-         do_cpu_init(x86_cpu);
--        cpu->vcpu_dirty =3D true;
-         vcpu->interruptable =3D true;
-     }
-=20
-@@ -923,17 +922,13 @@ static void whpx_vcpu_process_async_events(CPUState *=
-cpu)
-     }
-=20
-     if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
--        if (!cpu->vcpu_dirty) {
--            whpx_get_registers(cpu);
--        }
-+        whpx_cpu_synchronize_state(cpu);
-         do_cpu_sipi(x86_cpu);
-     }
-=20
-     if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-         cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
--        if (!cpu->vcpu_dirty) {
--            whpx_get_registers(cpu);
--        }
-+        whpx_cpu_synchronize_state(cpu);
-         apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
-                                       env->tpr_access_type);
-     }
-@@ -1125,8 +1120,10 @@ static int whpx_vcpu_run(CPUState *cpu)
-=20
- static void do_whpx_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data a=
-rg)
- {
--    whpx_get_registers(cpu);
--    cpu->vcpu_dirty =3D true;
-+    if (!cpu->vcpu_dirty) {
-+        whpx_get_registers(cpu);
-+        cpu->vcpu_dirty =3D true;
-+    }
+diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
+index 84ea794..2b52c7c 100644
+--- a/include/qemu/lockable.h
++++ b/include/qemu/lockable.h
+@@ -93,4 +93,69 @@ static inline void qemu_lockable_unlock(QemuLockable *x)
+     x->unlock(x->object);
  }
 =20
- static void do_whpx_cpu_synchronize_post_reset(CPUState *cpu,
++static inline QemuLockable *qemu_lockable_auto_lock(QemuLockable *x)
++{
++    qemu_lockable_lock(x);
++    return x;
++}
++
++static inline void qemu_lockable_auto_unlock(QemuLockable *x)
++{
++    if (x) {
++        qemu_lockable_unlock(x);
++    }
++}
++
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(QemuLockable, qemu_lockable_auto_unlock)
++
++#define WITH_QEMU_LOCK_GUARD_(x, var) \
++    for (g_autoptr(QemuLockable) var =3D \
++                qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x))); \
++         var; \
++         qemu_lockable_auto_unlock(var), var =3D NULL)
++
++/**
++ * WITH_QEMU_LOCK_GUARD - Lock a lock object for scope
++ *
++ * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
++ *
++ * This macro defines a lock scope such that entering the scope takes the =
+lock
++ * and leaving the scope releases the lock.  Return statements are allowed
++ * within the scope and release the lock.  Break and continue statements l=
+eave
++ * the scope early and release the lock.
++ *
++ *   WITH_QEMU_LOCK_GUARD(&mutex) {
++ *       ...
++ *       if (error) {
++ *           return; <-- mutex is automatically unlocked
++ *       }
++ *
++ *       if (early_exit) {
++ *           break;  <-- leave this scope early
++ *       }
++ *       ...
++ *   }
++ */
++#define WITH_QEMU_LOCK_GUARD(x) \
++    WITH_QEMU_LOCK_GUARD_((x), qemu_lockable_auto##__COUNTER__)
++
++/**
++ * QEMU_LOCK_GUARD - Lock an object until the end of the scope
++ *
++ * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
++ *
++ * This macro takes a lock until the end of the scope.  Return statements
++ * release the lock.
++ *
++ *   ... <-- mutex not locked
++ *   QEMU_LOCK_GUARD(&mutex); <-- mutex locked from here onwards
++ *   ...
++ *   if (error) {
++ *       return; <-- mutex is automatically unlocked
++ *   }
++ */
++#define QEMU_LOCK_GUARD(x) \
++    g_autoptr(QemuLockable) qemu_lockable_auto##__COUNTER__ =3D \
++            qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x)))
++
+ #endif
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index ef52d28..d548d3c 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/timer.h"
++#include "qemu/lockable.h"
+ #include "sysemu/replay.h"
+ #include "sysemu/cpus.h"
+=20
+@@ -186,13 +187,12 @@ bool timerlist_expired(QEMUTimerList *timer_list)
+         return false;
+     }
+=20
+-    qemu_mutex_lock(&timer_list->active_timers_lock);
+-    if (!timer_list->active_timers) {
+-        qemu_mutex_unlock(&timer_list->active_timers_lock);
+-        return false;
++    WITH_QEMU_LOCK_GUARD(&timer_list->active_timers_lock) {
++        if (!timer_list->active_timers) {
++            return false;
++        }
++        expire_time =3D timer_list->active_timers->expire_time;
+     }
+-    expire_time =3D timer_list->active_timers->expire_time;
+-    qemu_mutex_unlock(&timer_list->active_timers_lock);
+=20
+     return expire_time <=3D qemu_clock_get_ns(timer_list->clock->type);
+ }
+@@ -225,13 +225,12 @@ int64_t timerlist_deadline_ns(QEMUTimerList *timer_li=
+st)
+      * value but ->notify_cb() is called when the deadline changes.  There=
+fore
+      * the caller should notice the change and there is no race condition.
+      */
+-    qemu_mutex_lock(&timer_list->active_timers_lock);
+-    if (!timer_list->active_timers) {
+-        qemu_mutex_unlock(&timer_list->active_timers_lock);
+-        return -1;
++    WITH_QEMU_LOCK_GUARD(&timer_list->active_timers_lock) {
++        if (!timer_list->active_timers) {
++            return -1;
++        }
++        expire_time =3D timer_list->active_timers->expire_time;
+     }
+-    expire_time =3D timer_list->active_timers->expire_time;
+-    qemu_mutex_unlock(&timer_list->active_timers_lock);
+=20
+     delta =3D expire_time - qemu_clock_get_ns(timer_list->clock->type);
+=20
 --=20
 1.8.3.1
 
