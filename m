@@ -2,69 +2,67 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D20BC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A81C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2605D20719
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACE3C20719
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fz8lvufY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2605D20719
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kc2CkQIj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE3C20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE3m8-00010a-9M
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 00:24:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35450)
+	id 1jE3oW-0002F4-UI
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 00:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jE3l6-0000Bb-4H
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:23:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jE3nn-0001mC-Cs
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jE3l4-000309-79
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:23:15 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:60807)
+ (envelope-from <jsnow@redhat.com>) id 1jE3nm-0003Qp-9V
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:26:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:27063)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE3l3-0002uD-N5
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:23:14 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jE3nm-0003P4-6E
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:26:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584418992;
+ s=mimecast20190719; t=1584419161;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Wd4IkP8OMy2rsZpEZ82kL7z5LpiblyNEWuIPyB9UYnU=;
- b=fz8lvufYjD1SEoXCzSYtMDwpu67R1FxG2+wXXBvVV9qSAp4/ZbLZbESRUGWpzdzxuQ4pm1
- nuyomORkTLrxrFfwoJvGtKqO0W1fgJ9QYa5ZRDTy6SBPFAPatKRTuF4hEavQ/G/qiNdZ7l
- eoFcoeQ3n29vuMBEGhjVhXLgOmTsoHo=
+ bh=SMBrovLEGwycXGPe8PQjpQAx/91Wk6IJtsciBvjM2OM=;
+ b=Kc2CkQIjvjzk7O2TEnbtTafqFoJEflagkQwWHf1kwgId58zGuCx6TWRf3cjrerVCI2Lv9+
+ PquP+qeugDilYjMrZkxeZBTK5KrA3bGrXI54r6TeEzku07bVMNDc5fZkFm5bbV57cS9NKJ
+ s/IAci8VueFiccqAUutkvYmnMCClsIw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-aLv-8WnMMia4QvC_ARy6Rw-1; Tue, 17 Mar 2020 00:22:28 -0400
-X-MC-Unique: aLv-8WnMMia4QvC_ARy6Rw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-259-8F5MLKF8Mj6y9DpGE-uGog-1; Tue, 17 Mar 2020 00:25:18 -0400
+X-MC-Unique: 8F5MLKF8Mj6y9DpGE-uGog-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB4C518C8C02;
- Tue, 17 Mar 2020 04:22:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51BC61005516;
+ Tue, 17 Mar 2020 04:25:16 +0000 (UTC)
 Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D08E99351F;
- Tue, 17 Mar 2020 04:22:22 +0000 (UTC)
-Subject: Re: [PATCH 0/7] via-ide: fixes and improvements
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, philmd@redhat.com,
- amarkovic@wavecomp.com, mst@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, balaton@eik.bme.hu
-References: <20200313082444.2439-1-mark.cave-ayland@ilande.co.uk>
- <842b7c37-74bc-d5e1-070d-69dd74bf8caf@redhat.com>
- <a472d8fb-cff9-66e5-3456-5ff4c670eb32@ilande.co.uk>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 770B25C1B2;
+ Tue, 17 Mar 2020 04:25:10 +0000 (UTC)
+Subject: Re: [PATCH 0/8] Misc hw/ide legacy clean up
+To: BALATON Zoltan <balaton@eik.bme.hu>, Markus Armbruster <armbru@redhat.com>
+References: <cover.1584134074.git.balaton@eik.bme.hu>
+ <87lfo0lr9t.fsf@dusky.pond.sub.org>
+ <alpine.BSF.2.22.395.2003161401100.70254@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003161440060.12641@zero.eik.bme.hu>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -140,14 +138,14 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <b219c84b-8dc6-e360-85d8-7b0694587750@redhat.com>
-Date: Tue, 17 Mar 2020 00:22:22 -0400
+Message-ID: <dcc1f556-52ad-8592-fd3e-662fcedcd7b8@redhat.com>
+Date: Tue, 17 Mar 2020 00:25:09 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <a472d8fb-cff9-66e5-3456-5ff4c670eb32@ilande.co.uk>
+In-Reply-To: <alpine.BSF.2.22.395.2003161440060.12641@zero.eik.bme.hu>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
@@ -166,77 +164,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/14/20 5:15 AM, Mark Cave-Ayland wrote:
-> On 13/03/2020 17:57, John Snow wrote:
-> 
->> On 3/13/20 4:24 AM, Mark Cave-Ayland wrote:
->>> Following on from the earlier thread "Implement "non 100% native mode"
->>> in via-ide", here is an updated patchset based upon the test cases
->>> sent to me off-list.
+On 3/16/20 9:41 AM, BALATON Zoltan wrote:
+> On Mon, 16 Mar 2020, BALATON Zoltan wrote:
+>> On Mon, 16 Mar 2020, Markus Armbruster wrote:
+>>> BALATON Zoltan <balaton@eik.bme.hu> writes:
+>>>> These are some clean ups to remove more legacy init functions and
+>>>> lessen dependence on include/hw/ide.h with some simplifications in
+>>>> board code. There should be no functional change.
 >>>
->>> The VIA IDE controller is similar to early versions of the PIIX
->>> controller in that the primary and secondary IDE channels are hardwired
->>> to IRQs 14 and 15 respectively. Guest OSs typically handle this by
->>> either switching the controller to legacy mode, or using native mode and
->>> using a combination of PCI device/vendor ID and/or checking various
->>> registers in PCI configuration space to detect this condition and apply
->>> a special fixed IRQ 14/15 routing.
+>>> PATCH 1 could quote precedence more clearly in the commit message, but
+>>> that's detail.
 >>>
->>> This patchset effectively updates the VIA IDE PCI device to follow the
->>> behaviour in the datasheet in two ways: fixing some PCI configuration
->>> space register defaults and behaviours, and always using legacy IRQ 14/15
->>> routing, and once applied allows all our known test images to boot
->>> correctly.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>
->>>
->>> BALATON Zoltan (2):
->>>   ide/via: Get rid of via_ide_init()
->>>   pci: Honour wmask when resetting PCI_INTERRUPT_LINE
->>>
->>> Mark Cave-Ayland (5):
->>>   via-ide: move registration of VMStateDescription to DeviceClass
->>>   via-ide: ensure that PCI_INTERRUPT_LINE is hard-wired to its default
->>>     value
->>>   via-ide: initialise IDE controller in legacy mode
->>>   via-ide: allow guests to write to PCI_CLASS_PROG
->>>   via-ide: always use legacy IRQ 14/15 routing
->>>
->>>  hw/ide/via.c            | 21 +++++----------------
->>>  hw/mips/mips_fulong2e.c |  5 ++++-
->>>  hw/pci/pci.c            |  5 ++++-
->>>  include/hw/ide.h        |  1 -
->>>  4 files changed, 13 insertions(+), 19 deletions(-)
->>>
+>>> I don't like PATCH 4.
 >>
->> Does this supersede everything else so far? (Except the two cmd646
->> related series, four patches total, which are already staged)
+>> Sent alternative v2 version of patch 7 so you can drop patch 4 if you
+>> like,
 > 
-> Yes, that's correct. It passes all our tests, and even better allows the fulong2e CD
-> image at the link Zoltan posted to boot.
+> and patch 6 v2 also sent that is affected as well if you drop patch 4.
 > 
-> So I believe it's good unless Alexander has any objections?
-> 
-> 
-> ATB,
-> 
-> Mark.
+>> the rest of the series should apply unchanged. Note that there might
+>> be some places where MAX_IDE_BUS is defined but not used and current
+>> code probably has assumption about this being 2 elsewhere and would
+>> break with any other value so other than philosophical there should be
+>> no reason to keep this defined everywhere.
+>>
+>>> PATCH 1-3,5-8:
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> Thanks.
+>>
+>> Regards,
+>> BALATON Zoltan
+>>
 > 
 
-Tentatively staged! Please let me know during the RC testing phase if
-you discover problems.
-
-Thanks, applied to my IDE tree:
-
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
+Can you do me a favor and send a proper v2 of the whole series, with
+review tags applied?
 
 --js
 
