@@ -2,94 +2,85 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8087FC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E02C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A889205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:12:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12F62205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtRFZ7Jr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A889205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhPNfB1g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12F62205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jECx4-00044I-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:12:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49339)
+	id 1jECyu-00058r-9y
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jECvx-00034s-F0
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:11:06 -0400
+ (envelope-from <crosa@redhat.com>) id 1jECy3-0004Xz-9n
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jECvw-0003Q7-4k
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:11:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:40351)
+ (envelope-from <crosa@redhat.com>) id 1jECy1-0005hb-SV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:15 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24925)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jECvv-0003LE-VB
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:11:04 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jECy1-0005ed-NI
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454263;
+ s=mimecast20190719; t=1584454393;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7irHrlsmj7YMvbsYW9FQVp4bPOWizWsJiOdTw0+S3mA=;
- b=WtRFZ7JrNamX+jKlyM0h5IPy46GkTn43iJ9K9o8NaDftlVy+1tv/T0/Zp7e6bGdqEYVnXl
- yGkuZpkbwyL7fvaihrRCX22ZonXnMfr3iruCyT6lUxE66rXpa2PWMfFFhg7l6VYV7oJ4bt
- OZtaLbvsgmywAkyfScwAkazRWcLCzB4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-qBdaowvjOWS29Hx2yQrHtg-1; Tue, 17 Mar 2020 10:10:59 -0400
-X-MC-Unique: qBdaowvjOWS29Hx2yQrHtg-1
-Received: by mail-wr1-f71.google.com with SMTP id f13so4533470wro.23
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:10:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7irHrlsmj7YMvbsYW9FQVp4bPOWizWsJiOdTw0+S3mA=;
- b=FHnYMlsQgozGpmmscZosC5qKX6Kxtds+JtmgfqLpvj17cRhDEi4IH17BFC8s2hBMHk
- JBMEBc801QSB6X/dzpFSHOobQVNgCbEjbm53ggrvb0XSphJ/6jsJNj49nlLUOevMjSav
- jXJR7Ys1XCtVy8juNPyoAx/5MsxD78ibNmr9JCGn2WM9M6SarWve0zq6v58VH+WEwRoz
- 4gPns6uJpG3F+TXj/mYVRb1pDrPPApdhMHQx7aAkpJg4xb4mQ/0zlsaqcclpg1C1f9Xm
- SmlG4lrOYJTLtwP0P6qm+z5+yYNDu904mRJYiaLnCw61PcDT7RKGBfvh/Xxdv8qhx1cK
- +WnQ==
-X-Gm-Message-State: ANhLgQ05x57jwrcDTj5M7P/CAgU8VYV9Lz9pnnlK3SAi6hkb3UdZ2zY+
- buCbeum1C5/aS9/ENNQ4bzXMQ7Y9nPmcOps1qrb7rc3JV7Y4iybNkoFLmPnDz9238HGsPBTM6f/
- XXXepQg9hJ9ke7ND9belIvXszICvsWaQ=
-X-Received: by 2002:a5d:4486:: with SMTP id j6mr5977042wrq.427.1584454258420; 
- Tue, 17 Mar 2020 07:10:58 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vv87ekUlh6YhCa2qab4kOPsQGBpVptx3gOnzEKhxx7YqfAeBkxehLTdL2VEPtp3nUqNyOQQkmvJtPyiKtcF4qA=
-X-Received: by 2002:a5d:4486:: with SMTP id j6mr5977013wrq.427.1584454258193; 
- Tue, 17 Mar 2020 07:10:58 -0700 (PDT)
+ bh=WaxJQScd3Zk21rf7Xu3I7yi9+2aJYAFts8hQzgk2fNs=;
+ b=YhPNfB1gfaQwFGMkG3/u8NTpnVGE9H/LAQfQBBESCXU3riVUPO6NtjCimuIRCbfinx8nwt
+ wKdlopGUAg7qCvDSCUbqqLv/K6Zb78hOK+PQ7y0Ik3mM4wRDEP9yAzkfqHWBP++5D1m0P8
+ RnvYNBV4H0h2odl6vum4FwkXngsNKVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-bLldfXJ-MaC5ZpEiDLpcEw-1; Tue, 17 Mar 2020 10:13:05 -0400
+X-MC-Unique: bLldfXJ-MaC5ZpEiDLpcEw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B9FA800D50;
+ Tue, 17 Mar 2020 14:13:04 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-2.rdu2.redhat.com [10.10.117.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9812D7E317;
+ Tue, 17 Mar 2020 14:12:59 +0000 (UTC)
+Date: Tue, 17 Mar 2020 10:12:57 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/5] QEMU Gating CI
+Message-ID: <20200317141257.GA5724@localhost.localdomain>
+References: <20200312193616.438922-1-crosa@redhat.com>
+ <CAFEAcA_PiX7LffcT9+1Bdn764fsqsSzUZib-yp=Og0Vpa3oOrw@mail.gmail.com>
+ <20200312221619.GA483011@dhcp-17-173.bos.redhat.com>
+ <CAFEAcA8=3zcffu8FYEenyNR5O=kHh8OJmMCJj6Uwh5HJw_b-WA@mail.gmail.com>
+ <1367332727.1329619.1584360253413.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-jiZ=Pv7Co6gdkqKans=m6-9RwKAQuB9mri-baM5Gssw@mail.gmail.com>
+ <849930679.1334346.1584361606961.JavaMail.zimbra@redhat.com>
+ <CAFEAcA8Lw94_=kY+Fv-cFW2Tk5RD62EjODjKdGf2-mLdDw7FuQ@mail.gmail.com>
+ <1182067639.1655516.1584421185287.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
 MIME-Version: 1.0
-References: <cover.1584437957.git.balaton@eik.bme.hu>
- <3240656814c804513de08bdbbf318f2f590df241.1584437958.git.balaton@eik.bme.hu>
- <c43e2f9b-3002-32f0-08fa-7164a98f3b9f@redhat.com>
- <f70ea487-c8e8-d76d-fbe5-9213284a8574@redhat.com>
- <2038186d-3f18-d430-2305-5697097397e9@redhat.com>
- <549ffd77-a020-51c8-96e7-c4afc28ff633@redhat.com>
- <alpine.BSF.2.22.395.2003171505380.40468@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.22.395.2003171505380.40468@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 17 Mar 2020 15:10:47 +0100
-Message-ID: <CAP+75-Xu34jQ+WB+CHMm6udk5vhVVDi1e3YnB82KSpj72ztW6g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] hw/ide: Get rid of piix4_init function
-To: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA-zRw7kzwzXxPmLaUqwOrQLwW9BymOJ34iJOOTCUAf=xg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,75 +92,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Wainer Moschetta <wmoschet@redhat.com>,
  QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 3:07 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> On Tue, 17 Mar 2020, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 3/17/20 2:50 PM, John Snow wrote:
-> >> On 3/17/20 6:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>> On 3/17/20 11:41 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>> On 3/17/20 10:39 AM, BALATON Zoltan wrote:
-> >>>>> This removes pci_piix4_ide_init() function similar to clean up done=
- to
-> >>>>> other ide devices.
-> >>>>>
-> >>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >>>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> >>>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> >>>>
-> >>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>>
-> >>> Please disregard this tag (I withdraw it), I mis-read the pci variabl=
-e
-> >>> was not assigned.
-> >>>
-> >>
-> >> Is there an issue you've noticed, or you are just no longer certain
-> >> enough to give an RB?
+--qMm9M+Fa2AknHoGS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Mar 17, 2020 at 09:29:32AM +0000, Peter Maydell wrote:
+> On Tue, 17 Mar 2020 at 04:59, Cleber Rosa <crosa@redhat.com> wrote:
+> > Yes, that did the trick and I can now see the configuration.  What I ca=
+n
+> > *not* see is any "Specific Runner" configured.  So maybe:
 > >
-> > I asked Zoltan there why he was reassigning 'pci' and he replied here:
-> > https://www.mail-archive.com/qemu-block@nongnu.org/msg63324.html
+> > 1) The documentation I included is not clear enough about the fact that
+> > setup steps need to be done on a machine so that it becomes a "Runner"
 > >
-> > I don't know enough the PCI API (and don't have time this week to dig i=
-nto
-> > it) to check how pci->devfn is used (is it populated by a pci_create()
-> > call?).
+> > 2) The (Ansible) playbooks (especially contrib/ci/orgs/qemu/gitlab-runn=
+er.yml)
+> > is not working as intended
 > >
-> >    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
-> >                                          true, TYPE_PIIX4_PCI_DEVICE);
-> >    ...
-> > +   pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
-> >    ...
-> >    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
+> > 3) Some expectations misalignment on machines that would be available t=
+o run
+> > those jobs
 > >
-> > What annoys me is here -------^^^^^^ I don't know if reassigning the pc=
-i
-> > variable can have an impact, so as I am not confident I prefer to withd=
-raw my
-> > review tag.
+> > In any case, none of those should be big problems.  Please let me know =
+what
+> > you did/experienced/expected up to this point, and we can continue from=
+ there.
+>=20
+> Ah, I see. My assumption was that this was all stuff that you were
+> working on, so that I would then be able to test that it worked correctly=
+,
+> not that I would need to do configuration of the gitlab.com setup.
+
+Hi Peter,
+
+So, I had to use temporary hardware resources to set this up (and set
+it up countless times TBH).  I had the understanding based on the list
+of machines you documented[1] that at least some of them would be used
+for the permanent setup.
+
+> I thought all the stuff about "how to set up runners" was only for
+> people who wanted to set up some 3rd-party CI for non-official
+> forks or for when we wanted to add extra runners in future (eg for
+> architectures not yet covered). So the only thing I did was follow
+> your "just push to staging" instructions.
 >
-> OK, I did not know that's what you were asking about and did not notice
-> this could be a problem. To avoid any doubt I'll send a new version to
-> avoid this shortly.
 
-Sorry I was a bit rushed for soft-freeze, I should have spent more
-time in my comment then, this would have saved everybody a bit of
-email traffic.
-I'll try to remember next time.
+OK, I see it, now it makes more sense.  So we're "only" missing the
+setup for the machines we'll use for the more permanent setup.  Would
+you like to do a staged setup/migration using one or some of the
+machines you documented?  I'm 100% onboard to help with this, meaning
+that I can assist you with instructions, or do "pair setup" of the
+machines if needed.  I think a good part of the evaluation here comes
+down to how manageable/reproducible the setup is, so it'd make sense
+for one to be part of the setup itself.
 
-Thanks for sending an updated version.
+FIY there's also the possibility of grabbing some free VMs on GCP,
+Azure, etc and setting them up as GitLab runners in a temporary way
+(because of the temporarily free and VM nature).  I have a few
+problems with this approach, including the fact that it doesn't yield
+the complete experience wrt using hardware one owns and will have to
+manage, besides the hardware limitations themselves.
 
-> Regards,
-> BALATON Zoltan
+Please let me know how you want to move on from here.
+
+Cheers,
+- Cleber.
+
+> thanks
+> -- PMM
+>=20
+
+[1] https://wiki.qemu.org/Requirements/GatingCI#Current_Tests
+
+--qMm9M+Fa2AknHoGS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5w2uUACgkQZX6NM6Xy
+CfNnERAApKFlDSnkXnGqbt3Uclb5qEAhjtxVAFlp83OHnntinkBbFFMRWr9eLGzg
+dMUgiqSGGMZie5AcSyEeBwh/VYnDFgnODSh5NlRjLBhJUTe4n9db50N6yXmmE2ON
+OJ+QYY7i/vsnsoljYOuDylVYF8JbL7e+dKLCCVotq96WC3fV7b8WgJ1CjyIfo+yj
+Xxo6JWc+H1Jzt64YT0vRNl5LrMpg2p46F2+lo21TOGPR+uSyeh63rZUz+dXk9hkB
+t5K17Oa8X89axKMMjbQmHtBvoyrVnccPzX3xH1hHznnD/Xhe58VtDn6FESc/uKzH
+MGe2bcQXtuivYGfheyXH6DOvNHN/iD9ERH0DNv3eewBiw6iReqAP25xK14DmWy3F
+f6r5N86uhE0h44/AHhAFr85NSANfWu8CwSdOzx6J665q6feuBcANsqCfw5Nnqq6G
+caEONZB4c57KqA8dj8eBotj/GScof5l4RDXjz99hLg+mcofFGg+ThRahzaLlvV16
+g+Fuag2YUkvHYA9x7QbRzZa6rIB+R3id7grZl7rDq4ZcTqlI1tVs2u5uf5Xni28b
+zyVhiTGBtR/sSS4G/ROka9nqPM9NJrV0H3fKX5kEbWo0cCrecnlLJs7MTLeecymY
++9qA2jVZI5JZoOgQ8ZVBL9rkj602pRPYtqcbSta7VWdBh1I702E=
+=N9Kl
+-----END PGP SIGNATURE-----
+
+--qMm9M+Fa2AknHoGS--
 
 
