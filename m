@@ -2,96 +2,78 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFCEC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 790E6C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D1AC2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:18:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1AC2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4345020663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:20:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgFcgX0G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4345020663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jED3O-0003Ty-HJ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:18:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57471)
+	id 1jED5K-0007cv-BI
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:20:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mahesh@linux.ibm.com>) id 1jEBME-0005nd-Bi
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:30:07 -0400
+ (envelope-from <crosa@redhat.com>) id 1jED1t-0001K0-2H
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mahesh@linux.ibm.com>) id 1jEBMD-00009q-1U
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:30:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57612)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mahesh@linux.ibm.com>)
- id 1jEBMC-0008UY-Pg
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:30:04 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02HCM666034817
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 08:30:03 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yrubp08f4-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 08:30:02 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mahesh@linux.ibm.com>;
- Tue, 17 Mar 2020 12:29:59 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 17 Mar 2020 12:29:56 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 02HCTtGn37618082
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 17 Mar 2020 12:29:55 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7ECCAA405B;
- Tue, 17 Mar 2020 12:29:55 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4A786A405C;
- Tue, 17 Mar 2020 12:29:54 +0000 (GMT)
-Received: from [192.168.0.24] (unknown [9.199.55.39])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 17 Mar 2020 12:29:54 +0000 (GMT)
-Subject: [PATCH] ppc/spapr: Set the effective address provided flag in mc
- error log.
-From: Mahesh Salgaonkar <mahesh@linux.ibm.com>
-To: Qemu-ppc <qemu-ppc@nongnu.org>
-Date: Tue, 17 Mar 2020 17:59:53 +0530
-User-Agent: StGit/unknown-version
+ (envelope-from <crosa@redhat.com>) id 1jED1r-0007yC-OU
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:12 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:47035)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jED1r-0007vj-K7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584454631;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nVKMcGxmP8PU2vpAgDPmZ12PJSUYbLXimE6E8kXTmQA=;
+ b=HgFcgX0GMoghTF1fBqHH0Zlt9qgzES4sUeAXQMkQC8vgjIArvS3vWxmexhz+Oocp8bCUHy
+ hrMGkwvRoZVMkZepMFHMfsw9JTOe2QQmhdKN/r+SPexoWEimmertHt09gmiZdyqhXeBb4w
+ PGJ4Wqn1GlOEte1i2zqTE5rWOo1Z9Gw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-vza3d_XjM72djl1lhwKhaA-1; Tue, 17 Mar 2020 10:17:09 -0400
+X-MC-Unique: vza3d_XjM72djl1lhwKhaA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BDBD1005F6F;
+ Tue, 17 Mar 2020 14:17:08 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
+ [10.10.117.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D8EA473873;
+ Tue, 17 Mar 2020 14:17:06 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v10 3/3] Acceptance tests: add make targets to download images
+Date: Tue, 17 Mar 2020 10:16:54 -0400
+Message-Id: <20200317141654.29355-4-crosa@redhat.com>
+In-Reply-To: <20200317141654.29355-1-crosa@redhat.com>
+References: <20200317141654.29355-1-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20031712-4275-0000-0000-000003ADC81C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20031712-4276-0000-0000-000038C2F0D6
-Message-Id: <158444819283.31599.12155058652686614304.stgit@jupiter>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.645
- definitions=2020-03-17_03:2020-03-17,
- 2020-03-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0
- adultscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 clxscore=1011 impostorscore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003170052
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Tue, 17 Mar 2020 10:17:12 -0400
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,99 +85,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>,
- Nicholas Piggin <npiggin@gmail.com>, Qemu-devel <qemu-devel@nongnu.org>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <willianr@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Per PAPR, it is expected to set effective address provided flag in
-sub_err_type member of mc extended error log (i.e
-rtas_event_log_v6_mc.sub_err_type). This somehow got missed in original
-fwnmi-mce patch series. Hence guest fails to extract effective address from
-mce rtas log. This patch fixes that.
+The newly introduced "boot linux" tests make use of Linux images that
+are larger than usual, and fall into what Avocado calls "vmimages",
+and can be referred to by name, version and architecture.
 
-Without this patch guest MCE logs fails print DAR value:
+The images can be downloaded automatically during the test. But, to
+make for more reliable test results, this introduces a target that
+will download the vmimages for the architectures that have been
+configured and are available for the currently used distro (Fedora
+31).
 
-[   11.933608] Disabling lock debugging due to kernel taint
-[   11.933773] MCE: CPU0: machine check (Severe) Host TLB Multihit [Recovered]
-[   11.933979] MCE: CPU0: NIP: [c000000000090b34] radix__flush_tlb_range_psize+0x194/0xf00
-[   11.934223] MCE: CPU0: Initiator CPU
-[   11.934341] MCE: CPU0: Unknown
-
-After the change:
-
-[   22.454149] Disabling lock debugging due to kernel taint
-[   22.454316] MCE: CPU0: machine check (Severe) Host TLB Multihit DAR: deadbeefdeadbeef [Recovered]
-[   22.454605] MCE: CPU0: NIP: [c0000000003e5804] kmem_cache_alloc+0x84/0x330
-[   22.454820] MCE: CPU0: Initiator CPU
-[   22.454944] MCE: CPU0: Unknown
-
-
-Signed-off-by: Mahesh Salgaonkar <mahesh@linux.ibm.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Willian Rampazzo <willianr@redhat.com>
 ---
- hw/ppc/spapr_events.c |   26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tests/Makefile.include | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 8b32b7eea5..98a32a2e2e 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -243,6 +243,14 @@ struct rtas_event_log_v6_mc {
- #define RTAS_LOG_V6_MC_TLB_PARITY                        1
- #define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
- #define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
-+/*
-+ * Per PAPR,
-+ * For UE error type, set bit 1 of sub_err_type to indicate effective addr is
-+ * provided. For other error types (SLB/ERAT/TLB), set bit 0 to indicate
-+ * same.
-+ */
-+#define RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDED               0x40
-+#define RTAS_LOG_V6_MC_EA_ADDR_PROVIDED                  0x80
-     uint8_t reserved_1[6];
-     uint64_t effective_address;
-     uint64_t logical_address;
-@@ -726,6 +734,22 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
-                             RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
- }
- 
-+static void spapr_mc_set_ea_provided_flag(struct mc_extended_log *ext_elog)
-+{
-+	switch (ext_elog->mc.error_type) {
-+	case RTAS_LOG_V6_MC_TYPE_UE:
-+		ext_elog->mc.sub_err_type |= RTAS_LOG_V6_MC_UE_EA_ADDR_PROVIDED;
-+		break;
-+	case RTAS_LOG_V6_MC_TYPE_SLB:
-+	case RTAS_LOG_V6_MC_TYPE_ERAT:
-+	case RTAS_LOG_V6_MC_TYPE_TLB:
-+		ext_elog->mc.sub_err_type |= RTAS_LOG_V6_MC_EA_ADDR_PROVIDED;
-+		break;
-+	default:
-+		break;
-+	}
-+}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 67e8fcddda..9c19229a06 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -20,6 +20,8 @@ check-help:
+ =09@echo " $(MAKE) check-venv           Creates a Python venv for tests"
+ =09@echo " $(MAKE) check-clean          Clean the tests and related data"
+ =09@echo
++=09@echo " $(MAKE) get-vm-images        Downloads all images used by accep=
+tance tests, according to configured targets (~350 MB each, 1.5 GB max)"
++=09@echo
+ =09@echo
+ =09@echo "The variable SPEED can be set to control the gtester speed setti=
+ng."
+ =09@echo "Default options are -k and (for $(MAKE) V=3D1) --verbose; they c=
+an be"
+@@ -889,7 +891,20 @@ $(TESTS_RESULTS_DIR):
+=20
+ check-venv: $(TESTS_VENV_DIR)
+=20
+-check-acceptance: check-venv $(TESTS_RESULTS_DIR)
++FEDORA_31_ARCHES_CANDIDATES=3D$(patsubst ppc64,ppc64le,$(TARGETS))
++FEDORA_31_ARCHES :=3D x86_64 aarch64 ppc64le s390x
++FEDORA_31_DOWNLOAD=3D$(filter $(FEDORA_31_ARCHES),$(FEDORA_31_ARCHES_CANDI=
+DATES))
 +
- static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-                                         struct mc_extended_log *ext_elog)
- {
-@@ -751,6 +775,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-             ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
-             if (mc_derror_table[i].dar_valid) {
-                 ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
-+                spapr_mc_set_ea_provided_flag(ext_elog);
-             }
- 
-             summary |= mc_derror_table[i].initiator
-@@ -769,6 +794,7 @@ static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
-             ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
-             if (mc_ierror_table[i].nip_valid) {
-                 ext_elog->mc.effective_address = cpu_to_be64(env->nip);
-+                spapr_mc_set_ea_provided_flag(ext_elog);
-             }
- 
-             summary |= mc_ierror_table[i].initiator
++# download one specific Fedora 31 image
++get-vm-image-fedora-31-%: $(check-venv)
++=09$(call quiet-command, \
++             $(TESTS_VENV_DIR)/bin/python -m avocado vmimage get \
++             --distro=3Dfedora --distro-version=3D31 --arch=3D$*)
++
++# download all vm images, according to defined targets
++get-vm-images: $(check-venv) $(patsubst %,get-vm-image-fedora-31-%, $(FEDO=
+RA_31_DOWNLOAD))
++
++check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+ =09$(call quiet-command, \
+             $(TESTS_VENV_DIR)/bin/python -m avocado \
+             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RESUL=
+TS_DIR) \
+@@ -900,7 +915,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+=20
+ # Consolidated targets
+=20
+-.PHONY: check-block check-qapi-schema check-qtest check-unit check check-c=
+lean
++.PHONY: check-block check-qapi-schema check-qtest check-unit check check-c=
+lean get-vm-images
+ check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schem=
+a/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ ifeq ($(CONFIG_TOOLS),y)
+--=20
+2.25.1
 
 
