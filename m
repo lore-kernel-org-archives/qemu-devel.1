@@ -2,102 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D51C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78037C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40589205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:03:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0isFY/Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40589205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C7A4205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:06:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C7A4205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jECoJ-0005jP-F9
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:03:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40367)
+	id 1jECrU-00070s-Ep
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jECn7-0004zp-SW
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:01:59 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jECqc-0006aY-UI
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jECn6-0001DV-La
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:01:57 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:22251)
+ (envelope-from <balaton@eik.bme.hu>) id 1jECqX-0000wd-SG
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:05:34 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:38707)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jECn6-0001Ay-Gv
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:01:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584453716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1fjqAwTuU/pxothbsgzA3Iu8zWzuLxsk/MI79OfMHP4=;
- b=d0isFY/Q5/i+BCYVXc3cP8hQTyYnHlSHgPLV7KYALzSKqL/vpObPWzM3XRnz/+5pA23aQ0
- wLalmiYPQT5Rzi52DXbDT0w6Ag1vGljssqRPOrdOpi5bdKEdK92SXgzB+qli6KfWVdVJkw
- MTN08pMk8RfDIII9AmUkpbcaxSvzU2M=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-jNjCPD-3NMir947lXdoh-Q-1; Tue, 17 Mar 2020 10:01:51 -0400
-X-MC-Unique: jNjCPD-3NMir947lXdoh-Q-1
-Received: by mail-wr1-f71.google.com with SMTP id k11so2072719wrq.2
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:01:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kxl1EfFl/soPuExGHjrlU88uVGUD3q5GopKVDeFc4EU=;
- b=qB0HwBqzgo7N3rFAYSb3mO7m+KESypDiZW3np6ApkjCm8/qrSOC0XgtYRNnhxdY2tR
- lQTi7dccqzWdLOIwo96bcCCW6XvNr+Die6Uw4UlbtwOislXS63z8+rIMCS4bGhycUsGj
- H8VTtiKVxjqREM6PFXuOZyKqKpUMxTMac9vEmaZyG8hCir7UfYh7+VWxfLNiRC9Y912N
- 2+HSeLTehlolMBw+0L/E7IQ79DsUbhS9jrC1EoRCtT+A3aThHFR1N3zGO8YKwIPlpZZg
- bVm0XdOTNKiMKlIS+pbxQHNCUj8AOH9UI4bDG1k66VNN/KRqEZyB59R9u/mr4Mi9Okyg
- ePZA==
-X-Gm-Message-State: ANhLgQ2Z3xyWxvZZrgiqgx/jgUVct3tUl8qJHEtAfawIslMLZJ6m/8KK
- 69RHweoPudpXwUNppl3LD25+HCjgxAvAeQpwYZRFq8Vg3EGIyrTsorsDTE46BGI+P6VZ5nI0YWU
- 3uY4YH0X8Om8KYZA=
-X-Received: by 2002:a5d:4484:: with SMTP id j4mr6696315wrq.153.1584453710014; 
- Tue, 17 Mar 2020 07:01:50 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vu3UntdUqqGwuxy5TZaA1DQAmrKd7B65YvGYy05yrHkDRTIv13zUMtCbxJs891cRJXM/DxRCQ==
-X-Received: by 2002:a5d:4484:: with SMTP id j4mr6696295wrq.153.1584453709761; 
- Tue, 17 Mar 2020 07:01:49 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id t5sm4006626wmi.34.2020.03.17.07.01.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 07:01:49 -0700 (PDT)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jECqS-0007TF-Ux; Tue, 17 Mar 2020 10:05:26 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id E0A88747E0B;
+ Tue, 17 Mar 2020 15:05:15 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id B9B3F747E06; Tue, 17 Mar 2020 15:05:15 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id B79F8747E0A;
+ Tue, 17 Mar 2020 15:05:15 +0100 (CET)
+Date: Tue, 17 Mar 2020 15:05:15 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: John Snow <jsnow@redhat.com>
 Subject: Re: [PATCH v2 2/7] hw/ide: Get rid of piix4_init function
-To: John Snow <jsnow@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+In-Reply-To: <2038186d-3f18-d430-2305-5697097397e9@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2003171455360.40468@zero.eik.bme.hu>
 References: <cover.1584437957.git.balaton@eik.bme.hu>
  <3240656814c804513de08bdbbf318f2f590df241.1584437958.git.balaton@eik.bme.hu>
  <c43e2f9b-3002-32f0-08fa-7164a98f3b9f@redhat.com>
  <f70ea487-c8e8-d76d-fbe5-9213284a8574@redhat.com>
  <2038186d-3f18-d430-2305-5697097397e9@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <549ffd77-a020-51c8-96e7-c4afc28ff633@redhat.com>
-Date: Tue, 17 Mar 2020 15:01:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <2038186d-3f18-d430-2305-5697097397e9@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+Content-Type: multipart/mixed;
+ BOUNDARY="3866299591-180044680-1584453889=:40468"
+Content-ID: <alpine.BSF.2.22.395.2003171505130.40468@zero.eik.bme.hu>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,55 +69,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 2:50 PM, John Snow wrote:
-> On 3/17/20 6:49 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 3/17/20 11:41 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--3866299591-180044680-1584453889=:40468
+Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
+Content-ID: <alpine.BSF.2.22.395.2003171505131.40468@zero.eik.bme.hu>
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, 17 Mar 2020, John Snow wrote:
+> On 3/17/20 6:49 AM, Philippe Mathieu-Daud=E9 wrote:
+>> On 3/17/20 11:41 AM, Philippe Mathieu-Daud=E9 wrote:
 >>> On 3/17/20 10:39 AM, BALATON Zoltan wrote:
->>>> This removes pci_piix4_ide_init() function similar to clean up done to
+>>>> This removes pci_piix4_ide_init() function similar to clean up done =
+to
 >>>> other ide devices.
 >>>>
 >>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 >>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 >>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 >>>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 >>
 >> Please disregard this tag (I withdraw it), I mis-read the pci variable
 >> was not assigned.
 >>
->=20
+>
 > Is there an issue you've noticed, or you are just no longer certain
 > enough to give an RB?
 
-I asked Zoltan there why he was reassigning 'pci' and he replied here:
-https://www.mail-archive.com/qemu-block@nongnu.org/msg63324.html
+My previous replies to this question:
 
-I don't know enough the PCI API (and don't have time this week to dig=20
-into it) to check how pci->devfn is used (is it populated by a=20
-pci_create() call?).
+https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg04356.html
+https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg04381.html
+
+End result after all patches in the series looks like this:
+
+DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus, I2CBus **smb=
+us)
+{
+     PCIDevice *pci;
+     DeviceState *dev;
 
      pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
                                            true, TYPE_PIIX4_PCI_DEVICE);
-     ...
-+   pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
-     ...
+     dev =3D DEVICE(pci);
+     if (isa_bus) {
+         *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+     }
+
+     pci =3D pci_create_simple(pci_bus, pci->devfn + 1, "piix4-ide");
+     pci_ide_create_devs(pci);
+
      pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
+     if (smbus) {
+         *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
+                                isa_get_irq(NULL, 9), NULL, 0, NULL);
+    }
 
-What annoys me is here -------^^^^^^ I don't know if reassigning the pci=20
-variable can have an impact, so as I am not confident I prefer to=20
-withdraw my review tag.
+     return dev;
+}
 
-Since the patch already has 2 R-b I'm not going to NAck it neither.
+I think it's clear enough what the pci variable is used for here and ther=
+e=20
+was no further reply from Philippe and Michael and others were OK with=20
+this so there was no definitive decision here. Mayby Philippe still does=20
+not like reusal of this variable enough to give Reviewed tag but there=20
+should be no other problem with it otherwise.
 
+Regards,
+BALATON Zoltan
+--3866299591-180044680-1584453889=:40468--
 
