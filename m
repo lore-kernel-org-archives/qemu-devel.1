@@ -2,87 +2,85 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AF5C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF29C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:38:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FA5F20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:11:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42E4B205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:38:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoKeJ786"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FA5F20663
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PLfnMOTJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E4B205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE6O1-000217-KL
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 03:11:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59012)
+	id 1jE6nd-0000sK-CE
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 03:38:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bharatb.linux@gmail.com>) id 1jE6NJ-0001Bj-It
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:10:54 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jE6n5-0000RJ-Sn
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bharatb.linux@gmail.com>) id 1jE6NI-0006n9-9W
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:10:53 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:43580)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1jE6n4-0008Dd-Oy
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:37:31 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34407)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
- id 1jE6NI-0006k9-55; Tue, 17 Mar 2020 03:10:52 -0400
-Received: by mail-qt1-x841.google.com with SMTP id l13so16545393qtv.10;
- Tue, 17 Mar 2020 00:10:51 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jE6n4-00088Y-FD
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:37:30 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z15so24240260wrl.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 00:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/mcB+5zeRW8vpPjLibt/ORo0JBWyAeoH2anb6aQF1pA=;
- b=BoKeJ786Qd79JsV5Nzqd6vT3j7PP+tzKX9V4Lnn97NGHrf6F14RGeL7eVDJEJQb78J
- agwtOy24rDMSrR0prMM2WOWTJlMM5H7tTBSpRRr/bdgeysn0hB6MqcZbw7/zZlRFZQ5T
- b2uMP0fAuSMrVWULmVwDhMF6i5hN/jVkU5/afJR+goVQopRZ1pHbZwUmMOZaGGYl+5pA
- 7ZxsJQ7MuIUmiyJpjRQ/e0XGeTHxsGW5aoerOJ4mkgQNDYfok1Ln2Sob41WnQufSJDnx
- MUJd7urv/m5ZwwMSFoYMv/3rEsm/S0GD9QjUVJBV71fxF3UbxXlT77HsrCMn+NIqqPDX
- hJTw==
+ :cc:content-transfer-encoding;
+ bh=Y7NrFQfTm69+MjGp3K5mXD1S8kG1BEKp0aPoo00lWxI=;
+ b=PLfnMOTJf2iLRbO2FZhA91iMqiDK6ZrSb5TWejqEnIWKG1X0WmFlW6pjBR+BRYqlKY
+ 9Kd9TXQED1LTjcy6T01JqUe50iNdw4TYYzjmXkNottENb9lIFNEtTtCl+OAusWbi9xI+
+ mecokHzawJHXNTV9uURqpzSw89rL44OwkKEauDLC6XoHNKioap6MwIcHX6U02rzLMPXD
+ MDiGrxCe/JFewcGOPjx3o7FzkSg8PAskwvBUV8PJp7YoSh5eA/1txfWjHMHDR1r8/KZ5
+ lTjzPxtFuRCMBWMAGtOfBBksksKVBSOxLmviBBYGL6MDHGjeqJ2poFvUvlW8zri3vLBG
+ 99pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/mcB+5zeRW8vpPjLibt/ORo0JBWyAeoH2anb6aQF1pA=;
- b=phbwInfWCOHNFQ9imT9fX4MabRmb84xPySmLRJZ1GRw2w3rZ8bPP0XeX//o/yh6/HO
- Dufl59dnLWWoByeSzWBSX/EMrWK0G5rA9zb7R2QhPBD2sSCRNfJjI9Cjoa7oBBN6VZLV
- 7Ng3KF1vsGkWJHQKSZEKOeQZr7WrQbLcZcHN7fTOen0TB6mcbGC++wzh+2GQXfW6xW9Z
- X/WJhT8StdxHhFRB8jHh5z9ge16Vk/NCtoxLWB0TIP9Odf9uDSMRccZVq3CnTKSFG/oN
- 8gtFHCAsE69/pWrTmbmOVIovaaKfrxl9KODnD0WVUVCb3KOOVRGz140GuC4swDnTvwja
- aziQ==
-X-Gm-Message-State: ANhLgQ0gj1p4Rfo6ZVzuF2op8gRa3DVSkQGMTjCWio8iEFj4HjTFvWDV
- JZlretnZX7pVBh7SK3CALxYPe5N1slWzE0t3s5s=
-X-Google-Smtp-Source: ADFU+vuHfPx9Atur8Wv1AGpW91SiZiadJNyFWmI2+IWxXI00rexQLNZOQtDDTm8jF5GjE1iADLvd6+7P+5vgY1ZFOxk=
-X-Received: by 2002:ac8:4a08:: with SMTP id x8mr3788320qtq.32.1584429051198;
- Tue, 17 Mar 2020 00:10:51 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Y7NrFQfTm69+MjGp3K5mXD1S8kG1BEKp0aPoo00lWxI=;
+ b=Ul2K1lXbkg4H4638tMc0qQuGP+nbcLCgIHWPnTjwyZJbfVUZ7JGFI9EbPxp+WkjVtu
+ GpqqxLPMDbSIkSmz2HoTm67iRjJqdH6C89qNAC14OyJtucbZ1H14cTrA/Hjecp2cRie9
+ VACpjHAP6RiVuN0ersuK0jK1RWQud6vSoCYRKbFNRD9bOiw3SGq86zoYTg/01JSVWMjM
+ 0CD4HMp+vJ8eTHNClUATkd5SpiZ9nTHQwH593cLYyo7D1DhfK47/rC6SCRZeQa2uEnMW
+ ksEztyr6wLm2186T5x6BMgLsbCy7r7X2ab2EaEqy8X0lbJ1Yr+UNtELXx0sQLjP20w5m
+ WIcQ==
+X-Gm-Message-State: ANhLgQ2cvwIg5+hcvSw6gxnYUiV8ABJQnxWgPxCyhbh8ZkoT6DLhAfZj
+ xU4Rwli1/xx/vf5wF0MNothlB0/mgtOXKShhKGc=
+X-Google-Smtp-Source: ADFU+vt7jhaaavXdQF/MvAgHcEF1npyurfYOw4XZ73KnGsHVcGAIw88y426HNiC4UJloiKRy6tg78Bef2JKu+HZNmnM=
+X-Received: by 2002:adf:cc85:: with SMTP id p5mr4291339wrj.196.1584430649067; 
+ Tue, 17 Mar 2020 00:37:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200313074811.27175-1-bbhushan2@marvell.com>
- <20200313074811.27175-4-bbhushan2@marvell.com>
- <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
- <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
- <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
- <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
- <CAAeCc_nnM-DGCyXjFJuk-6L8F+Oetq076SEjeV8kUAGxfJVQTw@mail.gmail.com>
- <cc447790-d1c5-784b-9706-fbcd76f0c94b@redhat.com>
- <CAAeCc_mSobL4oGcK-J3WJJq8BCS6M_oyPTrzJ9bk8yFgsUDBUw@mail.gmail.com>
- <20200316101124.GA304669@myrica>
-In-Reply-To: <20200316101124.GA304669@myrica>
-From: Bharat Bhushan <bharatb.linux@gmail.com>
-Date: Tue, 17 Mar 2020 12:40:39 +0530
-Message-ID: <CAAeCc_kJq_TjbZxf3Un5rpwBrNrz-8gdL_SMS-gP_0=rARf0WQ@mail.gmail.com>
-Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20200315144653.22660-1-armbru@redhat.com>
+ <20200315144653.22660-24-armbru@redhat.com>
+ <CAJ+F1CLUikxRN2nH8h_9zGXLLpsxz4H-cMxxLbctAzavWjAcWw@mail.gmail.com>
+ <874kunv60w.fsf@dusky.pond.sub.org>
+In-Reply-To: <874kunv60w.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 17 Mar 2020 08:37:17 +0100
+Message-ID: <CAJ+F1CKxM9VK-VeQNzfZQw+yZJ9tt4oEP0fqcMBNKwP4YqarxQ@mail.gmail.com>
+Subject: Re: [PATCH v3 23/34] qapi: Simplify how qmp_dispatch() gets the
+ request ID
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,94 +92,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- mst@redhat.com, drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
- Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, Bharat Bhushan <bbhushan2@marvell.com>,
- linuc.decode@gmail.com, eric.auger.pro@gmail.com
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jean,
+Hi
 
-On Mon, Mar 16, 2020 at 3:41 PM Jean-Philippe Brucker
-<jean-philippe@linaro.org> wrote:
+On Tue, Mar 17, 2020 at 7:40 AM Markus Armbruster <armbru@redhat.com> wrote=
+:
 >
-> Hi Bharat,
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 >
-> Could you Cc me on your next posting?  Unfortunately I don't have much
-> hardware for testing this at the moment, but I might be able to help a
-> little on the review.
->
-> On Mon, Mar 16, 2020 at 02:40:00PM +0530, Bharat Bhushan wrote:
-> > > >>> First issue is: your guest can use 4K page and your host can use 64KB
-> > > >>> pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
-> > > >>> a way to pass the host settings to the VIRTIO-IOMMU device.
-> > > >>>
-> > > >>> Even with 64KB pages, it did not work for me. I have obviously not the
-> > > >>> storm of VFIO_DMA_MAP failures but I have some, most probably due to
-> > > >>> some wrong notifications somewhere. I will try to investigate on my side.
-> > > >>>
-> > > >>> Did you test with VFIO on your side?
-> > > >>
-> > > >> I did not tried with different page sizes, only tested with 4K page size.
-> > > >>
-> > > >> Yes it works, I tested with two n/w device assigned to VM, both interfaces works
-> > > >>
-> > > >> First I will try with 64k page size.
-> > > >
-> > > > 64K page size does not work for me as well,
-> > > >
-> > > > I think we are not passing correct page_size_mask here
-> > > > (config.page_size_mask is set to TARGET_PAGE_MASK ( which is
-> > > > 0xfffffffffffff000))
-> > > I guess you mean with guest using 4K and host using 64K.
-> > > >
-> > > > We need to set this correctly as per host page size, correct?
-> > > Yes that's correct. We need to put in place a control path to retrieve
-> > > the page settings on host through VFIO to inform the virtio-iommu device.
-> > >
-> > > Besides this issue, did you try with 64kB on host and guest?
+> > On Sun, Mar 15, 2020 at 3:51 PM Markus Armbruster <armbru@redhat.com> w=
+rote:
+> >>
+> >> We convert the request object to a QDict twice: first in
+> >> qmp_dispatch() to get the request ID, and then again in
+> >> qmp_dispatch_check_obj(), which converts to QDict, then checks and
+> >> returns it.  We can't get the request ID from the latter, because it's
+> >> null when the qdict flunks the checks.
+> >>
+> >> Move getting the request ID into qmp_dispatch_check_obj().
+> >>
 > >
-> > I tried Followings
-> >   - 4k host and 4k guest  - it works with v7 version
-> >   - 64k host and 64k guest - it does not work with v7
-> >     hard-coded config.page_size_mask to 0xffffffffffff0000 and it works
+> > I don't see this is a an improvement. qmp_dispatch_check_obj() doesn't
+> > care about id.
+> >
+> > And it doesn't look like it is saving cycles either.
+> >
+> > Is that worth it?
+> >
+> > Code change is ok otherwise,
 >
-> You might get this from the iova_pgsize bitmap returned by
-> VFIO_IOMMU_GET_INFO. The virtio config.page_size_mask is global so there
-> is the usual problem of aggregating consistent properties, but I'm
-> guessing using the host page size as a granule here is safe enough.
+> The duplicated conversion to QDict annoys me, mostly because both copies
+> can fail.
 >
-> If it is a problem, we can add a PROBE property for page size mask,
-> allowing to define per-endpoint page masks. I have kernel patches
-> somewhere to do just that.
-
-I do not see we need page size mask per endpoint.
-
-While I am trying to understand what "page-size-mask" guest will work with
-
-- 4K page size host and 4k page size guest
-  config.page_size_mask = 0xffffffffffff000 will work
-
-- 64K page size host and 64k page size guest
-  config.page_size_mask = 0xfffffffffff0000 will work
-
-- 64K page size host and 4k page size guest
-   1) config.page_size_mask = 0xffffffffffff000 will also not work as
-VFIO in host expect iova and size to be aligned to 64k (PAGE_SIZE in
-host)
-   2) config.page_size_mask = 0xfffffffffff0000 will not work, iova
-initialization (in guest) expect minimum page-size supported by h/w to
-be equal to 4k (PAGE_SIZE in guest)
-       Should we look to relax this in iova allocation code?
-
-Thanks
--Bharat
-
-
+> But you're right, my solution is hamfisted.  What about this one?
 >
-> Thanks,
-> Jean
+>
+> From 46a1719be9503f86636ff672325c5430d4063b8b Mon Sep 17 00:00:00 2001
+> From: Markus Armbruster <armbru@redhat.com>
+> Date: Mon, 21 Oct 2019 15:52:20 +0200
+> Subject: [PATCH] qapi: Simplify how qmp_dispatch() gets the request ID
+>
+> We convert the request object to a QDict twice: first in
+> qmp_dispatch() to get the request ID, and then again in
+> qmp_dispatch_check_obj(), which converts to QDict, then checks and
+> returns it.  We can't get the request ID from the latter, because it's
+> null when the qdict flunks the checks.
+>
+> Move the checked conversion to QDict from qmp_dispatch_check_obj() to
+> qmp_dispatch(), and drop the duplicate there.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  qapi/qmp-dispatch.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index 550d1fe8d2..91e50fa0dd 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -19,20 +19,13 @@
+>  #include "sysemu/runstate.h"
+>  #include "qapi/qmp/qbool.h"
+>
+> -static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_=
+oob,
+> +static QDict *qmp_dispatch_check_obj(QDict *dict, bool allow_oob,
+>                                       Error **errp)
+>  {
+>      const char *exec_key =3D NULL;
+>      const QDictEntry *ent;
+>      const char *arg_name;
+>      const QObject *arg_obj;
+> -    QDict *dict;
+> -
+> -    dict =3D qobject_to(QDict, request);
+> -    if (!dict) {
+> -        error_setg(errp, "QMP input must be a JSON object");
+> -        return NULL;
+> -    }
+>
+>      for (ent =3D qdict_first(dict); ent;
+>           ent =3D qdict_next(dict, ent)) {
+> @@ -103,13 +96,21 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *r=
+equest,
+>      const char *command;
+>      QDict *args;
+>      QmpCommand *cmd;
+> -    QDict *dict =3D qobject_to(QDict, request);
+> -    QObject *id =3D dict ? qdict_get(dict, "id") : NULL;
+> +    QDict *dict;
+> +    QObject *id;
+>      QObject *ret =3D NULL;
+>      QDict *rsp =3D NULL;
+>
+> -    dict =3D qmp_dispatch_check_obj(request, allow_oob, &err);
+> +    dict =3D qobject_to(QDict, request);
+>      if (!dict) {
+> +        id =3D NULL;
+> +        error_setg(&err, "QMP input must be a JSON object");
+> +        goto out;
+> +    }
+> +
+> +    id =3D qdict_get(dict, "id");
+> +
+> +    if (!qmp_dispatch_check_obj(dict, allow_oob, &err)) {
+>          goto out;
+>      }
+>
+> --
+> 2.21.1
+>
+
+It seems cleaner to me,
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
