@@ -2,79 +2,81 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3C9C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23DDC1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5462A20724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 770AA20724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 21:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGFSaULT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5462A20724
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ad+44eVD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 770AA20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEJhg-0000I2-HX
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51659)
+	id 1jEJiS-0001Q0-Jc
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 17:25:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEJLE-0002uj-SL
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:39 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEJLW-0003GT-2C
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEJLA-0002rx-0o
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:36 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:30246)
+ (envelope-from <armbru@redhat.com>) id 1jEJLT-0004ff-Tz
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:53 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33681)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJL9-0002mZ-J6
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:31 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJLT-0004bz-MR
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 17:01:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584478887;
+ s=mimecast20190719; t=1584478910;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PwdCLMri1TgX9C3CJ8mQEiQzAA6UowfO3Oq7tsbIKgo=;
- b=eGFSaULTDi62tpo7fV8seRy278eyFOYdZwSCLZrlgRaIEsqV6K6k4PoMwcdq//hBfRVrdJ
- ASxB+zE4G/iG2PyBU4JP25pMbdiS5UpORztvm318FC+jxeSsrd/S5e7We9odHIB4u9GIKx
- YIOk9eWgKTaz2vGqTU4ma/YK9B83sOg=
+ bh=uw3m4irbrAA38+qfG9FoZq8Ay12RttaAVgGS5vYcKnw=;
+ b=Ad+44eVDu+riJrKB8ZsMZxC2pPGDD0f7IoXCFIN13bg9BbuN6eij6x9EeqfOL0OltGwnMo
+ 6MdzX/8dcnuRXIqNPlX0/A87jfgMXZL28M2magkfKPPe2ysqGZm5lc3n+M39NRY75sNMPL
+ hxKaVD33yxngssUeSh3b66Sgz0Zjdec=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-ukJ4sEdLODunUTP29vZ07A-1; Tue, 17 Mar 2020 17:01:24 -0400
-X-MC-Unique: ukJ4sEdLODunUTP29vZ07A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-311-2ZevcJRSOjG7mg2mDvT8Lg-1; Tue, 17 Mar 2020 17:01:24 -0400
+X-MC-Unique: 2ZevcJRSOjG7mg2mDvT8Lg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 131EB13FB
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 21:01:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6D68801E53
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 21:01:22 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC7D85DA7C;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8466719C4F;
  Tue, 17 Mar 2020 21:01:22 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 959AE113523E; Tue, 17 Mar 2020 22:01:15 +0100 (CET)
+ id 768A811358A3; Tue, 17 Mar 2020 22:01:15 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/30] qapi: New special feature flag "deprecated"
-Date: Tue, 17 Mar 2020 22:01:11 +0100
-Message-Id: <20200317210115.8864-27-armbru@redhat.com>
+Subject: [PULL 21/30] qapi: Add feature flags to struct members
+Date: Tue, 17 Mar 2020 22:01:06 +0100
+Message-Id: <20200317210115.8864-22-armbru@redhat.com>
 In-Reply-To: <20200317210115.8864-1-armbru@redhat.com>
 References: <20200317210115.8864-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,170 +88,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unlike regular feature flags, the new special feature flag
-"deprecated" is recognized by the QAPI generator.  For now, it's only
-permitted with commands, events, and struct members.  It will be put
-to use shortly.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200317115459.31821-26-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[Doc typo fixed]
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200317115459.31821-21-armbru@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt                    | 6 ++++++
- scripts/qapi/schema.py                          | 6 ++++++
- tests/Makefile.include                          | 1 +
- tests/qapi-schema/features-deprecated-type.err  | 2 ++
- tests/qapi-schema/features-deprecated-type.json | 3 +++
- tests/qapi-schema/features-deprecated-type.out  | 0
- tests/qapi-schema/qapi-schema-test.json         | 6 +++---
- tests/qapi-schema/qapi-schema-test.out          | 6 +++---
- 8 files changed, 24 insertions(+), 6 deletions(-)
- create mode 100644 tests/qapi-schema/features-deprecated-type.err
- create mode 100644 tests/qapi-schema/features-deprecated-type.json
- create mode 100644 tests/qapi-schema/features-deprecated-type.out
+ docs/devel/qapi-code-gen.txt            |  4 +++-
+ tests/qapi-schema/doc-good.texi         |  2 ++
+ qapi/introspect.json                    |  6 +++++-
+ scripts/qapi/expr.py                    |  3 ++-
+ scripts/qapi/introspect.py              |  2 +-
+ scripts/qapi/schema.py                  | 25 ++++++++++++++++++++-----
+ tests/qapi-schema/doc-good.json         |  5 ++++-
+ tests/qapi-schema/doc-good.out          |  3 +++
+ tests/qapi-schema/qapi-schema-test.json |  2 +-
+ tests/qapi-schema/qapi-schema-test.out  |  1 +
+ tests/qapi-schema/test-qapi.py          |  7 ++++---
+ 11 files changed, 46 insertions(+), 14 deletions(-)
 
 diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 39ae2cad98..1967adfa92 100644
+index 43f31b4b63..39ae2cad98 100644
 --- a/docs/devel/qapi-code-gen.txt
 +++ b/docs/devel/qapi-code-gen.txt
-@@ -683,6 +683,12 @@ Intended use is to have each feature string signal tha=
-t this build of
- QEMU shows a certain behaviour.
+@@ -234,7 +234,9 @@ Syntax:
+                '*features': FEATURES }
+     MEMBERS =3D { MEMBER, ... }
+     MEMBER =3D STRING : TYPE-REF
+-           | STRING : { 'type': TYPE-REF, '*if': COND }
++           | STRING : { 'type': TYPE-REF,
++                        '*if': COND,
++                        '*features': FEATURES }
+=20
+ Member 'struct' names the struct type.
+=20
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.t=
+exi
+index 76b396dae6..7f28fb7a0f 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -132,6 +132,8 @@ Not documented
+ @table @asis
+ @item @code{variant1-feat}
+ a feature
++@item @code{member-feat}
++a member feature
+ @end table
+=20
+ @end deftp
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index da3e176899..b1aabd4cfd 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -206,11 +206,15 @@
+ #           Future extension: if present and non-null, the parameter
+ #           is optional, and defaults to this value.
+ #
++# @features: names of features associated with the member, in no
++#            particular order.  (since 5.0)
++#
+ # Since: 2.5
+ ##
+ { 'struct': 'SchemaInfoObjectMember',
+-  'data': { 'name': 'str', 'type': 'str', '*default': 'any' } }
++  'data': { 'name': 'str', 'type': 'str', '*default': 'any',
+ # @default's type must be null or match @type
++            '*features': [ 'str' ] } }
+=20
+ ##
+ # @SchemaInfoObjectVariant:
+diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+index f9c4448980..2942520399 100644
+--- a/scripts/qapi/expr.py
++++ b/scripts/qapi/expr.py
+@@ -167,8 +167,9 @@ def check_type(value, info, source,
+                        allow_optional=3DTrue, permit_upper=3Dpermit_upper)
+         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswith(=
+'has_'):
+             raise QAPISemError(info, "%s uses reserved name" % key_source)
+-        check_keys(arg, info, key_source, ['type'], ['if'])
++        check_keys(arg, info, key_source, ['type'], ['if', 'features'])
+         check_if(arg, info, key_source)
++        check_features(arg.get('features'), info)
+         check_type(arg['type'], info, key_source, allow_array=3DTrue)
 =20
 =20
-+=3D=3D=3D=3D Special features =3D=3D=3D=3D
-+
-+Feature "deprecated" marks a command, event, or struct member as
-+deprecated.  It is not supported elsewhere so far.
-+
-+
- =3D=3D=3D Naming rules and reserved names =3D=3D=3D
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index a3fa9865db..23652be810 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -173,7 +173,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         obj =3D {'name': member.name, 'type': self._use_type(member.type)}
+         if member.optional:
+             obj['default'] =3D None
+-        return _make_tree(obj, member.ifcond, None)
++        return _make_tree(obj, member.ifcond, member.features)
 =20
- All names must begin with a letter, and contain only ASCII letters,
+     def _gen_variants(self, tag_name, variants):
+         return {'tag': tag_name,
 diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 6ee3677215..78309a00f0 100644
+index 59e1f5a395..6ee3677215 100644
 --- a/scripts/qapi/schema.py
 +++ b/scripts/qapi/schema.py
-@@ -193,6 +193,12 @@ class QAPISchemaType(QAPISchemaEntity):
-             return None
-         return self.name
+@@ -668,18 +668,31 @@ class QAPISchemaFeature(QAPISchemaMember):
 =20
-+    def check(self, schema):
-+        QAPISchemaEntity.check(self, schema)
-+        if 'deprecated' in [f.name for f in self.features]:
-+            raise QAPISemError(
-+                self.info, "feature 'deprecated' is not supported for type=
-s")
+=20
+ class QAPISchemaObjectTypeMember(QAPISchemaMember):
+-    def __init__(self, name, info, typ, optional, ifcond=3DNone):
++    def __init__(self, name, info, typ, optional, ifcond=3DNone, features=
+=3DNone):
+         super().__init__(name, info, ifcond)
+         assert isinstance(typ, str)
+         assert isinstance(optional, bool)
++        for f in features or []:
++            assert isinstance(f, QAPISchemaFeature)
++            f.set_defined_in(name)
+         self._type_name =3D typ
+         self.type =3D None
+         self.optional =3D optional
++        self.features =3D features or []
+=20
+     def check(self, schema):
+         assert self.defined_in
+         self.type =3D schema.resolve_type(self._type_name, self.info,
+                                         self.describe)
++        seen =3D {}
++        for f in self.features:
++            f.check_clash(self.info, seen)
 +
-     def describe(self):
-         assert self.meta
-         return "%s type '%s'" % (self.meta, self.name)
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 67e8fcddda..d1340301b2 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -242,6 +242,7 @@ qapi-schema +=3D event-case.json
- qapi-schema +=3D event-member-invalid-dict.json
- qapi-schema +=3D event-nest-struct.json
- qapi-schema +=3D features-bad-type.json
-+qapi-schema +=3D features-deprecated-type.json
- qapi-schema +=3D features-duplicate-name.json
- qapi-schema +=3D features-if-invalid.json
- qapi-schema +=3D features-missing-name.json
-diff --git a/tests/qapi-schema/features-deprecated-type.err b/tests/qapi-sc=
-hema/features-deprecated-type.err
-new file mode 100644
-index 0000000000..af4ffe20aa
---- /dev/null
-+++ b/tests/qapi-schema/features-deprecated-type.err
-@@ -0,0 +1,2 @@
-+features-deprecated-type.json: In struct 'S':
-+features-deprecated-type.json:2: feature 'deprecated' is not supported for=
- types
-diff --git a/tests/qapi-schema/features-deprecated-type.json b/tests/qapi-s=
-chema/features-deprecated-type.json
-new file mode 100644
-index 0000000000..4b5bf5b86e
---- /dev/null
-+++ b/tests/qapi-schema/features-deprecated-type.json
-@@ -0,0 +1,3 @@
-+# Feature 'deprecated' is not supported for types
-+{ 'struct': 'S', 'data': {},
-+  'features': [ 'deprecated' ] }
-diff --git a/tests/qapi-schema/features-deprecated-type.out b/tests/qapi-sc=
-hema/features-deprecated-type.out
-new file mode 100644
-index 0000000000..e69de29bb2
++    def connect_doc(self, doc):
++        super().connect_doc(doc)
++        if doc:
++            for f in self.features:
++                doc.connect_feature(f)
+=20
+=20
+ class QAPISchemaVariant(QAPISchemaObjectTypeMember):
+@@ -962,7 +975,7 @@ class QAPISchema:
+             name, info, doc, ifcond, features,
+             self._make_enum_members(data, info), prefix))
+=20
+-    def _make_member(self, name, typ, ifcond, info):
++    def _make_member(self, name, typ, ifcond, features, info):
+         optional =3D False
+         if name.startswith('*'):
+             name =3D name[1:]
+@@ -970,10 +983,12 @@ class QAPISchema:
+         if isinstance(typ, list):
+             assert len(typ) =3D=3D 1
+             typ =3D self._make_array_type(typ[0], info)
+-        return QAPISchemaObjectTypeMember(name, info, typ, optional, ifcon=
+d)
++        return QAPISchemaObjectTypeMember(name, info, typ, optional, ifcon=
+d,
++                                          self._make_features(features, in=
+fo))
+=20
+     def _make_members(self, data, info):
+-        return [self._make_member(key, value['type'], value.get('if'), inf=
+o)
++        return [self._make_member(key, value['type'], value.get('if'),
++                                  value.get('features'), info)
+                 for (key, value) in data.items()]
+=20
+     def _def_struct_type(self, expr, info, doc):
+@@ -996,7 +1011,7 @@ class QAPISchema:
+             typ =3D self._make_array_type(typ[0], info)
+         typ =3D self._make_implicit_object_type(
+             typ, info, self.lookup_type(typ),
+-            'wrapper', [self._make_member('data', typ, None, info)])
++            'wrapper', [self._make_member('data', typ, None, None, info)])
+         return QAPISchemaVariant(case, info, typ, ifcond)
+=20
+     def _def_union_type(self, expr, info, doc):
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.j=
+son
+index 457b8b2cdf..ddd89d1233 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -78,10 +78,13 @@
+ #
+ # Features:
+ # @variant1-feat: a feature
++# @member-feat: a member feature
+ ##
+ { 'struct': 'Variant1',
+   'features': [ 'variant1-feat' ],
+-  'data': { 'var1': { 'type': 'str', 'if': 'defined(IFSTR)' } } }
++  'data': { 'var1': { 'type': 'str',
++                      'features': [ 'member-feat' ],
++                      'if': 'defined(IFSTR)' } } }
+=20
+ ##
+ # @Variant2:
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.ou=
+t
+index 9bcb2b3e91..6757dd26a2 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -21,6 +21,7 @@ object Base
+ object Variant1
+     member var1: str optional=3DFalse
+         if ['defined(IFSTR)']
++        feature member-feat
+     feature variant1-feat
+ object Variant2
+ object Object
+@@ -135,6 +136,8 @@ Another paragraph (but no @var: line)
+=20
+     feature=3Dvariant1-feat
+ a feature
++    feature=3Dmember-feat
++a member feature
+ doc symbol=3DVariant2
+     body=3D
+=20
 diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
 pi-schema-test.json
-index f576c337af..6b1f05afa7 100644
+index fa4f3a15da..f576c337af 100644
 --- a/tests/qapi-schema/qapi-schema-test.json
 +++ b/tests/qapi-schema/qapi-schema-test.json
 @@ -258,7 +258,7 @@
    'data': { 'foo': 'int' },
    'features': [] }
  { 'struct': 'FeatureStruct1',
--  'data': { 'foo': { 'type': 'int', 'features': [ 'member-feature1' ] } },
-+  'data': { 'foo': { 'type': 'int', 'features': [ 'deprecated' ] } },
+-  'data': { 'foo': 'int' },
++  'data': { 'foo': { 'type': 'int', 'features': [ 'member-feature1' ] } },
    'features': [ 'feature1' ] }
  { 'struct': 'FeatureStruct2',
    'data': { 'foo': 'int' },
-@@ -308,7 +308,7 @@
-   'features': [] }
-=20
- { 'command': 'test-command-features1',
--  'features': [ 'feature1' ] }
-+  'features': [ 'deprecated' ] }
- { 'command': 'test-command-features3',
-   'features': [ 'feature1', 'feature2' ] }
-=20
-@@ -322,4 +322,4 @@
-                                               'defined(TEST_IF_COND_2)'] }=
- ] }
-=20
- { 'event': 'TEST-EVENT-FEATURES1',
--  'features': [ 'feature1' ] }
-+  'features': [ 'deprecated' ] }
 diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
 i-schema-test.out
-index cd863ae966..891b4101e0 100644
+index 1cbd0802b3..cd863ae966 100644
 --- a/tests/qapi-schema/qapi-schema-test.out
 +++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -359,7 +359,7 @@ object FeatureStruct0
+@@ -359,6 +359,7 @@ object FeatureStruct0
      member foo: int optional=3DFalse
  object FeatureStruct1
      member foo: int optional=3DFalse
--        feature member-feature1
-+        feature deprecated
++        feature member-feature1
      feature feature1
  object FeatureStruct2
      member foo: int optional=3DFalse
-@@ -419,7 +419,7 @@ command test-features0 q_obj_test-features0-arg -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
- command test-command-features1 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
--    feature feature1
-+    feature deprecated
- command test-command-features3 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
-     feature feature1
-@@ -440,7 +440,7 @@ command test-command-cond-features3 None -> None
-         if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
- event TEST-EVENT-FEATURES1 None
-     boxed=3DFalse
--    feature feature1
-+    feature deprecated
- module include/sub-module.json
- include sub-sub-module.json
- object SecondArrayRef
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.p=
+y
+index 8e09e54edb..f396b471eb 100755
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -55,6 +55,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('    member %s: %s optional=3D%s'
+                   % (m.name, m.type.name, m.optional))
+             self._print_if(m.ifcond, 8)
++            self._print_features(m.features, indent=3D8)
+         self._print_variants(variants)
+         self._print_if(ifcond)
+         self._print_features(features)
+@@ -96,11 +97,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('%sif %s' % (' ' * indent, ifcond))
+=20
+     @classmethod
+-    def _print_features(cls, features):
++    def _print_features(cls, features, indent=3D4):
+         if features:
+             for f in features:
+-                print('    feature %s' % f.name)
+-                cls._print_if(f.ifcond, 8)
++                print('%sfeature %s' % (' ' * indent, f.name))
++                cls._print_if(f.ifcond, indent + 4)
+=20
+=20
+ def test_frontend(fname):
 --=20
 2.21.1
 
