@@ -2,120 +2,76 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEB7C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71023C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:35:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B615320757
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C54C20757
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:35:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QpphJtSf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B615320757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YEEUFoyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C54C20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEBPj-0008Je-Tp
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:33:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60461)
+	id 1jEBRC-0001H2-FU
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:35:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEBOr-0007iA-0N
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:32:50 -0400
+ (envelope-from <imammedo@redhat.com>) id 1jEBQU-0000fq-Sv
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEBOo-00062U-Ca
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:32:47 -0400
-Received: from mail-vi1eur05on2071e.outbound.protection.outlook.com
- ([2a01:111:f400:7d00::71e]:45248
- helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jEBOj-0005Sn-R3; Tue, 17 Mar 2020 08:32:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GLvX4mRChgHfqhcEJkiKTJCkPkk8EKgoM2l3nNmOZVfR0NVBPgZj96rnzu72OXyWDXOnH8gt5yODvCy2akF/nmNwKW/BOwgnLcv7W67Qh2lOJ2iCeTO1nQAQ/li+fhIt6WMehvcXK0nwwU4Q212c9B3uAtCZJWxIqVayIGNzszdjuhvI05ywqLVPNg7kDzOQB5t14ukliAd9e6/W+AYX5Ip6RXQQBZwkFMbvlHyGjV5y6zSi80nFatR2P8PZyvLCc4avfOzdnPuuxkJzEsx2BgcLxrFDbP9Ibf1TC9tOZQFQcF0SURZ9XbtZpqkRH7iKOTcL69DjqLito4jZvJKJCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y3vTXC8xMiEBn2buP7Ihg0MvGRNUVQLF1XsJIShv8fs=;
- b=k+/0ZZu10iyGnIr3gIy65LF+f/LIUzAIIQuhoNF+qL9kChv6LAYWJj+VkyreBNEj0J0PlPDzOJiqIbj0n0iit17juCtyTREmaHLsEtzjO9XFAKFEOhFAlGF62vqcNOS8iarHe/hcks1F7XNUogZxwgerhnDTycUgCEdaLxf1ALda42waHpmjQFfl6zqdx6YYRb/mKLPn7FXzOpazj7m+gvPLIOnkbw2P7OtadSsN0FZ0J6+gxYbp+hIEI03vqQ5GpAlauo1lzlyHo6Pk2h06zOnPRktdO3OHqQ9d7FpgXpCFGlu4K/6Qy5xzaTCfRWull/lgCdKtqvan/yRopKRXMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y3vTXC8xMiEBn2buP7Ihg0MvGRNUVQLF1XsJIShv8fs=;
- b=QpphJtSfuk6o4XWffpQ2g/cXpCo3gOirUtePc0UqNG4nEy1dCXpkCc//+yPGagTbt10QYi8Iex7Cbh59qSjR8r05mj3+uwvhbXM0/tmRfel09FOPAmm/scvMKMMABjSROD109rbEiphWUsyKcu5sGW24vpjO/HPr37CE1PbOnxg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
- HE1PR0802MB2441.eurprd08.prod.outlook.com (10.175.34.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.13; Tue, 17 Mar 2020 12:32:38 +0000
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
- 2020 12:32:38 +0000
-Subject: Re: [PATCH 3/3] xen-block: Use one Error * variable instead of two
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200313170517.22480-1-armbru@redhat.com>
- <20200313170517.22480-4-armbru@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200317153236121
-Message-ID: <d6497746-2ed5-02e0-1934-065db818c1c6@virtuozzo.com>
-Date: Tue, 17 Mar 2020 15:32:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200313170517.22480-4-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR05CA0073.eurprd05.prod.outlook.com
- (2603:10a6:208:136::13) To HE1PR0802MB2507.eurprd08.prod.outlook.com
- (2603:10a6:3:e1::8)
+ (envelope-from <imammedo@redhat.com>) id 1jEBQT-0002V0-9B
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:34:30 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48101)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jEBQS-0002Oz-Vh
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 08:34:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584448468;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BWHzOfIQGW0MJ5alHlJ6a9h3mg0RHml5HycFc5GFPiw=;
+ b=YEEUFoygC1/SlIH0qxPH5yfSJ19pkfO57nCZaJbX+SrFAzeAnKkRyHcEAOBpa2Xu2w6WRk
+ dT++CEqkqbT7hL2Mbh2YycwOrKkFTDs00ejh1aZG5ArXLmWX4K0hcyDzqFrX6rjtpMrOI1
+ WBvAQtJ2768JDbnJkTHrYGbdZKQK1dg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-2_BcEghuOquEiF--E0lEUg-1; Tue, 17 Mar 2020 08:34:26 -0400
+X-MC-Unique: 2_BcEghuOquEiF--E0lEUg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4407800D55
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 12:34:25 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85F3B60BFB;
+ Tue, 17 Mar 2020 12:34:21 +0000 (UTC)
+Date: Tue, 17 Mar 2020 13:34:18 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] vl.c/memdev: Error on bad memory backend
+Message-ID: <20200317133418.7e084477@redhat.com>
+In-Reply-To: <20200317120759.49367-1-dgilbert@redhat.com>
+References: <20200317120759.49367-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.248) by
- AM0PR05CA0073.eurprd05.prod.outlook.com (2603:10a6:208:136::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.19 via Frontend
- Transport; Tue, 17 Mar 2020 12:32:37 +0000
-X-Tagtoolbar-Keys: D20200317153236121
-X-Originating-IP: [185.215.60.248]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 41cbc76a-bb82-48ee-432f-08d7ca6f4715
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2441:
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB244108D7D25ED2D55C4E7DACC1F60@HE1PR0802MB2441.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-Forefront-PRVS: 0345CFD558
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(136003)(346002)(376002)(366004)(39850400004)(396003)(199004)(81166006)(5660300002)(81156014)(36756003)(16576012)(86362001)(6486002)(316002)(8936002)(66476007)(66556008)(478600001)(66946007)(4326008)(31696002)(8676002)(31686004)(52116002)(2616005)(2906002)(956004)(26005)(16526019)(186003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2441;
- H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6/+cNqze4SLTfjgkfx9Nzzrym+gbPT8+7Izg2ppJ2Sax7NySMpFWjWTxdtegyAn14r65tusdjb/ggTUl2yGokyjb5NmKHjtBqyf+DpqUfIwyIGwRud59TItdm2WnDBvDtJjNDr2Iw4bw2GybnrJ6xTVw6D1ebiZYzEVhXEhL87Y9Q8TgjDHQBRUGlR+zkKndth0Ir3rm1UNiN2feIcY5k158IEz/voyGBfLCyLJagAsd0B+ZDRoXm3J/mgz1JeYN5yAs1IztImyL7Q7s7y8NeZz/lYgohT3eKmOh63pkZdcZrPBJ+E8SyRUSGb2rlfakB4Z11Ah422K/D3T/BiazXFqpY1K1sX8wB7BclO8LwTda4ZI8DwM8RtQ+AM0NsvdwpjKUYEzxsRssSPeDKufxLVIePTRoiyEo+rI82GqR6Q6EQfmR2jESSeuchSCFsdpQ
-X-MS-Exchange-AntiSpam-MessageData: Eoyhz45RKfrnqGcsBIWmuD8gvRbeVw0sb2VzLH6eR0OxavBBBkXFyH0YSaMrjs6VsywfwmVs6+n8VYY4loIRonS4Cb8OZ8bTSGk9tgj20M3zx1EzuMfpuH6mdSrq21mBS6PIzALO+CYji8/aHa9pkA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41cbc76a-bb82-48ee-432f-08d7ca6f4715
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 12:32:38.2149 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +1khEr5F3tq/WPxKTn+qvQTPqwKB7n9214G6DXVLKv7NDKAMG+RYFg7KitOUch85j/Hiy/F13qswTVWuj6/JPp0+HN4GVTcI+b4O1fDK7Eg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2441
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:111:f400:7d00::71e
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,59 +83,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alxndr@bu.edu, paul.durrant@citrix.com, ashijeetacharya@gmail.com,
- qemu-block@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-13.03.2020 20:05, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On Tue, 17 Mar 2020 12:07:59 +0000
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> If memory-backend is a non-existent object, qemu crashes.
+> Check that the backend actually resolves.
+>=20
+> e.g.   ./qemu-system-x86_64 -machine pc,accel=3Dkvm,memory-backend=3Dfoo
+
+there is a patch to fix it already
+ [PATCH] softmmu: fix crash with invalid -M memory-backend=3D
+   by Marc-Andr=C3=A9=20
+
+but looks like it fell through cracks ...
+
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->   hw/block/xen-block.c | 5 +----
->   1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-> index 3885464513..7b3b6dee97 100644
-> --- a/hw/block/xen-block.c
-> +++ b/hw/block/xen-block.c
-> @@ -998,14 +998,13 @@ static void xen_block_device_destroy(XenBackendInstance *backend,
->       XenBlockVdev *vdev = &blockdev->props.vdev;
->       XenBlockDrive *drive = blockdev->drive;
->       XenBlockIOThread *iothread = blockdev->iothread;
-> +    Error *local_err = NULL;
->   
->       trace_xen_block_device_destroy(vdev->number);
->   
->       object_unparent(OBJECT(xendev));
->   
->       if (iothread) {
-> -        Error *local_err = NULL;
-> -
->           xen_block_iothread_destroy(iothread, &local_err);
->           if (local_err) {
->               error_propagate_prepend(errp, local_err,
-> @@ -1015,8 +1014,6 @@ static void xen_block_device_destroy(XenBackendInstance *backend,
->       }
->   
->       if (drive) {
-> -        Error *local_err = NULL;
-> -
->           xen_block_drive_destroy(drive, &local_err);
->           if (local_err) {
->               error_propagate_prepend(errp, local_err,
+>  softmmu/vl.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index ff2685dff8..76507e99c4 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -4288,6 +4288,11 @@ void qemu_init(int argc, char **argv, char **envp)
+> =20
+>          backend =3D object_resolve_path_type(current_machine->ram_memdev=
+_id,
+>                                             TYPE_MEMORY_BACKEND, NULL);
+> +        if (!backend) {
+> +            error_report("Unknown memory backend object id '%s'",
+> +                         current_machine->ram_memdev_id);
+> +            exit(EXIT_FAILURE);
+> +        }
+>          backend_size =3D object_property_get_uint(backend, "size",  &err=
+or_abort);
+>          if (have_custom_ram_size && backend_size !=3D ram_size) {
+>                  error_report("Size specified by -m option must match siz=
+e of "
 
-Hmm, no "return;" statement after this propagation. It's OK, as there no more code in the function after this "if", but I'd add it to be consistent and to avoid forgetting to add a return here when add more code to the function.
-
-(and if you do this, you may also fix indentation of string paramter of error_propagate_prepend...)
-
-
-
-Anyway,
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-
--- 
-Best regards,
-Vladimir
 
