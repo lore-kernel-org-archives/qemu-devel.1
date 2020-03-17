@@ -2,78 +2,79 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E00C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACE2C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:22:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCB252051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:19:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4681E2051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:22:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nq75zUXe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB252051A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TD5uT+Pf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4681E2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEIgu-0002mi-Ty
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:19:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33229)
+	id 1jEIjT-0005XS-Dm
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:22:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jEIeN-0008Ep-Nb
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:17:21 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1jEIia-0004Ht-JQ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jEIeM-00081m-GN
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:17:19 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:51213)
+ (envelope-from <dgilbert@redhat.com>) id 1jEIiZ-0006mA-Cr
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:21:40 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:23691)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEIeM-0007ze-Cb
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:17:18 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jEIiZ-0006hJ-8O
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:21:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584476238;
+ s=mimecast20190719; t=1584476498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Srff7EUbPO7ccQO9oqvxam9/2s+uONoH4QC6YsPP9q8=;
- b=Nq75zUXexOYMPGZ+R2l9G6Q8UA3jQv1KC6TjrAWX0J8iHCAAPQOzbGyiW8PIE6+TnDAkhL
- +WVSlO4SdOYQJlILHh8CLpSV22HWjjfneaCs1kljHN6jMFEiQEan8cW63FaADEZVuwcUtr
- l6JlObIeDoyolxCcTk1jK6Q/uDK1znU=
+ bh=Vq3300QZSkIHMgL+gyrh6c0lIc2YNgJsP74br85rNtQ=;
+ b=TD5uT+PfapXXidSOT9GtCqLLCG553KWEG0ghockY7sb2zCnZLwaYyOpKxlhpxu5M8daSq9
+ Cp53t8aO7ABTTQo6rXo1/5ZTAtMNABjLCiyFR5sHhxVe/jl0Sf/em7VrTIb8GPsmawMHGL
+ o/oBCTXkCXi4m6kND6BK3ED6C2sXVGs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-PkJiHCcaOHqr7TtZrif-oQ-1; Tue, 17 Mar 2020 16:17:16 -0400
-X-MC-Unique: PkJiHCcaOHqr7TtZrif-oQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-266-Soa8w_3fOfeS-G1zuCoqLQ-1; Tue, 17 Mar 2020 16:21:36 -0400
+X-MC-Unique: Soa8w_3fOfeS-G1zuCoqLQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C10B100726D;
- Tue, 17 Mar 2020 20:17:15 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-193.phx2.redhat.com [10.3.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ADE4910027A3;
- Tue, 17 Mar 2020 20:17:14 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] net: Track netdevs in NetClientState rather than
- QemuOpt
-Date: Tue, 17 Mar 2020 15:17:11 -0500
-Message-Id: <20200317201711.322764-3-eblake@redhat.com>
-In-Reply-To: <20200317201711.322764-1-eblake@redhat.com>
-References: <20200317201711.322764-1-eblake@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59A2A8017CC;
+ Tue, 17 Mar 2020 20:21:35 +0000 (UTC)
+Received: from work-vm (ovpn-114-234.ams2.redhat.com [10.36.114.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2747D6E3EE;
+ Tue, 17 Mar 2020 20:21:19 +0000 (UTC)
+Date: Tue, 17 Mar 2020 20:21:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH] pci: Display PCI IRQ pin in "info pci"
+Message-ID: <20200317202117.GI3369@work-vm>
+References: <20200317195908.283800-1-peterx@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200317195908.283800-1-peterx@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,134 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lekiravi@yandex-team.ru, jasowang@redhat.com, armbru@redhat.com,
- dgilbert@redhat.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As mentioned in the previous patch, our use of QemuOpt group "netdev"
-has two purposes: collect the CLI arguments, and serve as a witness
-for monitor hotplug actions.  As the latter didn't use anything but an
-id, it felt rather unclean to have to touch QemuOpts at all when going
-through QMP, so let's instead track things with a bool field in
-NetClientState.
+* Peter Xu (peterx@redhat.com) wrote:
+> Sometimes it would be good to be able to read the pin number along
+> with the IRQ number allocated.  Since we'll dump the IRQ number, no
+> reason to not dump the pin information.  For example, the vfio-pci
+> device will overwrite the pin with the hardware pin number.  It would
+> be nice to know the pin number of one assigned device from QMP/HMP.
+>=20
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> CC: Julia Suvorova <jusual@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>=20
+> This helped me to debug an IRQ sharing issue, so may good to have it
+> in master too.
+> ---
+>  hw/pci/pci.c       | 1 +
+>  monitor/hmp-cmds.c | 3 ++-
+>  qapi/misc.json     | 6 ++++--
+>  3 files changed, 7 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index e1ed6677e1..7ebf532ac9 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1769,6 +1769,7 @@ static PciDeviceInfo *qmp_query_pci_device(PCIDevic=
+e *dev, PCIBus *bus,
+>      info->regions =3D qmp_query_pci_regions(dev);
+>      info->qdev_id =3D g_strdup(dev->qdev.id ? dev->qdev.id : "");
+> =20
+> +    info->irq_pin =3D dev->config[PCI_INTERRUPT_PIN];
+>      if (dev->config[PCI_INTERRUPT_PIN] !=3D 0) {
+>          info->has_irq =3D true;
+>          info->irq =3D dev->config[PCI_INTERRUPT_LINE];
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 58724031ea..04c86bbb03 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -680,7 +680,8 @@ static void hmp_info_pci_device(Monitor *mon, const P=
+ciDeviceInfo *dev)
+>      }
+> =20
+>      if (dev->has_irq) {
+> -        monitor_printf(mon, "      IRQ %" PRId64 ".\n", dev->irq);
+> +        monitor_printf(mon, "      IRQ %" PRId64 ", pin %c\n",
+> +                       dev->irq, (char)('A' + dev->irq_pin - 1));
 
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/net/net.h |  1 +
- monitor/misc.c    |  4 +---
- net/net.c         | 37 +++++++++++--------------------------
- 3 files changed, 13 insertions(+), 29 deletions(-)
+Can we trust dev->irq_pin not to be something silly and generate a
+non-printable?
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 96e6eae8176e..094e966af9ec 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -98,6 +98,7 @@ struct NetClientState {
-     unsigned rxfilter_notify_enabled:1;
-     int vring_enable;
-     int vnet_hdr_len;
-+    bool is_netdev;
-     QTAILQ_HEAD(, NetFilterState) filters;
- };
+Dave
 
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 41a86e7012a1..6c45fa490ff5 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -2035,13 +2035,11 @@ void netdev_del_completion(ReadLineState *rs, int n=
-b_args, const char *str)
-     count =3D qemu_find_net_clients_except(NULL, ncs, NET_CLIENT_DRIVER_NI=
-C,
-                                          MAX_QUEUE_NUM);
-     for (i =3D 0; i < MIN(count, MAX_QUEUE_NUM); i++) {
--        QemuOpts *opts;
-         const char *name =3D ncs[i]->name;
-         if (strncmp(str, name, len)) {
-             continue;
-         }
--        opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), name);
--        if (opts) {
-+        if (ncs[i]->is_netdev) {
-             readline_add_completion(rs, name);
-         }
-     }
-diff --git a/net/net.c b/net/net.c
-index a2065aabede2..38778e831da2 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1060,6 +1060,15 @@ static int net_client_init1(const void *object, bool=
- is_netdev, Error **errp)
-         }
-         return -1;
-     }
-+
-+    if (is_netdev) {
-+        NetClientState *nc;
-+
-+        nc =3D qemu_find_netdev(netdev->id);
-+        assert(nc);
-+        nc->is_netdev =3D true;
-+    }
-+
-     return 0;
- }
-
-@@ -1172,34 +1181,12 @@ void netdev_add(QemuOpts *opts, Error **errp)
-
- void qmp_netdev_add(Netdev *netdev, Error **errp)
- {
--    Error *local_err =3D NULL;
--    QemuOptsList *opts_list;
--    QemuOpts *opts;
--
--    opts_list =3D qemu_find_opts_err("netdev", &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    opts =3D qemu_opts_create(opts_list, netdev->id, 1, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
--    net_client_init1(netdev, true, &local_err);
--    if (local_err) {
--        qemu_opts_del(opts);
--        goto out;
--    }
--
--out:
--    error_propagate(errp, local_err);
-+    net_client_init1(netdev, true, errp);
- }
-
- void qmp_netdev_del(const char *id, Error **errp)
- {
-     NetClientState *nc;
--    QemuOpts *opts;
-
-     nc =3D qemu_find_netdev(id);
-     if (!nc) {
-@@ -1208,14 +1195,12 @@ void qmp_netdev_del(const char *id, Error **errp)
-         return;
-     }
-
--    opts =3D qemu_opts_find(qemu_find_opts_err("netdev", NULL), id);
--    if (!opts) {
-+    if (!nc->is_netdev) {
-         error_setg(errp, "Device '%s' is not a netdev", id);
-         return;
-     }
-
-     qemu_del_net_client(nc);
--    qemu_opts_del(opts);
- }
-
- static void netfilter_print_info(Monitor *mon, NetFilterState *nf)
---=20
-2.25.1
+>      }
+> =20
+>      if (dev->has_pci_bridge) {
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index c18fe681fb..f8d33ddb4e 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -403,6 +403,8 @@
+>  #
+>  # @irq: if an IRQ is assigned to the device, the IRQ number
+>  #
+> +# @irq_pin: the IRQ pin, zero means no IRQ (since 5.1)
+> +#
+>  # @qdev_id: the device name of the PCI device
+>  #
+>  # @pci_bridge: if the device is a PCI bridge, the bridge information
+> @@ -417,8 +419,8 @@
+>  { 'struct': 'PciDeviceInfo',
+>    'data': {'bus': 'int', 'slot': 'int', 'function': 'int',
+>             'class_info': 'PciDeviceClass', 'id': 'PciDeviceId',
+> -           '*irq': 'int', 'qdev_id': 'str', '*pci_bridge': 'PciBridgeInf=
+o',
+> -           'regions': ['PciMemoryRegion']} }
+> +           '*irq': 'int', 'irq_pin': 'int', 'qdev_id': 'str',
+> +           '*pci_bridge': 'PciBridgeInfo', 'regions': ['PciMemoryRegion'=
+] }}
+> =20
+>  ##
+>  # @PciInfo:
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
