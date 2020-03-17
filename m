@@ -2,97 +2,100 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49856C18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FA4C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143BD2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FCDA2051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cauJigdW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143BD2051A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRA0/USF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FCDA2051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jECzh-0006D6-7m
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:14:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52943)
+	id 1jED0T-0007qR-6g
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:15:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jECyr-0005HM-Sz
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:06 -0400
+ (envelope-from <peterx@redhat.com>) id 1jECyE-0004cr-S7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jECyq-0001hp-MU
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:05 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:35061)
+ (envelope-from <peterx@redhat.com>) id 1jECyD-0006hL-DJ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:26 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32809)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jECyq-0001gH-Ih
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:04 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jECyD-0006fA-9G
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454444;
+ s=mimecast20190719; t=1584454404;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+UBbZ9tWGjNN43eJbMmPxd6cZVaNwzYUMssw08TDUBA=;
- b=cauJigdW/VGHvhEs5SGMqNlBg/++cqVu5QPpGmkHCyfGxH9FGtahOGp7/rcyZSGxI+88M0
- engAsqg6PSlQFHVIdjWQdjFi3zMph+lvjs45H7rdUXDJT91UN0F0aW+RGa+Vr5DpKCc8Zx
- sOke7cBhLNP2KXs86ByoLdRCRcbE44g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-2b85kIidMXuzKPxun816nQ-1; Tue, 17 Mar 2020 10:14:02 -0400
-X-MC-Unique: 2b85kIidMXuzKPxun816nQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s4so5336707wrb.19
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:14:02 -0700 (PDT)
+ bh=8a/Z2IOyUSb9V91dtDf91kJ6b5T/iwDRrUdAxIfFOL0=;
+ b=hRA0/USFv9f8f+MzSeitec8Yfy28orRYe66zXcr4Z+L30Y7y6v58xVt23fsKpRx+EkS4+Q
+ XqR1xYRgYCTyOED9vwbduxOaQEL6vYrblsBRGIqSNcsDJds5pxupU94Vzs+G7pFnnS7vnl
+ cj8DCl++ouw10NCKtydATEd/yDnvYO4=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-kQfoNdPWOmuApM09gpoJXQ-1; Tue, 17 Mar 2020 10:13:20 -0400
+X-MC-Unique: kQfoNdPWOmuApM09gpoJXQ-1
+Received: by mail-qt1-f200.google.com with SMTP id l1so21202597qtp.10
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:13:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6leC9Z3btxw4uzyY0SvMMxSG88hUVvd55XNZE52mFTQ=;
- b=dFt2c3OyMuwg+zCTucfz18oI03Owkbppx68r2jgHmsUfSvfiOACXx+UhkbidWopHUw
- 8uixvMj0DhwXToP4W57GfzVv/q1IelPzeepjBA11CcQqE+HmCUOHbBe5vfMdtG5+YuS/
- d+w4tDl7pbgWAA7fjI0fpXEyXg7r54O3/O3zmpHT5rGsk0QViUmKQR8LqiHi+fucBF/9
- tK7sglDlAWo6Yv33p/9DuvyzQtzDEdO6WE2OZUE+zGGVvVyvYviU8N6TFqucuLYEt3ut
- 46CAb4NLNZC0dNFHbOhdkoq5WCY7Ngumz0DUnxuoBb5mX51NS9sxWBnOuEt0fBU/rgQm
- d3tQ==
-X-Gm-Message-State: ANhLgQ3LLz6/wFmNBt8BUv/Waq4AzZ5ThpCB7xF+YQ1mOKqSFR5upxmI
- nRArZ5r1oulEozs/LZun6Pxj2Sxq8dtlONYrwlBSQz5WJwdCJdBWOLSrXhCT2rcJXcaniWE9WIu
- UBF/RxB2oycY9eGU=
-X-Received: by 2002:a5d:63d2:: with SMTP id c18mr6271509wrw.163.1584454441445; 
- Tue, 17 Mar 2020 07:14:01 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuaW0sPCdO+wAc3KufETCkO+J3gQ7g58rcDtbhc3o9CR+3d8VkHlfMmUQM61Rfiih04pZsyKQ==
-X-Received: by 2002:a5d:63d2:: with SMTP id c18mr6271497wrw.163.1584454441289; 
- Tue, 17 Mar 2020 07:14:01 -0700 (PDT)
-Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
- [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id r3sm3036366wrn.35.2020.03.17.07.14.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Mar 2020 07:14:00 -0700 (PDT)
-Subject: Re: [PATCH v10 4/3] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200313170517.22480-1-armbru@redhat.com>
- <20200317125741.15301-1-vsementsov@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d340d29b-f99c-f192-c00d-c1af16a562e5@redhat.com>
-Date: Tue, 17 Mar 2020 15:13:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=nPavcgGBX1eR/CAge6T/JWebMF1Xn2eabWi2I2DnX0M=;
+ b=EoBvleuhUyVVWH91uY8rae1r/J+70+cRqG+1xznmQRTVXomohCYgEkGrJXiO1gZhoY
+ AjNr8R04O4imAcrlNxLfZ/qrRr5rAJQubbIKNdIbL83EeVN9Iw+YVlUQCFv7yyoBZldx
+ DdhPtamnHkoBASGfZOVs2vCditzVbaZxleK9r6Zwzz/05ZrREjlQOwXV4NrO4OoPmQM5
+ tktmB3V4wPWxTu8NBpGkpjdclh//vWER27j7LQpDIeHw5ugG5Rdx8dyjsm+fUunwlPGB
+ 68elRpdVlcgtc5YOfkzs3WhYgGe+xDx+toQiLRbl0JTws0geG2uXE1XGFluEt+MbpsfS
+ LJYw==
+X-Gm-Message-State: ANhLgQ0f7NtGJbrT7uALI+Ctyh6veWEaVB6iBEWr6fPdMSeiOxr8ZOF7
+ aiYO6vIyUI9UcJAXbYTO/TUY17NF3EiiYbrhku0jAL8FohFej1KgjW3P/TeFJL/7+kAh7dnbzNr
+ BP7LloCjCCHRia6E=
+X-Received: by 2002:a37:482:: with SMTP id 124mr4896202qke.306.1584454399800; 
+ Tue, 17 Mar 2020 07:13:19 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vthi+odn2LkvaujHeZJkhnPRRo3FvA+4J++ZlHO3knQIW+lR9KFpeZ9DOPb1T5CICcGcP6rbg==
+X-Received: by 2002:a37:482:: with SMTP id 124mr4896165qke.306.1584454399395; 
+ Tue, 17 Mar 2020 07:13:19 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id d185sm2072246qkf.46.2020.03.17.07.13.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Mar 2020 07:13:18 -0700 (PDT)
+Date: Tue, 17 Mar 2020 10:13:16 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
+Message-ID: <20200317141316.GA199571@xz-x1>
+References: <20200226163618.31aa86ed.pasic@linux.ibm.com>
+ <20200226115009-mutt-send-email-mst@kernel.org>
+ <20200227140215.2d12149c.pasic@linux.ibm.com>
+ <20200227104233-mutt-send-email-mst@kernel.org>
+ <20200313134446.782c5f7c.pasic@linux.ibm.com>
+ <20200313112902-mutt-send-email-mst@kernel.org>
+ <20200313163122.GB95517@xz-x1>
+ <20200316131723-mutt-send-email-mst@kernel.org>
+ <20200316181405.GB184827@xz-x1>
+ <158fbd3b-1285-e18d-b535-a1e7a9802f1f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200317125741.15301-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
+In-Reply-To: <158fbd3b-1285-e18d-b535-a1e7a9802f1f@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,67 +109,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alxndr@bu.edu, ashijeetacharya@gmail.com, paul.durrant@citrix.com,
- armbru@redhat.com, qemu-block@nongnu.org
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, "Singh,
+ Brijesh" <brijesh.singh@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-stable@nongnu.org, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 1:57 PM, Vladimir Sementsov-Ogievskiy wrote:
-> It's wrong to use same err object as errp parameter for several
-> function calls without intermediate checking for error: we'll crash if
-> try to set err object twice. Fix that.
+On Tue, Mar 17, 2020 at 11:04:26AM +0800, Jason Wang wrote:
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+> On 2020/3/17 =E4=B8=8A=E5=8D=882:14, Peter Xu wrote:
+> > On Mon, Mar 16, 2020 at 01:19:54PM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Mar 13, 2020 at 12:31:22PM -0400, Peter Xu wrote:
+> > > > On Fri, Mar 13, 2020 at 11:29:59AM -0400, Michael S. Tsirkin wrote:
+> > > > > On Fri, Mar 13, 2020 at 01:44:46PM +0100, Halil Pasic wrote:
+> > > > > > [..]
+> > > > > > > > CCing Tom. @Tom does vhost-vsock work for you with SEV and =
+current qemu?
+> > > > > > > >=20
+> > > > > > > > Also, one can specify iommu_platform=3Don on a device that =
+ain't a part of
+> > > > > > > > a secure-capable VM, just for the fun of it. And that break=
+s
+> > > > > > > > vhost-vsock. Or is setting iommu_platform=3Don only valid i=
+f
+> > > > > > > > qemu-system-s390x is protected virtualization capable?
+> > > > > > > >=20
+> > > > > > > > BTW, I don't have a strong opinion on the fixes tag. We cur=
+rently do not
+> > > > > > > > recommend setting iommu_platform, and thus I don't think we=
+ care too
+> > > > > > > > much about past qemus having problems with it.
+> > > > > > > >=20
+> > > > > > > > Regards,
+> > > > > > > > Halil
+> > > > > > > Let's just say if we do have a Fixes: tag we want to set it c=
+orrectly to
+> > > > > > > the commit that needs this fix.
+> > > > > > >=20
+> > > > > > I finally did some digging regarding the performance degradatio=
+n. For
+> > > > > > s390x the performance degradation on vhost-net was introduced b=
+y commit
+> > > > > > 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Be=
+fore
+> > > > > > IOMMUTLBEntry.addr_mask used to be based on plen, which in turn=
+ was
+> > > > > > calculated as the rest of the memory regions size (from address=
+), and
+> > > > > > covered most of the guest address space. That is we didn't have=
+ a whole
+> > > > > > lot of IOTLB API overhead.
+> > > > > >=20
+> > > > > > With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xf=
+ff which comes
+> > > > > > as ~TARGET_PAGE_MASK from flatview_do_translate(). To have thin=
+gs working
+> > > > > > properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the=
+ level of
+> > > > > > 076a93d797 and 076a93d797~1.
+> > > > > Peter, what's your take on this one?
+> > > > Commit 076a93d797 was one of the patchset where we want to provide
+> > > > sensible IOTLB entries and also that should start to work with huge
+> > > > pages.
+> > > So the issue bundamentally is that it
+> > > never produces entries larger than page size.
+> > >=20
+> > > Wasteful even just with huge pages, all the more
+> > > so which passthrough which could have giga-byte
+> > > entries.
+> > >=20
+> > > Want to try fixing that?
+> > Yes we can fix that, but I'm still not sure whether changing the
+> > interface of address_space_get_iotlb_entry() to cover adhoc regions is
+> > a good idea, because I think it's still a memory core API and imho it
+> > would still be good to have IOTLBs returned to be what the hardware
+> > will be using (always page aligned IOTLBs).  Also it would still be
+> > not ideal because vhost backend will still need to send the MISSING
+> > messages and block for each of the continuous guest memory ranges
+> > registered, so there will still be misterious delay.  Not to say
+> > logically all the caches can be invalidated too so in that sense I
+> > think it's as hacky as the vhost speedup patch mentioned below..
+> >=20
+> > Ideally I think vhost should be able to know when PT is enabled or
+> > disabled for the device, so the vhost backend (kernel or userspace)
+> > should be able to directly use GPA for DMA.  That might need some new
+> > vhost interface.
 >=20
-> Forgive me for sending this into your series, but seems it is very
-> appropriate.
 >=20
-> It's rephrasing  of my
->   [PATCH v9 03/10] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-> for partI series but but without use of ERRP_AUTO_PROPAGATE.
+> Yes but I think we don't need another API since we can send GPA->HVA mapp=
+ing
+> via device IOTLB API when we find there's no DMA translation at all (eith=
+er
+> PT or no vIOMMU).
+
+Jason,
+
+Do you mean what we've worked on before?
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00574.html
+
+(I just read the previous discussion on that patch, it seems to be
+ exactly what we've discussed again...)
+
+Thanks,
+
 >=20
->   hw/sd/ssi-sd.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
+> Vhost doesn't need to know whether an address is an IOVA (vIOMMU) , GPA (=
+no
+> vIOMMU), or even HVA (dpdk virtio-user).
 >=20
-> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-> index 91db069212..829797b597 100644
-> --- a/hw/sd/ssi-sd.c
-> +++ b/hw/sd/ssi-sd.c
-> @@ -255,13 +255,25 @@ static void ssi_sd_realize(SSISlave *d, Error **err=
-p)
->       carddev =3D qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
->       if (dinfo) {
->           qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo=
-), &err);
-> +        if (err) {
-> +            goto fail;
-> +        }
->       }
-> +
->       object_property_set_bool(OBJECT(carddev), true, "spi", &err);
-> +    if (err) {
-> +        goto fail;
-> +    }
-> +
->       object_property_set_bool(OBJECT(carddev), true, "realized", &err);
->       if (err) {
-> -        error_setg(errp, "failed to init SD card: %s", error_get_pretty(=
-err));
-> -        return;
-> +        goto fail;
->       }
-> +
-> +    return;
-> +
-> +fail:
-> +    error_propagate_prepend(errp, err, "failed to init SD card: ");
->   }
->  =20
->   static void ssi_sd_reset(DeviceState *dev)
+> Thanks
+>=20
+>=20
+> >=20
+> > For the s390's specific issue, I would think Jason's patch an simple
+> > and ideal solution already.
+> >=20
+> > Thanks,
+> >=20
 >=20
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+--=20
+Peter Xu
 
 
