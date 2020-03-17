@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03ACC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:03:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 061B2C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5CD5206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:03:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4EFC20738
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:03:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gKYSOItg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5CD5206EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LSpXH4Or"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4EFC20738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jELFI-0006lO-Ry
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:03:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57357)
+	id 1jELFL-0006ow-LS
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:03:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jELEO-0005xL-0d
+ (envelope-from <dgibson@ozlabs.org>) id 1jELEO-0005xM-6X
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jELEM-0006Tk-L7
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:02:39 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59105 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1jELEM-0006Ty-Ll
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:02:40 -0400
+Received: from ozlabs.org ([203.11.71.1]:49729)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jELEL-0006FP-ST; Tue, 17 Mar 2020 19:02:38 -0400
+ id 1jELEL-0006FE-Lg; Tue, 17 Mar 2020 19:02:38 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hpbZ3pGcz9sNg; Wed, 18 Mar 2020 10:02:34 +1100 (AEDT)
+ id 48hpbZ33xJz9sPF; Wed, 18 Mar 2020 10:02:34 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584486154;
- bh=3CeX7xVRqkXIUfHNtrgLmS946GhMDIODPBg+pZQE0fs=;
+ bh=daCyllCiIz+DXKhtmK1bLfgw6C6uWyHJ40VuQNfGUH4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gKYSOItgcT5qy81qi3OcUVYGn2XakpmU+k18/pZUV09SEERAKFvOem9hTSasCKyQG
- 4WK+Z1qBmjRy5aQRcY1SAWvgLFShyEWb4oiB9wAn2rsoAkOVdwVwkxIoW+e1y6lkpQ
- e7B1S/zROhtcKbUFvn9kJp0xWarQgzGPYpqf3iqs=
-Date: Wed, 18 Mar 2020 09:46:15 +1100
+ b=LSpXH4Oruo9qniV52tpk08WMPgtMV0FVm3HbZNbQo66gyEqFN+raJYmJifb0I24oX
+ 6yBPN4e82MvERPDU5PTuWse+JY7GaVlSSDb+zoBXkAu30XFWMTORCV/5/byu8ny71v
+ cufOQaGIUItgEu8QY2MEdW75QUiAbEefGkX1sEFI=
+Date: Wed, 18 Mar 2020 09:33:05 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Programmingkid <programmingkidx@gmail.com>
-Subject: Re: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset 	to
- take an alternate vector
-Message-ID: <20200317224615.GO20264@umbus.fritz.box>
-References: <mailman.138.1584442890.3017.qemu-ppc@nongnu.org>
- <34ABB38A-B887-41B5-9108-25DA6ADB4B24@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 00/45] ppc-for-5.0 queue 20200317
+Message-ID: <20200317223305.GN20264@umbus.fritz.box>
+References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
+ <bc2dc429-0c54-2a36-b901-97b14d4c9ce7@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IpgPcFyQO6wM49Um"
+ protocol="application/pgp-signature"; boundary="A2x6GFCQWVc4i5ud"
 Content-Disposition: inline
-In-Reply-To: <34ABB38A-B887-41B5-9108-25DA6ADB4B24@gmail.com>
+In-Reply-To: <bc2dc429-0c54-2a36-b901-97b14d4c9ce7@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -70,60 +69,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, Greg Kurz <groug@kaod.org>,
- npiggin@gmail.com, QEMU Developers <qemu-devel@nongnu.org>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-ppc <qemu-ppc@nongnu.org>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ aik@ozlabs.ru, groug@kaod.org, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---IpgPcFyQO6wM49Um
+--A2x6GFCQWVc4i5ud
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 17, 2020 at 11:06:15AM -0400, Programmingkid wrote:
+On Tue, Mar 17, 2020 at 11:30:31AM +0100, Paolo Bonzini wrote:
+> On 17/03/20 11:03, David Gibson wrote:
+> >       pseries: Update SLOF firmware image
+> >       ppc/spapr: Move GPRs setup to one place
+> >       pseries: Update SLOF firmware image
+> >       spapr/rtas: Reserve space for RTAS blob and log
+> >       pseries: Update SLOF firmware image
 >=20
-> > On Mar 17, 2020, at 7:01 AM, qemu-ppc-request@nongnu.org wrote:
-> >=20
-> > Message: 3
-> > Date: Tue, 17 Mar 2020 11:47:32 +0100
-> > From: C=E9dric Le Goater <clg@kaod.org>
-> > To: David Gibson <david@gibson.dropbear.id.au>, Nicholas Piggin
-> > 	<npiggin@gmail.com>
-> > Cc: qemu-ppc@nongnu.org, Aravinda Prasad <arawinda.p@gmail.com>,
-> > 	Ganesh Goudar <ganeshgr@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
-> > 	qemu-devel@nongnu.org
-> > Subject: Re: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset
-> > 	to take an alternate vector
-> > Message-ID: <097148e5-78be-a294-236d-160fb5c29d4a@kaod.org>
-> > Content-Type: text/plain; charset=3Dwindows-1252
-> >=20
-> > On 3/17/20 12:34 AM, David Gibson wrote:
-> >> On Tue, Mar 17, 2020 at 09:28:24AM +1000, Nicholas Piggin wrote:
-> >>> C=E9dric Le Goater's on March 17, 2020 4:15 am:
-> >>>> On 3/16/20 3:26 PM, Nicholas Piggin wrote:
-> >>>>> Provide for an alternate delivery location, -1 defaults to the
-> >>>>> architected address.
-> >>>>=20
-> >>>> I don't know what is the best approach, to override the vector addr
-> >>>> computed by powerpc_excp() or use a machine class handler with=20
-> >>>> cpu->vhyp.
-> >>>=20
-> >>> Yeah it's getting a bit ad hoc and inconsistent with machine check
-> >>> etc, I just figured get something minimal in there now. The whole
-> >>> exception delivery needs a spring clean though.
-> >>=20
->=20
-> Currently Mac OS 9 will not restart. When someone goes to restart it
-> the screen will turn black and stay that way. Could this patch solve
-> this problem?
+> Oh, no fake-OF patches?
 
-No.  It's unlikely to be related, and at this stage is used
-exclusively to implement the FWNMI stuff for the pseries machine.
+Apart from some prelims that make sense on their own, no.
+
+Not quite ready to go ahead with that, I'm afraid.
+
+>=20
+> Paolo
+>=20
+> > C=E9dric Le Goater (1):
+> >       spapr/xive: use SPAPR_IRQ_IPI to define IPI ranges exposed to the=
+ guest
+> >=20
+> > David Gibson (19):
+> >       ppc: Remove stub support for 32-bit hypervisor mode
+> >       ppc: Remove stub of PPC970 HID4 implementation
+> >       target/ppc: Correct handling of real mode accesses with vhyp on h=
+ash MMU
+> >       target/ppc: Introduce ppc_hash64_use_vrma() helper
+> >       spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+> >       target/ppc: Remove RMOR register from POWER9 & POWER10
+> >       target/ppc: Use class fields to simplify LPCR masking
+> >       target/ppc: Streamline calculation of RMA limit from LPCR[RMLS]
+> >       target/ppc: Correct RMLS table
+> >       target/ppc: Only calculate RMLS derived RMA limit on demand
+> >       target/ppc: Don't store VRMA SLBE persistently
+> >       spapr: Don't use weird units for MIN_RMA_SLOF
+> >       spapr,ppc: Simplify signature of kvmppc_rma_size()
+> >       spapr: Don't attempt to clamp RMA to VRMA constraint
+> >       spapr: Don't clamp RMA to 16GiB on new machine types
+> >       spapr: Clean up RMA size calculation
+> >       spapr: Move creation of ibm,dynamic-reconfiguration-memory dt node
+> >       spapr: Move creation of ibm,architecture-vec-5 property
+> >       spapr: Rename DT functions to newer naming convention
+> >=20
+> > Greg Kurz (2):
+> >       spapr: Handle pending hot plug/unplug requests at CAS
+> >       ppc: Officially deprecate the CPU "compat" property
+> >=20
+> > Nicholas Piggin (8):
+> >       ppc/spapr: Fix FWNMI machine check failure handling
+> >       ppc/spapr: Change FWNMI names
+> >       ppc/spapr: Add FWNMI System Reset state
+> >       ppc/spapr: Fix FWNMI machine check interrupt delivery
+> >       ppc/spapr: Allow FWNMI on TCG
+> >       target/ppc: allow ppc_cpu_do_system_reset to take an alternate ve=
+ctor
+> >       ppc/spapr: Implement FWNMI System Reset delivery
+> >       ppc/spapr: Ignore common "ibm,nmi-interlock" Linux bug
+> >=20
+> > Philippe Mathieu-Daud=E9 (8):
+> >       hw/ppc/pnv: Fix typo in comment
+> >       hw/scsi/viosrp: Add missing 'hw/scsi/srp.h' include
+> >       hw/scsi/spapr_vscsi: Use SRP_MAX_IU_LEN instead of sizeof flexibl=
+e array
+> >       hw/scsi/spapr_vscsi: Simplify a bit
+> >       hw/scsi/spapr_vscsi: Introduce req_iu() helper
+> >       hw/scsi/spapr_vscsi: Do not mix SRP IU size with DMA buffer size
+> >       hw/scsi/spapr_vscsi: Prevent buffer overflow
+> >       hw/scsi/spapr_vscsi: Convert debug fprintf() to trace event
+> >=20
+> > Shivaprasad G Bhat (1):
+> >       spapr: Fix Coverity warning while validating nvdimm options
+> >=20
+> > Vitaly Chikunov (1):
+> >       target/ppc: Fix rlwinm on ppc64
+> >=20
+> >  docs/system/deprecated.rst        |   7 +
+> >  hw/intc/spapr_xive.c              |   4 +-
+> >  hw/ppc/pnv_lpc.c                  |   2 +-
+> >  hw/ppc/spapr.c                    | 980 ++++++++++++++++++++----------=
+--------
+> >  hw/ppc/spapr_caps.c               |  19 +-
+> >  hw/ppc/spapr_cpu_core.c           |  16 +-
+> >  hw/ppc/spapr_events.c             |  51 +-
+> >  hw/ppc/spapr_hcall.c              |  15 +-
+> >  hw/ppc/spapr_nvdimm.c             |   7 +-
+> >  hw/ppc/spapr_ovec.c               |   4 +-
+> >  hw/ppc/spapr_rtas.c               |  45 +-
+> >  hw/scsi/spapr_vscsi.c             |  72 +--
+> >  hw/scsi/trace-events              |   1 +
+> >  hw/scsi/viosrp.h                  |   3 +-
+> >  include/hw/ppc/spapr.h            |  34 +-
+> >  include/hw/ppc/spapr_cpu_core.h   |   4 +-
+> >  include/hw/ppc/spapr_ovec.h       |   4 +-
+> >  pc-bios/README                    |   2 +-
+> >  pc-bios/slof.bin                  | Bin 931032 -> 965008 bytes
+> >  roms/SLOF                         |   2 +-
+> >  target/ppc/cpu-qom.h              |   1 +
+> >  target/ppc/cpu.h                  |  28 +-
+> >  target/ppc/excp_helper.c          |  79 ++-
+> >  target/ppc/kvm.c                  |   5 +-
+> >  target/ppc/kvm_ppc.h              |   7 +-
+> >  target/ppc/mmu-hash64.c           | 319 +++++--------
+> >  target/ppc/translate.c            |  20 +-
+> >  target/ppc/translate_init.inc.c   | 116 ++---
+> >  tests/qtest/libqos/libqos-spapr.h |   3 +-
+> >  29 files changed, 930 insertions(+), 920 deletions(-)
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -131,25 +197,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---IpgPcFyQO6wM49Um
+--A2x6GFCQWVc4i5ud
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5xUzcACgkQbDjKyiDZ
-s5LB1xAAniP/vIdBAfrnbWuELTFzkhcL+ydrVozHyZ6/Ri18inc3MhMdePmtr8tj
-atU1DbHUWoI6Adtot32eF+u3GPjHWzlS9H8DhzHyKPljyeQZ4EnAhP//xGkfSXE0
-/aaR+mwKx2BWnTA5mpy7gody6jQrP6xd6WQYTTGOhCvsFHTyAhwKCFutDQD2ShPU
-ygCA5N3tfd0Yvl1hUOwJNpU28KXrAM1dWpoC/lsoMvzDIXn3/J5QdPS8GUd9NvaP
-HCNxUzeeNgqOiaVtu5w3nGrkH3q3zUezvyM2XhHSV7sniiFyc6aT7dFdoUUDAUY7
-BNMlSHzUCvh3w/xj4o/KarZ783vryveXgExKfknhTA767ZeJMRDfNiiT9sqH0ps9
-hwhCK0x+UW/HQZgqvejR2noYZ1w5M9wKYx9lQIdfwSSVDR3RbLeTLCl1GzxgpjAw
-1tmAEw/C4uX93/WQ0DI92Ye/Euxcw9VnFSjSU8cr++M2BkU8PHjBNOxhUyDMyvNM
-tUk+0teDGu2188G7Lc4SeEpoYU7WP0yxp6J4Pnz/v+T/6VHOpqBMyNBu6a1DDYVT
-fHDHHE1FltxWngh9hDEgIjry7c7pWmqynCztu84h4vgUN9XOBRmSkfyfPHdP7Eik
-/w8bQSlVSzRX+cT9H2hhkQ54wQtbxoTs+RTDdUZKmFSrDxyo/Rw=
-=kZqM
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5xUCEACgkQbDjKyiDZ
+s5LzXg/+I+RbL/bm1Gjtrq9VSjVcTbZNPnDbCXgqbVe6YxaGHe7OQnE0xmAce9fl
+tcFhNVPhbog/Uh+Vfb0TYhdtGEyLI7UZwy0JDfLTKKeFEpKx7OjfN7SuqVBH6UaI
+gjgXDbpyP2oqRjaXQxjb7q4ukLYjGw89DHzhoCvpW+PbPobGcYDqGBtdDkxnmdDZ
+3MAvq6ehaUkPedrlnUC0WRF0zz2ufNbQ3klt6k/LP0L6voeTOkFqJM6nWhi7P6xY
+0vFszmOkYKqQOOm3/wZ2PuDjecgOaQDJ7kZSycBVaKRP8tYUqOi8yjjnmuVqZy7E
+n5kAb37bBxw3ejkVmgbibL5CGkYF1pTiyniYDtcewWMsouqT06RTfvtWiqAghLaB
+oAHmadMjUL1MX1i5mHnBkLmLipz+R0GoBOSHdnWsN95C64yc8jUAyhDeZpR1qxoz
+0qb/o51yb3aBEO3RxGN1R7Kxq8iCRMT4LCdI2B7WWTc4nGtG0A5Vw31y/sms/ZGw
+NuMgeNZFkaEDqT4O74NSSfYY77ed+0nYkfTDa1f4OOXfh4Cv0gF8zKo2KfYuU35U
+82REIxR0hVRmKOEMJOQOq1PGZbwFYac6iBVjxnmOBbwzGuXUeaAUzX6ITFtHxWdV
+527imy2KA56jhcW/8O8M1BQEdNcyHnAbVXfsnaStqIujVS5aAQ8=
+=yhP4
 -----END PGP SIGNATURE-----
 
---IpgPcFyQO6wM49Um--
+--A2x6GFCQWVc4i5ud--
 
