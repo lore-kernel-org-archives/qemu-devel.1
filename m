@@ -2,59 +2,103 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B1EC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2D1C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 444F720663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:48:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444F720663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id A92A820663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:49:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOpxnuSE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A92A820663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEESM-0006KR-Br
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:48:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57882)
+	id 1jEESl-00077M-Km
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEENK-0007Rh-GD
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:43:28 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEEMe-0006Wq-Vi
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:42:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEENI-0003jg-LX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:43:26 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:40513)
+ (envelope-from <philmd@redhat.com>) id 1jEEMd-0000Ox-56
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:42:44 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24052)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jEENH-00039g-Mm; Tue, 17 Mar 2020 11:43:24 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436486|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.335301-0.0134057-0.651294;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H1-9gdj_1584459796; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H1-9gdj_1584459796)
- by smtp.aliyun-inc.com(10.147.43.230);
- Tue, 17 Mar 2020 23:43:17 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v6 18/61] target/riscv: vector single-width integer multiply
- instructions
-Date: Tue, 17 Mar 2020 23:06:10 +0800
-Message-Id: <20200317150653.9008-19-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEEMd-0000LT-0X
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:42:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584459761;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=n5htWkFQVjV3nq6eFNrhXATuVCH+zX0fM0so4PnzsAI=;
+ b=aOpxnuSEQQRY76QzC1nG7c81w5mb4FU5fA87xD6IOJoluBUXjGizELhNTTrfmpXx/cK1Nc
+ 1hnn7XxG4ZEerjfTmAWOdwus/HHIcXpPsVpSr3y44n4JXDaSdO2CbQfxh/CCRXQ/vO7hxs
+ lrb7UqMCvUoh0QWZtPJBGfruhUtSa90=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-BLlW7I9qMAiZnRjYG-cneA-1; Tue, 17 Mar 2020 11:42:37 -0400
+X-MC-Unique: BLlW7I9qMAiZnRjYG-cneA-1
+Received: by mail-wm1-f70.google.com with SMTP id r23so7328321wmn.3
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 08:42:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mjTNLk+7Sz2D68z11aig8/LbtItNOkQ/Wsvikf+nsD8=;
+ b=LoCqADe5Mq9Um6j9A5WkcQcS6aLvXeopBSUKSpEiUQP4xk/ZHoY/SyIcLXfG25GM3Y
+ oqvA7Rf/rJhk2XluRAX23jKWYL2tN8Z25rwclhUTD7N9XOLcFBhROhTAq1Fng00hwDRq
+ K33PhhhIT9Su8uOSsRIsg47d8/xd+siGr36FqrdIvQEO+w5rmvjalo45gns9zNK/fIR3
+ CFE4Raj2DeYJdql8Aa9VJkBdBt1txD+OGPwAqiSzIWIuXIBEdWb2pBL+uEdnqkErTPKm
+ AWs2k5QOoMJtkaFvEuDETyYW8PoYxgxtqL/uobaDFvxy6/7QigUat8cYln3zXu1wXGVE
+ 9ReA==
+X-Gm-Message-State: ANhLgQ1mkoo+DYYmI5vbQe6AARM2PHBAyLHHEZAESCRMQ2Dhdl9rlJDG
+ YDSJb3vXoM21BBD8ETOOSRrrO+OR5IRlbXjbPcamCiGa++oIE9TfTaE+b4U+k3Zx3GONHWkPIsF
+ rqv7YS+gWouEESAQ=
+X-Received: by 2002:adf:b307:: with SMTP id j7mr6690630wrd.128.1584459756489; 
+ Tue, 17 Mar 2020 08:42:36 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuP3EfB9QJh2FzLtgnFze3lYq7H9udGgTiP04d2znq1ptIHNURCySy7fpIRqeodgMtxmnk/4g==
+X-Received: by 2002:adf:b307:: with SMTP id j7mr6690611wrd.128.1584459756223; 
+ Tue, 17 Mar 2020 08:42:36 -0700 (PDT)
+Received: from [192.168.1.34] (96.red-83-59-163.dynamicip.rima-tde.net.
+ [83.59.163.96])
+ by smtp.gmail.com with ESMTPSA id x24sm4187910wmc.36.2020.03.17.08.42.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Mar 2020 08:42:35 -0700 (PDT)
+Subject: Re: [PULL v2 00/61] Misc patches for soft freeze
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <1584396375-31278-1-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA-W=7LQyKvy-Pxv7eUh-tLoYu5jLiObTST0-Ee0wrCX7g@mail.gmail.com>
+ <da99ee7c-49fb-057e-a6bb-b2c89de86ffa@redhat.com>
+ <20200317142635.GB517094@stefanha-x1.localdomain>
+ <4685b090-c480-0061-6cae-f29cc8cbd717@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8f1f0486-2ad6-0d16-b423-bc09110b31a0@redhat.com>
+Date: Tue, 17 Mar 2020 16:42:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <4685b090-c480-0061-6cae-f29cc8cbd717@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,271 +110,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/helper.h                   |  33 +++++
- target/riscv/insn32.decode              |   8 ++
- target/riscv/insn_trans/trans_rvv.inc.c |  10 ++
- target/riscv/vector_helper.c            | 156 ++++++++++++++++++++++++
- 4 files changed, 207 insertions(+)
+On 3/17/20 3:47 PM, Paolo Bonzini wrote:
+> On 17/03/20 15:26, Stefan Hajnoczi wrote:
+>> Yes, looks like the compiler can't figure out the control flow on
+>> NetBSD.
+>>
+>> We could drop the WITH_QEMU_LOCK_GUARD() macro and use this idiom
+>> instead:
+>>
+>>    {
+>>        QEMU_LOCK_GUARD(&mutex);
+>>        ...
+>>    }
+>>
+>> But it's unusual for C code to create scopes without a statement (for,
+>> if, while).
+>=20
+> After staring at compiler dumps for a while I have just concluded that
+> this could actually be considered a bug in WITH_QEMU_LOCK_GUARD.
+>=20
+> QEMU_MAKE_LOCKABLE returns NULL if passed a NULL argument.  This is the
+> root cause of the NetBSD failure, as the compiler doesn't figure out
+> that &timer_list->active_timers_lock is non-NULL and therefore doesn't
+> simplify the qemu_make_lockable function.
+>=20
+> But why does that cause an uninitialized variable warning?  Because if
+> WITH_QEMU_LOCK_GUARD were passed NULL, it would not execute its body!
+>=20
+> So I'm going to squash the following in the series, mostly through a new
+> patch "lockable: introduce QEMU_MAKE_LOCKABLE_NONNULL":
+>=20
+> diff --git a/include/qemu/lockable.h b/include/qemu/lockable.h
+> index 44b3f4b..1aeb2cb 100644
+> --- a/include/qemu/lockable.h
+> +++ b/include/qemu/lockable.h
+> @@ -67,7 +67,7 @@ qemu_make_lockable(void *x, QemuLockable *lockable)
+>    * In C++ it would be different, but then C++ wouldn't need QemuLockabl=
+e
+>    * either...
+>    */
+> -#define QEMU_MAKE_LOCKABLE_(x) qemu_make_lockable((x), &(QemuLockable) {=
+    \
+> +#define QEMU_MAKE_LOCKABLE_(x) (&(QemuLockable) {    \
+>           .object =3D (x),                               \
+>           .lock =3D QEMU_LOCK_FUNC(x),                   \
+>           .unlock =3D QEMU_UNLOCK_FUNC(x),               \
+> @@ -75,14 +75,27 @@ qemu_make_lockable(void *x, QemuLockable *lockable)
+>  =20
+>   /* QEMU_MAKE_LOCKABLE - Make a polymorphic QemuLockable
+>    *
+> - * @x: a lock object (currently one of QemuMutex, CoMutex, QemuSpin).
+> + * @x: a lock object (currently one of QemuMutex, QemuRecMutex, CoMutex,=
+ QemuSpin).
+>    *
+>    * Returns a QemuLockable object that can be passed around
+> - * to a function that can operate with locks of any kind.
+> + * to a function that can operate with locks of any kind, or
+> + * NULL if @x is %NULL.
+>    */
+>   #define QEMU_MAKE_LOCKABLE(x)                        \
+>       QEMU_GENERIC(x,                                  \
+>                    (QemuLockable *, (x)),              \
+> +                 qemu_make_lockable((x), QEMU_MAKE_LOCKABLE_(x)))
+> +
+> +/* QEMU_MAKE_LOCKABLE_NONNULL - Make a polymorphic QemuLockable
+> + *
+> + * @x: a lock object (currently one of QemuMutex, QemuRecMutex, CoMutex,=
+ QemuSpin).
+> + *
+> + * Returns a QemuLockable object that can be passed around
+> + * to a function that can operate with locks of any kind.
+> + */
+> +#define QEMU_MAKE_LOCKABLE_NONNULL(x)                \
+> +    QEMU_GENERIC(x,                                  \
+> +                 (QemuLockable *, (x)),              \
+>                    QEMU_MAKE_LOCKABLE_(x))
+>  =20
+>   static inline void qemu_lockable_lock(QemuLockable *x)
+> @@ -112,7 +125,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QemuLockable, qemu_lock=
+able_auto_unlock)
+>  =20
+>   #define WITH_QEMU_LOCK_GUARD_(x, var) \
+>       for (g_autoptr(QemuLockable) var =3D \
+> -                qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE((x))); \
+> +                qemu_lockable_auto_lock(QEMU_MAKE_LOCKABLE_NONNULL((x)))=
+; \
+>            var; \
+>            qemu_lockable_auto_unlock(var), var =3D NULL)
+>  =20
+>=20
+> So thank you NetBSD compiler, I guess. :P
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index c7d4ff185a..f42a12eef3 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -525,3 +525,36 @@ DEF_HELPER_6(vmax_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmax_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vmul_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulh_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index aafbdc6be7..abfed469bc 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -363,6 +363,14 @@ vmaxu_vv        000110 . ..... ..... 000 ..... 1010111 @r_vm
- vmaxu_vx        000110 . ..... ..... 100 ..... 1010111 @r_vm
- vmax_vv         000111 . ..... ..... 000 ..... 1010111 @r_vm
- vmax_vx         000111 . ..... ..... 100 ..... 1010111 @r_vm
-+vmul_vv         100101 . ..... ..... 010 ..... 1010111 @r_vm
-+vmul_vx         100101 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulh_vv        100111 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulh_vx        100111 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
-+vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
-+vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 53c49ee15c..c276beabd6 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1452,3 +1452,13 @@ GEN_OPIVX_TRANS(vminu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmin_vx,  opivx_check)
- GEN_OPIVX_TRANS(vmaxu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmax_vx,  opivx_check)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+GEN_OPIVV_GVEC_TRANS(vmul_vv,  mul)
-+GEN_OPIVV_TRANS(vmulh_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vmulhsu_vv, opivv_check)
-+GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
-+GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 32c2760a8a..56ba9a7422 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -852,6 +852,10 @@ GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w, clearl)
- #define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
- #define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
- #define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-+#define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
-+#define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
-+#define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
-+#define OP_SUS_D int64_t, uint64_t, int64_t, uint64_t, int64_t
- 
- /* operation of two vector elements */
- typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-@@ -1585,3 +1589,155 @@ GEN_VEXT_VX(vmax_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vmax_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vmax_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vmax_vx_d, 8, 8, clearq)
-+
-+/* Vector Single-Width Integer Multiply Instructions */
-+#define DO_MUL(N, M) (N * M)
-+RVVCALL(OPIVV2, vmul_vv_b, OP_SSS_B, H1, H1, H1, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_h, OP_SSS_H, H2, H2, H2, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_w, OP_SSS_W, H4, H4, H4, DO_MUL)
-+RVVCALL(OPIVV2, vmul_vv_d, OP_SSS_D, H8, H8, H8, DO_MUL)
-+GEN_VEXT_VV(vmul_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmul_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmul_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmul_vv_d, 8, 8, clearq)
-+
-+static int8_t do_mulh_b(int8_t s2, int8_t s1)
-+{
-+    return (int16_t)s2 * (int16_t)s1 >> 8;
-+}
-+
-+static int16_t do_mulh_h(int16_t s2, int16_t s1)
-+{
-+    return (int32_t)s2 * (int32_t)s1 >> 16;
-+}
-+
-+static int32_t do_mulh_w(int32_t s2, int32_t s1)
-+{
-+    return (int64_t)s2 * (int64_t)s1 >> 32;
-+}
-+
-+static int64_t do_mulh_d(int64_t s2, int64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    muls64(&lo_64, &hi_64, s1, s2);
-+    return hi_64;
-+}
-+
-+static uint8_t do_mulhu_b(uint8_t s2, uint8_t s1)
-+{
-+    return (uint16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+
-+static uint16_t do_mulhu_h(uint16_t s2, uint16_t s1)
-+{
-+    return (uint32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+
-+static uint32_t do_mulhu_w(uint32_t s2, uint32_t s1)
-+{
-+    return (uint64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+
-+static uint64_t do_mulhu_d(uint64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64;
-+
-+    mulu64(&lo_64, &hi_64, s2, s1);
-+    return hi_64;
-+}
-+
-+static int8_t do_mulhsu_b(int8_t s2, uint8_t s1)
-+{
-+    return (int16_t)s2 * (uint16_t)s1 >> 8;
-+}
-+
-+static int16_t do_mulhsu_h(int16_t s2, uint16_t s1)
-+{
-+    return (int32_t)s2 * (uint32_t)s1 >> 16;
-+}
-+
-+static int32_t do_mulhsu_w(int32_t s2, uint32_t s1)
-+{
-+    return (int64_t)s2 * (uint64_t)s1 >> 32;
-+}
-+
-+static int64_t do_mulhsu_d(int64_t s2, uint64_t s1)
-+{
-+    uint64_t hi_64, lo_64, abs_s2 = s2;
-+
-+    if (s2 < 0) {
-+        abs_s2 = -s2;
-+    }
-+    mulu64(&lo_64, &hi_64, abs_s2, s1);
-+    if (s2 < 0) {
-+        lo_64 = ~lo_64;
-+        hi_64 = ~hi_64;
-+        if (lo_64 == UINT64_MAX) {
-+            lo_64 = 0;
-+            hi_64 += 1;
-+        } else {
-+            lo_64 += 1;
-+        }
-+    }
-+
-+    return hi_64;
-+}
-+
-+RVVCALL(OPIVV2, vmulh_vv_b, OP_SSS_B, H1, H1, H1, do_mulh_b)
-+RVVCALL(OPIVV2, vmulh_vv_h, OP_SSS_H, H2, H2, H2, do_mulh_h)
-+RVVCALL(OPIVV2, vmulh_vv_w, OP_SSS_W, H4, H4, H4, do_mulh_w)
-+RVVCALL(OPIVV2, vmulh_vv_d, OP_SSS_D, H8, H8, H8, do_mulh_d)
-+RVVCALL(OPIVV2, vmulhu_vv_b, OP_UUU_B, H1, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVV2, vmulhu_vv_h, OP_UUU_H, H2, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVV2, vmulhu_vv_w, OP_UUU_W, H4, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVV2, vmulhu_vv_d, OP_UUU_D, H8, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVV2, vmulhsu_vv_b, OP_SUS_B, H1, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVV2, vmulhsu_vv_h, OP_SUS_H, H2, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVV2, vmulhsu_vv_w, OP_SUS_W, H4, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVV2, vmulhsu_vv_d, OP_SUS_D, H8, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VV(vmulh_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulh_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulh_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulh_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vmulhsu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vmulhsu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vmulhsu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vmulhsu_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vmul_vx_b, OP_SSS_B, H1, H1, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_h, OP_SSS_H, H2, H2, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_w, OP_SSS_W, H4, H4, DO_MUL)
-+RVVCALL(OPIVX2, vmul_vx_d, OP_SSS_D, H8, H8, DO_MUL)
-+RVVCALL(OPIVX2, vmulh_vx_b, OP_SSS_B, H1, H1, do_mulh_b)
-+RVVCALL(OPIVX2, vmulh_vx_h, OP_SSS_H, H2, H2, do_mulh_h)
-+RVVCALL(OPIVX2, vmulh_vx_w, OP_SSS_W, H4, H4, do_mulh_w)
-+RVVCALL(OPIVX2, vmulh_vx_d, OP_SSS_D, H8, H8, do_mulh_d)
-+RVVCALL(OPIVX2, vmulhu_vx_b, OP_UUU_B, H1, H1, do_mulhu_b)
-+RVVCALL(OPIVX2, vmulhu_vx_h, OP_UUU_H, H2, H2, do_mulhu_h)
-+RVVCALL(OPIVX2, vmulhu_vx_w, OP_UUU_W, H4, H4, do_mulhu_w)
-+RVVCALL(OPIVX2, vmulhu_vx_d, OP_UUU_D, H8, H8, do_mulhu_d)
-+RVVCALL(OPIVX2, vmulhsu_vx_b, OP_SUS_B, H1, H1, do_mulhsu_b)
-+RVVCALL(OPIVX2, vmulhsu_vx_h, OP_SUS_H, H2, H2, do_mulhsu_h)
-+RVVCALL(OPIVX2, vmulhsu_vx_w, OP_SUS_W, H4, H4, do_mulhsu_w)
-+RVVCALL(OPIVX2, vmulhsu_vx_d, OP_SUS_D, H8, H8, do_mulhsu_d)
-+GEN_VEXT_VX(vmul_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmul_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmul_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmul_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulh_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulh_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulh_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulh_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
--- 
-2.23.0
+Yep, new patch looks good.
+
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
+>=20
+> Paolo
+>=20
 
 
