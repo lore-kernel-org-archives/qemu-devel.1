@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00BBC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E81C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:04:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A09820724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A52020724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:04:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XBPyL5wB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A09820724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EG7GWmbj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A52020724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEAxE-0004i0-7c
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:04:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56801)
+	id 1jEAxU-0005Rd-FG
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:04:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEAoY-00088G-4p
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:20 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEAoW-0006cc-L4
+ (envelope-from <armbru@redhat.com>) id 1jEAoW-00085D-IC
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:17 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:48509)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoW-0006Yk-FP
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1jEAoU-0006Pl-VZ
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:16 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:56578)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoU-0006N3-R3
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584446116;
+ s=mimecast20190719; t=1584446114;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1NrBoOJiPpPijarSOpG1Aow+BnBWvtdHBq3tpL59k0M=;
- b=XBPyL5wBBgxpDaUmst+fbIZ1JnN4AdGhnEgfg/aVOb/R41AFpoZTHzTkDob5RltoQb+K8q
- IuDJw+9reNeMF7u87mGoIiBL3s+gGo6EjK3jALKuLS7CySTltrKYQlxVEhMFpE7mqWgujJ
- M9RI08ZwC3fzq8rXdg56xHUULIPkzTc=
+ bh=ePcL4jMr5ho3uFRr0SwI3tKaouKaWGPYWwp+LQfUZMc=;
+ b=EG7GWmbjLOLeL9lENdqccllzBBztpe3eRY7L9c29kIna7yjk5w+gpBUeMCr9jXwqdHaPSk
+ 2CpjsqccoMot6N2DqqO3XQX4+CCxtBLxwDr4M9ClWdeVSjYyoxMi9LJCEYIbiOBV2o4w9S
+ gEqUc9A74GVhRJZFq8xd1ixx94uOe/U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-4DMogmT2OP6LZWmXMItqIA-1; Tue, 17 Mar 2020 07:55:12 -0400
-X-MC-Unique: 4DMogmT2OP6LZWmXMItqIA-1
+ us-mta-397-QzxlLTXrNhW-R25ItuWmEQ-1; Tue, 17 Mar 2020 07:55:13 -0400
+X-MC-Unique: QzxlLTXrNhW-R25ItuWmEQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E53EBDBAB;
- Tue, 17 Mar 2020 11:55:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FAA9800D4E;
+ Tue, 17 Mar 2020 11:55:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CC0B89080B;
- Tue, 17 Mar 2020 11:55:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B8CA9128E;
+ Tue, 17 Mar 2020 11:55:11 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1A6E311366F2; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
+ id 6C2F9113522F; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/34] qapi/schema: Clean up around
- QAPISchemaEntity.connect_doc()
-Date: Tue, 17 Mar 2020 12:54:36 +0100
-Message-Id: <20200317115459.31821-12-armbru@redhat.com>
+Subject: [PATCH v4 23/34] qapi: Simplify how qmp_dispatch() gets the request ID
+Date: Tue, 17 Mar 2020 12:54:48 +0100
+Message-Id: <20200317115459.31821-24-armbru@redhat.com>
 In-Reply-To: <20200317115459.31821-1-armbru@redhat.com>
 References: <20200317115459.31821-1-armbru@redhat.com>
 MIME-Version: 1.0
@@ -75,7 +74,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,80 +93,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QAPISchemaEntity calls doc.connect_feature() in .check().  Improper
-since commit ee1e6a1f6c8 split .connect_doc() off .check().  Move the
-call.  Requires making the children call super().connect_doc() as they
-should.
+We convert the request object to a QDict twice: first in
+qmp_dispatch() to get the request ID, and then again in
+qmp_dispatch_check_obj(), which converts to QDict, then checks and
+returns it.  We can't get the request ID from the latter, because it's
+null when the qdict flunks the checks.
+
+Move the checked conversion to QDict from qmp_dispatch_check_obj() to
+qmp_dispatch(), and drop the duplicate there.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/schema.py | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ qapi/qmp-dispatch.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index d759308b4e..2a2b495987 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -53,13 +53,13 @@ class QAPISchemaEntity:
-         seen =3D {}
-         for f in self.features:
-             f.check_clash(self.info, seen)
--            if self.doc:
--                self.doc.connect_feature(f)
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 550d1fe8d2..91e50fa0dd 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -19,20 +19,13 @@
+ #include "sysemu/runstate.h"
+ #include "qapi/qmp/qbool.h"
+=20
+-static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oo=
+b,
++static QDict *qmp_dispatch_check_obj(QDict *dict, bool allow_oob,
+                                      Error **errp)
+ {
+     const char *exec_key =3D NULL;
+     const QDictEntry *ent;
+     const char *arg_name;
+     const QObject *arg_obj;
+-    QDict *dict;
 -
-         self._checked =3D True
+-    dict =3D qobject_to(QDict, request);
+-    if (!dict) {
+-        error_setg(errp, "QMP input must be a JSON object");
+-        return NULL;
+-    }
 =20
-     def connect_doc(self, doc=3DNone):
--        pass
-+        doc =3D doc or self.doc
-+        if doc:
-+            for f in self.features:
-+                doc.connect_feature(f)
+     for (ent =3D qdict_first(dict); ent;
+          ent =3D qdict_next(dict, ent)) {
+@@ -103,13 +96,21 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *req=
+uest,
+     const char *command;
+     QDict *args;
+     QmpCommand *cmd;
+-    QDict *dict =3D qobject_to(QDict, request);
+-    QObject *id =3D dict ? qdict_get(dict, "id") : NULL;
++    QDict *dict;
++    QObject *id;
+     QObject *ret =3D NULL;
+     QDict *rsp =3D NULL;
 =20
-     def check_doc(self):
-         if self.doc:
-@@ -250,6 +250,7 @@ class QAPISchemaEnumType(QAPISchemaType):
-             m.check_clash(self.info, seen)
+-    dict =3D qmp_dispatch_check_obj(request, allow_oob, &err);
++    dict =3D qobject_to(QDict, request);
+     if (!dict) {
++        id =3D NULL;
++        error_setg(&err, "QMP input must be a JSON object");
++        goto out;
++    }
++
++    id =3D qdict_get(dict, "id");
++
++    if (!qmp_dispatch_check_obj(dict, allow_oob, &err)) {
+         goto out;
+     }
 =20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             for m in self.members:
-@@ -392,6 +393,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-             m.check_clash(info, seen)
-=20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.base and self.base.is_implicit():
-@@ -667,6 +669,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
-                 types_seen[qt] =3D v.name
-=20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             for v in self.variants.variants:
-@@ -733,6 +736,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                         % self.ret_type.describe())
-=20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.arg_type and self.arg_type.is_implicit():
-@@ -775,6 +779,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
-                     % self.arg_type.describe())
-=20
-     def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-         doc =3D doc or self.doc
-         if doc:
-             if self.arg_type and self.arg_type.is_implicit():
 --=20
 2.21.1
 
