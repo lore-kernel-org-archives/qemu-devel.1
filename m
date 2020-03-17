@@ -2,57 +2,64 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C42C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C48A4C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9235A20724
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:45:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9235A20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 93DDD20724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 18:46:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="dUZk+CMP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93DDD20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEHDQ-00019U-Nf
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:45:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33179)
+	id 1jEHEc-00028V-P4
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 14:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jEH2y-0003LU-FI
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:34:37 -0400
+ (envelope-from <berto@igalia.com>) id 1jEH8C-0003IZ-5h
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:40:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jEH2x-0003qQ-2W
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:34:36 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:36498)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jEH2t-0003RW-6X; Tue, 17 Mar 2020 14:34:31 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 05D88747DF5;
- Tue, 17 Mar 2020 19:34:29 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D6B6E747D5D; Tue, 17 Mar 2020 19:34:28 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id D504D746383;
- Tue, 17 Mar 2020 19:34:28 +0100 (CET)
-Date: Tue, 17 Mar 2020 19:34:28 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v3 0/8] Misc hw/ide legacy clean up
-In-Reply-To: <bcb72a4d-ace7-f4b2-650b-fd2e7cfece71@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2003171931520.35246@zero.eik.bme.hu>
-References: <cover.1584457537.git.balaton@eik.bme.hu>
- <bcb72a4d-ace7-f4b2-650b-fd2e7cfece71@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <berto@igalia.com>) id 1jEH89-0003Dl-VN
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 14:39:59 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:56363)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1jEH89-00032A-Lq; Tue, 17 Mar 2020 14:39:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=L90L256eetdjrBb3hySz2ppZX/NPByekqjWwyfvU14w=; 
+ b=dUZk+CMPZSuvfYH2YhKq3zAdcs+O9zL56s1HA7YtxtyU6PE4OKls+q7WTkrgYRJ1ntqOHJb+HwPel7P6pbF8ULHakg1bINxFVY4OIotWlK5oPofrNvLrcMaPp0kztbkMPDGWnBorXz4I7kMZnEnRFuZh4dUvU85rWkzNibUWcciyA8ELkOxz4OSPlMsFSFYn3gk5thwHNG/fZcBEmoVyzOrf3x7VO5JOxKW8J8RIR7SASHx9kzsyr2GZBQZaUg3veEixqrgrB08PPrIY4NWW51ObxcgGuDEJqcUWw8mhQLI2UPAZGJKo1LZHU3Ep/KHmP4JRlNCyMT5qjAGOkED9+w==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1jEH86-0002yz-Pm; Tue, 17 Mar 2020 19:39:54 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1jEH86-0006bv-GQ; Tue, 17 Mar 2020 19:39:54 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 0/2] Convert qcow2_get_cluster_offset() into
+ qcow2_get_host_offset()
+In-Reply-To: <cover.1582828123.git.berto@igalia.com>
+References: <cover.1582828123.git.berto@igalia.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Tue, 17 Mar 2020 19:39:54 +0100
+Message-ID: <w51d09a6d1h.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,62 +71,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Mar 2020, John Snow wrote:
-> On 3/17/20 11:05 AM, BALATON Zoltan wrote:
->> Avoid problems from reassigning variable in piix4_create and fix
->> compilation problem with mips_r4k
->>
->> BALATON Zoltan (8):
->>   hw/ide: Get rid of piix3_init functions
->>   hw/isa/piix4.c: Introduce variable to store devfn
->>   hw/ide: Get rid of piix4_init function
->>   hw/ide: Remove now unneded #include "hw/pci/pci.h" from hw/ide.h
->>   hw/ide/pci.c: Coding style update to fix checkpatch errors
->>   hw/ide: Do ide_drive_get() within pci_ide_create_devs()
->>   hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
->>   hw/ide: Remove unneeded inclusion of hw/ide.h
->>
->>  hw/alpha/dp264.c              | 13 +++----------
->>  hw/hppa/hppa_sys.h            |  1 -
->>  hw/hppa/machine.c             |  1 -
->>  hw/i386/pc_piix.c             | 18 +++++++++---------
->>  hw/ide/ahci_internal.h        |  1 +
->>  hw/ide/pci.c                  | 11 +++++++----
->>  hw/ide/piix.c                 | 31 +------------------------------
->>  hw/isa/piix4.c                | 23 ++++++++++-------------
->>  hw/mips/mips_fulong2e.c       |  5 +----
->>  hw/mips/mips_malta.c          |  2 +-
->>  hw/mips/mips_r4k.c            |  1 +
->>  hw/ppc/mac_newworld.c         |  1 -
->>  hw/ppc/mac_oldworld.c         |  1 -
->>  hw/ppc/prep.c                 |  1 -
->>  hw/sparc64/sun4u.c            |  6 +-----
->>  include/hw/ide.h              |  6 ------
->>  include/hw/ide/internal.h     |  2 ++
->>  include/hw/ide/pci.h          |  3 ++-
->>  include/hw/misc/macio/macio.h |  1 +
->>  include/hw/southbridge/piix.h |  3 +--
->>  20 files changed, 41 insertions(+), 90 deletions(-)
->>
+On Thu 27 Feb 2020 07:34:24 PM CET, Alberto Garcia wrote:
+> Hi,
 >
-> Passed local testing. Pushed to gitlab and pending further tests.
->
-> Track here: https://gitlab.com/jsnow/qemu/pipelines/127143307
+> this is something I did while working on the subcluster series but
+> it's independent from it so I thought to send it already.
 
-These tests don't seem to compile mips64el-softmmu target so probably miss 
-some of these which are only used on those boards. (E.g. I could not find 
-hw/ide/via.c mentioned in any of the logs.)
+I included this patches in v4 of the main series so you can ignore this
+thread.
 
-Regards,
-BALATON Zoltan
+Berto
 
