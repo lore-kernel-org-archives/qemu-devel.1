@@ -2,89 +2,56 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686DFC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBF1C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02E8C20757
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:07:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tqM+DA9Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E8C20757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9DF8D20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:08:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF8D20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEDoT-0007wj-S2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52301)
+	id 1jEDpJ-0001Ef-R5
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <programmingkidx@gmail.com>) id 1jEDnX-0006tW-Ot
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:06:29 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDoO-0008Cx-8z
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <programmingkidx@gmail.com>) id 1jEDnW-0005Bb-Ls
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:06:27 -0400
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:43093)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
- id 1jEDnQ-00048I-HY; Tue, 17 Mar 2020 11:06:20 -0400
-Received: by mail-qv1-xf43.google.com with SMTP id c28so10999000qvb.10;
- Tue, 17 Mar 2020 08:06:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=iicBtEJsKuObftjCntJzhmJhcV615VU5yQU1s0QCYoA=;
- b=tqM+DA9ZFc00dAK/Tug9ooP0pnCRsp6bRkMjj/YhDt/lNE9e4Uu9LdjioBXV21f43d
- sGI/7UwLO6VlfqaUummDPaFpVF8GwfOdHPiNPC8vaB27hjA+rRl1bmPdqznQqLn6ILHT
- 7Aec/u2B9mNOQtlBJkYM2lwwfD0t8BOMmjInfQ38ic+G24rcLERhRt5ORUMe30S3la28
- yf1hWukk2EeRSvn+UZI/c78e5xWqv9shv+rIjtgOxdWpE+qVP73ICLmmBaa5IPObGYa/
- bWNMWDK7+IfzUjjetOgbib9dV9hllMVg6jFOJXhM4SQ3S1LYSvPq6NRP+IXUTTpM5pom
- HH0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=iicBtEJsKuObftjCntJzhmJhcV615VU5yQU1s0QCYoA=;
- b=hMEWbggs5B+xbMV5fk+4d1wW/m9fc8WR3gB3HwvltdjxztX2zAtvktBCYeA1ExZ70a
- tEf+I/TZeemCfGp9hZwvtsBTSHqfZ1CXxsEHtwi/vNBCiVRqHxyB0h3Q9IOwBIjrfi1I
- ID0fUXJOyoPl/DDWyE9CNcbZvSbZZu5QdUkNkY9ib7syvlvMmjd6Ky3taSlZ7mEZ3f6T
- Bli/jCRk5RPeAO9kYJI84pJpxb3H3ey568SwiEoNL8zoEbvMF71+MTeDTjaTFkbaYoqv
- c8CWniH5KrNWsZYisB0kgovwtUyzpRTQ7weYm0X4iv+gUeCwYHd4dxVsYJ5eJL+HAxiy
- 6yyQ==
-X-Gm-Message-State: ANhLgQ111qY2fJ8m4zjDVbkKC5nkzNkxBdsWvlqK2SeETX4loZ3T3zdw
- NbMtRYjXgdIUlVWwZDmwchWmrBuc
-X-Google-Smtp-Source: ADFU+vvVFjReH1Ez0hhHxDWbPl/Cp+tI6VPwY5ub+bjR2jrW5BQV+2PbwLCjRMylCUbgflaHmgB+jg==
-X-Received: by 2002:a0c:ed2d:: with SMTP id u13mr5378959qvq.203.1584457578392; 
- Tue, 17 Mar 2020 08:06:18 -0700 (PDT)
-Received: from [192.168.0.4] (d149-67-30-58.try.wideopenwest.com.
- [67.149.58.30])
- by smtp.gmail.com with ESMTPSA id p126sm2104362qkd.108.2020.03.17.08.06.16
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 17 Mar 2020 08:06:17 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset to take
- an alternate vector
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.138.1584442890.3017.qemu-ppc@nongnu.org>
-Date: Tue, 17 Mar 2020 11:06:15 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <34ABB38A-B887-41B5-9108-25DA6ADB4B24@gmail.com>
-References: <mailman.138.1584442890.3017.qemu-ppc@nongnu.org>
-To: qemu-ppc <qemu-ppc@nongnu.org>,
- =?utf-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>, npiggin@gmail.com
-X-Mailer: Apple Mail (2.3273)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f43
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDoM-0003pp-7Y
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:07:19 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56035)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEDoL-0001uJ-8O; Tue, 17 Mar 2020 11:07:18 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.0746686|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.0230443-0.00100222-0.975954;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H0zOLJH_1584457618; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H0zOLJH_1584457618)
+ by smtp.aliyun-inc.com(10.147.44.129);
+ Tue, 17 Mar 2020 23:06:58 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 00/61]  target/riscv: support vector extension v0.7.1
+Date: Tue, 17 Mar 2020 23:05:52 +0800
+Message-Id: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,48 +63,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patchset implements the vector extension for RISC-V on QEMU.
 
-> On Mar 17, 2020, at 7:01 AM, qemu-ppc-request@nongnu.org wrote:
->=20
-> Message: 3
-> Date: Tue, 17 Mar 2020 11:47:32 +0100
-> From: C=C3=A9dric Le Goater <clg@kaod.org>
-> To: David Gibson <david@gibson.dropbear.id.au>, Nicholas Piggin
-> 	<npiggin@gmail.com>
-> Cc: qemu-ppc@nongnu.org, Aravinda Prasad <arawinda.p@gmail.com>,
-> 	Ganesh Goudar <ganeshgr@linux.ibm.com>, Greg Kurz =
-<groug@kaod.org>,
-> 	qemu-devel@nongnu.org
-> Subject: Re: [PATCH v2 6/8] target/ppc: allow ppc_cpu_do_system_reset
-> 	to take an alternate vector
-> Message-ID: <097148e5-78be-a294-236d-160fb5c29d4a@kaod.org>
-> Content-Type: text/plain; charset=3Dwindows-1252
->=20
-> On 3/17/20 12:34 AM, David Gibson wrote:
->> On Tue, Mar 17, 2020 at 09:28:24AM +1000, Nicholas Piggin wrote:
->>> C=C3=A9dric Le Goater's on March 17, 2020 4:15 am:
->>>> On 3/16/20 3:26 PM, Nicholas Piggin wrote:
->>>>> Provide for an alternate delivery location, -1 defaults to the
->>>>> architected address.
->>>>=20
->>>> I don't know what is the best approach, to override the vector addr
->>>> computed by powerpc_excp() or use a machine class handler with=20
->>>> cpu->vhyp.
->>>=20
->>> Yeah it's getting a bit ad hoc and inconsistent with machine check
->>> etc, I just figured get something minimal in there now. The whole
->>> exception delivery needs a spring clean though.
->>=20
+You can also find the patchset and all *test cases* in
+my repo(https://github.com/romanheros/qemu.git branch:vector-upstream-v3).
+All the test cases are in the directory qemu/tests/riscv/vector/. They are
+riscv64 linux user mode programs.
 
-Currently Mac OS 9 will not restart. When someone goes to restart it the =
-screen will turn black and stay that way. Could this patch solve this =
-problem?
+You can test the patchset by the script qemu/tests/riscv/vector/runcase.sh.
+
+Features:
+  * support specification riscv-v-spec-0.7.1.(https://github.com/riscv/riscv-v-spec/releases/tag/0.7.1/)
+  * support basic vector extension.
+  * support Zvlsseg.
+  * support Zvamo.
+  * not support Zvediv as it is changing.
+  * SLEN always equals VLEN.
+  * element width support 8bit, 16bit, 32bit, 64bit.
+
+Changelog:
+v6
+  * use gvec_dup Gvec IR to accellerate move and merge.
+  * a better way to implement fixed point instructions.
+  * a global check when vl == 0.
+  * limit some macros to only one inline function call.
+  * fixup sew error when use Gvec IR.
+  * fixup bugs for corner cases.
+v5
+  * fixup a bug in tb flags.
+v4
+  * no change
+v3
+  * move check code from execution-time to translation-time
+  * use a continous memory block for vector register description.
+  * vector registers as direct fields in RISCVCPUState.
+  * support VLEN configure from qemu command line.
+  * support ELEN configure from qemu command line.
+  * support vector specification version configure from qemu command line.
+  * probe pages before real load or store access.
+  * use probe_page_check for no-fault operations in linux user mode.
+  * generation atomic exit exception when in parallel environment.
+  * fixup a lot of concrete bugs.
+
+V2
+  * use float16_compare{_quiet}
+  * only use GETPC() in outer most helper
+  * add ctx.ext_v Property
+
+LIU Zhiwei (61):
+  target/riscv: add vector extension field in CPURISCVState
+  target/riscv: implementation-defined constant parameters
+  target/riscv: support vector extension csr
+  target/riscv: add vector configure instruction
+  target/riscv: add an internals.h header
+  target/riscv: add vector stride load and store instructions
+  target/riscv: add vector index load and store instructions
+  target/riscv: add fault-only-first unit stride load
+  target/riscv: add vector amo operations
+  target/riscv: vector single-width integer add and subtract
+  target/riscv: vector widening integer add and subtract
+  target/riscv: vector integer add-with-carry / subtract-with-borrow
+    instructions
+  target/riscv: vector bitwise logical instructions
+  target/riscv: vector single-width bit shift instructions
+  target/riscv: vector narrowing integer right shift instructions
+  target/riscv: vector integer comparison instructions
+  target/riscv: vector integer min/max instructions
+  target/riscv: vector single-width integer multiply instructions
+  target/riscv: vector integer divide instructions
+  target/riscv: vector widening integer multiply instructions
+  target/riscv: vector single-width integer multiply-add instructions
+  target/riscv: vector widening integer multiply-add instructions
+  target/riscv: vector integer merge and move instructions
+  target/riscv: vector single-width saturating add and subtract
+  target/riscv: vector single-width averaging add and subtract
+  target/riscv: vector single-width fractional multiply with rounding
+    and saturation
+  target/riscv: vector widening saturating scaled multiply-add
+  target/riscv: vector single-width scaling shift instructions
+  target/riscv: vector narrowing fixed-point clip instructions
+  target/riscv: vector single-width floating-point add/subtract
+    instructions
+  target/riscv: vector widening floating-point add/subtract instructions
+  target/riscv: vector single-width floating-point multiply/divide
+    instructions
+  target/riscv: vector widening floating-point multiply
+  target/riscv: vector single-width floating-point fused multiply-add
+    instructions
+  target/riscv: vector widening floating-point fused multiply-add
+    instructions
+  target/riscv: vector floating-point square-root instruction
+  target/riscv: vector floating-point min/max instructions
+  target/riscv: vector floating-point sign-injection instructions
+  target/riscv: vector floating-point compare instructions
+  target/riscv: vector floating-point classify instructions
+  target/riscv: vector floating-point merge instructions
+  target/riscv: vector floating-point/integer type-convert instructions
+  target/riscv: widening floating-point/integer type-convert
+    instructions
+  target/riscv: narrowing floating-point/integer type-convert
+    instructions
+  target/riscv: vector single-width integer reduction instructions
+  target/riscv: vector wideing integer reduction instructions
+  target/riscv: vector single-width floating-point reduction
+    instructions
+  target/riscv: vector widening floating-point reduction instructions
+  target/riscv: vector mask-register logical instructions
+  target/riscv: vector mask population count vmpopc
+  target/riscv: vmfirst find-first-set mask bit
+  target/riscv: set-X-first mask bit
+  target/riscv: vector iota instruction
+  target/riscv: vector element index instruction
+  target/riscv: integer extract instruction
+  target/riscv: integer scalar move instruction
+  target/riscv: floating-point scalar move instructions
+  target/riscv: vector slide instructions
+  target/riscv: vector register gather instruction
+  target/riscv: vector compress instruction
+  target/riscv: configure and turn on vector extension from command line
+
+ target/riscv/Makefile.objs              |    2 +-
+ target/riscv/cpu.c                      |   49 +
+ target/riscv/cpu.h                      |   82 +-
+ target/riscv/cpu_bits.h                 |   15 +
+ target/riscv/csr.c                      |   75 +-
+ target/riscv/fpu_helper.c               |   33 +-
+ target/riscv/helper.h                   | 1073 +++++
+ target/riscv/insn32-64.decode           |   11 +
+ target/riscv/insn32.decode              |  372 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 2710 +++++++++++++
+ target/riscv/internals.h                |   35 +
+ target/riscv/translate.c                |   24 +-
+ target/riscv/vector_helper.c            | 4928 +++++++++++++++++++++++
+ 13 files changed, 9366 insertions(+), 43 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+ create mode 100644 target/riscv/internals.h
+ create mode 100644 target/riscv/vector_helper.c
+
+-- 
+2.23.0
 
 
