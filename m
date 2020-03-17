@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86178C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C033DC1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41D172073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C9FD2073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:10:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HwD0sti3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D172073E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUvaUasK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9FD2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEIWG-00030s-Ey
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:08:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50570)
+	id 1jEIXf-00046q-Nj
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:10:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1jEITa-0008Or-04
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:11 -0400
+ (envelope-from <philmd@redhat.com>) id 1jEITT-0008G3-Lg
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1jEITY-00050H-Kg
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:09 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:45389)
+ (envelope-from <philmd@redhat.com>) id 1jEITS-0004Em-AE
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:03 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:53271)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEITY-0004w1-FH
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:08 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1jEITR-0004BM-Uh
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:06:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584475568;
+ s=mimecast20190719; t=1584475561;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KIARl1H3U65zXq4MlRqXVEjDrgSVBYcSfawq25lyOTg=;
- b=HwD0sti3zi8K0SdEOP/tnFOMlf73SdFTFL6HO5jLFzcbMn/cUEJ1DJeWTp6eUFbbnQrAxc
- d08w1clt8QdvV+Xy0n7/c/AnnKgOouw/6DA8jcPrkWPjBqG9TXRD+wCM1z6oDIvItGwen+
- iAKyV6ouYTQDjNpnvw1A29YTuO2WLEo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-xS3s4NP8MFSXe28Zc-GFSQ-1; Tue, 17 Mar 2020 16:06:04 -0400
-X-MC-Unique: xS3s4NP8MFSXe28Zc-GFSQ-1
-Received: by mail-wr1-f72.google.com with SMTP id b12so11276221wro.4
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 13:06:04 -0700 (PDT)
+ bh=/PyD7+RJ4/A5gy2wbJ6MziohBvoadqKSq3w75LWrEVU=;
+ b=RUvaUasK30DuvXgXBB03dWeEidSBvR99zpCj/D1daAKGUt13CTdigzjhSF7MzFIgZdHXgK
+ X2RqYsCFoBz/ePMgN4R8W1wDu/6vaTR/dP4mfqIFDI5ttKdBlm2J3dwbdJlekTeUuz4c6Q
+ bxkIFUDvGbOM6PFqKyGRZLoQ9HRBPOo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-FLzqcabtOayDF5AXmw38eg-1; Tue, 17 Mar 2020 16:05:59 -0400
+X-MC-Unique: FLzqcabtOayDF5AXmw38eg-1
+Received: by mail-wm1-f71.google.com with SMTP id a13so183150wme.7
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 13:05:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=mrd5FWvmNFE63RRMy6fTaQFpQYng5ob5o09jcOCUbzM=;
- b=I1wmWjGTnSWrVYHw1sB1UsX2w4i8ia8N8cn2nm1fK8FJ1vU5tfFQBnEA6DHvwnx6PV
- uz88GsfBvH7/4/V6YIDoxPPFjpyh7AYxLJvywRxKYqPb0S1wGdxvwftC43PHYiGMGnAg
- 5nYWCaK4yX1kQcDy3eOH7xvt7cdglvYav2ltFLG5m+j1FOhFeH2DHeEM03SHxug/QA0t
- aXG15O1htmdnXsRF/wOxL3bfIlPZpF/1Byp5ZB+zyu0fcSyhcYgDGBJ+KL4s5eRhLvmI
- PSlTnci3xy7JfFdizHJMqeZDgnMpBb+Xu6/JZG2mL12wyIxoiX6b8rjLzw5hecF5rZ7y
- Rzog==
-X-Gm-Message-State: ANhLgQ2LMSGPh3PigKHjblSIta1YddyYOAWeHULLuWDr3I+Iweoxoy+d
- iqpCz2T0CwZdKa95/W2UVdNuQ6qwayJus/k6QUZ/y5rErMb/yEiAjjyEo4nqZGqmh242bY3/wLG
- gMt1qE1+eGqIpOq0=
-X-Received: by 2002:a1c:2e92:: with SMTP id u140mr730820wmu.84.1584475563057; 
- Tue, 17 Mar 2020 13:06:03 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vuri5ZPg0/tYcFpIGHtBI+xYOPDo7pJVoPe7xPgBmScDhE03Afz8I6bYLAHJhgst5Dmyd7S4g==
-X-Received: by 2002:a1c:2e92:: with SMTP id u140mr730798wmu.84.1584475562845; 
- Tue, 17 Mar 2020 13:06:02 -0700 (PDT)
+ bh=VFYerVqML5WLPQvDawZvTMww1bUZUEqxoUBIS/19Nu8=;
+ b=DdCKl+hp6xLGW5VhTthXEfyUSDUsxA1H1Wj2U0PRm0S61HCsJQ4LLMJUp0GKg1vFQL
+ iNyrq+HEGWNOevI4DgfLse9hw3HGfcMktuK/q7RuAl2Ao+s7AFYCZbwFT1awx1usvDnb
+ 6RKk/w5UOKJ1kcwVraFcR7OdEXxMToho9UOY192EOfHTZPqG3ryJYPLvP5YgRPhwX3kQ
+ qeysup/fXWyuz4pACLhWxPWZjma3/5CAeGDebUIFBqO+hGVjS2GB54PEUr6BlcXP1GeV
+ oT2dx5nL6ydxQpUw3afEfgDGzR7NkHoenvNFsEcOBK3ImApriVWB1tqPdkU6Z8prKCUt
+ Z7oA==
+X-Gm-Message-State: ANhLgQ1VlklJR8PuYQ120O7JSj4oeaWkmjqni1T2ZIEhDS1FJAhERZ5I
+ yQUmjs+poK+/Td+6zLL309QNZic7WynmQa4NcDn8Mjw7rySNz37xDRxHtooc1itIXWGpDwtl+by
+ qS10Pp5aY0aSFTts=
+X-Received: by 2002:a1c:2e04:: with SMTP id u4mr726429wmu.185.1584475558360;
+ Tue, 17 Mar 2020 13:05:58 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vtlQ78HgeeGpUQpz0ATirjsLdrPNru8oNgbR+P282DUF/jhkumWLYytv93+bl1+JAwL4Q9cpA==
+X-Received: by 2002:a1c:2e04:: with SMTP id u4mr726394wmu.185.1584475558084;
+ Tue, 17 Mar 2020 13:05:58 -0700 (PDT)
 Received: from x1w.redhat.com (96.red-83-59-163.dynamicip.rima-tde.net.
  [83.59.163.96])
- by smtp.gmail.com with ESMTPSA id i8sm5606946wrw.55.2020.03.17.13.06.01
+ by smtp.gmail.com with ESMTPSA id o23sm6146519wro.23.2020.03.17.13.05.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 13:06:02 -0700 (PDT)
+ Tue, 17 Mar 2020 13:05:57 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] .travis.yml: Add a KVM-only s390x job
-Date: Tue, 17 Mar 2020 21:05:41 +0100
-Message-Id: <20200317200541.6246-5-philmd@redhat.com>
+Subject: [PATCH 3/4] tests/migration: Disable autoconverge test on Travis-CI
+ s390x
+Date: Tue, 17 Mar 2020 21:05:40 +0100
+Message-Id: <20200317200541.6246-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200317200541.6246-1-philmd@redhat.com>
 References: <20200317200541.6246-1-philmd@redhat.com>
@@ -90,8 +91,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,84 +103,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Cornelia Huck <cohuck@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
  Halil Pasic <pasic@linux.ibm.com>,
  Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a job to build QEMU on s390x with TCG disabled, so
-this configuration won't bitrot over time.
+This test fails on Travis-CI s390x when configured with --disable-tcg:
 
-This job is quick, running check-unit: Ran for 4 min 48 sec
-https://travis-ci.org/github/philmd/qemu/jobs/663659486
+  $ make check-qtest
+    TEST    check-qtest-s390x: tests/qtest/boot-serial-test
+  qemu-system-s390x: -accel tcg: invalid accelerator tcg
+  qemu-system-s390x: falling back to KVM
+    TEST    check-qtest-s390x: tests/qtest/pxe-test
+    TEST    check-qtest-s390x: tests/qtest/test-netfilter
+    TEST    check-qtest-s390x: tests/qtest/test-filter-mirror
+    TEST    check-qtest-s390x: tests/qtest/test-filter-redirector
+    TEST    check-qtest-s390x: tests/qtest/drive_del-test
+    TEST    check-qtest-s390x: tests/qtest/device-plug-test
+    TEST    check-qtest-s390x: tests/qtest/virtio-ccw-test
+    TEST    check-qtest-s390x: tests/qtest/cpu-plug-test
+    TEST    check-qtest-s390x: tests/qtest/migration-test
+  **
+  ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'got_=
+stop' should be FALSE
+  ERROR - Bail out! ERROR:tests/qtest/migration-test.c:1229:test_migrate_au=
+to_converge: 'got_stop' should be FALSE
+  make: *** [tests/Makefile.include:633: check-qtest-s390x] Error 1
+
+Per David Gilbert, it might be a threshold requiring tuning:
+"it could just be the writing is slow on s390 and the migration
+thread fast; in which case the autocomplete wouldn't be needed.
+Perhaps we just need to reduce the bandwidth limit."
+
+Disable the autoconverge test for now.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- .travis.yml | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ tests/qtest/migration-test.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/.travis.yml b/.travis.yml
-index b92798ac3b..0109f02ed4 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -524,6 +524,48 @@ jobs:
-               $(exit $BUILD_RC);
-           fi
-=20
-+    - name: "[s390x] GCC check (KVM)"
-+      arch: s390x
-+      dist: bionic
-+      addons:
-+        apt_packages:
-+          - libaio-dev
-+          - libattr1-dev
-+          - libbrlapi-dev
-+          - libcap-ng-dev
-+          - libgcrypt20-dev
-+          - libgnutls28-dev
-+          - libgtk-3-dev
-+          - libiscsi-dev
-+          - liblttng-ust-dev
-+          - libncurses5-dev
-+          - libnfs-dev
-+          - libnss3-dev
-+          - libpixman-1-dev
-+          - libpng-dev
-+          - librados-dev
-+          - libsdl2-dev
-+          - libseccomp-dev
-+          - liburcu-dev
-+          - libusb-1.0-0-dev
-+          - libvdeplug-dev
-+          - libvte-2.91-dev
-+          # Tests dependencies
-+          - genisoimage
-+      env:
-+        - TEST_CMD=3D"make check-unit"
-+        - CONFIG=3D"--disable-containers --disable-tcg --enable-kvm --disa=
-ble-tools"
-+      script:
-+        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-+        - BUILD_RC=3D0 && make -j${JOBS} || BUILD_RC=3D$?
-+        - |
-+          if [ "$BUILD_RC" -eq 0 ] ; then
-+              mv pc-bios/s390-ccw/*.img pc-bios/ ;
-+              ${TEST_CMD} ;
-+          else
-+              $(exit $BUILD_RC);
-+          fi
+diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+index 3d6cc83b88..878399666e 100644
+--- a/tests/qtest/migration-test.c
++++ b/tests/qtest/migration-test.c
+@@ -1181,6 +1181,16 @@ static void test_migrate_auto_converge(void)
+     MigrateStart *args =3D migrate_start_new();
+     QTestState *from, *to;
+     int64_t remaining, percentage;
++    char *travis_arch;
 +
-     # Release builds
-     # The make-release script expect a QEMU version, so our tag must start=
- with a 'v'.
-     # This is the case when release candidate tags are created.
++    /*
++     * This test does not work reliably on Travis s390x.
++     */
++    travis_arch =3D getenv("TRAVIS_CPU_ARCH");
++    if (travis_arch && g_str_equal(travis_arch, "s390x")) {
++        g_test_skip("Test does not work reliably on s390x Travis container=
+s.");
++        return;
++    }
+=20
+     /*
+      * We want the test to be stable and as fast as possible.
 --=20
 2.21.1
 
