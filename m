@@ -2,83 +2,69 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B10C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FFBC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:53:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 202EE206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:52:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SgkfgrvL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202EE206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69FB620658
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:53:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69FB620658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9po-0002a0-8v
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:52:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37554)
+	id 1jE9qe-0003vq-ME
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:53:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jE9lY-0004Ov-Vx
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:48:10 -0400
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE9nr-0008B5-BQ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jE9lW-0005go-Qb
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:48:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:32611)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jE9lW-0005eL-L4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:48:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584442086;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=P0n1YYL4/APPQLsGPtIEHuML+/kO9dUi6LIEEAe8m3E=;
- b=SgkfgrvL384kz4Tla0z8mXdqPnDPNR8udde0+6kEGSfHHdkDZ6f0WmfAfCPzCDd6ws21Fb
- t/qaYVO8JvcrZirXUG0OdWNIte8bJqxmgxSU90cyIs6k9UQ70+jp15EqKF8Z3YAVe7i/IO
- dsvnh+7dlcBr6IAYFNWRIvOn/HzVHZg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-g3JwkAMfNXmwP-DGEnmyEg-1; Tue, 17 Mar 2020 06:48:02 -0400
-X-MC-Unique: g3JwkAMfNXmwP-DGEnmyEg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F27D687181E;
- Tue, 17 Mar 2020 10:47:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BB3F8AC30;
- Tue, 17 Mar 2020 10:47:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 003521138404; Tue, 17 Mar 2020 11:47:53 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH] qom-qmp-cmds: Fix another memory leak in qmp_object_add()
-References: <20200317092241.31660-1-armbru@redhat.com>
- <7412CDE03601674DA8197E2EBD8937E83B69E58A@dggemm531-mbx.china.huawei.com>
-Date: Tue, 17 Mar 2020 11:47:53 +0100
-In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B69E58A@dggemm531-mbx.china.huawei.com>
- (Chenqun's message of "Tue, 17 Mar 2020 10:15:39 +0000")
-Message-ID: <87k13jqmue.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE9no-0002AC-85
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:50:31 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:33067)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1jE9no-00024q-0p
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:50:28 -0400
+Received: by mail-ot1-f65.google.com with SMTP id x26so4090836otk.0
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 03:50:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4RHKUQaqLP0RIgfBpLL5qOEOQG1NeX+nzzByYvELZmw=;
+ b=WBlJyjGd4mrhciKcnGhOQ5qvYMXCEhcmgfhZ8Dq1mOSLS13FnVY3SnlL3E3rfpaOUV
+ v5hxZ2DuQa2cgnD/QuTf8pLrRUqSyRdwbeYFsr91AOadc9fbT2QRecpk1Nm4iYn9P7Ql
+ 1iaReXimBIPdbl/RFXWdqOJ6tevRd53JptItCkkeloGXaMo04aXL4nAq4pSxX/2mih9G
+ Sa+ObVaGYWHp26dIfqoU4uaDiWsEWKvdURbEcPIalsSyZSq1WokIwEuBSso7iWZqRctj
+ uxSos2pLcC9Gh06YSidJQu7B0Bjot8UV4SeXk5UYUCuz5B16OICoESqZ5GR+iZOJ+s7p
+ VuHA==
+X-Gm-Message-State: ANhLgQ2bK1paYPhoV+jm1aYW6+x8EPHXhp7RSEcAkx2WsHz1/6rj+8OZ
+ xL2qaoGMxi3ulXaSUO3a7oEpASeIcPL53HkOKPM=
+X-Google-Smtp-Source: ADFU+vvCnj5TM9jDoklN6SW2pOqgA8Yhy1UV90pkEYu70e2sIcYjz1ttaGrq9DI81fCb/fZk6X299+gFRk0K7Dbjlgs=
+X-Received: by 2002:a9d:4d02:: with SMTP id n2mr2946810otf.107.1584442226939; 
+ Tue, 17 Mar 2020 03:50:26 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20200218151812.7816-1-geert+renesas@glider.be>
+ <20200218151812.7816-4-geert+renesas@glider.be>
+ <CACRpkdacAaw4PJp3Oa569JJTHTB4HjP-hPqZLmdFcuxvdvwBHg@mail.gmail.com>
+In-Reply-To: <CACRpkdacAaw4PJp3Oa569JJTHTB4HjP-hPqZLmdFcuxvdvwBHg@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 17 Mar 2020 11:50:15 +0100
+Message-ID: <CAMuHMdVnoZ8uki9Ur-E-pDe60U_d=hNs8GTkMoTU3kACwFeY=g@mail.gmail.com>
+Subject: Re: [PATCH v5 3/5] gpio: Add GPIO Aggregator
+To: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 209.85.210.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,86 +76,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- Pannengyuan <pannengyuan@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Chenqun (kuhn)" <kuhn.chenqun@huawei.com> writes:
+Hi Linus,
 
->>-----Original Message-----
->>From: Qemu-devel [mailto:qemu-devel-
->>bounces+kuhn.chenqun=3Dhuawei.com@nongnu.org] On Behalf Of Markus
->>Armbruster
->>Sent: Tuesday, March 17, 2020 5:23 PM
->>To: qemu-devel@nongnu.org
->>Cc: Kevin Wolf <kwolf@redhat.com>; pbonzini@redhat.com;
->>berrange@redhat.com; ehabkost@redhat.com
->>Subject: [PATCH] qom-qmp-cmds: Fix another memory leak in
->>qmp_object_add()
->>
->>When user_creatable_add_type() fails, qmp_object_add() returns both its
->>error and the usual empty QDict success value.  The QMP core handles the
->>error, and ignores the success value, leaking it.  Exposed by qmp-cmd-tes=
-t
->>case /x86_64/qmp/object-add-without-props, and duly reported both by
->>ASan and valgrind.
->>
->>To plug the leak, set the success value only on success.
->>
->>Fixes: 5f07c4d60d091320186e7b0edaf9ed2cc16b2d1e
->>Cc: Kevin Wolf <kwolf@redhat.com>
->>Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>---
-> Hi,  Markus
+On Thu, Mar 12, 2020 at 3:57 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> thanks for your patience and again sorry for procrastination on my part :(
 >
->         Looks like the same patch that has been reported already here:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg03928.html
+> Overall I start to like this driver a lot. It has come a long way.
+>
+> Some comments below are nitpicky, bear with me if they seem stupid.
 
-That patch has an additional hunk:
+Thanks a lot for your comments!
 
-  diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-  index 3885464513..041866b846 100644
-  --- a/hw/block/xen-block.c
-  +++ b/hw/block/xen-block.c
-  @@ -860,7 +860,7 @@ static XenBlockIOThread *xen_block_iothread_create(co=
-nst=20
-  char *id,
-       XenBlockIOThread *iothread =3D g_new(XenBlockIOThread, 1);
-       Error *local_err =3D NULL;
-       QDict *opts;
-  -    QObject *ret_data;
-  +    QObject *ret_data =3D NULL;
+> On Tue, Feb 18, 2020 at 4:18 PM Geert Uytterhoeven
+> <geert+renesas@glider.be> wrote:
+> > +#define DRV_NAME       "gpio-aggregator"
+> > +#define pr_fmt(fmt)    DRV_NAME ": " fmt
+>
+> I would just use dev_[info|err] for all messages to get rid of this.
 
-       iothread->id =3D g_strdup(id);
+See below.
 
-       opts =3D qdict_new();
-       qdict_put_str(opts, "qom-type", TYPE_IOTHREAD);
-       qdict_put_str(opts, "id", id);
-       qmp_object_add(opts, &ret_data, &local_err);
-       qobject_unref(opts);
-       qobject_unref(ret_data);
+> > +#include <linux/bitmap.h>
+> > +#include <linux/bitops.h>
+> > +#include <linux/ctype.h>
+> > +#include <linux/gpio/consumer.h>
+> > +#include <linux/gpio/driver.h>
+> > +#include <linux/gpio/machine.h>
+> > +#include <linux/idr.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/overflow.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/spinlock.h>
+> > +#include <linux/string.h>
+> > +
+> > +#include "gpiolib.h"
+>
+> When this file is includes I prefer if there is a comment next to
+> this include saying why we have to touch internals and which
+> ones.
 
-       if (local_err) {
-           error_propagate(errp, local_err);
+I have just discovered gpiod_to_chip(), which removes the need for two
+of the three users ;-)
 
-           g_free(iothread->id);
-           g_free(iothread);
-           return NULL;
-       }
+> > +struct gpio_aggregator {
+> > +       struct gpiod_lookup_table *lookups;
+> > +       struct platform_device *pdev;
+>
+> What about just storing struct device *dev?
+>
+> Then callbacks can just
+>
+> dev_err(aggregator->dev, "myerror\n");
 
-       return iothread;
+&aggr->pdev.dev or aggr->dev does't make much of a difference.
 
-> Maybe we should initialize ret_data in xen-block to avoid a possible unin=
-itialized error =EF=BC=9F
+> > +static char *get_arg(char **args)
+> > +{
+> > +       char *start = *args, *end;
+> > +
+> > +       start = skip_spaces(start);
+> > +       if (!*start)
+> > +               return NULL;
+> > +
+> > +       if (*start == '"') {
+> > +               /* Quoted arg */
+> > +               end = strchr(++start, '"');
+> > +               if (!end)
+> > +                       return ERR_PTR(-EINVAL);
+> > +       } else {
+> > +               /* Unquoted arg */
+> > +               for (end = start; *end && !isspace(*end); end++) ;
+> > +       }
+> > +
+> > +       if (*end)
+> > +               *end++ = '\0';
+> > +
+> > +       *args = end;
+> > +       return start;
+> > +}
+>
+> Isn't this function reimplementing strsep()?
+> while ((s = strsep(&p, " \""))) {
+> or something.
+>
+> I'm not the best with strings, just asking so I know you tried it
+> already.
 
-Yes, because xen_block_iothread_create() passes @ret_data to
-qobject_unref() even after qmp_object_add() failed.
+strsep(&p, " \"") would terminate the token if a space or double quote is
+seen.  I.e. it wouldn't handle spaces in quoted arguments.
+There's also argv_split(), but that doesn't handle quoted args, and
+duplicates all arguments.
 
-In short, Pan Nengyuan's patch is more complete.
+Line names assigned by "gpio-lines-names" may contain spaces, so support
+for quoted args is mandatory.
 
+> > +static int aggr_parse(struct gpio_aggregator *aggr)
+> > +{
+> > +       unsigned int first_index, last_index, i, n = 0;
+> > +       char *name, *offsets, *first, *last, *next;
+> > +       char *args = aggr->args;
+> > +       int error;
+> > +
+> > +       for (name = get_arg(&args), offsets = get_arg(&args); name;
+> > +            offsets = get_arg(&args)) {
+> > +               if (IS_ERR(name)) {
+> > +                       pr_err("Cannot get GPIO specifier: %pe\n", name);
+>
+> If gpio_aggregrator contained struct device *dev this would be
+> dev_err(aggr->dev, "...\n");
+
+aggr_parse() is called before the platform device is created, and before
+aggr->pdev is populated.  So there is no device to print yet.
+
+> > +static void gpio_aggregator_free(struct gpio_aggregator *aggr)
+> > +{
+> > +       platform_device_unregister(aggr->pdev);
+>
+> Aha maybe store both the pdev and the dev in the struct then?
+>
+> Or print using &aggr->pdev.dev.
+
+Same for aggr->pdev.dev (or aggr->dev).
+
+> > +       /*
+> > +        * If any of the GPIO lines are sleeping, then the entire forwarder
+> > +        * will be sleeping.
+> > +        * If any of the chips support .set_config(), then the forwarder will
+> > +        * support setting configs.
+> > +        */
+> > +       for (i = 0; i < ngpios; i++) {
+> > +               dev_dbg(dev, "gpio %u => gpio-%d (%s)\n", i,
+> > +                       desc_to_gpio(descs[i]), descs[i]->label ? : "?");
+>
+> If this desc->label business is why you need to include
+> "gpiolib.h" then I'd prefer if you just add a
+
+It was the third reason to include that file...
+
+> const char *gpiod_get_producer_name(struct gpio_desc *desc);
+>
+> to gpiolib (add in <linux/gpio/consumer.h> so that gpiolib can
+> try to give you something reasonable to print for the label here.
+> I ran into that problem before (wanting to print something like this)
+> and usually just printed the offset.
+>
+> But if it is a serious debug issue, let's fix a helper for this.
+>
+> gpiod_get_producer_name() could return the thing in
+> desc->label if that is set or else something along
+> "chipname-offset" or "unknown", I'm not very picky
+> with that.
+
+I will just remove the printing of the label, as it is no longer useful.
+Since I started using gpiod_lookup, the descriptor has already been
+requested at this point, which means its label will usually be
+"gpio-aggregator.N", i.e. it doesn't provide any help.
+The only exception is for a GPIO line which has an associated line name
+through "gpio-line-names" in DT.  But just seeing the global GPIO number
+should be good enough for debugging.
+
+BTW, one day you may want to have your our printk() format specifier for
+GPIOs?  Oh, no "%pg" and "%pG" are already taken; "%pp" is still
+available.
+
+> > error = aggr_add_gpio(aggr, name, U16_MAX, &n);
+>
+> Is the reason why you use e.g. "gpiochip0" as name here that this
+> is a simple ABI for userspace?
+
+"name" is not the "gpiochipN" name here, but the line name, cfr. the
+U16_MAX value for chip index, and the comment just above:
+
++                       /* Named GPIO line */
+
+That one is supposed to be stable, right?
+Note that this is the most use-centric way to refer to a GPIO.
+
+In the other caller:
+
++                               error = aggr_add_gpio(aggr, name, i, &n);
+
+"name" is a reference to the gpiochip, i.e. either its label, or the
+"gpiochipN" name.
+
+> Such like obtained from /sys/bus/gpio/devices/<chipname>?
+>
+> I would actually prefer to just add a sysfs attribute
+> such as "name" and set it to the value of gpiochip->label.
+
+Makes sense, but that would be a separate, unrelated patch, right?
+
+> These labels are compulsory and supposed to be unique.
+>
+> Then whatever creates an aggregator can just use
+> cat /sys/bus/gpio/devices/gpiochipN/name to send in
+> through the sysfs interface to this kernel driver.
+>
+> This will protect you in the following way:
+>
+> When a system is booted and populated the N in
+> gpiochipN is not stable and this aggregator will be used
+> by scripts that assume it is. We already had this dilemma
+> with things like network interfaces like eth0/1.
+>
+> This can be because of things like probe order which
+> can be random, or because someone compiled a
+> kernel with a new driver for a gpiochip that wasn't
+> detected before. This recently happened to Raspberry Pi,
+> that added gpio driver for "firmware GPIOs" (IIRC).
+>
+> The label on the chip is going to be more stable
+> I think, so it is better to use that.
+
+OK, so support for "gpiochipN" matching can be dropped, obsoleting
+"[PATCH v5 1/5] gpiolib: Add support for gpiochipN-based table lookup".
+
+Note that I added support for that in response to Bartosz' first try
+https://lore.kernel.org/linux-gpio/CAMpxmJUF1s1zyXVtoUGfbV7Yk+heua4rNjY=DrX=jr-v8UfNxA@mail.gmail.com/
+
+> This should also rid the need to include "gpiolib.h"
+> which makes me nervous.
+
+Consider it done!
+Thanks!
+
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
