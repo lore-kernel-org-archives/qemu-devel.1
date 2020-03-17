@@ -2,79 +2,159 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4507EC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB8CC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2C3620714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B39220767
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+fWi2+K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C3620714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zo/5Z8ec"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B39220767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEDBt-0005cV-Nu
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:27:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38479)
+	id 1jEDCz-0006Y7-BT
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1jEDBA-0005Bw-Fk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:26:49 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jEDBx-0005oN-Dd
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1jEDB9-0002lP-8J
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:26:48 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24559)
+ (envelope-from <jsnow@redhat.com>) id 1jEDBw-0002ZC-3Z
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:27:37 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:59091)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1jEDB9-0002iK-2z
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:26:47 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jEDBv-0002W7-Vs
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:27:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584455206;
+ s=mimecast20190719; t=1584455255;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+nqmrpAt8Bq6pO2wrCPcySJDZASLb5ZeXMdvNMe4ZU8=;
- b=H+fWi2+KcJRcGZFWcGaL3gIEV6r6m10GgJGAIDCqEXvHYl3QZVmkk6nYp/Cwi7tBg0u32+
- Iu0SJOHfgvdIYKHDpyTcKhxWvaD484NWuKQImuQD59RigFu/BRjXjIXo40YlHn4oa0S7e3
- KFfisqLG0z9HpljbgjynyWPHW0Y2ycY=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=H5YYp859fPELIkbe5aT9beTDgS/JY+vUchp14tqHQD8=;
+ b=Zo/5Z8ec4zhAYqO+RfcHaHg5CJF1W1UuKqgsYqBsEcZg6zzSsfj2LkkFiXUlFWi4wstywM
+ s0oNU6xwUIwa5FBLtP9j9xO3Ykx/oNBhSTWnKCobSIZkuRVcB3mD3kpYF6zS+qqNvWyKd8
+ rg+SZ9M0GjFZCija6QIfMqxX8ZyZJ1c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-a1qLYOdlP-CFuXxCUq3s6g-1; Tue, 17 Mar 2020 10:26:44 -0400
-X-MC-Unique: a1qLYOdlP-CFuXxCUq3s6g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-277-9AD628YKO8SOYAQoCnr4-g-1; Tue, 17 Mar 2020 10:27:32 -0400
+X-MC-Unique: 9AD628YKO8SOYAQoCnr4-g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3385BDB25;
- Tue, 17 Mar 2020 14:26:37 +0000 (UTC)
-Received: from localhost (ovpn-114-232.ams2.redhat.com [10.36.114.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BEF7360C81;
- Tue, 17 Mar 2020 14:26:36 +0000 (UTC)
-Date: Tue, 17 Mar 2020 14:26:35 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL v2 00/61] Misc patches for soft freeze
-Message-ID: <20200317142635.GB517094@stefanha-x1.localdomain>
-References: <1584396375-31278-1-git-send-email-pbonzini@redhat.com>
- <CAFEAcA-W=7LQyKvy-Pxv7eUh-tLoYu5jLiObTST0-Ee0wrCX7g@mail.gmail.com>
- <da99ee7c-49fb-057e-a6bb-b2c89de86ffa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FEA16125B;
+ Tue, 17 Mar 2020 14:27:15 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 674485DA7C;
+ Tue, 17 Mar 2020 14:27:13 +0000 (UTC)
+Subject: Re: [PATCH v2 6/7] hw/ide: Move MAX_IDE_DEVS define to
+ hw/ide/internal.h
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1584437957.git.balaton@eik.bme.hu>
+ <2abde3829a94acf0aa90942794ff0c4b03c653f4.1584437958.git.balaton@eik.bme.hu>
+ <7a616aa2-9482-1735-8f29-1d69b7393891@redhat.com>
+ <alpine.BSF.2.22.395.2003171523240.40468@zero.eik.bme.hu>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <6a8d6e8b-e137-614f-bfd1-4f03288982f5@redhat.com>
+Date: Tue, 17 Mar 2020 10:27:12 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <da99ee7c-49fb-057e-a6bb-b2c89de86ffa@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <alpine.BSF.2.22.395.2003171523240.40468@zero.eik.bme.hu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,104 +166,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---gatW/ieO32f1wygP
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 17, 2020 at 01:02:48PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Cc'ing Stefan
+
+On 3/17/20 10:24 AM, BALATON Zoltan wrote:
+> On Tue, 17 Mar 2020, John Snow wrote:
+>> On 3/17/20 5:39 AM, BALATON Zoltan wrote:
+>>> We can move this define now that less files use it to internal.h to
+>>> further reduce dependency on hw/ide.h.
+>>>
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>> =C2=A0include/hw/ide.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 2 --
+>>> =C2=A0include/hw/ide/internal.h | 2 ++
+>>> =C2=A02 files changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/hw/ide.h b/include/hw/ide.h
+>>> index d52c211f32..c5ce5da4f4 100644
+>>> --- a/include/hw/ide.h
+>>> +++ b/include/hw/ide.h
+>>> @@ -4,8 +4,6 @@
+>>> =C2=A0#include "hw/isa/isa.h"
+>>> =C2=A0#include "exec/memory.h"
+>>>
+>>> -#define MAX_IDE_DEVS=C2=A0=C2=A0=C2=A0 2
+>>> -
+>>> =C2=A0/* ide-isa.c */
+>>> =C2=A0ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int
+>>> isairq,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ DriveInfo *hd0, DriveInfo *hd1);
+>>> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+>>> index 1bc1fc73e5..55da35d768 100644
+>>> --- a/include/hw/ide/internal.h
+>>> +++ b/include/hw/ide/internal.h
+>>> @@ -27,6 +27,8 @@ typedef struct IDEDMAOps IDEDMAOps;
+>>> =C2=A0#define TYPE_IDE_BUS "IDE"
+>>> =C2=A0#define IDE_BUS(obj) OBJECT_CHECK(IDEBus, (obj), TYPE_IDE_BUS)
+>>>
+>>> +#define MAX_IDE_DEVS 2
+>>> +
+>>> =C2=A0/* Bits of HD_STATUS */
+>>> =C2=A0#define ERR_STAT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x01
+>>> =C2=A0#define INDEX_STAT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x02
+>>>
+>>
+>> /home/jsnow/src/qemu.git/ide/hw/mips/mips_r4k.c: In function
+>> =E2=80=98mips_r4k_init=E2=80=99:
+>> /home/jsnow/src/qemu.git/ide/hw/mips/mips_r4k.c:190:33: error:
+>> =E2=80=98MAX_IDE_DEVS=E2=80=99 undeclared (first use in this function); =
+did you mean
+>> =E2=80=98MAX_IDE_BUS=E2=80=99?
+>> =C2=A0190 |=C2=A0=C2=A0=C2=A0=C2=A0 DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_=
+DEVS];
+>> =C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~=
+~~~~~~~~~~
+>> =C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MA=
+X_IDE_BUS
+>>
+>>
+>>
+>> Missed a spot.
 >=20
-> On 3/17/20 12:03 PM, Peter Maydell wrote:
-> > On Mon, 16 Mar 2020 at 22:07, Paolo Bonzini <pbonzini@redhat.com> wrote=
-:
-> > >=20
-> > > The following changes since commit a98135f727595382e200d04c2996e868b7=
-925a01:
-> > >=20
-> > >    Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200316-pul=
-l-request' into staging (2020-03-16 14:55:59 +0000)
-> > >=20
-> > > are available in the git repository at:
-> > >=20
-> > >=20
-> > >    git://github.com/bonzini/qemu.git tags/for-upstream
-> > >=20
-> > > for you to fetch changes up to 9d04fea181318684a899fadd99cef7e0409745=
-6b:
-> > >=20
-> > >    hw/arm: Let devices own the MemoryRegion they create (2020-03-16 2=
-3:02:30 +0100)
-> > >=20
-> > > ----------------------------------------------------------------
-> > > * Bugfixes all over the place
-> > > * get/set_uint cleanups (Felipe)
-> > > * Lock guard support (Stefan)
-> > > * MemoryRegion ownership cleanup (Philippe)
-> > > * AVX512 optimization for buffer_is_zero (Robert)
-> >=20
-> > Hi; this generates a new warning on netbsd:
-> >=20
-> > /home/qemu/qemu-test.N42OXz/src/util/qemu-timer.c: In function
-> > 'timerlist_expired':
-> > /home/qemu/qemu-test.N42OXz/src/util/qemu-timer.c:197:12: warning:
-> > 'expire_time' may be used uninitialized in this function
-> > [-Wmaybe-uninitialized]
-> >       return expire_time <=3D qemu_clock_get_ns(timer_list->clock->type=
-);
-> >              ^
-> > /home/qemu/qemu-test.N42OXz/src/util/qemu-timer.c: In function
-> > 'timerlist_deadline_ns':
-> > /home/qemu/qemu-test.N42OXz/src/util/qemu-timer.c:235:11: warning:
-> > 'expire_time' may be used uninitialized in this function
-> > [-Wmaybe-uninitialized]
-> >       delta =3D expire_time - qemu_clock_get_ns(timer_list->clock->type=
-);
-> >             ^
-> >=20
-> > This is probably just the compiler being not smart enough
-> > to figure out that there's no code path where it's not
-> > initialized.
+> Probably due to dropping patch 4, I'll check and send a v3. Is there
+> anything else besides Philippe's suggestion?
+>=20
 
-Yes, looks like the compiler can't figure out the control flow on
-NetBSD.
+Not that I am aware of at this very second.
 
-We could drop the WITH_QEMU_LOCK_GUARD() macro and use this idiom
-instead:
-
-  {
-      QEMU_LOCK_GUARD(&mutex);
-      ...
-  }
-
-But it's unusual for C code to create scopes without a statement (for,
-if, while).
-
-Opinions?
-
-Stefan
-
---gatW/ieO32f1wygP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5w3hsACgkQnKSrs4Gr
-c8j9Rwf+PC44PXBs1ou2CQuthdpk8epqeMu69AksJlNepD5nWLGqX8Bwok6c2MIa
-7+ERm9hXZ1yi0228rTKD3S5RdXsggk5O8vABZIl3F7KJpuR6jLK919Vgwbb0G6Yv
-xhECbLo2rkXdyXpxxTPGgliDhkSFeNP29Z+iYjWccQJHpC1VPOQtA5XTMAOHiKTG
-erSHoJ2yyreibF7A6MLawVB4Bk4+yVrO6kpQM8LGY8ew4OrBxleO7ySTj5Ga/Kpz
-P2kMJ9M+DsvP5t3ncSsZRkvhlLQzbT5kF7BXmb299TR7AgmqT+Qu61XH8UuNVQNU
-6PG91HC6idLGNzaaUWc2NfXqWgzyiQ==
-=54je
------END PGP SIGNATURE-----
-
---gatW/ieO32f1wygP--
+--js
 
 
