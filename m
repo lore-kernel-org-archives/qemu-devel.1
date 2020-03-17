@@ -2,116 +2,54 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0433C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6356C2BB1D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B93BB20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wp4wxLYw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B93BB20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDED020714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDED020714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEE7I-0008WM-QZ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:26:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33234)
+	id 1jEE7L-0000FP-UJ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:26:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxm-0002re-Jd
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:04 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDur-0007LU-GX
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxl-0001kH-7J
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:02 -0400
-Received: from mail-he1eur04on071f.outbound.protection.outlook.com
- ([2a01:111:f400:fe0d::71f]:1794
- helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jEDxk-0001d5-VG; Tue, 17 Mar 2020 11:17:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j1JMRf8NFSt7038EyJXk5e5oYRrsQwn+XdpnYD/VUcePoqSJsgLpPDYvhh5p06NPGFaCRp6TH8Lvxby0B4UGlfqHHe8iNNSX0XgYUdrXEbs4tQJ3ZLJZIOzFEcQHeK8rGo9neNjDE0ygagx/OrgfRHBC9PnGO6lshzsqRffk7QO2i8mlvfluQvgWp9Muh1nJKooFxD40p8p2mGL0UqGfF3JznRAdcfDThmBWJeUL4ZJncTkZ2rXfhnlW0ezv/ExahiOK3OxU4yt5cQKCmCuRz68d50bn3z4d8ALO6QOzcgGmMcNfziTGJr+07MtazJiCgPIasV/J+FI28FXGJyNHUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/7w+twQDNLE1kCUVOa9jGf4f3ophG/9OvFgfLmC2doU=;
- b=U90v9vAlDWH14JB5ryOMonfuiaWTl3UKHnp78DbQgwbsioUMt8X/pZQyluwtokh8jTGJqQ2QD7yhIYda7nC39o9Aw+SxGTtE1fDWdaeit483ygYavGXkWIKgAbzp50ICm1xg6wAMM1NlUOqP9OAsOqZdUNcHmrmLsGVyE0/3tf9toKgb1Kt/UdvkVTvRbrj3pNjO4er6OJxWGUrzn44kpxa2tEKiKUx7R+VLxNefh+Z4DU217jFTTI9y8qvTPFO/yBnP+iasP7uW+FaxDvR52oGYgXYus/sKyAQbMZSSi2knZBTzlMuBvmGsNbmS83xIE12UpHIqjd5mD6TXft5qSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/7w+twQDNLE1kCUVOa9jGf4f3ophG/9OvFgfLmC2doU=;
- b=wp4wxLYwEzEirBSghWwMOrxhtTGRYhNaqno1O9VRfaMkHAwhl0lmYwwUTTG5eAp5PGKfP7AYvfAaah0I8gfskxziXoGutqxZ4MHMwR3wWJ1LpoNY8uDD2UoAq9WugmW+AeofE6tfwliBDzvfG1M7TDm9wh9GgGtzJHmN0qommwQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
- HE1PR0802MB2620.eurprd08.prod.outlook.com (10.175.36.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.21; Tue, 17 Mar 2020 15:16:59 +0000
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
- 2020 15:16:59 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 4/9] pflash: introduce ERRP_AUTO_PROPAGATE
-Date: Tue, 17 Mar 2020 18:16:20 +0300
-Message-ID: <20200317151625.20797-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-References: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::15) To HE1PR0802MB2507.eurprd08.prod.outlook.com
- (2603:10a6:3:e1::8)
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDum-0002Cn-Ee
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:59 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:49498)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jEDud-0001D4-UF; Tue, 17 Mar 2020 11:13:51 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 1A867747E07;
+ Tue, 17 Mar 2020 16:13:43 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 6D31A747E06; Tue, 17 Mar 2020 16:13:42 +0100 (CET)
+Message-Id: <e9713fdded4d212fa68ed03b844e531934226a6f.1584457537.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1584457537.git.balaton@eik.bme.hu>
+References: <cover.1584457537.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v3 6/8] hw/ide: Do ide_drive_get() within pci_ide_create_devs()
+Date: Tue, 17 Mar 2020 16:05:37 +0100
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.248) by
- AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.15 via Frontend
- Transport; Tue, 17 Mar 2020 15:16:58 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.248]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 43f7b024-b8cb-4a32-edff-08d7ca863ca5
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2620:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB26206518091F7ECDF6DCA12FC1F60@HE1PR0802MB2620.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1060;
-X-Forefront-PRVS: 0345CFD558
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(39850400004)(376002)(136003)(346002)(366004)(396003)(199004)(66946007)(6666004)(1076003)(66556008)(54906003)(66476007)(86362001)(6486002)(16526019)(5660300002)(6916009)(186003)(6506007)(52116002)(4326008)(81166006)(6512007)(81156014)(8676002)(8936002)(316002)(2906002)(26005)(478600001)(956004)(36756003)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2620;
- H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nzA1i5VcnBCWQhgWSupf6GPew9O/SZB36dp+pk0r3QIwVgQTu72Cp2J6ENVKQTjc3d8LclQUBd8wF7Zi8pToJC+Kyavq69CYrK8bfJ7ehlLqfqdJ+V1qmlzZbXFXz5nBkBTOFNb4nupc+49mfsAr6wHIiXsVaZiiVm7bTQvFAeEnAQWxlkmE77mZ7ORa05CJkqGH5+fX8h0S7+SfbfNHcRCoOHLpULQWmQLjBaAvbmYPJg6i8oIi7AvRIY7eTKlDIrGXtFmdm+EjAVLwXqKn+mp6x7Qs87Ac2v8Vc7hyXzeS56yfjWjzP4feXQXes0dkr3oY2XbE5kZ11yy5lD11mzBjImjpOww8s1HlkK0XUZn5LPKkGJfiWQHU6ksO8NgC6Z6bDZGlY5ooT7VIFjZSU+MiyWmE3oIge3PD4yD0IMmJHay9WAQUmiTcXspc+Otj
-X-MS-Exchange-AntiSpam-MessageData: WhOdvjgKABR9MasFU29xcpppQkO3lloO8QETDbqxwnpnU4EkYo+x7InSWlBiF/EiuyiutPtTb5vxVO6+W/w31qMD2yJkFhP8hc17Kmp1oD5nYYDx/llEFup0bob45Qof8PN4l/6C1NB6ETX9sQIP9Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43f7b024-b8cb-4a32-edff-08d7ca863ca5
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 15:16:59.0988 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7bc7zw5l6oPlngZ0ir0v5lgQ+5/yFDW4yEGBa0Dt3Yxl1YKPJqBFBsiuIZ3bgdOTAk3zlohHGT0sWcqqdmzmQoXnwMiIaIN78n790egS/8c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2620
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0d::71f
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org,
+    qemu-block@nongnu.org
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,110 +61,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp =3D=3D &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+The pci_ide_create_devs() function takes a hd_table parameter but all
+callers just pass what ide_drive_get() returns so we can do it locally
+simplifying callers and removing hd_table parameter.
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit is generated by command
-
-    sed -n '/^Parallel NOR Flash devices$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/block/pflash_cfi01.c | 7 +++----
- hw/block/pflash_cfi02.c | 7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
+ hw/alpha/dp264.c              | 13 +++----------
+ hw/i386/pc_piix.c             |  9 +++++----
+ hw/ide/pci.c                  |  4 +++-
+ hw/isa/piix4.c                | 10 ++--------
+ hw/mips/mips_fulong2e.c       |  4 +---
+ hw/mips/mips_malta.c          |  2 +-
+ hw/sparc64/sun4u.c            |  6 +-----
+ include/hw/ide/pci.h          |  2 +-
+ include/hw/southbridge/piix.h |  3 +--
+ 9 files changed, 18 insertions(+), 35 deletions(-)
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 24f3bce7ef..a5755e6119 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -700,12 +700,12 @@ static const MemoryRegionOps pflash_cfi01_ops =3D {
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 27595767e5..f7751b18f6 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -15,7 +15,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/rtc/mc146818rtc.h"
+-#include "hw/ide.h"
+ #include "hw/ide/pci.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/isa/superio.h"
+@@ -58,6 +57,7 @@ static void clipper_init(MachineState *machine)
+     const char *initrd_filename =3D machine->initrd_filename;
+     AlphaCPU *cpus[4];
+     PCIBus *pci_bus;
++    PCIDevice *pci_dev;
+     ISABus *isa_bus;
+     qemu_irq rtc_irq;
+     long size, i;
+@@ -100,15 +100,8 @@ static void clipper_init(MachineState *machine)
+     isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
 =20
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     /* IDE disk setup.  */
+-    {
+-        DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+-        PCIDevice *pci_dev;
+-
+-        ide_drive_get(hd, ARRAY_SIZE(hd));
+-
+-        pci_dev =3D pci_create_simple(pci_bus, -1, "cmd646-ide");
+-        pci_ide_create_devs(pci_dev, hd);
+-    }
++    pci_dev =3D pci_create_simple(pci_bus, -1, "cmd646-ide");
++    pci_ide_create_devs(pci_dev);
+=20
+     /* Load PALcode.  Given that this is not "real" cpu palcode,
+        but one explicitly written for the emulation, we might as
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index c399398739..9216596ec6 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -86,7 +86,6 @@ static void pc_init1(MachineState *machine,
+     int piix3_devfn =3D -1;
+     qemu_irq smi_irq;
+     GSIState *gsi_state;
+-    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     BusState *idebus[MAX_IDE_BUS];
+     ISADevice *rtc_state;
+     MemoryRegion *ram_memory;
+@@ -240,20 +239,22 @@ static void pc_init1(MachineState *machine,
+=20
+     pc_nic_init(pcmc, isa_bus, pci_bus);
+=20
+-    ide_drive_get(hd, ARRAY_SIZE(hd));
+     if (pcmc->pci_enabled) {
+         PCIDevice *dev;
+=20
+         dev =3D pci_create_simple(pci_bus, piix3_devfn + 1,
+                                 xen_enabled() ? "piix3-ide-xen" : "piix3=
+-ide");
+-        pci_ide_create_devs(dev, hd);
++        pci_ide_create_devs(dev);
+         idebus[0] =3D qdev_get_child_bus(&dev->qdev, "ide.0");
+         idebus[1] =3D qdev_get_child_bus(&dev->qdev, "ide.1");
+         pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
+     }
+ #ifdef CONFIG_IDE_ISA
+-else {
++    else {
++        DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+         int i;
++
++        ide_drive_get(hd, ARRAY_SIZE(hd));
+         for (i =3D 0; i < MAX_IDE_BUS; i++) {
+             ISADevice *dev;
+             char busname[] =3D "ide.0";
+diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+index e0c84392e2..97347f07f1 100644
+--- a/hw/ide/pci.c
++++ b/hw/ide/pci.c
+@@ -477,13 +477,15 @@ const VMStateDescription vmstate_ide_pci =3D {
+ };
+=20
+ /* hd_table must contain 4 block drivers */
+-void pci_ide_create_devs(PCIDevice *dev, DriveInfo **hd_table)
++void pci_ide_create_devs(PCIDevice *dev)
  {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI01 *pfl =3D PFLASH_CFI01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-     int num_devices;
--    Error *local_err =3D NULL;
+     PCIIDEState *d =3D PCI_IDE(dev);
++    DriveInfo *hd_table[2 * MAX_IDE_DEVS];
+     static const int bus[4]  =3D { 0, 0, 1, 1 };
+     static const int unit[4] =3D { 0, 1, 0, 1 };
+     int i;
 =20
-     if (pfl->sector_len =3D=3D 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zer=
-o.");
-@@ -739,9 +739,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Erro=
-r **errp)
-         &pfl->mem, OBJECT(dev),
-         &pflash_cfi01_ops,
-         pfl,
--        pfl->name, total_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+        pfl->name, total_len, errp);
-+    if (*errp) {
-         return;
++    ide_drive_get(hd_table, ARRAY_SIZE(hd_table));
+     for (i =3D 0; i < 4; i++) {
+         if (hd_table[i]) {
+             ide_create_drive(d->bus + bus[i], unit[i], hd_table[i]);
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 706eb5be69..cc3e5cef8c 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -241,11 +241,8 @@ static void piix4_register_types(void)
+=20
+ type_init(piix4_register_types)
+=20
+-DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
+-                          I2CBus **smbus, size_t ide_buses)
++DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus, I2CBus **sm=
+bus)
+ {
+-    size_t ide_drives =3D ide_buses * MAX_IDE_DEVS;
+-    DriveInfo **hd;
+     PCIDevice *pci;
+     DeviceState *dev;
+     int devfn =3D PCI_DEVFN(10, 0);
+@@ -258,10 +255,7 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **=
+isa_bus,
      }
 =20
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 12f18d401a..3da9f56391 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -718,9 +718,9 @@ static const MemoryRegionOps pflash_cfi02_ops =3D {
+     pci =3D pci_create_simple(pci_bus, devfn + 1, "piix4-ide");
+-    hd =3D g_new(DriveInfo *, ide_drives);
+-    ide_drive_get(hd, ide_drives);
+-    pci_ide_create_devs(pci, hd);
+-    g_free(hd);
++    pci_ide_create_devs(pci);
 =20
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+     pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
+     if (smbus) {
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 639ba2a091..0f312b5a35 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -239,7 +239,6 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bu=
+s, int slot, qemu_irq intc,
  {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI02 *pfl =3D PFLASH_CFI02(dev);
-     int ret;
--    Error *local_err =3D NULL;
+     qemu_irq *i8259;
+     ISABus *isa_bus;
+-    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     PCIDevice *dev;
 =20
-     if (pfl->uniform_sector_len =3D=3D 0 && pfl->sector_len[0] =3D=3D 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zer=
-o.");
-@@ -786,9 +786,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Erro=
-r **errp)
+     isa_bus =3D vt82c686b_isa_init(pci_bus, PCI_DEVFN(slot, 0));
+@@ -259,8 +258,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bu=
+s, int slot, qemu_irq intc,
+     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
 =20
-     memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-                                   &pflash_cfi02_ops, pfl, pfl->name,
--                                  pfl->chip_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                  pfl->chip_len, errp);
-+    if (*errp) {
-         return;
+     dev =3D pci_create_simple(pci_bus, PCI_DEVFN(slot, 1), "via-ide");
+-    ide_drive_get(hd, ARRAY_SIZE(hd));
+-    pci_ide_create_devs(dev, hd);
++    pci_ide_create_devs(dev);
+=20
+     pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci")=
+;
+     pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci")=
+;
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index d380f73d7b..e4c4de1b4e 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1403,7 +1403,7 @@ void mips_malta_init(MachineState *machine)
+     pci_bus =3D gt64120_register(s->i8259);
+=20
+     /* Southbridge */
+-    dev =3D piix4_create(pci_bus, &isa_bus, &smbus, MAX_IDE_BUS);
++    dev =3D piix4_create(pci_bus, &isa_bus, &smbus);
+=20
+     /* Interrupt controller */
+     qdev_connect_gpio_out_named(dev, "intr", 0, i8259_irq);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index d33e84f831..6abfcb30f8 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -50,7 +50,6 @@
+ #include "hw/sparc/sparc64.h"
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/sysbus.h"
+-#include "hw/ide.h"
+ #include "hw/ide/pci.h"
+ #include "hw/loader.h"
+ #include "hw/fw-path-provider.h"
+@@ -563,7 +562,6 @@ static void sun4uv_init(MemoryRegion *address_space_m=
+em,
+     PCIBus *pci_bus, *pci_busA, *pci_busB;
+     PCIDevice *ebus, *pci_dev;
+     SysBusDevice *s;
+-    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+     DeviceState *iommu, *dev;
+     FWCfgState *fw_cfg;
+     NICInfo *nd;
+@@ -663,12 +661,10 @@ static void sun4uv_init(MemoryRegion *address_space=
+_mem,
+         qemu_macaddr_default_if_unset(&macaddr);
      }
 =20
+-    ide_drive_get(hd, ARRAY_SIZE(hd));
+-
+     pci_dev =3D pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
+     qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
+     qdev_init_nofail(&pci_dev->qdev);
+-    pci_ide_create_devs(pci_dev, hd);
++    pci_ide_create_devs(pci_dev);
+=20
+     /* Map NVRAM into I/O (ebus) space */
+     nvram =3D m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
+diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
+index 98ffa7dfcd..dd504e5a0b 100644
+--- a/include/hw/ide/pci.h
++++ b/include/hw/ide/pci.h
+@@ -63,7 +63,7 @@ static inline IDEState *bmdma_active_if(BMDMAState *bmd=
+ma)
+ void bmdma_init(IDEBus *bus, BMDMAState *bm, PCIIDEState *d);
+ void bmdma_cmd_writeb(BMDMAState *bm, uint32_t val);
+ extern MemoryRegionOps bmdma_addr_ioport_ops;
+-void pci_ide_create_devs(PCIDevice *dev, DriveInfo **hd_table);
++void pci_ide_create_devs(PCIDevice *dev);
+=20
+ extern const VMStateDescription vmstate_ide_pci;
+ extern const MemoryRegionOps pci_ide_cmd_le_ops;
+diff --git a/include/hw/southbridge/piix.h b/include/hw/southbridge/piix.=
+h
+index 152628c6d9..02bd741209 100644
+--- a/include/hw/southbridge/piix.h
++++ b/include/hw/southbridge/piix.h
+@@ -68,7 +68,6 @@ extern PCIDevice *piix4_dev;
+=20
+ PIIX3State *piix3_create(PCIBus *pci_bus, ISABus **isa_bus);
+=20
+-DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
+-                          I2CBus **smbus, size_t ide_buses);
++DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus, I2CBus **sm=
+bus);
+=20
+ #endif
 --=20
-2.21.0
+2.21.1
 
 
