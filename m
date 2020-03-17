@@ -2,80 +2,82 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D27C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FFBC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:10:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37FDF20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 854DE206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:10:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D4YIMXKG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37FDF20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AKYFtF/g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 854DE206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEA58-0006r2-Ev
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:08:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
+	id 1jEA78-00081l-NU
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:10:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1jEA4S-0006K7-3R
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:07:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEA6L-0007OA-MM
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1jEA4Q-0007zA-NL
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:07:40 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:50900)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1jEA4Q-0007vO-Iq
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:07:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584443258;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5TF204cY1qC6l9HVQs6Lh94FXDWABbdvp6yJPoIW0RE=;
- b=D4YIMXKG/CErPNGZNqyOK3E6ZTz9DbBEe/P0B/PO+jc61Ie9vyFvw/KWL6P2az1akDFhuK
- OB4uTqO9BaUVjl4Jzcf3fKN6kc7UWP8Xj6QdybJEW1wUUQ7z7hW7FzSwtvQ0uzzE4OY/9k
- VDRTwqjWdxLf29tPh3WvTLSn6t1jrm0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-nrWzRZ67O664FXOzpM4qrQ-1; Tue, 17 Mar 2020 07:07:34 -0400
-X-MC-Unique: nrWzRZ67O664FXOzpM4qrQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 645AA800EB6;
- Tue, 17 Mar 2020 11:07:33 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D5E9393526;
- Tue, 17 Mar 2020 11:07:24 +0000 (UTC)
-Date: Tue, 17 Mar 2020 12:07:23 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 5/8] qapi/misc: Restrict query-vm-generation-id
- command to machine code
-Message-ID: <20200317120723.1a0d6cc3@redhat.com>
-In-Reply-To: <c8d31aa1-9e52-a45f-a23c-1e66305194a0@redhat.com>
-References: <20200316000348.29692-1-philmd@redhat.com>
- <20200316000348.29692-6-philmd@redhat.com>
- <20200316134538.4209b297@redhat.com>
- <c8d31aa1-9e52-a45f-a23c-1e66305194a0@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jEA6K-0006ck-Nh
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:09:37 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34468)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEA6K-0006WO-HW
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:09:36 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j5so5237799oij.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 04:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NXc1CMVP8fPkOAEbAXSA1LX5CXyYPNg1sYK75gFtxkA=;
+ b=AKYFtF/g6sx/HiI0KzPvMFmMkCrG9HVQZwHH//m5UuO3M10DTjRrbinSx1ERjGgAIy
+ IFJBbBo9FEDq+FYlh0xEv3STgi24H0e1TuIl2f0xaxHJPWvTr5ci+6VcJ6qASajowgto
+ QTZr1eGASXUMcw8Twz25eewAXhdMjPdaUiKsw46CzKLWF15RZK+mYKmpTCOtSt+ysACS
+ WHfGCZSLnNicLT8PU5H4DLccmFTS13K1OHrf3RcWM9ZQOmaXdVVB31gx19T/xfL3r5g7
+ R01/EmMI04lWnYIUnT0hPYqgbNZ0EWVTISaSWBCoErPVTnwSG8LmKalh5AL0iCLVrfir
+ b0yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=NXc1CMVP8fPkOAEbAXSA1LX5CXyYPNg1sYK75gFtxkA=;
+ b=FZXBoFj9jtryfHLgrJPQcFbHhB3osLI1ZSU5E8eFMA+hEB8joJmtQbzpj8cqI5AJFg
+ wtMfevdeP5f5XnQYB+u8W2X/bcQ8VDBScxiL1TPBeAB6doYn3jlJ2O3alSnGkkbNkj/B
+ bnQJz0FSTSemj90A0KrV0nuoVAieNEoUnzJGzMGm2jfZEUB38/aA+5PEzIfGWNOZbdrH
+ iHa8AzfmhNU5LZzZ34zFo21jKIq7nP3kKf1zfhTJPaPiaOj0iub+CFDkW+HT02Bga8ba
+ 3kQvpvK0seGzOxWnOYktkKmu3Lun1TY/zZuxrM5a8PeqR5TQZvuF8Zhou66E7ORnKvLY
+ 95jw==
+X-Gm-Message-State: ANhLgQ21TAq7Bp3ZElwYMWarKUGmAqw/ha83kg5qeE/etRHIRlG9SHN9
+ ERBOB/wRj9xdYXlZI7I8KB3JChCfRn7WlECT3pku5Q==
+X-Google-Smtp-Source: ADFU+vs2c9DxpS0l4trZekhVLc3xZAcpRkIj9P/idCPZL/Dwnk4e6YmgjRqCs9EAE8eGRtSGWMpvmCBrez5pnUn1SKo=
+X-Received: by 2002:aca:190f:: with SMTP id l15mr2930921oii.48.1584443374646; 
+ Tue, 17 Mar 2020 04:09:34 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+References: <20200303100511.5498-1-peter.maydell@linaro.org>
+ <c71dbe77-a883-361b-e33c-ed85ce07c0de@redhat.com>
+In-Reply-To: <c71dbe77-a883-361b-e33c-ed85ce07c0de@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Mar 2020 11:09:22 +0000
+Message-ID: <CAFEAcA-gZnOVD9MPwUBCcA4fvrTSaE1xEvd9dyr_r1RctiPJhg@mail.gmail.com>
+Subject: Re: [PATCH] cpu: Use DeviceClass reset instead of a special CPUClass
+ reset
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,138 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>,
- "Michael S.
- Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Chris Wulff <crwulff@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Stafford Horne <shorne@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Michael Walle <michael@walle.cc>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Mar 2020 10:44:33 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Tue, 17 Mar 2020 at 11:01, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> ping
 
-> On 3/16/20 1:45 PM, Igor Mammedov wrote:
-> > On Mon, 16 Mar 2020 01:03:45 +0100
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >  =20
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =20
-> >=20
-> > Acked-by: Igor Mammedov <imammedo@redhat.com> =20
-> >> ---
-> >>   qapi/machine.json | 20 ++++++++++++++++++++
-> >>   qapi/misc.json    | 21 ---------------------
-> >>   hw/acpi/vmgenid.c |  2 +-
-> >>   stubs/vmgenid.c   |  2 +-
-> >>   4 files changed, 22 insertions(+), 23 deletions(-)
-> >>
-> >> diff --git a/qapi/machine.json b/qapi/machine.json
-> >> index c096efbea3..1a2a4b0d48 100644
-> >> --- a/qapi/machine.json
-> >> +++ b/qapi/machine.json
-> >> @@ -415,6 +415,26 @@
-> >>   ##
-> >>   { 'command': 'query-target', 'returns': 'TargetInfo' }
-> >>  =20
-> >> +##
-> >> +# @GuidInfo:
-> >> +#
-> >> +# GUID information.
-> >> +#
-> >> +# @guid: the globally unique identifier
-> >> +#
-> >> +# Since: 2.9
-> >> +##
-> >> +{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
-> >> +
-> >> +##
-> >> +# @query-vm-generation-id:
-> >> +#
-> >> +# Show Virtual Machine Generation ID
-> >> +#
-> >> +# Since: 2.9
-> >> +##
-> >> +{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-> >> +
-> >>   ##
-> >>   # @LostTickPolicy:
-> >>   #
-> >> diff --git a/qapi/misc.json b/qapi/misc.json
-> >> index f70025f34c..8c02870227 100644
-> >> --- a/qapi/misc.json
-> >> +++ b/qapi/misc.json
-> >> @@ -1383,24 +1383,3 @@
-> >>   #
-> >>   ##
-> >>   { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
-> >> -
-> >> -##
-> >> -# @GuidInfo:
-> >> -#
-> >> -# GUID information.
-> >> -#
-> >> -# @guid: the globally unique identifier
-> >> -#
-> >> -# Since: 2.9
-> >> -##
-> >> -{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
-> >> -
-> >> -##
-> >> -# @query-vm-generation-id:
-> >> -#
-> >> -# Show Virtual Machine Generation ID
-> >> -#
-> >> -# Since: 2.9
-> >> -##
-> >> -{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' } =20
->=20
-> Daniel explained on IRC the GUID structure is "standardized by microsoft=
-=20
-> as a way to detect when a guest has certain operations applied" to a=20
-> saved snapshot.
->=20
-> https://docs.microsoft.com/en-us/windows/win32/hyperv_v2/virtual-machine-=
-generation-identifier=20
->=20
->=20
-> So this one goes to qapi/block-core.json, right?
+Eduardo said he'd queued it -- I've been assuming he'll send
+a pullreq for it.
 
-I think it belongs to machine
+(The followup work I was planning to base on this turned out
+to have complications I hadn't expected, so I've put it on
+the shelf for the moment. But this is still a good bit of cleanup.)
 
->=20
-> >> -
-> >> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> >> index 2df7623d74..2b26bacaf8 100644
-> >> --- a/hw/acpi/vmgenid.c
-> >> +++ b/hw/acpi/vmgenid.c
-> >> @@ -12,7 +12,7 @@
-> >>  =20
-> >>   #include "qemu/osdep.h"
-> >>   #include "qapi/error.h"
-> >> -#include "qapi/qapi-commands-misc.h"
-> >> +#include "qapi/qapi-commands-machine.h"
-> >>   #include "qemu/module.h"
-> >>   #include "hw/acpi/acpi.h"
-> >>   #include "hw/acpi/aml-build.h"
-> >> diff --git a/stubs/vmgenid.c b/stubs/vmgenid.c
-> >> index 568e42b064..bfad656c6c 100644
-> >> --- a/stubs/vmgenid.c
-> >> +++ b/stubs/vmgenid.c
-> >> @@ -1,6 +1,6 @@
-> >>   #include "qemu/osdep.h"
-> >>   #include "qapi/error.h"
-> >> -#include "qapi/qapi-commands-misc.h"
-> >> +#include "qapi/qapi-commands-machine.h"
-> >>   #include "qapi/qmp/qerror.h"
-> >>  =20
-> >>   GuidInfo *qmp_query_vm_generation_id(Error **errp) =20
-> >  =20
->=20
-
+thanks
+-- PMM
 
