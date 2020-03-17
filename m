@@ -2,82 +2,82 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B728EC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99359C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82230206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 626B620735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJpcrp17"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82230206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q4A2KVYD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 626B620735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEDPD-0007WY-M9
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51052)
+	id 1jEDPo-0008EB-ID
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:41:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jEDOC-0006UW-KK
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:40:17 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1jEDOW-0006x5-7w
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:40:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jEDOB-0000oE-8u
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:40:16 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:37563)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEDOB-0000jp-3F
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:40:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584456014;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pBEcqXjfhNcJf9LeWO9VtenTKBK/Yti2iUo1Fo0vhfM=;
- b=aJpcrp175k0/uqSKJ06/c4Xu/1g0EEHCiiWooYFLq2Ik+5moMemscPKs6QS0ihMvB1Ahx+
- B92OEWgVqaAgcUAHnPayhPYL1dL2JIiE8p6vmf7fiMBwl/h5OAVGuSAFfTOKv3foWHzG3q
- FiljFDEdXX7Q3O9lOzvXF+ZYPrnVTlI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-xLJvM9g3MXG0YrhZyOOZGA-1; Tue, 17 Mar 2020 10:40:09 -0400
-X-MC-Unique: xLJvM9g3MXG0YrhZyOOZGA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A363D107ACC9;
- Tue, 17 Mar 2020 14:40:07 +0000 (UTC)
-Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DECD77E317;
- Tue, 17 Mar 2020 14:40:00 +0000 (UTC)
-Subject: Re: [PULL 00/10] Bitmaps patches
-To: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>
-References: <20200317043819.20197-1-jsnow@redhat.com>
- <CAFEAcA_=DHpNZ+b9Hrim39R74Jik8MKqu8MPJm80wMsQS0FADQ@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5805273e-0a2f-850a-a07a-97dac0d7211e@redhat.com>
-Date: Tue, 17 Mar 2020 09:40:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1jEDOU-0004ZB-NN
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:40:36 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35698)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1jEDOU-0004Py-Fe; Tue, 17 Mar 2020 10:40:34 -0400
+Received: by mail-ot1-x344.google.com with SMTP id k26so21918642otr.2;
+ Tue, 17 Mar 2020 07:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IXo+53GAmIKD6wXgvb7WvhNswm2qw2hdjO0GagCEkbw=;
+ b=q4A2KVYDGqwcfmuS5mj2I+GbyDveBJVJ7F6Ba1VjYF+YnSGtE5e0i7nPy/7YlcnWFh
+ Q2T8YjRG+VOwO2FmxYSUnjTX1Fjg1Ky56QgwBJnJu3TM9UD0GM0XoP1XRbSjwiG+YXJF
+ TjfnsaVN6OIlksMhVyCodEyvBEcPor+9Db6jR3zHhuoNbMkpvij8nZdfrmY5F5yzQy6T
+ xL5B/LUy++dGnaStgRfeTGopM5Rhj8l0xiJDkyWyJo9QKlXvsDKoV2e5uTyxDNjP5QQn
+ RE9ZboqXjWxQqlFNIBdGNGfSUULIQKMPFRL41q3+XMPBvyi9A/Y6LpnWFYR5XXOg19MB
+ 5Vsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IXo+53GAmIKD6wXgvb7WvhNswm2qw2hdjO0GagCEkbw=;
+ b=YLt7m9zTLhm7HeHe67X7y4zm/NEXqWOGebgyYGzMK5lZWot4X4Ky+7nIQ3Cze7aRoM
+ 0ldrgP0wDGzwtJT6cQCzcfdq2V1tb7vbS+e+bK1Y+jUU21FYrpIw0cbX3Sf7Ql6HnYMg
+ o9+/0Xc4oxuCijNulZGJdiODpKYdZzj0zTPJj22mSC8ubr9Z9zLQD+RrL7u5DWRBdwx+
+ sQTAkVm22WAgUCNSElG64SmfPI8yEh0U6fORAiopBZrlmzQrrtzjiFmRdoJng7LZmyFl
+ s86/W9NdztU4rov8rhNLtGfv9q3cE9YbUaWAU0svSNsq2kVBh/yZGGiNp+odrfO9ZfSS
+ vaBA==
+X-Gm-Message-State: ANhLgQ2AuDvw8dJ7mRp6bJURtHYlM+4s9SrqRd6FKldrBNYlVW/JUV1F
+ 8SYYKXRDd3KhEgo1/qwJDxeGc0n76Ai2VCkoI28=
+X-Google-Smtp-Source: ADFU+vvihKMdA5HKbpCsPGXDU39kcTFis3ijVuXQrqQPxlNTZIgCmdX6vOJ7XNaep1IZ2Wme8dgpaMZsaOJDpsNMzsE=
+X-Received: by 2002:a9d:7a47:: with SMTP id z7mr4128533otm.341.1584456033478; 
+ Tue, 17 Mar 2020 07:40:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_=DHpNZ+b9Hrim39R74Jik8MKqu8MPJm80wMsQS0FADQ@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200228071914.11746-1-vsementsov@virtuozzo.com>
+ <20200228071914.11746-2-vsementsov@virtuozzo.com>
+ <CAL1e-=hX=7OJP-Rpc5TtVQkftq_F3wrh-auYt7yjAe+2i3whHQ@mail.gmail.com>
+ <75b4d5ad-f95f-dab2-1b53-5e654c29015e@virtuozzo.com>
+ <CAL1e-=gkw9_UJ-0zYx_qUYfRpGmpi-otXf2VnR=5SYDhm=RCGw@mail.gmail.com>
+In-Reply-To: <CAL1e-=gkw9_UJ-0zYx_qUYfRpGmpi-otXf2VnR=5SYDhm=RCGw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 17 Mar 2020 15:40:22 +0100
+Message-ID: <CAL1e-=gcf5DY_mCFoQ-0pVJp7jG6w5eQimk7+W5=MTgZ9Emb-Q@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] scripts/simplebench: add simplebench.py
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,66 +89,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Libvirt <libvir-list@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:bochs" <qemu-block@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 9:00 AM, Peter Maydell wrote:
-> On Tue, 17 Mar 2020 at 04:38, John Snow <jsnow@redhat.com> wrote:
+On Mon, Mar 2, 2020 at 10:05 PM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+>
+>
+>
+> > >> +
+> > >> +
+> > >> +def ascii_one(result):
+> > >> +    """Return ASCII representation of bench_one() returned dict."""
+> > >> +    if 'average' in result:
+> > >> +        s = '{:.2f} +- {:.2f}'.format(result['average'], result['delta'])
+> > >> +        if 'n-failed' in result:
+> > >> +            s += '\n({} failed)'.format(result['n-failed'])
+> > >> +        return s
+> > >> +    else:
+> > >> +        return 'FAILED'
+> > >
+> > > I think it would be visually clearer if "+-" was printed without any
+> > > space between it and the following number, using something
+> > > like this:
+> > >
+> > > s = ' {:.2f} +-{:.2f}'.format(result['average'], result['delta'])
+> > >
+> > > The resulting table would look like:
+> > >
+> > > ----------  -------------  -------------  -------------
+> > >              backup-1       backup-2       mirror
+> > > ssd -> ssd   0.43 +-0.00    4.48 +-0.06    4.38 +-0.02
+> > > ssd -> hdd   10.60 +-0.08   10.69 +-0.18   10.57 +-0.05
+> > > ssd -> nbd   33.81 +-0.37   10.67 +-0.17   10.07 +-0.07
+> > > ----------  -------------  -------------  -------------
+> > >
+> > > But, this is just cosmetics.
+> > >
+> > > With or without the suggestion above:
+> > >
+> > > Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> >
+> > Thanks for reviewing!
+> >
+> > Agree with this change, but I don't think it worth to resend the series for this one space)
+> > Hope it may be applied with pull request..
+> >
+>
+> I am an occasional Python programmer, and I felt comfortable
+> reviewing your series, but I am not a maintainer of this directory,
+> and I believe Eduardo or Cleber or other more active Python
+> contributors would be better choice for selecting this series in
+> their pull request.
+>
+> So, I can't send this series to Peter - Cleber, Eduardo, please
+> see to it.
+>
 
->>
->>    block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty (2020-03-12 16:36:46 -0400)
->>
->> ----------------------------------------------------------------
->> Pull request
->>
->> ---------------------------------------------------------------
-> 
-> Hi; this fails to compile with clang:
-> 
-> /home/petmay01/linaro/qemu-for-merges/nbd/server.c:1937:1: error:
-> unused function 'glib_listautoptr_cleanup_NBDExtentArray'
-> [-Werror,-Wunused-function]
-> G_DEFINE_AUTOPTR_CLEANUP_FUNC(NBDExtentArray, nbd_extent_array_free);
-> ^
-> /usr/include/glib-2.0/glib/gmacros.h:462:22: note: expanded from macro
-> 'G_DEFINE_AUTOPTR_CLEANUP_FUNC'
->    static inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList
-> **_l) { g_list_free_full (*_l, (GDestroyNotify) func); } \
->                       ^
-> /usr/include/glib-2.0/glib/gmacros.h:443:48: note: expanded from macro
-> '_GLIB_AUTOPTR_LIST_FUNC_NAME'
-> #define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName)
-> glib_listautoptr_cleanup_##TypeName
->                                                 ^
-> <scratch space>:49:1: note: expanded from here
-> glib_listautoptr_cleanup_NBDExtentArray
-> ^
+Eduardo, can you perhaps consider this series for selecting
+into your pull request?
 
-Should we add -Wno-unused-function to CFLAGS when dealing with a version 
-of clang that complains about that version of glib's headers?  Is it 
-fixed in a newer version of glib, where we could just backport a newer 
-definition of G_DEFINE_AUTOPTR_CLEANUP_FUNC() that adds whatever 
-annotations are needed to shut the compiler up?
+Thanks,
+Aleksandar
 
-On IRC, danpb pointed me to libvirt's solution:
-https://libvirt.org/git/?p=libvirt.git;a=commit;h=44e7f029
-
-Maybe we just write our own macro wrapper around 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC which takes care of adding necessary 
-annotations and use that instead (and our macro name might be shorter...)
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+> Yours,
+> Aleksandar
+>
+> > >
+> > >> +
+> > >> +
+> > >> +def bench(test_func, test_envs, test_cases, *args, **vargs):
+> > >> +    """Fill benchmark table
+> > >> +
+> > >> +    test_func -- benchmarking function, see bench_one for description
+> > >> +    test_envs -- list of test environments, see bench_one
+> > >> +    test_cases -- list of test cases, see bench_one
+> > >> +    args, vargs -- additional arguments for bench_one
+> > >> +
+> > >> +    Returns dict with the following fields:
+> > >> +        'envs':  test_envs
+> > >> +        'cases': test_cases
+> > >> +        'tab':   filled 2D array, where cell [i][j] is bench_one result for
+> > >> +                 test_cases[i] for test_envs[j] (i.e., rows are test cases and
+> > >> +                 columns are test environments)
+> > >> +    """
+> > >> +    tab = {}
+> > >> +    results = {
+> > >> +        'envs': test_envs,
+> > >> +        'cases': test_cases,
+> > >> +        'tab': tab
+> > >> +    }
+> > >> +    n = 1
+> > >> +    n_tests = len(test_envs) * len(test_cases)
+> > >> +    for env in test_envs:
+> > >> +        for case in test_cases:
+> > >> +            print('Testing {}/{}: {} :: {}'.format(n, n_tests,
+> > >> +                                                   env['id'], case['id']))
+> > >> +            if case['id'] not in tab:
+> > >> +                tab[case['id']] = {}
+> > >> +            tab[case['id']][env['id']] = bench_one(test_func, env, case,
+> > >> +                                                   *args, **vargs)
+> > >> +            n += 1
+> > >> +
+> > >> +    print('Done')
+> > >> +    return results
+> > >> +
+> > >> +
+> > >> +def ascii(results):
+> > >> +    """Return ASCII representation of bench() returned dict."""
+> > >> +    from tabulate import tabulate
+> > >> +
+> > >> +    tab = [[""] + [c['id'] for c in results['envs']]]
+> > >> +    for case in results['cases']:
+> > >> +        row = [case['id']]
+> > >> +        for env in results['envs']:
+> > >> +            row.append(ascii_one(results['tab'][case['id']][env['id']]))
+> > >> +        tab.append(row)
+> > >> +
+> > >> +    return tabulate(tab)
+> > >> --
+> > >> 2.21.0
+> > >>
+> > >>
+> >
+> >
+> > --
+> > Best regards,
+> > Vladimir
 
