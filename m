@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F526C18E5B
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C520BC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D198120736
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:07:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AC7320736
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jp3N8vCW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D198120736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPHZNoLW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AC7320736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEAzz-0002oQ-VG
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:07:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56923)
+	id 1jEB04-00034h-Kn
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEAoc-0008GA-51
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:24 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEAoc-0008GD-3c
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEAoZ-0006qO-3b
+ (envelope-from <armbru@redhat.com>) id 1jEAoZ-0006st-G9
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:20109)
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:27547)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoY-0006oM-So
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:18 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoZ-0006q6-9j
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1584446118;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=21luhvS9y0rAMdcbNzOO4uFJBqRLIs1zjLQKrJoDI30=;
- b=Jp3N8vCWprwdzWqkus+/flrr7btsG107v7/ipcMvzMU6e4bplBvzUCkyusPhbF52aVdHpL
- f7EfIsRkBtz/Offti4dVvZy+6I+9hwHGMmTNd36sZcm3illkZoCEs61Uf8D79BLl1QcBmS
- GYejFC4vVHZn+V0wHOPf5sGIZdOvPbo=
+ bh=0e0Um50E7TCBs44NSnKcmH5G7C0qOWmhvpEoLzLz/DQ=;
+ b=VPHZNoLWYkzTLveiylVxx+GsPNq7Ix49CFAaxpDgQQQCPvinWHPl5EaIxLumPdjscJuOG/
+ Li6yfs5s8Zc3Vhu1AXS3caG9jB8gR6eOKD9UnKioOJaM1gDrTXT0eYzxgScxCWZHLiz4ua
+ eDnydjJ4r1fhyZrtm0utKqWE8jU7YP4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-i-YNyQu_MgWJGlvIQWDFDQ-1; Tue, 17 Mar 2020 07:55:17 -0400
-X-MC-Unique: i-YNyQu_MgWJGlvIQWDFDQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-439-eoEJyeDfPv-DHMzydiK_TA-1; Tue, 17 Mar 2020 07:55:17 -0400
+X-MC-Unique: eoEJyeDfPv-DHMzydiK_TA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 028A085EE8E;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 094B813F5;
  Tue, 17 Mar 2020 11:55:16 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3706F10027A8;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5408E5C541;
  Tue, 17 Mar 2020 11:55:13 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9862D113525F; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
+ id A204C11336B0; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 32/34] qapi: Implement deprecated-input=reject for QMP
- commands
-Date: Tue, 17 Mar 2020 12:54:57 +0100
-Message-Id: <20200317115459.31821-33-armbru@redhat.com>
+Subject: [PATCH v4 34/34] qapi: New -compat deprecated-input=crash
+Date: Tue, 17 Mar 2020 12:54:59 +0100
+Message-Id: <20200317115459.31821-35-armbru@redhat.com>
 In-Reply-To: <20200317115459.31821-1-armbru@redhat.com>
 References: <20200317115459.31821-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -93,144 +92,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This policy rejects deprecated input, and thus permits "testing the
-future".  Implement it for QMP commands: make deprecated ones fail.
-Example: when QEMU is run with -compat deprecated-input=3Dreject, then
+Policy "crash" calls abort() when deprecated input is received.
 
-    {"execute": "query-cpus"}
-
-fails like this
-
-    {"error": {"class": "CommandNotFound", "desc": "Deprecated command quer=
-y-cpus disabled by policy"}}
-
-When the command is removed, the error will change to
-
-    {"error": {"class": "CommandNotFound", "desc": "The command query-cpus =
-has not been found"}}
+Bugs in integration tests may mask the error from policy "reject".
+Provide a larger hammer: crash outright.  Masking that seems unlikely.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/qapi/qmp/dispatch.h |  1 +
- qapi/qmp-dispatch.c         | 13 +++++++++++++
- tests/test-qmp-cmds.c       | 24 ++++++++++++++++++++++++
- scripts/qapi/commands.py    | 10 +++++++---
- 4 files changed, 45 insertions(+), 3 deletions(-)
+ qapi/compat.json             | 3 ++-
+ qapi/qmp-dispatch.c          | 1 +
+ qapi/qobject-input-visitor.c | 1 +
+ qemu-options.hx              | 4 +++-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 9aa426a398..ef256f2bb7 100644
---- a/include/qapi/qmp/dispatch.h
-+++ b/include/qapi/qmp/dispatch.h
-@@ -24,6 +24,7 @@ typedef enum QmpCommandOptions
-     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
-     QCO_ALLOW_OOB             =3D  (1U << 1),
-     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
-+    QCO_DEPRECATED            =3D  (1U << 3),
- } QmpCommandOptions;
+diff --git a/qapi/compat.json b/qapi/compat.json
+index fd6f8e932c..ec24567639 100644
+--- a/qapi/compat.json
++++ b/qapi/compat.json
+@@ -11,11 +11,12 @@
+ #
+ # @accept: Accept silently
+ # @reject: Reject with an error
++# @crash: abort() the process
+ #
+ # Since: 5.0
+ ##
+ { 'enum': 'CompatPolicyInput',
+-  'data': [ 'accept', 'reject' ] }
++  'data': [ 'accept', 'reject', 'crash' ] }
 =20
- typedef struct QmpCommand
+ ##
+ # @CompatPolicyOutput:
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 57d823c8e1..18d62cd83b 100644
+index 18d62cd83b..90335a1b7f 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -130,6 +130,19 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *req=
-uest,
-                   "The command %s has not been found", command);
-         goto out;
+@@ -139,6 +139,7 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *requ=
+est,
+                       "Deprecated command %s disabled by policy",
+                       command);
+             goto out;
++        case COMPAT_POLICY_INPUT_CRASH:
+         default:
+             abort();
+         }
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 6ea93f5a7a..a74c901be9 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -654,6 +654,7 @@ static bool qobject_input_deprecated(Visitor *v, const =
+char *name,
+         error_setg(errp, "Deprecated parameter '%s' disabled by policy",
+                    name);
+         return false;
++    case COMPAT_POLICY_INPUT_CRASH:
+     default:
+         abort();
      }
-+    if (cmd->options & QCO_DEPRECATED) {
-+        switch (compat_policy.deprecated_input) {
-+        case COMPAT_POLICY_INPUT_ACCEPT:
-+            break;
-+        case COMPAT_POLICY_INPUT_REJECT:
-+            error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
-+                      "Deprecated command %s disabled by policy",
-+                      command);
-+            goto out;
-+        default:
-+            abort();
-+        }
-+    }
-     if (!cmd->enabled) {
-         error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "The command %s has been disabled for this instance",
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index 82d599630c..a2099fee7d 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -277,6 +277,28 @@ static void test_dispatch_cmd_io(void)
-     qobject_unref(ret3);
- }
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 263d18d63a..7052d6e802 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3358,7 +3358,7 @@ DEFHEADING()
+ DEFHEADING(Debug/Expert options:)
 =20
-+static void test_dispatch_cmd_deprecated(void)
-+{
-+    const char *cmd =3D "{ 'execute': 'test-command-features1' }";
-+    QDict *ret;
-+
-+    memset(&compat_policy, 0, sizeof(compat_policy));
-+
-+    /* accept */
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-+    qobject_unref(ret);
-+
-+    compat_policy.has_deprecated_input =3D true;
-+    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_ACCEPT;
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-+    qobject_unref(ret);
-+
-+    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_REJECT;
-+    do_qmp_dispatch_error(false, ERROR_CLASS_COMMAND_NOT_FOUND, cmd);
-+}
-+
- static void test_dispatch_cmd_ret_deprecated(void)
- {
-     const char *cmd =3D "{ 'execute': 'test-features0' }";
-@@ -375,6 +397,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
-     g_test_add_func("/qmp/dispatch_cmd_success_response",
-                     test_dispatch_cmd_success_response);
-+    g_test_add_func("/qmp/dispatch_cmd_deprecated",
-+                    test_dispatch_cmd_deprecated);
-     g_test_add_func("/qmp/dispatch_cmd_ret_deprecated",
-                     test_dispatch_cmd_ret_deprecated);
-     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 35b79c554d..f628bbf144 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -194,9 +194,13 @@ out:
-     return ret
-=20
-=20
--def gen_register_command(name, success_response, allow_oob, allow_preconfi=
-g):
-+def gen_register_command(name, features,
-+                         success_response, allow_oob, allow_preconfig):
-     options =3D []
-=20
-+    if 'deprecated' in [f.name for f in features]:
-+        options +=3D ['QCO_DEPRECATED']
-+
-     if not success_response:
-         options +=3D ['QCO_NO_SUCCESS_RESP']
-     if allow_oob:
-@@ -302,8 +306,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
-;
-             self._genh.add(gen_command_decl(name, arg_type, boxed, ret_typ=
-e))
-             self._genh.add(gen_marshal_decl(name))
-             self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
--            self._regy.add(gen_register_command(name, success_response,
--                                                allow_oob, allow_preconfig=
-))
-+            self._regy.add(gen_register_command(
-+                name, features, success_response, allow_oob, allow_preconf=
-ig))
-=20
-=20
- def gen_commands(schema, output_dir, prefix):
+ DEF("compat", HAS_ARG, QEMU_OPTION_compat,
+-    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
+t|hide]\n"
++    "-compat [deprecated-input=3Daccept|reject|crash][,deprecated-output=
+=3Daccept|hide]\n"
+     "                Policy for handling deprecated management interfaces\=
+n",
+     QEMU_ARCH_ALL)
+ SRST
+@@ -3369,6 +3369,8 @@ SRST
+         Accept deprecated commands and arguments
+     ``deprecated-input=3Dreject``
+         Reject deprecated commands and arguments
++    ``deprecated-input=3Dcrash``
++        Crash on deprecated command
+     ``deprecated-output=3Daccept`` (default)
+         Emit deprecated command results and events
+     ``deprecated-output=3Dhide``
 --=20
 2.21.1
 
