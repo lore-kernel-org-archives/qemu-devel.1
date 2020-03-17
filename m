@@ -2,83 +2,55 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B279C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:16:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4205C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC23320714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:16:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUNz1eqR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC23320714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D00B2073E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:18:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D00B2073E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEDxY-0001pw-U7
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58225)
+	id 1jEDyt-0004Ml-M1
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEDu9-0006kN-UK
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:19 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDuh-0007Ax-KA
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEDu8-0007Lg-Mn
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:17 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:39644)
+ (envelope-from <balaton@eik.bme.hu>) id 1jEDug-0001Z2-Gk
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:51 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:49474)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEDu8-0007IL-H7
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584457996;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cMe4gcpCk7gBo8FlkVtx2v5//di/8sRY0Wyy5DbXA7k=;
- b=jUNz1eqRGm2Bv9S9PfAVhf+FNHhxc3nmQdT1pjrPWruf1WukPDgnVOeqz6OC7C3+a8EFi0
- r+3h9Trbd8qArMVo+qDdoBOPrYrqE8xOQgJqxjreTeQI6unBpyxBW0rBYBpuJPLjiutlLG
- novuBBu6pEuv34IX+aZru2vkpK6Maq4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-plY_EUf6Nxyfs8zpxnx4cg-1; Tue, 17 Mar 2020 11:13:14 -0400
-X-MC-Unique: plY_EUf6Nxyfs8zpxnx4cg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBE6A18B9FC1;
- Tue, 17 Mar 2020 15:13:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B7DAB7E317;
- Tue, 17 Mar 2020 15:13:12 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3250A1138404; Tue, 17 Mar 2020 16:13:11 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v10 4/3] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-References: <20200313170517.22480-1-armbru@redhat.com>
- <20200317125741.15301-1-vsementsov@virtuozzo.com>
-Date: Tue, 17 Mar 2020 16:13:11 +0100
-In-Reply-To: <20200317125741.15301-1-vsementsov@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Tue, 17 Mar 2020 15:57:41 +0300")
-Message-ID: <87lfnz6mm0.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1jEDuc-0000sK-Ii; Tue, 17 Mar 2020 11:13:47 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id D2D32747E0A;
+ Tue, 17 Mar 2020 16:13:42 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 5C5F6747DF5; Tue, 17 Mar 2020 16:13:42 +0100 (CET)
+Message-Id: <1020e0bfcfc6e364f967ccb2a9a3778ac174ccbe.1584457537.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1584457537.git.balaton@eik.bme.hu>
+References: <cover.1584457537.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v3 2/8] hw/isa/piix4.c: Introduce variable to store devfn
+Date: Tue, 17 Mar 2020 16:05:37 +0100
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org,
+    qemu-block@nongnu.org
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,67 +62,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, alxndr@bu.edu,
- paul.durrant@citrix.com, ashijeetacharya@gmail.com, philmd@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+To avoid any problem with reassigning pci variable store devfn in a
+variable instead of acessing it from the PCIDevice.
 
-> It's wrong to use same err object as errp parameter for several
-> function calls without intermediate checking for error: we'll crash if
-> try to set err object twice. Fix that.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->
-> Forgive me for sending this into your series, but seems it is very
-> appropriate.
->
-> It's rephrasing  of my
->  [PATCH v9 03/10] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-> for partI series but but without use of ERRP_AUTO_PROPAGATE.
->
->  hw/sd/ssi-sd.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-> index 91db069212..829797b597 100644
-> --- a/hw/sd/ssi-sd.c
-> +++ b/hw/sd/ssi-sd.c
-> @@ -255,13 +255,25 @@ static void ssi_sd_realize(SSISlave *d, Error **err=
-p)
->      carddev =3D qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
->      if (dinfo) {
->          qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo)=
-, &err);
-> +        if (err) {
-> +            goto fail;
-> +        }
->      }
-> +
->      object_property_set_bool(OBJECT(carddev), true, "spi", &err);
-> +    if (err) {
-> +        goto fail;
-> +    }
-> +
->      object_property_set_bool(OBJECT(carddev), true, "realized", &err);
->      if (err) {
-> -        error_setg(errp, "failed to init SD card: %s", error_get_pretty(=
-err));
-> -        return;
-> +        goto fail;
->      }
-> +
-> +    return;
-> +
-> +fail:
-> +    error_propagate_prepend(errp, err, "failed to init SD card: ");
->  }
-> =20
->  static void ssi_sd_reset(DeviceState *dev)
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/isa/piix4.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 7edec5e149..2cbdcd7700 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -247,9 +247,10 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **=
+isa_bus,
+     DriveInfo **hd;
+     PCIDevice *pci;
+     DeviceState *dev;
++    int devfn =3D PCI_DEVFN(10, 0);
+=20
+-    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
+-                                          true, TYPE_PIIX4_PCI_DEVICE);
++    pci =3D pci_create_simple_multifunction(pci_bus, devfn,  true,
++                                          TYPE_PIIX4_PCI_DEVICE);
+     dev =3D DEVICE(pci);
+     if (isa_bus) {
+         *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+@@ -257,11 +258,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus *=
+*isa_bus,
+=20
+     hd =3D g_new(DriveInfo *, ide_drives);
+     ide_drive_get(hd, ide_drives);
+-    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
++    pci_piix4_ide_init(pci_bus, hd, devfn + 1);
+     g_free(hd);
+-    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
++
++    pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
+     if (smbus) {
+-        *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
++        *smbus =3D piix4_pm_init(pci_bus, devfn + 3, 0x1100,
+                                isa_get_irq(NULL, 9), NULL, 0, NULL);
+    }
+=20
+--=20
+2.21.1
 
 
