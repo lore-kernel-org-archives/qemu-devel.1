@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 164C3C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A1AC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:11:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9A9420767
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F4D22073C
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:11:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V524NYvm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9A9420767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qb8hOBA0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4D22073C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEB2k-0000JF-V1
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56907)
+	id 1jEB3n-0001sf-Od
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:11:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56973)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEAob-0008Fk-QC
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:24 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEAod-0008Is-Q3
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEAoX-0006j4-Ls
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:21 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:34874)
+ (envelope-from <armbru@redhat.com>) id 1jEAoa-00070P-RK
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:23 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:24185)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoX-0006eN-E0
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:17 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoa-0006xf-Jp
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584446116;
+ s=mimecast20190719; t=1584446120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TgGX4lIj7YKgm+EM+OXuKQ+G5357jqiXMJoldM3tJc0=;
- b=V524NYvmBbPMzxbjTE48kkPImgwmS1xy/YNaODeth00R60JVY/9Y0iaQ2Y+3XKV7s/uJab
- AFG6u7U9FvT8AmkPV380RaXx6pV9F3Bwc5rqQLti4L4H9BusK7S5Kf1V78yseH7cr8C22f
- +bNe1tXnjhj5gtNYFKh3xTiDS1YeteE=
+ bh=oYE3kivzTU/MHGBvZenoCiESySyZ9Mfy3dijo0V7Q1w=;
+ b=Qb8hOBA07lV//6pswMhmbFduqq2tmm5sTcNJmHrunye3VAZ/S0WCspZjACqbaYtbgao8Vf
+ jJEZi0rD8Z3vGI6zoNe2JI/IcA4aEDyH4B2+NKeI7qZCeOMsP7AA3XRIitINub6oMfvJZm
+ rpJYifen8kWDQY6cRQ/2cgeW4Fik5dI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-0cPnYk0lMemdirjy5Z8VbA-1; Tue, 17 Mar 2020 07:55:13 -0400
-X-MC-Unique: 0cPnYk0lMemdirjy5Z8VbA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-366-vOStGJGVMlO1EPGFmkNMxw-1; Tue, 17 Mar 2020 07:55:16 -0400
+X-MC-Unique: vOStGJGVMlO1EPGFmkNMxw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19D11801E66;
- Tue, 17 Mar 2020 11:55:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E54A19251AD;
+ Tue, 17 Mar 2020 11:55:15 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
  [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F25AE9129E;
- Tue, 17 Mar 2020 11:55:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BAE528981;
+ Tue, 17 Mar 2020 11:55:13 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4CD041135A5A; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
+ id 93A26113525E; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 17/34] qapi/schema: Reorder classes so related ones are
- together
-Date: Tue, 17 Mar 2020 12:54:42 +0100
-Message-Id: <20200317115459.31821-18-armbru@redhat.com>
+Subject: [PATCH v4 31/34] qapi: Implement deprecated-output=hide for QMP
+ introspection
+Date: Tue, 17 Mar 2020 12:54:56 +0100
+Message-Id: <20200317115459.31821-32-armbru@redhat.com>
 In-Reply-To: <20200317115459.31821-1-armbru@redhat.com>
 References: <20200317115459.31821-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -87,336 +87,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move QAPISchemaAlternateType up some, so that all QAPISchemaFOOType
-are together.  Move QAPISchemaObjectTypeVariants right behind its
-users.
+This policy suppresses deprecated bits in output, and thus permits
+"testing the future".  Implement it for QMP command query-qmp-schema:
+suppress information on deprecated commands, events and object type
+members, i.e. anything that has the special feature flag "deprecated".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi/schema.py | 284 ++++++++++++++++++++---------------------
- 1 file changed, 142 insertions(+), 142 deletions(-)
+ qapi/introspect.json       |   2 +-
+ monitor/monitor-internal.h |   3 --
+ monitor/misc.c             |   2 -
+ monitor/qmp-cmds-control.c | 102 ++++++++++++++++++++++++++++++++-----
+ qemu-storage-daemon.c      |   2 -
+ 5 files changed, 90 insertions(+), 21 deletions(-)
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 4d8ad67303..0acf8b466f 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -444,82 +444,72 @@ class QAPISchemaObjectType(QAPISchemaType):
-             self.members, self.variants)
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index b1aabd4cfd..3ebd817866 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -48,7 +48,7 @@
+ ##
+ { 'command': 'query-qmp-schema',
+   'returns': [ 'SchemaInfo' ],
+-  'gen': false }                # just to simplify qmp_query_json()
++  'allow-preconfig': true }
 =20
+ ##
+ # @SchemaMetaType:
+diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+index 3e6baba88f..4d402ded85 100644
+--- a/monitor/monitor-internal.h
++++ b/monitor/monitor-internal.h
+@@ -180,7 +180,4 @@ void help_cmd(Monitor *mon, const char *name);
+ void handle_hmp_command(MonitorHMP *mon, const char *cmdline);
+ int hmp_compare_cmd(const char *name, const char *list);
 =20
--class QAPISchemaMember:
--    """ Represents object members, enum members and features """
--    role =3D 'member'
+-void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+-                                 Error **errp);
 -
--    def __init__(self, name, info, ifcond=3DNone):
--        assert isinstance(name, str)
--        self.name =3D name
--        self.info =3D info
--        self.ifcond =3D ifcond or []
--        self.defined_in =3D None
--
--    def set_defined_in(self, name):
--        assert not self.defined_in
--        self.defined_in =3D name
--
--    def check_clash(self, info, seen):
--        cname =3D c_name(self.name)
--        if cname in seen:
--            raise QAPISemError(
--                info,
--                "%s collides with %s"
--                % (self.describe(info), seen[cname].describe(info)))
--        seen[cname] =3D self
--
--    def describe(self, info):
--        role =3D self.role
--        defined_in =3D self.defined_in
--        assert defined_in
--
--        if defined_in.startswith('q_obj_'):
--            # See QAPISchema._make_implicit_object_type() - reverse the
--            # mapping there to create a nice human-readable description
--            defined_in =3D defined_in[6:]
--            if defined_in.endswith('-arg'):
--                # Implicit type created for a command's dict 'data'
--                assert role =3D=3D 'member'
--                role =3D 'parameter'
--            elif defined_in.endswith('-base'):
--                # Implicit type created for a flat union's dict 'base'
--                role =3D 'base ' + role
--            else:
--                # Implicit type created for a simple union's branch
--                assert defined_in.endswith('-wrapper')
--                # Unreachable and not implemented
--                assert False
--        elif defined_in.endswith('Kind'):
--            # See QAPISchema._make_implicit_enum_type()
--            # Implicit enum created for simple union's branches
--            assert role =3D=3D 'value'
--            role =3D 'branch'
--        elif defined_in !=3D info.defn_name:
--            return "%s '%s' of type '%s'" % (role, self.name, defined_in)
--        return "%s '%s'" % (role, self.name)
--
--
--class QAPISchemaEnumMember(QAPISchemaMember):
--    role =3D 'value'
--
--
--class QAPISchemaFeature(QAPISchemaMember):
--    role =3D 'feature'
--
--
--class QAPISchemaObjectTypeMember(QAPISchemaMember):
--    def __init__(self, name, info, typ, optional, ifcond=3DNone):
--        super().__init__(name, info, ifcond)
--        assert isinstance(typ, str)
--        assert isinstance(optional, bool)
--        self._type_name =3D typ
--        self.type =3D None
--        self.optional =3D optional
-+class QAPISchemaAlternateType(QAPISchemaType):
-+    meta =3D 'alternate'
-+
-+    def __init__(self, name, info, doc, ifcond, features, variants):
-+        super().__init__(name, info, doc, ifcond, features)
-+        assert isinstance(variants, QAPISchemaObjectTypeVariants)
-+        assert variants.tag_member
-+        variants.set_defined_in(name)
-+        variants.tag_member.set_defined_in(self.name)
-+        self.variants =3D variants
+ #endif
+diff --git a/monitor/misc.c b/monitor/misc.c
+index c3bc34c099..0237c71140 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -243,8 +243,6 @@ static void monitor_init_qmp_commands(void)
 =20
-     def check(self, schema):
--        assert self.defined_in
--        self.type =3D schema.resolve_type(self._type_name, self.info,
--                                        self.describe)
-+        super().check(schema)
-+        self.variants.tag_member.check(schema)
-+        # Not calling self.variants.check_clash(), because there's nothing
-+        # to clash with
-+        self.variants.check(schema, {})
-+        # Alternate branch names have no relation to the tag enum values;
-+        # so we have to check for potential name collisions ourselves.
-+        seen =3D {}
-+        types_seen =3D {}
-+        for v in self.variants.variants:
-+            v.check_clash(self.info, seen)
-+            qtype =3D v.type.alternate_qtype()
-+            if not qtype:
-+                raise QAPISemError(
-+                    self.info,
-+                    "%s cannot use %s"
-+                    % (v.describe(self.info), v.type.describe()))
-+            conflicting =3D set([qtype])
-+            if qtype =3D=3D 'QTYPE_QSTRING':
-+                if isinstance(v.type, QAPISchemaEnumType):
-+                    for m in v.type.members:
-+                        if m.name in ['on', 'off']:
-+                            conflicting.add('QTYPE_QBOOL')
-+                        if re.match(r'[-+0-9.]', m.name):
-+                            # lazy, could be tightened
-+                            conflicting.add('QTYPE_QNUM')
-+                else:
-+                    conflicting.add('QTYPE_QNUM')
-+                    conflicting.add('QTYPE_QBOOL')
-+            for qt in conflicting:
-+                if qt in types_seen:
-+                    raise QAPISemError(
-+                        self.info,
-+                        "%s can't be distinguished from '%s'"
-+                        % (v.describe(self.info), types_seen[qt]))
-+                types_seen[qt] =3D v.name
-+
-+    def connect_doc(self, doc=3DNone):
-+        super().connect_doc(doc)
-+        doc =3D doc or self.doc
-+        if doc:
-+            for v in self.variants.variants:
-+                doc.connect_member(v)
-+
-+    def c_type(self):
-+        return c_name(self.name) + pointer_suffix
-+
-+    def json_type(self):
-+        return 'value'
-+
-+    def visit(self, visitor):
-+        super().visit(visitor)
-+        visitor.visit_alternate_type(
-+            self.name, self.info, self.ifcond, self.features, self.variant=
-s)
+     qmp_init_marshal(&qmp_commands);
 =20
+-    qmp_register_command(&qmp_commands, "query-qmp-schema",
+-                         qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
+     qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
+                          QCO_NO_OPTIONS);
+     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+diff --git a/monitor/qmp-cmds-control.c b/monitor/qmp-cmds-control.c
+index 5cd9bb817c..bf5b711a7b 100644
+--- a/monitor/qmp-cmds-control.c
++++ b/monitor/qmp-cmds-control.c
+@@ -26,10 +26,14 @@
 =20
- class QAPISchemaObjectTypeVariants:
-@@ -613,6 +603,84 @@ class QAPISchemaObjectTypeVariants:
-             v.type.check_clash(info, dict(seen))
+ #include "monitor-internal.h"
+ #include "qemu-version.h"
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-control.h"
++#include "qapi/qapi-commands-introspect.h"
+ #include "qapi/qapi-emit-events.h"
+ #include "qapi/qapi-introspect.h"
++#include "qapi/qapi-visit-introspect.h"
++#include "qapi/qobject-input-visitor.h"
 =20
+ /*
+  * Accept QMP capabilities in @list for @mon.
+@@ -153,17 +157,89 @@ EventInfoList *qmp_query_events(Error **errp)
+     return ev_list;
+ }
 =20
-+class QAPISchemaMember:
-+    """ Represents object members, enum members and features """
-+    role =3D 'member'
+-/*
+- * Minor hack: generated marshalling suppressed for this command
+- * ('gen': false in the schema) so we can parse the JSON string
+- * directly into QObject instead of first parsing it with
+- * visit_type_SchemaInfoList() into a SchemaInfoList, then marshal it
+- * to QObject with generated output marshallers, every time.  Instead,
+- * we do it in test-qobject-input-visitor.c, just to make sure
+- * qapi-gen.py's output actually conforms to the schema.
+- */
+-void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+-                                 Error **errp)
+-{
+-    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
++static void *split_off_generic_list(void *list,
++                                    bool (*splitp)(void *elt),
++                                    void **part)
++{
++    GenericList *keep =3D NULL, **keep_tailp =3D &keep;
++    GenericList *split =3D NULL, **split_tailp =3D &split;
++    GenericList *tail;
 +
-+    def __init__(self, name, info, ifcond=3DNone):
-+        assert isinstance(name, str)
-+        self.name =3D name
-+        self.info =3D info
-+        self.ifcond =3D ifcond or []
-+        self.defined_in =3D None
++    for (tail =3D list; tail; tail =3D tail->next) {
++        if (splitp(tail)) {
++            *split_tailp =3D tail;
++            split_tailp =3D &tail->next;
++        } else {
++            *keep_tailp =3D tail;
++            keep_tailp =3D &tail->next;
++        }
++    }
 +
-+    def set_defined_in(self, name):
-+        assert not self.defined_in
-+        self.defined_in =3D name
++    *keep_tailp =3D *split_tailp =3D NULL;
++    *part =3D split;
++    return keep;
++}
 +
-+    def check_clash(self, info, seen):
-+        cname =3D c_name(self.name)
-+        if cname in seen:
-+            raise QAPISemError(
-+                info,
-+                "%s collides with %s"
-+                % (self.describe(info), seen[cname].describe(info)))
-+        seen[cname] =3D self
++static bool is_in(const char *s, strList *list)
++{
++    strList *tail;
 +
-+    def describe(self, info):
-+        role =3D self.role
-+        defined_in =3D self.defined_in
-+        assert defined_in
++    for (tail =3D list; tail; tail =3D tail->next) {
++        if (!strcmp(tail->value, s)) {
++            return true;
++        }
++    }
++    return false;
++}
 +
-+        if defined_in.startswith('q_obj_'):
-+            # See QAPISchema._make_implicit_object_type() - reverse the
-+            # mapping there to create a nice human-readable description
-+            defined_in =3D defined_in[6:]
-+            if defined_in.endswith('-arg'):
-+                # Implicit type created for a command's dict 'data'
-+                assert role =3D=3D 'member'
-+                role =3D 'parameter'
-+            elif defined_in.endswith('-base'):
-+                # Implicit type created for a flat union's dict 'base'
-+                role =3D 'base ' + role
-+            else:
-+                # Implicit type created for a simple union's branch
-+                assert defined_in.endswith('-wrapper')
-+                # Unreachable and not implemented
-+                assert False
-+        elif defined_in.endswith('Kind'):
-+            # See QAPISchema._make_implicit_enum_type()
-+            # Implicit enum created for simple union's branches
-+            assert role =3D=3D 'value'
-+            role =3D 'branch'
-+        elif defined_in !=3D info.defn_name:
-+            return "%s '%s' of type '%s'" % (role, self.name, defined_in)
-+        return "%s '%s'" % (role, self.name)
++static bool is_entity_deprecated(void *link)
++{
++    return is_in("deprecated", ((SchemaInfoList *)link)->value->features);
++}
 +
++static bool is_member_deprecated(void *link)
++{
++    return is_in("deprecated",
++                 ((SchemaInfoObjectMemberList *)link)->value->features);
++}
 +
-+class QAPISchemaEnumMember(QAPISchemaMember):
-+    role =3D 'value'
++static SchemaInfoList *zap_deprecated(SchemaInfoList *schema)
++{
++    void *to_zap;
++    SchemaInfoList *tail;
++    SchemaInfo *ent;
 +
++    schema =3D split_off_generic_list(schema, is_entity_deprecated, &to_za=
+p);
++    qapi_free_SchemaInfoList(to_zap);
 +
-+class QAPISchemaFeature(QAPISchemaMember):
-+    role =3D 'feature'
++    for (tail =3D schema; tail; tail =3D tail->next) {
++        ent =3D tail->value;
++        if (ent->meta_type =3D=3D SCHEMA_META_TYPE_OBJECT) {
++            ent->u.object.members
++                =3D split_off_generic_list(ent->u.object.members,
++                                         is_member_deprecated, &to_zap);
++            qapi_free_SchemaInfoObjectMemberList(to_zap);
++        }
++    }
 +
++    return schema;
++}
 +
-+class QAPISchemaObjectTypeMember(QAPISchemaMember):
-+    def __init__(self, name, info, typ, optional, ifcond=3DNone):
-+        super().__init__(name, info, ifcond)
-+        assert isinstance(typ, str)
-+        assert isinstance(optional, bool)
-+        self._type_name =3D typ
-+        self.type =3D None
-+        self.optional =3D optional
++SchemaInfoList *qmp_query_qmp_schema(Error **errp)
++{
++    QObject *obj =3D qobject_from_qlit(&qmp_schema_qlit);
++    Visitor *v =3D qobject_input_visitor_new(obj);
++    SchemaInfoList *schema =3D NULL;
 +
-+    def check(self, schema):
-+        assert self.defined_in
-+        self.type =3D schema.resolve_type(self._type_name, self.info,
-+                                        self.describe)
++    /* test_visitor_in_qmp_introspect() ensures this can't fail */
++    visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
++    g_assert(schema);
 +
++    qobject_unref(obj);
++    visit_free(v);
 +
- class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
-     role =3D 'branch'
++    if (compat_policy.deprecated_output =3D=3D COMPAT_POLICY_OUTPUT_HIDE) =
+{
++        return zap_deprecated(schema);
++    }
++    return schema;
+ }
+diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+index dd128978cc..23433090a8 100644
+--- a/qemu-storage-daemon.c
++++ b/qemu-storage-daemon.c
+@@ -142,8 +142,6 @@ static QemuOptsList qemu_object_opts =3D {
+ static void init_qmp_commands(void)
+ {
+     qmp_init_marshal(&qmp_commands);
+-    qmp_register_command(&qmp_commands, "query-qmp-schema",
+-                         qmp_query_qmp_schema, QCO_ALLOW_PRECONFIG);
 =20
-@@ -620,74 +688,6 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectType=
-Member):
-         super().__init__(name, info, typ, False, ifcond)
-=20
-=20
--class QAPISchemaAlternateType(QAPISchemaType):
--    meta =3D 'alternate'
--
--    def __init__(self, name, info, doc, ifcond, features, variants):
--        super().__init__(name, info, doc, ifcond, features)
--        assert isinstance(variants, QAPISchemaObjectTypeVariants)
--        assert variants.tag_member
--        variants.set_defined_in(name)
--        variants.tag_member.set_defined_in(self.name)
--        self.variants =3D variants
--
--    def check(self, schema):
--        super().check(schema)
--        self.variants.tag_member.check(schema)
--        # Not calling self.variants.check_clash(), because there's nothing
--        # to clash with
--        self.variants.check(schema, {})
--        # Alternate branch names have no relation to the tag enum values;
--        # so we have to check for potential name collisions ourselves.
--        seen =3D {}
--        types_seen =3D {}
--        for v in self.variants.variants:
--            v.check_clash(self.info, seen)
--            qtype =3D v.type.alternate_qtype()
--            if not qtype:
--                raise QAPISemError(
--                    self.info,
--                    "%s cannot use %s"
--                    % (v.describe(self.info), v.type.describe()))
--            conflicting =3D set([qtype])
--            if qtype =3D=3D 'QTYPE_QSTRING':
--                if isinstance(v.type, QAPISchemaEnumType):
--                    for m in v.type.members:
--                        if m.name in ['on', 'off']:
--                            conflicting.add('QTYPE_QBOOL')
--                        if re.match(r'[-+0-9.]', m.name):
--                            # lazy, could be tightened
--                            conflicting.add('QTYPE_QNUM')
--                else:
--                    conflicting.add('QTYPE_QNUM')
--                    conflicting.add('QTYPE_QBOOL')
--            for qt in conflicting:
--                if qt in types_seen:
--                    raise QAPISemError(
--                        self.info,
--                        "%s can't be distinguished from '%s'"
--                        % (v.describe(self.info), types_seen[qt]))
--                types_seen[qt] =3D v.name
--
--    def connect_doc(self, doc=3DNone):
--        super().connect_doc(doc)
--        doc =3D doc or self.doc
--        if doc:
--            for v in self.variants.variants:
--                doc.connect_member(v)
--
--    def c_type(self):
--        return c_name(self.name) + pointer_suffix
--
--    def json_type(self):
--        return 'value'
--
--    def visit(self, visitor):
--        super().visit(visitor)
--        visitor.visit_alternate_type(
--            self.name, self.info, self.ifcond, self.features, self.variant=
-s)
--
--
- class QAPISchemaCommand(QAPISchemaEntity):
-     meta =3D 'command'
-=20
+     QTAILQ_INIT(&qmp_cap_negotiation_commands);
+     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities"=
+,
 --=20
 2.21.1
 
