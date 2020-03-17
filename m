@@ -2,102 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FA4C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E522BC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FCDA2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRA0/USF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FCDA2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD6B920663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:15:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD6B920663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jED0T-0007qR-6g
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:15:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52093)
+	id 1jED0W-0007wh-Su
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:15:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1jECyE-0004cr-S7
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:32 -0400
+ (envelope-from <groug@kaod.org>) id 1jECzJ-0005vC-L9
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1jECyD-0006hL-DJ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:26 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:32809)
+ (envelope-from <groug@kaod.org>) id 1jECzH-00051f-1d
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:33 -0400
+Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:38727)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jECyD-0006fA-9G
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:13:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454404;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8a/Z2IOyUSb9V91dtDf91kJ6b5T/iwDRrUdAxIfFOL0=;
- b=hRA0/USFv9f8f+MzSeitec8Yfy28orRYe66zXcr4Z+L30Y7y6v58xVt23fsKpRx+EkS4+Q
- XqR1xYRgYCTyOED9vwbduxOaQEL6vYrblsBRGIqSNcsDJds5pxupU94Vzs+G7pFnnS7vnl
- cj8DCl++ouw10NCKtydATEd/yDnvYO4=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-kQfoNdPWOmuApM09gpoJXQ-1; Tue, 17 Mar 2020 10:13:20 -0400
-X-MC-Unique: kQfoNdPWOmuApM09gpoJXQ-1
-Received: by mail-qt1-f200.google.com with SMTP id l1so21202597qtp.10
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 07:13:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=nPavcgGBX1eR/CAge6T/JWebMF1Xn2eabWi2I2DnX0M=;
- b=EoBvleuhUyVVWH91uY8rae1r/J+70+cRqG+1xznmQRTVXomohCYgEkGrJXiO1gZhoY
- AjNr8R04O4imAcrlNxLfZ/qrRr5rAJQubbIKNdIbL83EeVN9Iw+YVlUQCFv7yyoBZldx
- DdhPtamnHkoBASGfZOVs2vCditzVbaZxleK9r6Zwzz/05ZrREjlQOwXV4NrO4OoPmQM5
- tktmB3V4wPWxTu8NBpGkpjdclh//vWER27j7LQpDIeHw5ugG5Rdx8dyjsm+fUunwlPGB
- 68elRpdVlcgtc5YOfkzs3WhYgGe+xDx+toQiLRbl0JTws0geG2uXE1XGFluEt+MbpsfS
- LJYw==
-X-Gm-Message-State: ANhLgQ0f7NtGJbrT7uALI+Ctyh6veWEaVB6iBEWr6fPdMSeiOxr8ZOF7
- aiYO6vIyUI9UcJAXbYTO/TUY17NF3EiiYbrhku0jAL8FohFej1KgjW3P/TeFJL/7+kAh7dnbzNr
- BP7LloCjCCHRia6E=
-X-Received: by 2002:a37:482:: with SMTP id 124mr4896202qke.306.1584454399800; 
- Tue, 17 Mar 2020 07:13:19 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vthi+odn2LkvaujHeZJkhnPRRo3FvA+4J++ZlHO3knQIW+lR9KFpeZ9DOPb1T5CICcGcP6rbg==
-X-Received: by 2002:a37:482:: with SMTP id 124mr4896165qke.306.1584454399395; 
- Tue, 17 Mar 2020 07:13:19 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id d185sm2072246qkf.46.2020.03.17.07.13.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 07:13:18 -0700 (PDT)
-Date: Tue, 17 Mar 2020 10:13:16 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-Message-ID: <20200317141316.GA199571@xz-x1>
-References: <20200226163618.31aa86ed.pasic@linux.ibm.com>
- <20200226115009-mutt-send-email-mst@kernel.org>
- <20200227140215.2d12149c.pasic@linux.ibm.com>
- <20200227104233-mutt-send-email-mst@kernel.org>
- <20200313134446.782c5f7c.pasic@linux.ibm.com>
- <20200313112902-mutt-send-email-mst@kernel.org>
- <20200313163122.GB95517@xz-x1>
- <20200316131723-mutt-send-email-mst@kernel.org>
- <20200316181405.GB184827@xz-x1>
- <158fbd3b-1285-e18d-b535-a1e7a9802f1f@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jECzG-0004hB-QV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:14:30 -0400
+Received: from player692.ha.ovh.net (unknown [10.108.35.211])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8555622B646
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:14:28 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player692.ha.ovh.net (Postfix) with ESMTPSA id CD55C10629FBF;
+ Tue, 17 Mar 2020 14:14:26 +0000 (UTC)
+Date: Tue, 17 Mar 2020 15:14:23 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v4 10/11] 9pfs: T_readdir latency optimization
+Message-ID: <20200317151423.14fc43d9@bahia.lan>
+In-Reply-To: <3047810.ezBau4JpT1@silver>
+References: <cover.1579567019.git.qemu_oss@crudebyte.com>
+ <2408892.h2sFNKg3ST@silver> <20200311171408.3b3a2dfa@bahia.home>
+ <3047810.ezBau4JpT1@silver>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <158fbd3b-1285-e18d-b535-a1e7a9802f1f@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+X-Ovh-Tracer-Id: 15799753393225374016
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefhedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+X-Received-From: 188.165.54.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,129 +69,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, "Singh,
- Brijesh" <brijesh.singh@amd.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 17, 2020 at 11:04:26AM +0800, Jason Wang wrote:
->=20
-> On 2020/3/17 =E4=B8=8A=E5=8D=882:14, Peter Xu wrote:
-> > On Mon, Mar 16, 2020 at 01:19:54PM -0400, Michael S. Tsirkin wrote:
-> > > On Fri, Mar 13, 2020 at 12:31:22PM -0400, Peter Xu wrote:
-> > > > On Fri, Mar 13, 2020 at 11:29:59AM -0400, Michael S. Tsirkin wrote:
-> > > > > On Fri, Mar 13, 2020 at 01:44:46PM +0100, Halil Pasic wrote:
-> > > > > > [..]
-> > > > > > > > CCing Tom. @Tom does vhost-vsock work for you with SEV and =
-current qemu?
-> > > > > > > >=20
-> > > > > > > > Also, one can specify iommu_platform=3Don on a device that =
-ain't a part of
-> > > > > > > > a secure-capable VM, just for the fun of it. And that break=
-s
-> > > > > > > > vhost-vsock. Or is setting iommu_platform=3Don only valid i=
-f
-> > > > > > > > qemu-system-s390x is protected virtualization capable?
-> > > > > > > >=20
-> > > > > > > > BTW, I don't have a strong opinion on the fixes tag. We cur=
-rently do not
-> > > > > > > > recommend setting iommu_platform, and thus I don't think we=
- care too
-> > > > > > > > much about past qemus having problems with it.
-> > > > > > > >=20
-> > > > > > > > Regards,
-> > > > > > > > Halil
-> > > > > > > Let's just say if we do have a Fixes: tag we want to set it c=
-orrectly to
-> > > > > > > the commit that needs this fix.
-> > > > > > >=20
-> > > > > > I finally did some digging regarding the performance degradatio=
-n. For
-> > > > > > s390x the performance degradation on vhost-net was introduced b=
-y commit
-> > > > > > 076a93d797 ("exec: simplify address_space_get_iotlb_entry"). Be=
-fore
-> > > > > > IOMMUTLBEntry.addr_mask used to be based on plen, which in turn=
- was
-> > > > > > calculated as the rest of the memory regions size (from address=
-), and
-> > > > > > covered most of the guest address space. That is we didn't have=
- a whole
-> > > > > > lot of IOTLB API overhead.
-> > > > > >=20
-> > > > > > With commit 076a93d797 I see IOMMUTLBEntry.addr_mask =3D=3D 0xf=
-ff which comes
-> > > > > > as ~TARGET_PAGE_MASK from flatview_do_translate(). To have thin=
-gs working
-> > > > > > properly I applied 75e5b70e6, b021d1c044, and d542800d1e on the=
- level of
-> > > > > > 076a93d797 and 076a93d797~1.
-> > > > > Peter, what's your take on this one?
-> > > > Commit 076a93d797 was one of the patchset where we want to provide
-> > > > sensible IOTLB entries and also that should start to work with huge
-> > > > pages.
-> > > So the issue bundamentally is that it
-> > > never produces entries larger than page size.
-> > >=20
-> > > Wasteful even just with huge pages, all the more
-> > > so which passthrough which could have giga-byte
-> > > entries.
-> > >=20
-> > > Want to try fixing that?
-> > Yes we can fix that, but I'm still not sure whether changing the
-> > interface of address_space_get_iotlb_entry() to cover adhoc regions is
-> > a good idea, because I think it's still a memory core API and imho it
-> > would still be good to have IOTLBs returned to be what the hardware
-> > will be using (always page aligned IOTLBs).  Also it would still be
-> > not ideal because vhost backend will still need to send the MISSING
-> > messages and block for each of the continuous guest memory ranges
-> > registered, so there will still be misterious delay.  Not to say
-> > logically all the caches can be invalidated too so in that sense I
-> > think it's as hacky as the vhost speedup patch mentioned below..
+On Wed, 11 Mar 2020 20:54:58 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
+> On Mittwoch, 11. M=C3=A4rz 2020 17:14:08 CET Greg Kurz wrote:
+> > On Wed, 11 Mar 2020 02:18:04 +0100
 > >=20
-> > Ideally I think vhost should be able to know when PT is enabled or
-> > disabled for the device, so the vhost backend (kernel or userspace)
-> > should be able to directly use GPA for DMA.  That might need some new
-> > vhost interface.
+> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > On Dienstag, 10. M=C3=A4rz 2020 19:33:36 CET Greg Kurz wrote:
+> > > > > This patch is also too big for my preference, but I don't see a v=
+iable
+> > > > > way
+> > > > > to split it further into separate patches. I already separated al=
+l the
+> > > > > patches I could. If you have suggestions, very much appreciated!
+> > > >=20
+> > > > Well, the patch could be split in two or three parts at least:
+> > > >=20
+> > > > (1) introduce the new function that reads multiple entries in codir=
+.c
+> > > >=20
+> > > > (2) use it from 9p.c
+> > > >=20
+> > > > (3) remove unused stuff if anything remains
+> > > >=20
+> > > > This doesn't seem to change much but the smaller diffstats
+> > > > for each individual patch make them less scary :) and with
+> > > > (1) applied only it is easier to compare what the old code
+> > > > in 9p.c and the new one in codir.c do.
+> > > >=20
+> > > > > The reason for this is that in order to fix these issues with cur=
+rent
+> > > > > T_readdir implementation, it requires to separate what's currentl=
+y one
+> > > > > task
+> > > > > (i.e. one function) into two separate tasks (i.e. two functions).
+> > > > > There is
+> > > > > no sensible way to do that.
+> > > >=20
+> > > > Yeah, I won't ask for finer grain.
+> > >=20
+> > > Me confused. Does that mean your split suggestion was just theoretica=
+l, or
+> > > do you need it?
+> >=20
+> > I need it and I won't ask for more splitting. Promised ! :)
 >=20
+> Okay then. :)
 >=20
-> Yes but I think we don't need another API since we can send GPA->HVA mapp=
+> > > > > Current code on master is much more tricky and error prone due to=
+ the
+> > > > > huge
+> > > > > amount of potential branches, individual error/cleanup handlers, =
+high
+> > > > > amount of thread dispatching and much more. In the patched versio=
+n all
+> > > > > these code complexities and error sources are removed.
+> > > >=20
+> > > > Come on :) The 9pfs code has been a can of worms from the beginning.
+> > > > It produced more than the average amount of security-related bugs,
+> > > > and most sadly, due to the overall lack of interest, it bitrotted
+> > > > and missed a lot of cool improvements like an appropriate support of
+> > > > unlinked files, QOM-ification of fsdev, conversion of proxy fsdev to
+> > > > vhost-user, hot plug/unplug support, live migration support and
+> > > > "much more"... The performance aspect of things is a full time job
+> > >=20
+> > > No, the performance issues are actually very managable in case of 9pf=
+s.
+> > > I already addressed readdir with this patch (by far the worst perform=
+ance
+> >=20
+> > They're very manageable if someone cares and spends time. Thanks again
+> > for doing this.
+>=20
+> Thanks!
+>=20
+> > > My intention is not to squeeze out the last fractional percent of
+> > > performance for 9pfs, but you certainly agree that a simple "ls" bloc=
+king
+> > > for more than 1 second is something that should be fixed, and fortuna=
+tely
+> > > the amount of
+> > I never observed such timeouts with my personal toy use of 9p but
+> > you did and this motivated you to step in, which is very welcome.
+>=20
+> Probably you don't notice it much because of the dirent cache on guest si=
+de.=20
+> If guest's dirent cache is cold, and you do a readdir() ("ls") on some=20
+> directory with e.g. several hundred entries, you should notice it.
+>=20
+> > > I think the cause of disagreements we have are solely our use cases of
+> > > 9pfs: your personal use case does not seem to require any performance
+> > > considerations or multi-user aspects, whereas my use case requires at
+> > > least some minimum performance grade for utilizing 9pfs for server
+> > > applications.
+> >=20
+> > Your point about the personal use case is right indeed but our
+> > disagreements, if any, aren't uniquely related to that. It's more about
+> > maintainership and available time really. I'm 100% benevolent "Odd fixe=
+r"
+> > now and I just try to avoid being forced into fixing things after my PR=
+ is
+> > merged. If you want to go faster, then you're welcome to upgrade to
+> > maintainer and send PRs. This would make sense since you care for 9p, y=
+ou
+> > showed a good understanding of the code and you provided beneficial
+> > contributions so far :)
+>=20
+> That maintainership upgrade is planned. The question is just when. What w=
+as=20
+> your idea, co-maintainership?
+>=20
+
+Basically yes.
+
+> > > > > > Oh, so we'd still have the current implementation being used, e=
+ven
+> > > > > > with this patch applied... This would be okay for a RFC patch b=
+ut
+> > > > > > in the end I'd really like to merge something that also converts
+> > > > > > v9fs_do_readdir_with_stat().
+> > > > >=20
+> > > > > Yes, I know, but I would not recommend mixing these things at this
+> > > > > point,
+> > > > > because it would be an entire effort on its own.
+> > > > >=20
+> > > > > v9fs_do_readdir_with_stat() is used for 9P2000.u, while
+> > > > > v9fs_do_readdir()
+> > > > > is used for 9P2000.L. They're behaving very differently, so it wo=
+uld
+> > > > > not
+> > > > > only require me to update v9fs_do_readdir_with_stat() and v9fs_re=
+ad(),
+> > > > > I
+> > > > > would also need to write their own test cases (plural, since ther=
+e are
+> > > > > none at all yet) and benchmarks, and of course somebody what need=
+ to
+> > > > > review all that additional amount of code, and who would actually=
+ test
+> > > > > it? I am actively testing my 9P2000.L changes, but I am not actua=
+lly
+> > > > > using 9P2000.u, so I could not guarantee for the same quality.
+> > > > >=20
+> > > > > Considering the current commitment situation regarding 9pfs, we c=
+an
+> > > > > only
+> > > > > bring things forward with compromises. Hence I suggest I concentr=
+ate
+> > > > > on
+> > > > > fixing the worst performance issues on 9P2000.L side first, and l=
+ater
+> > > > > on
+> > > > > if there are really people interested in seeing these improvement=
+s on
+> > > > > 9P2000.u side and willing to at least help out with testing, then=
+ I
+> > > > > can
+> > > > > definitely also adjust 9P2000.u side accordingly as well.
+> > > > >=20
+> > > > > But to also make this clear: this patch 10 is not introducing any
+> > > > > behaviour
+> > > > > change for 9P2000.u side.
+> > > >=20
+> > > > Ok, fair enough to leave 9p2000.U behind for now but I had to ask :)
+> > > > /me is even wondering if we should start deprecating 9p2000.U since
+> > > > most clients can use 9p2000.L now...
+> > >=20
+> > > I probably wouldn't. On macOS for instance there's only 9p2000.u. In =
+the
+> > > end
+> > Hmm... the only thing I've heard about is:
+> >=20
+> > https://github.com/benavento/mac9p
+> >=20
+> > and unless I'm missing something, this seems to only have a socket based
+> > transport... the server in QEMU is for virtio-9p and Xen 9p devices onl=
+y.
+> > Unless mac9p seriously plans to implement a driver for either of those,
+> > I'm still not convinced it is worth keeping .U around... and BTW, our
+> > deprecation policy imposes a 2 QEMU versions cooling period before
+> > actually removing the code. This would leave ample time for someone
+> > to speak up.
+>=20
+> Well, I leave that up to you. I could consider adding a transport for mac=
+OS=20
+> guests, but that's definitely not going to happen in any near future.
+>=20
+
+The whole idea behind dropping support for .U is really just about
+reducing the potential attack surface. But I'm also fine to keep
+things as is until the next CVE since I'm confident someone will
+help ;-)
+
+> > > > Not sure we're talking about the same loop here...
+> > > >=20
+> > > > I'm just suggesting that v9fs_readdir_lock() could be something lik=
+e:
+> > > >=20
+> > > > static inline void v9fs_readdir_lock(V9fsDir *dir)
+> > > > {
+> > > >=20
+> > > >     while (qemu_mutex_trylock(&dir->readdir_mutex)) {
+> > > >    =20
+> > > >         warn_report_once("blah");
+> > > >    =20
+> > > >     }
+> > > >=20
+> > > > }
+> > >=20
+> > > Ah yeah, in fact I got you wrong on this one. I thought you meant to =
+move
+> > > the lock within do_readdir_lowlat(). About your actual suggestion abo=
+ve
+> > > ...>=20
+> > > > > the loop. The normal case is not requiring a lock at all, like the
+> > > > > comment
+> > > > > describes. Doing multiple locks inside the loop unnecessaririly
+> > > > > reduces
+> > > > > performance for no reason.
+> > > > >=20
+> > > > > About *_trylock() instead of v9fs_readdir_lock(): might be a cand=
+idate
+> > > > > to
+> > > >=20
+> > > > Hmm... are you suggesting that do_readdir_lowlat() should return if=
+ it
+> > > > can't take the lock ?
+> > >=20
+> > > ... yep, that's what I had in mind for it later on. I would not mind
+> > > running trylock in a loop like you suggested; if it fails, log a warn=
 ing
-> via device IOTLB API when we find there's no DMA translation at all (eith=
-er
-> PT or no vIOMMU).
-
-Jason,
-
-Do you mean what we've worked on before?
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg00574.html
-
-(I just read the previous discussion on that patch, it seems to be
- exactly what we've discussed again...)
-
-Thanks,
-
->=20
-> Vhost doesn't need to know whether an address is an IOVA (vIOMMU) , GPA (=
-no
-> vIOMMU), or even HVA (dpdk virtio-user).
->=20
-> Thanks
->=20
->=20
+> > > and return. Because if the lock fails, then client is buggy. User can
+> > > read the warning in the logs and report the bug for client to be fixe=
+d.
+> > > Not worth to handle that case in any fancy way by server.
 > >=20
-> > For the s390's specific issue, I would think Jason's patch an simple
-> > and ideal solution already.
-> >=20
-> > Thanks,
-> >=20
+> > The locking is just a safety net because readdir(3) isn't necessarily
+> > thread safe. It was never my intention to add an error path for that.
+> > And thinking again, sending concurrent Treaddir requests on the same
+> > fid is certainly a weird thing to do but is it really a bug ?
+>=20
+> Well, I was unresolved on that issue as well, hence my decision to only l=
+eave=20
+> a TODO comment for now. My expectation would be separate fid for concurre=
+nt=20
+> readdir, but you are right of course, Treaddir (unlike its 9p2000.u=20
+> counterpart) is reentrant by design, since it has an offset parameter, so=
+ from=20
+> protocol perspective concurrent Treaddir is not per se impossible.
+>=20
+> The lock would not be noticable either with this patch, since unlike on=20
+> master, the lock is just retained on driver side now (with this patch), w=
+hich=20
+> returns very fast even on large directories, as you can see from the benc=
+hmark=20
+> output.
+>=20
+> So yes, returning from function with an error is probably not the best ch=
+oice.=20
+> My tendency is still though logging a message at least. I don't care abou=
+t=20
+> that too much though to deal with trylock() in a loop or something right =
+now.=20
+> There are more important things to take care of ATM.
 >=20
 
---=20
-Peter Xu
+Yeah, that can wait.
+
+> > > avoid similar mistakes by placing appropriate comment(s).
+> > >=20
+> > > > > > > > +                                        struct V9fsDirEnt
+> > > > > > > > **entries,
+> > > > > > > > +                                        int32_t maxsize, b=
+ool
+> > > > > > > > dostat)
+> > > > > >=20
+> > > > > > s/maxsize/max_count since this is the wording use in the caller.
+> > > > >=20
+> > > > > Wouldn't do that. This is the driver side, not the 9p protocol re=
+quest
+> > > > > handler. As you might have relized before, "max_count" is semanti=
+cally
+> > > > > completely wrong. This variable does not count integral entries, =
+it is
+> > > > > rather a maximum size (in bytes) of the destination buffer being
+> > > > > filled.
+> > > > >=20
+> > > > > On 9p request handler side it is ok to use "max_count" instead,
+> > > > > because
+> > > > > the
+> > > > > protocol definition uses exactly this term for the request parame=
+ter,
+> > > > > but
+> > > > > on driver side it's IMO inappropriate.
+> > > >=20
+> > > > I agree the max_count wording sucks and I don't care that much to
+> > > > name variables according to protocol definitions, but I do care
+> > > > to use the same name in caller/callee when it makes sense, for a
+> > > > better grep or cscope experience.
+> > >=20
+> > > So you insist on that max_count change?
+> >=20
+> > Rather the opposite. Kill max_count and make it maxsize, in a preparato=
+ry
+> > patch with the reasons you've exposed.
+>=20
+> Ah got it. OK then.
+>=20
+> Best regards,
+> Christian Schoenebeck
+>=20
+>=20
 
 
