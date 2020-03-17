@@ -2,62 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2B8C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19554C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F30CA20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D947420714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:12:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cVdESdZi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30CA20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nS+LLB7/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D947420714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9Cr-0006E0-4u
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:12:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45362)
+	id 1jE9DI-0007Sl-VS
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:12:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95l-00016e-AL
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:59 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95m-00019R-QV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95h-0002nU-Va
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:57 -0400
-Received: from ozlabs.org ([203.11.71.1]:50711)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95j-0002xF-2H
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:58 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60955 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE95h-0001uL-Fi; Tue, 17 Mar 2020 06:04:53 -0400
+ id 1jE95h-0001v9-Hx; Tue, 17 Mar 2020 06:04:54 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKw3gKlz9sSl; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
+ id 48hTKw5hLBz9sT2; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584439476;
- bh=SsCee0AU6qi7MD8E+l9wYYZMteadeXr2Ro4UYhkZybg=;
+ bh=a78LN1DHf/xUKLvhVIm9tRfpO0P/QhRCfN+jcV/NO9A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cVdESdZiVhMaOex1W6+cWmVUxiuqvRJDIProzIK7sV7kH8WvvdmknSStKKfnB3TYH
- p3iynBeJ6riX50Zt0+XM2MbIILL92jICv0qtNRpR5An8uU0z7fYGHeIKoziKpSkvXJ
- lQYFcMzs4jYFN5C73HNmqHt2EPRQM/CZYeirozzM=
+ b=nS+LLB7/iPHDKwPIsKxM5TanK4pX9DjeRoB9V7Ele/zfUj86+XY1m3srt/LtEUi2B
+ SpyfKWDDvrlzAPgPWxJI1Y2JgEWzrHk6nxm7A/BsVLfawirnUOrrE1gEOh3Pwue57x
+ Htco8lXXZaT4F/V4febCFkLgmXjMGGt9WkyfHEdY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 14/45] target/ppc: Correct RMLS table
-Date: Tue, 17 Mar 2020 21:03:52 +1100
-Message-Id: <20200317100423.622643-15-david@gibson.dropbear.id.au>
+Subject: [PULL 18/45] spapr,ppc: Simplify signature of kvmppc_rma_size()
+Date: Tue, 17 Mar 2020 21:03:56 +1100
+Message-Id: <20200317100423.622643-19-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,57 +70,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ qemu-devel@nongnu.org, groug@kaod.org, Cedric Le Goater <clg@fr.ibm.com>,
+ qemu-ppc@nongnu.org, clg@kaod.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The table of RMA limits based on the LPCR[RMLS] field is slightly wrong.
-We're missing the RMLS =3D=3D 0 =3D> 256 GiB RMA option, which is availab=
-le on
-POWER8, so add that.
+This function calculates the maximum size of the RMA as implied by the
+host's page size of structure of the VRMA (there are a number of other
+constraints on the RMA size which will supersede this one in many
+circumstances).
 
-The comment that goes with the table is much more wrong.  We *don't* filt=
-er
-invalid RMLS values when writing the LPCR, and there's not really a
-sensible way to do so.  Furthermore, while in theory the set of RMLS valu=
-es
-is implementation dependent, it seems in practice the same set has been
-available since around POWER4+ up until POWER8, the last model which
-supports RMLS at all.  So, correct that as well.
+The current interface takes the current RMA size estimate, and clamps it
+to the VRMA derived size.  The only current caller passes in an arguably
+wrong value (it will match the current RMA estimate in some but not all
+cases).
+
+We want to fix that, but for now just keep concerns separated by having t=
+he
+KVM helper function just return the VRMA derived limit, and let the calle=
+r
+combine it with other constraints.  We call the new function
+kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
+
+The helper should only ever be called in the KVM enabled case, so replace
+its !CONFIG_KVM stub with an assert() rather than a dummy value.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- target/ppc/mmu-hash64.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c       | 5 +++--
+ target/ppc/kvm.c     | 5 ++---
+ target/ppc/kvm_ppc.h | 7 +++----
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 934989e6d9..fcccaabb88 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -762,15 +762,16 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 510494ad87..18bf4bc3de 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1586,8 +1586,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *sp=
+apr)
+     spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
+=20
+     if (spapr->vrma_adjust) {
+-        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(MACHINE(spa=
+pr)),
+-                                          spapr->htab_shift);
++        hwaddr vrma_limit =3D kvmppc_vrma_limit(spapr->htab_shift);
++
++        spapr->rma_size =3D MIN(spapr_node0_size(MACHINE(spapr)), vrma_l=
+imit);
+     }
+ }
+=20
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 7f44b1aa1a..597f72be1b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2113,7 +2113,7 @@ void kvmppc_error_append_smt_possible_hint(Error *c=
+onst *errp)
+=20
+=20
+ #ifdef TARGET_PPC64
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
  {
-     CPUPPCState *env =3D &cpu->env;
-     /*
--     * This is the full 4 bits encoding of POWER8. Previous
--     * CPUs only support a subset of these but the filtering
--     * is done when writing LPCR.
-+     * In theory the meanings of RMLS values are implementation
-+     * dependent.  In practice, this seems to have been the set from
-+     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
-      *
-      * Unsupported values mean the OS has shot itself in the
-      * foot. Return a 0-sized RMA in this case, which we expect
-      * to trigger an immediate DSI or ISI
-      */
-     static const target_ulong rma_sizes[16] =3D {
-+        [0] =3D 256 * GiB,
-         [1] =3D 16 * GiB,
-         [2] =3D 1 * GiB,
-         [3] =3D 64 * MiB,
+     struct kvm_ppc_smmu_info info;
+     long rampagesize, best_page_shift;
+@@ -2140,8 +2140,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
+igned int hash_shift)
+         }
+     }
+=20
+-    return MIN(current_size,
+-               1ULL << (best_page_shift + hash_shift - 7));
++    return 1ULL << (best_page_shift + hash_shift - 7);
+ }
+ #endif
+=20
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 9e4f2357cc..332fa0aa1c 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -47,7 +47,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t =
+page_shift,
+                               int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)=
+;
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
+ bool kvmppc_has_cap_spapr_vfio(void);
+ #endif /* !CONFIG_USER_ONLY */
+ bool kvmppc_has_cap_epr(void);
+@@ -255,10 +255,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
+     return 0;
+ }
+=20
+-static inline uint64_t kvmppc_rma_size(uint64_t current_size,
+-                                       unsigned int hash_shift)
++static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
+ {
+-    return ram_size;
++    g_assert_not_reached();
+ }
+=20
+ static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
 --=20
 2.24.1
 
