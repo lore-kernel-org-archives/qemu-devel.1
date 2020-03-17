@@ -2,74 +2,154 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D73C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC414C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F37A720663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8669D20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 14:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dcy1kt5m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37A720663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2gHAAL/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8669D20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jED6x-0001aP-8F
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56045)
+	id 1jED82-0002bD-NQ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 10:23:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1jED20-0001PQ-HA
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:22 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jED7I-00024n-B6
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1jED1y-0008O0-Go
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:20 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:37234)
+ (envelope-from <jsnow@redhat.com>) id 1jED7H-0002Nq-26
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:22:48 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:38609)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1jED1y-0008Kz-Bh
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:17:18 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jED7G-0002DY-SS
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 10:22:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584454635;
+ s=mimecast20190719; t=1584454966;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wNFBpbXbFpO/qXVt2xjxYy5/DJQhb9zFt6vZXxcFoY8=;
- b=Dcy1kt5m4FOfRDeeA3BXvA9uPzRx7LeWwWmixjRq+YmtV5DyysFtKdnlN5mv+Yaf2Yz7OP
- uu+ozLXFqcDdG9D35jnueQQ40bk7E5dVkzDyU3JZFQF12mp6dRtznXuZv5aO3jP16S4UDa
- QcjS5VC4kPUjSLVQNsQNqAFjCEwbLyM=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=V/La2wCVBuN9tUdqgx/BSiPe9ju3c2dOrpe5Hs+PXo4=;
+ b=E2gHAAL/ASL6RDV4rxJJAghMY2SPN020avMNYE6wdurn7yG9U0wA8SUzHcuN5HCdXOkHrZ
+ ThC2zcwXcjUJmNMvcbOgXS9w4cdiJwZTREIlcxX+8/uS0dhzDInntk509kxZdfjbGpNnkU
+ dd/13Y5wscWgxyozZ2WoYvayGQ+Z16M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-y1Fn8mdhOXqS4iu1I9p_Og-1; Tue, 17 Mar 2020 10:17:10 -0400
-X-MC-Unique: y1Fn8mdhOXqS4iu1I9p_Og-1
+ us-mta-476-vy4Ok2EUPF6aHBo-mkierw-1; Tue, 17 Mar 2020 10:22:44 -0400
+X-MC-Unique: vy4Ok2EUPF6aHBo-mkierw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8F89107ACC9;
- Tue, 17 Mar 2020 14:17:06 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-2.rdu2.redhat.com
- [10.10.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C36E73873;
- Tue, 17 Mar 2020 14:17:05 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v10 2/3] Acceptance test: add "boot_linux" tests
-Date: Tue, 17 Mar 2020 10:16:53 -0400
-Message-Id: <20200317141654.29355-3-crosa@redhat.com>
-In-Reply-To: <20200317141654.29355-1-crosa@redhat.com>
-References: <20200317141654.29355-1-crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E2B4801E53;
+ Tue, 17 Mar 2020 14:22:42 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CDD893526;
+ Tue, 17 Mar 2020 14:22:35 +0000 (UTC)
+Subject: Re: [PATCH v2 6/7] hw/ide: Move MAX_IDE_DEVS define to
+ hw/ide/internal.h
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <cover.1584437957.git.balaton@eik.bme.hu>
+ <2abde3829a94acf0aa90942794ff0c4b03c653f4.1584437958.git.balaton@eik.bme.hu>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7a616aa2-9482-1735-8f29-1d69b7393891@redhat.com>
+Date: Tue, 17 Mar 2020 10:22:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <2abde3829a94acf0aa90942794ff0c4b03c653f4.1584437958.git.balaton@eik.bme.hu>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 63.128.21.74
@@ -84,335 +164,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This acceptance test, validates that a full blown Linux guest can
-successfully boot in QEMU.  In this specific case, the guest chosen is
-Fedora version 31.
 
- * x86_64, pc-i440fx and pc-q35 machine types, with TCG and KVM as
-   accelerators
 
- * aarch64 and virt machine type, with TCG and KVM as accelerators
+On 3/17/20 5:39 AM, BALATON Zoltan wrote:
+> We can move this define now that less files use it to internal.h to
+> further reduce dependency on hw/ide.h.
+>=20
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/hw/ide.h          | 2 --
+>  include/hw/ide/internal.h | 2 ++
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/include/hw/ide.h b/include/hw/ide.h
+> index d52c211f32..c5ce5da4f4 100644
+> --- a/include/hw/ide.h
+> +++ b/include/hw/ide.h
+> @@ -4,8 +4,6 @@
+>  #include "hw/isa/isa.h"
+>  #include "exec/memory.h"
+> =20
+> -#define MAX_IDE_DEVS=092
+> -
+>  /* ide-isa.c */
+>  ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq=
+,
+>                          DriveInfo *hd0, DriveInfo *hd1);
+> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+> index 1bc1fc73e5..55da35d768 100644
+> --- a/include/hw/ide/internal.h
+> +++ b/include/hw/ide/internal.h
+> @@ -27,6 +27,8 @@ typedef struct IDEDMAOps IDEDMAOps;
+>  #define TYPE_IDE_BUS "IDE"
+>  #define IDE_BUS(obj) OBJECT_CHECK(IDEBus, (obj), TYPE_IDE_BUS)
+> =20
+> +#define MAX_IDE_DEVS 2
+> +
+>  /* Bits of HD_STATUS */
+>  #define ERR_STAT=09=090x01
+>  #define INDEX_STAT=09=090x02
+>=20
 
- * ppc64 and pseries machine type with TCG as accelerator
+/home/jsnow/src/qemu.git/ide/hw/mips/mips_r4k.c: In function
+=E2=80=98mips_r4k_init=E2=80=99:
+/home/jsnow/src/qemu.git/ide/hw/mips/mips_r4k.c:190:33: error:
+=E2=80=98MAX_IDE_DEVS=E2=80=99 undeclared (first use in this function); did=
+ you mean
+=E2=80=98MAX_IDE_BUS=E2=80=99?
+  190 |     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+      |                                 ^~~~~~~~~~~~
+      |                                 MAX_IDE_BUS
 
- * s390x and s390-ccw-virtio machine type with TCG as accelerator
 
-The Avocado vmimage utils library is used to download and cache the
-Linux guest images, and from those images a snapshot image is created
-and given to QEMU.  If a qemu-img binary is available in the build
-directory, it's used to create the snapshot image, so that matching
-qemu-system-* and qemu-img are used in the same test run.  If qemu-img
-is not available in the build tree, one is attempted to be found
-installed system-wide (in the $PATH).  If qemu-img is not found in the
-build dir or in the $PATH, the test is canceled.
 
-The method for checking the successful boot is based on "cloudinit"
-and its "phone home" feature.  The guest is given an ISO image with
-the location of the phone home server, and the information to post
-(the instance ID).  Upon receiving the correct information, from the
-guest, the test is considered to have PASSed.
+Missed a spot.
 
-This test is currently limited to user mode networking only, and
-instructs the guest to connect to the "router" address that is hard
-coded in QEMU.
-
-To create the cloudinit ISO image that will be used to configure the
-guest, the pycdlib library is also required and has been added as
-requirement to the virtual environment created by "check-venv".
-
-The console output is read by a separate thread, by means of the
-Avocado datadrainer utility module.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- .travis.yml                    |   2 +-
- tests/acceptance/boot_linux.py | 222 +++++++++++++++++++++++++++++++++
- tests/requirements.txt         |   1 +
- 3 files changed, 224 insertions(+), 1 deletion(-)
- create mode 100644 tests/acceptance/boot_linux.py
-
-diff --git a/.travis.yml b/.travis.yml
-index b92798ac3b..c460059a7b 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -315,7 +315,7 @@ jobs:
-     - name: "GCC check-acceptance"
-       dist: bionic
-       env:
--        - CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-soft=
-mmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-sof=
-tmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86=
-_64-softmmu,xtensa-softmmu"
-+        - CONFIG=3D"--enable-tools --target-list=3Daarch64-softmmu,alpha-s=
-oftmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-so=
-ftmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sp=
-arc-softmmu,x86_64-softmmu,xtensa-softmmu"
-         - TEST_CMD=3D"make check-acceptance"
-       after_script:
-         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
-est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
-] not in ("PASS", "SKIP")]' | xargs cat
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.p=
-y
-new file mode 100644
-index 0000000000..075a386300
---- /dev/null
-+++ b/tests/acceptance/boot_linux.py
-@@ -0,0 +1,222 @@
-+# Functional test that boots a complete Linux system via a cloud image
-+#
-+# Copyright (c) 2018-2020 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+
-+from avocado_qemu import Test, BUILD_DIR
-+
-+from qemu.accel import kvm_available
-+from qemu.accel import tcg_available
-+
-+from avocado.utils import cloudinit
-+from avocado.utils import network
-+from avocado.utils import vmimage
-+from avocado.utils import datadrainer
-+from avocado.utils.path import find_command
-+
-+ACCEL_NOT_AVAILABLE_FMT =3D "%s accelerator does not seem to be available"
-+KVM_NOT_AVAILABLE =3D ACCEL_NOT_AVAILABLE_FMT % "KVM"
-+TCG_NOT_AVAILABLE =3D ACCEL_NOT_AVAILABLE_FMT % "TCG"
-+
-+
-+class BootLinux(Test):
-+    """
-+    Boots a Linux system, checking for a successful initialization
-+    """
-+
-+    timeout =3D 900
-+    chksum =3D None
-+
-+    def setUp(self):
-+        super(BootLinux, self).setUp()
-+        self.vm.add_args('-smp', '2')
-+        self.vm.add_args('-m', '1024')
-+        self.prepare_boot()
-+        self.prepare_cloudinit()
-+
-+    def prepare_boot(self):
-+        self.log.debug('Looking for and selecting a qemu-img binary to be =
-'
-+                       'used to create the bootable snapshot image')
-+        # If qemu-img has been built, use it, otherwise the system wide on=
-e
-+        # will be used.  If none is available, the test will cancel.
-+        qemu_img =3D os.path.join(BUILD_DIR, 'qemu-img')
-+        if not os.path.exists(qemu_img):
-+            qemu_img =3D find_command('qemu-img', False)
-+        if qemu_img is False:
-+            self.cancel('Could not find "qemu-img", which is required to '
-+                        'create the bootable image')
-+        vmimage.QEMU_IMG =3D qemu_img
-+
-+        self.log.info('Downloading/preparing boot image')
-+        # Fedora 31 only provides ppc64le images
-+        image_arch =3D self.arch
-+        if image_arch =3D=3D 'ppc64':
-+            image_arch =3D 'ppc64le'
-+        try:
-+            self.boot =3D vmimage.get(
-+                'fedora', arch=3Dimage_arch, version=3D'31',
-+                checksum=3Dself.chksum,
-+                algorithm=3D'sha256',
-+                cache_dir=3Dself.cache_dirs[0],
-+                snapshot_dir=3Dself.workdir)
-+            self.vm.add_args('-drive', 'file=3D%s' % self.boot.path)
-+        except:
-+            self.cancel('Failed to download/prepare boot image')
-+
-+    def prepare_cloudinit(self):
-+        self.log.info('Preparing cloudinit image')
-+        try:
-+            cloudinit_iso =3D os.path.join(self.workdir, 'cloudinit.iso')
-+            self.phone_home_port =3D network.find_free_port()
-+            cloudinit.iso(cloudinit_iso, self.name,
-+                          username=3D'root',
-+                          password=3D'password',
-+                          # QEMU's hard coded usermode router address
-+                          phone_home_host=3D'10.0.2.2',
-+                          phone_home_port=3Dself.phone_home_port)
-+            self.vm.add_args('-drive', 'file=3D%s,format=3Draw' % cloudini=
-t_iso)
-+        except Exception:
-+            self.cancel('Failed to prepared cloudinit image')
-+
-+    def launch_and_wait(self):
-+        self.vm.set_console()
-+        self.vm.launch()
-+        console_drainer =3D datadrainer.LineLogger(self.vm.console_socket.=
-fileno(),
-+                                                 logger=3Dself.log.getChil=
-d('console'))
-+        console_drainer.start()
-+        self.log.info('VM launched, waiting for boot confirmation from gue=
-st')
-+        cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), s=
-elf.name)
-+
-+
-+class BootLinuxX8664(BootLinux):
-+    """
-+    :avocado: tags=3Darch:x86_64
-+    """
-+
-+    chksum =3D 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c=
-5c27a0'
-+
-+    def test_pc_i440fx_tcg(self):
-+        """
-+        :avocado: tags=3Dmachine:pc
-+        :avocado: tags=3Daccel:tcg
-+        """
-+        if not tcg_available(self.qemu_bin):
-+            self.cancel(TCG_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "tcg")
-+        self.launch_and_wait()
-+
-+    def test_pc_i440fx_kvm(self):
-+        """
-+        :avocado: tags=3Dmachine:pc
-+        :avocado: tags=3Daccel:kvm
-+        """
-+        if not kvm_available(self.arch, self.qemu_bin):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.launch_and_wait()
-+
-+    def test_pc_q35_tcg(self):
-+        """
-+        :avocado: tags=3Dmachine:q35
-+        :avocado: tags=3Daccel:tcg
-+        """
-+        if not tcg_available(self.qemu_bin):
-+            self.cancel(TCG_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "tcg")
-+        self.launch_and_wait()
-+
-+    def test_pc_q35_kvm(self):
-+        """
-+        :avocado: tags=3Dmachine:q35
-+        :avocado: tags=3Daccel:kvm
-+        """
-+        if not kvm_available(self.arch, self.qemu_bin):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.launch_and_wait()
-+
-+
-+class BootLinuxAarch64(BootLinux):
-+    """
-+    :avocado: tags=3Darch:aarch64
-+    :avocado: tags=3Dmachine:virt
-+    :avocado: tags=3Dmachine:gic-version=3D2
-+    """
-+
-+    chksum =3D '1e18d9c0cf734940c4b5d5ec592facaed2af0ad0329383d5639c997fdf=
-16fe49'
-+
-+    def add_common_args(self):
-+        self.vm.add_args('-bios',
-+                         os.path.join(BUILD_DIR, 'pc-bios',
-+                                      'edk2-aarch64-code.fd'))
-+        self.vm.add_args('-device', 'virtio-rng-pci,rng=3Drng0')
-+        self.vm.add_args('-object', 'rng-random,id=3Drng0,filename=3D/dev/=
-urandom')
-+
-+    def test_virt_tcg(self):
-+        """
-+        :avocado: tags=3Daccel:tcg
-+        :avocado: tags=3Dcpu:max
-+        """
-+        if not tcg_available(self.qemu_bin):
-+            self.cancel(TCG_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "tcg")
-+        self.vm.add_args("-cpu", "max")
-+        self.vm.add_args("-machine", "virt,gic-version=3D2")
-+        self.add_common_args()
-+        self.launch_and_wait()
-+
-+    def test_virt_kvm(self):
-+        """
-+        :avocado: tags=3Daccel:kvm
-+        :avocado: tags=3Dcpu:host
-+        """
-+        if not kvm_available(self.arch, self.qemu_bin):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.vm.add_args("-cpu", "host")
-+        self.vm.add_args("-machine", "virt,gic-version=3D2")
-+        self.add_common_args()
-+        self.launch_and_wait()
-+
-+
-+class BootLinuxPPC64(BootLinux):
-+    """
-+    :avocado: tags=3Darch:ppc64
-+    """
-+
-+    chksum =3D '7c3528b85a3df4b2306e892199a9e1e43f991c506f2cc390dc4efa2026=
-ad2f58'
-+
-+    def test_pseries_tcg(self):
-+        """
-+        :avocado: tags=3Dmachine:pseries
-+        :avocado: tags=3Daccel:tcg
-+        """
-+        if not tcg_available(self.qemu_bin):
-+            self.cancel(TCG_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "tcg")
-+        self.launch_and_wait()
-+
-+
-+class BootLinuxS390X(BootLinux):
-+    """
-+    :avocado: tags=3Darch:s390x
-+    """
-+
-+    chksum =3D '4caaab5a434fd4d1079149a072fdc7891e354f834d355069ca982fdcaf=
-5a122d'
-+
-+    def test_s390_ccw_virtio_tcg(self):
-+        """
-+        :avocado: tags=3Dmachine:s390-ccw-virtio
-+        :avocado: tags=3Daccel:tcg
-+        """
-+        if not tcg_available(self.qemu_bin):
-+            self.cancel(TCG_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "tcg")
-+        self.launch_and_wait()
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index f4f1736a08..f9c84b4ba1 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -2,3 +2,4 @@
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
- avocado-framework=3D=3D76.0
-+pycdlib=3D=3D1.9.0
---=20
-2.25.1
+--js
 
 
