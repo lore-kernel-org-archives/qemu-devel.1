@@ -2,87 +2,87 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7896CC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 06:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AF5C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43FF8205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 06:53:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FA5F20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 07:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ChJ0EHVd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43FF8205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoKeJ786"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FA5F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE66d-0005u6-F1
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 02:53:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41456)
+	id 1jE6O1-000217-KL
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 03:11:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jE65p-0005VH-9h
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 02:52:51 -0400
+ (envelope-from <bharatb.linux@gmail.com>) id 1jE6NJ-0001Bj-It
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jE65o-0001aB-47
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 02:52:49 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:44758)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jE65o-0001Vd-07
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 02:52:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584427967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+zgTkWP2hWotAc7GXxdgXXTnozeU1J5/d+pKG54xiYE=;
- b=ChJ0EHVd7Kit7TBrzdtqySZU+aLiUWTh7U7E/8SFev1395dez4ZZGw6Wo8LyJoRfuJfmKx
- gKXklBKyrhYbDskUXbnCF6qEjPrIsbl0ciGpa/RIO5uy71QW8yjgbnEhQ55Nua+6nI49Lw
- MRWu+g6mxedFAA3yswkAEJrzEqzFinY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-HyTpti-3MpOG4pgCLjnQhA-1; Tue, 17 Mar 2020 02:52:43 -0400
-X-MC-Unique: HyTpti-3MpOG4pgCLjnQhA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8493B107ACC4;
- Tue, 17 Mar 2020 06:52:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 329B35D9C9;
- Tue, 17 Mar 2020 06:52:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B69051138404; Tue, 17 Mar 2020 07:52:40 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Subject: Re: [PATCH v3 24/34] qapi: Replace qmp_dispatch()'s TODO comment by
- an explanation
-References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-25-armbru@redhat.com>
- <CAJ+F1CLGr7HYp3kAfjGXgPwxcGAyaPOmkN3+7s_oV-XHVdOVPw@mail.gmail.com>
-Date: Tue, 17 Mar 2020 07:52:40 +0100
-In-Reply-To: <CAJ+F1CLGr7HYp3kAfjGXgPwxcGAyaPOmkN3+7s_oV-XHVdOVPw@mail.gmail.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 16 Mar 2020
- 18:36:13 +0100")
-Message-ID: <87wo7jtqvb.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <bharatb.linux@gmail.com>) id 1jE6NI-0006n9-9W
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 03:10:53 -0400
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:43580)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bharatb.linux@gmail.com>)
+ id 1jE6NI-0006k9-55; Tue, 17 Mar 2020 03:10:52 -0400
+Received: by mail-qt1-x841.google.com with SMTP id l13so16545393qtv.10;
+ Tue, 17 Mar 2020 00:10:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/mcB+5zeRW8vpPjLibt/ORo0JBWyAeoH2anb6aQF1pA=;
+ b=BoKeJ786Qd79JsV5Nzqd6vT3j7PP+tzKX9V4Lnn97NGHrf6F14RGeL7eVDJEJQb78J
+ agwtOy24rDMSrR0prMM2WOWTJlMM5H7tTBSpRRr/bdgeysn0hB6MqcZbw7/zZlRFZQ5T
+ b2uMP0fAuSMrVWULmVwDhMF6i5hN/jVkU5/afJR+goVQopRZ1pHbZwUmMOZaGGYl+5pA
+ 7ZxsJQ7MuIUmiyJpjRQ/e0XGeTHxsGW5aoerOJ4mkgQNDYfok1Ln2Sob41WnQufSJDnx
+ MUJd7urv/m5ZwwMSFoYMv/3rEsm/S0GD9QjUVJBV71fxF3UbxXlT77HsrCMn+NIqqPDX
+ hJTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/mcB+5zeRW8vpPjLibt/ORo0JBWyAeoH2anb6aQF1pA=;
+ b=phbwInfWCOHNFQ9imT9fX4MabRmb84xPySmLRJZ1GRw2w3rZ8bPP0XeX//o/yh6/HO
+ Dufl59dnLWWoByeSzWBSX/EMrWK0G5rA9zb7R2QhPBD2sSCRNfJjI9Cjoa7oBBN6VZLV
+ 7Ng3KF1vsGkWJHQKSZEKOeQZr7WrQbLcZcHN7fTOen0TB6mcbGC++wzh+2GQXfW6xW9Z
+ X/WJhT8StdxHhFRB8jHh5z9ge16Vk/NCtoxLWB0TIP9Odf9uDSMRccZVq3CnTKSFG/oN
+ 8gtFHCAsE69/pWrTmbmOVIovaaKfrxl9KODnD0WVUVCb3KOOVRGz140GuC4swDnTvwja
+ aziQ==
+X-Gm-Message-State: ANhLgQ0gj1p4Rfo6ZVzuF2op8gRa3DVSkQGMTjCWio8iEFj4HjTFvWDV
+ JZlretnZX7pVBh7SK3CALxYPe5N1slWzE0t3s5s=
+X-Google-Smtp-Source: ADFU+vuHfPx9Atur8Wv1AGpW91SiZiadJNyFWmI2+IWxXI00rexQLNZOQtDDTm8jF5GjE1iADLvd6+7P+5vgY1ZFOxk=
+X-Received: by 2002:ac8:4a08:: with SMTP id x8mr3788320qtq.32.1584429051198;
+ Tue, 17 Mar 2020 00:10:51 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+References: <20200313074811.27175-1-bbhushan2@marvell.com>
+ <20200313074811.27175-4-bbhushan2@marvell.com>
+ <da0a4d7b-c27d-839d-56b6-da67c94adeb7@redhat.com>
+ <CAAeCc_m=PKV0T8DmaE06F9NMYfU792f9TDdoyKkaPaEN3597ag@mail.gmail.com>
+ <9b4ab5e8-8848-50ba-17c8-652567483126@redhat.com>
+ <CAAeCc_ksAdoNJcFWkoB4YcySAb5Hw7D+kLyHx-Nt0hZJY17AXA@mail.gmail.com>
+ <CAAeCc_nnM-DGCyXjFJuk-6L8F+Oetq076SEjeV8kUAGxfJVQTw@mail.gmail.com>
+ <cc447790-d1c5-784b-9706-fbcd76f0c94b@redhat.com>
+ <CAAeCc_mSobL4oGcK-J3WJJq8BCS6M_oyPTrzJ9bk8yFgsUDBUw@mail.gmail.com>
+ <20200316101124.GA304669@myrica>
+In-Reply-To: <20200316101124.GA304669@myrica>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Tue, 17 Mar 2020 12:40:39 +0530
+Message-ID: <CAAeCc_kJq_TjbZxf3Un5rpwBrNrz-8gdL_SMS-gP_0=rARf0WQ@mail.gmail.com>
+Subject: Re: [PATCH v7 3/5] virtio-iommu: Call iommu notifier for attach/detach
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,55 +94,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ mst@redhat.com, drjones@redhat.com, peterx@redhat.com, qemu-devel@nongnu.org,
+ Auger Eric <eric.auger@redhat.com>, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, Bharat Bhushan <bbhushan2@marvell.com>,
+ linuc.decode@gmail.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Hi Jean,
 
-> Hi
+On Mon, Mar 16, 2020 at 3:41 PM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
 >
-> On Sun, Mar 15, 2020 at 3:48 PM Markus Armbruster <armbru@redhat.com> wro=
-te:
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  qapi/qmp-dispatch.c | 6 +++++-
->>  1 file changed, 5 insertions(+), 1 deletion(-)
->>
->> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
->> index 112d29a9ab..fb53687ce9 100644
->> --- a/qapi/qmp-dispatch.c
->> +++ b/qapi/qmp-dispatch.c
->> @@ -164,7 +164,11 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *=
-request,
->>          g_assert(!ret);
->>          return NULL;
->>      } else if (!ret) {
->> -        /* TODO turn into assertion */
->> +        /*
->> +         * When the command's schema has no 'returns', cmd->fn()
->> +         * leaves @ret null.  The QMP spec calls for an the empty
+> Hi Bharat,
 >
-> "for an"
+> Could you Cc me on your next posting?  Unfortunately I don't have much
+> hardware for testing this at the moment, but I might be able to help a
+> little on the review.
+>
+> On Mon, Mar 16, 2020 at 02:40:00PM +0530, Bharat Bhushan wrote:
+> > > >>> First issue is: your guest can use 4K page and your host can use 64KB
+> > > >>> pages. In that case VFIO_DMA_MAP will fail with -EINVAL. We must devise
+> > > >>> a way to pass the host settings to the VIRTIO-IOMMU device.
+> > > >>>
+> > > >>> Even with 64KB pages, it did not work for me. I have obviously not the
+> > > >>> storm of VFIO_DMA_MAP failures but I have some, most probably due to
+> > > >>> some wrong notifications somewhere. I will try to investigate on my side.
+> > > >>>
+> > > >>> Did you test with VFIO on your side?
+> > > >>
+> > > >> I did not tried with different page sizes, only tested with 4K page size.
+> > > >>
+> > > >> Yes it works, I tested with two n/w device assigned to VM, both interfaces works
+> > > >>
+> > > >> First I will try with 64k page size.
+> > > >
+> > > > 64K page size does not work for me as well,
+> > > >
+> > > > I think we are not passing correct page_size_mask here
+> > > > (config.page_size_mask is set to TARGET_PAGE_MASK ( which is
+> > > > 0xfffffffffffff000))
+> > > I guess you mean with guest using 4K and host using 64K.
+> > > >
+> > > > We need to set this correctly as per host page size, correct?
+> > > Yes that's correct. We need to put in place a control path to retrieve
+> > > the page settings on host through VFIO to inform the virtio-iommu device.
+> > >
+> > > Besides this issue, did you try with 64kB on host and guest?
+> >
+> > I tried Followings
+> >   - 4k host and 4k guest  - it works with v7 version
+> >   - 64k host and 64k guest - it does not work with v7
+> >     hard-coded config.page_size_mask to 0xffffffffffff0000 and it works
+>
+> You might get this from the iova_pgsize bitmap returned by
+> VFIO_IOMMU_GET_INFO. The virtio config.page_size_mask is global so there
+> is the usual problem of aggregating consistent properties, but I'm
+> guessing using the host page size as a granule here is safe enough.
+>
+> If it is a problem, we can add a PROBE property for page size mask,
+> allowing to define per-endpoint page masks. I have kernel patches
+> somewhere to do just that.
 
-Fixing, thanks!
+I do not see we need page size mask per endpoint.
 
-> Can we assert that the command's schema has no 'returns' in this case?
+While I am trying to understand what "page-size-mask" guest will work with
 
-Feels impractical.  Enforcing "no returns when success-response is
-false" is the QAPI schema frontend's job anyway.  That's a separate
-patch.  I can put it on my to-do list.
+- 4K page size host and 4k page size guest
+  config.page_size_mask = 0xffffffffffff000 will work
 
->> +         * object then; supply it.
->> +         */
->>          ret =3D QOBJECT(qdict_new());
->>      }
->>
->> --
->> 2.21.1
->>
->>
+- 64K page size host and 64k page size guest
+  config.page_size_mask = 0xfffffffffff0000 will work
 
+- 64K page size host and 4k page size guest
+   1) config.page_size_mask = 0xffffffffffff000 will also not work as
+VFIO in host expect iova and size to be aligned to 64k (PAGE_SIZE in
+host)
+   2) config.page_size_mask = 0xfffffffffff0000 will not work, iova
+initialization (in guest) expect minimum page-size supported by h/w to
+be equal to 4k (PAGE_SIZE in guest)
+       Should we look to relax this in iova allocation code?
+
+Thanks
+-Bharat
+
+
+>
+> Thanks,
+> Jean
 
