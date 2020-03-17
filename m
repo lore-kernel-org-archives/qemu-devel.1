@@ -2,58 +2,62 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD225C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CA1C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DB6A20738
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:58:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB6A20738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64BE620724
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64BE620724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEFXi-0003iq-Oo
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47331)
+	id 1jEFYI-0004mY-GG
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:58:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFLo-00081Z-Jd
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:45:58 -0400
+ (envelope-from <groug@kaod.org>) id 1jEFXE-0003GY-Sg
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEFLn-00079M-5w
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:45:56 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:43173)
+ (envelope-from <groug@kaod.org>) id 1jEFXD-0001Ck-H5
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:57:44 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:41147)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jEFLl-0005Cr-I1; Tue, 17 Mar 2020 12:45:55 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08612438|-1; CH=blue; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.0163901-8.12421e-05-0.983529;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03312; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H1.IPM._1584463541; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H1.IPM._1584463541)
- by smtp.aliyun-inc.com(10.147.42.22); Wed, 18 Mar 2020 00:45:41 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v6 49/61] target/riscv: vector mask-register logical
- instructions
-Date: Tue, 17 Mar 2020 23:06:41 +0800
-Message-Id: <20200317150653.9008-50-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1jEFXD-0000fz-8B
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:57:43 -0400
+Received: from player159.ha.ovh.net (unknown [10.110.103.177])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id A899C1B5B75
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 17:57:40 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player159.ha.ovh.net (Postfix) with ESMTPSA id F3B5910815BC9;
+ Tue, 17 Mar 2020 16:57:30 +0000 (UTC)
+Date: Tue, 17 Mar 2020 17:57:24 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 4/5] ppc/spapr: Don't kill the guest if a recovered
+ FWNMI machine check delivery fails
+Message-ID: <20200317175724.711884d5@bahia.lan>
+In-Reply-To: <20200317050215.159334-5-npiggin@gmail.com>
+References: <20200317050215.159334-1-npiggin@gmail.com>
+ <20200317050215.159334-5-npiggin@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 109212294222617027
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrudefhedgledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhduheelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.253.128
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,144 +69,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Aravinda Prasad <arawinda.p@gmail.com>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Mahesh Salgaonkar <mahesh@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@fr.ibm.com>,
+ Ganesh Goudar <ganeshgr@linux.ibm.com>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   |  9 ++++++
- target/riscv/insn32.decode              |  8 +++++
- target/riscv/insn_trans/trans_rvv.inc.c | 28 +++++++++++++++++
- target/riscv/vector_helper.c            | 41 +++++++++++++++++++++++++
- 4 files changed, 86 insertions(+)
+On Tue, 17 Mar 2020 15:02:14 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 15569223cb..116c14f40f 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1082,3 +1082,12 @@ DEF_HELPER_6(vfredmin_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
- 
- DEF_HELPER_6(vfwredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vfwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_6(vmand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnand_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmandnot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmornot_mm, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vmxnor_mm, void, ptr, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 526a964d28..a4128c26a0 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -545,6 +545,14 @@ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
- vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
- # Vector widening ordered and unordered float reduction sum
- vfwredsum_vs    1100-1 . ..... ..... 001 ..... 1010111 @r_vm
-+vmand_mm        011001 - ..... ..... 010 ..... 1010111 @r
-+vmnand_mm       011101 - ..... ..... 010 ..... 1010111 @r
-+vmandnot_mm     011000 - ..... ..... 010 ..... 1010111 @r
-+vmxor_mm        011011 - ..... ..... 010 ..... 1010111 @r
-+vmor_mm         011010 - ..... ..... 010 ..... 1010111 @r
-+vmnor_mm        011110 - ..... ..... 010 ..... 1010111 @r
-+vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
-+vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
- 
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index fd927f0959..620a73d741 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2189,3 +2189,31 @@ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
- 
- /* Vector Widening Floating-Point Reduction Instructions */
- GEN_OPFVV_WIDEN_TRANS(vfwredsum_vs, reduction_check)
-+
-+/*
-+ *** Vector Mask Operations
-+ */
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_MM_TRANS(NAME)                                         \
-+static bool trans_##NAME(DisasContext *s, arg_r *a)                \
-+{                                                                  \
-+    if (vext_check_isa_ill(s)) {                              \
-+        uint32_t data = 0;                                         \
-+        gen_helper_gvec_4_ptr *fn = gen_helper_##NAME;             \
-+        data = FIELD_DP32(data, VDATA, MLEN, s->mlen);             \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        tcg_gen_gvec_4_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+            vreg_ofs(s, a->rs1), vreg_ofs(s, a->rs2),              \
-+            cpu_env, 0, s->vlen / 8, data, fn);                    \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+GEN_MM_TRANS(vmand_mm)
-+GEN_MM_TRANS(vmnand_mm)
-+GEN_MM_TRANS(vmandnot_mm)
-+GEN_MM_TRANS(vmxor_mm)
-+GEN_MM_TRANS(vmor_mm)
-+GEN_MM_TRANS(vmnor_mm)
-+GEN_MM_TRANS(vmornot_mm)
-+GEN_MM_TRANS(vmxnor_mm)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 57532959fb..7157ad49ea 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4470,3 +4470,44 @@ void HELPER(vfwredsum_vs_w)(void *vd, void *v0, void *vs1,
-     *((uint64_t *)vd) = s1;
-     clearq(vd, 1, sizeof(uint64_t), tot);
- }
-+
-+/*
-+ *** Vector Mask Operations
-+ */
-+/* Vector Mask-Register Logical Instructions */
-+#define GEN_VEXT_MASK_VV(NAME, OP)                        \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
-+        void *vs2, CPURISCVState *env, uint32_t desc)     \
-+{                                                         \
-+    uint32_t mlen = vext_mlen(desc);                      \
-+    uint32_t vlmax = env_archcpu(env)->cfg.vlen / mlen;   \
-+    uint32_t vl = env->vl;                                \
-+    uint32_t i;                                           \
-+    int a, b;                                             \
-+                                                          \
-+    if (vl == 0) {                                        \
-+        return;                                           \
-+    }                                                     \
-+    for (i = 0; i < vl; i++) {                            \
-+        a = vext_elem_mask(vs1, mlen, i);                 \
-+        b = vext_elem_mask(vs2, mlen, i);                 \
-+        vext_set_elem_mask(vd, mlen, i, OP(b, a));        \
-+    }                                                     \
-+    for (; i < vlmax; i++) {                              \
-+        vext_set_elem_mask(vd, mlen, i, 0);               \
-+    }                                                     \
-+}
-+#define DO_NAND(N, M)  (!(N & M))
-+#define DO_ANDNOT(N, M)  (N & !M)
-+#define DO_NOR(N, M)  (!(N | M))
-+#define DO_ORNOT(N, M)  (N | !M)
-+#define DO_XNOR(N, M)  (!(N ^ M))
-+
-+GEN_VEXT_MASK_VV(vmand_mm, DO_AND)
-+GEN_VEXT_MASK_VV(vmnand_mm, DO_NAND)
-+GEN_VEXT_MASK_VV(vmandnot_mm, DO_ANDNOT)
-+GEN_VEXT_MASK_VV(vmxor_mm, DO_XOR)
-+GEN_VEXT_MASK_VV(vmor_mm, DO_OR)
-+GEN_VEXT_MASK_VV(vmnor_mm, DO_NOR)
-+GEN_VEXT_MASK_VV(vmornot_mm, DO_ORNOT)
-+GEN_VEXT_MASK_VV(vmxnor_mm, DO_XNOR)
--- 
-2.23.0
+> Try to be tolerant of errors if the machine check had been recovered
+> by the host.
+> 
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+
+Same comment as previous patch on multi-line error strings and
+warn_report() in the !recovered case.
+
+>  hw/ppc/spapr_events.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index d35151eeb0..3f524cb0ca 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -807,13 +807,20 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>      /* get rtas addr from fdt */
+>      rtas_addr = spapr_get_rtas_addr();
+>      if (!rtas_addr) {
+> -        warn_report("FWNMI: Unable to deliver machine check to guest: "
+> -                    "rtas_addr not found.");
+> -        qemu_system_guest_panicked(NULL);
+> +        if (!recovered) {
+> +            warn_report("FWNMI: Unable to deliver machine check to guest: "
+> +                        "rtas_addr not found.");
+> +            qemu_system_guest_panicked(NULL);
+> +        } else {
+> +            warn_report("FWNMI: Unable to deliver machine check to guest: "
+> +                        "rtas_addr not found. Machine check recovered.");
+> +        }
+>          g_free(ext_elog);
+>          return;
+>      }
+>  
+> +    spapr->fwnmi_machine_check_interlock = cpu->vcpu_id;
+> +
+
+I don't understand this change.
+
+>      stq_be_phys(&address_space_memory, rtas_addr + RTAS_ERROR_LOG_OFFSET,
+>                  env->gpr[3]);
+>      cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET +
+> @@ -850,9 +857,14 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>           * that CPU called "ibm,nmi-interlock")
+>           */
+>          if (spapr->fwnmi_machine_check_interlock == cpu->vcpu_id) {
+> -            warn_report("FWNMI: Unable to deliver machine check to guest: "
+> -                        "nested machine check.");
+> -            qemu_system_guest_panicked(NULL);
+> +            if (!recovered) {
+> +                warn_report("FWNMI: Unable to deliver machine check to guest: "
+> +                            "nested machine check.");
+> +                qemu_system_guest_panicked(NULL);
+> +            } else {
+> +                warn_report("FWNMI: Unable to deliver machine check to guest: "
+> +                            "nested machine check. Machine check recovered.");
+> +            }
+>              return;
+>          }
+>          qemu_cond_wait_iothread(&spapr->fwnmi_machine_check_interlock_cond);
+> @@ -880,7 +892,6 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>          warn_report("Received a fwnmi while migration was in progress");
+>      }
+>  
+> -    spapr->fwnmi_machine_check_interlock = cpu->vcpu_id;
+>      spapr_mce_dispatch_elog(cpu, recovered);
+>  }
+>  
 
 
