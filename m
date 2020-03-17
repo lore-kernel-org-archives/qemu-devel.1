@@ -2,93 +2,156 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB876C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D30BC1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:23:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7025320674
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 566DC20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y3TrbQ4w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7025320674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeJnBsTR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566DC20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jELXB-0004Rv-Hg
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49281)
+	id 1jELY7-00060i-HR
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:23:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1jELWD-0003rf-Sy
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:06 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jELWx-0004U2-FV
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1jELWC-0008Cz-CQ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:05 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:42871)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1jELWC-00081B-3e
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:04 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id v11so28013744wrm.9
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 16:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=qRJwUi782ziwDz0/bJ43zB3CXhs6p3juE1se1OxLBSo=;
- b=y3TrbQ4w6bJDcGcSKLofCVZjYTdeDFAk5D6PtAUQvKt7wCJKAtWhvbv4B6dnZ4Z/ZI
- ZRBKthLYPiwl4ruYS5hhJL3d5nv3wisJXSpgmYQO0q08DLoCf97JrvI7gk5AaCUtRj1w
- i5srKhuTV5I8rOj1vjjT6dSOrc6QO37Q2YXPPP5UpfOUDBOupeuRkForXCy5+stw2wUh
- 5w9on9T7OQHpPA/okqhwcuZ+0+RTUfYDp34Z8TQo6jnG1Ce4u0vpV4Fc6TRZNcbzxuHs
- 0Vo7g3Z6qEiivqf3EnrZS/vWM46ZsVP8OuC68ONhSGmdNuqZvwmo0tQfJWKkf27tbNFQ
- ZrcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=qRJwUi782ziwDz0/bJ43zB3CXhs6p3juE1se1OxLBSo=;
- b=VfiG7FPcqt68l2cJg9aD0cAMHI2Yx8fOHjIj14HHSHPYoszxXfi3JZ/N6+nPM8s2bX
- vuxWcjmfXLbacNZSyjlpEAC2uHCXqAvZvzyBfrnpAWEAQPh0Pp5O+CwHCj3bd4hSwMek
- txWi9bo1MqEESKm0GRJ/lg5vVtjTVN1PAfUEPfmEsCNRb1x3EjJW2b1xnYt9VlNiVKgs
- 7XIJwD+YxrSUWGfNnOOaEr//Opd177jp9pE6IT2yb6DNTc4h/Tx8u0Hj20QdNVx2usrf
- uMYSoi9kUFzWEECCKEcboPg9dV1nnL1hxZ2PF1/BteJPQrpgS3H2t5Pi0otAL7KkE4pk
- k4xw==
-X-Gm-Message-State: ANhLgQ04FStReUL8Yzye+qR0CL1cAo9uv+2/qEIn+xPGgLJiDwVpLsmw
- XBIhDDID/1ZjrAIA1IaM1ztaDg==
-X-Google-Smtp-Source: ADFU+vu3S7MJI8+bUai/xFmxxwE0I7pmXPz35PhHobzzxFdoSeE0HaozvVuKyDEFsLxO46/K5+2eiQ==
-X-Received: by 2002:adf:d4ce:: with SMTP id w14mr1420850wrk.101.1584487262374; 
- Tue, 17 Mar 2020 16:21:02 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y5sm1204170wmi.34.2020.03.17.16.21.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 16:21:00 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 12F4B1FF7E;
- Tue, 17 Mar 2020 23:21:00 +0000 (GMT)
-References: <20200312104142.21259-1-alex.bennee@linaro.org>
- <20200312104913.GB4089516@redhat.com>
- <CAJ+F1CJWy2gEHHjzqyqnvHFf6EP4mEGABLt4aA7xptkXDwPGiw@mail.gmail.com>
- <20200316103331.GC1528804@redhat.com>
- <20200317095414.GC492272@stefanha-x1.localdomain>
- <20200317184704.GG3369@work-vm>
-User-agent: mu4e 1.3.10; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH] tools/virtiofsd: add support for --socket-group
-In-reply-to: <20200317184704.GG3369@work-vm>
-Date: Tue, 17 Mar 2020 23:21:00 +0000
-Message-ID: <87a74ek1pf.fsf@linaro.org>
+ (envelope-from <jsnow@redhat.com>) id 1jELWv-00040m-S7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35574)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jELWv-0003wN-LM
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:21:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584487308;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=hWd/hXDGKUF5XG5CNnoI5ouoxDaCfHV5ukMSPrZIPYs=;
+ b=PeJnBsTR526TH7mD0VOikGliDuh1S769alTHlxlzzr8X3ijUr1gz/10CMPnyErx9MkK2D1
+ v4dTaYjliB09dRYXm67FTBkJ88U4hpdMj9c/s41jiKcWSbBsqYXBABMhV9h0EKOetACkYa
+ XOltmhtQwofns0yXmDF6crQFenZYEmg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-JVoJT3RMM5O2qp35vNqtNA-1; Tue, 17 Mar 2020 19:21:45 -0400
+X-MC-Unique: JVoJT3RMM5O2qp35vNqtNA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB6DDDB20;
+ Tue, 17 Mar 2020 23:21:41 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3ED111001DC0;
+ Tue, 17 Mar 2020 23:21:36 +0000 (UTC)
+Subject: Re: [PATCH v3 0/8] Misc hw/ide legacy clean up
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <cover.1584457537.git.balaton@eik.bme.hu>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <bd1de8e9-3a61-d747-ef7b-1441ac3a8ac3@redhat.com>
+Date: Tue, 17 Mar 2020 19:21:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <cover.1584457537.git.balaton@eik.bme.hu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,72 +163,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang?= =?utf-8?Q?=C3=A9?= <berrange@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Dr. David Alan Gilbert <dgilbert@redhat.com> writes:
 
-> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
->> On Mon, Mar 16, 2020 at 10:33:31AM +0000, Daniel P. Berrang=C3=A9 wrote:
->> > On Sat, Mar 14, 2020 at 02:33:25PM +0100, Marc-Andr=C3=A9 Lureau wrote:
->> > > Hi
->> > >=20
->> > > On Thu, Mar 12, 2020 at 11:49 AM Daniel P. Berrang=C3=A9 <berrange@r=
-edhat.com> wrote:
->> > > >
->> > > > On Thu, Mar 12, 2020 at 10:41:42AM +0000, Alex Benn=C3=A9e wrote:
->> > > > > If you like running QEMU as a normal user (very common for TCG r=
-uns)
->> > > > > but you have to run virtiofsd as a root user you run into connec=
-tion
->> > > > > problems. Adding support for an optional --socket-group allows t=
-he
->> > > > > users to keep using the command line.
->> > > >
->> > > > If we're going to support this, then I think we need to put it in
->> > > > the vhost-user.rst specification so we standardize across backends.
->> > > >
->> > > >
->> > >=20
->> > > Perhaps. Otoh, I wonder if the backend spec should be more limited to
->> > > arguments/introspection that are used by programs.
->> > >=20
->> > > In this case, I even consider --socket-path to be unnecessary, as a
->> > > management layer can/should provide a preopened & setup fd directly.
->> > >=20
->> > > What do you think?
->> >=20
->> > I think there's value in standardization even if it is an option targe=
-tted
->> > at human admins, rather than machine usage. You are right though that
->> > something like libvirt would never use --socket-group, or --socket-pat=
-h.
->> > Even admins would benefit if all programs followed the same naming for
->> > these.  We could document such options as "SHOULD" rather than "MUST"
->> > IOW, we don't mandate --socket-group, but if you're going to provide a
->> > way to control socket group, this option should be used.
->>=20
->> I agree.  It's still useful to have a convention that most vhost-user
->> backend programs follow.
->
-> Alex:
->   Can you add the doc entry that Stefan and Marc-Andr=C3=A9 are asking
-> for;  it's probably good they go together.
+On 3/17/20 11:05 AM, BALATON Zoltan wrote:
+> Avoid problems from reassigning variable in piix4_create and fix
+> compilation problem with mips_r4k
+> 
+> BALATON Zoltan (8):
+>   hw/ide: Get rid of piix3_init functions
+>   hw/isa/piix4.c: Introduce variable to store devfn
+>   hw/ide: Get rid of piix4_init function
+>   hw/ide: Remove now unneded #include "hw/pci/pci.h" from hw/ide.h
+>   hw/ide/pci.c: Coding style update to fix checkpatch errors
+>   hw/ide: Do ide_drive_get() within pci_ide_create_devs()
+>   hw/ide: Move MAX_IDE_DEVS define to hw/ide/internal.h
+>   hw/ide: Remove unneeded inclusion of hw/ide.h
+> 
+>  hw/alpha/dp264.c              | 13 +++----------
+>  hw/hppa/hppa_sys.h            |  1 -
+>  hw/hppa/machine.c             |  1 -
+>  hw/i386/pc_piix.c             | 18 +++++++++---------
+>  hw/ide/ahci_internal.h        |  1 +
+>  hw/ide/pci.c                  | 11 +++++++----
+>  hw/ide/piix.c                 | 31 +------------------------------
+>  hw/isa/piix4.c                | 23 ++++++++++-------------
+>  hw/mips/mips_fulong2e.c       |  5 +----
+>  hw/mips/mips_malta.c          |  2 +-
+>  hw/mips/mips_r4k.c            |  1 +
+>  hw/ppc/mac_newworld.c         |  1 -
+>  hw/ppc/mac_oldworld.c         |  1 -
+>  hw/ppc/prep.c                 |  1 -
+>  hw/sparc64/sun4u.c            |  6 +-----
+>  include/hw/ide.h              |  6 ------
+>  include/hw/ide/internal.h     |  2 ++
+>  include/hw/ide/pci.h          |  3 ++-
+>  include/hw/misc/macio/macio.h |  1 +
+>  include/hw/southbridge/piix.h |  3 +--
+>  20 files changed, 41 insertions(+), 90 deletions(-)
+> 
 
-Sure - is docs/interop/vhost-user.rst the master spec for vhost-user
-daemons?
+Thanks, applied to my IDE tree:
 
->
-> Dave
->
->> Stefan
+https://github.com/jnsnow/qemu/commits/ide
+https://github.com/jnsnow/qemu.git
 
+--js
 
---=20
-Alex Benn=C3=A9e
 
