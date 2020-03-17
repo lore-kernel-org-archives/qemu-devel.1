@@ -2,74 +2,87 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DB2C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54069C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:43:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E913E20409
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:42:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E913E20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F2A920409
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:43:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gk9RPjrN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F2A920409
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEJ2b-000391-2l
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59789)
+	id 1jEJ3U-0004Hh-AQ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:43:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1jEJ1D-0001do-FP
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1jEJ1Q-00024m-UO
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1jEJ1C-0005oQ-59
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1jEJ1B-0005ar-Uf
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:40:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jEJ1A-0006aq-8Q
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 20:40:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3EC172E80C8
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 20:40:52 +0000 (UTC)
+ (envelope-from <armbru@redhat.com>) id 1jEJ1P-0007fl-PU
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:41:08 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:33624)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEJ1P-0007e1-Ll
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:41:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584477667;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3K7CwCTzobN5Hk3+7i0TSXzKcxTnndVZTZETwtuo4Zs=;
+ b=Gk9RPjrNIu6no9fN+aDjW55r2iQ2EdSI4nW76ZrIq6cE0KfCs515/k2f6ZSnJLhrDFL+oa
+ /Ixq8pyvwx6YjUfbdaAk5Rpz/h0xzPmxsg1XK5D+N2tFZN3rCU9asqyyP/q3THEzR5Vtdt
+ f4Gqq19Da4caA7UoLFWPKfvb4r88m10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-yfHe3B74M4KaDIXNQO0Awg-1; Tue, 17 Mar 2020 16:41:03 -0400
+X-MC-Unique: yfHe3B74M4KaDIXNQO0Awg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD3B1107ACCA;
+ Tue, 17 Mar 2020 20:41:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
+ [10.36.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86C6019C58;
+ Tue, 17 Mar 2020 20:41:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id ED1F21138404; Tue, 17 Mar 2020 21:40:59 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v4 25/34] qapi: New special feature flag "deprecated"
+References: <20200317115459.31821-1-armbru@redhat.com>
+ <20200317115459.31821-26-armbru@redhat.com>
+ <f26a00be-62a8-ffe9-9f0a-2dfb8e638b8a@redhat.com>
+Date: Tue, 17 Mar 2020 21:40:59 +0100
+In-Reply-To: <f26a00be-62a8-ffe9-9f0a-2dfb8e638b8a@redhat.com> (Eric Blake's
+ message of "Tue, 17 Mar 2020 15:32:30 -0500")
+Message-ID: <87tv2miujo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Mar 2020 20:35:26 -0000
-From: carlosedp <carlosedp@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: carlosedp laurent-vivier
-X-Launchpad-Bug-Reporter: carlosedp (carlosedp)
-X-Launchpad-Bug-Modifier: carlosedp (carlosedp)
-References: <158445595923.20060.16174990100496488911.malonedeb@wampee.canonical.com>
-Message-Id: <158447732650.11338.4872950680078287954.malone@soybean.canonical.com>
-Subject: [Bug 1867786] Re: Qemu PPC64 freezes with multi-core CPU
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="3a6db24bbe7280ec09bae73384238390fcc98ad3";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 52d85593e3b1ec00a70bd44a8f34b68e0c0679d9
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,72 +91,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1867786 <1867786@bugs.launchpad.net>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just reverted to 4.2.0 and it works fine. No freezes for the past
-hour.
+Eric Blake <eblake@redhat.com> writes:
 
-=E2=9D=AF qemu-system-ppc64 --version
-QEMU emulator version 4.2.0
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+> On 3/17/20 6:54 AM, Markus Armbruster wrote:
+>> Unlike regular feature flags, the new special feature flag
+>> "deprecated" is recognized by the QAPI generator.  For now, it's only
+>> permitted with commands, events, and struct members.  It will be put
+>> to use shortly.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>> +++ b/docs/devel/qapi-code-gen.txt
+>> @@ -683,6 +683,12 @@ Intended use is to have each feature string signal =
+that this build of
+>>   QEMU shows a certain behaviour.
+>>     +=3D=3D=3D=3D Special features =3D=3D=3D=3D
+>> +
+>> +Feature "deprecated" makes a command, event, or struct member as
+>> +deprecated.  It is not supported elsewhere so far.
+>
+> Reads awkwardly, but I can't tell if it was a typo or an extra
+> word. Either "makes a command, event, or struct member deprecated" or
+> "marks a command, event, or struct member as deprecated".
 
-Couldn't bisect to find the bad commit.
+I typoed the latter.  Will fix!
 
-Carlos
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- =
+Thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1867786
-
-Title:
-  Qemu PPC64 freezes with multi-core CPU
-
-Status in QEMU:
-  New
-
-Bug description:
-  I installed Debian 10 on a Qemu PPC64 VM running with the following
-  flags:
-
-  qemu-system-ppc64 \
-       -nographic -nodefaults -monitor pty -serial stdio \
-       -M pseries -cpu POWER9 -smp cores=3D4,threads=3D1 -m 4G \
-       -drive file=3Ddebian-ppc64el-qemu.qcow2,format=3Dqcow2,if=3Dvirtio \
-       -netdev user,id=3Dnetwork01,$ports -device rtl8139,netdev=3Dnetwork0=
-1 \
-
-  =
-
-  Within a couple minutes on any operation (could be a Go application or si=
-mply changing the hostname with hostnamectl, the VM freezes and prints this=
- on the console:
-
-  ```
-  root@debian:~# [  950.428255] rcu: INFO: rcu_sched self-detected stall on=
- CPU
-  [  950.428453] rcu:     3-....: (5318 ticks this GP) idle=3D8e2/1/0x40000=
-00000000004 softirq=3D5957/5960 fqs=3D2544
-  [  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! [zsh:462]
-
-  Message from syslogd@debian at Mar 17 11:35:24 ...
-   kernel:[  976.244481] watchdog: BUG: soft lockup - CPU#3 stuck for 23s! =
-[zsh:462]
-  [  980.110018] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tas=
-ks: { 3-... } 5276 jiffies s: 93 root: 0x8/.
-  [  980.111177] rcu: blocking rcu_node structures:
-  [ 1013.442268] rcu: INFO: rcu_sched self-detected stall on CPU
-  [ 1013.442365] rcu:     3-....: (21071 ticks this GP) idle=3D8e2/1/0x4000=
-000000000004 softirq=3D5957/5960 fqs=3D9342
-  ```
-
-  If I change to 1 core on the command line, I haven't seen these
-  freezes.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1867786/+subscriptions
 
