@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF74C5ACBF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 08:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30303C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 08:49:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F9F4205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 08:42:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F9F4205ED
+	by mail.kernel.org (Postfix) with ESMTPS id F3F9620719
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 08:49:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F9620719
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE7oF-000729-JR
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 04:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42887)
+	id 1jE7uR-0001Is-75
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 04:49:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE7nU-0006de-V9
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:42:02 -0400
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE7td-0000sy-K6
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:48:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE7nT-0000BM-Q5
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:42:00 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:37949)
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1jE7tc-0005fN-Fb
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:48:21 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:34385)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1jE7nT-00006J-M0
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:41:59 -0400
-Received: by mail-ot1-f68.google.com with SMTP id t28so18150672ott.5
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 01:41:59 -0700 (PDT)
+ id 1jE7tc-0005bp-Ai
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 04:48:20 -0400
+Received: by mail-ot1-f66.google.com with SMTP id j16so20798029otl.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 01:48:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8KAPg4bTos1rY9vws0C/xCO+F9oh55hyP0CnonU852I=;
- b=g5uOC8sw/Z0RvLGOEnkVvpk3qIFpOZO37vgxryIyUanw0m8QSjoI8EnMjGglh5UUnV
- av85BpkbY53lcyYoLm51NtBzxx/CuxGOn0v/LxMWuUcbiS+Z3tBsI/mCBto7P3H96mno
- mxFI98zZUzh0lhghvJpuVcfcYgNEXPnrA0mjy/p3SgHpHsO9i8506vwEUye+tVeyN9PY
- aVaeK2Jo8xQk2Yj0P6xZchJWKP0uFwixUPXIGfco8LkbeVRB8U11njkBNzLC0wSQ1zKR
- hBemY1lc4NZvY4IGdaaEvePdVuzoR+uuOX6w3gizff2pRs5X+/YMcbXZkNOWMrxRB3sR
- 6wVA==
-X-Gm-Message-State: ANhLgQ2fUVfVHOGdij2aL04JDCMsJ7cqUMeQrqBpnRKsh/sKRVfBtK94
- N1beCqJA3FFSdc3GWMz8tN/xR/T7+ZmMCICfRpA=
-X-Google-Smtp-Source: ADFU+vvJp0nv92HoVayJxMdw/lQoVKJfhGofeOWGjeWQZ4VsyHP2OYzQFJDW/aLh70OIkdl5GYBag7ZinGzuIjBpa74=
-X-Received: by 2002:a9d:8d0:: with SMTP id 74mr2800645otf.39.1584434518599;
- Tue, 17 Mar 2020 01:41:58 -0700 (PDT)
+ bh=TF9ZPq6K3m7hthYQMxgsfrxGm1XjgIE20ka3eMWPfOI=;
+ b=nMIUgiefu8x1cILWpPflZh6tHuk4mcHWTLaIAV05OVbo2owp9EucNHqGExq1iD3hit
+ U7AiaebyAJnYIqhjn/E4/8l4IgaDKOclLtReG3ne0edg4Vrubdxo6u/rUvOitSGeyskC
+ wbMcnCV9OG5DabfRifuJEqAOmeC7SQhHtvKYnvMVX++Whx0AEaMjcFWHIrqOyPlN6Dv2
+ XXfNQbWp5aMAdyQF2Nx2pQACICglDQF+QlPt74+CHk3TbLHurvbyqsicOI3iezAFL7W2
+ OdYvjrkQdkRxT7srHpBfCBCcFnwB0rovyinlPIzOavkb6nx4Guud2q1S4RClQN/tajv4
+ ibAg==
+X-Gm-Message-State: ANhLgQ3YlPfek6nFjGGHXNCGaNgIUQ4LCLwrXgaLwLXVhJeakvpcOx7F
+ jj7+amMyDCbyKEni7ggS/PDdDoD2tHJw4O2KSJ4=
+X-Google-Smtp-Source: ADFU+vvY8Z0ef/19Mtjmqmv34pha/3636uxkMdzDg1Xxss7VCZaBeH5oruI+jGiAKjqfKhyWlQxYBTSwLqHEgrCeU/s=
+X-Received: by 2002:a9d:5c0c:: with SMTP id o12mr2783773otk.145.1584434899513; 
+ Tue, 17 Mar 2020 01:48:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200218151812.7816-1-geert+renesas@glider.be>
- <20200218151812.7816-2-geert+renesas@glider.be>
- <CACRpkdZGKB9opaOFT8Yz-tfE9vcCVeF9EvvBi7jWWuAAh3C_FA@mail.gmail.com>
-In-Reply-To: <CACRpkdZGKB9opaOFT8Yz-tfE9vcCVeF9EvvBi7jWWuAAh3C_FA@mail.gmail.com>
+ <20200218151812.7816-3-geert+renesas@glider.be>
+ <CACRpkda1JAnC=Feb39GeKEEP6q8Qwpsth6J+4OKj6A8S3YAUyQ@mail.gmail.com>
+In-Reply-To: <CACRpkda1JAnC=Feb39GeKEEP6q8Qwpsth6J+4OKj6A8S3YAUyQ@mail.gmail.com>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 17 Mar 2020 09:41:47 +0100
-Message-ID: <CAMuHMdVM=F_p0L24shstWbQSur7JJ6irVBiugxxqKsky0hxdAg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] gpiolib: Add support for gpiochipN-based table
- lookup
+Date: Tue, 17 Mar 2020 09:48:08 +0100
+Message-ID: <CAMuHMdVwbGNOWk+MK-XZSrSMY3nNnn0sfJ0UZFXaZgQh-tQDZw@mail.gmail.com>
+Subject: Re: [PATCH v5 2/5] gpiolib: Add support for GPIO line table lookup
 To: Linus Walleij <linus.walleij@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.68
+X-Received-From: 209.85.210.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,33 +96,43 @@ Sender: "Qemu-devel"
 
 Hi Linus,
 
-On Thu, Mar 12, 2020 at 3:23 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+On Thu, Mar 12, 2020 at 3:21 PM Linus Walleij <linus.walleij@linaro.org> wrote:
 > On Tue, Feb 18, 2020 at 4:18 PM Geert Uytterhoeven
 > <geert+renesas@glider.be> wrote:
->
-> > Currently GPIO controllers can only be referred to by label in GPIO
-> > lookup tables.
+> > Currently GPIOs can only be referred to by GPIO controller and offset in
+> > GPIO lookup tables.
 > >
-> > Add support for looking them up by "gpiochipN" name, with "N" the
-> > corresponding GPIO device's ID number.
+> > Add support for looking them up by line name.
+> > Rename gpiod_lookup.chip_label to gpiod_lookup.key, to make it clear
+> > that this field can have two meanings, and update the kerneldoc and
+> > GPIO_LOOKUP*() macros.
 > >
 > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > > Reviewed-by: Ulrich Hecht <uli+renesas@fpond.eu>
 > > Reviewed-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 > > Tested-by: Eugeniu Rosca <erosca@de.adit-jv.com>
 >
-> Just like with patch 2/5 I have the same problem here that
-> the commit message doesn't state the technical reason why
-> we need to change this and support the device name in these
-> tables and not just labels.
+> I will try to understand why this change is necessary to implement
+> the gpio aggregator (probablt I will comment that on the other
+> patches like "aha now I see it" or so, but it would help a lot if the
+> commit message
+> would state the technical reason to why we need to do this change,
+> like what it is that you want to do and why you cannot do it without
+> this change.
 
-As these "gpiochipN" names are not stable, I will drop this patch, and
-the related support.
+It's very simple: how do you want the user to refer to a specific GPIO
+line? Currently he can only do so by gpiochip label and index.
+However, there exists another stable reference: the (optional) line name,
+which can be attached using "gpio-line-names" in DT or ACPI.
+As this is the most use-centric way to refer to a GPIO, it makes sense
+to support lookup based on that, too.
+
+Will reword to make this clearer.
+
 
 Gr{oetje,eeting}s,
 
                         Geert
-
 
 --
 Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
