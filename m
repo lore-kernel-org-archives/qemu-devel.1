@@ -4,66 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2373DC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7EEC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED17C20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:56:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED17C20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 629DC20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629DC20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEa9-0006Rl-W2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:56:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37012)
+	id 1jEEab-0007fg-GV
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jEEVL-0004nt-5X
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:47 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEEPQ-0002Cn-8W
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jEEVJ-0007El-8s
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:43 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:35129)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEVI-000790-Q4
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:41 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MtwQk-1jYwAz1bHY-00uIMC; Tue, 17 Mar 2020 16:51:25 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 03/37] linux-user/i386: Emulate x86_64 vsyscalls
-Date: Tue, 17 Mar 2020 16:50:42 +0100
-Message-Id: <20200317155116.1227513-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200317155116.1227513-1-laurent@vivier.eu>
-References: <20200317155116.1227513-1-laurent@vivier.eu>
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEEPL-0008UH-I8
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:45:34 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45731)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEEPF-0008HF-Jc; Tue, 17 Mar 2020 11:45:29 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08562487|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_system_inform|0.0508488-0.00050273-0.948649;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=10; RT=10; SR=0; TI=SMTPD_---.H1-Aq38_1584459917; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H1-Aq38_1584459917)
+ by smtp.aliyun-inc.com(10.147.42.197);
+ Tue, 17 Mar 2020 23:45:18 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 19/61] target/riscv: vector integer divide instructions
+Date: Tue, 17 Mar 2020 23:06:11 +0800
+Message-Id: <20200317150653.9008-20-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:DisN5QYBYT8eockwvbUcXgNGzPf6AdrGQRK32k0reebOjW2gdeA
- x6n8k1RUr8G0HPWq2HK4EKeG+nWCfVXG9uw9F9f1RgbFV/Hso4F5hwqotf6KFuXm76XS5Ew
- CGxw0ZZcTeCQjTonO7w1vF4E7MdM+y7bKNuUCmWtWHl3GHGQlKQBaH9qYbXi+d0gev102fY
- JJLHNuyfVG5lYZq2LrwcQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7gu1KM9ArR4=:aFIDNMVxLSntpsgLRg1feU
- 8/gZG7oPcGkWGUz+ezelScIn+volkCP5xwpnmKlBR3H4Ry7QA6drZ8UlRF5sN6xzfYs+IG/y8
- Ns5rWOb5IxjE0rvAgCeB83gL9wxrbcUQspcgC0ZADHKhx3aECuIrySP0MZHy7jbGHJ6R0wbaM
- YPAJkcbtc/CiRWnIU/PjbdEWotpAFNYjzXxT1QuKDWgaq3sKJB1soeSXJ6zSf0+cCZ3B6yjqO
- L9op5xLLzaHP83sIOQdeKlOuklygDYWxrTUOH3uQkoXFkm1/FFouerRadnNO49YqHRrjehmeP
- TqaIMmCFTH8cP8laomi4r2kXx/MuPapSwDAr+hXWQmxwmBqC5py117Ab9Is8Rcj16i5tbaVcc
- oMS7xER/snBOTguhV62V78lFhm+M6UV5rePoN2UnI60T8y6qfhUa62NEusNfUK+7mGpdnrhkF
- 7zBKLvlK7oJRzjd8kh+HnK6a3GpYJ6WKY4CHWIo8ye5dyITr5OQFv1zTjuKWR6rXfjK0umxYh
- G1fs7ryjak608kTHG9kxAHfCJs7j/uSTEmjSdjpVRkeoK0+4LEEmjx3vjoEla3r7fJ3AdX5GB
- mjQFBFnOM0OQbD48URp2Kb7Tr3W97YnGPeAPtpWCF+nFeCbOn6Lh36E292G5/JP6LlP3VEoWV
- GbLPeie+qc5040byRTVsyI/U/b88K015AgSIam1xxGnehuR5NqL18NnsGBbfzcWlrZkn+xtTQ
- 5zh7HI45nYqxLpZxdMMQ62fgWaeLT0jeTUgW8OeSbi6DXLOyENnFuheYGfeJ4g+uyylREoepr
- OE9k3X9Mv7hMW2z1tHm9lv3Ne2vHMAP85zUTGKDX/I/0V2fnY2vpevqTa+CNEauin22Yq9I
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,204 +65,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-Notice the magic page during translate, much like we already
-do for the arm32 commpage.  At runtime, raise an exception to
-return cpu_loop for emulation.
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200213032223.14643-4-richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/i386/cpu_loop.c | 108 +++++++++++++++++++++++++++++++++++++
- target/i386/cpu.h          |   7 +++
- target/i386/translate.c    |  14 ++++-
- 3 files changed, 128 insertions(+), 1 deletion(-)
+ target/riscv/helper.h                   | 33 +++++++++++
+ target/riscv/insn32.decode              |  8 +++
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
+ target/riscv/vector_helper.c            | 74 +++++++++++++++++++++++++
+ 4 files changed, 125 insertions(+)
 
-diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
-index e217cca5ee1e..70cde417e605 100644
---- a/linux-user/i386/cpu_loop.c
-+++ b/linux-user/i386/cpu_loop.c
-@@ -92,6 +92,109 @@ static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
-     queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
- }
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index f42a12eef3..357f149198 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -558,3 +558,36 @@ DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++
++DEF_HELPER_6(vdivu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdivu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdivu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdivu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdiv_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vremu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vremu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vremu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vremu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrem_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrem_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrem_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vrem_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vdivu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdivu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdivu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdivu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdiv_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdiv_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdiv_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vdiv_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vremu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vremu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vremu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vremu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrem_vx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrem_vx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrem_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vrem_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index abfed469bc..7fb8f8fad8 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -371,6 +371,14 @@ vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
+ vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
+ vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
+ vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
++vdivu_vv        100000 . ..... ..... 010 ..... 1010111 @r_vm
++vdivu_vx        100000 . ..... ..... 110 ..... 1010111 @r_vm
++vdiv_vv         100001 . ..... ..... 010 ..... 1010111 @r_vm
++vdiv_vx         100001 . ..... ..... 110 ..... 1010111 @r_vm
++vremu_vv        100010 . ..... ..... 010 ..... 1010111 @r_vm
++vremu_vx        100010 . ..... ..... 110 ..... 1010111 @r_vm
++vrem_vv         100011 . ..... ..... 010 ..... 1010111 @r_vm
++vrem_vx         100011 . ..... ..... 110 ..... 1010111 @r_vm
  
-+#ifdef TARGET_X86_64
-+static bool write_ok_or_segv(CPUX86State *env, abi_ptr addr, size_t len)
-+{
-+    /*
-+     * For all the vsyscalls, NULL means "don't write anything" not
-+     * "write it at address 0".
-+     */
-+    if (addr == 0 || access_ok(VERIFY_WRITE, addr, len)) {
-+        return true;
-+    }
+ vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
+ vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index c276beabd6..ed53eaaef5 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1462,3 +1462,13 @@ GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
+ GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
+ GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
 +
-+    env->error_code = PG_ERROR_W_MASK | PG_ERROR_U_MASK;
-+    gen_signal(env, TARGET_SIGSEGV, TARGET_SEGV_MAPERR, addr);
-+    return false;
-+}
++/* Vector Integer Divide Instructions */
++GEN_OPIVV_TRANS(vdivu_vv, opivv_check)
++GEN_OPIVV_TRANS(vdiv_vv, opivv_check)
++GEN_OPIVV_TRANS(vremu_vv, opivv_check)
++GEN_OPIVV_TRANS(vrem_vv, opivv_check)
++GEN_OPIVX_TRANS(vdivu_vx, opivx_check)
++GEN_OPIVX_TRANS(vdiv_vx, opivx_check)
++GEN_OPIVX_TRANS(vremu_vx, opivx_check)
++GEN_OPIVX_TRANS(vrem_vx, opivx_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 56ba9a7422..4fc7a08954 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -1741,3 +1741,77 @@ GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
+ GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
 +
-+/*
-+ * Since v3.1, the kernel traps and emulates the vsyscall page.
-+ * Entry points other than the official generate SIGSEGV.
-+ */
-+static void emulate_vsyscall(CPUX86State *env)
-+{
-+    int syscall;
-+    abi_ulong ret;
-+    uint64_t caller;
++/* Vector Integer Divide Instructions */
++#define DO_DIVU(N, M) (unlikely(M == 0) ? (__typeof(N))(-1) : N / M)
++#define DO_REMU(N, M) (unlikely(M == 0) ? N : N % M)
++#define DO_DIV(N, M)  (unlikely(M == 0) ? (__typeof(N))(-1) :\
++        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? N : N / M)
++#define DO_REM(N, M)  (unlikely(M == 0) ? N :\
++        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? 0 : N % M)
 +
-+    /*
-+     * Validate the entry point.  We have already validated the page
-+     * during translation to get here; now verify the offset.
-+     */
-+    switch (env->eip & ~TARGET_PAGE_MASK) {
-+    case 0x000:
-+        syscall = TARGET_NR_gettimeofday;
-+        break;
-+    case 0x400:
-+        syscall = TARGET_NR_time;
-+        break;
-+    case 0x800:
-+        syscall = TARGET_NR_getcpu;
-+        break;
-+    default:
-+        goto sigsegv;
-+    }
++RVVCALL(OPIVV2, vdivu_vv_b, OP_UUU_B, H1, H1, H1, DO_DIVU)
++RVVCALL(OPIVV2, vdivu_vv_h, OP_UUU_H, H2, H2, H2, DO_DIVU)
++RVVCALL(OPIVV2, vdivu_vv_w, OP_UUU_W, H4, H4, H4, DO_DIVU)
++RVVCALL(OPIVV2, vdivu_vv_d, OP_UUU_D, H8, H8, H8, DO_DIVU)
++RVVCALL(OPIVV2, vdiv_vv_b, OP_SSS_B, H1, H1, H1, DO_DIV)
++RVVCALL(OPIVV2, vdiv_vv_h, OP_SSS_H, H2, H2, H2, DO_DIV)
++RVVCALL(OPIVV2, vdiv_vv_w, OP_SSS_W, H4, H4, H4, DO_DIV)
++RVVCALL(OPIVV2, vdiv_vv_d, OP_SSS_D, H8, H8, H8, DO_DIV)
++RVVCALL(OPIVV2, vremu_vv_b, OP_UUU_B, H1, H1, H1, DO_REMU)
++RVVCALL(OPIVV2, vremu_vv_h, OP_UUU_H, H2, H2, H2, DO_REMU)
++RVVCALL(OPIVV2, vremu_vv_w, OP_UUU_W, H4, H4, H4, DO_REMU)
++RVVCALL(OPIVV2, vremu_vv_d, OP_UUU_D, H8, H8, H8, DO_REMU)
++RVVCALL(OPIVV2, vrem_vv_b, OP_SSS_B, H1, H1, H1, DO_REM)
++RVVCALL(OPIVV2, vrem_vv_h, OP_SSS_H, H2, H2, H2, DO_REM)
++RVVCALL(OPIVV2, vrem_vv_w, OP_SSS_W, H4, H4, H4, DO_REM)
++RVVCALL(OPIVV2, vrem_vv_d, OP_SSS_D, H8, H8, H8, DO_REM)
++GEN_VEXT_VV(vdivu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vdivu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vdivu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vdivu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vdiv_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vdiv_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vdiv_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vdiv_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vremu_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vremu_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vremu_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vremu_vv_d, 8, 8, clearq)
++GEN_VEXT_VV(vrem_vv_b, 1, 1, clearb)
++GEN_VEXT_VV(vrem_vv_h, 2, 2, clearh)
++GEN_VEXT_VV(vrem_vv_w, 4, 4, clearl)
++GEN_VEXT_VV(vrem_vv_d, 8, 8, clearq)
 +
-+    /*
-+     * Validate the return address.
-+     * Note that the kernel treats this the same as an invalid entry point.
-+     */
-+    if (get_user_u64(caller, env->regs[R_ESP])) {
-+        goto sigsegv;
-+    }
-+
-+    /*
-+     * Validate the the pointer arguments.
-+     */
-+    switch (syscall) {
-+    case TARGET_NR_gettimeofday:
-+        if (!write_ok_or_segv(env, env->regs[R_EDI],
-+                              sizeof(struct target_timeval)) ||
-+            !write_ok_or_segv(env, env->regs[R_ESI],
-+                              sizeof(struct target_timezone))) {
-+            return;
-+        }
-+        break;
-+    case TARGET_NR_time:
-+        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(abi_long))) {
-+            return;
-+        }
-+        break;
-+    case TARGET_NR_getcpu:
-+        if (!write_ok_or_segv(env, env->regs[R_EDI], sizeof(uint32_t)) ||
-+            !write_ok_or_segv(env, env->regs[R_ESI], sizeof(uint32_t))) {
-+            return;
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    /*
-+     * Perform the syscall.  None of the vsyscalls should need restarting.
-+     */
-+    ret = do_syscall(env, syscall, env->regs[R_EDI], env->regs[R_ESI],
-+                     env->regs[R_EDX], env->regs[10], env->regs[8],
-+                     env->regs[9], 0, 0);
-+    g_assert(ret != -TARGET_ERESTARTSYS);
-+    g_assert(ret != -TARGET_QEMU_ESIGRETURN);
-+    if (ret == -TARGET_EFAULT) {
-+        goto sigsegv;
-+    }
-+    env->regs[R_EAX] = ret;
-+
-+    /* Emulate a ret instruction to leave the vsyscall page.  */
-+    env->eip = caller;
-+    env->regs[R_ESP] += 8;
-+    return;
-+
-+ sigsegv:
-+    /* Like force_sig(SIGSEGV).  */
-+    gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
-+}
-+#endif
-+
- void cpu_loop(CPUX86State *env)
- {
-     CPUState *cs = env_cpu(env);
-@@ -141,6 +244,11 @@ void cpu_loop(CPUX86State *env)
-                 env->regs[R_EAX] = ret;
-             }
-             break;
-+#endif
-+#ifdef TARGET_X86_64
-+        case EXCP_VSYSCALL:
-+            emulate_vsyscall(env);
-+            break;
- #endif
-         case EXCP0B_NOSEG:
-         case EXCP0C_STACK:
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 08b4422f36bd..39be555db3da 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1001,6 +1001,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- 
- #define EXCP_VMEXIT     0x100 /* only for system emulation */
- #define EXCP_SYSCALL    0x101 /* only for user emulation */
-+#define EXCP_VSYSCALL   0x102 /* only for user emulation */
- 
- /* i386-specific interrupt pending bits.  */
- #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
-@@ -2215,4 +2216,10 @@ static inline bool hyperv_feat_enabled(X86CPU *cpu, int feat)
-     return !!(cpu->hyperv_features & BIT(feat));
- }
- 
-+#if defined(TARGET_X86_64) && \
-+    defined(CONFIG_USER_ONLY) && \
-+    defined(CONFIG_LINUX)
-+# define TARGET_VSYSCALL_PAGE  (UINT64_C(-10) << 20)
-+#endif
-+
- #endif /* I386_CPU_H */
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index d9af8f4078b3..5e5dbb41b0ce 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8555,7 +8555,19 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
- static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
--    target_ulong pc_next = disas_insn(dc, cpu);
-+    target_ulong pc_next;
-+
-+#ifdef TARGET_VSYSCALL_PAGE
-+    /*
-+     * Detect entry into the vsyscall page and invoke the syscall.
-+     */
-+    if ((dc->base.pc_next & TARGET_PAGE_MASK) == TARGET_VSYSCALL_PAGE) {
-+        gen_exception(dc, EXCP_VSYSCALL, dc->base.pc_next);
-+        return;
-+    }
-+#endif
-+
-+    pc_next = disas_insn(dc, cpu);
- 
-     if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
-         /* if single step mode, we generate only one instruction and
++RVVCALL(OPIVX2, vdivu_vx_b, OP_UUU_B, H1, H1, DO_DIVU)
++RVVCALL(OPIVX2, vdivu_vx_h, OP_UUU_H, H2, H2, DO_DIVU)
++RVVCALL(OPIVX2, vdivu_vx_w, OP_UUU_W, H4, H4, DO_DIVU)
++RVVCALL(OPIVX2, vdivu_vx_d, OP_UUU_D, H8, H8, DO_DIVU)
++RVVCALL(OPIVX2, vdiv_vx_b, OP_SSS_B, H1, H1, DO_DIV)
++RVVCALL(OPIVX2, vdiv_vx_h, OP_SSS_H, H2, H2, DO_DIV)
++RVVCALL(OPIVX2, vdiv_vx_w, OP_SSS_W, H4, H4, DO_DIV)
++RVVCALL(OPIVX2, vdiv_vx_d, OP_SSS_D, H8, H8, DO_DIV)
++RVVCALL(OPIVX2, vremu_vx_b, OP_UUU_B, H1, H1, DO_REMU)
++RVVCALL(OPIVX2, vremu_vx_h, OP_UUU_H, H2, H2, DO_REMU)
++RVVCALL(OPIVX2, vremu_vx_w, OP_UUU_W, H4, H4, DO_REMU)
++RVVCALL(OPIVX2, vremu_vx_d, OP_UUU_D, H8, H8, DO_REMU)
++RVVCALL(OPIVX2, vrem_vx_b, OP_SSS_B, H1, H1, DO_REM)
++RVVCALL(OPIVX2, vrem_vx_h, OP_SSS_H, H2, H2, DO_REM)
++RVVCALL(OPIVX2, vrem_vx_w, OP_SSS_W, H4, H4, DO_REM)
++RVVCALL(OPIVX2, vrem_vx_d, OP_SSS_D, H8, H8, DO_REM)
++GEN_VEXT_VX(vdivu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vdivu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vdivu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vdivu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vdiv_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vdiv_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vdiv_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vdiv_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vremu_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vremu_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vremu_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vremu_vx_d, 8, 8, clearq)
++GEN_VEXT_VX(vrem_vx_b, 1, 1, clearb)
++GEN_VEXT_VX(vrem_vx_h, 2, 2, clearh)
++GEN_VEXT_VX(vrem_vx_w, 4, 4, clearl)
++GEN_VEXT_VX(vrem_vx_d, 8, 8, clearq)
 -- 
-2.24.1
+2.23.0
 
 
