@@ -2,118 +2,74 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B21EC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF02AC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:30:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F08DC2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81C5A206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:30:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EnZH2f3c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F08DC2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aK5OBkgn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81C5A206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEE9d-0004l5-1o
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:29:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33204)
+	id 1jEEAb-0005dF-Hn
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:30:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxl-0002pE-8v
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:02 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1jEE0a-0006t3-5H
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1jEDxj-0001aM-Hk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:17:01 -0400
-Received: from mail-he1eur04on0718.outbound.protection.outlook.com
- ([2a01:111:f400:fe0d::718]:38692
- helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jEDxj-0001CE-8o
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:16:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GUzaMurbVJCHONIutn6FVg1CKOst52OOCOhQ4RBmKUv5bEU7sLWTzJu2z033eliUNEc388RZPBN5zJ0rhEJMsLPoINqu8PCv4G7PI3CkcE5vLaoG5Ge6JmSQ0VWfRE/9DlmRT3FNBkh4UqoSQkg2t2Jclb5Liere2jDLmIAQf3Kp8Exoj3hXVM2hrYRTbBFmzcUGy7E+Xxj3ktAj1KmuR07mVQd1yPqSWDqZv5qeibfZRQiGdnLZbEEGhkYrAa+u+ejTFfnpBE7u/2WgKetngPaUbkNwBfb6/0yfIv40c7c5FWIU/I8nMOpqnycDlW0fY7b+eov4DMYInHAT+Si9sQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3j106k9EKlyYw31jk7ZgZGTNbLs/5KHn4gp9c3MACwY=;
- b=EZbzPJoWONsMgRl7KeReAzjlx79eRnGrWJI09WyWNKOTC2IRnhBbcge2/Q4pBy7FCiJ31d7Bp8GAYebIi3sEAjv5/pPtLw1zagiqJ7hlX95qcxxhwV7sYyrwjrmedY0Obdizl6uwkZ+XX8zF5Cw9xXSzho5i+Mwbfxevd/bF99DKQPRFOyupu46qoAicvt3yCMQbBkpUI8TvSFFCE1VOT8T1zHZMJRUwRxfFkwLms5paSuFhGDSMer3bkID2bgva7VpoXSKcNYu58moX/mbypNJB5zPnSISispCqXnNuJqcktIv1W93fK4tgKtctPvxjnLM9ePEqOiLsmdJbMq0SHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3j106k9EKlyYw31jk7ZgZGTNbLs/5KHn4gp9c3MACwY=;
- b=EnZH2f3cF4gLBA8RKYluF2zLrHo/DzeS/mJjdOC7foqoKMEYbR7QBNX/MFFDkUkvdHRhfTV5qDdukw502DyeLWWyZdMl2lnjKXJPP0sPE47J0eWqN4WcPwHHTGsSLr6hAZRG7JJtLd6dr/qV9npmHOla77MLMZ0GT7epdpesM3w=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com (10.175.35.136) by
- HE1PR0802MB2620.eurprd08.prod.outlook.com (10.175.36.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2814.21; Tue, 17 Mar 2020 15:16:58 +0000
-Received: from HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f]) by HE1PR0802MB2507.eurprd08.prod.outlook.com
- ([fe80::4d32:e4e1:5b9f:240f%12]) with mapi id 15.20.2814.021; Tue, 17 Mar
- 2020 15:16:58 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+ (envelope-from <pbonzini@redhat.com>) id 1jEE0Y-0006B5-3o
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:19:56 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:49126)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1jEE0X-00067R-T7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:19:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584458393;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=28lZqcCxlwqh008YT0L91ByjTUAIlioPkjcFBN3wVcY=;
+ b=aK5OBkgnghOzobSLqM4E7L2zdEKZ8sp13wd0DHA/nO+uz/cHbhoqCgitkq3lKO4csXEsSR
+ B6OBhp0bcmmOZa0++s3eAlnfcS+LrLX6rozfV0L3LuagZ9lsBzfLuIJ8/Vx1pgz5Z5DeUi
+ L7sRpsWHQy6KPHxw4LxjWCmlXs2vmqQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-nt42XhiAMk-Dj6PhbxnDBw-1; Tue, 17 Mar 2020 11:19:50 -0400
+X-MC-Unique: nt42XhiAMk-Dj6PhbxnDBw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A127800D53
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:19:49 +0000 (UTC)
+Received: from 640k.localdomain.com (unknown [10.36.110.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 56FA36E3EE
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:19:45 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v10 3/9] SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
-Date: Tue, 17 Mar 2020 18:16:19 +0300
-Message-ID: <20200317151625.20797-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-References: <20200317151625.20797-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::15) To HE1PR0802MB2507.eurprd08.prod.outlook.com
- (2603:10a6:3:e1::8)
+Subject: [PULL v3 00/62] Misc patches for soft freeze
+Date: Tue, 17 Mar 2020 16:19:31 +0100
+Message-Id: <1584458374-29068-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (185.215.60.248) by
- AM0PR10CA0005.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2835.15 via Frontend
- Transport; Tue, 17 Mar 2020 15:16:56 +0000
-X-Mailer: git-send-email 2.21.0
-X-Originating-IP: [185.215.60.248]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fc883ae0-82fd-445c-5132-08d7ca863bda
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2620:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB2620748174A6DAC13F696E34C1F60@HE1PR0802MB2620.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:156;
-X-Forefront-PRVS: 0345CFD558
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(39850400004)(376002)(136003)(346002)(366004)(396003)(199004)(66946007)(6666004)(1076003)(66556008)(54906003)(66476007)(86362001)(6486002)(16526019)(5660300002)(6916009)(186003)(69590400007)(6506007)(52116002)(4326008)(81166006)(6512007)(81156014)(8676002)(8936002)(316002)(2906002)(26005)(478600001)(956004)(36756003)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:HE1PR0802MB2620;
- H:HE1PR0802MB2507.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KA8yngjKwceDqyFpD91l9l/hO/vsHs057NFVsaVfJils0j8yQQdom0irq+JH8AvILGIiTw2XgHNJLak0ilqiJyiMeZbYJl2S8896GBK5MF+Sbg786XM6NlonK7WDIa7hjS+4LnhocoA7tcoDWAYLo+cSTD1aXOorq0xAx/BgWckY+40FEOyOtVVpJcTaxUcd7YxAn+LuBUGCk+INwrlar8V6ja9U2LfS8G52NEcjja69QycO0F8hac7bDZpddxx7cVjjjtXclf+otgA9IDJ0Er3Upbvum+LBPOiYv1A20fGm8CH3sLq/hA4s+tfEA8GvyukAur/Aow1xSGWEHI9yI0/M5pmHDIJ73OdT8naCrl4xtXwm5cC78+XaJMKWvuI8xcgCoFncYVJp5SeqQ6rl2KFdJwDEojDKy+r9xag1Qi6e0vl+lxjsiGPLEogcZ3Uag3m5wcb6Yq8uIztDLDQaswQNtiHvO3ANpS/91B5gE4ZiTdh9qhz038+ottAG8ej8
-X-MS-Exchange-AntiSpam-MessageData: dHX5WTbpw0Za30vKnIfuOuu5IdERtRnmQcvPigXuw+xl7pCHYpbyMtGwI4C6S10343dHNZUycmjW/yuX88w9EB5BHBW6HwXqCir6J0dgdhr4nkm/fzzZ3onQHmtloimRTmQq7ptgqx5cHK+3TuShNg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc883ae0-82fd-445c-5132-08d7ca863bda
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 15:16:57.8934 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HBnXhpuUNYA9BMHhNXOodC/vXvExKMhZn0X+Nw795chCVpQ5KbBo1i/q8Cw1npeIXlywy9RxSWK67kjtxsjDA7iiWe1Ob5M0ntPw+gQTMNw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2620
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0d::718
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,179 +81,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp =3D=3D &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+The following changes since commit a98135f727595382e200d04c2996e868b7925a01=
+:
 
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200316-pull-reque=
+st' into staging (2020-03-16 14:55:59 +0000)
 
-This commit is generated by command
+are available in the git repository at:
 
-    sed -n '/^SD (Secure Card)$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/sd/sdhci-pci.c |  7 +++----
- hw/sd/sdhci.c     | 21 +++++++++------------
- hw/sd/ssi-sd.c    | 16 ++++++++--------
- 3 files changed, 20 insertions(+), 24 deletions(-)
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
-index 19fa8bd8ed..ceaf3ea35b 100644
---- a/hw/sd/sdhci-pci.c
-+++ b/hw/sd/sdhci-pci.c
-@@ -29,13 +29,12 @@ static Property sdhci_pci_properties[] =3D {
-=20
- static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SDHCIState *s =3D PCI_SDHCI(dev);
--    Error *local_err =3D NULL;
-=20
-     sdhci_initfn(s);
--    sdhci_common_realize(s, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    sdhci_common_realize(s, errp);
-+    if (*errp) {
-         return;
-     }
-=20
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index de63ffb037..c25ac3c099 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1288,7 +1288,7 @@ static const MemoryRegionOps sdhci_mmio_ops =3D {
-=20
- static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
- {
--    Error *local_err =3D NULL;
-+    ERRP_AUTO_PROPAGATE();
-=20
-     switch (s->sd_spec_version) {
-     case 2 ... 3:
-@@ -1299,9 +1299,8 @@ static void sdhci_init_readonly_registers(SDHCIState =
-*s, Error **errp)
-     }
-     s->version =3D (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
-=20
--    sdhci_check_capareg(s, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    sdhci_check_capareg(s, errp);
-+    if (*errp) {
-         return;
-     }
- }
-@@ -1332,11 +1331,10 @@ void sdhci_uninitfn(SDHCIState *s)
-=20
- void sdhci_common_realize(SDHCIState *s, Error **errp)
- {
--    Error *local_err =3D NULL;
-+    ERRP_AUTO_PROPAGATE();
-=20
--    sdhci_init_readonly_registers(s, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    sdhci_init_readonly_registers(s, errp);
-+    if (*errp) {
-         return;
-     }
-     s->buf_maxsz =3D sdhci_get_fifolen(s);
-@@ -1456,13 +1454,12 @@ static void sdhci_sysbus_finalize(Object *obj)
-=20
- static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SDHCIState *s =3D SYSBUS_SDHCI(dev);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
--    Error *local_err =3D NULL;
-=20
--    sdhci_common_realize(s, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    sdhci_common_realize(s, errp);
-+    if (*errp) {
-         return;
-     }
-=20
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index 829797b597..bc44e1a0f5 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd =3D {
-=20
- static void ssi_sd_realize(SSISlave *d, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     ssi_sd_state *s =3D FROM_SSI_SLAVE(ssi_sd_state, d);
-     DeviceState *carddev;
-     DriveInfo *dinfo;
--    Error *err =3D NULL;
-=20
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
-                         DEVICE(d), "sd-bus");
-@@ -254,26 +254,26 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-     dinfo =3D drive_get_next(IF_SD);
-     carddev =3D qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
-     if (dinfo) {
--        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), =
-&err);
--        if (err) {
-+        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), =
-errp);
-+        if (*errp) {
-             goto fail;
-         }
-     }
-=20
--    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
--    if (err) {
-+    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
-+    if (*errp) {
-         goto fail;
-     }
-=20
--    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
--    if (err) {
-+    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
-+    if (*errp) {
-         goto fail;
-     }
-=20
-     return;
-=20
- fail:
--    error_propagate_prepend(errp, err, "failed to init SD card: ");
-+    error_prepend(errp, "failed to init SD card: ");
- }
-=20
- static void ssi_sd_reset(DeviceState *dev)
+for you to fetch changes up to 32b9523ad5b44dea87792d5d8f71a87e8cc5803b:
+
+  hw/arm: Let devices own the MemoryRegion they create (2020-03-17 15:18:50=
+ +0100)
+
+----------------------------------------------------------------
+* Bugfixes all over the place
+* get/set_uint cleanups (Felipe)
+* Lock guard support (Stefan)
+* MemoryRegion ownership cleanup (Philippe)
+* AVX512 optimization for buffer_is_zero (Robert)
+
+----------------------------------------------------------------
+Christian Ehrhardt (1):
+      modules: load modules from versioned /var/run dir
+
+Christophe de Dinechin (1):
+      scsi/qemu-pr-helper: Fix out-of-bounds access to trnptid_list[]
+
+Colin Xu (1):
+      MAINTAINERS: Add entry for Guest X86 HAXM CPUs
+
+Dr. David Alan Gilbert (1):
+      exec/rom_reset: Free rom data during inmigrate skip
+
+Eduardo Habkost (1):
+      Use -isystem for linux-headers dir
+
+Felipe Franciosi (4):
+      qom/object: enable setter for uint types
+      ich9: fix getter type for sci_int property
+      ich9: Simplify ich9_lpc_initfn
+      qom/object: Use common get/set uint helpers
+
+Jan Kiszka (1):
+      hw/i386/intel_iommu: Fix out-of-bounds access on guest IRT
+
+Joe Richey (1):
+      optionrom/pvh: scan entire RSDP Area
+
+Julio Faracco (1):
+      i386: Fix GCC warning with snprintf when HAX is enabled
+
+Kashyap Chamarthy (1):
+      qemu-cpu-models.rst: Document -noTSX, mds-no, taa-no, and tsx-ctrl
+
+Longpeng (Mike) (1):
+      cpus: avoid pause_all_vcpus getting stuck due to race
+
+Marc-Andr=C3=A9 Lureau (1):
+      build-sys: do not make qemu-ga link with pixman
+
+Matt Borgerson (1):
+      memory: Fix start offset for bitmap log_clear hook
+
+Paolo Bonzini (2):
+      oslib-posix: initialize mutex and condition variable
+      lockable: add QEMU_MAKE_LOCKABLE_NONNULL
+
+Peter Maydell (1):
+      softmmu/vl.c: Handle '-cpu help' and '-device help' before 'no defaul=
+t machine'
+
+Philippe Mathieu-Daud=C3=A9 (36):
+      misc: Replace zero-length arrays with flexible array member (automati=
+c)
+      misc: Replace zero-length arrays with flexible array member (manual)
+      configure: Fix building with SASL on Windows
+      tests/docker: Install SASL library to extend code coverage on amd64
+      Makefile: Align 'help' target output
+      Makefile: Let the 'help' target list the tools targets
+      hw/audio/fmopl: Move ENV_CURVE to .heap to save 32KiB of .bss
+      hw/audio/intel-hda: Use memory region alias to reduce .rodata by 4.34=
+MB
+      hw/usb/quirks: Use smaller types to reduce .rodata by 10KiB
+      ui/curses: Make control_characters[] array const
+      ui/curses: Move arrays to .heap to save 74KiB of .bss
+      memory: Correctly return alias region type
+      memory: Simplify memory_region_init_rom_nomigrate() to ease review
+      scripts/cocci: Rename memory-region-{init-ram -> housekeeping}
+      scripts/cocci: Patch to replace memory_region_init_{ram,readonly -> r=
+om}
+      hw/arm: Use memory_region_init_rom() with read-only regions
+      hw/display: Use memory_region_init_rom() with read-only regions
+      hw/m68k: Use memory_region_init_rom() with read-only regions
+      hw/net: Use memory_region_init_rom() with read-only regions
+      hw/pci-host: Use memory_region_init_rom() with read-only regions
+      hw/ppc: Use memory_region_init_rom() with read-only regions
+      hw/riscv: Use memory_region_init_rom() with read-only regions
+      hw/sh4: Use memory_region_init_rom() with read-only regions
+      hw/sparc: Use memory_region_init_rom() with read-only regions
+      scripts/cocci: Patch to detect potential use of memory_region_init_ro=
+m
+      scripts/cocci: Patch to remove unnecessary memory_region_set_readonly=
+()
+      scripts/cocci: Patch to let devices own their MemoryRegions
+      hw/core: Let devices own the MemoryRegion they create
+      hw/display: Let devices own the MemoryRegion they create
+      hw/dma: Let devices own the MemoryRegion they create
+      hw/riscv: Let devices own the MemoryRegion they create
+      hw/char: Let devices own the MemoryRegion they create
+      hw/arm/stm32: Use memory_region_init_rom() with read-only regions
+      hw/ppc/ppc405: Use memory_region_init_rom() with read-only regions
+      hw/arm: Remove unnecessary memory_region_set_readonly() on ROM alias
+      hw/arm: Let devices own the MemoryRegion they create
+
+Robert Hoo (2):
+      configure: add configure option avx512f_opt
+      util: add util function buffer_zero_avx512()
+
+Stefan Hajnoczi (2):
+      lockable: add lock guards
+      lockable: add QemuRecMutex support
+
+Sunil Muthuswamy (3):
+      WHPX: TSC get and set should be dependent on VM state
+      WHPX: Use QEMU values for trapped CPUID
+      WHPX: Use proper synchronization primitives while processing
+
+ MAINTAINERS                                        |  12 ++
+ Makefile                                           |  49 +++--
+ Makefile.target                                    |   2 +-
+ block/linux-aio.c                                  |   2 +-
+ block/vmdk.c                                       |   2 +-
+ bsd-user/qemu.h                                    |   2 +-
+ configure                                          |  62 +++++-
+ contrib/libvhost-user/libvhost-user.h              |   2 +-
+ contrib/vhost-user-gpu/Makefile.objs               |   6 +-
+ .../vhost-user-gpu/{main.c =3D> vhost-user-gpu.c}    |   0
+ cpus.c                                             |   6 +-
+ docs/interop/vhost-user.rst                        |   4 +-
+ docs/system/cpu-models-x86.rst.inc                 |  57 +++++-
+ exec.c                                             |   9 +-
+ hw/acpi/ich9.c                                     |  99 +---------
+ hw/acpi/nvdimm.c                                   |   6 +-
+ hw/acpi/pcihp.c                                    |   7 +-
+ hw/acpi/piix4.c                                    |  12 +-
+ hw/arm/exynos4210.c                                |  14 +-
+ hw/arm/fsl-imx25.c                                 |  10 +-
+ hw/arm/fsl-imx31.c                                 |   6 +-
+ hw/arm/fsl-imx6.c                                  |   6 +-
+ hw/arm/fsl-imx6ul.c                                |   9 +-
+ hw/arm/mainstone.c                                 |   3 +-
+ hw/arm/msf2-soc.c                                  |   6 +-
+ hw/arm/nrf51_soc.c                                 |   2 +-
+ hw/arm/omap_sx1.c                                  |   6 +-
+ hw/arm/palm.c                                      |   3 +-
+ hw/arm/spitz.c                                     |   3 +-
+ hw/arm/stellaris.c                                 |   3 +-
+ hw/arm/stm32f205_soc.c                             |  11 +-
+ hw/arm/stm32f405_soc.c                             |  12 +-
+ hw/arm/tosa.c                                      |   3 +-
+ hw/arm/xlnx-zynqmp.c                               |  11 +-
+ hw/audio/fmopl.c                                   |   4 +-
+ hw/audio/intel-hda.c                               |  24 +--
+ hw/char/sclpconsole-lm.c                           |   2 +-
+ hw/char/sclpconsole.c                              |   2 +-
+ hw/char/serial.c                                   |   7 +-
+ hw/core/loader.c                                   |  25 ++-
+ hw/core/platform-bus.c                             |   3 +-
+ hw/display/cg3.c                                   |   5 +-
+ hw/display/g364fb.c                                |   3 +-
+ hw/display/macfb.c                                 |   4 +-
+ hw/display/tcx.c                                   |   5 +-
+ hw/dma/i8257.c                                     |   2 +-
+ hw/dma/rc4030.c                                    |   4 +-
+ hw/dma/soc_dma.c                                   |   2 +-
+ hw/i386/intel_iommu.c                              |   6 +
+ hw/i386/x86.c                                      |   2 +-
+ hw/isa/lpc_ich9.c                                  |  27 +--
+ hw/m68k/bootinfo.h                                 |   2 +-
+ hw/m68k/q800.c                                     |   3 +-
+ hw/misc/edu.c                                      |  13 +-
+ hw/misc/omap_l4.c                                  |   2 +-
+ hw/net/dp8393x.c                                   |   5 +-
+ hw/nvram/eeprom93xx.c                              |   2 +-
+ hw/pci-host/prep.c                                 |   5 +-
+ hw/pci-host/q35.c                                  |  14 +-
+ hw/ppc/mac_newworld.c                              |   3 +-
+ hw/ppc/mac_oldworld.c                              |   3 +-
+ hw/ppc/ppc405_boards.c                             |   6 +-
+ hw/ppc/spapr.c                                     |  36 +---
+ hw/ppc/spapr_drc.c                                 |   3 +-
+ hw/rdma/vmw/pvrdma_qp_ops.c                        |   4 +-
+ hw/riscv/sifive_e.c                                |   9 +-
+ hw/riscv/sifive_u.c                                |   2 +-
+ hw/s390x/virtio-ccw.c                              |   2 +-
+ hw/sh4/shix.c                                      |   3 +-
+ hw/sparc/leon3.c                                   |   3 +-
+ hw/usb/dev-network.c                               |   2 +-
+ hw/usb/dev-smartcard-reader.c                      |   4 +-
+ hw/usb/quirks.c                                    |   4 +-
+ hw/usb/quirks.h                                    |  22 ++-
+ hw/virtio/virtio.c                                 |   4 +-
+ hw/xen/xen_pt.h                                    |   2 +-
+ include/hw/acpi/acpi-defs.h                        |  16 +-
+ include/hw/arm/smmu-common.h                       |   2 +-
+ include/hw/boards.h                                |   2 +-
+ include/hw/i386/intel_iommu.h                      |   3 +-
+ include/hw/s390x/event-facility.h                  |   2 +-
+ include/hw/s390x/sclp.h                            |   8 +-
+ include/hw/virtio/virtio-iommu.h                   |   2 +-
+ include/qemu/cpuid.h                               |   3 +
+ include/qemu/lockable.h                            |  86 ++++++++-
+ include/qom/object.h                               |  48 ++++-
+ include/sysemu/cryptodev.h                         |   2 +-
+ include/sysemu/whpx.h                              |   7 +
+ include/tcg/tcg.h                                  |   2 +-
+ memory.c                                           |  31 +--
+ net/queue.c                                        |   2 +-
+ pc-bios/optionrom/pvh_main.c                       |   2 +-
+ pc-bios/s390-ccw/bootmap.h                         |   2 +-
+ pc-bios/s390-ccw/sclp.h                            |   2 +-
+ plugins/core.c                                     |   7 +-
+ plugins/loader.c                                   |  16 +-
+ qom/object.c                                       | 212 +++++++++++++++++=
++---
+ .../coccinelle/memory-region-housekeeping.cocci    | 159 ++++++++++++++++
+ scripts/coccinelle/memory-region-init-ram.cocci    |  38 ----
+ scsi/qemu-pr-helper.c                              |  17 +-
+ softmmu/vl.c                                       |  26 ++-
+ target/arm/cpu.c                                   |  22 +--
+ target/i386/hax-posix.c                            |  33 +---
+ target/i386/hax-windows.c                          |  33 +---
+ target/i386/sev.c                                  | 106 +----------
+ target/i386/whp-dispatch.h                         |   9 +
+ target/i386/whpx-all.c                             | 162 +++++++++++-----
+ target/s390x/ioinst.c                              |   2 +-
+ tests/docker/dockerfiles/debian-amd64.docker       |   1 +
+ tests/qtest/libqos/ahci.h                          |   2 +-
+ ui/console.c                                       |   4 +-
+ ui/curses.c                                        |  10 +-
+ util/bufferiszero.c                                |  71 ++++++-
+ util/module.c                                      |  14 ++
+ util/oslib-posix.c                                 |   7 +
+ util/qemu-timer.c                                  |  23 ++-
+ 116 files changed, 1161 insertions(+), 767 deletions(-)
+ rename contrib/vhost-user-gpu/{main.c =3D> vhost-user-gpu.c} (100%)
+ create mode 100644 scripts/coccinelle/memory-region-housekeeping.cocci
+ delete mode 100644 scripts/coccinelle/memory-region-init-ram.cocci
 --=20
-2.21.0
+1.8.3.1
 
 
