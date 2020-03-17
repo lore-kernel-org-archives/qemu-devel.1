@@ -2,86 +2,95 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DC6C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034C8C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA71220409
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:29:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC00A20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 22:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dilger-ca.20150623.gappssmtp.com header.i=@dilger-ca.20150623.gappssmtp.com header.b="m0AH7r1Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA71220409
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dilger.ca
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dl/PvlTI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC00A20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEKiV-0002lj-1z
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 18:29:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49196)
+	id 1jEKut-0004jT-QZ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 18:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <adilger@dilger.ca>) id 1jEKht-0002Mo-C1
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:29:07 -0400
+ (envelope-from <peterx@redhat.com>) id 1jEKuG-0004KZ-Sm
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <adilger@dilger.ca>) id 1jEKhp-0000XD-Uq
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:29:03 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34623)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <adilger@dilger.ca>) id 1jEKhp-0000Jx-6z
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:29:01 -0400
-Received: by mail-pg1-x542.google.com with SMTP id t3so12503610pgn.1
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:29:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dilger-ca.20150623.gappssmtp.com; s=20150623;
- h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
- :references; bh=0lyGaEtpoR36zLPiwWYFHdQkK3uTz09qvDzxTC9qJgI=;
- b=m0AH7r1QajvnwJDiSCHD1obDuxlvXoWJoeZTuKDL4FhB6Q9YFWG7G5iQxs4s1nUlKC
- LHqxl0+/4Sxgym4e8EvZQP4y8fTIJQJrRLVbRS6imTF2VDjqOSmPsUtaMagUoBupXSOy
- ZYNM7tXTkwMz6FiqmmP3njcsHB7Y+uppZ4XnIpcTWDkSG38p6zfIE5sBTP+W4AtGc9hi
- 65qvOTUveZKf1+TQm5zTAPcuPacMeahONbOQfFP/s7U5lLiiGd09HRpaiSnFs92bLa3R
- 1dMlW2pZxf0EEI9rBIqhxz6iR2sUtMLhbIzLaq8zwu2QhW+bI7kVvyN/3+XXu3VpNMIx
- S7xw==
+ (envelope-from <peterx@redhat.com>) id 1jEKuE-0004Jn-Bk
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:41:52 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45362)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1jEKuE-0004ET-3g
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 18:41:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584484908;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8OE5xE74N3nqWhtm4h65lZMGaV8qdbFOoAL0hVx3/Q4=;
+ b=Dl/PvlTIWtlnEMrh50BkMl1XNJnpMgGwaoxKHJJ+K64UmWrcNeQih3mXa/EFZ2L5O1qcmu
+ 9qRmKaUQ4PR2ZOx6uwIWs64ERQcxksVzn09gckRih3siJdBO0T9ikDDkiYk5PHVOJIqW8x
+ H4+AOssohwTW0+L+7Id1F9VqJrQKH4A=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-BYu-1V53PKyISwbyuF7HIw-1; Tue, 17 Mar 2020 18:41:46 -0400
+X-MC-Unique: BYu-1V53PKyISwbyuF7HIw-1
+Received: by mail-wr1-f70.google.com with SMTP id w11so11368727wrp.20
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 15:41:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:message-id:mime-version:subject:date
- :in-reply-to:cc:to:references;
- bh=0lyGaEtpoR36zLPiwWYFHdQkK3uTz09qvDzxTC9qJgI=;
- b=H+lhh1z1SHtzz6oWl7OTQFgtxLWi62LYfhmtuOQ5lBRs1Etzc8qGXi7JKJF64/mmHO
- znZzp1LoX3h50omlRbdLkvHi39DqOLQXQ+kBdHjKKPGoBMO/Clb78OkDZZc3IsyF/rwU
- o/oV2se3sjri1LQnZeXkk4YBYDa6/+yEWaYFd8Tw005bglUCbdQBft8w+ro9a0q0nfRx
- iMR9ME8mVpAJBeEOJbXoY5YPbolm9HI1203c8VccmRdZ3gJ6QDPoa4JQQvlUH+Edimjt
- Wwh2JlnWeG9fUrH/AazVNGWLDxJF66pdvyI86wiby/+OFig0Qcz7FB07xJs1ZtgC+Jo3
- wqdQ==
-X-Gm-Message-State: ANhLgQ203iRly59+ktqWq5JldbQEnxaiheedQqszHY0ad3KWjGGVR3rq
- BfKklgPqyQp41ceJzTSfBNYYGw==
-X-Google-Smtp-Source: ADFU+vsp+4j6Fx+oPzHi/3kBAA+Q+4xgxKUsWM/GD5wIKIixyEDdMzG80DS72RAa77tlWbPEMffOYQ==
-X-Received: by 2002:aa7:91c7:: with SMTP id z7mr994278pfa.237.1584484139442;
- Tue, 17 Mar 2020 15:28:59 -0700 (PDT)
-Received: from [192.168.10.160] (S0106a84e3fe4b223.cg.shawcable.net.
- [70.77.216.213])
- by smtp.gmail.com with ESMTPSA id j19sm4037676pfe.102.2020.03.17.15.28.57
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 17 Mar 2020 15:28:58 -0700 (PDT)
-From: Andreas Dilger <adilger@dilger.ca>
-Message-Id: <88FAA4EA-7DAF-478F-8DFE-747FAF4CF818@dilger.ca>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_6A2BBFD8-44C3-4E14-A14D-CC95C0572A09";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
-Date: Tue, 17 Mar 2020 16:28:53 -0600
-In-Reply-To: <20200317113153.7945-1-linus.walleij@linaro.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-References: <20200317113153.7945-1-linus.walleij@linaro.org>
-X-Mailer: Apple Mail (2.3273)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=vGXRaYdRGDkLs1wGRBmgsuljII0RxK/M4/v+hyZgPUE=;
+ b=R9+vNR0OdW/WDe47qTCrGZbXHOwtQzT6AgEJj3q6IH0pqtHUoWH5sJ1towUsP6xH2g
+ PDPtKbbeF73mrNwZ9QPup/FgQZGFMcghnpivOX32IG5KtGUg67QoEW0fgmrdj0bmFABW
+ LD0q4aCiijXtA7jQrdFpM1cm/6fjLTjiX1iR7s+5Scale5KT4zcczKRV+9SUhApIvqrF
+ pqJqzeEy/mhFd9coJbtmsThJhXzVrFSl+Vrtho+gLzL47cMd6gljvi7ayVMeiLw3ds3+
+ cUZDznBNkoCQxqHN8XM325oOPxRt6IbS/UIZuPzr2p7xRsdkx75GAxe11Yuxlsw/BoyF
+ myNA==
+X-Gm-Message-State: ANhLgQ0DYQjVU6rN8WdpXRm6Cdxw092TomADVTZBxxBKOlWqBfLEb8jC
+ mcbJtgMooD7movGM+FbOH0ZzqKDTXX9zxqpXikwQzg4kCDKqF084M4B+igANyXzGF91ycSYActH
+ qsipjvf4ju/MQgG4=
+X-Received: by 2002:adf:bbcf:: with SMTP id z15mr1374475wrg.340.1584484903375; 
+ Tue, 17 Mar 2020 15:41:43 -0700 (PDT)
+X-Google-Smtp-Source: ADFU+vuveNXt+EWlqBaeMso3PGHQl+3Gq3ftYSWFhsTJm+UDNQlBdUrp7vEtrUNRLCSINHKkJsgAhQ==
+X-Received: by 2002:adf:bbcf:: with SMTP id z15mr1374456wrg.340.1584484903059; 
+ Tue, 17 Mar 2020 15:41:43 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id i8sm6074299wrw.55.2020.03.17.15.41.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Mar 2020 15:41:42 -0700 (PDT)
+Date: Tue, 17 Mar 2020 18:41:38 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 4/5] KVM: Kick resamplefd for split kernel irqchip
+Message-ID: <20200317224138.GE233068@xz-x1>
+References: <20200317195042.282977-1-peterx@redhat.com>
+ <20200317195042.282977-5-peterx@redhat.com>
+ <20200317150646.2718d3a6@w520.home> <20200317214108.GD233068@xz-x1>
+ <20200317161200.0c41fe60@w520.home>
+MIME-Version: 1.0
+In-Reply-To: <20200317161200.0c41fe60@w520.home>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,168 +102,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Theodore Ts'o <tytso@mit.edu>,
- Linux API <linux-api@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- stable@vger.kernel.org, Florian Weimer <fw@deneb.enyo.de>,
- Andy Lutomirski <luto@kernel.org>,
- Linux FS Devel <linux-fsdevel@vger.kernel.org>,
- linux-ext4 <linux-ext4@vger.kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---Apple-Mail=_6A2BBFD8-44C3-4E14-A14D-CC95C0572A09
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
-
-On Mar 17, 2020, at 5:31 AM, Linus Walleij <linus.walleij@linaro.org> =
-wrote:
+On Tue, Mar 17, 2020 at 04:12:00PM -0600, Alex Williamson wrote:
+> On Tue, 17 Mar 2020 17:41:08 -0400
+> Peter Xu <peterx@redhat.com> wrote:
 >=20
-> It was brought to my attention that this bug from 2018 was
-> still unresolved: 32 bit emulators like QEMU were given
-> 64 bit hashes when running 32 bit emulation on 64 bit systems.
+> > On Tue, Mar 17, 2020 at 03:06:46PM -0600, Alex Williamson wrote:
+> >=20
+> > [...]
+> >=20
+> > > > diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+> > > > index 15747fe2c2..81a17cc2b8 100644
+> > > > --- a/hw/intc/ioapic.c
+> > > > +++ b/hw/intc/ioapic.c
+> > > > @@ -236,8 +236,29 @@ void ioapic_eoi_broadcast(int vector)
+> > > >          for (n =3D 0; n < IOAPIC_NUM_PINS; n++) {
+> > > >              entry =3D s->ioredtbl[n];
+> > > > =20
+> > > > -            if ((entry & IOAPIC_VECTOR_MASK) !=3D vector ||
+> > > > -                ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) !=
+=3D IOAPIC_TRIGGER_LEVEL) {
+> > > > +            if ((entry & IOAPIC_VECTOR_MASK) !=3D vector) {
+> > > > +                continue;
+> > > > +            }
+> > > > +
+> > > > +            /*
+> > > > +             * When IOAPIC is in the userspace while APIC is still=
+ in
+> > > > +             * the kernel (i.e., split irqchip), we have a trick t=
+o
+> > > > +             * kick the resamplefd logic for registered irqfds fro=
+m
+> > > > +             * userspace to deactivate the IRQ.  When that happens=
+, it
+> > > > +             * means the irq bypassed userspace IOAPIC (so the irr=
+ and
+> > > > +             * remote-irr of the table entry should be bypassed to=
+o
+> > > > +             * even if interrupt come).  Still kick the resamplefd=
+s if
+> > > > +             * they're bound to the IRQ, to make sure to EOI the
+> > > > +             * interrupt for the hardware correctly.
+> > > > +             *
+> > > > +             * Note: We still need to go through the irr & remote-=
+irr
+> > > > +             * operations below because we don't know whether ther=
+e're
+> > > > +             * emulated devices that are using/sharing the same IR=
+Q.
+> > > > +             */
+> > > > +            kvm_resample_fd_notify(n);
+> > > > +
+> > > > +            if (((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) !=
+=3D
+> > > > +                IOAPIC_TRIGGER_LEVEL) {
+> > > >                  continue;
+> > > >              }
+> > > >   =20
+> > >=20
+> > > What's the logic for sending resampler notifies before testing if the
+> > > ioapic entry is in level triggered mode?  vfio won't use this for
+> > > anything other than level triggered.  Inserting it between these chec=
+ks
+> > > confused me and in my testing wasn't necessary.  Thanks, =20
+> >=20
+> > I put it there to match the kernel implementation, and IIUC Paolo
+> > agreed with that too:
+> >=20
+> > https://patchwork.kernel.org/patch/11407441/#23190969
+> >=20
+> > Since we've discussed a few times here, I think I can talk a bit more
+> > on how I understand this in case I was wrong...
+> >=20
+> > Even if we have the fact that all the existing devices that use this
+> > code should be using level-triggered IRQs, however... *If* there comes
+> > an edge-triggered INTx device and we assign it using vfio-pci, vfio
+> > should also mask the IRQ after it generates (according to
+> > vfio_intx_handler), is that right?  Then we still need to kick the
+> > resamplefd for that does-not-exist device too to make sure it'll work?
 >=20
-> The personality(2) system call supports to let processes
-> indicate that they are 32 bit Linux to the kernel. This
-> was suggested by Teo in the original thread, so I just wired
-> it up and it solves the problem.
+> "edge-triggered INTx" is not a thing that exists.  The PCI spec defines
+> interrupt pins as:
 >=20
-> Programs that need the 32 bit hash only need to issue the
-> personality(PER_LINUX32) call and things start working.
-
-I'm generally with with this from the ext4 point of view.
-
-That said, I'd think it would be preferable for ease of use and
-compatibility that applications didn't have to be modified
-(e.g. have QEMU or glibc internally set PER_LINUX32 for this
-process before the 32-bit syscall is called, given that it knows
-whether it is emulating a 32-bit runtime or not).
-
-The other way to handle this would be for ARM32 to check the
-PER_LINUX32 flag via is_compat_task() so that there wouldn't
-need to be any changes to the ext4 code at all?
-
-Cheers, Andreas
-
-
-> I made a test program like this:
+>   2.2.6. Interrupt Pins (Optional)
 >=20
->  #include <dirent.h>
->  #include <errno.h>
->  #include <stdio.h>
->  #include <string.h>
->  #include <sys/types.h>
->  #include <sys/personality.h>
->=20
->  int main(int argc, char** argv) {
->    DIR* dir;
->    personality(PER_LINUX32);
->    dir =3D opendir("/boot");
->    printf("dir=3D%p\n", dir);
->    printf("readdir(dir)=3D%p\n", readdir(dir));
->    printf("errno=3D%d: %s\n", errno, strerror(errno));
->    return 0;
->  }
->=20
-> This was compiled with an ARM32 toolchain from Bootlin using
-> glibc 2.28 and thus suffering from the bug.
->=20
-> Before the patch:
->=20
->  $ ./readdir-bug
->  dir=3D0x86000
->  readdir(dir)=3D(nil)
->  errno=3D75: Value too large for defined data type
->=20
-> After the patch:
->=20
->  $ ./readdir-bug
->  dir=3D0x86000
->  readdir(dir)=3D0x86020
->  errno=3D0: Success
->=20
-> Problem solved.
->=20
-> Cc: Florian Weimer <fw@deneb.enyo.de>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: stable@vger.kernel.org
-> Suggested-by: Theodore Ts'o <tytso@mit.edu>
-> Link: https://bugs.launchpad.net/qemu/+bug/1805913
-> Link: https://lore.kernel.org/lkml/87bm56vqg4.fsf@mid.deneb.enyo.de/
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=3D205957
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> fs/ext4/dir.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
->=20
-> diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
-> index 9aa1f75409b0..3faf9edf3e92 100644
-> --- a/fs/ext4/dir.c
-> +++ b/fs/ext4/dir.c
-> @@ -27,6 +27,7 @@
-> #include <linux/slab.h>
-> #include <linux/iversion.h>
-> #include <linux/unicode.h>
-> +#include <linux/personality.h>
-> #include "ext4.h"
-> #include "xattr.h"
->=20
-> @@ -618,6 +619,14 @@ static int ext4_dx_readdir(struct file *file, =
-struct dir_context *ctx)
->=20
-> static int ext4_dir_open(struct inode * inode, struct file * filp)
-> {
-> +	/*
-> +	 * If we are currently running e.g. a 32 bit emulator on
-> +	 * a 64 bit machine, the emulator will indicate that it needs
-> +	 * a 32 bit personality and thus 32 bit hashes from the file
-> +	 * system.
-> +	 */
-> +	if (personality(current->personality) =3D=3D PER_LINUX32)
-> +		filp->f_mode |=3D FMODE_32BITHASH;
-> 	if (IS_ENCRYPTED(inode))
-> 		return fscrypt_get_encryption_info(inode) ? -EACCES : 0;
-> 	return 0;
-> --
-> 2.24.1
->=20
+>   Interrupts on PCI are optional and defined as "level sensitive,"
+>   asserted low (negative true), using open drain output drivers.
 
+Ah OK!  I didn't notice it's a spec-wise answer...
 
-Cheers, Andreas
+>=20
+> Masking of interrupts while they're in-service is not done for edge
+> triggered interrupts, we assume that being a discrete interrupt is a
+> sufficient rate limiter versus a level triggered interrupt, which is
+> continuous and can saturate the host.
+>=20
+> If it exists before the level check only to match the kernel, maybe a
+> comment or todo item to check whether it's the optimal approach for
+> both cases should be in order.  I can't think of any reason why we'd
+> need it for the sake of edge triggered vfio interrupts in either place.
 
+I guess the KVM implementation of that is still required for the
+kernel PIT implementation as Paolo mentioned.  Since this seems to be
+confusing and the userspace does not have a real use case for that,
+let me repost this patch only so the userspace resamplefd only reacts
+to level triggered interrupts.
 
+Thanks,
 
+--=20
+Peter Xu
 
-
-
---Apple-Mail=_6A2BBFD8-44C3-4E14-A14D-CC95C0572A09
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAl5xTyUACgkQcqXauRfM
-H+BC6xAAjbwtIJvDdEy/qp+tIiAxJRt5HMEaY8aVQErnLKlF3zKRTaC2bALhC47s
-1WgXIIYz4EvfMXqDyhatd4suolut6wa+mvMStIAqKqck4gxNTW19jmw+1i3LVUuu
-S/1SUX3A9y3W+SXXu2AHqKfNkOTad+/nSlsa/Ku6uABCdll7TcVGGLaVw2WVKY/v
-wsznGmTsnq3qF0lDjoQCewsa1yUeCwmiIjauXMmn0KL35EfkSMyKoDKK4r5MKbSE
-P6TV5eSOAvVJeBLeAQEuCcnUdob1M56hASvTuaS8twjQhzu29xTETGqx3Kb3g7hF
-wBRpG4e9QxLhW+Dq8XjqSF+7e7RBQMROp/rIvPd3/d80ORBWBvl/dAe67m3GMvWI
-ptyRcA23uJrZ5Dc8pKKQCcc/TREc+UbCtUfdE+S5CPKD/WK/0E8qTyzZg1EAnPEE
-2LcObvno+JoA6tAa8bjdg2uVvHHMG2HeVgxSIMrbn9wQeCLhX35vbCZ+4kY1yDh1
-1ui3ltzHUPZdAy8WYg2Bn1a42WkvEMfdz60uTSVFO35zzQXvLzaPVbmE06/rhh/5
-nxIR/5+N+/MYvHL8h7tGDUnDoQumiM2NfKWoE+eupUjXGbjEuSb2TdUnj9Siczzy
-vwRTSF9u+f7ZfDPXuenBALq47Qq4HvF8qa7weH8iXnj9UWk31D8=
-=ak2k
------END PGP SIGNATURE-----
-
---Apple-Mail=_6A2BBFD8-44C3-4E14-A14D-CC95C0572A09--
 
