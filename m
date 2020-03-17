@@ -2,80 +2,78 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BB3C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9DFC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:12:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E812073C
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:11:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 654F52076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 12:12:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1J3mxgd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E812073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mdv9Ev0h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654F52076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEB4S-0003h1-3G
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:11:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56951)
+	id 1jEB5G-0005Gc-IO
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 08:12:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1jEAoc-0008H9-KS
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:25 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1jEArY-0005Dd-5A
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:58:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1jEAoX-0006jh-QY
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:22 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1jEAoX-0006gR-JG
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:55:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584446117;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iFoWNzsJY50h+D+cw8ftjU8cjOlchFCyDTr3cIsHFwk=;
- b=J1J3mxgdbwSz8UWU4EmsmXhqTQNB5ZKzUfX+UeChWj1tqYRZXot0gaDqYnNdYWXkPV7u8g
- ULsr5BV3qyiJhBBBikmz0VDi0xaPso62HHv1DGgbX1HN9UN/AYaKyJjhgaIu4da9PBQSre
- rI8eaV7tZjb7tNdPSZBaA678HIjWRjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-jyB7CPfeMAC4wADxPTavxQ-1; Tue, 17 Mar 2020 07:55:13 -0400
-X-MC-Unique: jyB7CPfeMAC4wADxPTavxQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7A861034B35;
- Tue, 17 Mar 2020 11:55:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-130.ams2.redhat.com
- [10.36.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38D029497E;
- Tue, 17 Mar 2020 11:55:12 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 84AA21135245; Tue, 17 Mar 2020 12:55:00 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 28/34] qapi: Implement deprecated-output=hide for QMP
- command results
-Date: Tue, 17 Mar 2020 12:54:53 +0100
-Message-Id: <20200317115459.31821-29-armbru@redhat.com>
-In-Reply-To: <20200317115459.31821-1-armbru@redhat.com>
-References: <20200317115459.31821-1-armbru@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1jEArW-0007Vj-Pd
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:58:23 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34084)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1jEArW-0007Tg-EB
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:58:22 -0400
+Received: by mail-oi1-x241.google.com with SMTP id j5so5374238oij.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 04:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6tLG0UvowYMxwNr6UXAFjrYE3UP2cWO9OOJLVI6SNuM=;
+ b=Mdv9Ev0hWdBHO5UtWJBB5vCi54nNKxRYMIn7zCsdg1tggsr/dFr1x5TNXD+4ERd0q2
+ PUoF44Wb4BkSNPkR9ulesNTcwjCkGsbALj4ZupRv8XsmzqWwS5YJXopOOx8syMeK4533
+ 7eJYFQUad/uIAzsDKrZnKv5hZtUuKt17hNXGdkfIJoDgY97TICZViYb6603+aR6OzAIb
+ 2WSTWc2I0/1ENQjAE2ngPZCWMxZ8qIWEyPqceeV2NDusE76aX2/SupifuU1JiiZ96QMT
+ fuESbGTlTjfcLIhal4/lii+GTNk+pVzllv8CdXvcxNo+Wm9dlKrXPl602p7K7WcrqKHS
+ 8gcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6tLG0UvowYMxwNr6UXAFjrYE3UP2cWO9OOJLVI6SNuM=;
+ b=uSg/0QaLl86+ehyV7DIR/qyWPdEgTR4OeSdb0sYeqzK1kFPiEVHPoLfXwshTQ3M4oY
+ rEmYwV1sn6HjoXyD8XbP6i4hq8gSd0VdFugzt8hFGWLpNfMl4bMbQ3aTbbSN8Kpiv4vv
+ LfWbovBTyEINfRYoyqhDSYKh2ZaP3yYqXE8IRbS8ttEYZKrvtAwH0IQlDAAFNpwAXclK
+ E+G5Pbkp7YfpeNW5ZrgmJ4ghmOwsr8FrhGl7+7bZdomjVKbhMajjMk5Uyj2a9P6Zhkm2
+ jFxbQesOscxt48jKUuyd1SMsgVKWcIXvqUR11nLlHYOAHpAb8E9rWQ3QhzONX2M/MfhM
+ bOPA==
+X-Gm-Message-State: ANhLgQ30o3WJgE6bKF3Iw/x5O+ShF9kYwndSd0e8WwO2ftk1StJrfXed
+ p0tH3XUmq5mzm1pVJ6X2bKoAEey0U6EJmjwap8hW0g==
+X-Google-Smtp-Source: ADFU+vv2vA2intsubk2Bd6nP5kQhiggirL2UjEzCPX13Y5LB21Ez3zUMdijWMELThsGoCt5RUUEDjjKOmgDyl+5iHeY=
+X-Received: by 2002:aca:c695:: with SMTP id w143mr3238753oif.98.1584446301315; 
+ Tue, 17 Mar 2020 04:58:21 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+References: <20200317113153.7945-1-linus.walleij@linaro.org>
+In-Reply-To: <20200317113153.7945-1-linus.walleij@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Mar 2020 11:58:09 +0000
+Message-ID: <CAFEAcA9mXE+gPnvM6HZ-w0+BhbpeuH=osFH-9NUzCLv=w-c7HQ@mail.gmail.com>
+Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
+To: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,386 +85,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
+Cc: Theodore Ts'o <tytso@mit.edu>, Linux API <linux-api@vger.kernel.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, stable@vger.kernel.org,
+ Florian Weimer <fw@deneb.enyo.de>, Andreas Dilger <adilger.kernel@dilger.ca>,
+ Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+ Ext4 Developers List <linux-ext4@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This policy suppresses deprecated bits in output, and thus permits
-"testing the future".  Implement it for QMP command results.  Example:
-when QEMU is run with -compat deprecated-output=3Dhide, then
+On Tue, 17 Mar 2020 at 11:31, Linus Walleij <linus.walleij@linaro.org> wrote:
+>
+> It was brought to my attention that this bug from 2018 was
+> still unresolved: 32 bit emulators like QEMU were given
+> 64 bit hashes when running 32 bit emulation on 64 bit systems.
+>
+> The personality(2) system call supports to let processes
+> indicate that they are 32 bit Linux to the kernel. This
+> was suggested by Teo in the original thread, so I just wired
+> it up and it solves the problem.
 
-    {"execute": "query-cpus-fast"}
+Thanks for having a look at this. I'm not sure this is what
+QEMU needs, though. When QEMU runs, it is not a 32-bit
+process, it's a 64-bit process. Some of the syscalls
+it makes are on behalf of the guest and would need 32-bit
+semantics (including this one of wanting 32-bit hash sizes
+in directory reads). But some syscalls it makes for itself
+(either directly, or via libraries it's linked against
+including glibc and glib) -- those would still want the
+usual 64-bit semantics, I would have thought.
 
-yields
+> Programs that need the 32 bit hash only need to issue the
+> personality(PER_LINUX32) call and things start working.
 
-    {"return": [{"thread-id": 9805, "props": {"core-id": 0, "thread-id": 0,=
- "socket-id": 0}, "qom-path": "/machine/unattached/device[0]", "cpu-index":=
- 0, "target": "x86_64"}]}
+What in particular does this personality setting affect?
+My copy of the personality(2) manpage just says:
 
-instead of
+       PER_LINUX32 (since Linux 2.2)
+              [To be documented.]
 
-    {"return": [{"arch": "x86", "thread-id": 22436, "props": {"core-id": 0,=
- "thread-id": 0, "socket-id": 0}, "qom-path": "/machine/unattached/device[0=
-]", "cpu-index": 0, "target": "x86_64"}]}
+which isn't very informative.
 
-Note the suppression of deprecated member "arch".
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- include/qapi/qobject-output-visitor.h   |  9 ++++++
- include/qapi/visitor-impl.h             |  3 ++
- include/qapi/visitor.h                  |  9 ++++++
- qapi/qapi-visit-core.c                  |  9 ++++++
- qapi/qobject-output-visitor.c           | 19 +++++++++++
- tests/test-qmp-cmds.c                   | 42 ++++++++++++++++++++++---
- qapi/trace-events                       |  1 +
- scripts/qapi/commands.py                |  2 +-
- scripts/qapi/visit.py                   | 12 +++++++
- tests/qapi-schema/qapi-schema-test.json | 17 +++++-----
- tests/qapi-schema/qapi-schema-test.out  | 18 +++++------
- 11 files changed, 118 insertions(+), 23 deletions(-)
-
-diff --git a/include/qapi/qobject-output-visitor.h b/include/qapi/qobject-o=
-utput-visitor.h
-index 2b1726baf5..29f4ea6aad 100644
---- a/include/qapi/qobject-output-visitor.h
-+++ b/include/qapi/qobject-output-visitor.h
-@@ -53,4 +53,13 @@ typedef struct QObjectOutputVisitor QObjectOutputVisitor=
-;
-  */
- Visitor *qobject_output_visitor_new(QObject **result);
-=20
-+/*
-+ * Create a QObject output visitor for @obj for use with QMP
-+ *
-+ * This is like qobject_output_visitor_new(), except it obeys the
-+ * policy for handling deprecated management interfaces set with
-+ * -compat.
-+ */
-+Visitor *qobject_output_visitor_new_qmp(QObject **result);
-+
- #endif
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 8ccb3b6c20..a6b26b7a5b 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -110,6 +110,9 @@ struct Visitor
-        The core takes care of the return type in the public interface. */
-     void (*optional)(Visitor *v, const char *name, bool *present);
-=20
-+    /* Optional */
-+    bool (*deprecated)(Visitor *v, const char *name);
-+
-     /* Must be set */
-     VisitorType type;
-=20
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index c5b23851a1..c89d51b2a4 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -449,6 +449,15 @@ void visit_end_alternate(Visitor *v, void **obj);
-  */
- bool visit_optional(Visitor *v, const char *name, bool *present);
-=20
-+/*
-+ * Should we visit deprecated member @name?
-+ *
-+ * @name must not be NULL.  This function is only useful between
-+ * visit_start_struct() and visit_end_struct(), since only objects
-+ * have deprecated members.
-+ */
-+bool visit_deprecated(Visitor *v, const char *name);
-+
- /*
-  * Visit an enum value.
-  *
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 5365561b07..501b3ccdef 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -137,6 +137,15 @@ bool visit_optional(Visitor *v, const char *name, bool=
- *present)
-     return *present;
- }
-=20
-+bool visit_deprecated(Visitor *v, const char *name)
-+{
-+    trace_visit_deprecated(v, name);
-+    if (v->deprecated) {
-+        return v->deprecated(v, name);
-+    }
-+    return true;
-+}
-+
- bool visit_is_input(Visitor *v)
- {
-     return v->type =3D=3D VISITOR_INPUT;
-diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
-index 26d7be5ec9..84cee17596 100644
---- a/qapi/qobject-output-visitor.c
-+++ b/qapi/qobject-output-visitor.c
-@@ -13,6 +13,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/visitor-impl.h"
- #include "qemu/queue.h"
-@@ -31,6 +32,8 @@ typedef struct QStackEntry {
-=20
- struct QObjectOutputVisitor {
-     Visitor visitor;
-+    CompatPolicyOutput deprecated_policy;
-+
-     QSLIST_HEAD(, QStackEntry) stack; /* Stack of unfinished containers */
-     QObject *root; /* Root of the output visit */
-     QObject **result; /* User's storage location for result */
-@@ -198,6 +201,13 @@ static void qobject_output_type_null(Visitor *v, const=
- char *name,
-     qobject_output_add(qov, name, qnull());
- }
-=20
-+static bool qobject_output_deprecated(Visitor *v, const char *name)
-+{
-+    QObjectOutputVisitor *qov =3D to_qov(v);
-+
-+    return qov->deprecated_policy !=3D COMPAT_POLICY_OUTPUT_HIDE;
-+}
-+
- /* Finish building, and return the root object.
-  * The root object is never null. The caller becomes the object's
-  * owner, and should use qobject_unref() when done with it.  */
-@@ -247,6 +257,7 @@ Visitor *qobject_output_visitor_new(QObject **result)
-     v->visitor.type_number =3D qobject_output_type_number;
-     v->visitor.type_any =3D qobject_output_type_any;
-     v->visitor.type_null =3D qobject_output_type_null;
-+    v->visitor.deprecated =3D qobject_output_deprecated;
-     v->visitor.complete =3D qobject_output_complete;
-     v->visitor.free =3D qobject_output_free;
-=20
-@@ -255,3 +266,11 @@ Visitor *qobject_output_visitor_new(QObject **result)
-=20
-     return &v->visitor;
- }
-+
-+Visitor *qobject_output_visitor_new_qmp(QObject **result)
-+{
-+    QObjectOutputVisitor *v =3D to_qov(qobject_output_visitor_new(result))=
-;
-+
-+    v->deprecated_policy =3D compat_policy.deprecated_output;
-+    return &v->visitor;
-+}
-diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-index d12ff47e26..82d599630c 100644
---- a/tests/test-qmp-cmds.c
-+++ b/tests/test-qmp-cmds.c
-@@ -1,4 +1,5 @@
- #include "qemu/osdep.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qnum.h"
-@@ -45,12 +46,17 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **errp)
- {
- }
-=20
--void qmp_test_features0(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
--                       FeatureStruct2 *fs2, FeatureStruct3 *fs3,
--                       FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
--                       CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cfs3,
--                       Error **errp)
-+FeatureStruct1 *qmp_test_features0(bool has_fs0, FeatureStruct0 *fs0,
-+                                   bool has_fs1, FeatureStruct1 *fs1,
-+                                   bool has_fs2, FeatureStruct2 *fs2,
-+                                   bool has_fs3, FeatureStruct3 *fs3,
-+                                   bool has_fs4, FeatureStruct4 *fs4,
-+                                   bool has_cfs1, CondFeatureStruct1 *cfs1=
-,
-+                                   bool has_cfs2, CondFeatureStruct2 *cfs2=
-,
-+                                   bool has_cfs3, CondFeatureStruct3 *cfs3=
-,
-+                                   Error **errp)
- {
-+    return g_new(FeatureStruct1, 1);
- }
-=20
- void qmp_test_command_features1(Error **errp)
-@@ -271,6 +277,30 @@ static void test_dispatch_cmd_io(void)
-     qobject_unref(ret3);
- }
-=20
-+static void test_dispatch_cmd_ret_deprecated(void)
-+{
-+    const char *cmd =3D "{ 'execute': 'test-features0' }";
-+    QDict *ret;
-+
-+    memset(&compat_policy, 0, sizeof(compat_policy));
-+
-+    /* default accept */
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
-+    assert(ret && qdict_size(ret) =3D=3D 1);
-+    qobject_unref(ret);
-+
-+    compat_policy.has_deprecated_output =3D true;
-+    compat_policy.deprecated_output =3D COMPAT_POLICY_OUTPUT_ACCEPT;
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
-+    assert(ret && qdict_size(ret) =3D=3D 1);
-+    qobject_unref(ret);
-+
-+    compat_policy.deprecated_output =3D COMPAT_POLICY_OUTPUT_HIDE;
-+    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
-+    assert(ret && qdict_size(ret) =3D=3D 0);
-+    qobject_unref(ret);
-+}
-+
- /* test generated dealloc functions for generated types */
- static void test_dealloc_types(void)
- {
-@@ -345,6 +375,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
-     g_test_add_func("/qmp/dispatch_cmd_success_response",
-                     test_dispatch_cmd_success_response);
-+    g_test_add_func("/qmp/dispatch_cmd_ret_deprecated",
-+                    test_dispatch_cmd_ret_deprecated);
-     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
-     g_test_add_func("/qmp/dealloc_partial", test_dealloc_partial);
-=20
-diff --git a/qapi/trace-events b/qapi/trace-events
-index 5eb4afa110..eff1fbd199 100644
---- a/qapi/trace-events
-+++ b/qapi/trace-events
-@@ -17,6 +17,7 @@ visit_start_alternate(void *v, const char *name, void *ob=
-j, size_t size) "v=3D%p n
- visit_end_alternate(void *v, void *obj) "v=3D%p obj=3D%p"
-=20
- visit_optional(void *v, const char *name, bool *present) "v=3D%p name=3D%s=
- present=3D%p"
-+visit_deprecated(void *v, const char *name) "v=3D%p name=3D%s"
-=20
- visit_type_enum(void *v, const char *name, int *obj) "v=3D%p name=3D%s obj=
-=3D%p"
- visit_type_int(void *v, const char *name, int64_t *obj) "v=3D%p name=3D%s =
-obj=3D%p"
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index bc30876c88..35b79c554d 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -69,7 +69,7 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_=
-in, QObject **ret_out,
-     Error *err =3D NULL;
-     Visitor *v;
-=20
--    v =3D qobject_output_visitor_new(ret_out);
-+    v =3D qobject_output_visitor_new_qmp(ret_out);
-     visit_type_%(c_name)s(v, "unused", &ret_in, &err);
-     if (!err) {
-         visit_complete(v, ret_out);
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 23d9194aa4..21df3abed2 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -56,6 +56,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s=
- *obj, Error **errp)
-                      c_type=3Dbase.c_name())
-=20
-     for memb in members:
-+        deprecated =3D 'deprecated' in [f.name for f in memb.features]
-         ret +=3D gen_if(memb.ifcond)
-         if memb.optional:
-             ret +=3D mcgen('''
-@@ -63,6 +64,12 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)=
-s *obj, Error **errp)
- ''',
-                          name=3Dmemb.name, c_name=3Dc_name(memb.name))
-             push_indent()
-+        if deprecated:
-+            ret +=3D mcgen('''
-+    if (visit_deprecated(v, "%(name)s")) {
-+''',
-+                         name=3Dmemb.name)
-+            push_indent()
-         ret +=3D mcgen('''
-     visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, &err);
-     if (err) {
-@@ -71,6 +78,11 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)=
-s *obj, Error **errp)
- ''',
-                      c_type=3Dmemb.type.c_name(), name=3Dmemb.name,
-                      c_name=3Dc_name(memb.name))
-+        if deprecated:
-+            pop_indent()
-+            ret +=3D mcgen('''
-+    }
-+''')
-         if memb.optional:
-             pop_indent()
-             ret +=3D mcgen('''
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
-pi-schema-test.json
-index 6b1f05afa7..e4cce0d5b0 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -297,14 +297,15 @@
-   'features': [ 'feature1' ] }
-=20
- { 'command': 'test-features0',
--  'data': { 'fs0': 'FeatureStruct0',
--            'fs1': 'FeatureStruct1',
--            'fs2': 'FeatureStruct2',
--            'fs3': 'FeatureStruct3',
--            'fs4': 'FeatureStruct4',
--            'cfs1': 'CondFeatureStruct1',
--            'cfs2': 'CondFeatureStruct2',
--            'cfs3': 'CondFeatureStruct3' },
-+  'data': { '*fs0': 'FeatureStruct0',
-+            '*fs1': 'FeatureStruct1',
-+            '*fs2': 'FeatureStruct2',
-+            '*fs3': 'FeatureStruct3',
-+            '*fs4': 'FeatureStruct4',
-+            '*cfs1': 'CondFeatureStruct1',
-+            '*cfs2': 'CondFeatureStruct2',
-+            '*cfs3': 'CondFeatureStruct3' },
-+  'returns': 'FeatureStruct1',
-   'features': [] }
-=20
- { 'command': 'test-command-features1',
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
-i-schema-test.out
-index 891b4101e0..cd53323abd 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -407,15 +407,15 @@ alternate FeatureAlternate1
-     case eins: FeatureStruct1
-     feature feature1
- object q_obj_test-features0-arg
--    member fs0: FeatureStruct0 optional=3DFalse
--    member fs1: FeatureStruct1 optional=3DFalse
--    member fs2: FeatureStruct2 optional=3DFalse
--    member fs3: FeatureStruct3 optional=3DFalse
--    member fs4: FeatureStruct4 optional=3DFalse
--    member cfs1: CondFeatureStruct1 optional=3DFalse
--    member cfs2: CondFeatureStruct2 optional=3DFalse
--    member cfs3: CondFeatureStruct3 optional=3DFalse
--command test-features0 q_obj_test-features0-arg -> None
-+    member fs0: FeatureStruct0 optional=3DTrue
-+    member fs1: FeatureStruct1 optional=3DTrue
-+    member fs2: FeatureStruct2 optional=3DTrue
-+    member fs3: FeatureStruct3 optional=3DTrue
-+    member fs4: FeatureStruct4 optional=3DTrue
-+    member cfs1: CondFeatureStruct1 optional=3DTrue
-+    member cfs2: CondFeatureStruct2 optional=3DTrue
-+    member cfs3: CondFeatureStruct3 optional=3DTrue
-+command test-features0 q_obj_test-features0-arg -> FeatureStruct1
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
- command test-command-features1 None -> None
-     gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfig=
-=3DFalse
---=20
-2.21.1
-
+thanks
+-- PMM
 
