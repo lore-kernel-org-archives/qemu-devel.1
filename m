@@ -2,83 +2,89 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065C3C10F29
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE7B7C2BB1D
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:07:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB69D20658
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 823FD20658
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:07:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LHF/9M3V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB69D20658
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RVdNSGKy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823FD20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE3WA-0001lY-T5
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 00:07:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45386)
+	id 1jE3WB-0001pP-MF
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 00:07:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1jE3UW-00087a-J8
+ (envelope-from <palmerdabbelt@google.com>) id 1jE3UW-00087b-JV
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1jE3UV-00029h-4t
+ (envelope-from <palmerdabbelt@google.com>) id 1jE3UV-00029n-4y
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:08 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:38394)
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43397)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1jE3UU-0001ys-O0
+ id 1jE3UU-0001zs-Nz
  for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:06 -0400
-Received: by mail-pf1-x431.google.com with SMTP id z5so11185824pfn.5
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:06:03 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id f8so9004545plt.10
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to; bh=iNBqy/EyGYwQ63RRDbQPMjqB6icieu8FIzbCkicjV2c=;
- b=LHF/9M3V35NDN33t2dJlKN+4XJNsJBwuofv/9JOiPoQAAZgdD7tCc44RM/+Osu1Rc9
- A9yOtIJRV2gqQLWWVdmkEdJVdJU/noxzE4iuTp03mRVjsmfgbO+9b0v5HSuAeHyWAdxe
- 8l5L4+FJUKUoQJc5LfLlvpuXQR3M4NGS0K21i1GW+UiyH/3OVMSGfADu/LuChAQYKnT8
- eQnvWS6r+lp+qKfEsBrsleE2CbonzEueYlHR9xq9fUBDEyg8AOAo4Fw/x9iaOPRgC/gU
- VJbIxLLQ+D2kS3/fcCKsj6vMNjBbLCyQKA6LSMUU7K+ypiNvvi02G4JvA1sX6BBuNXHG
- FVuQ==
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=w80CzMDxP22b8vsHY5R1KjcrEbEeVniwI+3e9Z9g2gI=;
+ b=RVdNSGKy+5t3KDmeaRJkyaaVbU6RLMsdHgueG1lJ9OlgMPSHrN4ynU7t95JZo951Nr
+ lGidtawaBCUh44dSKaxJhNea/V4CBE7ASk3Yr2Em2sb+K2r+T8hjQJawETtv6DGPtU7T
+ vaAGcEAlkiJmpdqJ4zQzRFh7yA14AQVPD6ihq7VWr1OMyLLveG3DplSc4eXGivvKSE6L
+ DCIA9HoWkwEAhE40knEv1rzJyq3XWHxk7g1WdgfCh7A5K/igM9OwdMdNYqmaaYBLLNmL
+ L4feS+lGS1blhxLi0fb04pq0PPQsU1BsU5Sa0j22vBDobTFpr7xKG12DiTqi/+q9V7Ic
+ Z4dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=iNBqy/EyGYwQ63RRDbQPMjqB6icieu8FIzbCkicjV2c=;
- b=eiC80wzkyjuxRXIEEMDcKYByrZrsrm809MENgsmVyrDCIxNrtdm2V7TLIzbawGO1Ir
- v7t9/Dv1x1UyAYNK0YAfkhhtGACaB51zr6nInk4dn/wr76mzbSgvWlf/N42Nl6CTJfgY
- jAAhT3o/3DhcdP0vFXd2iTexjt/5zrGN8AnRWYNAdXgOEFjApeNvNQYjFTktf9Gm2iAd
- GhDZY8YS7u4JO5qP31b488qfGo9q12hf0Ctt6ViKeRirZN8p6yh/1HRNFjrrjKORYGin
- VPsJxojBvfBxoKGjbqBzvMGw3XGo86LhbPfyy1yavGI3Z/vJ+TRFR7qxhf93UHaPXoEu
- kmvQ==
-X-Gm-Message-State: ANhLgQ1AMft/hMO3uDw5YdK3lIFogjKeI5wCetbLvUu0RqKmOwt4o/JH
- L3LaJZMyp6V9BLQbEmm+Wd9N5g==
-X-Google-Smtp-Source: ADFU+vu4KijjLwxveeTDD/6FM+mzdNt3hMowVffwXj0NpXu0qmYVmSpKZuJWn4gXGUoXt+B+HNV7tQ==
-X-Received: by 2002:a63:28c:: with SMTP id 134mr3009660pgc.165.1584417961985; 
- Mon, 16 Mar 2020 21:06:01 -0700 (PDT)
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=w80CzMDxP22b8vsHY5R1KjcrEbEeVniwI+3e9Z9g2gI=;
+ b=pPHtm9dMehPb9M4ASaB2fSjN0OrSRmCLO0vmw13zb2OVgbJrOtnDJDTNRRHr9Xg7J6
+ JYv/ix936e+SfVtjaW6QIfL+Psavfr1af8nBHUN8x+ZZ39f4C1s4z4sYlt7860kHjLs0
+ 2GzSEaDW+ejmjTKDXjyCTT+PEotWXq2rGsoLZ4a8wVWZuB6xDCeBUj/0Muxw21Ag96Oo
+ aKBCUN7blHnBZDc2s0WG0Cs1U05NXASKdTyyCIh4GrVREDi3f923bYGWcWor+QUZNSbZ
+ umZE1JRURAn6Gb2DGLcXyecqjabSP7OoKqYWhvfMF5IXQ3jl23b3AQ2W4dROEMKFPwPl
+ lcXg==
+X-Gm-Message-State: ANhLgQ3K0gpQaSzQ5EHF/qP21dqK12togWtPck1TLfOkwD1zhtMhpE5D
+ +vCs4WapbTVUrXi546N0mOBDhw==
+X-Google-Smtp-Source: ADFU+vtHPfipcGazbneWadOe0kx2X1CNILdui8txA4y7RiXl8kBgmpSPiidSGpCpkhgCfK0xa9NHxA==
+X-Received: by 2002:a17:902:c1d1:: with SMTP id
+ c17mr2429101plc.184.1584417963707; 
+ Mon, 16 Mar 2020 21:06:03 -0700 (PDT)
 Received: from localhost (c-67-161-15-180.hsd1.ca.comcast.net. [67.161.15.180])
- by smtp.gmail.com with ESMTPSA id 26sm849506pgs.85.2020.03.16.21.06.01
+ by smtp.gmail.com with ESMTPSA id e10sm1275052pfm.121.2020.03.16.21.06.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 21:06:01 -0700 (PDT)
-Subject: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 5
-Date: Mon, 16 Mar 2020 21:05:41 -0700
-Message-Id: <20200317040547.222501-1-palmerdabbelt@google.com>
+ Mon, 16 Mar 2020 21:06:03 -0700 (PDT)
+Subject: [PULL 1/6] target/riscv: Correctly implement TSR trap
+Date: Mon, 16 Mar 2020 21:05:42 -0700
+Message-Id: <20200317040547.222501-2-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
+In-Reply-To: <20200317040547.222501-1-palmerdabbelt@google.com>
+References: <20200317040547.222501-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::431
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,59 +100,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a98135f727595382e200d04c2996e868b7925a01:
+From: Alistair Francis <alistair.francis@wdc.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200316-pull-request' into staging (2020-03-16 14:55:59 +0000)
+As reported in: https://bugs.launchpad.net/qemu/+bug/1851939 we weren't
+correctly handling illegal instructions based on the value of MSTATUS_TSR
+and the current privledge level.
 
-are available in the Git repository at:
+This patch fixes the issue raised in the bug by raising an illegal
+instruction if TSR is set and we are in S-Mode.
 
-  git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-sf5
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Jonathan Behrens <jonathan@fintelia.io
+Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
+---
+ target/riscv/op_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-for you to fetch changes up to c5969a3a3c2cb9ea02ffb7e86acb059d3cf8c264:
-
-  target/riscv: Fix VS mode interrupts forwarding. (2020-03-16 17:03:51 -0700)
-
-----------------------------------------------------------------
-RISC-V Patches for the 5.0 Soft Freeze, Part 5
-
-This tag contains the last of the patches I'd like to target for the 5.0 soft
-freeze.  At this point we're mostly collecting fixes, but there are a few new
-features.  The changes include:
-
-* An OpenSBI update, including the various bits necessary to put CI together
-  and an image for the 32-bit sifive_u board.
-* A fix that disallows TSR when outside of machine mode.
-* A fix for VS-mode interrupt forwarding.
-
-----------------------------------------------------------------
-Alistair Francis (1):
-      target/riscv: Correctly implement TSR trap
-
-Bin Meng (4):
-      roms: opensbi: Upgrade from v0.5 to v0.6
-      roms: opensbi: Add 32-bit firmware image for sifive_u machine
-      riscv: sifive_u: Update BIOS_FILENAME for 32-bit
-      gitlab-ci.yml: Add jobs to build OpenSBI firmware binaries
-
-Rajnesh Kanwal (1):
-      target/riscv: Fix VS mode interrupts forwarding.
-
- .gitlab-ci-opensbi.yml                       |  63 +++++++++++++++++++++++++++
- .gitlab-ci.d/opensbi/Dockerfile              |  33 ++++++++++++++
- .gitlab-ci.yml                               |   1 +
- Makefile                                     |   2 +-
- hw/riscv/sifive_u.c                          |   6 ++-
- pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin | Bin 0 -> 49472 bytes
- pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 40984 -> 41280 bytes
- pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 49160 -> 53760 bytes
- pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 45064 -> 49664 bytes
- roms/Makefile                                |   7 +++
- roms/opensbi                                 |   2 +-
- target/riscv/cpu_helper.c                    |   9 +++-
- target/riscv/op_helper.c                     |   2 +-
- 13 files changed, 120 insertions(+), 5 deletions(-)
- create mode 100644 .gitlab-ci-opensbi.yml
- create mode 100644 .gitlab-ci.d/opensbi/Dockerfile
- create mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 8736f689c2..c6412f680c 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -85,7 +85,7 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+     }
+ 
+     if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+-        get_field(env->mstatus, MSTATUS_TSR)) {
++        get_field(env->mstatus, MSTATUS_TSR) && !(env->priv >= PRV_M)) {
+         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+     }
+ 
+-- 
+2.25.1.481.gfbce0eb801-goog
 
 
