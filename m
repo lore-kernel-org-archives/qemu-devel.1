@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE2AC1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34946C1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2F2920714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:32:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F129020714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 23:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfJduzrN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F2920714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z8PlMbFE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F129020714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jELhF-00058n-Ro
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53345)
+	id 1jELiZ-0007Cn-2a
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 19:33:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1jELZe-0000oz-0i
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:24:39 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jELaE-0001j3-87
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1jELZc-0005PC-Qk
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:24:37 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35046)
+ (envelope-from <jsnow@redhat.com>) id 1jELaC-0008P9-Ca
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:13 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:45952)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jELZc-0005MW-NJ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:24:36 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jELaC-0008Hj-8h
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 19:25:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584487476;
+ s=mimecast20190719; t=1584487510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hav4nkUHBnBpOmQjjncPxXw7xtu0T2JmJhQ14ZDoJo8=;
- b=VfJduzrN4iWZ5SjDqn6MGzIaq1accctDVBvNQziimq+Wgzv2o5PxLS5d+xZgyf9fy7/EYn
- Lg7fcMlN9HcENoFi7yr/fySsZqK1BCI/9ITtKRfFbBuTwONZo2ieM7un7z94isQOv+WQCZ
- YlePh6SrQGZ68Nl19yUNnUR2zy5+dk0=
+ bh=YQM0UB9If7Xg4g9za/6nNer7pYMGCLAddpBFGqJQ8wM=;
+ b=Z8PlMbFEg7HqiBtgmYjXC4tVaJ+sHjq4AvNxL8g7X9b1ryj7SwdnagAVeJHFXxJfF0ub8C
+ qPiQgf1udnUoPy4qHss55444Dz+B5uaSCk/L+XpJIazZlEg79oUyuBhnUcqI6LvWmlCYrq
+ pQAZvRIiwaMsLeXXNAKo07GJt7WjcFA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-zALfh3zzPPCyxJofTIVa5w-1; Tue, 17 Mar 2020 19:24:32 -0400
-X-MC-Unique: zALfh3zzPPCyxJofTIVa5w-1
+ us-mta-476-wER0LIegMkKk25wdS13xjA-1; Tue, 17 Mar 2020 19:25:08 -0400
+X-MC-Unique: wER0LIegMkKk25wdS13xjA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBC621005514;
- Tue, 17 Mar 2020 23:24:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47AD81005516;
+ Tue, 17 Mar 2020 23:25:06 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 96D7960BE0;
- Tue, 17 Mar 2020 23:24:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC21C60BE0;
+ Tue, 17 Mar 2020 23:24:53 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 09/20] via-ide: initialise IDE controller in legacy mode
-Date: Tue, 17 Mar 2020 19:23:18 -0400
-Message-Id: <20200317232329.22362-10-jsnow@redhat.com>
+Subject: [PULL 14/20] hw/isa/piix4.c: Introduce variable to store devfn
+Date: Tue, 17 Mar 2020 19:23:23 -0400
+Message-Id: <20200317232329.22362-15-jsnow@redhat.com>
 In-Reply-To: <20200317232329.22362-1-jsnow@redhat.com>
 References: <20200317232329.22362-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,56 +101,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-According to both the VT82C686B and VT8231 datasheets the VIA Southbridge I=
-DE
-controller is initialised in legacy mode.
+To avoid any problem with reassigning pci variable store devfn in a
+variable instead of acessing it from the PCIDevice.
 
-This allows Linux to correctly determine that legacy rather than PCI IRQ ro=
-uting
-should be used since the boot console text in the fulong2e test image chang=
-es from:
-
-scsi0 : pata_via
-scsi1 : pata_via
-ata1: PATA max UDMA/100 cmd 0xffffffffbfd04050 ctl 0xffffffffbfd04062 \
-  bmdma 0xffffffffbfd04040 irq 14
-ata2: PATA max UDMA/100 cmd 0xffffffffbfd04058 ctl 0xffffffffbfd04066 \
-  bmdma 0xffffffffbfd04048 irq 14
-
-to:
-
-scsi0 : pata_via
-scsi1 : pata_via
-ata1: PATA max UDMA/100 cmd 0xffffffffbfd001f0 ctl 0xffffffffbfd003f6 \
-  bmdma 0xffffffffbfd04040 irq 14
-ata2: PATA max UDMA/100 cmd 0xffffffffbfd00170 ctl 0xffffffffbfd00376 \
-  bmdma 0xffffffffbfd04048 irq 15
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Tested-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-id: 20200313082444.2439-6-mark.cave-ayland@ilande.co.uk
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 1020e0bfcfc6e364f967ccb2a9a3778ac174ccbe.1584457537.git.balaton=
+@eik.bme.hu
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/via.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/isa/piix4.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 8363bd4802..c8835de01b 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -167,7 +167,7 @@ static void via_ide_realize(PCIDevice *dev, Error **err=
-p)
-     uint8_t *pci_conf =3D dev->config;
-     int i;
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 7edec5e149..2cbdcd7700 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -247,9 +247,10 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **is=
+a_bus,
+     DriveInfo **hd;
+     PCIDevice *pci;
+     DeviceState *dev;
++    int devfn =3D PCI_DEVFN(10, 0);
 =20
--    pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode =
-*/
-+    pci_config_set_prog_interface(pci_conf, 0x8a); /* legacy mode */
-     pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-     dev->wmask[PCI_INTERRUPT_LINE] =3D 0;
+-    pci =3D pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
+-                                          true, TYPE_PIIX4_PCI_DEVICE);
++    pci =3D pci_create_simple_multifunction(pci_bus, devfn,  true,
++                                          TYPE_PIIX4_PCI_DEVICE);
+     dev =3D DEVICE(pci);
+     if (isa_bus) {
+         *isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+@@ -257,11 +258,12 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **i=
+sa_bus,
+=20
+     hd =3D g_new(DriveInfo *, ide_drives);
+     ide_drive_get(hd, ide_drives);
+-    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
++    pci_piix4_ide_init(pci_bus, hd, devfn + 1);
+     g_free(hd);
+-    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
++
++    pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
+     if (smbus) {
+-        *smbus =3D piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
++        *smbus =3D piix4_pm_init(pci_bus, devfn + 3, 0x1100,
+                                isa_get_irq(NULL, 9), NULL, 0, NULL);
+    }
 =20
 --=20
 2.21.1
