@@ -2,86 +2,55 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEE9C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5D5C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88336206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:47:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RL5YB2oG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88336206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2AC7C20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:54:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC7C20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=deneb.enyo.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEAhH-0004lY-Q6
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:47:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43697)
+	id 1jEAnX-0006oj-Ay
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1jEAae-0000fM-Jq
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:40:57 -0400
+ (envelope-from <fw@deneb.enyo.de>) id 1jEAmz-0006OW-1J
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1jEAad-0003l1-J8
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:40:56 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44405)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1jEAad-0003dA-BP
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:40:55 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id y2so9714272wrn.11
- for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 04:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Ua1+sx+ArThYkjHUd6R8UKXnZNXGP9jD04wMaayZK/g=;
- b=RL5YB2oG3iArlwHLksWx2nyZPiRFTp2VvJLygY4em9a9szirrPcXmfjykmXYR8Ocrz
- qAm+oVzdnDmtp5BKl7d9266Dl0goENy0DC8oQSuAZZMwAwM6ggA0jr2Bdlat399Q9SMj
- Bu5+Kk+fJO/HcZH7O8qqlCw1NocrggcEXFA6EL+6QOw3zWMZqQo6ZyR8jQgEnnmoFNjB
- JML39hu5fXsBRSrH7PWbkVv5dUMM49F5rgzPSgE/p6FpG4+xCrArEMmF4+85odtLUdxy
- Yt3WvV4hC0NJUXKg7TZ/mN+ks3kOKBdAoAajjQWpt67sOtVs8qPXbnyJ4cj7EAOBlZW9
- HXJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ua1+sx+ArThYkjHUd6R8UKXnZNXGP9jD04wMaayZK/g=;
- b=M4MtIZCKY9dQuRA4fcgu8jwziMB4iTZnv5b2/SeStfZ7e4iyAq1Hh9Yp0Vxt/eXgrr
- OGK8GV9Q2KtiLgIncTxrpeTh02Nwjgxg4p5oYJ9+c3Q2RFTPMGcq88N1myXWtaPp+2M4
- TimP0+flr2b4cKAMsMIpw53taG2PqMUmO4gEqC8KTayhzRFyDYpsBisVfgRA1iI32unY
- b0R0mHLVTxs2/pcVM+j6XATyYNZyA8W90b47zw/PcBtQyeEnRbssxTtOlykmE+FtP7mH
- DGvExW381Jv5Mvc7L4H6FY5P6ZpwecDDbFD+iLQVpTOpS9zDgDnczpp3znDikRG4ph9t
- ZLDQ==
-X-Gm-Message-State: ANhLgQ3erLoDkB/HJSJKRhQ1lDsB62GOlhZInRBNnxmNGX6Vk9KckIfa
- qOxtHP8mz5KtdJr+5ewW643chg7vgwaKuA==
-X-Google-Smtp-Source: ADFU+vsDgqItHnRVMDxy1toPka4x8136yMjRoUaxSSOYOZsDUyMa4RX/H4XtwgCNGHeJatmLUf9e6g==
-X-Received: by 2002:adf:e883:: with SMTP id d3mr5548209wrm.75.1584445254011;
- Tue, 17 Mar 2020 04:40:54 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a186sm3577443wmh.33.2020.03.17.04.40.53
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Mar 2020 04:40:53 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 11/11] hw/arm/pxa2xx: Do not wire up OHCI for PXA255
-Date: Tue, 17 Mar 2020 11:40:39 +0000
-Message-Id: <20200317114039.26914-12-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200317114039.26914-1-peter.maydell@linaro.org>
-References: <20200317114039.26914-1-peter.maydell@linaro.org>
+ (envelope-from <fw@deneb.enyo.de>) id 1jEAmx-0004mn-9w
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:53:40 -0400
+Received: from albireo.enyo.de ([37.24.231.21]:39144)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <fw@deneb.enyo.de>) id 1jEAmx-0004Qx-33
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:53:39 -0400
+Received: from [172.17.203.2] (helo=deneb.enyo.de)
+ by albireo.enyo.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ id 1jEAmp-0003yE-1g; Tue, 17 Mar 2020 11:53:31 +0000
+Received: from fw by deneb.enyo.de with local (Exim 4.92)
+ (envelope-from <fw@deneb.enyo.de>)
+ id 1jEAlQ-0004mu-4A; Tue, 17 Mar 2020 12:52:04 +0100
+From: Florian Weimer <fw@deneb.enyo.de>
+To: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH] ext4: Give 32bit personalities 32bit hashes
+References: <20200317113153.7945-1-linus.walleij@linaro.org>
+Date: Tue, 17 Mar 2020 12:52:04 +0100
+In-Reply-To: <20200317113153.7945-1-linus.walleij@linaro.org> (Linus Walleij's
+ message of "Tue, 17 Mar 2020 12:31:53 +0100")
+Message-ID: <87lfnzdwrf.fsf@mid.deneb.enyo.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 37.24.231.21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,37 +62,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Theodore Ts'o <tytso@mit.edu>,
+ linux-api@vger.kernel.org, qemu-devel@nongnu.org, stable@vger.kernel.org,
+ Andreas Dilger <adilger.kernel@dilger.ca>, Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+* Linus Walleij:
 
-PXA255 does not support a USB OHCI controller, so don't wire it up.
+> It was brought to my attention that this bug from 2018 was
+> still unresolved: 32 bit emulators like QEMU were given
+> 64 bit hashes when running 32 bit emulation on 64 bit systems.
+>
+> The personality(2) system call supports to let processes
+> indicate that they are 32 bit Linux to the kernel. This
+> was suggested by Teo in the original thread, so I just wired
+> it up and it solves the problem.
+>
+> Programs that need the 32 bit hash only need to issue the
+> personality(PER_LINUX32) call and things start working.
+>
+> I made a test program like this:
+>
+>   #include <dirent.h>
+>   #include <errno.h>
+>   #include <stdio.h>
+>   #include <string.h>
+>   #include <sys/types.h>
+>   #include <sys/personality.h>
+>
+>   int main(int argc, char** argv) {
+>     DIR* dir;
+>     personality(PER_LINUX32);
+>     dir = opendir("/boot");
+>     printf("dir=%p\n", dir);
+>     printf("readdir(dir)=%p\n", readdir(dir));
+>     printf("errno=%d: %s\n", errno, strerror(errno));
+>     return 0;
+>   }
+>
+> This was compiled with an ARM32 toolchain from Bootlin using
+> glibc 2.28 and thus suffering from the bug.
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Message-id: 20200313160215.28155-1-linux@roeck-us.net
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/pxa2xx.c | 3 ---
- 1 file changed, 3 deletions(-)
+Just be sure: Is it possible to move the PER_LINUX32 setting into QEMU?
+(I see why not.)
 
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index 56a36202d71..336c9bad4ae 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -2290,9 +2290,6 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
-         s->ssp[i] = (SSIBus *)qdev_get_child_bus(dev, "ssi");
-     }
- 
--    sysbus_create_simple("sysbus-ohci", 0x4c000000,
--                         qdev_get_gpio_in(s->pic, PXA2XX_PIC_USBH1));
--
-     s->pcmcia[0] = pxa2xx_pcmcia_init(address_space, 0x20000000);
-     s->pcmcia[1] = pxa2xx_pcmcia_init(address_space, 0x30000000);
- 
--- 
-2.20.1
-
+However, this does not solve the issue with network file systems and
+other scenarios.  I still think need to add a workaround to the glibc
+implementation.
 
