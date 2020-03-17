@@ -2,53 +2,53 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,TVD_SUBJ_WIPE_DEBT,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 962D4C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 692C1C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61AAC205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35A4E20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HZNnyV1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AAC205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="h6Q95a4J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A4E20714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9Ac-0002Pj-Gw
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45325)
+	id 1jE9Ah-0002Yr-Bh
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:10:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95j-00013j-V2
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:00 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95f-0000uO-Nf
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95h-0002lH-L5
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:55 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41927 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE95a-0001qc-A8
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:51 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:40631 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE95h-0001uK-6s; Tue, 17 Mar 2020 06:04:53 -0400
+ id 1jE95Z-0001IP-TT; Tue, 17 Mar 2020 06:04:46 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKw4v3Gz9sSt; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
+ id 48hTKw23jcz9sSb; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1584439476;
- bh=ahf6kPUdTFlVRzytiUCLwUm2hqrLDJD3Di+JZ1vbp30=;
+ bh=/vRF7LH21Z9YI4tvoah84Uft6k1d+ANzUl5tBCjdNnw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HZNnyV1hmaH/QbFp9bsKZ311WiT5hxSo64ZaLebi1GN6l/LfRWjPT1Y85N7bvDdJO
- /ndfFNtKYTma9/azWRt802tssBmRs7TG8qP65clcGeFZkC8qxrt3YNp/wldCN0zhrm
- M+1hHy0tNRLoXF02R1+Fp6S+nVY9q1CabquRba4I=
+ b=h6Q95a4Je9LUuJp9iOay4ysuBWPeVAU2CWyXakLuQIH/rRF9HZ16rxDjavbl1xq6V
+ IU0L3MAiSeQlPYebb5fFQ0SqvS1OLtqUBfM78xIgTdi5Uvgu97w7G0gdIhD+Yov0gV
+ MQ17CQfvIWHqrLRTr3OoIv2apD0YmDhJpURmktlU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 17/45] spapr: Don't use weird units for MIN_RMA_SLOF
-Date: Tue, 17 Mar 2020 21:03:55 +1100
-Message-Id: <20200317100423.622643-18-david@gibson.dropbear.id.au>
+Subject: [PULL 11/45] target/ppc: Remove RMOR register from POWER9 & POWER10
+Date: Tue, 17 Mar 2020 21:03:49 +1100
+Message-Id: <20200317100423.622643-12-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
@@ -71,63 +71,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
  qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIN_RMA_SLOF records the minimum about of RMA that the SLOF firmware
-requires.  It lets us give a meaningful error if the RMA ends up too smal=
-l,
-rather than just letting SLOF crash.
+Currently we create the Real Mode Offset Register (RMOR) on all Book3S cp=
+us
+from POWER7 onwards.  However the translation mode which the RMOR control=
+s
+is no longer supported in POWER9, and so the register has been removed fr=
+om
+the architecture.
 
-It's currently stored as a number of megabytes, which is strange for glob=
-al
-constants.  Move that megabyte scaling into the definition of the constan=
-t
-like most other things use.
-
-Change from M to MiB in the associated message while we're at it.
+Remove it from our model on POWER9 and POWER10.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/ppc/spapr.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/ppc/translate_init.inc.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index cc10798be4..510494ad87 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -103,7 +103,7 @@
- #define FW_OVERHEAD             0x2800000
- #define KERNEL_LOAD_ADDR        FW_MAX_SIZE
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index aecad96db3..f7acd3d61d 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8015,12 +8015,16 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+-    spr_register_hv(env, SPR_RMOR, "RMOR",
++    spr_register_hv(env, SPR_HRMOR, "HRMOR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+-    spr_register_hv(env, SPR_HRMOR, "HRMOR",
++}
++
++static void gen_spr_rmor(CPUPPCState *env)
++{
++    spr_register_hv(env, SPR_RMOR, "RMOR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+@@ -8497,6 +8501,7 @@ static void init_proc_POWER7(CPUPPCState *env)
 =20
--#define MIN_RMA_SLOF            128UL
-+#define MIN_RMA_SLOF            (128 * MiB)
+     /* POWER7 Specific Registers */
+     gen_spr_book3s_ids(env);
++    gen_spr_rmor(env);
+     gen_spr_amr(env);
+     gen_spr_book3s_purr(env);
+     gen_spr_power5p_common(env);
+@@ -8637,6 +8642,7 @@ static void init_proc_POWER8(CPUPPCState *env)
 =20
- #define PHANDLE_INTC            0x00001111
-=20
-@@ -2956,10 +2956,10 @@ static void spapr_machine_init(MachineState *mach=
-ine)
-         }
-     }
-=20
--    if (spapr->rma_size < (MIN_RMA_SLOF * MiB)) {
-+    if (spapr->rma_size < MIN_RMA_SLOF) {
-         error_report(
--            "pSeries SLOF firmware requires >=3D %ldM guest RMA (Real Mo=
-de Area memory)",
--            MIN_RMA_SLOF);
-+            "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real =
-Mode Area memory)",
-+            MIN_RMA_SLOF / MiB);
-         exit(1);
-     }
-=20
+     /* POWER8 Specific Registers */
+     gen_spr_book3s_ids(env);
++    gen_spr_rmor(env);
+     gen_spr_amr(env);
+     gen_spr_iamr(env);
+     gen_spr_book3s_purr(env);
 --=20
 2.24.1
 
