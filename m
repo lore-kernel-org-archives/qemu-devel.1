@@ -2,114 +2,156 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0256C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7D6C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:37:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 752E62073E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:36:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752E62073E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 8734820735
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 16:37:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qwq55/s6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8734820735
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEFD8-0004AP-Js
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:36:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60324)
+	id 1jEFDA-0004GC-K5
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 12:37:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1jEEms-0002ru-0l
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:09:52 -0400
+ (envelope-from <jsnow@redhat.com>) id 1jEEwZ-0001rv-Ku
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1jEEmp-00052l-FN
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:09:49 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:60453)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEmp-0004ry-43
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:09:47 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M6VRf-1jCIy61aR7-0070W8; Tue, 17 Mar 2020 17:09:35 +0100
-To: qemu-devel@nongnu.org
-References: <20200316161550.336150-1-laurent@vivier.eu>
- <20200316161550.336150-13-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PULL 12/38] linux-user: Support futex_time64
-Message-ID: <1dc0f25f-c472-f893-0a96-4657dfbd2220@vivier.eu>
-Date: Tue, 17 Mar 2020 17:09:33 +0100
+ (envelope-from <jsnow@redhat.com>) id 1jEEwX-00048d-Q7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:19:51 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:24612)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1jEEwX-000456-Ix
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 12:19:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1584461989;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Rwf7Yq2DhDQ9CY4jSA21AgbhEsD2TvkAwT7y6OjQ79M=;
+ b=Qwq55/s6qjxIrfmyJtiuK7jSzRDqGDIY45877xTYMo86ryCFn/S3XIUV72thEtkBmCtdvU
+ u+zNW25ODOWOg+mGs3fWONQzPAMnOFUkd5HR1MmjVNZeCxjbdvBkH/l9/DyOK/ZU4jBytn
+ Ri2sYVvyJU6GG3j5xaXsM3tTuhhyCmo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-lVNisFBcMKyCLEAJnjzipg-1; Tue, 17 Mar 2020 12:19:45 -0400
+X-MC-Unique: lVNisFBcMKyCLEAJnjzipg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA9178010FB;
+ Tue, 17 Mar 2020 16:19:44 +0000 (UTC)
+Received: from [10.10.112.191] (ovpn-112-191.rdu2.redhat.com [10.10.112.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2176E60BE0;
+ Tue, 17 Mar 2020 16:19:44 +0000 (UTC)
+Subject: Re: [PATCH] hd-geo-test: Clean up use of buf[] in
+ create_qcow2_with_mbr()
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200317092354.31831-1-armbru@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <83ee007a-e4db-f822-0869-938e0403dca8@redhat.com>
+Date: Tue, 17 Mar 2020 12:19:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200316161550.336150-13-laurent@vivier.eu>
+In-Reply-To: <20200317092354.31831-1-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:TjIysdX8NvgNUGrLtGBb3VAwTvkWNdZ4sDGqClWHGI/ay+5+LtF
- 6csE0jA2pPwtR2oMhnIHw3+C9f/i22lkJD96bSx0AJIeNInnqiQFtl5spDCt1drqf53p6+c
- 34u5yQ9gEaOl/NkDYv60FTpipOZw39gegS66mWtRO6XykqnUgtdtpJMQdZ5O+HoGt6Z6CmD
- JAXza8T8+VNeIsJvONa7Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:LUd9y8VOes0=:6BdbFP52Hq+A7jzVpc5Z5B
- ZZbw0pwwZj0jEbS1WUGC7HLS1ilXGykMUtVYu/fwD0uyYjBVYqTEkpjbb1m0h6Q86K5xmqJCQ
- y97xa6QSpnI2wk0vxbxTRB3wLKycqMi5wA1hQ6d/2C3HvgMG6Bcp2anFWArTrCalTnrb20GLO
- X6HDUM1N1cVuap0hRPIx3zlXRdpuf/qncPT3ukuPCXhP3ayPAmPTspTm2TdqoKoHxqqJOQbh/
- MGadW6Lijb1XWn1yYeFDLM+T40wYpQgBvTjPNbFgPt/+PvgptG0IzCc2ZwuDCFG2dBnWwtkK6
- VkQN6DptkZwxMGhOszBYAW2/RhboNRLgOUSLx/yHNiKaqEZRuekavo5xt8aXMhNqhGUmGybWV
- j/UfjDWt9mdOSsFBmoSLCG53+m/A8gWGbB8yvpyyLltWsdEVhY3WP9gA5ynLsIjSKqdsGY1q5
- LzYAmd+s04uZlEHRartPwkn6FYM07pRLQxUahh27qqGr6pJgNGegdJAo6+707jbKAK+SlYxLc
- t2WraC+9j/gm8CHTbCKm+wvNfB2+ZtG4S0ZlaOuqo/3Qp/CHIJw+UOc80RN22iRS4/E49bCh+
- zqfR8Ami5xp/BDE29c0Yi5LTjaNMibDQE1MaNXR9/vwGw1msb8v4hOE+2dIfFMdAuvkry+a0l
- xdlxLfNj9KE6g2KE/+qi90e6Zocw3aBY41u4K0PqZHdaSfyvAJzydV7w/YOErdUy491NUVQv0
- 6ViPDwhG87ocEMhqkhQxgMLXpLPiOps4jpx88KNlaOrLOsEf+JNbpOwbJ1o0yvvoC5y6BbRdm
- wKDvEuU2TykS8W9D++q9Y1MKCUkwO5H1jdAIX/0+q6t1O3JY+NNm8hbx8EqL1FNSwxzX0tA
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+ [fuzzy]
+X-Received-From: 216.205.24.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,279 +163,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Sam Eiderman <shmuel.eiderman@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
 
-I have removed this patch from the pull request because Peter reported a
-problem:
 
-Compile failure, aarch32:
-
-/home/peter.maydell/qemu/linux-user/syscall.c: In function 'do_sys_futex':
-/home/peter.maydell/qemu/linux-user/syscall.c:6946:16: error: implicit
-declaration of function 'sys_futex_time64'; did you mean
-'safe_futex_time64'? [-Werror=implicit-function-declaration]
-         return sys_futex_time64(uaddr, op, val, timeout, uaddr2, val3);
-                ^~~~~~~~~~~~~~~~
-                safe_futex_time64
-
-Moreover patchew reported some style issues for the code you have added
-(yes, it's a cut'n'paste of existing code, but I think it's a good
-opportunity to fix that too).
-
-Could you have a look?
-
-I will add the new patch to my next pull request as it is a bugfix that
-can be merged during thr RC cycle.
-
-Thanks,
-Laurent
-
-Le 16/03/2020 à 17:15, Laurent Vivier a écrit :
-> From: Alistair Francis <alistair.francis@wdc.com>
+On 3/17/20 5:23 AM, Markus Armbruster wrote:
+> valgrind reports write unitialized bytes from buf[].  Clear them.
 > 
-> Add support for host and target futex_time64. If futex_time64 exists on
-> the host we try that first before falling back to the standard futex
-> syscall.
+> ASan reports we store to misaligned address in buf[].  Use stl_le_p()
+> for that.
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> Message-Id: <517832730838e1d0b5eda26781b280854d792f9e.1584143748.git.alistair.francis@wdc.com>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Cc: Sam Eiderman <shmuel.eiderman@oracle.com>
+> Cc: John Snow <jsnow@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  linux-user/syscall.c | 144 +++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 131 insertions(+), 13 deletions(-)
+>  tests/qtest/hd-geo-test.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index aaf62d48992a..32d75cfe3b8a 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -245,7 +245,12 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
->  #define __NR_sys_rt_sigqueueinfo __NR_rt_sigqueueinfo
->  #define __NR_sys_rt_tgsigqueueinfo __NR_rt_tgsigqueueinfo
->  #define __NR_sys_syslog __NR_syslog
-> -#define __NR_sys_futex __NR_futex
-> +#if defined(__NR_futex)
-> +# define __NR_sys_futex __NR_futex
-> +#endif
-> +#if defined(__NR_futex_time64)
-> +# define __NR_sys_futex_time64 __NR_futex_time64
-> +#endif
->  #define __NR_sys_inotify_init __NR_inotify_init
->  #define __NR_sys_inotify_add_watch __NR_inotify_add_watch
->  #define __NR_sys_inotify_rm_watch __NR_inotify_rm_watch
-> @@ -295,10 +300,16 @@ _syscall1(int,exit_group,int,error_code)
->  #if defined(TARGET_NR_set_tid_address) && defined(__NR_set_tid_address)
->  _syscall1(int,set_tid_address,int *,tidptr)
->  #endif
-> -#if defined(TARGET_NR_futex) && defined(__NR_futex)
-> +#if (defined(TARGET_NR_futex) && defined(__NR_futex)) || \
-> +    (defined(TARGET_NR_futex_time64) && \
-> +        (HOST_LONG_BITS == 64 && defined(__NR_futex)))
->  _syscall6(int,sys_futex,int *,uaddr,int,op,int,val,
->            const struct timespec *,timeout,int *,uaddr2,int,val3)
->  #endif
-> +#if (defined(TARGET_NR_futex_time64) && defined(__NR_futex_teim64))
-> +_syscall6(int,sys_futex_time64,int *,uaddr,int,op,int,val,
-> +          const struct timespec *,timeout,int *,uaddr2,int,val3)
-> +#endif
->  #define __NR_sys_sched_getaffinity __NR_sched_getaffinity
->  _syscall3(int, sys_sched_getaffinity, pid_t, pid, unsigned int, len,
->            unsigned long *, user_mask_ptr);
-> @@ -762,10 +773,14 @@ safe_syscall5(int, ppoll, struct pollfd *, ufds, unsigned int, nfds,
->  safe_syscall6(int, epoll_pwait, int, epfd, struct epoll_event *, events,
->                int, maxevents, int, timeout, const sigset_t *, sigmask,
->                size_t, sigsetsize)
-> -#ifdef TARGET_NR_futex
-> +#if defined(__NR_futex)
->  safe_syscall6(int,futex,int *,uaddr,int,op,int,val, \
->                const struct timespec *,timeout,int *,uaddr2,int,val3)
->  #endif
-> +#if defined(__NR_futex_time64)
-> +safe_syscall6(int,futex_time64,int *,uaddr,int,op,int,val, \
-> +              const struct timespec *,timeout,int *,uaddr2,int,val3)
-> +#endif
->  safe_syscall2(int, rt_sigsuspend, sigset_t *, newset, size_t, sigsetsize)
->  safe_syscall2(int, kill, pid_t, pid, int, sig)
->  safe_syscall2(int, tkill, int, tid, int, sig)
-> @@ -1229,7 +1244,7 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
->  }
->  #endif
+> diff --git a/tests/qtest/hd-geo-test.c b/tests/qtest/hd-geo-test.c
+> index a249800544..48e8e02d6e 100644
+> --- a/tests/qtest/hd-geo-test.c
+> +++ b/tests/qtest/hd-geo-test.c
+> @@ -421,7 +421,7 @@ static char *create_qcow2_with_mbr(MBRpartitions mbr, uint64_t sectors)
+>      char *raw_path = strdup(template);
+>      char *qcow2_path = strdup(template);
+>      char cmd[100 + 2 * PATH_MAX];
+> -    uint8_t buf[512];
+> +    uint8_t buf[512] = {};
+>      int i, ret, fd, offset;
+>      uint64_t qcow2_size = sectors * 512;
+>      uint8_t status, parttype, head, sector, cyl;
+> @@ -457,8 +457,8 @@ static char *create_qcow2_with_mbr(MBRpartitions mbr, uint64_t sectors)
+>          buf[offset + 0x6] = sector;
+>          buf[offset + 0x7] = cyl;
 >  
-> -#if defined(TARGET_NR_clock_settime64)
-> +#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
->  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
->                                                   abi_ulong target_addr)
->  {
-> @@ -6907,6 +6922,55 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
->  }
->  #endif
+> -        (*(uint32_t *)&buf[offset + 0x8]) = cpu_to_le32(mbr[i].start_sect);
+> -        (*(uint32_t *)&buf[offset + 0xc]) = cpu_to_le32(mbr[i].nr_sects);
+> +        stl_le_p(&buf[offset + 0x8], mbr[i].start_sect);
+> +        stl_le_p(&buf[offset + 0xc], mbr[i].nr_sects);
 >  
-> +static int do_sys_futex(int *uaddr, int op, int val,
-> +                         const struct timespec *timeout, int *uaddr2,
-> +                         int val3)
-> +{
-> +#if HOST_LONG_BITS == 64
-> +#if defined(__NR_futex)
-> +    /* always a 64-bit time_t, it doesn't define _time64 version  */
-> +    return sys_futex(uaddr, op, val, timeout, uaddr2, val3);
-> +
-> +#endif
-> +#else /* HOST_LONG_BITS == 64 */
-> +#if defined(__NR_futex_time64)
-> +    if (sizeof(timeout->tv_sec) == 8) {
-> +        /* _time64 function on 32bit arch */
-> +        return sys_futex_time64(uaddr, op, val, timeout, uaddr2, val3);
-> +    }
-> +#endif
-> +#if defined(__NR_futex)
-> +    /* old function on 32bit arch */
-> +    return sys_futex(uaddr, op, val, timeout, uaddr2, val3);
-> +#endif
-> +#endif /* HOST_LONG_BITS == 64 */
-> +    g_assert_not_reached();
-> +}
-> +
-> +static int do_safe_futex(int *uaddr, int op, int val,
-> +                         const struct timespec *timeout, int *uaddr2,
-> +                         int val3)
-> +{
-> +#if HOST_LONG_BITS == 64
-> +#if defined(__NR_futex)
-> +    /* always a 64-bit time_t, it doesn't define _time64 version  */
-> +    return get_errno(safe_futex(uaddr, op, val, timeout, uaddr2, val3));
-> +#endif
-> +#else /* HOST_LONG_BITS == 64 */
-> +#if defined(__NR_futex_time64)
-> +    if (sizeof(timeout->tv_sec) == 8) {
-> +        /* _time64 function on 32bit arch */
-> +        return get_errno(safe_futex_time64(uaddr, op, val, timeout, uaddr2,
-> +                                           val3));
-> +    }
-> +#endif
-> +#if defined(__NR_futex)
-> +    /* old function on 32bit arch */
-> +    return get_errno(safe_futex(uaddr, op, val, timeout, uaddr2, val3));
-> +#endif
-> +#endif /* HOST_LONG_BITS == 64 */
-> +    return -TARGET_ENOSYS;
-> +}
->  
->  /* ??? Using host futex calls even when target atomic operations
->     are not really atomic probably breaks things.  However implementing
-> @@ -6936,12 +7000,61 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
->          } else {
->              pts = NULL;
->          }
-> -        return get_errno(safe_futex(g2h(uaddr), op, tswap32(val),
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, tswap32(val),
-> +                         pts, NULL, val3));
-> +    case FUTEX_WAKE:
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +    case FUTEX_FD:
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +    case FUTEX_REQUEUE:
-> +    case FUTEX_CMP_REQUEUE:
-> +    case FUTEX_WAKE_OP:
-> +        /* For FUTEX_REQUEUE, FUTEX_CMP_REQUEUE, and FUTEX_WAKE_OP, the
-> +           TIMEOUT parameter is interpreted as a uint32_t by the kernel.
-> +           But the prototype takes a `struct timespec *'; insert casts
-> +           to satisfy the compiler.  We do not need to tswap TIMEOUT
-> +           since it's not compared to guest memory.  */
-> +        pts = (struct timespec *)(uintptr_t) timeout;
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, pts,
-> +                                       g2h(uaddr2),
-> +                                       (base_op == FUTEX_CMP_REQUEUE
-> +                                        ? tswap32(val3)
-> +                                        : val3)));
-> +    default:
-> +        return -TARGET_ENOSYS;
-> +    }
-> +}
-> +#endif
-> +
-> +#if defined(TARGET_NR_futex_time64)
-> +static int do_futex_time64(target_ulong uaddr, int op, int val, target_ulong timeout,
-> +                           target_ulong uaddr2, int val3)
-> +{
-> +    struct timespec ts, *pts;
-> +    int base_op;
-> +
-> +    /* ??? We assume FUTEX_* constants are the same on both host
-> +       and target.  */
-> +#ifdef FUTEX_CMD_MASK
-> +    base_op = op & FUTEX_CMD_MASK;
-> +#else
-> +    base_op = op;
-> +#endif
-> +    switch (base_op) {
-> +    case FUTEX_WAIT:
-> +    case FUTEX_WAIT_BITSET:
-> +        if (timeout) {
-> +            pts = &ts;
-> +            target_to_host_timespec64(pts, timeout);
-> +        } else {
-> +            pts = NULL;
-> +        }
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, tswap32(val),
->                           pts, NULL, val3));
->      case FUTEX_WAKE:
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
->      case FUTEX_FD:
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, NULL, NULL, 0));
->      case FUTEX_REQUEUE:
->      case FUTEX_CMP_REQUEUE:
->      case FUTEX_WAKE_OP:
-> @@ -6951,16 +7064,17 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
->             to satisfy the compiler.  We do not need to tswap TIMEOUT
->             since it's not compared to guest memory.  */
->          pts = (struct timespec *)(uintptr_t) timeout;
-> -        return get_errno(safe_futex(g2h(uaddr), op, val, pts,
-> -                                    g2h(uaddr2),
-> -                                    (base_op == FUTEX_CMP_REQUEUE
-> -                                     ? tswap32(val3)
-> -                                     : val3)));
-> +        return get_errno(do_safe_futex(g2h(uaddr), op, val, pts,
-> +                                       g2h(uaddr2),
-> +                                       (base_op == FUTEX_CMP_REQUEUE
-> +                                        ? tswap32(val3)
-> +                                        : val3)));
->      default:
->          return -TARGET_ENOSYS;
+>          offset += 0x10;
 >      }
->  }
->  #endif
-> +
->  #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
->  static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
->                                       abi_long handle, abi_long mount_id,
-> @@ -7532,7 +7646,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              ts = cpu->opaque;
->              if (ts->child_tidptr) {
->                  put_user_u32(0, ts->child_tidptr);
-> -                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
-> +                do_sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
->                            NULL, NULL, 0);
->              }
->              thread_cpu = NULL;
-> @@ -11630,6 +11744,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_futex:
->          return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
->  #endif
-> +#ifdef TARGET_NR_futex_time64
-> +    case TARGET_NR_futex_time64:
-> +        return do_futex_time64(arg1, arg2, arg3, arg4, arg5, arg6);
-> +#endif
->  #if defined(TARGET_NR_inotify_init) && defined(__NR_inotify_init)
->      case TARGET_NR_inotify_init:
->          ret = get_errno(sys_inotify_init());
 > 
+
+Staged.
+
+Trying out our gitlab CI pipelines now:
+
+https://gitlab.com/jsnow/qemu/-/tree/ide
+
+
+Traditional message:
+
+Thanks, applied to my IDE tree:
+
+https://github.com/jnsnow/qemu/commits/ide
+https://github.com/jnsnow/qemu.git
+
+--js
 
 
