@@ -2,54 +2,58 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6356C2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA40C10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:27:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDED020714
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:26:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDED020714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 3178F20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3178F20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEE7L-0000FP-UJ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58890)
+	id 1jEE7c-0000vZ-Bt
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:27:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1jEDur-0007LU-GX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:14:03 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDw2-0000hR-RE
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:15:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1jEDum-0002Cn-Ee
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:13:59 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:49498)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1jEDw0-00034k-Cy
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:15:14 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:49181)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1jEDud-0001D4-UF; Tue, 17 Mar 2020 11:13:51 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 1A867747E07;
- Tue, 17 Mar 2020 16:13:43 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 6D31A747E06; Tue, 17 Mar 2020 16:13:42 +0100 (CET)
-Message-Id: <e9713fdded4d212fa68ed03b844e531934226a6f.1584457537.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1584457537.git.balaton@eik.bme.hu>
-References: <cover.1584457537.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [PATCH v3 6/8] hw/ide: Do ide_drive_get() within pci_ide_create_devs()
-Date: Tue, 17 Mar 2020 16:05:37 +0100
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1jEDvz-0001aL-Cl; Tue, 17 Mar 2020 11:15:12 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green; DM=||false|;
+ DS=CONTINUE|ham_alarm|0.134728-0.00237387-0.862898; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e02c03305; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=11; RT=11; SR=0;
+ TI=SMTPD_---.H0zXA-6_1584458101; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.H0zXA-6_1584458101)
+ by smtp.aliyun-inc.com(10.147.43.230);
+ Tue, 17 Mar 2020 23:15:01 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 04/61] target/riscv: add vector configure instruction
+Date: Tue, 17 Mar 2020 23:05:56 +0800
+Message-Id: <20200317150653.9008-5-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: qemu-devel@nongnu.org,
-    qemu-block@nongnu.org
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,270 +65,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Markus Armbruster <armbru@redhat.com>, hpoussin@reactos.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
+ Alistair Francis <alistair.francis@wdc.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pci_ide_create_devs() function takes a hd_table parameter but all
-callers just pass what ide_drive_get() returns so we can do it locally
-simplifying callers and removing hd_table parameter.
+vsetvl and vsetvli are two configure instructions for vl, vtype. TB flags
+should update after configure instructions. The (ill, lmul, sew ) of vtype
+and the bit of (VSTART == 0 && VL == VLMAX) will be placed within tb_flags.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/alpha/dp264.c              | 13 +++----------
- hw/i386/pc_piix.c             |  9 +++++----
- hw/ide/pci.c                  |  4 +++-
- hw/isa/piix4.c                | 10 ++--------
- hw/mips/mips_fulong2e.c       |  4 +---
- hw/mips/mips_malta.c          |  2 +-
- hw/sparc64/sun4u.c            |  6 +-----
- include/hw/ide/pci.h          |  2 +-
- include/hw/southbridge/piix.h |  3 +--
- 9 files changed, 18 insertions(+), 35 deletions(-)
+ target/riscv/Makefile.objs              |  2 +-
+ target/riscv/cpu.h                      | 63 ++++++++++++++++++----
+ target/riscv/helper.h                   |  2 +
+ target/riscv/insn32.decode              |  5 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 69 +++++++++++++++++++++++++
+ target/riscv/translate.c                | 17 +++++-
+ target/riscv/vector_helper.c            | 53 +++++++++++++++++++
+ 7 files changed, 199 insertions(+), 12 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
+ create mode 100644 target/riscv/vector_helper.c
 
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 27595767e5..f7751b18f6 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -15,7 +15,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
- #include "hw/rtc/mc146818rtc.h"
--#include "hw/ide.h"
- #include "hw/ide/pci.h"
- #include "hw/timer/i8254.h"
- #include "hw/isa/superio.h"
-@@ -58,6 +57,7 @@ static void clipper_init(MachineState *machine)
-     const char *initrd_filename =3D machine->initrd_filename;
-     AlphaCPU *cpus[4];
-     PCIBus *pci_bus;
-+    PCIDevice *pci_dev;
-     ISABus *isa_bus;
-     qemu_irq rtc_irq;
-     long size, i;
-@@ -100,15 +100,8 @@ static void clipper_init(MachineState *machine)
-     isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
-=20
-     /* IDE disk setup.  */
--    {
--        DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
--        PCIDevice *pci_dev;
--
--        ide_drive_get(hd, ARRAY_SIZE(hd));
--
--        pci_dev =3D pci_create_simple(pci_bus, -1, "cmd646-ide");
--        pci_ide_create_devs(pci_dev, hd);
--    }
-+    pci_dev =3D pci_create_simple(pci_bus, -1, "cmd646-ide");
-+    pci_ide_create_devs(pci_dev);
-=20
-     /* Load PALcode.  Given that this is not "real" cpu palcode,
-        but one explicitly written for the emulation, we might as
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index c399398739..9216596ec6 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -86,7 +86,6 @@ static void pc_init1(MachineState *machine,
-     int piix3_devfn =3D -1;
-     qemu_irq smi_irq;
-     GSIState *gsi_state;
--    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     BusState *idebus[MAX_IDE_BUS];
-     ISADevice *rtc_state;
-     MemoryRegion *ram_memory;
-@@ -240,20 +239,22 @@ static void pc_init1(MachineState *machine,
-=20
-     pc_nic_init(pcmc, isa_bus, pci_bus);
-=20
--    ide_drive_get(hd, ARRAY_SIZE(hd));
-     if (pcmc->pci_enabled) {
-         PCIDevice *dev;
-=20
-         dev =3D pci_create_simple(pci_bus, piix3_devfn + 1,
-                                 xen_enabled() ? "piix3-ide-xen" : "piix3=
--ide");
--        pci_ide_create_devs(dev, hd);
-+        pci_ide_create_devs(dev);
-         idebus[0] =3D qdev_get_child_bus(&dev->qdev, "ide.0");
-         idebus[1] =3D qdev_get_child_bus(&dev->qdev, "ide.1");
-         pc_cmos_init(pcms, idebus[0], idebus[1], rtc_state);
-     }
- #ifdef CONFIG_IDE_ISA
--else {
-+    else {
-+        DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-         int i;
+diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+index ff651f69f6..ff38df6219 100644
+--- a/target/riscv/Makefile.objs
++++ b/target/riscv/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
++obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o vector_helper.o gdbstub.o
+ obj-$(CONFIG_SOFTMMU) += pmp.o
+ 
+ ifeq ($(CONFIG_SOFTMMU),y)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 603715f849..f42f075024 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -21,6 +21,7 @@
+ #define RISCV_CPU_H
+ 
+ #include "hw/core/cpu.h"
++#include "hw/registerfields.h"
+ #include "exec/cpu-defs.h"
+ #include "fpu/softfloat-types.h"
+ 
+@@ -99,6 +100,12 @@ typedef struct CPURISCVState CPURISCVState;
+ 
+ #define RV_VLEN_MAX 512
+ 
++FIELD(VTYPE, VLMUL, 0, 2)
++FIELD(VTYPE, VSEW, 2, 3)
++FIELD(VTYPE, VEDIV, 5, 2)
++FIELD(VTYPE, RESERVED, 7, sizeof(target_ulong) * 8 - 9)
++FIELD(VTYPE, VILL, sizeof(target_ulong) * 8 - 2, 1)
 +
-+        ide_drive_get(hd, ARRAY_SIZE(hd));
-         for (i =3D 0; i < MAX_IDE_BUS; i++) {
-             ISADevice *dev;
-             char busname[] =3D "ide.0";
-diff --git a/hw/ide/pci.c b/hw/ide/pci.c
-index e0c84392e2..97347f07f1 100644
---- a/hw/ide/pci.c
-+++ b/hw/ide/pci.c
-@@ -477,13 +477,15 @@ const VMStateDescription vmstate_ide_pci =3D {
- };
-=20
- /* hd_table must contain 4 block drivers */
--void pci_ide_create_devs(PCIDevice *dev, DriveInfo **hd_table)
-+void pci_ide_create_devs(PCIDevice *dev)
+ struct CPURISCVState {
+     target_ulong gpr[32];
+     uint64_t fpr[32]; /* assume both F and D extensions */
+@@ -358,19 +365,62 @@ void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
+ #define TB_FLAGS_MMU_MASK   3
+ #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
+ 
++typedef CPURISCVState CPUArchState;
++typedef RISCVCPU ArchCPU;
++#include "exec/cpu-all.h"
++
++FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
++FIELD(TB_FLAGS, LMUL, 3, 2)
++FIELD(TB_FLAGS, SEW, 5, 3)
++FIELD(TB_FLAGS, VILL, 8, 1)
++
++/*
++ * A simplification for VLMAX
++ * = (1 << LMUL) * VLEN / (8 * (1 << SEW))
++ * = (VLEN << LMUL) / (8 << SEW)
++ * = (VLEN << LMUL) >> (SEW + 3)
++ * = VLEN >> (SEW + 3 - LMUL)
++ */
++static inline uint32_t vext_get_vlmax(RISCVCPU *cpu, target_ulong vtype)
++{
++    uint8_t sew, lmul;
++
++    sew = FIELD_EX64(vtype, VTYPE, VSEW);
++    lmul = FIELD_EX64(vtype, VTYPE, VLMUL);
++    return cpu->cfg.vlen >> (sew + 3 - lmul);
++}
++
+ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+-                                        target_ulong *cs_base, uint32_t *flags)
++                                        target_ulong *cs_base, uint32_t *pflags)
  {
-     PCIIDEState *d =3D PCI_IDE(dev);
-+    DriveInfo *hd_table[2 * MAX_IDE_DEVS];
-     static const int bus[4]  =3D { 0, 0, 1, 1 };
-     static const int unit[4] =3D { 0, 1, 0, 1 };
-     int i;
-=20
-+    ide_drive_get(hd_table, ARRAY_SIZE(hd_table));
-     for (i =3D 0; i < 4; i++) {
-         if (hd_table[i]) {
-             ide_create_drive(d->bus + bus[i], unit[i], hd_table[i]);
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 706eb5be69..cc3e5cef8c 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -241,11 +241,8 @@ static void piix4_register_types(void)
-=20
- type_init(piix4_register_types)
-=20
--DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
--                          I2CBus **smbus, size_t ide_buses)
-+DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus, I2CBus **sm=
-bus)
- {
--    size_t ide_drives =3D ide_buses * MAX_IDE_DEVS;
--    DriveInfo **hd;
-     PCIDevice *pci;
-     DeviceState *dev;
-     int devfn =3D PCI_DEVFN(10, 0);
-@@ -258,10 +255,7 @@ DeviceState *piix4_create(PCIBus *pci_bus, ISABus **=
-isa_bus,
++    uint32_t flags = 0;
++
+     *pc = env->pc;
+     *cs_base = 0;
++
++    if (riscv_has_ext(env, RVV)) {
++        uint32_t vlmax = vext_get_vlmax(env_archcpu(env), env->vtype);
++        bool vl_eq_vlmax = (env->vstart == 0) && (vlmax == env->vl);
++        flags = FIELD_DP32(flags, TB_FLAGS, VILL,
++                    FIELD_EX64(env->vtype, VTYPE, VILL));
++        flags = FIELD_DP32(flags, TB_FLAGS, SEW,
++                    FIELD_EX64(env->vtype, VTYPE, VSEW));
++        flags = FIELD_DP32(flags, TB_FLAGS, LMUL,
++                    FIELD_EX64(env->vtype, VTYPE, VLMUL));
++        flags = FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
++    } else {
++        flags = FIELD_DP32(flags, TB_FLAGS, VILL, 1);
++    }
++
+ #ifdef CONFIG_USER_ONLY
+-    *flags = TB_FLAGS_MSTATUS_FS;
++    flags |= TB_FLAGS_MSTATUS_FS;
+ #else
+-    *flags = cpu_mmu_index(env, 0);
++    flags |= cpu_mmu_index(env, 0);
+     if (riscv_cpu_fp_enabled(env)) {
+-        *flags |= env->mstatus & MSTATUS_FS;
++        flags |= env->mstatus & MSTATUS_FS;
      }
-=20
-     pci =3D pci_create_simple(pci_bus, devfn + 1, "piix4-ide");
--    hd =3D g_new(DriveInfo *, ide_drives);
--    ide_drive_get(hd, ide_drives);
--    pci_ide_create_devs(pci, hd);
--    g_free(hd);
-+    pci_ide_create_devs(pci);
-=20
-     pci_create_simple(pci_bus, devfn + 2, "piix4-usb-uhci");
-     if (smbus) {
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 639ba2a091..0f312b5a35 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -239,7 +239,6 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bu=
-s, int slot, qemu_irq intc,
- {
-     qemu_irq *i8259;
-     ISABus *isa_bus;
--    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     PCIDevice *dev;
-=20
-     isa_bus =3D vt82c686b_isa_init(pci_bus, PCI_DEVFN(slot, 0));
-@@ -259,8 +258,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bu=
-s, int slot, qemu_irq intc,
-     isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
-=20
-     dev =3D pci_create_simple(pci_bus, PCI_DEVFN(slot, 1), "via-ide");
--    ide_drive_get(hd, ARRAY_SIZE(hd));
--    pci_ide_create_devs(dev, hd);
-+    pci_ide_create_devs(dev);
-=20
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci")=
-;
-     pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci")=
-;
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index d380f73d7b..e4c4de1b4e 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1403,7 +1403,7 @@ void mips_malta_init(MachineState *machine)
-     pci_bus =3D gt64120_register(s->i8259);
-=20
-     /* Southbridge */
--    dev =3D piix4_create(pci_bus, &isa_bus, &smbus, MAX_IDE_BUS);
-+    dev =3D piix4_create(pci_bus, &isa_bus, &smbus);
-=20
-     /* Interrupt controller */
-     qdev_connect_gpio_out_named(dev, "intr", 0, i8259_irq);
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index d33e84f831..6abfcb30f8 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -50,7 +50,6 @@
- #include "hw/sparc/sparc64.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/sysbus.h"
--#include "hw/ide.h"
- #include "hw/ide/pci.h"
- #include "hw/loader.h"
- #include "hw/fw-path-provider.h"
-@@ -563,7 +562,6 @@ static void sun4uv_init(MemoryRegion *address_space_m=
-em,
-     PCIBus *pci_bus, *pci_busA, *pci_busB;
-     PCIDevice *ebus, *pci_dev;
-     SysBusDevice *s;
--    DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-     DeviceState *iommu, *dev;
-     FWCfgState *fw_cfg;
-     NICInfo *nd;
-@@ -663,12 +661,10 @@ static void sun4uv_init(MemoryRegion *address_space=
-_mem,
-         qemu_macaddr_default_if_unset(&macaddr);
-     }
-=20
--    ide_drive_get(hd, ARRAY_SIZE(hd));
--
-     pci_dev =3D pci_create(pci_busA, PCI_DEVFN(3, 0), "cmd646-ide");
-     qdev_prop_set_uint32(&pci_dev->qdev, "secondary", 1);
-     qdev_init_nofail(&pci_dev->qdev);
--    pci_ide_create_devs(pci_dev, hd);
-+    pci_ide_create_devs(pci_dev);
-=20
-     /* Map NVRAM into I/O (ebus) space */
-     nvram =3D m48t59_init(NULL, 0, 0, NVRAM_SIZE, 1968, 59);
-diff --git a/include/hw/ide/pci.h b/include/hw/ide/pci.h
-index 98ffa7dfcd..dd504e5a0b 100644
---- a/include/hw/ide/pci.h
-+++ b/include/hw/ide/pci.h
-@@ -63,7 +63,7 @@ static inline IDEState *bmdma_active_if(BMDMAState *bmd=
-ma)
- void bmdma_init(IDEBus *bus, BMDMAState *bm, PCIIDEState *d);
- void bmdma_cmd_writeb(BMDMAState *bm, uint32_t val);
- extern MemoryRegionOps bmdma_addr_ioport_ops;
--void pci_ide_create_devs(PCIDevice *dev, DriveInfo **hd_table);
-+void pci_ide_create_devs(PCIDevice *dev);
-=20
- extern const VMStateDescription vmstate_ide_pci;
- extern const MemoryRegionOps pci_ide_cmd_le_ops;
-diff --git a/include/hw/southbridge/piix.h b/include/hw/southbridge/piix.=
-h
-index 152628c6d9..02bd741209 100644
---- a/include/hw/southbridge/piix.h
-+++ b/include/hw/southbridge/piix.h
-@@ -68,7 +68,6 @@ extern PCIDevice *piix4_dev;
-=20
- PIIX3State *piix3_create(PCIBus *pci_bus, ISABus **isa_bus);
-=20
--DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
--                          I2CBus **smbus, size_t ide_buses);
-+DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus, I2CBus **sm=
-bus);
-=20
  #endif
---=20
-2.21.1
++    *pflags = flags;
+ }
+ 
+ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+@@ -411,9 +461,4 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
+ 
+ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
+ 
+-typedef CPURISCVState CPUArchState;
+-typedef RISCVCPU ArchCPU;
+-
+-#include "exec/cpu-all.h"
+-
+ #endif /* RISCV_CPU_H */
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index debb22a480..3c28c7e407 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -76,3 +76,5 @@ DEF_HELPER_2(mret, tl, env, tl)
+ DEF_HELPER_1(wfi, void, env)
+ DEF_HELPER_1(tlb_flush, void, env)
+ #endif
++/* Vector functions */
++DEF_HELPER_3(vsetvl, tl, env, tl, tl)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b883672e63..53340bdbc4 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -62,6 +62,7 @@
+ @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
+ @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
+ @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
++@r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
+ 
+ @hfence_gvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+ @hfence_bvma ....... ..... .....   ... ..... ....... %rs2 %rs1
+@@ -207,3 +208,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011 @r2_rm
+ fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
+ fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
+ fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
++
++# *** RV32V Extension ***
++vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
++vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+new file mode 100644
+index 0000000000..7381c24295
+--- /dev/null
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -0,0 +1,69 @@
++/*
++ * RISC-V translation routines for the RVV Standard Extension.
++ *
++ * Copyright (c) 2020 C-SKY Limited. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
++{
++    TCGv s1, s2, dst;
++    s2 = tcg_temp_new();
++    dst = tcg_temp_new();
++
++    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
++    if (a->rs1 == 0) {
++        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
++        s1 = tcg_const_tl(RV_VLEN_MAX);
++    } else {
++        s1 = tcg_temp_new();
++        gen_get_gpr(s1, a->rs1);
++    }
++    gen_get_gpr(s2, a->rs2);
++    gen_helper_vsetvl(dst, cpu_env, s1, s2);
++    gen_set_gpr(a->rd, dst);
++    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
++    lookup_and_goto_ptr(ctx);
++    ctx->base.is_jmp = DISAS_NORETURN;
++
++    tcg_temp_free(s1);
++    tcg_temp_free(s2);
++    tcg_temp_free(dst);
++    return true;
++}
++
++static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
++{
++    TCGv s1, s2, dst;
++    s2 = tcg_const_tl(a->zimm);
++    dst = tcg_temp_new();
++
++    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
++    if (a->rs1 == 0) {
++        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
++        s1 = tcg_const_tl(RV_VLEN_MAX);
++    } else {
++        s1 = tcg_temp_new();
++        gen_get_gpr(s1, a->rs1);
++    }
++    gen_helper_vsetvl(dst, cpu_env, s1, s2);
++    gen_set_gpr(a->rd, dst);
++    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
++    ctx->base.is_jmp = DISAS_NORETURN;
++
++    tcg_temp_free(s1);
++    tcg_temp_free(s2);
++    tcg_temp_free(dst);
++    return true;
++}
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 43bf7e39a6..af07ac4160 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -56,6 +56,12 @@ typedef struct DisasContext {
+        to reset this known value.  */
+     int frm;
+     bool ext_ifencei;
++    /* vector extension */
++    bool vill;
++    uint8_t lmul;
++    uint8_t sew;
++    uint16_t vlen;
++    bool vl_eq_vlmax;
+ } DisasContext;
+ 
+ #ifdef TARGET_RISCV64
+@@ -711,6 +717,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+ #include "insn_trans/trans_rva.inc.c"
+ #include "insn_trans/trans_rvf.inc.c"
+ #include "insn_trans/trans_rvd.inc.c"
++#include "insn_trans/trans_rvv.inc.c"
+ #include "insn_trans/trans_privileged.inc.c"
+ 
+ /* Include the auto-generated decoder for 16 bit insn */
+@@ -745,10 +752,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPURISCVState *env = cs->env_ptr;
+     RISCVCPU *cpu = RISCV_CPU(cs);
++    uint32_t tb_flags = ctx->base.tb->flags;
+ 
+     ctx->pc_succ_insn = ctx->base.pc_first;
+-    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+-    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
++    ctx->mem_idx = tb_flags & TB_FLAGS_MMU_MASK;
++    ctx->mstatus_fs = tb_flags & TB_FLAGS_MSTATUS_FS;
+     ctx->priv_ver = env->priv_ver;
+ #if !defined(CONFIG_USER_ONLY)
+     if (riscv_has_ext(env, RVH)) {
+@@ -772,6 +780,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
+     ctx->ext_ifencei = cpu->cfg.ext_ifencei;
++    ctx->vlen = cpu->cfg.vlen;
++    ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
++    ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
++    ctx->lmul = FIELD_EX32(tb_flags, TB_FLAGS, LMUL);
++    ctx->vl_eq_vlmax = FIELD_EX32(tb_flags, TB_FLAGS, VL_EQ_VLMAX);
+ }
+ 
+ static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+new file mode 100644
+index 0000000000..2afe716f2a
+--- /dev/null
++++ b/target/riscv/vector_helper.c
+@@ -0,0 +1,53 @@
++/*
++ * RISC-V Vector Extension Helpers for QEMU.
++ *
++ * Copyright (c) 2020 C-SKY Limited. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++#include <math.h>
++
++target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
++    target_ulong s2)
++{
++    int vlmax, vl;
++    RISCVCPU *cpu = env_archcpu(env);
++    uint16_t sew = 8 << FIELD_EX64(s2, VTYPE, VSEW);
++    uint8_t ediv = FIELD_EX64(s2, VTYPE, VEDIV);
++    bool vill = FIELD_EX64(s2, VTYPE, VILL);
++    target_ulong reserved = FIELD_EX64(s2, VTYPE, RESERVED);
++
++    if ((sew > cpu->cfg.elen) || vill || (ediv != 0) || (reserved != 0)) {
++        /* only set vill bit. */
++        env->vtype = FIELD_DP64(0, VTYPE, VILL, 1);
++        env->vl = 0;
++        env->vstart = 0;
++        return 0;
++    }
++
++    vlmax = vext_get_vlmax(cpu, s2);
++    if (s1 <= vlmax) {
++        vl = s1;
++    } else {
++        vl = vlmax;
++    }
++    env->vl = vl;
++    env->vtype = s2;
++    env->vstart = 0;
++    return vl;
++}
+-- 
+2.23.0
 
 
