@@ -2,82 +2,81 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8F5C1975A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 346DAC1975A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 215F12051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F33D42051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 20:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlLyOu4B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215F12051A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBnVSTXo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33D42051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEIoI-0000lK-4e
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:27:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42488)
+	id 1jEIpi-0001ps-5t
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 16:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1jEInL-0008HX-Sl
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:26:37 -0400
+ (envelope-from <eblake@redhat.com>) id 1jEIoY-0001Gl-T7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:27:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1jEInK-0005pB-ML
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:26:35 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:35874)
+ (envelope-from <eblake@redhat.com>) id 1jEIoX-0005Lx-SZ
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:27:50 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:27501)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1jEInK-0005iA-Im
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:26:34 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEIoX-0005IK-Nn
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 16:27:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584476791;
+ s=mimecast20190719; t=1584476868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/i9WXgisJ1g+RA1rppOjUNagbGqFwC92ciPUCh5EP/w=;
- b=VlLyOu4BWDYrVPeR8pLIHZnQWzz0yYPdRpLtQ9Mvn7chaQDB1zIWyYH0RstqoOIFzh/JOz
- avn/nuo+eeBM6An0G5O3z9swJGxosqJyHRfAb8Hwe2Btyylkc6Hnp8GSskKAVxbjmOW1ZO
- tg36E/UQzL9Ire8mukaU0UtJTqHzwUg=
+ bh=t3mvC+FCMYEdmIkmgAioa0aN4WlLbKf3umQ9Szu0/b8=;
+ b=VBnVSTXoWDnwslfJ939lsIZKzcquHy6xrl8epNKL3oOqziCb8RS1jdAt+SNbYsv+bWItpS
+ vkH+/s72Y0H5lZMBUMTaPK0XI1Lwg9bMvnve1ZA7q4n0HCh99Ur+gxtY0ayGIGUxJf+Zem
+ Owek3hpZyhJh5ZvKYJPR7cyIr64wLyM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-p9TtGonCPd6MYEG9QgCR3A-1; Tue, 17 Mar 2020 16:26:29 -0400
-X-MC-Unique: p9TtGonCPd6MYEG9QgCR3A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-428-MAQ1O7WcN0aW4Bxv02KA0w-1; Tue, 17 Mar 2020 16:27:44 -0400
+X-MC-Unique: MAQ1O7WcN0aW4Bxv02KA0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30A351007269;
- Tue, 17 Mar 2020 20:26:28 +0000 (UTC)
-Received: from work-vm (ovpn-114-234.ams2.redhat.com [10.36.114.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11A375C1BB;
- Tue, 17 Mar 2020 20:26:22 +0000 (UTC)
-Date: Tue, 17 Mar 2020 20:26:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 3/4] tests/migration: Disable autoconverge test on
- Travis-CI s390x
-Message-ID: <20200317202620.GJ3369@work-vm>
-References: <20200317200541.6246-1-philmd@redhat.com>
- <20200317200541.6246-4-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A60ED8017CC;
+ Tue, 17 Mar 2020 20:27:43 +0000 (UTC)
+Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BD085D9E2;
+ Tue, 17 Mar 2020 20:27:40 +0000 (UTC)
+Subject: Re: [PATCH v4 20/34] qapi: Add feature flags to struct members
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200317115459.31821-1-armbru@redhat.com>
+ <20200317115459.31821-21-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <39d4cc7c-76b8-9e78-a694-c2ae1d8324f3@redhat.com>
+Date: Tue, 17 Mar 2020 15:27:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200317200541.6246-4-philmd@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200317115459.31821-21-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 216.205.24.74
+X-Received-From: 63.128.21.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,93 +88,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> This test fails on Travis-CI s390x when configured with --disable-tcg:
->=20
->   $ make check-qtest
->     TEST    check-qtest-s390x: tests/qtest/boot-serial-test
->   qemu-system-s390x: -accel tcg: invalid accelerator tcg
->   qemu-system-s390x: falling back to KVM
->     TEST    check-qtest-s390x: tests/qtest/pxe-test
->     TEST    check-qtest-s390x: tests/qtest/test-netfilter
->     TEST    check-qtest-s390x: tests/qtest/test-filter-mirror
->     TEST    check-qtest-s390x: tests/qtest/test-filter-redirector
->     TEST    check-qtest-s390x: tests/qtest/drive_del-test
->     TEST    check-qtest-s390x: tests/qtest/device-plug-test
->     TEST    check-qtest-s390x: tests/qtest/virtio-ccw-test
->     TEST    check-qtest-s390x: tests/qtest/cpu-plug-test
->     TEST    check-qtest-s390x: tests/qtest/migration-test
->   **
->   ERROR:tests/qtest/migration-test.c:1229:test_migrate_auto_converge: 'go=
-t_stop' should be FALSE
->   ERROR - Bail out! ERROR:tests/qtest/migration-test.c:1229:test_migrate_=
-auto_converge: 'got_stop' should be FALSE
->   make: *** [tests/Makefile.include:633: check-qtest-s390x] Error 1
-
-Before we take the hammer to it, could you try reducing it's initial
-bandwidth, the code that says:
-
-    /*
-     * Set the initial parameters so that the migration could not converge
-     * without throttling.
-     */
-    migrate_set_parameter_int(from, "downtime-limit", 1);
-    migrate_set_parameter_int(from, "max-bandwidth", 100000000); /* ~100Mb/=
-s */
-
-knock a couple of 0's off that and see if it's happy.
-
-Dave
-
-> Per David Gilbert, it might be a threshold requiring tuning:
-> "it could just be the writing is slow on s390 and the migration
-> thread fast; in which case the autocomplete wouldn't be needed.
-> Perhaps we just need to reduce the bandwidth limit."
->=20
-> Disable the autoconverge test for now.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On 3/17/20 6:54 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  tests/qtest/migration-test.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->=20
-> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-> index 3d6cc83b88..878399666e 100644
-> --- a/tests/qtest/migration-test.c
-> +++ b/tests/qtest/migration-test.c
-> @@ -1181,6 +1181,16 @@ static void test_migrate_auto_converge(void)
->      MigrateStart *args =3D migrate_start_new();
->      QTestState *from, *to;
->      int64_t remaining, percentage;
-> +    char *travis_arch;
-> +
-> +    /*
-> +     * This test does not work reliably on Travis s390x.
-> +     */
-> +    travis_arch =3D getenv("TRAVIS_CPU_ARCH");
-> +    if (travis_arch && g_str_equal(travis_arch, "s390x")) {
-> +        g_test_skip("Test does not work reliably on s390x Travis contain=
-ers.");
-> +        return;
-> +    }
-> =20
->      /*
->       * We want the test to be stable and as fast as possible.
-> --=20
-> 2.21.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+> +++ b/qapi/introspect.json
+> @@ -206,11 +206,15 @@
+>   #           Future extension: if present and non-null, the parameter
+>   #           is optional, and defaults to this value.
+>   #
+> +# @features: names of features associated with the member, in no
+> +#            particular order.  (since 5.0)
+
+We're down to the soft-freeze wire ;)
+
+> +#
+>   # Since: 2.5
+>   ##
+>   { 'struct': 'SchemaInfoObjectMember',
+> -  'data': { 'name': 'str', 'type': 'str', '*default': 'any' } }
+> +  'data': { 'name': 'str', 'type': 'str', '*default': 'any',
+>   # @default's type must be null or match @type
+> +            '*features': [ 'str' ] } }
+
+The comment was outside the overall definition, and now occurs=20
+mid-object.  I might have listed '*features' first, leaving '*default'=20
+last so that the comment can still be outside the overall struct.  But=20
+that's aesthetics; the QAPI parser handles things correctly as-is.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
