@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3460EC2BB1D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DBCC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01686205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:20:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 763C820658
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ojU1y/fV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01686205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Szs+mtCH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 763C820658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9KU-0003ur-3l
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:20:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45360)
+	id 1jE9L7-00056e-G2
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95l-00016V-8M
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:01 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1jE96c-0002an-BW
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE95h-0002mt-Tt
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:04:57 -0400
-Received: from ozlabs.org ([203.11.71.1]:36463)
+ (envelope-from <dgibson@ozlabs.org>) id 1jE96a-0000k0-MR
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:50 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49853 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE95h-0001uZ-EG; Tue, 17 Mar 2020 06:04:53 -0400
+ id 1jE96a-0006UO-7O; Tue, 17 Mar 2020 06:05:48 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKw4VWVz9sSw; Tue, 17 Mar 2020 21:04:36 +1100 (AEDT)
+ id 48hTL26Nbsz9sTZ; Tue, 17 Mar 2020 21:04:42 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584439476;
- bh=88kztm91h2bkC3afsiHERGe38CDEWroGsrNUk9qctec=;
+ d=gibson.dropbear.id.au; s=201602; t=1584439482;
+ bh=bQQmdDvTIGTYx9hToVqDanlWHhCaBUAPPuQxwhbV9d4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ojU1y/fVAWoS4lnWaBx1VTEhLTVmaM09uEABtCO7JqcCp5mGdD8M+CqZCtf6tbrAy
- cAKdZtwpWJysdNDonAcXVr3rVSPTfvCF73BGPQ9ljgRh5qTSctQMPEsF6m6XwQxVtK
- JYPTi/TirxwbxTnzrHa2/caKeH67CpT8Z+GDVLGM=
+ b=Szs+mtCHEuG7pJhOWVtyNcVeUiRz0W20aviFU8F21j9s/3iP6aPIMGNAaouPtlhIQ
+ SccB+wE18iry5mn4V9a+UlrVXfm/lxWQJuwNK2FDzEBD9x8QJ8S3HlAtL6fJcohpj3
+ u3cxIPnQdZ3T+akLA0ZDFZx112csMId2cn1188w0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 15/45] target/ppc: Only calculate RMLS derived RMA limit on
- demand
-Date: Tue, 17 Mar 2020 21:03:53 +1100
-Message-Id: <20200317100423.622643-16-david@gibson.dropbear.id.au>
+Subject: [PULL 41/45] ppc/spapr: Allow FWNMI on TCG
+Date: Tue, 17 Mar 2020 21:04:19 +1100
+Message-Id: <20200317100423.622643-42-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,85 +70,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+ Nicholas Piggin <npiggin@gmail.com>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the LPCR is written, we update the env->rmls field with the RMA limi=
-t
-it implies.  Simplify things by just calculating the value directly from
-the LPCR value when we need it.
+From: Nicholas Piggin <npiggin@gmail.com>
 
-It's possible this is a little slower, but it's unlikely to be significan=
-t,
-since this is only for real mode accesses in a translation configuration
-that's not used very often, and the whole thing is behind the qemu TLB
-anyway.  Therefore, keeping the number of state variables down and not
-having to worry about making sure it's always in sync seems the better
-option.
+There should no longer be a reason to prevent TCG providing FWNMI.
+System Reset interrupts are generated to the guest with nmi monitor
+command and H_SIGNAL_SYS_RESET. Machine Checks can not be injected
+currently, but this could be implemented with the mce monitor cmd
+similarly to i386.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Message-Id: <20200316142613.121089-6-npiggin@gmail.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+[dwg: Re-enable FWNMI in qtests, since that now works]
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h        | 1 -
- target/ppc/mmu-hash64.c | 9 ++++++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ hw/ppc/spapr_caps.c               | 5 +----
+ tests/qtest/libqos/libqos-spapr.h | 3 +--
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8077fdb068..f9871b1233 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1046,7 +1046,6 @@ struct CPUPPCState {
-     uint64_t insns_flags2;
- #if defined(TARGET_PPC64)
-     ppc_slb_t vrma_slb;
--    target_ulong rmls;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index f626d769a0..679ae7959f 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -516,10 +516,7 @@ static void cap_fwnmi_apply(SpaprMachineState *spapr=
+, uint8_t val,
+         return; /* Disabled by default */
+     }
+=20
+-    if (tcg_enabled()) {
+-        warn_report("Firmware Assisted Non-Maskable Interrupts(FWNMI) no=
+t "
+-                    "supported in TCG");
+-    } else if (kvm_enabled()) {
++    if (kvm_enabled()) {
+         if (kvmppc_set_fwnmi() < 0) {
+             error_setg(errp, "Firmware Assisted Non-Maskable Interrupts(=
+FWNMI) "
+                              "not supported by KVM");
+diff --git a/tests/qtest/libqos/libqos-spapr.h b/tests/qtest/libqos/libqo=
+s-spapr.h
+index 16174dbada..49bd72d20b 100644
+--- a/tests/qtest/libqos/libqos-spapr.h
++++ b/tests/qtest/libqos/libqos-spapr.h
+@@ -12,7 +12,6 @@ void qtest_spapr_shutdown(QOSState *qs);
+     "cap-cfpc=3Dbroken,"                           \
+     "cap-sbbc=3Dbroken,"                           \
+     "cap-ibs=3Dbroken,"                            \
+-    "cap-ccf-assist=3Doff,"                        \
+-    "cap-fwnmi=3Doff"
++    "cap-ccf-assist=3Doff,"
+=20
  #endif
-=20
-     int error_code;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index fcccaabb88..4fd7b7ee74 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -837,8 +837,10 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vad=
-dr eaddr,
-=20
-             goto skip_slb_search;
-         } else {
-+            target_ulong limit =3D rmls_limit(cpu);
-+
-             /* Emulated old-style RMO mode, bounds check against RMLS */
--            if (raddr >=3D env->rmls) {
-+            if (raddr >=3D limit) {
-                 if (rwx =3D=3D 2) {
-                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-@@ -1000,8 +1002,10 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *=
-cpu, target_ulong addr)
-                 return -1;
-             }
-         } else {
-+            target_ulong limit =3D rmls_limit(cpu);
-+
-             /* Emulated old-style RMO mode, bounds check against RMLS */
--            if (raddr >=3D env->rmls) {
-+            if (raddr >=3D limit) {
-                 return -1;
-             }
-             return raddr | env->spr[SPR_RMOR];
-@@ -1091,7 +1095,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
-al)
-     CPUPPCState *env =3D &cpu->env;
-=20
-     env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
--    env->rmls =3D rmls_limit(cpu);
-     ppc_hash64_update_vrma(cpu);
- }
-=20
 --=20
 2.24.1
 
