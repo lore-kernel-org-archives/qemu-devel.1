@@ -2,84 +2,84 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF38AC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A409C18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:33:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88BE020658
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F44E20719
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 11:33:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRq7zmfr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88BE020658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+QLlWXH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F44E20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEAPy-0001Aw-ND
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:29:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60179)
+	id 1jEAT4-0002s2-Bp
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 07:33:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1jEAPH-0000eV-Bv
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:29:12 -0400
+ (envelope-from <linus.walleij@linaro.org>) id 1jEAS1-0002QX-GT
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:32:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1jEAPF-0002EH-9E
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:29:10 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:21019)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1jEAPF-0001xn-0j
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:29:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1584444548;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mBoKto1yqadjDiDiDu3t09uWv+wnMFe33nVllPHtZHI=;
- b=YRq7zmfrkIVtfIX1NMBoTE8s18MkLQ/Xxu1ns8onFVbDu5D6p73ck5R2JzwnRb4P7qexx4
- f+JaxO/l1n0b7tftsdRZWuTi743lZEO9ANhvDZcZp/1JvVm8Euf7ykHXwSlupmDAEwJCwg
- QSBfFBsPuhRb2YW0mO+MyzLxUNPQCO8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-TFfK5d1APC-FwW3T5OAbSg-1; Tue, 17 Mar 2020 07:29:06 -0400
-X-MC-Unique: TFfK5d1APC-FwW3T5OAbSg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 917DE800D4E;
- Tue, 17 Mar 2020 11:29:05 +0000 (UTC)
-Received: from [10.3.112.193] (ovpn-112-193.phx2.redhat.com [10.3.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D9EC5C1BB;
- Tue, 17 Mar 2020 11:29:05 +0000 (UTC)
-Subject: Re: [PATCH v3 12/34] qapi: Add feature flags to remaining definitions
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200315144653.22660-1-armbru@redhat.com>
- <20200315144653.22660-13-armbru@redhat.com>
- <a6b5dcd4-6ac7-adef-d3c0-20a6a9748bd3@redhat.com>
- <87a74fv8hk.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <43385d38-0269-dedb-1d20-3952712f3891@redhat.com>
-Date: Tue, 17 Mar 2020 06:29:04 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <linus.walleij@linaro.org>) id 1jEARz-0008W2-Rl
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:32:01 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34341)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+ id 1jEARz-0008DR-GI
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 07:31:59 -0400
+Received: by mail-lj1-x242.google.com with SMTP id s13so22388985ljm.1
+ for <qemu-devel@nongnu.org>; Tue, 17 Mar 2020 04:31:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WmJlBqTMa5CmdiFIToGjODDNiC8IWRj11NilEIEtQyE=;
+ b=F+QLlWXHueXk9FIie+nFx5HGLWeGdYJkP1o+weY4/OE7tGYvjaycevNwN888rlgn8/
+ nTLBUXpuzAe/IDou25ef/q2vc4WvRwwug6YUdLnhfXfZVDS8027fcl7ELowhrgXoSEtY
+ KB/HU3ypUqaJZR6sLIjBk22EL59kT6FsLYCgoS79hCVnV/7uXK3bACbOAImWiQ5zfDmV
+ OlqVjFhQ0dUs97Wu5f1FzjrVVB4iciokJnoUKu5vXptLshhJeBCg7P7kDhQ349KTiC7w
+ /97l8ecM3Q9N+M80A4VduEj/zPXxW7kDiUmHHsoK/FaHIwVXsqo7l7hu1VHHRoZeT6xI
+ r3Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WmJlBqTMa5CmdiFIToGjODDNiC8IWRj11NilEIEtQyE=;
+ b=pjwsuP8AlwCCkxI0SXI3z3Ghutanq/6rqqeCrZuLfUp9mQ90Idoa7uJtIximfNTw+x
+ 8ENDUwbdpUnTDvvyImi6KwYUVjCB0H2KEFnYuK8dfckvzvnSYZyVRGahKh5aLxNNHCAr
+ vOeaIUC51VsA+zBlgj2ZDfKjF2R+0rmqKQvrNVEvszcGcL+RDce57/HOV3/JrXR0wWk0
+ J2oox2F+zPbuN2KXWo3Uf/7CfAnEForVajIFflw743+kcN80h8DopBMBKb2/HOzPQu6O
+ WwyxpAl6vfGJEd2IFxSUCyTvX+Xcpwzt92IjTvnFrQQEw7/oSfCBBKDWksEt/oFe8lvj
+ 7s8w==
+X-Gm-Message-State: ANhLgQ1U7IhX6VIuBDYZ1ZUQC0pg9rbb4unIE0a5s/94XiPDq1c8vBKw
+ EhSWnGlk+9tIRHmtrtmM60xZtg==
+X-Google-Smtp-Source: ADFU+vuUA0PtGuRfrupcVqALAoBlNnXdvyHxT7lgi1sZxyelUn5XW7P+x0jA+NKEwgdlYgklvWkvNA==
+X-Received: by 2002:a2e:9804:: with SMTP id a4mr500667ljj.180.1584444717157;
+ Tue, 17 Mar 2020 04:31:57 -0700 (PDT)
+Received: from genomnajs.ideon.se ([85.235.10.227])
+ by smtp.gmail.com with ESMTPSA id a18sm2105691ljn.85.2020.03.17.04.31.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Mar 2020 04:31:56 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>
+Subject: [PATCH] ext4: Give 32bit personalities 32bit hashes
+Date: Tue, 17 Mar 2020 12:31:53 +0100
+Message-Id: <20200317113153.7945-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <87a74fv8hk.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.128.21.74
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,52 +91,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, linux-api@vger.kernel.org,
+ Linus Walleij <linus.walleij@linaro.org>, qemu-devel@nongnu.org,
+ stable@vger.kernel.org, Florian Weimer <fw@deneb.enyo.de>,
+ Andy Lutomirski <luto@kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-ext4@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/17/20 12:46 AM, Markus Armbruster wrote:
+It was brought to my attention that this bug from 2018 was
+still unresolved: 32 bit emulators like QEMU were given
+64 bit hashes when running 32 bit emulation on 64 bit systems.
 
->>> +++ b/tests/qapi-schema/doc-good.json
->>> @@ -53,10 +53,14 @@
->>>    # @Enum:
->>>    # @one: The _one_ {and only}
->>>    #
->>> +# Features:
->>> +# @enum-feat: Also _one_ {and only}
->     +#
->      # @two is undocumented
->      ##
->      { 'enum': 'Enum', 'data':
->        [ { 'name': 'one', 'if': 'defined(IFONE)' }, 'two' ],
->     +  'features': [ 'enum-feat' ],
->        'if': 'defined(IFCOND)' }
-> 
->>
->> All our existing public features are a single word (matching naming
->> conventions elsewhere in QAPI).  Are we sure we want to allow feature
->> names that include whitespace?  Of course, the fact that our testsuite
->> covers it (even if we don't use it publically) means that we are sure
->> that our generator can handle it, regardless of whether we decide that
->> a separate patch should restrict feature names.  But I don't see it
->> holding up this patch.
-> 
-> We definitely do not want to exempt feature names from the QAPI naming
-> rules.
-> 
-> The code enforces this.  If I change '-' to ' ' in 'features': [
-> 'enum-feat' ], I get
-> 
->      doc-good.json:61: 'features' member 'enum feat' has an invalid name
+The personality(2) system call supports to let processes
+indicate that they are 32 bit Linux to the kernel. This
+was suggested by Teo in the original thread, so I just wired
+it up and it solves the problem.
 
-Good. I was getting confused between the doc comment (which generally 
-should have spaces, rather than being one word) and the feature name 
-itself.  Sorry for the distraction.
+Programs that need the 32 bit hash only need to issue the
+personality(PER_LINUX32) call and things start working.
 
+I made a test program like this:
+
+  #include <dirent.h>
+  #include <errno.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <sys/types.h>
+  #include <sys/personality.h>
+
+  int main(int argc, char** argv) {
+    DIR* dir;
+    personality(PER_LINUX32);
+    dir = opendir("/boot");
+    printf("dir=%p\n", dir);
+    printf("readdir(dir)=%p\n", readdir(dir));
+    printf("errno=%d: %s\n", errno, strerror(errno));
+    return 0;
+  }
+
+This was compiled with an ARM32 toolchain from Bootlin using
+glibc 2.28 and thus suffering from the bug.
+
+Before the patch:
+
+  $ ./readdir-bug
+  dir=0x86000
+  readdir(dir)=(nil)
+  errno=75: Value too large for defined data type
+
+After the patch:
+
+  $ ./readdir-bug
+  dir=0x86000
+  readdir(dir)=0x86020
+  errno=0: Success
+
+Problem solved.
+
+Cc: Florian Weimer <fw@deneb.enyo.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: stable@vger.kernel.org
+Suggested-by: Theodore Ts'o <tytso@mit.edu>
+Link: https://bugs.launchpad.net/qemu/+bug/1805913
+Link: https://lore.kernel.org/lkml/87bm56vqg4.fsf@mid.deneb.enyo.de/
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=205957
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ fs/ext4/dir.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/fs/ext4/dir.c b/fs/ext4/dir.c
+index 9aa1f75409b0..3faf9edf3e92 100644
+--- a/fs/ext4/dir.c
++++ b/fs/ext4/dir.c
+@@ -27,6 +27,7 @@
+ #include <linux/slab.h>
+ #include <linux/iversion.h>
+ #include <linux/unicode.h>
++#include <linux/personality.h>
+ #include "ext4.h"
+ #include "xattr.h"
+ 
+@@ -618,6 +619,14 @@ static int ext4_dx_readdir(struct file *file, struct dir_context *ctx)
+ 
+ static int ext4_dir_open(struct inode * inode, struct file * filp)
+ {
++	/*
++	 * If we are currently running e.g. a 32 bit emulator on
++	 * a 64 bit machine, the emulator will indicate that it needs
++	 * a 32 bit personality and thus 32 bit hashes from the file
++	 * system.
++	 */
++	if (personality(current->personality) == PER_LINUX32)
++		filp->f_mode |= FMODE_32BITHASH;
+ 	if (IS_ENCRYPTED(inode))
+ 		return fscrypt_get_encryption_info(inode) ? -EACCES : 0;
+ 	return 0;
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.24.1
 
 
