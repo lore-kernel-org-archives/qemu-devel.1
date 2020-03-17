@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEC9C10F29
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C8C5C2BB1D
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:07:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C59F20658
+	by mail.kernel.org (Postfix) with ESMTPS id 5CCCB20717
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 04:07:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SoVQ7qqd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C59F20658
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s2xqYpjY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CCCB20717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE3WI-00022k-AF
+	id 1jE3WI-00023a-Hq
 	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 00:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45591)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1jE3Uh-0008HX-VX
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:21 -0400
+ (envelope-from <palmerdabbelt@google.com>) id 1jE3Ua-0008AX-FA
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1jE3Uc-0003Bl-MZ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:19 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:37996)
+ (envelope-from <palmerdabbelt@google.com>) id 1jE3UZ-0002ku-C7
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:12 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40740)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1jE3Uc-000364-F9
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:14 -0400
-Received: by mail-pl1-x643.google.com with SMTP id w3so9016610plz.5
- for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:06:14 -0700 (PDT)
+ id 1jE3UZ-0002af-5O
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 00:06:11 -0400
+Received: by mail-pl1-x642.google.com with SMTP id h11so9008298plk.7
+ for <qemu-devel@nongnu.org>; Mon, 16 Mar 2020 21:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=tHG/U0lEWI15yHCwzFAku+uasHUSPsU9VIZR3vpSWIk=;
- b=SoVQ7qqdv1zBbiWBBeah8Su3lgoLTpGSTwj5tY+nwnkgn7UM7VPWby7CvGjqS0/At7
- 0U3vMgrzgKEiQ56dNmrELxz8CHjlBQyrIJxXBwYGy2+n55KaCcXFV4ylojmsxXx4n4jh
- NJiThiioGVGddnljbIKkDBqZ4b8/blF3F2m71jmzB+/oC5/d6OSYxocid1m086QGNNHC
- erHQ9B3SSW5xnTEXdsZzRZN/201UKLju16HkEdTVUfTq3RkxFw7xwvp8szpqTq4Yd++L
- tsicO8kxV+tZ4sMpI6shVN5lC/POWnsd9Fi2ys9lCzokuEGY0M8PchO3XmB+X5L0TI1L
- QavQ==
+ bh=2h8EAiuDrspnzxr4GNpQ/1tZBmlKA5RBBaJwzzdSex0=;
+ b=s2xqYpjYQ+CJLGk34Xrg/uwnXMHXlmaeWmB1lLf07wnf8ebIJ7XOxTWMRJttCGko2C
+ P2lIgCAdg880xQHvksWI0hAAJFnG4RvlMfEHFCSyK3dYGzleTokr0XTiBTw26tkeHCnd
+ 7NBWejnFOdn3yymtaZbkFrUQbHMTQejNRsvUEDvko/+NfJrIydOS8XWxe0RtwDJ8KvM3
+ dqxgpW5uzy3eZE+bL9JCZDjh5CzP0MGjywomhmAmkXXco36bipEJdR93vg3LPoDWhLX5
+ 0yomus015OcD+J3iQjHe5Dx0X1WXsjMGeamCZLBWMnzG+bix8B1c7JonxknCqO8LtbgK
+ Jimw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=tHG/U0lEWI15yHCwzFAku+uasHUSPsU9VIZR3vpSWIk=;
- b=QqW2Shgh2H8SW/1W0MsF0bTKIv5NnL75Ob/LB0GvXTtO5PjYDgXOJRZVXq5NvVyUUY
- X7B6Kq1g4bNlHtGUxagKf3GcH6azniwBHFis4qUWWPCunDwV8z5uEobXANoI1csbf+Qd
- cXItqPbBah4f3UrrTBYRkxNmUJUOm+3JGGpmkm5X2fQktUeqwh36zI2qjIm2/96p1TQH
- qC2MwPN2KifVCocmzzTOZg6RNavv97yZ+QY03OaR1wDTd4PQZ2+uVbhxYTKn27LuBhzY
- 1wPbeVEDrBaWpYpRGpIa/RExYLm1Z31XTtqanFHf5AUlDKi7T+7CCO2mX7OYKd++qx1a
- xMTA==
-X-Gm-Message-State: ANhLgQ3IgRxvK+6S1snxyj1DkC7P24opn21tisuyfMy3yGZp9vahrAZi
- iOwBlsmissFG9s0u3h6z2oVOpQ==
-X-Google-Smtp-Source: ADFU+vtHOYcE5y1fvjPP9DZ+f+We0PpZM9mXyEvz2mSnwmBI2fUoUY5yYOiAU7dSpvYHIbRmocd5nw==
-X-Received: by 2002:a17:902:449:: with SMTP id
- 67mr2350346ple.339.1584417973363; 
- Mon, 16 Mar 2020 21:06:13 -0700 (PDT)
+ bh=2h8EAiuDrspnzxr4GNpQ/1tZBmlKA5RBBaJwzzdSex0=;
+ b=d+IrB/HtkMMjsexqA/NCvmYOkiUT8/MU/RQSUpR3B+ayKMglVV1hkqhqg3jnz7inFp
+ vthqdMClst3ziQCZM6dk/RYqipV0PqKndcByq7yn0yTXj4WSlkQEiV7E6tY3XPG5fKYp
+ jXPMh4WSa3pt5bq6YchiuC2g1Q52T5iD25qsbNhFgQx+RF3V0KGj2iKzJ46x51QoDUy2
+ vu/rDqpgTKkmt0HMEJXFp56oJv88pFhWmzxDaLds/foxDAUSKI8QBljp7pxXZHHpXu4M
+ S5j7Ff8Bj6fk7Fu5Ye9X5UX7BH/m6RtDo5d1JSR25LHcVKIrXiw7iXBRb4okxU4L992B
+ fx4A==
+X-Gm-Message-State: ANhLgQ2lJBz0aZlm/75tZhxi3wMIVyn+V2rAeWzOqxUxTo9r1bntrvMO
+ xj5EZ0f1HCuKNqCW6CCwPJiljA==
+X-Google-Smtp-Source: ADFU+vtArDFC1QGTHkxtH4OOgQu1L6KWdnnnoVYt+xwYoZHzvU4qDC8IPhdzetTb3iHClFx+MUcIqQ==
+X-Received: by 2002:a17:90b:3692:: with SMTP id
+ mj18mr3048427pjb.138.1584417970026; 
+ Mon, 16 Mar 2020 21:06:10 -0700 (PDT)
 Received: from localhost (c-67-161-15-180.hsd1.ca.comcast.net. [67.161.15.180])
- by smtp.gmail.com with ESMTPSA id o128sm1328213pfg.5.2020.03.16.21.06.12
+ by smtp.gmail.com with ESMTPSA id 129sm1294079pfw.84.2020.03.16.21.06.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Mar 2020 21:06:12 -0700 (PDT)
-Subject: [PULL 6/6] target/riscv: Fix VS mode interrupts forwarding.
-Date: Mon, 16 Mar 2020 21:05:47 -0700
-Message-Id: <20200317040547.222501-7-palmerdabbelt@google.com>
+ Mon, 16 Mar 2020 21:06:09 -0700 (PDT)
+Subject: [PULL 4/6] riscv: sifive_u: Update BIOS_FILENAME for 32-bit
+Date: Mon, 16 Mar 2020 21:05:45 -0700
+Message-Id: <20200317040547.222501-5-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
 In-Reply-To: <20200317040547.222501-1-palmerdabbelt@google.com>
 References: <20200317040547.222501-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>,
+ Bin Meng <bmeng.cn@gmail.com>, Alistair Francis <alistair.francis@wdc.com>,
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,50 +100,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
 
-Currently riscv_cpu_local_irq_pending is used to find out pending
-interrupt and VS mode interrupts are being shifted to represent
-S mode interrupts in this function. So when the cause returned by
-this function is passed to riscv_cpu_do_interrupt to actually
-forward the interrupt, the VS mode forwarding check does not work
-as intended and interrupt is actually forwarded to hypervisor. This
-patch fixes this issue.
+Update BIOS_FILENAME to consider 32-bit bios image file name.
 
-Signed-off-by: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Tested booting Linux v5.5 32-bit image (built from rv32_defconfig
+plus CONFIG_SOC_SIFIVE) with the default 32-bit bios image.
+
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu_helper.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ hw/riscv/sifive_u.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 5ea5d133aa..d3ba9efb02 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -46,7 +46,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
-     target_ulong pending = env->mip & env->mie &
-                                ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
-     target_ulong vspending = (env->mip & env->mie &
--                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)) >> 1;
-+                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 156a003642..4409ea1ccc 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -56,7 +56,11 @@
  
-     target_ulong mie    = env->priv < PRV_M ||
-                           (env->priv == PRV_M && mstatus_mie);
-@@ -907,6 +907,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+ #include <libfdt.h>
  
-             if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
-                 !force_hs_execp) {
-+                /*
-+                 * See if we need to adjust cause. Yes if its VS mode interrupt
-+                 * no if hypervisor has delegated one of hs mode's interrupt
-+                 */
-+                if (cause == IRQ_VS_TIMER || cause == IRQ_VS_SOFT ||
-+                    cause == IRQ_VS_EXT)
-+                    cause = cause - 1;
-                 /* Trap to VS mode */
-             } else if (riscv_cpu_virt_enabled(env)) {
-                 /* Trap into HS mode, from virt */
+-#define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
++#if defined(TARGET_RISCV32)
++# define BIOS_FILENAME "opensbi-riscv32-sifive_u-fw_jump.bin"
++#else
++# define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
++#endif
+ 
+ static const struct MemmapEntry {
+     hwaddr base;
 -- 
 2.25.1.481.gfbce0eb801-goog
 
