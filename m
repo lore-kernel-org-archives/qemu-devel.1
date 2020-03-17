@@ -2,62 +2,65 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C6AC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DCEC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 610F2205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:28:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="euScu9ax"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 610F2205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 7909C20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 10:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7909C20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jE9Su-0002Qi-IK
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45990)
+	id 1jE9Tm-0003m9-L6
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 06:29:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1jE969-0001jn-Aj
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:22 -0400
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jE9GQ-0005N2-Ik
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1jE967-0005lL-GF
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:05:21 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:48023 helo=ozlabs.org)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1jE9GO-0006My-KO
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:15:58 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2511 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1jE967-0002rW-4k; Tue, 17 Mar 2020 06:05:19 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48hTKy4yzVz9sTD; Tue, 17 Mar 2020 21:04:37 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1584439478;
- bh=B1jV0fPQqocvsTwTXF9kvnqwBe/46c7fcSvYFuxuhlo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=euScu9axJryurPEQPYiT+tUUw9VrfgPdpAYpM/A6LVkKGFDZcxb29YGOlVeZ16uBH
- iZC7kTJ5UWJrBUa7xP5630ooScJg+S4aofXwIHZ/LZlETzHlcRdRjbDfC27TPQycj+
- 4uVsomRwAFKilupiq3nua/WJUCrkww8TdViV/bhE=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 25/45] hw/scsi/spapr_vscsi: Introduce req_iu() helper
-Date: Tue, 17 Mar 2020 21:04:03 +1100
-Message-Id: <20200317100423.622643-26-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200317100423.622643-1-david@gibson.dropbear.id.au>
-References: <20200317100423.622643-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1jE9GO-0005Lp-7S
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 06:15:56 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id DA7D17B9018C35A16583;
+ Tue, 17 Mar 2020 18:15:49 +0800 (CST)
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.221]) by
+ DGGEMM405-HUB.china.huawei.com ([10.3.20.213]) with mapi id 14.03.0439.000;
+ Tue, 17 Mar 2020 18:15:39 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Markus Armbruster <armbru@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [PATCH] qom-qmp-cmds: Fix another memory leak in qmp_object_add()
+Thread-Topic: [PATCH] qom-qmp-cmds: Fix another memory leak in qmp_object_add()
+Thread-Index: AQHV/D3In4NOl2cshU65ZirmzAslvahMjsHQ
+Date: Tue, 17 Mar 2020 10:15:39 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B69E58A@dggemm531-mbx.china.huawei.com>
+References: <20200317092241.31660-1-armbru@redhat.com>
+In-Reply-To: <20200317092241.31660-1-armbru@redhat.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.188
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,214 +72,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ Pannengyuan <pannengyuan@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Introduce the req_iu() helper which returns a pointer to
-the viosrp_iu union held in the vscsi_req structure.
-This simplifies the next patch.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20200305121253.19078-5-philmd@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/scsi/spapr_vscsi.c | 39 +++++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 16 deletions(-)
-
-diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
-index 3cb5a38181..70547f98ac 100644
---- a/hw/scsi/spapr_vscsi.c
-+++ b/hw/scsi/spapr_vscsi.c
-@@ -97,6 +97,11 @@ typedef struct {
-     vscsi_req reqs[VSCSI_REQ_LIMIT];
- } VSCSIState;
-=20
-+static union viosrp_iu *req_iu(vscsi_req *req)
-+{
-+    return &req->iu;
-+}
-+
- static struct vscsi_req *vscsi_get_req(VSCSIState *s)
- {
-     vscsi_req *req;
-@@ -121,7 +126,7 @@ static struct vscsi_req *vscsi_find_req(VSCSIState *s=
-, uint64_t srp_tag)
-=20
-     for (i =3D 0; i < VSCSI_REQ_LIMIT; i++) {
-         req =3D &s->reqs[i];
--        if (req->iu.srp.cmd.tag =3D=3D srp_tag) {
-+        if (req_iu(req)->srp.cmd.tag =3D=3D srp_tag) {
-             return req;
-         }
-     }
-@@ -188,7 +193,7 @@ static int vscsi_send_iu(VSCSIState *s, vscsi_req *re=
-q,
-     req->crq.s.reserved =3D 0x00;
-     req->crq.s.timeout =3D cpu_to_be16(0x0000);
-     req->crq.s.IU_length =3D cpu_to_be16(length);
--    req->crq.s.IU_data_ptr =3D req->iu.srp.rsp.tag; /* right byte order =
-*/
-+    req->crq.s.IU_data_ptr =3D req_iu(req)->srp.rsp.tag; /* right byte o=
-rder */
-=20
-     if (rc =3D=3D 0) {
-         req->crq.s.status =3D VIOSRP_OK;
-@@ -224,7 +229,7 @@ static void vscsi_makeup_sense(VSCSIState *s, vscsi_r=
-eq *req,
- static int vscsi_send_rsp(VSCSIState *s, vscsi_req *req,
-                           uint8_t status, int32_t res_in, int32_t res_ou=
-t)
- {
--    union viosrp_iu *iu =3D &req->iu;
-+    union viosrp_iu *iu =3D req_iu(req);
-     uint64_t tag =3D iu->srp.rsp.tag;
-     int total_len =3D sizeof(iu->srp.rsp);
-     uint8_t sol_not =3D iu->srp.cmd.sol_not;
-@@ -285,7 +290,7 @@ static int vscsi_fetch_desc(VSCSIState *s, struct vsc=
-si_req *req,
-                             unsigned n, unsigned buf_offset,
-                             struct srp_direct_buf *ret)
- {
--    struct srp_cmd *cmd =3D &req->iu.srp.cmd;
-+    struct srp_cmd *cmd =3D &req_iu(req)->srp.cmd;
-=20
-     switch (req->dma_fmt) {
-     case SRP_NO_DATA_DESC: {
-@@ -473,7 +478,7 @@ static int data_out_desc_size(struct srp_cmd *cmd)
-=20
- static int vscsi_preprocess_desc(vscsi_req *req)
- {
--    struct srp_cmd *cmd =3D &req->iu.srp.cmd;
-+    struct srp_cmd *cmd =3D &req_iu(req)->srp.cmd;
-=20
-     req->cdb_offset =3D cmd->add_cdb_len & ~3;
-=20
-@@ -655,7 +660,7 @@ static void *vscsi_load_request(QEMUFile *f, SCSIRequ=
-est *sreq)
-=20
- static void vscsi_process_login(VSCSIState *s, vscsi_req *req)
- {
--    union viosrp_iu *iu =3D &req->iu;
-+    union viosrp_iu *iu =3D req_iu(req);
-     struct srp_login_rsp *rsp =3D &iu->srp.login_rsp;
-     uint64_t tag =3D iu->srp.rsp.tag;
-=20
-@@ -681,7 +686,7 @@ static void vscsi_process_login(VSCSIState *s, vscsi_=
-req *req)
-=20
- static void vscsi_inquiry_no_target(VSCSIState *s, vscsi_req *req)
- {
--    uint8_t *cdb =3D req->iu.srp.cmd.cdb;
-+    uint8_t *cdb =3D req_iu(req)->srp.cmd.cdb;
-     uint8_t resp_data[36];
-     int rc, len, alen;
-=20
-@@ -770,7 +775,7 @@ static void vscsi_report_luns(VSCSIState *s, vscsi_re=
-q *req)
-=20
- static int vscsi_queue_cmd(VSCSIState *s, vscsi_req *req)
- {
--    union srp_iu *srp =3D &req->iu.srp;
-+    union srp_iu *srp =3D &req_iu(req)->srp;
-     SCSIDevice *sdev;
-     int n, lun;
-=20
-@@ -821,7 +826,7 @@ static int vscsi_queue_cmd(VSCSIState *s, vscsi_req *=
-req)
-=20
- static int vscsi_process_tsk_mgmt(VSCSIState *s, vscsi_req *req)
- {
--    union viosrp_iu *iu =3D &req->iu;
-+    union viosrp_iu *iu =3D req_iu(req);
-     vscsi_req *tmpreq;
-     int i, lun =3D 0, resp =3D SRP_TSK_MGMT_COMPLETE;
-     SCSIDevice *d;
-@@ -831,7 +836,8 @@ static int vscsi_process_tsk_mgmt(VSCSIState *s, vscs=
-i_req *req)
-     fprintf(stderr, "vscsi_process_tsk_mgmt %02x\n",
-             iu->srp.tsk_mgmt.tsk_mgmt_func);
-=20
--    d =3D vscsi_device_find(&s->bus, be64_to_cpu(req->iu.srp.tsk_mgmt.lu=
-n), &lun);
-+    d =3D vscsi_device_find(&s->bus,
-+                          be64_to_cpu(req_iu(req)->srp.tsk_mgmt.lun), &l=
-un);
-     if (!d) {
-         resp =3D SRP_TSK_MGMT_FIELDS_INVALID;
-     } else {
-@@ -842,7 +848,7 @@ static int vscsi_process_tsk_mgmt(VSCSIState *s, vscs=
-i_req *req)
-                 break;
-             }
-=20
--            tmpreq =3D vscsi_find_req(s, req->iu.srp.tsk_mgmt.task_tag);
-+            tmpreq =3D vscsi_find_req(s, req_iu(req)->srp.tsk_mgmt.task_=
-tag);
-             if (tmpreq && tmpreq->sreq) {
-                 assert(tmpreq->sreq->hba_private);
-                 scsi_req_cancel(tmpreq->sreq);
-@@ -867,7 +873,8 @@ static int vscsi_process_tsk_mgmt(VSCSIState *s, vscs=
-i_req *req)
-=20
-             for (i =3D 0; i < VSCSI_REQ_LIMIT; i++) {
-                 tmpreq =3D &s->reqs[i];
--                if (tmpreq->iu.srp.cmd.lun !=3D req->iu.srp.tsk_mgmt.lun=
-) {
-+                if (req_iu(tmpreq)->srp.cmd.lun
-+                        !=3D req_iu(req)->srp.tsk_mgmt.lun) {
-                     continue;
-                 }
-                 if (!tmpreq->active || !tmpreq->sreq) {
-@@ -911,7 +918,7 @@ static int vscsi_process_tsk_mgmt(VSCSIState *s, vscs=
-i_req *req)
-=20
- static int vscsi_handle_srp_req(VSCSIState *s, vscsi_req *req)
- {
--    union srp_iu *srp =3D &req->iu.srp;
-+    union srp_iu *srp =3D &req_iu(req)->srp;
-     int done =3D 1;
-     uint8_t opcode =3D srp->rsp.opcode;
-=20
-@@ -948,7 +955,7 @@ static int vscsi_send_adapter_info(VSCSIState *s, vsc=
-si_req *req)
-     struct mad_adapter_info_data info;
-     int rc;
-=20
--    sinfo =3D &req->iu.mad.adapter_info;
-+    sinfo =3D &req_iu(req)->mad.adapter_info;
-=20
- #if 0 /* What for ? */
-     rc =3D spapr_vio_dma_read(&s->vdev, be64_to_cpu(sinfo->buffer),
-@@ -984,7 +991,7 @@ static int vscsi_send_capabilities(VSCSIState *s, vsc=
-si_req *req)
-     uint64_t buffer;
-     int rc;
-=20
--    vcap =3D &req->iu.mad.capabilities;
-+    vcap =3D &req_iu(req)->mad.capabilities;
-     req_len =3D len =3D be16_to_cpu(vcap->common.length);
-     buffer =3D be64_to_cpu(vcap->buffer);
-     if (len > sizeof(cap)) {
-@@ -1029,7 +1036,7 @@ static int vscsi_send_capabilities(VSCSIState *s, v=
-scsi_req *req)
-=20
- static int vscsi_handle_mad_req(VSCSIState *s, vscsi_req *req)
- {
--    union mad_iu *mad =3D &req->iu.mad;
-+    union mad_iu *mad =3D &req_iu(req)->mad;
-     bool request_handled =3D false;
-     uint64_t retlen =3D 0;
-=20
---=20
-2.24.1
-
+Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogUWVtdS1kZXZlbCBbbWFpbHRvOnFl
+bXUtZGV2ZWwtDQo+Ym91bmNlcytrdWhuLmNoZW5xdW49aHVhd2VpLmNvbUBub25nbnUub3JnXSBP
+biBCZWhhbGYgT2YgTWFya3VzDQo+QXJtYnJ1c3Rlcg0KPlNlbnQ6IFR1ZXNkYXksIE1hcmNoIDE3
+LCAyMDIwIDU6MjMgUE0NCj5UbzogcWVtdS1kZXZlbEBub25nbnUub3JnDQo+Q2M6IEtldmluIFdv
+bGYgPGt3b2xmQHJlZGhhdC5jb20+OyBwYm9uemluaUByZWRoYXQuY29tOw0KPmJlcnJhbmdlQHJl
+ZGhhdC5jb207IGVoYWJrb3N0QHJlZGhhdC5jb20NCj5TdWJqZWN0OiBbUEFUQ0hdIHFvbS1xbXAt
+Y21kczogRml4IGFub3RoZXIgbWVtb3J5IGxlYWsgaW4NCj5xbXBfb2JqZWN0X2FkZCgpDQo+DQo+
+V2hlbiB1c2VyX2NyZWF0YWJsZV9hZGRfdHlwZSgpIGZhaWxzLCBxbXBfb2JqZWN0X2FkZCgpIHJl
+dHVybnMgYm90aCBpdHMNCj5lcnJvciBhbmQgdGhlIHVzdWFsIGVtcHR5IFFEaWN0IHN1Y2Nlc3Mg
+dmFsdWUuICBUaGUgUU1QIGNvcmUgaGFuZGxlcyB0aGUNCj5lcnJvciwgYW5kIGlnbm9yZXMgdGhl
+IHN1Y2Nlc3MgdmFsdWUsIGxlYWtpbmcgaXQuICBFeHBvc2VkIGJ5IHFtcC1jbWQtdGVzdA0KPmNh
+c2UgL3g4Nl82NC9xbXAvb2JqZWN0LWFkZC13aXRob3V0LXByb3BzLCBhbmQgZHVseSByZXBvcnRl
+ZCBib3RoIGJ5DQo+QVNhbiBhbmQgdmFsZ3JpbmQuDQo+DQo+VG8gcGx1ZyB0aGUgbGVhaywgc2V0
+IHRoZSBzdWNjZXNzIHZhbHVlIG9ubHkgb24gc3VjY2Vzcy4NCj4NCj5GaXhlczogNWYwN2M0ZDYw
+ZDA5MTMyMDE4NmU3YjBlZGFmOWVkMmNjMTZiMmQxZQ0KPkNjOiBLZXZpbiBXb2xmIDxrd29sZkBy
+ZWRoYXQuY29tPg0KPlNpZ25lZC1vZmYtYnk6IE1hcmt1cyBBcm1icnVzdGVyIDxhcm1icnVAcmVk
+aGF0LmNvbT4NCj4tLS0NCkhpLCAgTWFya3VzDQoNCiAgICAgICAgTG9va3MgbGlrZSB0aGUgc2Ft
+ZSBwYXRjaCB0aGF0IGhhcyBiZWVuIHJlcG9ydGVkIGFscmVhZHkgaGVyZToNCmh0dHBzOi8vbGlz
+dHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDIwLTAzL21zZzAzOTI4Lmh0bWwN
+Cg0KTWF5YmUgd2Ugc2hvdWxkIGluaXRpYWxpemUgcmV0X2RhdGEgaW4geGVuLWJsb2NrIHRvIGF2
+b2lkIGEgcG9zc2libGUgdW5pbml0aWFsaXplZCBlcnJvciDvvJ8NCg0KVGhhbmtzLg0KPiBxb20v
+cW9tLXFtcC1jbWRzLmMgfCAyICstDQo+IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwg
+MSBkZWxldGlvbigtKQ0KPg0KPmRpZmYgLS1naXQgYS9xb20vcW9tLXFtcC1jbWRzLmMgYi9xb20v
+cW9tLXFtcC1jbWRzLmMgaW5kZXgNCj40MzUxOTNiMDM2Li42YmQxMzdjY2JmIDEwMDY0NA0KPi0t
+LSBhL3FvbS9xb20tcW1wLWNtZHMuYw0KPisrKyBiL3FvbS9xb20tcW1wLWNtZHMuYw0KPkBAIC0y
+ODcsOCArMjg3LDggQEAgdm9pZCBxbXBfb2JqZWN0X2FkZChRRGljdCAqcWRpY3QsIFFPYmplY3QN
+Cj4qKnJldF9kYXRhLCBFcnJvciAqKmVycnApDQo+ICAgICB2aXNpdF9mcmVlKHYpOw0KPiAgICAg
+aWYgKG9iaikgew0KPiAgICAgICAgIG9iamVjdF91bnJlZihvYmopOw0KPisgICAgICAgICpyZXRf
+ZGF0YSA9IFFPQkpFQ1QocWRpY3RfbmV3KCkpOw0KPiAgICAgfQ0KPi0gICAgKnJldF9kYXRhID0g
+UU9CSkVDVChxZGljdF9uZXcoKSk7DQo+IH0NCj4NCj4gdm9pZCBxbXBfb2JqZWN0X2RlbChjb25z
+dCBjaGFyICppZCwgRXJyb3IgKiplcnJwKQ0KPi0tDQo+Mi4yMS4xDQo+DQoNCg==
 
