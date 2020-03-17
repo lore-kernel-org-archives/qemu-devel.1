@@ -2,68 +2,69 @@ Return-Path: <SRS0=hQJD=5C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3F7C10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EFBC10F29
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF4C020663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4C020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1E98920663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:55:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E98920663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEZ3-0003hu-UH
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52369)
+	id 1jEEZD-00040z-6m
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1jEEI1-0008IP-3F
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:58 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jEEVC-0004d6-OH
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1jEEHy-0003iy-Nj
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:56 -0400
-Resent-Date: Tue, 17 Mar 2020 11:37:56 -0400
-Resent-Message-Id: <E1jEEHy-0003iy-Nj@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21126)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1jEEHy-0003XG-DQ
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:37:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1584459463; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=H8pvayZtcNXHYib+FOP/efLy19Tn7pzYrBcFKeFTC/zxRI1hmpkzzI25yoxZkfPEGG68Eetj8B3L+ogGWVNwraNX4QaTQfWCKoyxFWrQy7Mc6PlsKlMtSlcwf6wzT+5VJwjyGPbQH0+mmNEN1rixds07NVxS3SeSQftl4c7zT+4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1584459463;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=RM/Jku03U9xlfFrW+LwnSKWJkvAU/zukYxKapQTk/cE=; 
- b=ElutwA1EbrBPfauJhkZuf6HMDhccB+3zUaeAGqG7HnWN/SOe5VB1+O6FaZ1136uyqcdiK2rx/am65AQOr3JUWZV3NAcx3qaIvVEG/66lFGcUYEF++G7vl1mGM8AuBum0iYM/eVrgue1idsxQdAHl+lBZNIcquaF163je8WF0uDw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 158445946088653.02815593272385;
- Tue, 17 Mar 2020 08:37:40 -0700 (PDT)
-In-Reply-To: <20200317135803.2682384-1-marcandre.lureau@redhat.com>
-Subject: Re: [PATCH] slirp: update submodule to v4.2.0
-Message-ID: <158445945964.25100.11060721921655386960@39012742ff91>
+ (envelope-from <laurent@vivier.eu>) id 1jEEVB-00072G-AI
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:34 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:42227)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEVB-0006x1-0y
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:33 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1N3sZy-1jMn5Y1qXQ-00zkvc; Tue, 17 Mar 2020 16:51:24 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 02/37] linux-user/i386: Split out gen_signal
+Date: Tue, 17 Mar 2020 16:50:41 +0100
+Message-Id: <20200317155116.1227513-3-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200317155116.1227513-1-laurent@vivier.eu>
+References: <20200317155116.1227513-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: marcandre.lureau@redhat.com
-Date: Tue, 17 Mar 2020 08:37:40 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:yl9iV5z5k4ilKegLV/oxiSfHKw4x+y1m3eUvIFi6YySUnmMJlzq
+ 6EK+P0XKhoDu95lX0GqdLWYuGkALFDHbtGxyZ47dsNy5GdGK9v3FrWm5hoZy7475Uibg1RD
+ gqTlFIhB/6HSSaYPbB8eAYHo3S5FNlAMVBkbfHMCqa3xbazE9LRqgP8tgg42+qQfrr9nSUj
+ +y3hymR5CE++DJ8gnSkXg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GB7Mwgs9lI4=:Z1OElvx9QlWZUBspJ8YXeP
+ CZ0RxQyiJLWAANPJgVStjVNjsYCurIkiCbNLssdFBNlFVVHSFTJuqj3j/Qg5XqNL+vXk2a9cm
+ XOLZNaztAGtxQmzwE6Ca1cIFcK+sP04puFZkLSDVetrlqgfDFY5Bq5Gpz1G0IXX6k603DYGJS
+ hl9DMX/7JeeyvjLsanADkdVP4Ge271UgK60mw18JvZaLUqQTVZi4jKBifIKuwWPzygioPMlG0
+ MgqVvMdWAiSSdwzBjPmU+zg/M84rEAQyuit9xWHDe1oJJhc1OC3BnZ/pFh43btIyAKmuIZs7B
+ hoSKV5vGarRIVc0yaIxKSK18kRSn0oSNPF5wSTHC2KlSCbEN5qXtwHJlBuULRWOOEHLt2z2pW
+ Wa8J/1egTGaTMd8DS54wxPFL4OX1YSjVJfpZPGNXRMi2pXlNzpwiOe8puean0NCyVwerLtDNs
+ cy9ObWPTUZOTe8KgbMp8pq9FTOZi/67dKHw/bo2LxV8Z5YJaadSda6XGYnMsh47CCHoTW2SNQ
+ SiH8yGRb8kXVitOL7kE7amncT2CGFftBnuKttGWyZTP0/Z2P74Wz60Hd0BcNSzVWGkKQ1R9dd
+ RSKbih+HaO0Q2DaKQl/MU4A9BRMLNj1yBC0L3C2BtVJTs5pMtXBJ9DM3L0dZlQyYXNkvWEwoc
+ 4+0rAhov888IcZzUw41HtimXVRj7ttJTqiJR5EpdWOlK/AptmLKccQHSQpqi+qMnPBfgG/pHm
+ rvdsmP/0INRDpy4r20xVgnwokSg+CxQPhBuY3yoKoxF847Tt/r8LzMQ/QhUGd4GgINF1VV2mJ
+ K1jPNXbjFQ6MhUySMpFGZsE6VE7P8yvErNGCHvqbCJOLnD7IKD+SeigXcHyuUciIhvUBdsH
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,60 +76,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
- samuel.thibault@ens-lyon.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMxNzEzNTgwMy4yNjgy
-Mzg0LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZh
-aWxlZCB0aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
-dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
-ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1h
-a2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1taW5nd0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAg
-R0VOICAgICBody9pMzg2L3hlbi90cmFjZS5oCiAgQ0MgICAgICAvdG1wL3FlbXUtdGVzdC9idWls
-ZC9zbGlycC9zcmMvdXRpbC5vCi90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zcmMvc29ja2V0LmM6
-IEluIGZ1bmN0aW9uICdzb3RyYW5zbGF0ZV9vdXQ2JzoKL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJw
-L3NyYy9zb2NrZXQuYzo4NDM6NDc6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDIgb2YgJ2dldF9k
-bnM2X2FkZHInIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBh
-dGlibGUtcG9pbnRlci10eXBlc10KICAgICAgICAgcmV0dXJuIGdldF9kbnM2X2FkZHIoJnNpbi0+
-c2luNl9hZGRyLCAmc2luLT5zaW42X3Njb3BlX2lkKSA+PSAwOwogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC9zcmMvc29ja2V0LmM6NjoKLS0t
-CiBpbnQgZ2V0X2RuczZfYWRkcihzdHJ1Y3QgaW42X2FkZHIgKnBkbnM2X2FkZHIsIHVpbnQzMl90
-ICpzY29wZV9pZCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIH5+fn5+fn5+fn5efn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
-IGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjQ0OiAvdG1wL3FlbXUtdGVzdC9idWlsZC9z
-bGlycC9zcmMvc29ja2V0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmlu
-aXNoZWQgam9icy4uLi4KICBHRU4gICAgIGh3L2lkZS90cmFjZS5oCiAgR0VOICAgICBody9pbnB1
-dC90cmFjZS5oCi0tLQogICAgICAgICBERVAgZHRjLWxleGVyLmxleC5jCiAgICAgICAgQ0hLIHZl
-cnNpb25fZ2VuLmgKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgJy90bXAvcWVtdS10ZXN0L3Ny
-Yy9zbGlycCcKbWFrZTogKioqIFtNYWtlZmlsZTo1NTg6IHNsaXJwL2FsbF0gRXJyb3IgMgptYWtl
-OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogICAgICAgIFVQRCB2ZXJzaW9u
-X2dlbi5oCiAgICAgICAgIERFUCAvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL3V0aWwuYwotLS0KICAg
-IHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVk
-UHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICct
-LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZjIwYWFiODVhZGFmNDE2NTg1MGY4Njhi
-Mjc5NWRiZWYnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
-ZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
-VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
-JywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdics
-ICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hl
-OnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWRnZzlpamlzL3NyYy9kb2Nr
-ZXItc3JjLjIwMjAtMDMtMTctMTEuMzYuMTIuMjI1MzQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3Fl
-bXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQg
-bm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmlu
-c3RhbmNlLnV1aWQ9ZjIwYWFiODVhZGFmNDE2NTg1MGY4NjhiMjc5NWRiZWYKbWFrZVsxXTogKioq
-IFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3Rt
-cC9wYXRjaGV3LXRlc3Rlci10bXAtZGdnOWlqaXMvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4t
-dGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgMW0yNy44MTFzCnVzZXIgICAgMG04
-LjA2OHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMjAwMzE3MTM1ODAzLjI2ODIzODQtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20v
-dGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+From: Richard Henderson <richard.henderson@linaro.org>
+
+This is a bit tidier than open-coding the 5 lines necessary
+to initialize the target_siginfo_t.  In addition, this zeros
+the remaining bytes of the target_siginfo_t, rather than
+passing in garbage.
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200213032223.14643-3-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/i386/cpu_loop.c | 93 ++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 60 deletions(-)
+
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+index 024b6f4d588c..e217cca5ee1e 100644
+--- a/linux-user/i386/cpu_loop.c
++++ b/linux-user/i386/cpu_loop.c
+@@ -81,13 +81,23 @@ static void set_idt(int n, unsigned int dpl)
+ }
+ #endif
+ 
++static void gen_signal(CPUX86State *env, int sig, int code, abi_ptr addr)
++{
++    target_siginfo_t info = {
++        .si_signo = sig,
++        .si_code = code,
++        ._sifields._sigfault._addr = addr
++    };
++
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
+ void cpu_loop(CPUX86State *env)
+ {
+     CPUState *cs = env_cpu(env);
+     int trapnr;
+     abi_ulong pc;
+     abi_ulong ret;
+-    target_siginfo_t info;
+ 
+     for(;;) {
+         cpu_exec_start(cs);
+@@ -134,70 +144,45 @@ void cpu_loop(CPUX86State *env)
+ #endif
+         case EXCP0B_NOSEG:
+         case EXCP0C_STACK:
+-            info.si_signo = TARGET_SIGBUS;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_SI_KERNEL;
+-            info._sifields._sigfault._addr = 0;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGBUS, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0D_GPF:
+             /* XXX: potential problem if ABI32 */
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_fault(env);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP0E_PAGE:
+-            info.si_signo = TARGET_SIGSEGV;
+-            info.si_errno = 0;
+-            if (!(env->error_code & 1))
+-                info.si_code = TARGET_SEGV_MAPERR;
+-            else
+-                info.si_code = TARGET_SEGV_ACCERR;
+-            info._sifields._sigfault._addr = env->cr[2];
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGSEGV,
++                       (env->error_code & 1 ?
++                        TARGET_SEGV_ACCERR : TARGET_SEGV_MAPERR),
++                       env->cr[2]);
+             break;
+         case EXCP00_DIVZ:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                /* division by zero */
+-                info.si_signo = TARGET_SIGFPE;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_FPE_INTDIV;
+-                info._sifields._sigfault._addr = env->eip;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGFPE, TARGET_FPE_INTDIV, env->eip);
+             break;
+         case EXCP01_DB:
+         case EXCP03_INT3:
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
++                break;
++            }
+ #endif
+-            {
+-                info.si_signo = TARGET_SIGTRAP;
+-                info.si_errno = 0;
+-                if (trapnr == EXCP01_DB) {
+-                    info.si_code = TARGET_TRAP_BRKPT;
+-                    info._sifields._sigfault._addr = env->eip;
+-                } else {
+-                    info.si_code = TARGET_SI_KERNEL;
+-                    info._sifields._sigfault._addr = 0;
+-                }
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            if (trapnr == EXCP01_DB) {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, env->eip);
++            } else {
++                gen_signal(env, TARGET_SIGTRAP, TARGET_SI_KERNEL, 0);
+             }
+             break;
+         case EXCP04_INTO:
+@@ -205,31 +190,19 @@ void cpu_loop(CPUX86State *env)
+ #ifndef TARGET_X86_64
+             if (env->eflags & VM_MASK) {
+                 handle_vm86_trap(env, trapnr);
+-            } else
+-#endif
+-            {
+-                info.si_signo = TARGET_SIGSEGV;
+-                info.si_errno = 0;
+-                info.si_code = TARGET_SI_KERNEL;
+-                info._sifields._sigfault._addr = 0;
+-                queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++                break;
+             }
++#endif
++            gen_signal(env, TARGET_SIGSEGV, TARGET_SI_KERNEL, 0);
+             break;
+         case EXCP06_ILLOP:
+-            info.si_signo = TARGET_SIGILL;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_ILL_ILLOPN;
+-            info._sifields._sigfault._addr = env->eip;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGILL, TARGET_ILL_ILLOPN, env->eip);
+             break;
+         case EXCP_INTERRUPT:
+             /* just indicate that signals should be handled asap */
+             break;
+         case EXCP_DEBUG:
+-            info.si_signo = TARGET_SIGTRAP;
+-            info.si_errno = 0;
+-            info.si_code = TARGET_TRAP_BRKPT;
+-            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            gen_signal(env, TARGET_SIGTRAP, TARGET_TRAP_BRKPT, 0);
+             break;
+         case EXCP_ATOMIC:
+             cpu_exec_step_atomic(cs);
+-- 
+2.24.1
+
 
