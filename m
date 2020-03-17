@@ -4,56 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7EEC10F29
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C917DC18E5B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629DC20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629DC20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E5F620714
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Mar 2020 15:57:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E5F620714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jEEab-0007fg-GV
-	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:57:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60252)
+	id 1jEEah-0007mk-Qk
+	for qemu-devel@archiver.kernel.org; Tue, 17 Mar 2020 11:57:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEEPQ-0002Cn-8W
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:45:39 -0400
+ (envelope-from <laurent@vivier.eu>) id 1jEEVK-0004mJ-Db
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1jEEPL-0008UH-I8
- for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:45:34 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:45731)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jEEPF-0008HF-Jc; Tue, 17 Mar 2020 11:45:29 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08562487|-1; CH=green; DM=||false|;
- DS=CONTINUE|ham_system_inform|0.0508488-0.00050273-0.948649;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=10; RT=10; SR=0; TI=SMTPD_---.H1-Aq38_1584459917; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.H1-Aq38_1584459917)
- by smtp.aliyun-inc.com(10.147.42.197);
- Tue, 17 Mar 2020 23:45:18 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v6 19/61] target/riscv: vector integer divide instructions
-Date: Tue, 17 Mar 2020 23:06:11 +0800
-Message-Id: <20200317150653.9008-20-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
-References: <20200317150653.9008-1-zhiwei_liu@c-sky.com>
+ (envelope-from <laurent@vivier.eu>) id 1jEEVJ-0007EH-5R
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:42 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:51517)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1jEEVI-00079M-P1
+ for qemu-devel@nongnu.org; Tue, 17 Mar 2020 11:51:40 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1M7JvO-1jD82u2zDI-007oNM; Tue, 17 Mar 2020 16:51:29 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 06/37] linux-user: Add AT_EXECFN auxval
+Date: Tue, 17 Mar 2020 16:50:45 +0100
+Message-Id: <20200317155116.1227513-7-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200317155116.1227513-1-laurent@vivier.eu>
+References: <20200317155116.1227513-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-Provags-ID: V03:K1:7Kilwg1l9IsgK+FEbdtGTS5sPxpECCuDHv241Zo5PdMdH0c6SVV
+ ds3rUZkaSrsPN6v9UWoMHdP4BjrEp/NzCAgrCIdyYL/pkzWDAhaA8UR1bh7sTK4T6BMEXuA
+ gdWPBMdqJzzmjIQ4APT68jYbLS/TrQ+kBB4arorUQsgw0LP5I73lmfL1qdK5AplPSbLB/cO
+ A+JgmFuBDsEC9JxFfwKOw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Halbe73P018=:CJ8Joq4htcm+TGKBLRkac5
+ uFOTO6wmPc/ZkV47UY2aSR6PhlqA0s5WpTsQL2F+vMBYu5aSTRwbsnhZRAhoVnIE6iK8cTrl1
+ kUGfr0bWwjbxUpvu50knPJfF6XEHCTSiUWKzw0XVVBI2uicOcQ0ZNx5NQQCUJIkbSzbeNOzQA
+ XTSG8+fnhotrTzI+H+C59lmXzT1Y/AO58kFgifgtDfB1qSroGHYgkPfQwH4QLUvR0Z9nBHqMW
+ 1lWvxwiDFhW6lS/YsOJchE8zq8251YUq4/JnKywsvr3iQkvBF1FwLq2Rb2Rw3aHcJMtFKLlUM
+ wmkrhgPrjbnu81Uj8Qam7vSjkkhSoOny2ttClLgq0labqgrEOnQUrT4JNF6Ocbouvj7uJ9XOd
+ 6jYIReh5RxlA56gZKkUNfhjk7AIugMvl9+lSAmZBEkQwRbTjeBEGqTqSWGSpnL670qgnYFnpz
+ bOmTDxkHt5BQ4ofMiTLYrJHc9U+n9VJYpzXMSUp50hV2ILQb582dielkcg4CghQ3M4Y9lnzFF
+ PHAVWJRKiLzgqwwHvyqxQn1a8GMc1fuAYHFSFWMU6mDv9grFDDynyCY9+w9r8r2Pm9Zw6dYUb
+ 7c0V97SUa6UreE0UdY9blksvmWOhmVOQ8oUMvhW0UBZCAca+JQ1JDGkfg5BoGRMA1qCnMTahc
+ gQhcKDYjY6Ipl3SkMJw1EuIqDXPNRc1Coj0BxckHbaZOGifimlp/kOgkORn5+zYKgoib7R+1I
+ 7phjRR50WMjAwJ+Kk2IzEDlObUTeq5nX+i/6zL2zsXMBWBCqqMA5xeYKLucKoXLuYDe2/mqpq
+ kmXdVAVzxQcpGvAJL1C1taF61FS87pkmz7cVpF07dN/q8oTNlcDySuetnQTGySOPslexv0b
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,183 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: guoren@linux.alibaba.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, wenmeng_zhang@c-sky.com,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Lirong Yuan <yuanzi@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   | 33 +++++++++++
- target/riscv/insn32.decode              |  8 +++
- target/riscv/insn_trans/trans_rvv.inc.c | 10 ++++
- target/riscv/vector_helper.c            | 74 +++++++++++++++++++++++++
- 4 files changed, 125 insertions(+)
+From: Lirong Yuan <yuanzi@google.com>
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index f42a12eef3..357f149198 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -558,3 +558,36 @@ DEF_HELPER_6(vmulhsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vmulhsu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+
-+DEF_HELPER_6(vdivu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vremu_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vrem_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdivu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vdiv_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vremu_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vrem_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index abfed469bc..7fb8f8fad8 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -371,6 +371,14 @@ vmulhu_vv       100100 . ..... ..... 010 ..... 1010111 @r_vm
- vmulhu_vx       100100 . ..... ..... 110 ..... 1010111 @r_vm
- vmulhsu_vv      100110 . ..... ..... 010 ..... 1010111 @r_vm
- vmulhsu_vx      100110 . ..... ..... 110 ..... 1010111 @r_vm
-+vdivu_vv        100000 . ..... ..... 010 ..... 1010111 @r_vm
-+vdivu_vx        100000 . ..... ..... 110 ..... 1010111 @r_vm
-+vdiv_vv         100001 . ..... ..... 010 ..... 1010111 @r_vm
-+vdiv_vx         100001 . ..... ..... 110 ..... 1010111 @r_vm
-+vremu_vv        100010 . ..... ..... 010 ..... 1010111 @r_vm
-+vremu_vx        100010 . ..... ..... 110 ..... 1010111 @r_vm
-+vrem_vv         100011 . ..... ..... 010 ..... 1010111 @r_vm
-+vrem_vx         100011 . ..... ..... 110 ..... 1010111 @r_vm
+This change adds the support for AT_EXECFN auxval.
+
+Signed-off-by: Lirong Yuan <yuanzi@google.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200302193153.66415-1-yuanzi@google.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/elfload.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index db748c58775f..8198be044604 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1573,7 +1573,7 @@ struct exec
+                                  ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+ #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
  
- vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
- vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index c276beabd6..ed53eaaef5 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1462,3 +1462,13 @@ GEN_OPIVX_GVEC_TRANS(vmul_vx,  muls)
- GEN_OPIVX_TRANS(vmulh_vx, opivx_check)
- GEN_OPIVX_TRANS(vmulhu_vx, opivx_check)
- GEN_OPIVX_TRANS(vmulhsu_vx, opivx_check)
-+
-+/* Vector Integer Divide Instructions */
-+GEN_OPIVV_TRANS(vdivu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vdiv_vv, opivv_check)
-+GEN_OPIVV_TRANS(vremu_vv, opivv_check)
-+GEN_OPIVV_TRANS(vrem_vv, opivv_check)
-+GEN_OPIVX_TRANS(vdivu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vdiv_vx, opivx_check)
-+GEN_OPIVX_TRANS(vremu_vx, opivx_check)
-+GEN_OPIVX_TRANS(vrem_vx, opivx_check)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 56ba9a7422..4fc7a08954 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1741,3 +1741,77 @@ GEN_VEXT_VX(vmulhsu_vx_b, 1, 1, clearb)
- GEN_VEXT_VX(vmulhsu_vx_h, 2, 2, clearh)
- GEN_VEXT_VX(vmulhsu_vx_w, 4, 4, clearl)
- GEN_VEXT_VX(vmulhsu_vx_d, 8, 8, clearq)
-+
-+/* Vector Integer Divide Instructions */
-+#define DO_DIVU(N, M) (unlikely(M == 0) ? (__typeof(N))(-1) : N / M)
-+#define DO_REMU(N, M) (unlikely(M == 0) ? N : N % M)
-+#define DO_DIV(N, M)  (unlikely(M == 0) ? (__typeof(N))(-1) :\
-+        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? N : N / M)
-+#define DO_REM(N, M)  (unlikely(M == 0) ? N :\
-+        unlikely((N == -N) && (M == (__typeof(N))(-1))) ? 0 : N % M)
-+
-+RVVCALL(OPIVV2, vdivu_vv_b, OP_UUU_B, H1, H1, H1, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_h, OP_UUU_H, H2, H2, H2, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_w, OP_UUU_W, H4, H4, H4, DO_DIVU)
-+RVVCALL(OPIVV2, vdivu_vv_d, OP_UUU_D, H8, H8, H8, DO_DIVU)
-+RVVCALL(OPIVV2, vdiv_vv_b, OP_SSS_B, H1, H1, H1, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_h, OP_SSS_H, H2, H2, H2, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_w, OP_SSS_W, H4, H4, H4, DO_DIV)
-+RVVCALL(OPIVV2, vdiv_vv_d, OP_SSS_D, H8, H8, H8, DO_DIV)
-+RVVCALL(OPIVV2, vremu_vv_b, OP_UUU_B, H1, H1, H1, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_h, OP_UUU_H, H2, H2, H2, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_w, OP_UUU_W, H4, H4, H4, DO_REMU)
-+RVVCALL(OPIVV2, vremu_vv_d, OP_UUU_D, H8, H8, H8, DO_REMU)
-+RVVCALL(OPIVV2, vrem_vv_b, OP_SSS_B, H1, H1, H1, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_h, OP_SSS_H, H2, H2, H2, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_w, OP_SSS_W, H4, H4, H4, DO_REM)
-+RVVCALL(OPIVV2, vrem_vv_d, OP_SSS_D, H8, H8, H8, DO_REM)
-+GEN_VEXT_VV(vdivu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vdivu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vdivu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vdivu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vdiv_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vdiv_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vdiv_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vdiv_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vremu_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vremu_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vremu_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vremu_vv_d, 8, 8, clearq)
-+GEN_VEXT_VV(vrem_vv_b, 1, 1, clearb)
-+GEN_VEXT_VV(vrem_vv_h, 2, 2, clearh)
-+GEN_VEXT_VV(vrem_vv_w, 4, 4, clearl)
-+GEN_VEXT_VV(vrem_vv_d, 8, 8, clearq)
-+
-+RVVCALL(OPIVX2, vdivu_vx_b, OP_UUU_B, H1, H1, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_h, OP_UUU_H, H2, H2, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_w, OP_UUU_W, H4, H4, DO_DIVU)
-+RVVCALL(OPIVX2, vdivu_vx_d, OP_UUU_D, H8, H8, DO_DIVU)
-+RVVCALL(OPIVX2, vdiv_vx_b, OP_SSS_B, H1, H1, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_h, OP_SSS_H, H2, H2, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_w, OP_SSS_W, H4, H4, DO_DIV)
-+RVVCALL(OPIVX2, vdiv_vx_d, OP_SSS_D, H8, H8, DO_DIV)
-+RVVCALL(OPIVX2, vremu_vx_b, OP_UUU_B, H1, H1, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_h, OP_UUU_H, H2, H2, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_w, OP_UUU_W, H4, H4, DO_REMU)
-+RVVCALL(OPIVX2, vremu_vx_d, OP_UUU_D, H8, H8, DO_REMU)
-+RVVCALL(OPIVX2, vrem_vx_b, OP_SSS_B, H1, H1, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_h, OP_SSS_H, H2, H2, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_w, OP_SSS_W, H4, H4, DO_REM)
-+RVVCALL(OPIVX2, vrem_vx_d, OP_SSS_D, H8, H8, DO_REM)
-+GEN_VEXT_VX(vdivu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vdivu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vdivu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vdivu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vdiv_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vdiv_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vdiv_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vdiv_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vremu_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vremu_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vremu_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vremu_vx_d, 8, 8, clearq)
-+GEN_VEXT_VX(vrem_vx_b, 1, 1, clearb)
-+GEN_VEXT_VX(vrem_vx_h, 2, 2, clearh)
-+GEN_VEXT_VX(vrem_vx_w, 4, 4, clearl)
-+GEN_VEXT_VX(vrem_vx_d, 8, 8, clearq)
+-#define DLINFO_ITEMS 15
++#define DLINFO_ITEMS 16
+ 
+ static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
+ {
+@@ -2037,6 +2037,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+     NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+     NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
++    NEW_AUX_ENT(AT_EXECFN, info->file_string);
+ 
+ #ifdef ELF_HWCAP2
+     NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
 -- 
-2.23.0
+2.24.1
 
 
